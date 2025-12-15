@@ -1,0 +1,44 @@
+<div class="grid lg:grid-cols-2">
+  <section class="relative p-10 overflow-hidden flex items-end">
+
+    <div class=" absolute w-full h-full left-0 top-0 z-1">
+      <img class="absolute w-full h-full object-cover left-0 top-0  -z-1"
+        src="/images/modern-abstract-design-background-polygonal-shapes_1302-5293.png" alt="">
+        <span class="absolute w-full h-full bg-linear-to-tr from-30% from-transparent to-95% to-main-bg left-0 top-0 -z-1"></span>
+        <span class="absolute w-full h-full bg-linear-to-br from-30% from-transparent to-95% to-main-bg left-0 top-0 -z-1"></span>
+        <span class="absolute w-full h-full bg-linear-to-bl from-30% from-transparent to-95% to-main-bg left-0 top-0 -z-1"></span>
+        <span class="absolute w-full h-full bg-linear-to-tl from-30% from-transparent to-95% to-main-bg left-0 top-0 -z-1"></span>
+    </div>
+    <div class="relative z-2 flex flex-col gap-4 max-w-[400px]">
+      <div class="flex items-center gap-2">
+        <div class="bg-app-blue px-1 rounded aspect-square">
+          <i class="pi pi-shop text-2xl!"></i>
+        </div>
+        <h3 class="text-lg! font-semibold">E-Commerce Dashboard</h3>
+      </div>
+      <h2 class="text-3xl font-bold">Manage Your Business with Ease</h2>
+      <p class="text-gray-400 ">Take full control of your e-commerce operations from one centralized dashboard.</p>
+    </div>
+  </section>
+  <section class="flex flex-col gap-4 p-10">
+    <h1 class="text-4xl font-bold">Admin Login</h1>
+    <p class="text-gray-400 mb-4">welcome back,please enter your details.</p>
+    <form class="flex flex-col gap-4" [formGroup]="fg" (ngSubmit)="onSubmit()">
+      <app-input-error-message-handler class="flex flex-col gap-2">
+        <label for="email">Email Address</label>
+        <input pInputText formControlName="email" type="email" id="email" placeholder="Enter your email" />
+      </app-input-error-message-handler>
+      <app-input-error-message-handler class="flex flex-col gap-2">
+        <label for="password">Password</label>
+        <input pInputText formControlName="password" type="password" id="password" placeholder="Enter your password" />
+      </app-input-error-message-handler>
+      <div class="flex  items-center gap-2">
+        <input type="checkbox" id="remember" />
+        <label for="remember">Remember me</label>
+        <a href="" class="text-app-blue ml-auto text-sm">Forgot Password?</a>
+      </div>
+      <button  type="submit" class="w-full cursor-pointer bg-app-blue rounded py-2.5 mt-4 text-white">Login</button>
+    </form>
+    <p   class="text-gray-400 text-sm mx-auto" >Need support? <a href="" class="text-app-blue ">Contact us</a></p>
+  </section>
+</div>

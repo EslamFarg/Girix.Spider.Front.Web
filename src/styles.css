@@ -1,3 +1,34 @@
 /* You can add global styles to this file, and also import other style files */
 
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'primeicons/primeicons.css';
+@import './app/styles/fonts.css';
+
+@theme {
+  --color-main-bg: #111921;
+  --color-secondary-bg: #192633;
+  --color-app-blue: #137fec;
+  /* base */
+  --color-dark-line: #393c49;
+  /* bg */
+  --color-light-bg: #fff2e8;
+  --color-dark-bg-2: #1f1d2b;
+  --color-form-bg: #2d303e;
+  /* text */
+  --color-text-gray: #889898;
+  --color-text-light: #d3dce6;
+  --color-text-lighter: #e0e6e9;
+}
+
+:root {
+  --p-paginator-background: transparent !important;
+}
+@custom-variant dark (&:where(.dark-mode, .dark-mode *));
+
+body {
+  font-family: 'Cairo', sans-serif !important;
+}
+.container {
+  margin: 0 auto;
+  max-width: 1800px !important;
+}

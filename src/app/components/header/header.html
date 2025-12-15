@@ -1,0 +1,68 @@
+<header>
+  <div class="bg-dark-bg-2">
+    <div class="px-4 py-3 grid grid-cols-3 container mx-auto">
+      <div class="flex items-center gap-3">
+        <div class="text-text-gray px-3 py-1.5 bg-white font-medium text-xl rounded leading-none">LOGO</div>
+        <div>أبناء المحله</div>
+      </div>
+
+      <div class="flex items-center justify-center">20 يناير 2026 / 03:56:22 ص</div>
+
+      <div class="flex items-center gap-2 text-light-bg ms-auto">
+        <img class="w-8 h-8 rounded-full object-cover" src="" appImgFallback alt="" />
+        <p class="font-bold text-xs">يوسف نبيل</p>
+        <i class="pi pi-angle-down"></i>
+      </div>
+    </div>
+  </div>
+  <nav class="bg-text-lighter">
+    <div class="container flex items-center px-4 py-1 w-full overflow-x-auto">
+      @for (parent of navItems; track $index) {
+      <!-- parent -->
+      <button
+        class="nav-item z-20 h-full opacity-0 hidden duration-500 ease-in-out translate-x-[100vw] transition-all flex-col gap-2 items-center justify-center py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-20"
+        [class.nav-item-active]="parent.routerLink === activeLink"
+        [class.ms-0!]="$first"
+        [class.nav-item-visible]="
+          activeLink == '/home' || isChildActive(parent.routerLink) || parent.routerLink === activeLink
+        "
+        (click)="toggleActiveLink(parent.routerLink)"
+      >
+        <img appImgFallback class="w-12 h-12 object-cover" [src]="parent.iconUrl" alt="" />
+        <span class="text-dark-bg-2 font-bold text-sm w-max max-w-50 text-center">{{ parent.label }}</span>
+      </button>
+      <!-- children -->
+      @if ( parent.children) { @if (parent.routerLink === activeLink || isParentActive(parent.routerLink)) {
+      <svg class="ms-3" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          opacity="0.4"
+          d="M21.0634 17.5871L25.9957 18.0233C27.1026 18.0233 28 17.1171 28 15.9994C28 14.8818 27.1026 13.9756 25.9957 13.9756L21.0634 14.4118C20.195 14.4118 19.491 15.1226 19.491 15.9994C19.491 16.8777 20.195 17.5871 21.0634 17.5871Z"
+          fill="black"
+        />
+        <path
+          d="M4.50175 17.5069C4.57884 17.5847 4.86684 17.9137 5.13738 18.1869C6.71555 19.8979 10.8362 22.6958 12.9918 23.552C13.3191 23.6886 14.1467 23.9794 14.5904 24C15.0136 24 15.418 23.9016 15.8034 23.7077C16.2849 23.436 16.6689 23.0072 16.8812 22.5019C17.0165 22.1524 17.2289 21.1023 17.2289 21.0832C17.4398 19.9361 17.5547 18.0709 17.5547 16.0088C17.5547 14.0466 17.4398 12.2578 17.2667 11.0916C17.2478 11.071 17.0354 9.76831 16.8042 9.32183C16.3809 8.50523 15.5533 8 14.6674 8H14.5904C14.0129 8.01909 12.7998 8.52579 12.7998 8.54342C10.7591 9.39967 6.73591 12.0624 5.11847 13.8322C5.11847 13.8322 4.66175 14.2875 4.46394 14.571C4.15558 14.9793 4.0014 15.4845 4.0014 15.9897C4.0014 16.5537 4.17449 17.078 4.50175 17.5069Z"
+          fill="black"
+        />
+      </svg>
+
+      }
+      <div
+        class="flex w-0 z-10 gap-2 overflow-hidden transition-all duration-500 ease-in-out"
+        [class.w-full]="parent.routerLink === activeLink || isParentActive(parent.routerLink)"
+      >
+        @for (child of parent.children; track $index) {
+        <a
+          class="nav-item opacity-0 translate-x-[100vw] transition-all duration-500 ease-in-out flex flex-col gap-2 items-center justify-center py-1 cursor-pointer group border-2 border-transparent rounded-lg min-w-20"
+          [class.nav-item-active]="child.routerLink === activeLink"
+          [class.nav-item-visible]="isParentActive(parent.routerLink) || child.routerLink === activeLink"
+          (click)="toggleActiveLink(child.routerLink)"
+        >
+          <img appImgFallback  class="w-12 h-12 object-cover" [src]="child.iconUrl" alt="" />
+          <span class="text-dark-bg-2 font-bold text-sm w-max max-w-50 text-center">{{ child.label }}</span>
+        </a>
+        }
+      </div>
+      } }
+    </div>
+  </nav>
+</header>

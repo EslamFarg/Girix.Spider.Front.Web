@@ -1,0 +1,15 @@
+
+
+.nav-item-visible{
+  opacity: 1;
+  display: flex;
+  margin: 0 8px;
+  --tw-translate-x: 0;
+}
+.nav-item:hover,
+.nav-item-active{
+  border-color: var(--color-dark-line);
+  background-color: #25283633;
+  
+}
+ 
