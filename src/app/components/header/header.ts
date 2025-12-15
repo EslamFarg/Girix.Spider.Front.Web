@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, viewChild } from '@angular/core';
 import { ImgFallback } from '@/directives/img-fallback';
 import { RouterLink } from '@angular/router';
 
@@ -23,6 +23,7 @@ export interface ISubNavItem {
   styleUrl: './header.css',
 })
 export class Header {
+  header = viewChild<ElementRef<HTMLElement>>('header');
   navItems: IMainNavItem[] = [
     {
       label: 'الرئيسية',
@@ -323,5 +324,15 @@ export class Header {
   isParentActive(parentLink: string) {
     return parentLink === this.activeLink || this.isChildActive(parentLink);
     // return this.navItems.some((item) => item.routerLink === parentLink);
+  }
+
+  get height() {
+    let height = 152//Math.round(+(this.header()?.nativeElement?.clientHeight ?? 0));
+    this.header()!.nativeElement.style.height = `${height}px`;
+    return height
+  }
+
+  log() {
+    console.log(this.height);
   }
 }

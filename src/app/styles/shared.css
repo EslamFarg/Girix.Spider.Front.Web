@@ -1,0 +1,12 @@
+
+.custom-scroll::-webkit-scrollbar {
+  /* stylish */
+  width: 5px;
+  height: 5px;
+  background-color: #f1f1f1;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 5px;
+}

@@ -1,5 +1,5 @@
 import { BaseComponent } from '@/components/base-component/base-component';
-import { Component } from '@angular/core';
+import { Component, ElementRef, viewChild } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
@@ -263,5 +263,19 @@ export class Menu extends BaseComponent {
     this.fg.get('categoryId')?.setValue(+categoryId);
   }
 
-  onSubmit() {}
+
+  //
+  nav=viewChild<ElementRef<HTMLElement>>('nav')
+  form=viewChild<ElementRef<HTMLElement>>('form')
+  itemsContainer=viewChild<ElementRef<HTMLElement>>('itemsContainer')
+  ngAfterViewInit(){
+    const navHeight = +(this.nav()?.nativeElement.offsetHeight ?? 0);
+    const formHeight = +(this.form()?.nativeElement.offsetHeight ?? 0);
+    const itemsContainerHeight = `calc(100% - ${(navHeight + formHeight )}px)` ;
+    this.itemsContainer()!.nativeElement.style.height = `${itemsContainerHeight}px`;
+  }
+
+  onSubmit(){
+
+  }
 }

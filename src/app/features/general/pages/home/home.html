@@ -1,6 +1,340 @@
-<div class="container w-full flex gap-4 p-4 ">
-  <app-menu/>
-  <div>
+<div class="container w-full flex gap-4 p-4 h-full">
+  <app-menu />
 
+  <div class="flex-1 flex flex-col gap-4 h-full custom-scroll overflow-auto">
+    <!-- actions btns -->
+    <div class="flex gap-2 *:flex-1 *:max-w-25 w-full justify-end">
+      <p-button styleClass="border-dark-line! bg-dark-line! text-white! py-1! w-full" label="حفظ" />
+      <p-button styleClass="border-dark-line! text-dark-line! py-1! w-full" label="حذف" variant="outlined" />
+      <p-button styleClass="border-dark-line! text-dark-line! py-1! w-full" label="جديد" variant="outlined" />
+      <p-button styleClass="border-dark-line! text-dark-line! py-1! w-full" label="طباعة" variant="outlined" />
+    </div>
+
+    <!-- receipt summary -->
+    <div class="flex justify-between text-dark-line border border-text-gray rounded-[14px] p-2">
+      <!-- right -->
+      <ul class="flex flex-col gap-2 *:text-sm *:font-bold *:flex *:items-center *:gap-2">
+        <li>
+          <span>رقم الفاتوره:</span>
+          <span>#12345</span>
+        </li>
+        <li>
+          <span>رقم الطلب:</span>
+          <span>102</span>
+        </li>
+        <li>
+          <span>رقم الكاشير:</span>
+          <span>22</span>
+        </li>
+      </ul>
+
+      <!-- left -->
+      <ul class="flex flex-col gap-2 *:text-sm *:flex *:items-center *:gap-2">
+        <li>
+          <span>20 يناير 2026 04:25 م</span>
+        </li>
+        <li>
+          <span class="font-bold">اسم البائع:</span>
+          <span>محمد احمد</span>
+        </li>
+        <li>
+          <span class="font-bold">رقم الجوال:</span>
+          <span>0123456789</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- location btns -->
+    <div class="flex gap-2 location-btns *:flex-1 w-full justify-end">
+      <p-button
+        styleClass="text-dark-line! py-1! w-full bg-text-lighter! border-transparent!"
+        label="حذف"
+        variant="outlined"
+      />
+      <p-button
+        [style]="{ 'box-shadow': ' 0px 0px 15px 0px #FFFFFF80 inset' }"
+        styleClass="text-white! py-1! w-full bg-dark-bg-2! border-transparent!"
+        label="حفظ"
+      />
+      <p-button
+        styleClass="text-dark-line! py-1! w-full bg-text-lighter! border-transparent!"
+        label="جديد"
+        variant="outlined"
+      />
+    </div>
+
+    <!-- local space options -->
+    <div class="flex w-full border border-text-light rounded-[14px] p-3">
+      <div class="flex gap-2 *:flex-1 flex-1 justify-end">
+        <p-button
+          styleClass="text-dark-line! py-1! w-full bg-text-lighter! border-transparent!"
+          label="طاوله"
+          variant="outlined"
+        />
+        <p-button
+          [style]="{ 'box-shadow': ' 0px 0px 15px 0px #FFFFFF80 inset' }"
+          styleClass="text-white! py-1! w-full bg-dark-bg-2! border-transparent!"
+          label="غرفه"
+        />
+        <p-button
+          styleClass="text-dark-line! py-1! w-full bg-text-lighter! border-transparent!"
+          label="كوخ"
+          variant="outlined"
+        />
+      </div>
+      <div class="px-3 text-text-gray text-xl font-light">|</div>
+      <div class="border border-text-light rounded-lg w-1/2">
+        <span>كوخ 1</span>
+        <span>02:00:00</span>
+      </div>
+    </div>
+
+    <!-- order items -->
+    <div class="p-2 border border-text-light rounded-[14px]">
+      <table class="text-dark-bg-2 w-full text-center">
+        <thead>
+          <tr class="border-b border-text-gray *:pb-2">
+            <th></th>
+            <th>الصنف</th>
+            <th>الكميه</th>
+            <th>السعر</th>
+            <th>المجموع</th>
+            <th>الضريبه</th>
+            <th>الاجمالي</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          <tr>
+            <!-- actions -->
+            <td>
+              <div class="flex items-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M10.7517 1.24995C12.7517 1.37495 14.6267 2.37495 16.0017 3.74995C17.6267 5.49995 18.5017 7.62495 18.5017 10.125C18.5017 12.125 17.7517 14 16.5017 15.625C15.2517 17.125 13.5017 18.25 11.5017 18.625C9.50174 18.9999 7.50174 18.75 5.75174 17.75C4.00174 16.7499 2.62674 15.25 1.87674 13.375C1.12674 11.5 1.00174 9.37495 1.62674 7.49995C2.25174 5.49995 3.37674 3.87495 5.12674 2.74995C6.75174 1.62495 8.75174 1.12495 10.7517 1.24995ZM11.3767 17.375C13.0017 16.9999 14.5017 16.125 15.6267 14.75C16.6267 13.375 17.2517 11.75 17.1267 9.99995C17.1267 7.99995 16.3767 5.99995 15.0017 4.62495C13.7517 3.37495 12.2517 2.62495 10.5017 2.49995C8.87674 2.37495 7.12674 2.74995 5.75174 3.74995C4.37674 4.74995 3.37674 6.12495 2.87674 7.87495C2.37674 9.49995 2.37674 11.25 3.12674 12.875C3.87674 14.5 5.00174 15.75 6.50174 16.625C8.00174 17.5 9.75174 17.75 11.3767 17.375ZM9.87674 9.37495L12.8767 6.24995L13.7517 7.12495L10.7517 10.2499L13.7517 13.375L12.8767 14.2499L9.87674 11.1249L6.87674 14.2499L6.00174 13.375L9.00174 10.2499L6.00174 7.12495L6.87674 6.24995L9.87674 9.37495Z"
+                    fill="black"
+                  />
+                </svg>
+                <svg
+                  class="cursor-pointer"
+                  (click)="showDialog()"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6.875 3.125H4.79167C3.87119 3.125 3.125 3.87119 3.125 4.79167V6.875C3.125 7.79547 3.87119 8.54167 4.79167 8.54167H6.875C7.79547 8.54167 8.54167 7.79547 8.54167 6.875V4.79167C8.54167 3.87119 7.79547 3.125 6.875 3.125Z"
+                    stroke="#393C49"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M14.1654 3.125V5.83333M14.1654 5.83333V8.54167M14.1654 5.83333H11.457M14.1654 5.83333H16.8737"
+                    stroke="#393C49"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M6.875 11.4584H4.79167C3.87119 11.4584 3.125 12.2046 3.125 13.125V15.2084C3.125 16.1288 3.87119 16.875 4.79167 16.875H6.875C7.79547 16.875 8.54167 16.1288 8.54167 15.2084V13.125C8.54167 12.2046 7.79547 11.4584 6.875 11.4584Z"
+                    stroke="#393C49"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M15.207 11.4584H13.1237C12.2032 11.4584 11.457 12.2046 11.457 13.125V15.2084C11.457 16.1288 12.2032 16.875 13.1237 16.875H15.207C16.1275 16.875 16.8737 16.1288 16.8737 15.2084V13.125C16.8737 12.2046 16.1275 11.4584 15.207 11.4584Z"
+                    stroke="#393C49"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+            </td>
+            <!-- items -->
+            <td>
+              <div class="flex flex-col gap-1 text-center">
+                <span>ماكرونه</span>
+                <div class="flex items-center justify-center gap-2">
+                  @for (item of ['بيبسي','ماكروني','أرز']; track $index) {
+                  <div class="relative border border-text-light rounded-md">
+                    <div class="py-0.5 px-1 text-xs font-semibold">{{ item }}</div>
+                    <div
+                      class="flex items-center justify-center rounded-full bg-text-lighter w-3 text-[#FA8D7B] font-bold text-[10px] aspect-square leading-none absolute -top-1.5 -left-1.5"
+                    >
+                      <span class="h-fit">1</span>
+                    </div>
+                  </div>
+                  }
+                </div>
+              </div>
+            </td>
+            <!-- quantity -->
+            <td>
+              <div class="flex items-center justify-center gap-2">
+                <button type="button" class="bg-text-gray p-2 rounded">
+                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
+                      fill="#393C49"
+                    />
+                  </svg>
+                </button>
+                <span class="font-bold">2</span>
+                <button type="button" class="bg-text-gray p-2 rounded">
+                  <svg width="8" height="8" viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
+                      fill="#393C49"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </td>
+            <!-- price -->
+            <td>
+              <div
+                class="mx-auto font-semibold border border-text-light rounded text-center w-fit h-fit px-2 py-0.5 leading-none"
+              >
+                500
+              </div>
+            </td>
+            <!-- total -->
+            <td>
+              <div class="font-semibold">1000</div>
+            </td>
+            <!-- tax -->
+            <td>
+              <div class="font-semibold">50</div>
+            </td>
+            <!-- net -->
+            <td>
+              <div class="font-semibold">1050</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="border-t border-text-light pt-2 mt-2">
+        <div class="bg-text-light grid grid-cols-3 font-bold text-dark-bg-2 py-1 px-2 rounded">
+          <span>المجموع</span>
+          <span class="mx-auto">8</span>
+          <span class="ms-auto">920.00</span>
+        </div>
+        <div
+          class="p-4 grid grid-cols-2 text-dark-bg-2 *:flex *:justify-between *:items-center gap-2 text-sm font-semibold"
+        >
+          <div>
+            <span>الخصم</span>
+            <div>123123</div>
+          </div>
+          <div>
+            <span>الخدمه</span>
+            <div>15.00</div>
+          </div>
+          <div>
+            <span>حجز الكوخ</span>
+            <div>145.00</div>
+          </div>
+          <div>
+            <span>الضريبة</span>
+            <div>30.00</div>
+          </div>
+          <div
+            class="flex text-base col-span-2 mt-1 pt-1 font-bold justify-between items-center border-t border-text-light text-dark-bg-2"
+          >
+            <span>الصافي</span>
+            <span>2300.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 mt-2"></div>
+    </div>
+
+    <!-- options -->
+    <div class="flex gap-2 location-btns *:flex-1 w-full justify-end">
+      <p-button
+        styleClass="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full  border-text-light!"
+        label="بيانات العميل"
+        variant="outlined"
+      />
+      <p-button
+        styleClass="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full  border-text-light!"
+        label="بيانات الدفع"
+        variant="outlined"
+      />
+      <p-button
+        styleClass="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full  border-text-light!"
+        label="بيانات الدفع"
+        variant="outlined"
+      />
+    </div>
   </div>
 </div>
+
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '40rem' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-text-lighter!"
+  class="addition-dialog"
+>
+  <!-- <ng-template #header >
+    <div class="inline-flex items-center justify-center gap-2">
+      <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
+      <span class="font-bold whitespace-nowrap">Amy Elsner</span>
+    </div>
+  </ng-template> -->
+
+  <p class="font-bold text-center text-dark-bg-2 text-lg">الاضافات</p>
+
+  <div class="grid grid-cols-4 gap-2">
+    @for (item of [1,2,3,4,5]; track $index) {
+    <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-center p-2">
+      <img class="w-20" appImgFallback fallBackLink="/images/placeholders/menu-item.png" src="" alt="" />
+      <div class="flex items-center justify-between w-full text-dark-line font-bold">
+        <span>بيبسي</span>
+        <span>1.03</span>
+      </div>
+      <div class="flex items-center justify-center gap-4">
+        <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
+              fill="#ffffff"
+            />
+          </svg>
+        </button>
+        <span class="font-bold text-dark-line">2</span>
+        <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
+          <svg width="8" height="8" viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
+              fill="#ffffff"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      [style]="{boxShadow: '0px 4px 4px 0px #EA7C6999'}"
+      styleClass=" bg-[#EA7C69]! text-white! px-6!"
+      [text]="true"
+      class="mx-auto"
+      severity="secondary"
+      (click)="visible = false"
+    />
+  </ng-template>
+</p-dialog>

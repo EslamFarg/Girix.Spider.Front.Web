@@ -1,0 +1,8 @@
+.location-btns{
+  
+
+}
+
+.addition-dialog::ng-deep .p-dialog-header{
+    padding-bottom: 0 !important;
+  }

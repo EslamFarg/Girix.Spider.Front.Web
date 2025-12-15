@@ -1,6 +1,6 @@
-<section class="border border-text-light rounded-[14px] p-2 flex flex-col gap-5">
+<section  class="border border-text-light rounded-[14px] p-2 flex flex-col gap-5 h-full">
   <!-- search -->
-  <form [formGroup]="fg" (ngSubmit)="onSubmit()">
+  <form #form [formGroup]="fg" (ngSubmit)="onSubmit()">
     <app-input-error-message-handler [fc]="fg.get('text')">
       <input
         class="w-full bg-transparent! border-text-light!"
@@ -13,7 +13,7 @@
   </form>
 
   <!-- categories -->
-  <nav class="flex gap-2">
+  <nav #nav class="flex gap-2">
     @for (item of filterCategories; track $index) {
     <button
       class="bg-text-lighter flex-1 cursor-pointer transition-all text-dark-line text-sm py-2 font-semibold rounded-lg min-w-25 text-center"
@@ -27,7 +27,7 @@
     }
   </nav>
 
-  <div class="grid grid-cols-5 gap-4 mt-8" style="row-gap: 40px">
+  <div #itemsContainer class="custom-scroll grid grid-cols-5 gap-4 pt-8 h-full  overflow-auto" style="row-gap: 40px">
     @for (item of menuItems; track $index) {
     <div class="text-white bg-form-bg rounded-xl flex flex-col gap-4 py-2 px-4 items-center justify-center">
       <div class="h-10 w-20 relative rounded-full">
