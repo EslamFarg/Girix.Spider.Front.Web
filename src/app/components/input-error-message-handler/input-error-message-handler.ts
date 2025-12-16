@@ -2,10 +2,11 @@ import { ValidationErrorsEnum } from '@/lib/enums/validation-errors';
 import { Component, input } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { Message } from 'primeng/message';
+import { InputGroupModule } from 'primeng/inputgroup';
 
 @Component({
   selector: 'app-input-error-message-handler',
-  imports: [Message],
+  imports: [Message,InputGroupModule],
   templateUrl: './input-error-message-handler.html',
   styleUrl: './input-error-message-handler.css',
 })

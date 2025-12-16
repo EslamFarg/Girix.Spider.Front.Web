@@ -1,4 +1,4 @@
-<header #header (click)="log()" class=" ">
+<header #header (click)="log()" class="w-full">
   <div class="bg-dark-bg-2">
     <div class="px-4 py-3 grid grid-cols-3 container mx-auto">
       <div class="flex items-center gap-3">
@@ -15,22 +15,23 @@
       </div>
     </div>
   </div>
-  <nav class="bg-text-lighter">
-    <div class="container flex items-center px-4 py-1 w-full overflow-x-auto">
+  <nav class="bg-text-lighter overflow-auto custom-scroll w-full">
+    <div class="container flex items-center px-4 py-1 min-w-full w-fit overflow-x-auto">
       @for (parent of navItems; track $index) {
       <!-- parent -->
-      <button
+      <a
         class="nav-item z-20 h-full opacity-0 hidden duration-500 ease-in-out translate-x-[100vw] transition-all flex-col gap-2 items-center justify-center py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-20"
         [class.nav-item-active]="parent.routerLink === activeLink"
         [class.ms-0!]="$first"
         [class.nav-item-visible]="
-          activeLink == '/home' || isChildActive(parent.routerLink) || parent.routerLink === activeLink
+          activeLink == '/' || isChildActive(parent.routerLink) || parent.routerLink === activeLink
         "
+        [routerLink]="parent.routerLink === '/' ? ['/'] : []"
         (click)="toggleActiveLink(parent.routerLink)"
       >
         <img appImgFallback class="w-12 h-12 object-cover" [src]="parent.iconUrl" alt="" />
         <span class="text-dark-bg-2 font-bold text-sm w-max max-w-50 text-center">{{ parent.label }}</span>
-      </button>
+      </a>
       <!-- children -->
       @if ( parent.children) { @if (parent.routerLink === activeLink || isParentActive(parent.routerLink)) {
       <svg class="ms-3" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -56,8 +57,9 @@
           [class.nav-item-active]="child.routerLink === activeLink"
           [class.nav-item-visible]="isParentActive(parent.routerLink) || child.routerLink === activeLink"
           (click)="toggleActiveLink(child.routerLink)"
+          [routerLink]="child.routerLink"
         >
-          <img appImgFallback  class="w-12 h-12 object-cover" [src]="child.iconUrl" alt="" />
+          <img appImgFallback class="w-12 h-12 object-cover" [src]="child.iconUrl" alt="" />
           <span class="text-dark-bg-2 font-bold text-sm w-max max-w-50 text-center">{{ child.label }}</span>
         </a>
         }

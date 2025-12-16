@@ -3,8 +3,8 @@ import { Component, ElementRef, viewChild } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
-import { ImgFallback } from "@/directives/img-fallback";
-
+import { ImgFallback } from '@/directives/img-fallback';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 export interface IMenuItem {
   id: number;
   label: string;
@@ -18,7 +18,13 @@ export interface IMenuItem {
 
 @Component({
   selector: 'app-menu',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputTextModule, ImgFallback],
+  imports: [
+    ReactiveFormsModule,
+    InputErrorMessageHandler,
+    InputTextModule,
+    ImgFallback,
+    InputGroupAddonModule,
+  ],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
 })
@@ -263,19 +269,16 @@ export class Menu extends BaseComponent {
     this.fg.get('categoryId')?.setValue(+categoryId);
   }
 
-
   //
-  nav=viewChild<ElementRef<HTMLElement>>('nav')
-  form=viewChild<ElementRef<HTMLElement>>('form')
-  itemsContainer=viewChild<ElementRef<HTMLElement>>('itemsContainer')
-  ngAfterViewInit(){
+  nav = viewChild<ElementRef<HTMLElement>>('nav');
+  form = viewChild<ElementRef<HTMLElement>>('form');
+  itemsContainer = viewChild<ElementRef<HTMLElement>>('itemsContainer');
+  ngAfterViewInit() {
     const navHeight = +(this.nav()?.nativeElement.offsetHeight ?? 0);
     const formHeight = +(this.form()?.nativeElement.offsetHeight ?? 0);
-    const itemsContainerHeight = `calc(100% - ${(navHeight + formHeight )}px)` ;
+    const itemsContainerHeight = `calc(100% - ${navHeight + formHeight}px)`;
     this.itemsContainer()!.nativeElement.style.height = `${itemsContainerHeight}px`;
   }
 
-  onSubmit(){
-
-  }
+  onSubmit() {}
 }

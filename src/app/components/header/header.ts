@@ -1,10 +1,11 @@
 import { Component, ElementRef, viewChild } from '@angular/core';
 import { ImgFallback } from '@/directives/img-fallback';
 import { RouterLink } from '@angular/router';
+import { BaseComponent } from '@/components/base-component/base-component';
 
 export interface IMainNavItem {
   label: string;
-  iconUrl: string;
+  icon: string;
   action?: string;
   routerLink: string;
   children?: ISubNavItem[];
@@ -12,7 +13,7 @@ export interface IMainNavItem {
 
 export interface ISubNavItem {
   label: string;
-  iconUrl: string;
+  icon: string;
   routerLink: string;
 }
 
@@ -22,294 +23,301 @@ export interface ISubNavItem {
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
-export class Header {
+export class Header extends BaseComponent {
   header = viewChild<ElementRef<HTMLElement>>('header');
+
   navItems: IMainNavItem[] = [
     {
       label: 'الرئيسية',
-      iconUrl: '/grg',
-      routerLink: '/home',
+      icon: ``,
+      routerLink: '/',
     },
     {
       label: 'الفواتير',
-      iconUrl: '/tttt',
+      icon: '/tttt',
       routerLink: '/invoices',
       children: [
         {
           label: 'الطلبات',
-          iconUrl: '',
+          icon: '',
           routerLink: '/invoices/orders',
         },
         {
           label: 'المرتجعات',
-          iconUrl: '',
+          icon: '',
           routerLink: '/invoices/refunds',
         },
       ],
     },
     {
       label: 'الأصناف',
-      iconUrl: '',
+      icon: '',
       routerLink: '/classes',
       children: [
         {
           label: 'المنتجات',
-          iconUrl: '',
+          icon: '',
           routerLink: '/classes/products',
         },
         {
           label: 'الوجبات',
-          iconUrl: '',
+          icon: '',
           routerLink: '/classes/meals',
         },
         {
           label: 'المجموعات',
-          iconUrl: '',
+          icon: '',
           routerLink: '/classes/groups',
         },
       ],
     },
     {
       label: 'المطعم',
-      iconUrl: '',
+      icon: '',
       routerLink: '/restaurant',
       children: [
         {
           label: 'الطاولات',
-          iconUrl: '',
+          icon: '',
           routerLink: '/restaurant/tables',
         },
         {
           label: 'الاكواخ',
-          iconUrl: '',
+          icon: '',
           routerLink: '/restaurant/cabins',
         },
         {
           label: 'الغرفه',
-          iconUrl: '',
+          icon: '',
           routerLink: '/restaurant/rooms',
         },
       ],
     },
     {
+      label: 'العملاء',
+      icon: '',
+      routerLink: '/customers',
+      children: [
+        {
+          label: 'إضافه عميل',
+          icon: '',
+          routerLink: '/customers/add',
+        },
+      ],
+    },
+    {
       label: 'المخزون',
-      iconUrl: '',
+      icon: '',
       routerLink: '/storage',
       children: [
         {
           label: 'الارصده الافتتاحيه',
-          iconUrl: '',
+          icon: '',
           routerLink: '/storage/opening-balances',
         },
         {
           label: 'المشتريات',
-          iconUrl: '',
+          icon: '',
           routerLink: '/storage/purchases',
         },
         {
           label: 'مرتجعات مشتريات',
-          iconUrl: '',
+          icon: '',
           routerLink: '/storage/purchases-refunds',
         },
         {
           label: 'تسويه جرديه',
-          iconUrl: '',
+          icon: '',
           routerLink: '/storage/inventory',
         },
       ],
     },
     {
       label: 'التبديلات',
-      iconUrl: '',
+      icon: '',
       routerLink: '/replacements',
       children: [
         {
           label: 'غرف',
-          iconUrl: '',
+          icon: '',
           routerLink: '/replacements/rooms',
         },
         {
           label: 'اكواخ',
-          iconUrl: '',
+          icon: '',
           routerLink: '/replacements/cabins',
         },
         {
           label: 'طاولات',
-          iconUrl: '',
+          icon: '',
           routerLink: '/replacements/tables',
         },
         {
           label: 'ديليفري',
-          iconUrl: '',
+          icon: '',
           routerLink: '/replacements/deliveries',
         },
       ],
     },
     {
       label: 'التحصيلات',
-      iconUrl: '',
+      icon: '',
       routerLink: '/collections',
       children: [
         {
           label: 'الكل',
-          iconUrl: '',
+          icon: '',
           routerLink: '/collections/all',
         },
         {
           label: 'الطاولات',
-          iconUrl: '',
+          icon: '',
           routerLink: '/collections/tables',
         },
         {
           label: 'غرف',
-          iconUrl: '',
+          icon: '',
           routerLink: '/collections/rooms',
         },
         {
           label: 'أكواخ',
-          iconUrl: '',
+          icon: '',
           routerLink: '/collections/cabins',
         },
         {
           label: 'ديليفري',
-          iconUrl: '',
+          icon: '',
           routerLink: '/collections/deliveries',
         },
       ],
     },
     {
       label: 'الحسابات',
-      iconUrl: '',
+      icon: '',
       routerLink: '/accounts',
       children: [
         {
           label: 'القيود',
-          iconUrl: '',
+          icon: '',
           routerLink: '/accounts/journals',
         },
         {
           label: 'سند قبض مجمع',
-          iconUrl: '',
+          icon: '',
           routerLink: '/accounts/receipts',
         },
         {
           label: 'سند صرف مجمع',
-          iconUrl: '',
+          icon: '',
           routerLink: '/accounts/payments',
         },
         {
           label: 'شجره الحسابات',
-          iconUrl: '',
+          icon: '',
           routerLink: '/accounts/accounts-tree',
         },
       ],
     },
     {
       label: 'الديليفري',
-      iconUrl: '',
+      icon: '',
       routerLink: '/deliveries',
       children: [
         {
           label: 'بيانات الديليفري',
-          iconUrl: '',
+          icon: '',
           routerLink: '/deliveries/data',
         },
       ],
     },
     {
       label: 'المستخدمين',
-      iconUrl: '',
+      icon: '',
       routerLink: '/users',
       children: [
         {
           label: 'إضافه مستخدم',
-          iconUrl: '',
+          icon: '',
           routerLink: '/users/add',
         },
       ],
     },
-    {
-      label: 'العملاء',
-      iconUrl: '',
-      routerLink: '/customers',
-      children: [
-        {
-          label: 'إضافه عميل',
-          iconUrl: '',
-          routerLink: '/customers/add',
-        },
-      ],
-    },
+    
     {
       label: 'الإعدادات',
-      iconUrl: '',
+      icon: '',
       routerLink: '/settings',
       children: [
         {
           label: 'إعدادات البرنامج',
-          iconUrl: '',
+          icon: '',
           routerLink: '/settings/program',
         },
         {
           label: 'إعدادات الماليه',
-          iconUrl: '',
+          icon: '',
           routerLink: '/settings/financial',
         },
         {
           label: 'إداره فتح/ غلق اليوميه',
-          iconUrl: '',
+          icon: '',
           routerLink: '/settings/transactions',
         },
         {
           label: 'طابعه ال QR',
-          iconUrl: '',
+          icon: '',
           routerLink: '/settings/qr',
         },
         {
           label: 'إعدادات الحسابات الإفتراضيه',
-          iconUrl: '',
+          icon: '',
           routerLink: '/settings/default-accounts',
         },
         {
           label: 'إضافه طابعه',
-          iconUrl: '',
+          icon: '',
           routerLink: '/settings/add-printer',
         },
         {
           label: 'اعدادات الطابعه',
-          iconUrl: '',
+          icon: '',
           routerLink: '/settings/printer',
         },
       ],
     },
     {
       label: 'بيانات البرنامج',
-      iconUrl: '',
+      icon: '',
       routerLink: '/app-settings',
       children: [
         {
           label: 'الملف الشخصي',
-          iconUrl: '',
+          icon: '',
           routerLink: '/app-settings/profile',
         },
         {
           label: 'بيانات المطعم',
-          iconUrl: '/',
+          icon: '/',
           routerLink: '/app-settings/restaurant',
         },
       ],
     },
   ];
+  activeLink: string = '/';
 
-  activeLink: string = '/home';
+  ngOnInit() {
+      this.activeLink = this.router.url
+  }
+
 
   toggleActiveLink(link: string) {
     console.log('link', link);
-    if (this.navItems.find((i) => i.routerLink === link) && this.activeLink !== '/home') {
-      this.activeLink = '/home';
+    if (this.navItems.find((i) => i.routerLink === link) && this.activeLink !== '/') {
+      this.activeLink = '/';
     } else {
       this.activeLink = link;
     }
+     
     console.log(this.activeLink);
   }
 

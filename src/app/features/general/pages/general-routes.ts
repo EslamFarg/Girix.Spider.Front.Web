@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { Home } from './home/home';
+import { Home } from '@/features/general/pages/home/home';
 
 export default [
   {

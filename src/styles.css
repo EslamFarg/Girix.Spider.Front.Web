@@ -4,6 +4,7 @@
 @import 'primeicons/primeicons.css';
 @import './app/styles/fonts.css';
 @import './app/styles/shared.css';
+@import './app/styles/primeng-overrides.css';
 
 @theme {
   --color-main-bg: #111921;
@@ -13,10 +14,11 @@
   --color-dark-line: #393c49;
   /* bg */
   --color-light-bg: #fff2e8;
+  --color-dark-bg-1: #252836;
   --color-dark-bg-2: #1f1d2b;
   --color-form-bg: #2d303e;
   /* text */
-  --color-text-dark: #3B5162;
+  --color-text-dark: #3b5162;
   --color-text-gray: #889898;
   --color-text-light: #d3dce6;
   --color-text-lighter: #e0e6e9;
@@ -24,6 +26,11 @@
 
 :root {
   --p-paginator-background: transparent !important;
+  --p-form-field-border-color: var(--color-text-lighter) !important;
+  --p-select-background: transparent !important;
+  --p-select-color:var(--color-text-dark) !important;
+  /* --p-overlay-select-background: transparent !important; */
+  
 }
 @custom-variant dark (&:where(.dark-mode, .dark-mode *));
 

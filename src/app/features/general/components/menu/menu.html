@@ -1,73 +1,75 @@
-<section  class="border border-text-light rounded-[14px] p-2 flex flex-col gap-5 h-full">
-  <!-- search -->
-  <form #form [formGroup]="fg" (ngSubmit)="onSubmit()">
-    <app-input-error-message-handler [fc]="fg.get('text')">
-      <input
-        class="w-full bg-transparent! border-text-light!"
-        pInputText
-        type="text"
-        formControlName="text"
-        placeholder="بحث"
-      />
-    </app-input-error-message-handler>
-  </form>
+<div class="p-4 pe-0 h-full">
+  <section class="border border-text-light rounded-[14px] p-2 flex flex-col gap-5 h-full">
+    <!-- search -->
+    <form #form [formGroup]="fg" (ngSubmit)="onSubmit()">
+      <app-input-error-message-handler [fc]="fg.get('text')">
+        <input class="w-full bg-transparent!" pInputText type="text" formControlName="text" placeholder="بحث" />
+        <p-inputgroup-addon>
+          <i class="pi pi-filter"></i>
+        </p-inputgroup-addon>
+        <p-inputgroup-addon>
+          <i class="pi pi-search"></i>
+        </p-inputgroup-addon>
+      </app-input-error-message-handler>
+    </form>
 
-  <!-- categories -->
-  <nav #nav class="flex gap-2">
-    @for (item of filterCategories; track $index) {
-    <button
-      class="bg-text-lighter flex-1 cursor-pointer transition-all text-dark-line text-sm py-2 font-semibold rounded-lg min-w-25 text-center"
-      [class.filter-category-active]="fg.get('categoryId')?.value == item.id"
-      style="box-shadow: 0px 0px 10px 0px #ffffff33 inset"
-      type="button"
-      (click)="selectCategory(item.id)"
-    >
-      {{ item.label }}
-    </button>
-    }
-  </nav>
+    <!-- categories -->
+    <nav #nav class="flex gap-2 w-full overflow-auto custom-scroll min-h-max">
+      @for (item of filterCategories; track $index) {
+      <button
+        class="bg-text-lighter flex-1 cursor-pointer transition-all text-dark-line text-sm py-2 font-semibold rounded-lg min-w-25 text-center"
+        [class.filter-category-active]="fg.get('categoryId')?.value == item.id"
+        style="box-shadow: 0px 0px 10px 0px #ffffff33 inset"
+        type="button"
+        (click)="selectCategory(item.id)"
+      >
+        {{ item.label }}
+      </button>
+      }
+    </nav>
 
-  <div #itemsContainer class="custom-scroll grid grid-cols-5 gap-4 pt-8 h-full  overflow-auto" style="row-gap: 40px">
-    @for (item of menuItems; track $index) {
-    <div class="text-white bg-form-bg rounded-xl flex flex-col gap-4 py-2 px-4 items-center justify-center">
-      <div class="h-10 w-20 relative rounded-full">
-        <div
-          class="absolute w-full aspect-square bottom-0 left-0 rounded-full"
-          style="box-shadow: 0px 3.13px 15.63px 0px #ffffff40"
-        >
-          <img
-            class="w-full h-full object-cover"
-            appImgFallback
-            fallBackLink="/images/placeholders/menu-item.png"
-            [src]="item.imageUrl"
-            alt=""
-          />
+    <div #itemsContainer class="no-scrollbar grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-5 gap-4 pt-8 h-full overflow-auto" style="row-gap: 40px">
+      @for (item of menuItems; track $index) {
+      <div class="text-white bg-form-bg rounded-xl flex flex-col gap-2 py-2 px-4 items-center justify-center">
+        <div class="h-10 w-20 relative rounded-full">
+          <div
+            class="absolute w-full aspect-square bottom-0 left-0 rounded-full"
+            style="box-shadow: 0px 3.13px 15.63px 0px #ffffff40"
+          >
+            <img
+              class="w-full h-full object-cover"
+              appImgFallback
+              fallBackLink="/images/placeholders/menu-item.png"
+              [src]="item.imageUrl"
+              alt=""
+            />
+          </div>
+        </div>
+        <p class="text-sm font-bold">
+          {{ item.label }}
+        </p>
+        <div class="flex items-center justify-between w-full">
+          <button type="button" class="underline text-xs font-semibold">تفاصيل</button>
+          <span class="text-xs font-bold">{{ item.price }}</span>
+        </div>
+
+        <div class="flex items-center gap-2 w-full justify-between">
+          <button
+            type="button"
+            class="p-2 text-text-lighter leading-none rounded bg-text-gray flex items-center justify-center cursor-pointer"
+          >
+            <i class="pi pi-plus text-[8px]!"></i>
+          </button>
+          <span>1</span>
+          <button
+            type="button"
+            class="p-2 text-text-lighter leading-none rounded bg-text-gray flex items-center justify-center cursor-pointer"
+          >
+            <i class="pi pi-minus text-[8px]!"></i>
+          </button>
         </div>
       </div>
-      <p class="text-sm font-bold">
-        {{ item.label }}
-      </p>
-      <div class="flex items-center justify-between w-full">
-        <button type="button" class="underline text-xs font-semibold">تفاصيل</button>
-        <span class="text-xs font-bold">{{ item.price }}</span>
-      </div>
-
-      <div class="flex items-center gap-2 w-full justify-between">
-        <button
-          type="button"
-          class="p-2 text-text-lighter leading-none rounded bg-text-gray flex items-center justify-center cursor-pointer"
-        >
-          <i class="pi pi-plus text-[8px]! "></i>
-        </button>
-        <span>1</span>
-        <button
-          type="button"
-          class="p-2 text-text-lighter leading-none rounded bg-text-gray flex items-center justify-center cursor-pointer"
-        >
-          <i class="pi pi-minus text-[8px]!"></i>
-        </button>
-      </div>
+      }
     </div>
-    }
-  </div>
-</section>
+  </section>
+</div>

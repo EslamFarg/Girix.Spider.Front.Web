@@ -14,11 +14,16 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@/features/general/pages/general-routes').then((m) => m.default),
       },
-      // {
-      //   path: 'products',
-      //   loadChildren: () =>
-      //     import('@/features/products/pages/product-routes').then((m) => m.default),
-      // },
+      {
+        path: 'invoices',
+        loadChildren: () =>
+          import('@/features/invoices/pages/invoices-routes').then((m) => m.default),
+      },
+      {
+        path: 'classes',
+        loadChildren: () =>
+          import('@/features/classes/pages/classes-routes').then((m) => m.default),
+      },
     ],
   },
   {
@@ -27,4 +32,8 @@ export const routes: Routes = [
     children: authRoutes,
     canActivate: [isAuthenticatedGuard],
   },
+  {
+    path: '**',
+    redirectTo: '',    
+  }
 ];

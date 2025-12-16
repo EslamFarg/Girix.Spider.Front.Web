@@ -1,0 +1,38 @@
+.p-inputgroup {
+  box-shadow: var(--p-inputtext-shadow);
+}
+
+.p-inputgroupaddon {
+  background: transparent !important;
+}
+
+.p-inputgroupaddon + .p-inputtext {
+  border-right-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.p-inputtext:has(+ .p-inputgroupaddon) {
+  border-left-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.p-inputgroupaddon{
+  transition-duration: 300ms !important;
+}
+
+.p-inputgroupaddon :has(~ .p-inputtext:hover),
+.p-inputtext:hover  ~ .p-inputgroupaddon {
+  border-color: var(--p-inputtext-hover-border-color) ;
+}
+
+.p-inputgroupaddon:first-child, .p-inputgroupaddon + .p-inputgroupaddon {
+  border-inline-start-color: transparent !important;
+}
+
+.p-inputgroupaddon :has(~ .p-inputtext:focus),
+.p-inputtext:focus ~ .p-inputgroupaddon {
+  border-color: var(--p-inputtext-focus-border-color) ;
+}
+.p-paginator-page.p-paginator-page-selected{
+  color: var(--color-dark-bg-2) !important;
+}

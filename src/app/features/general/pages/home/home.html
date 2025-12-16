@@ -1,9 +1,27 @@
-<div class="container w-full flex gap-4 p-4 h-full">
-  <app-menu />
+<div class="container w-full flex gap-4 h-full">
+  <p-drawer
+    [(visible)]="isMenuVisible"
+    header="Drawer"
+    class="xl:hidden"
+    position="right"
+    styleClass="w-full! bg-white!"
+  >
+    <app-menu />
+  </p-drawer>
 
-  <div class="flex-1 flex flex-col gap-4 h-full custom-scroll overflow-auto">
+  <app-menu class="hidden xl:inline-block" />
+
+  <div class="flex-1 flex flex-col gap-4 h-full custom-scroll overflow-auto p-4 ps-0">
     <!-- actions btns -->
     <div class="flex gap-2 *:flex-1 *:max-w-25 w-full justify-end">
+      <p-button
+        label="المينيو"
+        type="button"
+        (click)="isMenuVisible = true"
+        class="me-auto xl:hidden "
+        styleClass="border-dark-line! text-dark-line! py-1!"
+        variant="outlined"
+      />
       <p-button styleClass="border-dark-line! bg-dark-line! text-white! py-1! w-full" label="حفظ" />
       <p-button styleClass="border-dark-line! text-dark-line! py-1! w-full" label="حذف" variant="outlined" />
       <p-button styleClass="border-dark-line! text-dark-line! py-1! w-full" label="جديد" variant="outlined" />
@@ -329,7 +347,7 @@
   <ng-template #footer>
     <p-button
       label="Cancel"
-      [style]="{boxShadow: '0px 4px 4px 0px #EA7C6999'}"
+      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
       styleClass=" bg-[#EA7C69]! text-white! px-6!"
       [text]="true"
       class="mx-auto"

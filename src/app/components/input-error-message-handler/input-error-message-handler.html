@@ -1,4 +1,6 @@
-<ng-content/>
+<p-inputgroup>
+  <ng-content/>
+</p-inputgroup>
 
 @if(fc()?.invalid && fc()?.touched){
   <p-message severity="error" size="small" variant="simple">{{getErrorMessage()}}</p-message>
