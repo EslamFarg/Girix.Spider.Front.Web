@@ -2,10 +2,11 @@ import { Component, ElementRef, viewChild } from '@angular/core';
 import { ImgFallback } from '@/directives/img-fallback';
 import { RouterLink } from '@angular/router';
 import { BaseComponent } from '@/components/base-component/base-component';
+import headerIcons from './header-icons';
 
 export interface IMainNavItem {
   label: string;
-  icon: string;
+  imgUrl: string;
   action?: string;
   routerLink: string;
   children?: ISubNavItem[];
@@ -13,7 +14,7 @@ export interface IMainNavItem {
 
 export interface ISubNavItem {
   label: string;
-  icon: string;
+  imgUrl: string;
   routerLink: string;
 }
 
@@ -26,278 +27,279 @@ export interface ISubNavItem {
 export class Header extends BaseComponent {
   header = viewChild<ElementRef<HTMLElement>>('header');
 
+  
+
   navItems: IMainNavItem[] = [
     {
       label: 'الرئيسية',
-      icon: ``,
+      imgUrl: headerIcons.home.imgUrl,
       routerLink: '/',
     },
     {
       label: 'الفواتير',
-      icon: '/tttt',
+      imgUrl: headerIcons.invoices.imgUrl,
       routerLink: '/invoices',
       children: [
         {
           label: 'الطلبات',
-          icon: '',
+          imgUrl: headerIcons.invoices.children.orders,
           routerLink: '/invoices/orders',
         },
         {
           label: 'المرتجعات',
-          icon: '',
+          imgUrl: headerIcons.invoices.children.refunds,
           routerLink: '/invoices/refunds',
         },
       ],
     },
     {
       label: 'الأصناف',
-      icon: '',
+      imgUrl: headerIcons.classes.imgUrl,
       routerLink: '/classes',
       children: [
         {
           label: 'المنتجات',
-          icon: '',
+          imgUrl: headerIcons.classes.children.products,
           routerLink: '/classes/products',
         },
         {
           label: 'الوجبات',
-          icon: '',
+          imgUrl: headerIcons.classes.children.meals,
           routerLink: '/classes/meals',
         },
         {
           label: 'المجموعات',
-          icon: '',
+          imgUrl: headerIcons.classes.children.groups,
           routerLink: '/classes/groups',
         },
       ],
     },
     {
       label: 'المطعم',
-      icon: '',
+      imgUrl: headerIcons.restaurant.imgUrl,
       routerLink: '/restaurant',
       children: [
         {
           label: 'الطاولات',
-          icon: '',
+          imgUrl: headerIcons.restaurant.children.tables,
           routerLink: '/restaurant/tables',
         },
         {
           label: 'الاكواخ',
-          icon: '',
+          imgUrl: headerIcons.restaurant.children.cabins,
           routerLink: '/restaurant/cabins',
         },
         {
           label: 'الغرفه',
-          icon: '',
+          imgUrl: headerIcons.restaurant.children.rooms,
           routerLink: '/restaurant/rooms',
         },
       ],
     },
     {
       label: 'العملاء',
-      icon: '',
+      imgUrl: headerIcons.customers.imgUrl,
       routerLink: '/customers',
       children: [
         {
           label: 'إضافه عميل',
-          icon: '',
+          imgUrl: headerIcons.customers.children.add,
           routerLink: '/customers/add',
         },
       ],
     },
     {
       label: 'المخزون',
-      icon: '',
+      imgUrl: headerIcons.storage.imgUrl,
       routerLink: '/storage',
       children: [
         {
           label: 'الارصده الافتتاحيه',
-          icon: '',
+          imgUrl: headerIcons.storage.children.openingBalances,
           routerLink: '/storage/opening-balances',
         },
         {
           label: 'المشتريات',
-          icon: '',
+          imgUrl: headerIcons.storage.children.purchases,
           routerLink: '/storage/purchases',
         },
         {
           label: 'مرتجعات مشتريات',
-          icon: '',
+          imgUrl: headerIcons.storage.children.purchasesReturns,
           routerLink: '/storage/purchases-refunds',
         },
         {
           label: 'تسويه جرديه',
-          icon: '',
+          imgUrl: headerIcons.storage.children.inventory,
           routerLink: '/storage/inventory',
         },
       ],
     },
     {
       label: 'التبديلات',
-      icon: '',
+      imgUrl: headerIcons.replacements.imgUrl,
       routerLink: '/replacements',
       children: [
         {
           label: 'غرف',
-          icon: '',
+          imgUrl: headerIcons.replacements.children.rooms,
           routerLink: '/replacements/rooms',
         },
         {
           label: 'اكواخ',
-          icon: '',
+          imgUrl: headerIcons.replacements.children.cabins,
           routerLink: '/replacements/cabins',
         },
         {
           label: 'طاولات',
-          icon: '',
+          imgUrl: headerIcons.replacements.children.tables,
           routerLink: '/replacements/tables',
         },
         {
           label: 'ديليفري',
-          icon: '',
+          imgUrl: headerIcons.replacements.children.deliveries,
           routerLink: '/replacements/deliveries',
         },
       ],
     },
     {
       label: 'التحصيلات',
-      icon: '',
+      imgUrl: headerIcons.collections.imgUrl,
       routerLink: '/collections',
       children: [
         {
           label: 'الكل',
-          icon: '',
+          imgUrl: headerIcons.collections.children.all,
           routerLink: '/collections/all',
         },
         {
           label: 'الطاولات',
-          icon: '',
+          imgUrl: headerIcons.collections.children.tables,
           routerLink: '/collections/tables',
         },
         {
           label: 'غرف',
-          icon: '',
+          imgUrl: headerIcons.collections.children.rooms,
           routerLink: '/collections/rooms',
         },
         {
           label: 'أكواخ',
-          icon: '',
+          imgUrl: headerIcons.collections.children.cabins,
           routerLink: '/collections/cabins',
         },
         {
           label: 'ديليفري',
-          icon: '',
+          imgUrl: headerIcons.collections.children.deliveries,
           routerLink: '/collections/deliveries',
         },
       ],
     },
     {
       label: 'الحسابات',
-      icon: '',
+      imgUrl: headerIcons.accounts.imgUrl,
       routerLink: '/accounts',
       children: [
         {
           label: 'القيود',
-          icon: '',
+          imgUrl: headerIcons.accounts.children.journals,
           routerLink: '/accounts/journals',
         },
         {
           label: 'سند قبض مجمع',
-          icon: '',
-          routerLink: '/accounts/receipts',
+          imgUrl: headerIcons.accounts.children.collectiveReceipt,
+          routerLink: '/accounts/collective-receipt',
         },
         {
           label: 'سند صرف مجمع',
-          icon: '',
-          routerLink: '/accounts/payments',
+          imgUrl: headerIcons.accounts.children.collectivePayment,
+          routerLink: '/accounts/collective-payment',
         },
         {
           label: 'شجره الحسابات',
-          icon: '',
+          imgUrl: headerIcons.accounts.children.accountsTree,
           routerLink: '/accounts/accounts-tree',
         },
       ],
     },
     {
       label: 'الديليفري',
-      icon: '',
+      imgUrl: headerIcons.deliveries.imgUrl,
       routerLink: '/deliveries',
       children: [
         {
           label: 'بيانات الديليفري',
-          icon: '',
+          imgUrl: headerIcons.deliveries.children.data,
           routerLink: '/deliveries/data',
         },
       ],
     },
     {
       label: 'المستخدمين',
-      icon: '',
+      imgUrl: headerIcons.users.imgUrl,
       routerLink: '/users',
       children: [
         {
           label: 'إضافه مستخدم',
-          icon: '',
+          imgUrl: headerIcons.users.children.add,
           routerLink: '/users/add',
         },
       ],
     },
-    
     {
       label: 'الإعدادات',
-      icon: '',
+      imgUrl: headerIcons.settings.imgUrl,
       routerLink: '/settings',
       children: [
         {
           label: 'إعدادات البرنامج',
-          icon: '',
+          imgUrl: headerIcons.settings.children.program,
           routerLink: '/settings/program',
         },
         {
           label: 'إعدادات الماليه',
-          icon: '',
+          imgUrl: headerIcons.settings.children.financial,
           routerLink: '/settings/financial',
         },
         {
           label: 'إداره فتح/ غلق اليوميه',
-          icon: '',
-          routerLink: '/settings/transactions',
+          imgUrl: headerIcons.settings.children.dailyOpeningClosing,
+          routerLink: '/settings/daily-opening-closing',
         },
         {
           label: 'طابعه ال QR',
-          icon: '',
+          imgUrl: headerIcons.settings.children.qr,
           routerLink: '/settings/qr',
         },
         {
           label: 'إعدادات الحسابات الإفتراضيه',
-          icon: '',
+          imgUrl: headerIcons.settings.children.defaultAccounts,
           routerLink: '/settings/default-accounts',
         },
         {
           label: 'إضافه طابعه',
-          icon: '',
+          imgUrl: headerIcons.settings.children.addPrinter,
           routerLink: '/settings/add-printer',
         },
         {
           label: 'اعدادات الطابعه',
-          icon: '',
+          imgUrl: headerIcons.settings.children.printerSettings,
           routerLink: '/settings/printer',
         },
       ],
     },
     {
       label: 'بيانات البرنامج',
-      icon: '',
+      imgUrl: headerIcons.appSettings.imgUrl,
       routerLink: '/app-settings',
       children: [
         {
           label: 'الملف الشخصي',
-          icon: '',
+          imgUrl: headerIcons.appSettings.children.profile,
           routerLink: '/app-settings/profile',
         },
         {
           label: 'بيانات المطعم',
-          icon: '/',
+          imgUrl: headerIcons.appSettings.children.restaurant,
           routerLink: '/app-settings/restaurant',
         },
       ],
@@ -334,13 +336,13 @@ export class Header extends BaseComponent {
     // return this.navItems.some((item) => item.routerLink === parentLink);
   }
 
-  get height() {
-    let height = 152//Math.round(+(this.header()?.nativeElement?.clientHeight ?? 0));
-    this.header()!.nativeElement.style.height = `${height}px`;
-    return height
-  }
+  // get height() {
+  //   let height = 152//Math.round(+(this.header()?.nativeElement?.clientHeight ?? 0));
+  //   this.header()!.nativeElement.style.height = `${height}px`;
+  //   return height
+  // }
 
-  log() {
-    console.log(this.height);
-  }
+  // log() {
+  //   console.log(this.height);
+  // }
 }

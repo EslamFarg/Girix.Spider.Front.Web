@@ -6,10 +6,11 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
+import { MealsNav } from "../../components/meals-nav/meals-nav";
 
 @Component({
   selector: 'app-meals',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon,InputTextModule,SelectModule,PaginatorModule],
+  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon, InputTextModule, SelectModule, PaginatorModule, MealsNav],
   templateUrl: './meals.html',
   styleUrl: './meals.css',
 })

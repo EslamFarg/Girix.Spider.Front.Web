@@ -7,10 +7,12 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { ImgFallback } from "@/directives/img-fallback";
+import { RouterLink, RouterLinkActive } from "@angular/router";
+import { ProductsNav } from "../../components/products-nav/products-nav";
 
 @Component({
   selector: 'app-products',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon, InputTextModule, SelectModule, PaginatorModule, ImgFallback],
+  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon, InputTextModule, SelectModule, PaginatorModule, ImgFallback, RouterLink, RouterLinkActive, ProductsNav],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })

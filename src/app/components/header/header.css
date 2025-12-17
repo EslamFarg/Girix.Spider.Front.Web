@@ -3,7 +3,7 @@
 .nav-item-visible{
   opacity: 1;
   display: flex;
-  margin: 0 8px;
+  margin: 0 10px;
   --tw-translate-x: 0;
 }
 .nav-item:hover,

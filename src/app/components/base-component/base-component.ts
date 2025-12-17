@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 
 @Component({
@@ -11,6 +12,7 @@ import { Router } from '@angular/router';
 export class BaseComponent {
   fb = inject(FormBuilder);
   router = inject(Router);
+  sanitizer = inject(DomSanitizer);
 
  
 }

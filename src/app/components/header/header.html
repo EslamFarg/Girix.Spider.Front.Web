@@ -1,40 +1,43 @@
-<header #header (click)="log()" class="w-full">
+<header #header class="w-full h-[120px] flex flex-col">
   <div class="bg-dark-bg-2">
-    <div class="px-4 py-3 grid grid-cols-3 container mx-auto">
-      <div class="flex items-center gap-3">
+    <div class="px-8 py-1.5 grid grid-cols-3 container mx-auto items-center">
+      <a href="" routerLink="/">
+        <img class="w-7" src="/images/logo.png" alt="">
+      </a>
+      <!-- <div class="flex items-center gap-3">
         <div class="text-text-gray px-3 py-1.5 bg-white font-medium text-xl rounded leading-none">LOGO</div>
         <div>أبناء المحله</div>
-      </div>
+      </div> -->
 
-      <div class="flex items-center justify-center">20 يناير 2026 / 03:56:22 ص</div>
+      <div class="flex items-center justify-center text-sm">20 يناير 2026 / 03:56:22 ص</div>
 
       <div class="flex items-center gap-2 text-light-bg ms-auto">
-        <img class="w-8 h-8 rounded-full object-cover" src="" appImgFallback alt="" />
-        <p class="font-bold text-xs">يوسف نبيل</p>
+        <img class="w-6 h-6 rounded-full object-cover" src="" appImgFallback alt="" />
+        <p class="font-semibold text-xs">يوسف نبيل</p>
         <i class="pi pi-angle-down"></i>
       </div>
     </div>
   </div>
-  <nav class="bg-text-lighter overflow-auto custom-scroll w-full">
-    <div class="container flex items-center px-4 py-1 min-w-full w-fit overflow-x-auto">
+  <nav class="bg-text-lighter overflow-auto custom-scroll w-full flex-1">
+    <div class="container flex items-center h-full px-4 py-1 min-w-full w-fit ">
       @for (parent of navItems; track $index) {
       <!-- parent -->
       <a
-        class="nav-item z-20 h-full opacity-0 hidden duration-500 ease-in-out translate-x-[100vw] transition-all flex-col gap-2 items-center justify-center py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-20"
+        class="nav-item z-20 h-full  opacity-0 hidden duration-500 ease-in-out translate-x-[100vw] transition-all flex-col gap-1 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-15"
         [class.nav-item-active]="parent.routerLink === activeLink"
-        [class.ms-0!]="$first"
+        [class.ms-0!]="$first || isParentActive(parent.routerLink)"
         [class.nav-item-visible]="
           activeLink == '/' || isChildActive(parent.routerLink) || parent.routerLink === activeLink
         "
         [routerLink]="parent.routerLink === '/' ? ['/'] : []"
         (click)="toggleActiveLink(parent.routerLink)"
       >
-        <img appImgFallback class="w-12 h-12 object-cover" [src]="parent.iconUrl" alt="" />
-        <span class="text-dark-bg-2 font-bold text-sm w-max max-w-50 text-center">{{ parent.label }}</span>
+        <img class="h-10 object-center  " [src]="'/images/icons/header/' + parent.imgUrl + '.png'" alt="" />
+        <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{ parent.label }}</span>
       </a>
       <!-- children -->
       @if ( parent.children) { @if (parent.routerLink === activeLink || isParentActive(parent.routerLink)) {
-      <svg class="ms-3" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="mx-3" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           opacity="0.4"
           d="M21.0634 17.5871L25.9957 18.0233C27.1026 18.0233 28 17.1171 28 15.9994C28 14.8818 27.1026 13.9756 25.9957 13.9756L21.0634 14.4118C20.195 14.4118 19.491 15.1226 19.491 15.9994C19.491 16.8777 20.195 17.5871 21.0634 17.5871Z"
@@ -53,14 +56,18 @@
       >
         @for (child of parent.children; track $index) {
         <a
-          class="nav-item opacity-0 translate-x-[100vw] transition-all duration-500 ease-in-out flex flex-col gap-2 items-center justify-center py-1 cursor-pointer group border-2 border-transparent rounded-lg min-w-20"
+          class="nav-item opacity-0 translate-x-[100vw] mx-0! transition-all duration-500 ease-in-out flex flex-col gap-4 items-center justify-center py-1 cursor-pointer group border-2 border-transparent rounded-lg min-w-15"
           [class.nav-item-active]="child.routerLink === activeLink"
           [class.nav-item-visible]="isParentActive(parent.routerLink) || child.routerLink === activeLink"
           (click)="toggleActiveLink(child.routerLink)"
           [routerLink]="child.routerLink"
         >
-          <img appImgFallback class="w-12 h-12 object-cover" [src]="child.iconUrl" alt="" />
-          <span class="text-dark-bg-2 font-bold text-sm w-max max-w-50 text-center">{{ child.label }}</span>
+          <img
+            class="h-10  "
+            [src]="'/images/icons/header/' + parent.imgUrl + '/' + child.imgUrl + '.png'"
+            alt=""
+          />
+          <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{ child.label }}</span>
         </a>
         }
       </div>

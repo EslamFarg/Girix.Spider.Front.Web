@@ -6,10 +6,11 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
+import { GroupsNav } from "../../components/groups-nav/groups-nav";
 
 @Component({
   selector: 'app-groups',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon,InputTextModule,SelectModule,PaginatorModule],
+  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon, InputTextModule, SelectModule, PaginatorModule, GroupsNav],
   templateUrl: './groups.html',
   styleUrl: './groups.css',
 })
