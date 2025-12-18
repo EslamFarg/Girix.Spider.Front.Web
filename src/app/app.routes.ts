@@ -24,6 +24,21 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@/features/classes/pages/classes-routes').then((m) => m.default),
       },
+      {
+        path: 'restaurant',
+        loadChildren: () =>
+          import('@/features/restaurant/pages/restaurant-routes').then((m) => m.default),
+      },
+      {
+        path: 'storage',
+        loadChildren: () =>
+          import('@/features/storage/pages/storage-routes').then((m) => m.default),
+      },
+      {
+        path: 'replacements',
+        loadChildren: () =>
+          import('@/features/replacements/pages/replacements-routes').then((m) => m.default),
+      },
     ],
   },
   {

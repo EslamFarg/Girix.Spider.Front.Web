@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-section-wrapper',
@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './section-wrapper.css',
 })
 export class SectionWrapper {
-
+  class = input<string>();
 }

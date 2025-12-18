@@ -2,8 +2,8 @@
   <app-meals-nav />
 
   <div class="container mt-4! w-full border border-text-light rounded-[14px] p-2">
+    <!-- search -->
     <div class="flex h-fit items-start gap-2 border w-full">
-      <!-- search -->
       <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="flex-1">
         <app-input-error-message-handler [fc]="fg.get('text')">
           <input class="w-full bg-transparent!" pInputText type="text" formControlName="text" placeholder="بحث" />

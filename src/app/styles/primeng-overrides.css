@@ -11,13 +11,18 @@
   box-shadow: none !important;
 }
 
-.p-inputtext:has(+ .p-inputgroupaddon) {
-  border-left-color: transparent !important;
-  box-shadow: none !important;
-}
+
 
 .p-inputgroupaddon{
   transition-duration: 300ms !important;
+}
+
+.p-inputtext:enabled:hover {
+    border-color: var(--p-inputtext-hover-border-color) !important;
+}
+
+.p-inputtext:enabled:focus {
+    border-color: var(--p-inputtext-focus-border-color) !important;
 }
 
 .p-inputgroupaddon :has(~ .p-inputtext:hover),
@@ -35,4 +40,23 @@
 }
 .p-paginator-page.p-paginator-page-selected{
   color: var(--color-dark-bg-2) !important;
+}
+
+.p-inputgroup{
+  .p-inputgroupaddon + .p-inputtext,
+  .p-inputtext:has(+ .p-inputgroupaddon) {
+    box-shadow: none !important;
+  }
+ 
+  .p-inputtext:has(+ .p-inputgroupaddon){
+    border-inline-end-color: transparent !important;
+    border-start-end-radius: 0 !important;
+    border-end-end-radius: 0 !important;
+  }
+
+  .p-inputgroupaddon + .p-inputtext{
+    border-inline-start-color: transparent !important;
+    border-start-start-radius: 0 !important;
+    border-end-start-radius: 0 !important;
+  }
 }
