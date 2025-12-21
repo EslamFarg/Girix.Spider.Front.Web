@@ -58,7 +58,7 @@
           <td>$120.00</td>
           <td>
             <div class="actions">
-              <button type="button" class="edit bg-[#EA7C694D]!">
+              <button type="button" (click)="openCollectionInvoiceDialog()" class="collect bg-[#EA7C694D]!">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g clip-path="url(#clip0_1026_46739)">
                     <mask
@@ -161,3 +161,65 @@
     <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
   </app-section-wrapper>
 </div>
+
+<p-dialog
+  [visible]="isCollectionInvoiceDialogVisible"
+  [modal]="true"
+  [style]="{ width: '100%',maxWidth:'800px' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-text-lighter!"
+  class="addition-dialog"
+  (onHide)="closeCollectionInvoiceDialog()"
+>
+  <!-- <ng-template #header >
+    <div class="inline-flex items-center justify-center gap-2">
+      <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
+      <span class="font-bold whitespace-nowrap">Amy Elsner</span>
+    </div>
+  </ng-template> -->
+
+  <p class="font-bold text-center text-dark-bg-2 text-lg">الاضافات</p>
+
+  <div class="grid grid-cols-4 gap-2">
+    @for (item of [1,2,3,4,5]; track $index) {
+    <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-center p-2">
+      <img class="w-20" appImgFallback fallBackLink="/images/placeholders/menu-item.png" src="" alt="" />
+      <div class="flex items-center justify-between w-full text-dark-line font-bold">
+        <span>بيبسي</span>
+        <span>1.03</span>
+      </div>
+      <div class="flex items-center justify-center gap-4">
+        <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
+              fill="#ffffff"
+            />
+          </svg>
+        </button>
+        <span class="font-bold text-dark-line">2</span>
+        <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
+          <svg width="8" height="8" viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
+              fill="#ffffff"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
+      styleClass=" bg-[#EA7C69]! text-white! px-6!"
+      [text]="true"
+      class="mx-auto"
+      severity="secondary"
+      (click)="closeCollectionInvoiceDialog()"
+    />
+  </ng-template>
+</p-dialog>
