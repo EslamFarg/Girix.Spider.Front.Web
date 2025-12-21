@@ -39,6 +39,16 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@/features/replacements/pages/replacements-routes').then((m) => m.default),
       },
+      {
+        path: 'customers',
+        loadChildren: () =>
+          import('@/features/customers/pages/customers-routes').then((m) => m.default),
+      },
+      {
+        path: 'collections',
+        loadChildren: () =>
+          import('@/features/collections/pages/collections-routes').then((m) => m.default),
+      },
     ],
   },
   {

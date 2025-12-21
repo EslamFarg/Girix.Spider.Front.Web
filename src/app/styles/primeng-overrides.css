@@ -11,58 +11,61 @@
   box-shadow: none !important;
 }
 
-
-
-.p-inputgroupaddon{
+.p-inputgroupaddon {
   transition-duration: 300ms !important;
 }
 
 .p-inputtext:enabled:hover {
-    border-color: var(--p-inputtext-hover-border-color) !important;
+  border-color: var(--p-inputtext-hover-border-color) !important;
 }
 
 .p-inputtext:enabled:focus {
-    border-color: var(--p-inputtext-focus-border-color) !important;
+  border-color: var(--p-inputtext-focus-border-color) !important;
 }
 
 .p-inputgroupaddon :has(~ .p-inputtext:hover),
-.p-inputtext:hover  ~ .p-inputgroupaddon {
-  border-color: var(--p-inputtext-hover-border-color) ;
+.p-inputtext:hover ~ .p-inputgroupaddon {
+  border-color: var(--p-inputtext-hover-border-color);
 }
 
-.p-inputgroupaddon:first-child, .p-inputgroupaddon + .p-inputgroupaddon {
+.p-inputgroupaddon:first-child,
+.p-inputgroupaddon + .p-inputgroupaddon {
   border-inline-start-color: transparent !important;
 }
 
 .p-inputgroupaddon :has(~ .p-inputtext:focus),
 .p-inputtext:focus ~ .p-inputgroupaddon {
-  border-color: var(--p-inputtext-focus-border-color) ;
+  border-color: var(--p-inputtext-focus-border-color);
 }
-.p-paginator-page.p-paginator-page-selected{
+.p-paginator-page.p-paginator-page-selected {
   color: var(--color-dark-bg-2) !important;
 }
 
-.p-inputgroup{
+.p-inputgroup {
   .p-inputgroupaddon + .p-inputtext,
   .p-inputtext:has(+ .p-inputgroupaddon) {
     box-shadow: none !important;
   }
- 
-  .p-inputtext:has(+ .p-inputgroupaddon){
+
+  .p-inputtext:has(+ .p-inputgroupaddon) {
     border-inline-end-color: transparent !important;
     border-start-end-radius: 0 !important;
     border-end-end-radius: 0 !important;
   }
 
-  .p-inputgroupaddon + .p-inputtext{
+  .p-inputgroupaddon + .p-inputtext {
     border-inline-start-color: transparent !important;
     border-start-start-radius: 0 !important;
     border-end-start-radius: 0 !important;
   }
 }
 
+.p-select {
+  display: flex;
+  align-items: center;
+}
 
-.p-password-toggle-mask-icon{
+.p-password-toggle-mask-icon {
   cursor: pointer !important;
   z-index: 99;
 }

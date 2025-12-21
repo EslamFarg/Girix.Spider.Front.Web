@@ -325,14 +325,14 @@ export class Header extends BaseComponent {
   }
 
   toggleActiveLink(link: string) {
-    console.log('link', link);
+    // console.log('link', link);
     if (this.navItems.find((i) => i.routerLink === link) && this.activeLink !== '/') {
       this.activeLink = '/';
     } else {
       this.activeLink = link;
     }
 
-    console.log(this.activeLink);
+    // console.log(this.activeLink);
   }
 
   isChildActive(parentLink: string) {

@@ -1,0 +1,182 @@
+<p-dialog
+  header=" "
+  [modal]="true"
+  [visible]="isVisible()"
+  [style]="{ width: '100%',maxWidth:'800px' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-base-bg!"
+  (onHide)="close()"
+>
+  <div class="flex flex-col gap-6 items-center justify-center">
+    @switch (currentSpace()) {
+    <!--  -->
+    @case (SpacesEnum.Rooms){
+    <div
+      style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
+      class="flex border p-8 cursor-pointer border-[#393C49] aspect-[0.89] available items-center justify-center bg-white rounded"
+      [class.replacements-available]="true"
+      [class.replacements-reserved]="false"
+    >
+      <span class="text-black font-bold">R1</span>
+    </div>
+    } @case (SpacesEnum.Cabins) {
+    <div
+      class="relative text-black cursor-pointer mt-8 "
+      [class.cabin-available]="true"
+      [class.cabin-reserved]="false"
+      [class.cabin-on-hold]="false"
+    >
+      <div
+        class="absolute w-4/6 cabin rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded"
+        style="
+          background: linear-gradient(147deg, rgba(255, 255, 255, 0.5) 6.91%, rgba(153, 153, 153, 0.5) 91.82%);
+          backdrop-filter: blur(30.445161819458008px);
+          box-shadow: -4px -4px 6.09px 0px rgba(var(--color), 0.5);
+        "
+      ></div>
+      <div
+        style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
+        class="flex border-2 z-10 min-w-20 relative border-transparent aspect-[calc(110/72)] available items-center justify-center bg-[#E2E2E2] rounded-2xl"
+      >
+        <span class="font-bold">R1</span>
+      </div>
+      <countdown
+        #countdown
+        class="mx-auto w-fit block"
+        [config]="countdownConfig"
+        (event)="handleCountdownEvent($event)"
+      />
+    </div>
+    } @case (SpacesEnum.Tables) {
+    <div
+      style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
+      class="flex border p-8 cursor-pointer border-[#393C49] aspect-square available items-center justify-center bg-white rounded-full"
+      [class.replacements-available]="true"
+      [class.replacements-reserved]="false"
+    >
+      <span class="text-black font-bold">R1</span>
+    </div>
+    } }
+
+    <!-- nav -->
+    <div class="flex gap-2 justify-center replacement-dialog-nav">
+      <p-button
+        styleClass=" py-1! w-full   border-transparent! text-sm!"
+        label="طاوله"
+        class="w-25"
+        [attr.style]=""
+        [class.replacement-dialog-nav-active]="changeToSpace() == SpacesEnum.Tables"
+        (onClick)="setChangeToSpace(SpacesEnum.Tables)"
+      />
+      <p-button
+        styleClass="  py-1! w-full   border-transparent! text-sm!"
+        label="غرفه"
+        class="w-25"
+        [class.replacement-dialog-nav-active]="changeToSpace() == SpacesEnum.Rooms"
+        (onClick)="setChangeToSpace(SpacesEnum.Rooms)"
+      />
+      <p-button
+        styleClass="  py-1! w-full    border-transparent! text-sm!"
+        label="كوخ"
+        class="w-25"
+        [class.replacement-dialog-nav-active]="changeToSpace() == SpacesEnum.Cabins"
+        (onClick)="setChangeToSpace(SpacesEnum.Cabins)"
+      />
+    </div>
+
+    <!-- cards -->
+    @switch (changeToSpace()){
+    <!--  -->
+    @case (SpacesEnum.Tables) {
+    <div class="flex my-4 gap-8 w-full overflow-auto custom-scroll pb-2">
+      @for (item of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 ]; track $index) {
+      <div
+        style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
+        class="flex border min-w-25 w-25 cursor-pointer border-[#393C49] aspect-square available items-center justify-center bg-white rounded-full"
+        [class.replacements-available]="$index % 3 == 0"
+        [class.replacements-reserved]="$index % 4 == 1"
+      >
+        <span class="text-black font-bold">R{{ $index + 1 }}</span>
+      </div>
+      }
+    </div>
+    }
+    <!--  -->
+    @case (SpacesEnum.Rooms) {
+    <div class="flex my-4 gap-8 w-full overflow-auto custom-scroll pb-2">
+      @for (item of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 ]; track $index) {
+      <div
+        style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
+        class="flex border min-w-25 w-25 cursor-pointer border-[#393C49] aspect-[0.89] available items-center justify-center bg-white rounded"
+        [class.replacements-available]="$index % 3 == 0"
+        [class.replacements-reserved]="$index % 4 == 1"
+      >
+        <span class="text-black font-bold">R{{ $index + 1 }}</span>
+      </div>
+      }
+    </div>
+    }
+    <!--  -->
+    @case (SpacesEnum.Cabins) {
+    <div class="flex my-4 gap-8 w-full overflow-auto custom-scroll pb-2">
+      @for (item of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]; track $index) {
+      <div
+        class="relative text-black cursor-pointer mt-8"
+        [class.cabin-available]="true"
+        [class.cabin-reserved]="false"
+        [class.cabin-on-hold]="false"
+      >
+        <div
+          class="absolute w-4/6 cabin rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded"
+          style="
+            background: linear-gradient(147deg, rgba(255, 255, 255, 0.5) 6.91%, rgba(153, 153, 153, 0.7) 91.82%);
+            backdrop-filter: blur(30.445161819458008px);
+            box-shadow: -4px -4px 6.09px 0px rgba(var(--color), 0.5);
+          "
+        ></div>
+        <div
+          style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
+          class="flex border-2 z-10 min-w-25 w-25 relative border-transparent aspect-[calc(110/72)] available items-center justify-center bg-[#E2E2E2] rounded-xl"
+        >
+          <span class="font-bold">R1</span>
+        </div>
+        <countdown
+          #countdown
+          class="mx-auto w-fit block"
+          [config]="countdownConfig"
+          (event)="handleCountdownEvent($event)"
+        />
+      </div>
+      }
+    </div>
+
+    } }
+
+    <!--  -->
+    <div class="flex w-full *:flex-1 [&_p-select]:h-[46px]! [&_input]:h-[46px]! items-center gap-4">
+      <div>
+        <label for="productName">مدة الحجز</label>
+        <app-input-error-message-handler>
+          <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
+        </app-input-error-message-handler>
+      </div>
+      <div>
+        <label for="costPrice">رقم / اسم الكوخ</label>
+        <app-input-error-message-handler>
+          <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="H1" />
+        </app-input-error-message-handler>
+      </div>
+      <div>
+        <label for="costPrice">سعر الكوخ في الساعة</label>
+        <app-input-error-message-handler>
+          <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="50.00" />
+        </app-input-error-message-handler>
+      </div>
+    </div>
+    <!--  -->
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancel" severity="secondary" (click)="close()" />
+      <p-button label="Save" (click)="close()" />
+    </div>
+  </div>
+</p-dialog>

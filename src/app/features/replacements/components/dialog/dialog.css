@@ -1,0 +1,11 @@
+.replacement-dialog-nav {
+  --p-button-primary-background: var(--color-text-lighter);
+  --p-button-primary-color: var(--color-dark-line);
+}
+.replacement-dialog-nav-active {
+  --p-button-primary-background: var(--color-dark-bg-2) !important;
+  --p-button-primary-color: white;
+  &::ng-deep button {
+    box-shadow: 0px 0px 15px 0px #ffffff80 inset;
+  }
+}

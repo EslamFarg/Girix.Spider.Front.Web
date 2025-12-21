@@ -7,10 +7,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { GroupsNav } from "../../components/groups-nav/groups-nav";
+import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
 
 @Component({
   selector: 'app-groups',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon, InputTextModule, SelectModule, PaginatorModule, GroupsNav],
+  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon, InputTextModule, SelectModule, PaginatorModule, GroupsNav, SectionWrapper],
   templateUrl: './groups.html',
   styleUrl: './groups.css',
 })

@@ -1,7 +1,7 @@
 <div class="p-4 h-full overflow-auto custom-scroll">
-  <app-groups-nav />
+  <app-groups-nav class="block mb-4" />
 
-  <div class="container mt-4! w-full border border-text-light rounded-[14px] p-2">
+  <app-section-wrapper >
     <div class="flex h-fit items-start gap-2 border w-full">
       <!-- search -->
       <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="flex-1">
@@ -85,5 +85,5 @@
     </table>
 
     <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
-  </div>
+  </app-section-wrapper>
 </div>

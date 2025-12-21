@@ -1,4 +1,4 @@
-<app-section-wrapper class="block mt-4">
+<app-section-wrapper class="block mt-4 p-4 overflow-auto custom-scroll">
   <!-- search -->
   <form #form [formGroup]="fg" (ngSubmit)="onSubmit()">
     <app-input-error-message-handler [fc]="fg.get('text')">
@@ -23,4 +23,21 @@
       </p-inputgroup-addon>
     </app-input-error-message-handler>
   </form>
+
+  <!-- items grid -->
+  <div class="grid grid-cols-6 my-4 mt-8" style="row-gap: 4rem; column-gap: 7rem">
+    @for (item of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 ]; track $index) {
+    <div
+      style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
+      class="flex border cursor-pointer border-[#393C49] aspect-square available items-center justify-center bg-white rounded-full"
+      [class.replacements-available]="$index % 3 == 0"
+      [class.replacements-reserved]="$index % 4 == 1"
+      (click)="openDialog()"
+    >
+      <span class="text-black font-bold">R{{ $index + 1 }}</span>
+    </div>
+    }
+  </div>
+
+  <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
 </app-section-wrapper>

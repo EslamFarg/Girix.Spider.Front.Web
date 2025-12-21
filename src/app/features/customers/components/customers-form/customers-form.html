@@ -1,0 +1,106 @@
+<div class="flex items-center gap-2 justify-end">
+  <p-button styleClass="border-dark-line! bg-dark-line! text-white! py-1! px-8!" label="حفظ" />
+  <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="حذف" variant="outlined" />
+  <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="جديد" variant="outlined" />
+  <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="طباعة" variant="outlined" />
+</div>
+
+<div class="grid grid-cols-4 gap-4 flex-1">
+  <div class="col-span-4">
+    <label for="productName">اسم العميل</label>
+    <app-input-error-message-handler>
+      <input pInputText id="productName" aria-describedby="productName-help" placeholder="الاسم" />
+    </app-input-error-message-handler>
+  </div>
+  <div class="col-span-2">
+    <label for="productPrice">رقم الجوال</label>
+    <app-input-error-message-handler>
+      <input pInputText id="productPrice" aria-describedby="productPrice-help" placeholder="رقم جوال" />
+    </app-input-error-message-handler>
+  </div>
+  <div class="col-span-2">
+    <label for="costPrice">رقم جوال إضافي</label>
+    <app-input-error-message-handler>
+      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="رقم جوال" />
+    </app-input-error-message-handler>
+  </div>
+
+  <div class="col-span-2">
+    <label for="productName">سجل تجاري</label>
+    <app-input-error-message-handler>
+      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="رقم " />
+    </app-input-error-message-handler>
+  </div>
+  <div class="col-span-2">
+    <label for="productName">رقم ضريبي</label>
+    <app-input-error-message-handler>
+      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="رقم " />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="productName">المدينه</label>
+    <app-input-error-message-handler>
+      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="المدينه " />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="productName">الحي</label>
+    <app-input-error-message-handler>
+      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="الحي " />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="productName">الشارع</label>
+    <app-input-error-message-handler>
+      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="الشارع " />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="productName">العماره</label>
+    <app-input-error-message-handler>
+      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="العماره " />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="productName">الرقم البريدي</label>
+    <app-input-error-message-handler>
+      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="الرقم البريدي " />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="productName">الدور</label>
+    <app-input-error-message-handler>
+      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="الدور " />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="productName">الشقه</label>
+    <app-input-error-message-handler>
+      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="الشقه " />
+    </app-input-error-message-handler>
+  </div>
+  
+   
+  <div class="flex flex-col justify-end">
+    <div class="flex items-center h-fit gap-2 pb-1">
+      <app-input-error-message-handler>
+        <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
+      </app-input-error-message-handler>
+      <label for="productName" class="text-dark-line text-sm font-semibold">العميل يعتبر شركه</label>
+    </div>
+  </div>
+
+  <div class="col-span-4">
+    <label for="productName">البيان</label>
+    <app-input-error-message-handler>
+      <textarea
+        rows="7"
+        cols="30"
+        pTextarea
+        id="productName"
+        aria-describedby="productName-help"
+        placeholder="البيان"
+      ></textarea>
+    </app-input-error-message-handler>
+  </div>
+</div>

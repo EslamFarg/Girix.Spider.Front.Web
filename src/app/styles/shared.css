@@ -156,18 +156,24 @@ label + app-input-error-message-handler input {
   }
 }
 
-.p-password.app-input{
+.p-password.app-input {
   padding: 0 !important;
 }
 
+.app-input,
+.app-input input,
+label + app-input-error-message-handler select,
+label + app-input-error-message-handler .p-select,
+label + app-input-error-message-handler input {
+  height: 32px;
+}
 .app-input,
 .app-input input,
 label + app-input-error-message-handler textarea,
 label + app-input-error-message-handler select,
 label + app-input-error-message-handler .p-select,
 label + app-input-error-message-handler input {
-  height: 32px ;
-  padding: 0 8px !important;
+  padding: 2px 8px !important;
 }
 
 /*  */
@@ -175,4 +181,14 @@ label + app-input-error-message-handler input {
   font-weight: 700;
   background-color: var(--color-dark-bg-1);
   color: white;
+}
+/* replacements */
+.replacements-available {
+  border-color: #34c759;
+  box-shadow: 0px 0px 20px 0px #4be7124d inset !important;
+}
+.replacements-reserved {
+  border-color: #ff2d55;
+
+  box-shadow: 0px 0px 20px 0px #ff00004d inset !important;
 }
