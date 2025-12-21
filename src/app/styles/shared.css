@@ -135,6 +135,7 @@ label:has(+ app-input-error-message-handler) {
 }
 
 .app-input,
+.app-input input,
 label + app-input-error-message-handler select,
 label + app-input-error-message-handler textarea,
 label + app-input-error-message-handler .p-select,
@@ -154,10 +155,18 @@ label + app-input-error-message-handler input {
     color: var(--color-text-gray) !important;
   }
 }
+
+.p-password.app-input{
+  padding: 0 !important;
+}
+
+.app-input,
+.app-input input,
+label + app-input-error-message-handler textarea,
 label + app-input-error-message-handler select,
 label + app-input-error-message-handler .p-select,
 label + app-input-error-message-handler input {
-  height: 32px !important;
+  height: 32px ;
   padding: 0 8px !important;
 }
 

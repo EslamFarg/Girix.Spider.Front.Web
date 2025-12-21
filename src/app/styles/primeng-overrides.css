@@ -60,3 +60,9 @@
     border-end-start-radius: 0 !important;
   }
 }
+
+
+.p-password-toggle-mask-icon{
+  cursor: pointer !important;
+  z-index: 99;
+}

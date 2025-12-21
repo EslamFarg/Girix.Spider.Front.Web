@@ -1,7 +1,9 @@
+import { AuthService } from '@/features/auth/services/auth-service';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-base-component',
@@ -13,6 +15,7 @@ export class BaseComponent {
   fb = inject(FormBuilder);
   router = inject(Router);
   sanitizer = inject(DomSanitizer);
-
- 
+  confirmationService = inject(ConfirmationService);
+  messageService = inject(MessageService);
+  authService = inject(AuthService);
 }

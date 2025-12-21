@@ -3,6 +3,8 @@ import { ImgFallback } from '@/directives/img-fallback';
 import { RouterLink } from '@angular/router';
 import { BaseComponent } from '@/components/base-component/base-component';
 import headerIcons from './header-icons';
+import { MenuItem } from 'primeng/api';
+import { Menu } from 'primeng/menu';
 
 export interface IMainNavItem {
   label: string;
@@ -20,14 +22,25 @@ export interface ISubNavItem {
 
 @Component({
   selector: 'app-header',
-  imports: [ImgFallback, RouterLink],
+  imports: [ImgFallback, RouterLink, Menu],
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
 export class Header extends BaseComponent {
   header = viewChild<ElementRef<HTMLElement>>('header');
 
-  
+  menuItems: MenuItem[] = [
+    {
+      label: 'الاجاراءات',
+      items: [
+        {
+          label: 'تسجيل الخروج',
+          icon: 'pi pi-sign-out',
+          command: (event) => this.onLogoutClick(event.originalEvent!),
+        },
+      ],
+    },
+  ];
 
   navItems: IMainNavItem[] = [
     {
@@ -308,9 +321,8 @@ export class Header extends BaseComponent {
   activeLink: string = '/';
 
   ngOnInit() {
-      this.activeLink = this.router.url
+    this.activeLink = this.router.url;
   }
-
 
   toggleActiveLink(link: string) {
     console.log('link', link);
@@ -319,7 +331,7 @@ export class Header extends BaseComponent {
     } else {
       this.activeLink = link;
     }
-     
+
     console.log(this.activeLink);
   }
 
@@ -345,4 +357,35 @@ export class Header extends BaseComponent {
   // log() {
   //   console.log(this.height);
   // }
+
+  onLogoutClick(event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل تريد تسجيل الخروج؟',
+      header: 'تسجيل الخروج',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'تسجيل الخروج',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'تم تسجيل الخروج',
+          detail: 'لقد قمت بتسجيل الخروج بنجاح',
+        });
+        this.authService.logout();
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'تم الالغاء', detail: 'لقد قمت بالغاء الخروج' });
+      },
+    });
+  }
 }

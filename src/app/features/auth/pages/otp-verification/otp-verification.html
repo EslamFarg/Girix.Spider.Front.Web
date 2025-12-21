@@ -1,0 +1,26 @@
+<div class="flex items-center justify-center h-screen">
+  <section class="flex flex-col gap-4 p-10 w-120">
+    <div class="text-center">
+      <a routerLink="/auth/login" class="text-app-blue text-sm underline cursor-pointer">تسجيل الدخول</a>
+      <h1 class="text-xl font-bold select-none mt-2">ادخل OTP code</h1>
+    </div>
+    <p class="text-text-light text-sm text-center max-w-80 mx-auto leading-relaxed">
+     ادخل رمز التحقق الذي ارسلناه للتو علي البريد الالكتروني الخاص بك gt******.com
+    </p>
+    <form class="flex w-full flex-col mt-4 gap-3" [formGroup]="fg" (ngSubmit)="onSubmit()">
+      <app-input-error-message-handler>
+        <p-inputotp styleClass="aspect-square" dir="ltr" style="--p-inputtext-border-color:  var(--color-dark-bg-1)"  [integerOnly]="true" [length]="6" />
+      </app-input-error-message-handler>
+      <p class="text-text-light text-sm text-center max-w-80 mx-auto leading-relaxed">يمكنك اعاده ارسال الرمز بعد 35 ثانيه</p>
+      <button class="text-app-blue  text-sm cursor-pointer" type="button">اعاده ارسال الرمز ؟</button>
+      <p-button
+        type="button"
+        routerLink="/auth/reset-password"
+        label="إستمرار"
+        class=" w-full max-w-44 mx-auto"
+        [style]="{'--p-button-primary-background': 'var(--color-dark-bg-1)','--p-button-primary-border-color': 'var(--color-dark-bg-2)'}"
+        styleClass="w-full     cursor-pointer ! rounded py-2.5 mt-4 text-white!"
+      />
+    </form>
+  </section>
+</div>
