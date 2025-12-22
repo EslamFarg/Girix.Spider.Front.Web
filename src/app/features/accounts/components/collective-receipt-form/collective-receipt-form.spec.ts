@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Dialog } from './dialog';
+import { CollectiveReceiptForm } from './collective-receipt-form';
 
-describe('Dialog', () => {
-  let component: Dialog;
-  let fixture: ComponentFixture<Dialog>;
+describe('CollectiveReceiptForm', () => {
+  let component: CollectiveReceiptForm;
+  let fixture: ComponentFixture<CollectiveReceiptForm>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Dialog]
+      imports: [CollectiveReceiptForm]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Dialog);
+    fixture = TestBed.createComponent(CollectiveReceiptForm);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

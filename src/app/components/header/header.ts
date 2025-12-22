@@ -219,13 +219,13 @@ export class Header extends BaseComponent {
         },
         {
           label: 'سند قبض مجمع',
-          imgUrl: headerIcons.accounts.children.collectiveReceipt,
-          routerLink: '/accounts/collective-receipt',
+          imgUrl: headerIcons.accounts.children.collectiveReceipts,
+          routerLink: '/accounts/collective-receipts',
         },
         {
           label: 'سند صرف مجمع',
-          imgUrl: headerIcons.accounts.children.collectivePayment,
-          routerLink: '/accounts/collective-payment',
+          imgUrl: headerIcons.accounts.children.collectivePayments,
+          routerLink: '/accounts/collective-payments',
         },
         {
           label: 'شجره الحسابات',

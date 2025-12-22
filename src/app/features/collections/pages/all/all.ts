@@ -1,5 +1,5 @@
 import { BaseComponent } from '@/components/base-component/base-component';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
@@ -8,7 +8,8 @@ import { Select } from 'primeng/select';
 import { Paginator } from 'primeng/paginator';
 import { InputText } from 'primeng/inputtext';
 import { Dialog } from 'primeng/dialog';
-import { Button } from "primeng/button";
+import { Button } from 'primeng/button';
+import { CollectionsService } from '../../services/collections-service';
 
 @Component({
   selector: 'app-all',
@@ -21,8 +22,8 @@ import { Button } from "primeng/button";
     ReactiveFormsModule,
     InputText,
     Dialog,
-    Button
-],
+    Button,
+  ],
   templateUrl: './all.html',
   styleUrl: './all.css',
 })
@@ -43,18 +44,22 @@ export class All extends BaseComponent {
   onSubmit() {}
 
   first = 0;
+
   rows = 10;
   onPageChange(event: any) {}
 
-
-  isCollectionInvoiceDialogVisible = false;
-
-
+  collectionsService = inject(CollectionsService);
   openCollectionInvoiceDialog() {
-    this.isCollectionInvoiceDialogVisible = true;
+    this.collectionsService.openCollectionInvoiceDialog();
   }
 
-  closeCollectionInvoiceDialog() {
-    this.isCollectionInvoiceDialogVisible = false;
+  isInvoiceTypeChangeDialogVisible = false;
+
+  openInvoiceTypeChangeDialog() {
+    this.isInvoiceTypeChangeDialogVisible = true;
+  }
+
+  closeInvoiceTypeChangeDialog() {
+    this.isInvoiceTypeChangeDialogVisible = false;
   }
 }

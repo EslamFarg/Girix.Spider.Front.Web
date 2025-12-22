@@ -1,20 +1,20 @@
 import { BaseComponent } from '@/components/base-component/base-component';
 import { Component, inject, signal } from '@angular/core';
-import { DialogModule } from 'primeng/dialog';
+import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdown';
 import { Replacements, SpacesEnum } from '../../services/replacements';
-import { Button } from 'primeng/button';
-import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdown';
 import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
+import { Button } from "primeng/button";
 import { Select } from "primeng/select";
+import { Dialog } from "primeng/dialog";
 import { InputText } from "primeng/inputtext";
 
 @Component({
-  selector: 'app-dialog',
-  imports: [DialogModule, Button, CountdownComponent, InputErrorMessageHandler, Select, InputText],
-  templateUrl: './dialog.html',
-  styleUrl: './dialog.css',
+  selector: 'app-replacement-dialog',
+  imports: [InputErrorMessageHandler, Button, Select, CountdownComponent, Dialog, InputText],
+  templateUrl: './replacement-dialog.html',
+  styleUrl: './replacement-dialog.css',
 })
-export class Dialog extends BaseComponent {
+export class ReplacementDialog  extends BaseComponent {
   replacementsService = inject(Replacements);
   SpacesEnum = SpacesEnum;
   currentSpace = this.replacementsService.currentSpace;
@@ -30,4 +30,5 @@ export class Dialog extends BaseComponent {
   setChangeToSpace(space: SpacesEnum) {
     this.changeToSpace.set(space);
   }
+
 }

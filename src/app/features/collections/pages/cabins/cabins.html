@@ -1,1 +1,57 @@
-<p>cabins works!</p>
+<app-section-wrapper class="block mt-4 p-4 overflow-auto custom-scroll">
+  <!-- search -->
+  <form #form [formGroup]="fg" (ngSubmit)="onSubmit()">
+    <app-input-error-message-handler [fc]="fg.get('text')">
+      <input class="w-full bg-transparent! h-8!" pInputText type="text" formControlName="text" placeholder="بحث" />
+      <p-inputgroup-addon class="p-0!">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M10.4154 17.5C6.04311 17.5 2.4987 13.9555 2.4987 9.58329C2.4987 5.21104 6.04311 1.66663 10.4154 1.66663C14.7876 1.66663 18.332 5.21104 18.332 9.58329C18.332 13.9555 14.7876 17.5 10.4154 17.5Z"
+            stroke="#7F7F7F"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M1.66536 18.3333L3.33203 16.6666"
+            stroke="#7F7F7F"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </p-inputgroup-addon>
+    </app-input-error-message-handler>
+  </form>
+
+  <!-- items grid -->
+  <div class="grid grid-cols-6 my-4 mt-25" style="row-gap: 8rem; column-gap: 6rem">
+    @for (item of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 ]; track $index) {
+    <div
+      class="relative text-black cursor-pointer"
+      [class.cabin-available]="$index % 3 == 0"
+      [class.cabin-reserved]="$index % 4 == 1"
+      [class.cabin-on-hold]="$index % 5 == 1"
+      (click)="openCollectionInvoiceDialog()"
+    >
+      <div
+        class="absolute w-4/6 cabin rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded"
+        style="
+          background: linear-gradient(147deg, rgba(255, 255, 255, 0.5) 6.91%, rgba(153, 153, 153, 0.5) 91.82%);
+          backdrop-filter: blur(30.445161819458008px);
+          box-shadow: -4px -4px 6.09px 0px rgba(var(--color), 0.5);
+        "
+      ></div>
+      <div
+        style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
+        class="flex border-2 z-10 relative border-transparent aspect-[calc(110/72)] available items-center justify-center bg-[#E2E2E2] rounded-2xl"
+      >
+        <span class="font-bold">R{{ $index + 1 }}</span>
+      </div>
+      <countdown  #countdown class="mx-auto w-fit block" [config]="countdownConfig" (event)="handleCountdownEvent($event)" />
+    </div>
+    }
+  </div>
+
+  <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
+</app-section-wrapper>

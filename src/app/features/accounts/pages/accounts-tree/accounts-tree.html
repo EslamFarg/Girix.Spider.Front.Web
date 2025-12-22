@@ -1,0 +1,20 @@
+<app-section-wrapper>
+  <p-tree [value]="files()" class="w-full md:w-[30rem]">
+    <ng-template let-node pTemplate="url">
+      <a
+        [href]="node.data"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-surface-700 dark:text-surface-100 hover:text-primary"
+      >
+        {{ node.label }}
+      </a>
+    </ng-template>
+    <ng-template let-node pTemplate="default">
+      <div class="flex items-center" gap-2>
+        <i class="pi pi-file"></i>
+        <b class="ms-2">{{ node.label }}</b>
+      </div>
+    </ng-template>
+  </p-tree>
+</app-section-wrapper>

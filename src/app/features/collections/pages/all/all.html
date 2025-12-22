@@ -127,7 +127,7 @@
                   </defs>
                 </svg>
               </button>
-              <button type="button" class="edit bg-text-light!">
+              <button (click)="openInvoiceTypeChangeDialog()" type="button" class="edit bg-text-light!">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     d="M14.7073 6.37467C14.0026 5.45926 13.0464 4.7691 11.9556 4.38861C10.8649 4.00813 9.68685 3.95382 8.5657 4.23234C7.44455 4.51086 6.42889 5.11012 5.64299 5.95682C4.85708 6.80351 4.335 7.86092 4.14062 8.99967M14.999 3.33301V6.66634H11.6656M5.28896 13.6247C5.99344 14.5404 6.94963 15.2309 8.04049 15.6117C9.13135 15.9924 10.3095 16.0468 11.4309 15.7682C12.5522 15.4897 13.5679 14.8902 14.3538 14.0433C15.1397 13.1963 15.6616 12.1387 15.8556 10.9997M4.99812 16.6663V13.333H8.33146"
@@ -162,64 +162,47 @@
   </app-section-wrapper>
 </div>
 
+
+
 <p-dialog
-  [visible]="isCollectionInvoiceDialogVisible"
+  [visible]="isInvoiceTypeChangeDialogVisible"
   [modal]="true"
-  [style]="{ width: '100%',maxWidth:'800px' }"
+  [style]="{ width: '100%', maxWidth: '400px' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-text-lighter!"
+  styleClass="bg-white!"
+  contentStyleClass=" custom-scroll overflow-visible!"
   class="addition-dialog"
-  (onHide)="closeCollectionInvoiceDialog()"
+  (onHide)="closeInvoiceTypeChangeDialog()"
 >
-  <!-- <ng-template #header >
-    <div class="inline-flex items-center justify-center gap-2">
-      <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
-      <span class="font-bold whitespace-nowrap">Amy Elsner</span>
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2 flex-1 ps-10 text-xl font-bold text-dark-bg-2">
+      تحويل
     </div>
-  </ng-template> -->
+  </ng-template>
 
-  <p class="font-bold text-center text-dark-bg-2 text-lg">الاضافات</p>
-
-  <div class="grid grid-cols-4 gap-2">
-    @for (item of [1,2,3,4,5]; track $index) {
-    <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-center p-2">
-      <img class="w-20" appImgFallback fallBackLink="/images/placeholders/menu-item.png" src="" alt="" />
-      <div class="flex items-center justify-between w-full text-dark-line font-bold">
-        <span>بيبسي</span>
-        <span>1.03</span>
-      </div>
-      <div class="flex items-center justify-center gap-4">
-        <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
-          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
-              fill="#ffffff"
-            />
-          </svg>
-        </button>
-        <span class="font-bold text-dark-line">2</span>
-        <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
-          <svg width="8" height="8" viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
-              fill="#ffffff"
-            />
-          </svg>
-        </button>
-      </div>
-    </div>
-    }
+  <div class="text-dark-bg-2 flex flex-col gap-4 font-medium text-sm">
+     <div>
+          <label for="productName">نوع الفاتوره</label>
+          <app-input-error-message-handler>
+            <input class="h-[46px]!" [disabled]="true" pInputText id="productName" aria-describedby="productName-help" placeholder="محلي" />
+          </app-input-error-message-handler>
+        </div>
+        <div>
+          <label for="productName">تحويل إلي</label>
+          <app-input-error-message-handler>
+            <p-select [options]="[]" optionLabel="name" placeholder="إختر" class="w-full! h-[46px]!" />
+          </app-input-error-message-handler>
+        </div>
   </div>
 
   <ng-template #footer>
-    <p-button
-      label="Cancel"
-      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
-      styleClass=" bg-[#EA7C69]! text-white! px-6!"
-      [text]="true"
-      class="mx-auto"
-      severity="secondary"
-      (click)="closeCollectionInvoiceDialog()"
-    />
+    <div class="flex justify-center w-full">
+      <p-button
+        label="حفظ"
+        styleClass=" bg-dark-line! text-white! w-25 h-[32px]!"
+         severity="secondary"
+        (click)="closeInvoiceTypeChangeDialog()"
+      />
+    </div>
   </ng-template>
 </p-dialog>

@@ -49,6 +49,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@/features/collections/pages/collections-routes').then((m) => m.default),
       },
+      {
+        path: 'accounts',
+        loadChildren: () =>
+          import('@/features/accounts/pages/accounts-routes').then((m) => m.default),
+      },
     ],
   },
   {
