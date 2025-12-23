@@ -241,8 +241,8 @@ export class Header extends BaseComponent {
       children: [
         {
           label: 'بيانات الديليفري',
-          imgUrl: headerIcons.deliveries.children.data,
-          routerLink: '/deliveries/data',
+          imgUrl: headerIcons.deliveries.children.deliveryMen,
+          routerLink: '/deliveries/delivery-men',
         },
       ],
     },
@@ -319,17 +319,42 @@ export class Header extends BaseComponent {
     },
   ];
   activeLink: string = '/';
-
+  prevActiveLink: string = '/';
+  isShowingMenu = true;
   ngOnInit() {
     this.activeLink = this.router.url;
   }
 
+  isParent(route: string) {
+    return this.navItems.some((i) => i.routerLink === route);
+  }
+
   toggleActiveLink(link: string) {
     // console.log('link', link);
-    if (this.navItems.find((i) => i.routerLink === link) && this.activeLink !== '/') {
-      this.activeLink = '/';
-    } else {
+    const isParent = this.isParent(link);
+    const isPrevious = link === this.prevActiveLink;
+    const isPreviousParent = this.isParent(this.prevActiveLink);
+    if (link === '/') {
+      if (this.prevActiveLink === '/' || isPreviousParent) {
+        this.activeLink = '/';
+      } else {
+        this.prevActiveLink = link;
+      }
+      this.isShowingMenu = true;
+    } else if (isParent) {
+      this.prevActiveLink = link;
       this.activeLink = link;
+      this.isShowingMenu = !this.isShowingMenu;
+      // } else if (isParent && isPrevious) {
+      //   this.prevActiveLink = '/';
+      //   this.isShowingMenu = true;
+    } else if (!isParent) {
+      this.prevActiveLink = link;
+      this.activeLink = link;
+      this.isShowingMenu = false;
+    } else if (link === this.prevActiveLink) {
+      this.prevActiveLink = '/';
+      this.isShowingMenu = true;
     }
 
     // console.log(this.activeLink);

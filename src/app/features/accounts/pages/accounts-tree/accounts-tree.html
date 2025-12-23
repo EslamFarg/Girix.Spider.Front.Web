@@ -1,20 +1,88 @@
-<app-section-wrapper>
-  <p-tree [value]="files()" class="w-full md:w-[30rem]">
-    <ng-template let-node pTemplate="url">
-      <a
-        [href]="node.data"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-surface-700 dark:text-surface-100 hover:text-primary"
-      >
-        {{ node.label }}
-      </a>
-    </ng-template>
-    <ng-template let-node pTemplate="default">
-      <div class="flex items-center" gap-2>
-        <i class="pi pi-file"></i>
-        <b class="ms-2">{{ node.label }}</b>
+<app-section-wrapper class="p-4" styleClass="py-6">
+  <div class="grid grid-cols-3 gap-4">
+    <div class="flex flex-col gap-6 col-span-2">
+      <app-section-wrapper styleClass="grid grid-cols-2 gap-4 h-fit!">
+        <div class="h-fit">
+          <label for="costPrice">رقم الحساب</label>
+          <app-input-error-message-handler>
+            <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="110001" />
+          </app-input-error-message-handler>
+        </div>
+        <div class="h-fit">
+          <label for="costPrice">إسم حساب الاب</label>
+          <app-input-error-message-handler>
+            <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="الاسم" />
+          </app-input-error-message-handler>
+        </div>
+      </app-section-wrapper>
+      <app-section-wrapper styleClass="grid grid-cols-2 gap-4">
+        <div>
+          <label for="costPrice">رقم الحساب</label>
+          <app-input-error-message-handler>
+            <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="الاسم" />
+          </app-input-error-message-handler>
+        </div>
+        <div>
+          <label for="productName">إسم الحساب</label>
+          <app-input-error-message-handler>
+            <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
+          </app-input-error-message-handler>
+        </div>
+        <div>
+          <label for="productName">مجموعه الحساب</label>
+          <app-input-error-message-handler>
+            <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
+          </app-input-error-message-handler>
+        </div>
+        <div>
+          <label for="productName">طبيعه الحساب</label>
+          <app-input-error-message-handler>
+            <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
+          </app-input-error-message-handler>
+        </div>
+        <div>
+          <label for="productName">حاله الحساب</label>
+          <app-input-error-message-handler>
+            <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
+          </app-input-error-message-handler>
+        </div>
+        <div>
+          <label for="productName">الحساب الختامي</label>
+          <app-input-error-message-handler>
+            <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
+          </app-input-error-message-handler>
+        </div>
+      </app-section-wrapper>
+      <div class="flex items-center gap-2 justify-end">
+        <p-button styleClass="border-dark-line! bg-dark-line! text-white! py-1! px-8!" label="حفظ" />
+        <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="حذف" variant="outlined" />
+        <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="جديد" variant="outlined" />
       </div>
-    </ng-template>
-  </p-tree>
+    </div>
+
+    <app-section-wrapper>
+      <p-tree
+        [value]="files()"
+        class="w-full  "
+        style="--p-tree-background: transparent; --p-tree-node-color: black"
+      >
+        <ng-template let-node pTemplate="url">
+          <a
+            [href]="node.data"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-surface-700 dark:text-surface-100 hover:text-primary"
+          >
+            {{ node.label }}
+          </a>
+        </ng-template>
+        <ng-template let-node pTemplate="default">
+          <div class="flex items-center" gap-2>
+            <i class="pi pi-file"></i>
+            <b class="ms-2">{{ node.label }}</b>
+          </div>
+        </ng-template>
+      </p-tree>
+    </app-section-wrapper>
+  </div>
 </app-section-wrapper>

@@ -1,4 +1,4 @@
-<div class="h-full overflow-auto custom-scroll p-4">
+<div class="h-full overflow-auto no-scrollbar p-4">
   <app-section-wrapper class="flex flex-col gap-5">
     <!-- search -->
     <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="flex flex-1 w-full items-start gap-2 *:flex-1">
@@ -11,11 +11,30 @@
     </form>
 
     <!-- actions -->
-    <div class="flex items-center gap-2 justify-end">
-      <p-button styleClass="border-dark-line! bg-dark-line! text-white! py-1! px-8!" label="حفظ" />
-      <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="حذف" variant="outlined" />
-      <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="جديد" variant="outlined" />
-      <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="طباعة" variant="outlined" />
+    <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 my-4">
+      <p-button
+        class="flex-1 md:flex-none"
+        styleClass="border-dark-line! bg-dark-line! text-white! py-1! w-full  md:px-8!"
+        label="حفظ"
+      />
+      <p-button
+        class="flex-1 md:flex-none"
+        styleClass="border-dark-line! text-dark-line! py-1!  w-full md:px-8!"
+        label="حذف"
+        variant="outlined"
+      />
+      <p-button
+        class="flex-1 md:flex-none"
+        styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
+        label="جديد"
+        variant="outlined"
+      />
+      <p-button
+        class="flex-1 md:flex-none"
+        styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
+        label="طباعة"
+        variant="outlined"
+      />
     </div>
 
     <!-- data -->

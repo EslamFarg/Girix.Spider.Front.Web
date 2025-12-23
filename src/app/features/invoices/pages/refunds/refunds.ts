@@ -6,10 +6,11 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
+import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
 
 @Component({
   selector: 'app-refunds',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon,InputTextModule,SelectModule,PaginatorModule],
+  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon, InputTextModule, SelectModule, PaginatorModule, SectionWrapper],
   templateUrl: './refunds.html',
   styleUrl: './refunds.css',
 })

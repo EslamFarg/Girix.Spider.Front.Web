@@ -69,3 +69,77 @@
   cursor: pointer !important;
   z-index: 99;
 }
+/* tree */
+p-tree .p-tree-node-content:has(+ .p-tree-node-children) {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    top: 100%;
+    /* 8px padding - 16px  */
+    right: 15.5px;
+    /* background-color: white; */
+    z-index: 1;
+  }
+  /* &::before {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    top: 100%;
+    right: 16px;
+    background-color: white;
+    z-index: 1;
+  } */
+}
+
+p-tree .p-tree-node-children > p-treenode > .p-tree-node > .p-tree-node-content {
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 1px;
+    top: 50%;
+    /* 8px padding - 16px  */
+    right: -8px;
+    /* translate: 0 -50%; */
+    background-color: black;
+    z-index: 1;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: calc(100% + 1px);
+    top: calc(-50% - 1px);
+    /* 8px padding - 16px  */
+    right: -8px;
+    /* translate: 0 -50%; */
+    background-color: black;
+    z-index: 1;
+  }
+}
+p-tree .p-tree-node-children > p-treenode:nth-child(1) > .p-tree-node > .p-tree-node-content{
+  &::after{
+    height: 50%;
+    top: 0%;
+  }
+}
+.p-tree-node-children{
+  position: relative;
+  &::after{
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: calc(100% + 1px);
+    top: -15px;
+    /* 8px padding - 16px  */
+    right: -8px;
+    /* translate: 0 -50%; */
+    background-color: black;
+    z-index: 1;
+  }
+}

@@ -6,11 +6,12 @@ import { InputGroupAddon } from "primeng/inputgroupaddon";
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { PaginatorModule } from 'primeng/paginator';
+import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
 
 
 @Component({
   selector: 'app-orders',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon,InputTextModule,SelectModule,PaginatorModule],
+  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon, InputTextModule, SelectModule, PaginatorModule, SectionWrapper],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })

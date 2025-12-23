@@ -1,37 +1,56 @@
-<div class="flex items-center gap-2 justify-end">
-  <p-button styleClass="border-dark-line! bg-dark-line! text-white! py-1! px-8!" label="حفظ" />
-  <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="حذف" variant="outlined" />
-  <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="جديد" variant="outlined" />
-  <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="طباعة" variant="outlined" />
+<div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 mb-4">
+  <p-button
+    class="flex-1 md:flex-none"
+    styleClass="border-dark-line! bg-dark-line! text-white! py-1! w-full  md:px-8!"
+    label="حفظ"
+  />
+  <p-button
+    class="flex-1 md:flex-none"
+    styleClass="border-dark-line! text-dark-line! py-1!  w-full md:px-8!"
+    label="حذف"
+    variant="outlined"
+  />
+  <p-button
+    class="flex-1 md:flex-none"
+    styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
+    label="جديد"
+    variant="outlined"
+  />
+  <p-button
+    class="flex-1 md:flex-none"
+    styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
+    label="طباعة"
+    variant="outlined"
+  />
 </div>
 
-<div class="grid grid-cols-4 gap-4 flex-1">
-  <div class="col-span-4">
+<div class="grid md:grid-cols-4 gap-4 flex-1">
+  <div class="md:col-span-4">
     <label for="productName">اسم العميل</label>
     <app-input-error-message-handler>
       <input pInputText id="productName" aria-describedby="productName-help" placeholder="الاسم" />
     </app-input-error-message-handler>
   </div>
-  <div class="col-span-2">
+  <div class="md:col-span-2">
     <label for="productPrice">رقم الجوال</label>
     <app-input-error-message-handler>
       <input pInputText id="productPrice" aria-describedby="productPrice-help" placeholder="رقم جوال" />
     </app-input-error-message-handler>
   </div>
-  <div class="col-span-2">
+  <div class="md:col-span-2">
     <label for="costPrice">رقم جوال إضافي</label>
     <app-input-error-message-handler>
       <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="رقم جوال" />
     </app-input-error-message-handler>
   </div>
 
-  <div class="col-span-2">
+  <div class="md:col-span-2">
     <label for="productName">سجل تجاري</label>
     <app-input-error-message-handler>
       <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="رقم " />
     </app-input-error-message-handler>
   </div>
-  <div class="col-span-2">
+  <div class="md:col-span-2">
     <label for="productName">رقم ضريبي</label>
     <app-input-error-message-handler>
       <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="رقم " />
@@ -79,8 +98,7 @@
       <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="الشقه " />
     </app-input-error-message-handler>
   </div>
-  
-   
+
   <div class="flex flex-col justify-end">
     <div class="flex items-center h-fit gap-2 pb-1">
       <app-input-error-message-handler>
@@ -90,7 +108,7 @@
     </div>
   </div>
 
-  <div class="col-span-4">
+  <div class="md:col-span-4">
     <label for="productName">البيان</label>
     <app-input-error-message-handler>
       <textarea

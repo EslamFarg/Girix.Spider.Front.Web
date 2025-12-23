@@ -1,11 +1,12 @@
 import { Route } from '@angular/router';
-import { Home } from '@/features/general/pages/home/home';
 import { Journals } from './journals/journals';
 import { CollectivePayments } from './collective-payments/collective-payments';
 import { CollectiveReceipts } from './collective-receipts/collective-receipts';
 import { AddCollectiveReceipt } from './add-collective-receipt/add-collective-receipt';
 import { EditCollectiveReceipt } from './edit-collective-receipt/edit-collective-receipt';
 import { AccountsTree } from './accounts-tree/accounts-tree';
+import { AddCollectivePayment } from './add-collective-payment/add-collective-payment';
+import { EditCollectivePayment } from './edit-collective-payment/edit-collective-payment';
 
 export default [
   {
@@ -19,11 +20,11 @@ export default [
   },
   {
     path: 'collective-payments/add',
-    component: Home,
+    component: AddCollectivePayment,
   },
   {
     path: 'collective-payments/:id/edit',
-    component: Home,
+    component: EditCollectivePayment,
   },
   //collective receipts
   {

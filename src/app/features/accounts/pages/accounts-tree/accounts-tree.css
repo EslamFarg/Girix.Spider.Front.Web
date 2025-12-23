@@ -1,7 +1,7 @@
-
 p-tree::ng-deep .p-tree-node-content {
   width: fit-content;
   position: relative;
+  /* padding-inline-start: 1.5rem; */
 }
 
 p-tree::ng-deep .p-tree-node-toggle-button {
@@ -14,16 +14,7 @@ p-tree::ng-deep .p-tree-node-toggle-button {
   opacity: 0;
   cursor: pointer;
 }
-p-tree::ng-deep .p-tree-node-content:has( + .p-tree-node-children) {
-  position: relative;
-  &::after {
-    content: '';
-    position: absolute;
-    width: 1px;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background-color: white;
-    z-index: 1;
-  }
+p-tree::ng-deep .p-tree-node-children {
+  --p-tree-indent: 1.5rem;
 }
+

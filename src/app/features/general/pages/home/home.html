@@ -72,7 +72,7 @@
     </div>
 
     <!-- local space options -->
-    <div class="flex w-full border border-text-light rounded-[14px] p-3">
+    <div class="flex flex-col gap-4 sm:gap-0 sm:flex-row w-full border border-text-light rounded-[14px] p-3">
       <div class="flex gap-2 *:flex-1 flex-1 justify-end">
         <p-button
           styleClass="text-dark-line! py-1! w-full bg-text-lighter! border-transparent! text-sm!"
@@ -90,9 +90,9 @@
           variant="outlined"
         />
       </div>
-      <div class="px-3 text-text-gray text-xl font-light">|</div>
+      <div class="px-3 text-text-gray text-xl font-light hidden sm:block">|</div>
       <div
-        class="border border-text-light rounded-lg w-1/2 py-1.25 px-3 text-dark-bg-2 font-bold text-xs flex items-center justify-between"
+        class="border border-text-light rounded-lg sm:w-1/2 py-1.25 px-3 text-dark-bg-2 font-bold text-xs flex items-center justify-between"
       >
         <span>كوخ 1</span>
         <span>02:00:00</span>
@@ -100,7 +100,7 @@
     </div>
 
     <!-- order items -->
-    <div class="p-2 border border-text-light rounded-[14px] w-full overflow-hidden">
+    <div class="p-2 border border-text-light rounded-[14px] w-full min-h-fit overflow-hidden">
       <div class="w-full overflow-auto custom-scroll pb-0.5">
         <table class="text-dark-bg-2 text-center min-w-full">
           <thead>
@@ -115,7 +115,8 @@
             </tr>
           </thead>
           <tbody class="text-sm">
-            <tr class="text-xs">
+            @for (item of [1,2,3,4,5,6,7]; track $index) {
+            <tr class="text-xs *:py-1">
               <!-- actions -->
               <td>
                 <div class="flex items-center gap-2">
@@ -216,18 +217,13 @@
                 </div>
               </td>
               <!-- total -->
-              <td>
-                <div class="font-semibold">1000</div>
-              </td>
+              <td class="font-semibold">1000</td>
               <!-- tax -->
-              <td>
-                <div class="font-semibold">50</div>
-              </td>
+              <td class="font-semibold">50</td>
               <!-- net -->
-              <td>
-                <div class="font-semibold">1050</div>
-              </td>
+              <td class="font-semibold">1050</td>
             </tr>
+            }
           </tbody>
         </table>
       </div>
@@ -271,7 +267,7 @@
     </div>
 
     <!-- options -->
-    <div class="flex  gap-2 location-btns  *:flex-1 w-full justify-end">
+    <div class="flex gap-2 location-btns *:flex-1 w-full justify-end">
       <p-button
         styleClass="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full  border-text-light! text-xs!"
         label="بيانات العميل"

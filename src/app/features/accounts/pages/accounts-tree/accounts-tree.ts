@@ -2,10 +2,14 @@ import { Component, signal } from '@angular/core';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { TreeModule } from 'primeng/tree';
 import { TreeNode } from 'primeng/api';
+import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
+import { Select } from "primeng/select";
+import { Button } from "primeng/button";
+import { InputText } from "primeng/inputtext";
 
 @Component({
   selector: 'app-accounts-tree',
-  imports: [SectionWrapper, TreeModule],
+  imports: [SectionWrapper, TreeModule, InputErrorMessageHandler, Select, Button, InputText],
   templateUrl: './accounts-tree.html',
   styleUrl: './accounts-tree.css',
 })

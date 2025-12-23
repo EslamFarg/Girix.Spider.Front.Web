@@ -1,6 +1,6 @@
 <header #header class="w-full h-[130px] flex flex-col relative">
   <div class="bg-dark-bg-2">
-    <div class="px-8 py-1.5 grid grid-cols-3 container relativeitems-center">
+    <div class="px-4 xl:px-8 py-1.5 grid grid-cols-2 sm:grid-cols-3 container relativeitems-center">
       <a href="" routerLink="/">
         <img class="w-7" src="/images/logo.png" alt="" />
       </a>
@@ -9,7 +9,7 @@
         <div>أبناء المحله</div>
       </div> -->
 
-      <div class="flex items-center justify-center text-sm">20 يناير 2026 / 03:56:22 ص</div>
+      <div class="hidden items-center justify-center text-sm sm:flex">20 يناير 2026 / 03:56:22 ص</div>
 
       <div class="flex items-center gap-2 text-light-bg ms-auto cursor-pointer" (click)="menu.toggle($event)">
         <img class="w-6 h-6 rounded-full object-cover" src="" appImgFallback alt="" />
@@ -19,16 +19,17 @@
       <p-menu dir="rtl" #menu [model]="menuItems" [popup]="true" [style]="{ insetInlineEnd: '100%' }" />
     </div>
   </div>
+
   <nav class="bg-text-lighter overflow-auto custom-scroll w-full flex-1">
     <div class="container flex items-center h-full px-4 py-1 w-full">
       @for (parent of navItems; track $index) {
       <!-- parent -->
       <a
-        class="nav-item z-20 h-full opacity-0 hidden duration-500 ease-in-out translate-x-[100vw] transition-all flex-col gap-1 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-15"
+        class="nav-item z-20 h-full opacity-0 hidden duration-500 ease-in-out translate-x-[100vw] transition-all flex-col gap-1 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
         [class.nav-item-active]="parent.routerLink === activeLink"
         [class.ms-0!]="$first || isParentActive(parent.routerLink)"
         [class.nav-item-visible]="
-          activeLink == '/' || isChildActive(parent.routerLink) || parent.routerLink === activeLink
+          activeLink == '/' || isChildActive(parent.routerLink) || parent.routerLink === activeLink || isShowingMenu
         "
         [routerLink]="parent.routerLink === '/' ? ['/'] : []"
         (click)="toggleActiveLink(parent.routerLink)"
@@ -37,7 +38,7 @@
         <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{ parent.label }}</span>
       </a>
       <!-- children -->
-      @if ( parent.children) { @if (parent.routerLink === activeLink || isParentActive(parent.routerLink)) {
+      @if ( parent.children && !isShowingMenu) { @if (parent.routerLink === activeLink || isParentActive(parent.routerLink)) {
       <svg class="mx-3" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           opacity="0.4"
@@ -52,14 +53,14 @@
 
       }
       <div
-        class="flex w-0 z-10 gap-2 overflow-hidden transition-all duration-500 ease-in-out h-full"
+        class="flex w-0 z-10 gap-2 overflow-auto transition-all duration-500 ease-in-out h-full"
         [class.w-full]="parent.routerLink === activeLink || isParentActive(parent.routerLink)"
       >
         @for (child of parent.children; track $index) {
         <a
-          class="nav-item opacity-0 translate-x-[100vw] mx-0! transition-all duration-500 ease-in-out flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-15"
+          class="nav-item opacity-0 translate-x-[100vw] mx-0! transition-all duration-500 ease-in-out flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
           [class.nav-item-active]="child.routerLink === activeLink"
-          [class.nav-item-visible]="isParentActive(parent.routerLink) || child.routerLink === activeLink"
+          [class.nav-item-visible]="isParentActive(parent.routerLink) || child.routerLink === activeLink || !isShowingMenu"
           (click)="toggleActiveLink(child.routerLink)"
           [routerLink]="child.routerLink"
         >

@@ -54,6 +54,16 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@/features/accounts/pages/accounts-routes').then((m) => m.default),
       },
+      {
+        path: 'deliveries',
+        loadChildren: () =>
+          import('@/features/deliveries/pages/deliveries-routes').then((m) => m.default),
+      },
+      {
+        path: 'users',
+        loadChildren: () =>
+          import('@/features/users/pages/users-routes').then((m) => m.default),
+      },
     ],
   },
   {
