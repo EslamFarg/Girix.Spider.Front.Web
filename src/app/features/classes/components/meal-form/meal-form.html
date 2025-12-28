@@ -38,9 +38,16 @@
           />
         </svg>
       </div>
-      <p-carousel class="w-full max-w-60 mx-auto" [value]="[1, 2, 3,1,1,1,1]" [numVisible]="3" [numScroll]="1"  [circular]="false" [showIndicators]="false">
+      <p-carousel
+        class="w-full max-w-60 mx-auto"
+        [value]="[1, 2, 3, 1, 1, 1, 1]"
+        [numVisible]="3"
+        [numScroll]="1"
+        [circular]="false"
+        [showIndicators]="false"
+      >
         <ng-template let-product #item>
-            <img src="/images/placeholders/menu-item.png" class="w-10 h-10 mx-auto rounded-full" alt="" />
+          <img src="/images/placeholders/menu-item.png" class="w-10 h-10 mx-auto rounded-full" alt="" />
         </ng-template>
       </p-carousel>
     </div>

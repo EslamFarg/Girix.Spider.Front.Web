@@ -64,6 +64,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@/features/users/pages/users-routes').then((m) => m.default),
       },
+      {
+        path: 'settings',
+        loadChildren: () =>
+          import('@/features/settings/pages/settings-routes').then((m) => m.default),
+      },
     ],
   },
   {
