@@ -4,12 +4,37 @@
   opacity: 1;
   display: flex;
   margin: 0 5px;
-  --tw-translate-x: 0;
+  translate: 0 0 !important;
+  max-width: 200px;
+  order: 0 !important;
+  /* --tw-translate-x: 0; */
+
 }
 .nav-item:hover,
 .nav-item-active{
   border-color: var(--color-dark-line);
-  background-color: #25283633;
-  
+  background-color: #25283633;  
+}
+
+.slide-out {
+  animation: slideOut 1s ease-in-out forwards;
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+
+  99% {
+    transform: translateX(100vw);
+    opacity: 0;
+  }
+  100%{
+    display: none;
+  }
 }
  

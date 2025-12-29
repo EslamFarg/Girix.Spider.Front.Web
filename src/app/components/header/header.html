@@ -1,4 +1,4 @@
-<header #header class="w-full h-[130px] flex flex-col relative">
+<header #header class="w-full h-[135px] flex flex-col relative">
   <div class="bg-dark-bg-2">
     <div class="px-4 xl:px-8 py-1.5 grid grid-cols-2 sm:grid-cols-3 container relativeitems-center">
       <a href="" routerLink="/">
@@ -25,8 +25,11 @@
       @for (parent of navItems; track $index) {
       <!-- parent -->
       <a
-        class="nav-item z-20 h-full opacity-0 hidden duration-500 ease-in-out translate-x-[100vw] transition-all flex-col gap-1 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
+        class="nav-item z-20 h-full opacity-0 max-w-0 duration-500 ease-in-out transition-all flex-col gap-1 items-center justify-between py-1 order-100 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
         [class.nav-item-active]="parent.routerLink === activeLink"
+        [class.slide-out]="
+          !(activeLink == '/' || isChildActive(parent.routerLink) || parent.routerLink === activeLink || isShowingMenu)
+        "
         [class.ms-0!]="$first || isParentActive(parent.routerLink)"
         [class.nav-item-visible]="
           activeLink == '/' || isChildActive(parent.routerLink) || parent.routerLink === activeLink || isShowingMenu
@@ -38,8 +41,10 @@
         <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{ parent.label }}</span>
       </a>
       <!-- children -->
-      @if ( parent.children && !isShowingMenu) { @if (parent.routerLink === activeLink || isParentActive(parent.routerLink)) {
-      <svg class="mx-3" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- @if ( parent.children && !isShowingMenu) { -->
+      <!--  -->
+      @if (!isShowingMenu && (parent.routerLink === activeLink || isParentActive(parent.routerLink))) {
+      <svg class="min-w-8 mx-3" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           opacity="0.4"
           d="M21.0634 17.5871L25.9957 18.0233C27.1026 18.0233 28 17.1171 28 15.9994C28 14.8818 27.1026 13.9756 25.9957 13.9756L21.0634 14.4118C20.195 14.4118 19.491 15.1226 19.491 15.9994C19.491 16.8777 20.195 17.5871 21.0634 17.5871Z"
@@ -50,17 +55,19 @@
           fill="black"
         />
       </svg>
-
       }
+      <!--  -->
       <div
-        class="flex w-0 z-10 gap-2 overflow-auto transition-all duration-500 ease-in-out h-full"
-        [class.w-full]="parent.routerLink === activeLink || isParentActive(parent.routerLink)"
+        class="flex custom-scroll z-10 gap-2 overflow-auto transition-all duration-500 ease-in-out h-full w-full max-w-0"
+        [class.max-w-screen]="!isShowingMenu && (parent.routerLink === activeLink || isParentActive(parent.routerLink))"
       >
         @for (child of parent.children; track $index) {
         <a
           class="nav-item opacity-0 translate-x-[100vw] mx-0! transition-all duration-500 ease-in-out flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
           [class.nav-item-active]="child.routerLink === activeLink"
-          [class.nav-item-visible]="isParentActive(parent.routerLink) || child.routerLink === activeLink || !isShowingMenu"
+          [class.nav-item-visible]="
+            isParentActive(parent.routerLink) || child.routerLink === activeLink || !isShowingMenu
+          "
           (click)="toggleActiveLink(child.routerLink)"
           [routerLink]="child.routerLink"
         >
@@ -69,7 +76,8 @@
         </a>
         }
       </div>
-      } }
+      <!-- }  -->
+      }
     </div>
   </nav>
 </header>
