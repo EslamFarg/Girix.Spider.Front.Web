@@ -1,4 +1,10 @@
-:host{
+:host {
   display: block;
   overflow: auto;
- }
+}
+
+:host::ng-deep .keep-border {
+  border-color: var(--color-text-light);
+  border-radius: 14px;
+  padding:1rem;
+}
