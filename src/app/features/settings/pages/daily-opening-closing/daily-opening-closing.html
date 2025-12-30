@@ -1,4 +1,5 @@
-<app-section-wrapper class="p-4" styleClass="flex flex-col gap-4">
+<div class="min-h-full h-full overflow-auto custom-scroll">
+  <app-section-wrapper class="p-4 " styleClass="flex flex-col gap-4">
   <!-- search -->
   <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="h-fit items-start gap-2 border w-full">
     <app-input-error-message-handler [fc]="fg.get('text')">
@@ -64,38 +65,49 @@
     >
       <ng-template let-item #item>
         @switch (item) { @case (DocFormSections.opening) {
-        <div>
+        <div class="flex flex-col gap-4">
           <!-- الرصيد السابق -->
           <div class="doc-input">
-            <label for="productPrice">الرصيد السابق</label>
+            <label for="productPrice" class="mb-0!">الرصيد السابق</label>
             <app-input-error-message-handler>
               <input pInputText id="productPrice" aria-describedby="productPrice-help" placeholder="3000" />
             </app-input-error-message-handler>
           </div>
           <!-- العهده -->
           <div class="doc-input">
-            <label for="">الرصيد السابق</label>
+            <label for="" class="mb-0!">الرصيد السابق</label>
             <app-input-error-message-handler>
               <input pInputText id="productName" aria-describedby="productName-help" placeholder="3000" />
             </app-input-error-message-handler>
           </div>
           <!-- ملاحظات -->
-          <div class="doc-input">
-            <label for="">الرصيد السابق</label>
-            <app-input-error-message-handler>
-              <textarea
-                rows="5"
-                cols="30"
-                pTextarea
-                id="productName"
-                aria-describedby="productName-help"
-                placeholder="البيان"
-              ></textarea>
-            </app-input-error-message-handler>
+          <div>
+            <label for="" class="text-dark-bg-1 font-medium text-sm">ملاحظات</label>
+            <div class="doc-input my-1">
+              <app-input-error-message-handler class="w-full">
+                <textarea
+                  rows="5"
+                  cols="30"
+                  pTextarea
+                  class="w-full"
+                  id="productName"
+                  aria-describedby="productName-help"
+                  placeholder="ملاحظات"
+                ></textarea>
+              </app-input-error-message-handler>
+            </div>
           </div>
         </div>
         } @case (DocFormSections.closing) { } @case (DocFormSections.deficitReduction) { } }
       </ng-template>
     </p-carousel>
+    <div class="ms-auto w-fit mt-4">
+      <p-button
+           styleClass="border-dark-line! bg-dark-line! text-white! py-1!    md:px-8!"
+            label="حفظ"
+        />
+    </div>
   </form>
 </app-section-wrapper>
+
+</div>

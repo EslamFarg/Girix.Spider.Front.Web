@@ -1,0 +1,143 @@
+<div class="custom-scroll overflow-auto h-full">
+  <app-section-wrapper class="p-4 sm:px-6 min-h-full h-full"  >
+    <form action="" class="flex flex-col gap-4 md:gap-6"  >
+      <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 md:mt-4">
+        <p-button
+          class="flex-1 md:flex-none"
+          styleClass="border-dark-line! bg-dark-line! text-white! py-1! w-full  md:px-8!"
+          label="حفظ"
+        />
+        <p-button
+          class="flex-1 md:flex-none"
+          styleClass="border-dark-line! text-dark-line! py-1!  w-full md:px-8!"
+          label="حذف"
+          variant="outlined"
+        />
+        <p-button
+          class="flex-1 md:flex-none"
+          styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
+          label="جديد"
+          variant="outlined"
+        />
+      </div>
+
+      <div>
+        <label for="productName" class="text-dark-bg-2 mb-2 block font-medium">سعر الخدمه</label>
+        <div class="grid grid-cols-2 md:grid-cols-[auto_auto_1fr] gap-2">
+          <app-input-error-message-handler>
+            <label
+              for="servicePricePercentage"
+              class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
+              [class.financial-input-active]="servicePricePercentage.checked"
+            >
+              <input
+                #servicePricePercentage
+                [defaultChecked]="true"
+                type="radio"
+                name="servicePriceType"
+                id="servicePricePercentage"
+                aria-describedby="productName-help"
+                (change)="(null)"
+              />
+              <span class="text-dark-line text-xs">نسبه الخدمه</span>
+            </label>
+          </app-input-error-message-handler>
+          <app-input-error-message-handler>
+            <label
+              for="servicePriceValue"
+              class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
+              [class.financial-input-active]="servicePriceValue.checked"
+            >
+              <input
+                #servicePriceValue
+                (change)="(null)"
+                type="radio"
+                name="servicePriceType"
+                id="servicePriceValue"
+                aria-describedby="productName-help"
+              />
+              <span class="text-dark-line text-xs">قيمه الخدمه</span>
+            </label>
+          </app-input-error-message-handler>
+          <app-input-error-message-handler class="h-11 *:h-full flex-1 col-span-2 md:col-span-1">
+            <input
+              type="text"
+              class="app-input h-full!"
+              pInputText
+              id="productPrice"
+              aria-describedby="productPrice-help"
+              placeholder="العدد"
+            />
+          </app-input-error-message-handler>
+        </div>
+      </div>
+
+      <div>
+        <label for="productName" class="text-dark-bg-2 mb-2 block font-medium">سعر التوصيل</label>
+        <div class="grid grid-cols-2 md:grid-cols-[auto_auto_1fr] gap-2">
+          <app-input-error-message-handler>
+            <label
+              for="deliveryPricePercentage"
+              class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
+              [class.financial-input-active]="deliveryPricePercentage.checked"
+            >
+              <input
+                #deliveryPricePercentage
+                [defaultChecked]="true"
+                type="radio"
+                name="deliveryPriceType"
+                id="deliveryPricePercentage"
+                aria-describedby="productName-help"
+                (change)="(null)"
+              />
+              <span class="text-dark-line text-xs">نسبه التوصيل</span>
+            </label>
+          </app-input-error-message-handler>
+          <app-input-error-message-handler>
+            <label
+              for="deliveryPriceValue"
+              class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
+              [class.financial-input-active]="deliveryPriceValue.checked"
+            >
+              <input
+                #deliveryPriceValue
+                (change)="(null)"
+                type="radio"
+                name="deliveryPriceType"
+                id="deliveryPriceValue"
+                aria-describedby="productName-help"
+              />
+              <span class="text-dark-line text-xs">قيمه التوصيل</span>
+            </label>
+          </app-input-error-message-handler>
+          <app-input-error-message-handler class="h-11 *:h-full flex-1  col-span-2 md:col-span-1">
+            <input
+              type="text"
+              class="app-input h-full!"
+              pInputText
+              id="productPrice"
+              aria-describedby="productPrice-help"
+              placeholder="العدد"
+            />
+          </app-input-error-message-handler>
+        </div>
+      </div>
+
+      <div>
+        <label for="productName" class="text-dark-bg-2 mb-2 block font-medium">الخصم</label>
+        <div class="flex gap-2">
+          <app-input-error-message-handler class="h-11 *:h-full flex-1">
+            <input
+              type="text"
+              class="app-input h-full!"
+              pInputText
+              id="productPrice"
+              aria-describedby="productPrice-help"
+              placeholder="العدد"
+            />
+          </app-input-error-message-handler>
+        </div>
+      </div>
+    </form>
+  </app-section-wrapper>
+</div>

@@ -18,6 +18,7 @@ export interface ISubNavItem {
   label: string;
   imgUrl: string;
   routerLink: string;
+  subLinks?: string[];
 }
 
 @Component({
@@ -267,6 +268,7 @@ export class Header extends BaseComponent {
           label: 'إعدادات البرنامج',
           imgUrl: headerIcons.settings.children.program,
           routerLink: '/settings/program',
+          subLinks: ['/settings/program/language', '/settings/program/support', '/settings/program/about'],
         },
         {
           label: 'إعدادات الماليه',
@@ -361,16 +363,27 @@ export class Header extends BaseComponent {
   }
 
   isChildActive(parentLink: string) {
-    return (
-      this.navItems
-        .find((item) => item.routerLink === parentLink)
-        ?.children?.some((child) => child.routerLink === this.activeLink) ?? false
-    );
+    const parent = this.navItems.find((item) => item.routerLink === parentLink);
+    const isChildActive = parent?.children?.some((child) => child.routerLink === this.activeLink);
+    return isChildActive;
   }
 
   isParentActive(parentLink: string) {
     return parentLink === this.activeLink || this.isChildActive(parentLink);
     // return this.navItems.some((item) => item.routerLink === parentLink);
+  }
+
+  isAnyChildSubLinksActive(parentLink: string) {
+    const parent = this.navItems.find((item) => item.routerLink === parentLink);
+    return parent?.children?.some((child) => child.subLinks?.some((subLink) => subLink === this.activeLink));
+  }
+
+  isAnySubLinksActive(parentLink: string, childLink: string) {
+    const parent = this.navItems.find((item) => item.routerLink === parentLink);
+    const child = parent?.children?.find((item) => item.routerLink === childLink);
+    if (!child) return false;
+    if (!child.subLinks) return false;
+    return child.subLinks.some((subLink) => subLink === this.activeLink);
   }
 
   // get height() {

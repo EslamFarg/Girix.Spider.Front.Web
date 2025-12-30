@@ -1,0 +1,12 @@
+.financial-input-active {
+  box-shadow: 0px 0px 10px 0px #808080b2 inset;
+  & span {
+    color: var(--color-dark-bg-2);
+    font-weight: 600;
+  }
+}
+
+
+.app-input{
+  --p-inputtext-border-color:var(--color-dark-bg-2) !important
+}

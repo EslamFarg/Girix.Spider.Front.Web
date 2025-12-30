@@ -26,13 +26,27 @@
       <!-- parent -->
       <a
         class="nav-item z-20 h-full opacity-0 max-w-0 duration-500 ease-in-out transition-all flex-col gap-1 items-center justify-between py-1 order-100 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
-        [class.nav-item-active]="parent.routerLink === activeLink"
+        [class.nav-item-active]="
+          isShowingMenu && (parent.routerLink === activeLink ||
+          isParentActive(parent.routerLink) ||
+          isAnyChildSubLinksActive(parent.routerLink))
+        "
         [class.slide-out]="
-          !(activeLink == '/' || isChildActive(parent.routerLink) || parent.routerLink === activeLink || isShowingMenu)
+          !(
+            activeLink == '/' ||
+            isAnyChildSubLinksActive(parent.routerLink) ||
+            isChildActive(parent.routerLink) ||
+            parent.routerLink === activeLink ||
+            isShowingMenu
+          )
         "
         [class.ms-0!]="$first || isParentActive(parent.routerLink)"
         [class.nav-item-visible]="
-          activeLink == '/' || isChildActive(parent.routerLink) || parent.routerLink === activeLink || isShowingMenu
+          activeLink == '/' ||
+          isChildActive(parent.routerLink) ||
+          isAnyChildSubLinksActive(parent.routerLink) ||
+          parent.routerLink === activeLink ||
+          isShowingMenu
         "
         [routerLink]="parent.routerLink === '/' ? ['/'] : []"
         (click)="toggleActiveLink(parent.routerLink)"
@@ -43,8 +57,16 @@
       <!-- children -->
       <!-- @if ( parent.children && !isShowingMenu) { -->
       <!--  -->
-      @if (!isShowingMenu && (parent.routerLink === activeLink || isParentActive(parent.routerLink))) {
-      <svg class="min-w-8 mx-3" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      @if (!isShowingMenu && (parent.routerLink === activeLink || isParentActive(parent.routerLink) ||
+      isAnyChildSubLinksActive(parent.routerLink)) ) {
+      <svg
+        class="min-w-8 mx-3"
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <path
           opacity="0.4"
           d="M21.0634 17.5871L25.9957 18.0233C27.1026 18.0233 28 17.1171 28 15.9994C28 14.8818 27.1026 13.9756 25.9957 13.9756L21.0634 14.4118C20.195 14.4118 19.491 15.1226 19.491 15.9994C19.491 16.8777 20.195 17.5871 21.0634 17.5871Z"
@@ -58,18 +80,28 @@
       }
       <!--  -->
       <div
-        class="flex custom-scroll z-10 gap-2 overflow-auto transition-all duration-500 ease-in-out h-full w-full max-w-0"
-        [class.max-w-screen]="!isShowingMenu && (parent.routerLink === activeLink || isParentActive(parent.routerLink))"
+        class="flex custom-scroll overflow-auto z-10 gap-2       h-full   max-w-0"
+        [class.max-w-screen!]="
+          !isShowingMenu &&
+          (parent.routerLink === activeLink ||
+            isParentActive(parent.routerLink) ||
+            isAnyChildSubLinksActive(parent.routerLink))
+        "
       >
         @for (child of parent.children; track $index) {
         <a
-          class="nav-item opacity-0 translate-x-[100vw] mx-0! transition-all duration-500 ease-in-out flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
-          [class.nav-item-active]="child.routerLink === activeLink"
-          [class.nav-item-visible]="
-            isParentActive(parent.routerLink) || child.routerLink === activeLink || !isShowingMenu
+          class="nav-item opacity-0  mx-0! transition-all duration-500  flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
+          [class.nav-item-active]="
+            child.routerLink === activeLink || isAnySubLinksActive(parent.routerLink, child.routerLink)
           "
-          (click)="toggleActiveLink(child.routerLink)"
-          [routerLink]="child.routerLink"
+          [class.nav-item-visible]="
+            isParentActive(parent.routerLink) ||
+            isAnyChildSubLinksActive(parent.routerLink) ||
+            child.routerLink === activeLink ||
+            !isShowingMenu
+          "
+          (click)="toggleActiveLink(child?.subLinks ? child.subLinks![0] : child.routerLink!)"
+          [routerLink]="child?.subLinks ? child.subLinks![0] : child.routerLink!"
         >
           <img class="h-10" [src]="'/images/icons/header/' + parent.imgUrl + '/' + child.imgUrl + '.png'" alt="" />
           <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{ child.label }}</span>

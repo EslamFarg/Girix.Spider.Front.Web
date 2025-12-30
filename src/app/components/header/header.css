@@ -4,10 +4,10 @@
   opacity: 1;
   display: flex;
   margin: 0 5px;
-  translate: 0 0 !important;
+  /* translate: 0 0 !important; */
   max-width: 200px;
   order: 0 !important;
-  /* --tw-translate-x: 0; */
+  --tw-translate-x: 0 !important;
 
 }
 .nav-item:hover,

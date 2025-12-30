@@ -8,6 +8,7 @@ import { DefaultAccounts } from './default-accounts/default-accounts';
 import { AddPrinter } from './add-printer/add-printer';
 import { AddOpeningBalances } from '@/features/storage/pages/add-opening-balances/add-opening-balances';
 import { DailyOpeningClosing } from './daily-opening-closing/daily-opening-closing';
+import { Financial } from './financial/financial';
   
  
 
@@ -16,21 +17,28 @@ export default [
     path: 'printer',
     component: Printer,
   },
+  
+  //program
+  {
+    path: 'program/about',
+    component: About,
+  },
+  {
+    path: 'program/language',
+    component: Language,
+  },
+  {
+    path: 'program/support',
+    component: Support,
+  },
+  //
   {
     path: 'qr',
     component: Qr,
   },
   {
-    path: 'about',
-    component: About,
-  },
-  {
-    path: 'language',
-    component: Language,
-  },
-  {
-    path: 'support',
-    component: Support,
+    path: 'financial',
+    component: Financial,
   },
   {
     path: 'default-accounts',
