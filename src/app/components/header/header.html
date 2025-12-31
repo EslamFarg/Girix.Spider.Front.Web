@@ -1,4 +1,4 @@
-<header #header class="w-full h-[135px] flex flex-col relative">
+<header #header class="w-full h-[140px] flex flex-col relative">
   <div class="bg-dark-bg-2">
     <div class="px-4 xl:px-8 py-1.5 grid grid-cols-2 sm:grid-cols-3 container relativeitems-center">
       <a href="" routerLink="/">
@@ -19,7 +19,12 @@
       <p-menu dir="rtl" #menu [model]="menuItems" [popup]="true" [style]="{ insetInlineEnd: '100%' }" />
     </div>
   </div>
-
+  <p-progressbar
+    mode="indeterminate"
+    class="max-h-0 overflow-hidden transition-all"
+    [class.max-h-1.25!]="isLoading()"
+    [style]="{ height: '5px', '--p-progressbar-border-radius': '0' }"
+  />
   <nav class="bg-text-lighter overflow-auto custom-scroll w-full flex-1">
     <div class="container flex items-center h-full px-4 py-1 w-full">
       @for (parent of navItems; track $index) {
@@ -27,9 +32,10 @@
       <a
         class="nav-item z-20 h-full opacity-0 max-w-0 duration-500 ease-in-out transition-all flex-col gap-1 items-center justify-between py-1 order-100 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
         [class.nav-item-active]="
-          isShowingMenu && (parent.routerLink === activeLink ||
-          isParentActive(parent.routerLink) ||
-          isAnyChildSubLinksActive(parent.routerLink))
+          isShowingMenu &&
+          (parent.routerLink === activeLink ||
+            isParentActive(parent.routerLink) ||
+            isAnyChildSubLinksActive(parent.routerLink))
         "
         [class.slide-out]="
           !(
@@ -80,7 +86,7 @@
       }
       <!--  -->
       <div
-        class="flex custom-scroll overflow-auto z-10 gap-2       h-full   max-w-0"
+        class="flex custom-scroll overflow-auto z-10 gap-2 h-full max-w-0"
         [class.max-w-screen!]="
           !isShowingMenu &&
           (parent.routerLink === activeLink ||
@@ -90,7 +96,7 @@
       >
         @for (child of parent.children; track $index) {
         <a
-          class="nav-item opacity-0  mx-0! transition-all duration-500  flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
+          class="nav-item opacity-0 mx-0! transition-all duration-500 flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
           [class.nav-item-active]="
             child.routerLink === activeLink || isAnySubLinksActive(parent.routerLink, child.routerLink)
           "

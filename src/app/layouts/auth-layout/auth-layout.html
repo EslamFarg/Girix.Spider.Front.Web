@@ -1,3 +1,12 @@
-<main class="flex justify-center items-center sm:p-4 bg-[#121212] h-screen">
-  <router-outlet/>
+<main
+  class="flex justify-center items-center sm:p-4 bg-[#121212] h-screen"
+  [class.pointer-events-none]="isLoading()"
+  [class.opacity-50]="isLoading()"
+>
+  <router-outlet />
 </main>
+<p-progress-spinner
+  class="fixed! left-1/2! z-100 top-1/2! -translate-x-1/2! -translate-y-1/2! opacity-0 transition-all"
+  [class.opacity-100]="isLoading()"
+  ariaLabel="loading"
+/>

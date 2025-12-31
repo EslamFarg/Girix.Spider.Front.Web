@@ -30,7 +30,6 @@ export class Cabins extends BaseComponent {
 
    
   //countdown
-  // countDownEles = viewChildren<CountdownComponent>('countdown');
   countdownConfig: CountdownConfig = { format: 'hh:mm:ss', leftTime: 60*60*2 };
   handleCountdownEvent(event: CountdownEvent) {}
 

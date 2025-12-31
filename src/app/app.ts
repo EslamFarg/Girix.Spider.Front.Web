@@ -10,7 +10,7 @@ import { ReplacementDialog } from "./features/replacements/components/replacemen
   imports: [RouterOutlet, ConfirmDialogModule, ToastModule, CollectionDialog, ReplacementDialog],
   templateUrl: './app.html',
   styleUrl: './app.css',
-  providers: [ConfirmationService,MessageService,ConfirmDialogModule],
+  providers: [],
 })
 export class App {
   protected readonly title = signal('restaurant-dashboard-angular');

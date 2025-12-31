@@ -6,11 +6,21 @@ import { routes } from './app.routes';
 
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { loadingInterceptor } from './core/interceptors/loading-interceptor';
+import { errorInterceptor } from './core/interceptors/error-interceptor';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { jwtInterceptor } from './features/auth/interceptors/jwt-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideHttpClient(withInterceptors([loadingInterceptor, errorInterceptor, jwtInterceptor])),
     provideRouter(routes),
+    ConfirmationService,
+    MessageService,
+    ConfirmDialogModule,
     providePrimeNG({
       theme: {
         preset: Aura,
@@ -18,7 +28,6 @@ export const appConfig: ApplicationConfig = {
           prefix: 'p',
           darkModeSelector: '.dark-mode',
           cssLayer: false,
-          
         },
       },
     }),

@@ -41,11 +41,13 @@
       class="text-dark-bg-1 h-12.5 flex-1 text-center px-1 rounded-lg font-semibold flex items-center justify-center"
       ><span>اللغه</span>
     </p-button>
+    
     <p-button
       styleClass="w-full"
       class="text-dark-bg-1 h-12.5 flex-1 text-center px-1 rounded-lg font-semibold flex items-center justify-center"
       ><span>حول البرنامج</span>
     </p-button>
+    
     <p-button
       styleClass="w-full"
       class="text-dark-bg-1 h-12.5 flex-1 text-center px-1 rounded-lg font-semibold flex items-center justify-center"
@@ -54,6 +56,7 @@
   </section>
 
   <form action="">
+
     <p-carousel
       [value]="sectionIds"
       [numVisible]="1"
@@ -101,12 +104,14 @@
         } @case (DocFormSections.closing) { } @case (DocFormSections.deficitReduction) { } }
       </ng-template>
     </p-carousel>
+
     <div class="ms-auto w-fit mt-4">
       <p-button
            styleClass="border-dark-line! bg-dark-line! text-white! py-1!    md:px-8!"
             label="حفظ"
         />
     </div>
+
   </form>
 </app-section-wrapper>
 

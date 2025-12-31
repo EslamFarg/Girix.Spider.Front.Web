@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
+import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
 import { BaseComponent } from '@/components/base-component/base-component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PasswordModule } from 'primeng/password';
-import { RouterLink } from "@angular/router";
-import { Button } from "primeng/button";
+import { RouterLink } from '@angular/router';
+import { Button } from 'primeng/button';
+import { pipe } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -14,15 +15,33 @@ import { Button } from "primeng/button";
   styleUrl: './login.css',
 })
 export class Login extends BaseComponent {
+  isRememberMe = false;
   initialFormValue = {
-    email: '',
-    password: ''
+    emailOrPhone: this.fb.control<string>('batman@gmail.com', [Validators.required]),
+    password: this.fb.control<string>('Aa1235@@', [Validators.required]),
   };
-  fg  = this.fb.group(this.initialFormValue);
 
-
+  fg = this.fb.group(this.initialFormValue);
 
   onSubmit() {
-    window.location.href = '/';
+    if (this.fg.invalid) {
+      this.fg.markAllAsTouched();
+      return;
+    }
+    
+
+    
+    this.authService.login(this.fg.getRawValue()).subscribe({
+      next: (data) => {
+        if(this.isRememberMe){
+          this.authService.save('userDetails', data);
+        }
+        this.messageService.add({
+          severity: 'success',
+          summary: 'تم تسجيل الدخول',
+          detail: 'لقد قمت بتسجيل الدخول بنجاح',
+        });
+      },
+    });
   }
 }

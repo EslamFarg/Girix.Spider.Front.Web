@@ -8,6 +8,7 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayout,
+    canActivate: [isAuthenticatedGuard],
     children: [
       {
         path: '',
@@ -68,6 +69,11 @@ export const routes: Routes = [
         path: 'settings',
         loadChildren: () =>
           import('@/features/settings/pages/settings-routes').then((m) => m.default),
+      },
+      {
+        path: 'app-info',
+        loadChildren: () =>
+          import('@/features/app-info/pages/app-info-routes').then((m) => m.default),
       },
     ],
   },

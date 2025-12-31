@@ -12,7 +12,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
   styleUrl: './base-component.css',
 })
 export class BaseComponent {
-  fb = inject(FormBuilder);
+  nullableFb = inject(FormBuilder);
+  fb=this.nullableFb.nonNullable;
   router = inject(Router);
   sanitizer = inject(DomSanitizer);
   confirmationService = inject(ConfirmationService);

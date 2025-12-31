@@ -12,18 +12,22 @@
         <p-inputotp
           styleClass="aspect-square"
           dir="ltr"
-          style="
-            --p-inputtext-border-color: var(--color-dark-bg-1);
-            --p-inputtext-background: var(--color-text-dark);
-          "
+          style="--p-inputtext-border-color: var(--color-dark-bg-1); --p-inputtext-background: var(--color-text-dark)"
           [integerOnly]="true"
           [length]="6"
         />
       </app-input-error-message-handler>
-      <p class="text-text-light text-sm text-center max-w-80 mx-auto leading-relaxed">
-        يمكنك اعاده ارسال الرمز بعد 35 ثانيه
+      <p
+        class="text-text-light text-sm text-center max-w-80 mx-auto leading-relaxed"
+        [class.hidden]="isResendCountdownOver"
+      >
+        يمكنك اعاده ارسال الرمز بعد
+        <countdown #countdown class="mx-auto w-fit" [config]="countdownConfig" (event)="handleCountdownEvent($event)" />
+        ثانيه
       </p>
-      <button class="text-app-blue text-sm cursor-pointer" type="button">اعاده ارسال الرمز ؟</button>
+      <button class="text-app-blue text-sm cursor-pointer" [class.hidden]="!isResendCountdownOver" type="button">
+        اعاده ارسال الرمز ؟
+      </button>
       <p-button
         type="button"
         routerLink="/auth/reset-password"

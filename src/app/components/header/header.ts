@@ -1,11 +1,12 @@
-import { Component, ElementRef, viewChild } from '@angular/core';
+import { Component, ElementRef, inject, viewChild } from '@angular/core';
 import { ImgFallback } from '@/directives/img-fallback';
 import { RouterLink } from '@angular/router';
 import { BaseComponent } from '@/components/base-component/base-component';
 import headerIcons from './header-icons';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-
+import { ProgressBarModule, ProgressBar } from 'primeng/progressbar';
+import { LayoutService } from '@/layouts/services/layout-service';
 export interface IMainNavItem {
   label: string;
   imgUrl: string;
@@ -23,13 +24,14 @@ export interface ISubNavItem {
 
 @Component({
   selector: 'app-header',
-  imports: [ImgFallback, RouterLink, Menu],
+  imports: [ImgFallback, RouterLink, Menu, ProgressBar],
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
 export class Header extends BaseComponent {
   header = viewChild<ElementRef<HTMLElement>>('header');
-
+  layoutService = inject(LayoutService);
+  isLoading = this.layoutService.isLoading;
   menuItems: MenuItem[] = [
     {
       label: 'الاجاراءات',
@@ -304,18 +306,18 @@ export class Header extends BaseComponent {
     },
     {
       label: 'بيانات البرنامج',
-      imgUrl: headerIcons.appSettings.imgUrl,
-      routerLink: '/app-settings',
+      imgUrl: headerIcons.appInfo.imgUrl,
+      routerLink: '/app-info',
       children: [
         {
           label: 'الملف الشخصي',
-          imgUrl: headerIcons.appSettings.children.profile,
-          routerLink: '/app-settings/profile',
+          imgUrl: headerIcons.appInfo.children.profile,
+          routerLink: '/app-info/profile',
         },
         {
           label: 'بيانات المطعم',
-          imgUrl: headerIcons.appSettings.children.restaurant,
-          routerLink: '/app-settings/restaurant',
+          imgUrl: headerIcons.appInfo.children.restaurant,
+          routerLink: '/app-info/restaurant',
         },
       ],
     },
