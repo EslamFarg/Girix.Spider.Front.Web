@@ -21,16 +21,15 @@
   </div>
   <p-progressbar
     mode="indeterminate"
-    class="max-h-0 overflow-hidden transition-all"
-    [class.max-h-1.25!]="isLoading()"
-    [style]="{ height: '5px', '--p-progressbar-border-radius': '0' }"
+    class="  overflow-hidden transition-all"
+    [style]="{ height: '5px',maxHeight: isLoading() ? '5px' : '0', '--p-progressbar-border-radius': '0' }"
   />
-  <nav class="bg-text-lighter overflow-auto custom-scroll w-full flex-1">
-    <div class="container flex items-center h-full px-4 py-1 w-full">
+  <nav class="bg-text-lighter overflow-auto custom-scroll w-full flex-1 shadow" #nav>
+    <div class="container flex items-center h-full px-4 py-1 min-w-max  w-full">
       @for (parent of navItems; track $index) {
       <!-- parent -->
       <a
-        class="nav-item z-20 h-full opacity-0 max-w-0 duration-500 ease-in-out transition-all flex-col gap-1 items-center justify-between py-1 order-100 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
+        class="nav-item z-20 h-full opacity-0 max-w-0 duration-500 ease-in-out transition-all flex-col gap-1 items-center justify-between py-1 order-100 px-2 cursor-pointer group border-2 border-transparent rounded-lg"
         [class.nav-item-active]="
           isShowingMenu &&
           (parent.routerLink === activeLink ||
@@ -87,7 +86,7 @@
       <!--  -->
       <div
         class="flex custom-scroll overflow-auto z-10 gap-2 h-full max-w-0"
-        [class.max-w-screen!]="
+        [class.max-w-fit!]="
           !isShowingMenu &&
           (parent.routerLink === activeLink ||
             isParentActive(parent.routerLink) ||

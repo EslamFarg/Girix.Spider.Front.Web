@@ -12,6 +12,7 @@
         <p-inputotp
           styleClass="aspect-square"
           dir="ltr"
+          formControlName="otp"
           style="--p-inputtext-border-color: var(--color-dark-bg-1); --p-inputtext-background: var(--color-text-dark)"
           [integerOnly]="true"
           [length]="6"
@@ -29,8 +30,7 @@
         اعاده ارسال الرمز ؟
       </button>
       <p-button
-        type="button"
-        routerLink="/auth/reset-password"
+        type="submit"
         label="إستمرار"
         class="w-full max-w-44 mx-auto"
         [style]="{

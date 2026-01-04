@@ -1,7 +1,11 @@
-<app-header #header/>
-<main #main class=" bg-white overflow-hidden h-[calc(100vh-140px)]" >
+<app-header #header  [class.pointer-events-none]="isLoading()" />
+<main #main class="bg-white overflow-hidden h-[calc(100vh-140px)] relative">
   <!-- <app-sidebar class="h-screen"/> -->
   <!-- <div class="flex-1  h-screen overflow-auto will-change-auto"> -->
-    <router-outlet/>
+  <router-outlet />
   <!-- </div> -->
+  <div class="absolute top-0 left-0 w-full h-full transition-all bg-black/5 -z-100 opacity-0 "
+    [class.opacity-100!]="isLoading()"
+    [class.z-999!]="isLoading()"
+  ></div>
 </main>

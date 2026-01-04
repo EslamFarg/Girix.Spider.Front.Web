@@ -1,10 +1,10 @@
 import { BaseComponent } from '@/components/base-component/base-component';
 import { Component } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
-import { Password } from "primeng/password";
-import { Button } from "primeng/button";
-import { InputText } from "primeng/inputtext";
+import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { Password } from 'primeng/password';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-reset-password',
@@ -12,16 +12,30 @@ import { InputText } from "primeng/inputtext";
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.css',
 })
-export class ResetPassword  extends BaseComponent {
+export class ResetPassword extends BaseComponent {
+  isRememberMe = false;
   initialFormValue = {
-    email: '',
-    password: ''
+    newPassword: this.fb.control<string>('P@ssw0rd', [Validators.required]),
+    confirmPassword: this.fb.control<string>('P@ssw0rd', [Validators.required]),
   };
-  fg  = this.fb.group(this.initialFormValue);
 
-
+  fg = this.fb.group(this.initialFormValue);
 
   onSubmit() {
-    window.location.href = '/';
+    if (this.fg.invalid || this.fg.value.newPassword !== this.fg.value.confirmPassword) {
+      this.fg.markAllAsTouched();
+      return;
+    }
+
+    this.authService.changePassword(this.fg.getRawValue()).subscribe({
+      next: (data) => {
+        this.router.navigate(['/auth/login']);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'تم تغيير كلمة المرور',
+          detail: 'لقد قمت بتغيير كلمة المرور بنجاح',
+        });
+      },
+    });
   }
 }

@@ -32,6 +32,8 @@ export interface IUserDetails {
 export class AuthService extends BaseService {
   userDetails = signal<IUserDetails | null>(this.get('userDetails'));
   isAuthenticated = computed(() => this.userDetails() !== null);
+  override apiRoute = 'Auth';
+
   login(dto: ILoginDto) {
     let loginResultObs: Observable<IUserDetails>;
 
@@ -57,7 +59,7 @@ export class AuthService extends BaseService {
         observer.complete();
       });
     } else {
-      loginResultObs = this.http.post<IUserDetails>(`${this.apiUrl}/auth/login`, dto);
+      loginResultObs = this.http.post<IUserDetails>(`${this.apiUrl}/login`, dto);
     }
 
     return loginResultObs.pipe(
@@ -70,17 +72,77 @@ export class AuthService extends BaseService {
     );
   }
 
-  forgotPassword(email: string) {
-    return this.http.post<boolean>(`${this.apiUrl}/auth/forgetPassword`, { email });
+  get forgotPasswordEmail() {
+    return this.get('forgotPasswordEmail');
+  }
+  get forgotPasswordToken() {
+    return this.get('forgotPasswordToken');
   }
 
-  validateOtp(dto: { email: string; otp: string }) {
-    return this.http.post<boolean>(`${this.apiUrl}/auth/validOtp`, dto);
+  forgotPassword(email: string) {
+    this.save('forgotPasswordEmail', email);
+
+    if (this.isMock) {
+      return new Observable<boolean>((observer) => {
+        observer.next(true);
+        observer.complete();
+      });
+    }
+
+    return this.http.post<boolean>(`${this.apiUrl}/forgetPassword`, { email });
+  }
+
+  validateOtp(otp: string) {
+    if (this.isMock) {
+      return new Observable<{
+        token: string;
+        userId: string;
+      }>((observer) => {
+        observer.next({
+          token: 'token',
+          userId: '1234567890123456789012345678901234567890',
+        });
+        observer.complete();
+      }).pipe(
+        tap({
+          next: (result) => {
+            this.save('forgotPasswordToken', result.token);
+          },
+        })
+      );
+    }
+
+    return this.http
+      .post<{
+        token: string;
+        userId: string;
+      }>(`${this.apiUrl}/validOtp`, {
+        email: this.forgotPasswordEmail,
+        otp,
+      })
+      .pipe(
+        tap({
+          next: (result) => {
+            this.save('forgotPasswordToken', result.token);
+          },
+        })
+      );
   }
 
   logout() {
     this.remove('userDetails');
     this.userDetails.set(null);
     this.router.navigate(['/auth/login']);
+  }
+
+  changePassword(dto: { newPassword: string; confirmPassword: string }) {
+    if (this.isMock) {
+      return new Observable<boolean>((observer) => {
+        observer.next(true);
+        observer.complete();
+      });
+    }
+
+    return this.http.post<boolean>(`${this.apiUrl}/changePassword`, dto);
   }
 }

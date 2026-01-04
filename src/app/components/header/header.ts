@@ -30,8 +30,8 @@ export interface ISubNavItem {
 })
 export class Header extends BaseComponent {
   header = viewChild<ElementRef<HTMLElement>>('header');
-  layoutService = inject(LayoutService);
   isLoading = this.layoutService.isLoading;
+  nav = viewChild<ElementRef<HTMLElement>>('nav');
   menuItems: MenuItem[] = [
     {
       label: 'الاجاراءات',
@@ -334,10 +334,16 @@ export class Header extends BaseComponent {
   }
 
   toggleActiveLink(link: string) {
-    // console.log('link', link);
+    //toggle overflow hidden for exact 1 second to avoid unwanted scroll
+    this.nav()!.nativeElement.style.overflow = 'hidden';
+    this.nav()!.nativeElement.scrollLeft = 0;
+    setTimeout(() => {
+      this.nav()!.nativeElement.style.overflow = 'auto';
+    }, 500);
+
     const isParent = this.isParent(link);
-    const isPrevious = link === this.prevActiveLink;
     const isPreviousParent = this.isParent(this.prevActiveLink);
+
     if (link === '/') {
       if (this.prevActiveLink === '/' || isPreviousParent) {
         this.activeLink = '/';
@@ -349,9 +355,6 @@ export class Header extends BaseComponent {
       this.prevActiveLink = link;
       this.activeLink = link;
       this.isShowingMenu = !this.isShowingMenu;
-      // } else if (isParent && isPrevious) {
-      //   this.prevActiveLink = '/';
-      //   this.isShowingMenu = true;
     } else if (!isParent) {
       this.prevActiveLink = link;
       this.activeLink = link;
@@ -360,8 +363,6 @@ export class Header extends BaseComponent {
       this.prevActiveLink = '/';
       this.isShowingMenu = true;
     }
-
-    // console.log(this.activeLink);
   }
 
   isChildActive(parentLink: string) {
@@ -387,16 +388,6 @@ export class Header extends BaseComponent {
     if (!child.subLinks) return false;
     return child.subLinks.some((subLink) => subLink === this.activeLink);
   }
-
-  // get height() {
-  //   let height = 152//Math.round(+(this.header()?.nativeElement?.clientHeight ?? 0));
-  //   this.header()!.nativeElement.style.height = `${height}px`;
-  //   return height
-  // }
-
-  // log() {
-  //   console.log(this.height);
-  // }
 
   onLogoutClick(event: Event) {
     this.confirmationService.confirm({

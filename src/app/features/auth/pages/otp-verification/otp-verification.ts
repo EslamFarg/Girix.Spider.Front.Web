@@ -2,7 +2,7 @@ import { BaseComponent } from '@/components/base-component/base-component';
 import { Component } from '@angular/core';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { Button } from 'primeng/button';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { InputOtpModule } from 'primeng/inputotp';
 import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdown';
@@ -15,10 +15,25 @@ import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdo
 })
 export class OtpVerification extends BaseComponent {
   initialFormValue = {
-    email: '',
-    password: '',
+    otp: this.fb.control<string>('', [Validators.required, Validators.minLength(6)]),
   };
   fg = this.fb.group(this.initialFormValue);
+
+  onSubmit() {
+    if (this.fg.invalid) {
+      this.fg.markAllAsTouched();
+      return;
+    }
+
+    this.authService.validateOtp(this.fg.getRawValue().otp).subscribe({
+      next: (result) => {
+        if (result.token) {
+          //strictly check for boolean response
+          this.router.navigate(['/auth/reset-password']);
+        }
+      },
+    });
+  }
 
   isResendCountdownOver = false;
 
@@ -29,8 +44,5 @@ export class OtpVerification extends BaseComponent {
       console.log('done');
       this.isResendCountdownOver = true;
     }
-  }
-  onSubmit() {
-    window.location.href = '/';
   }
 }

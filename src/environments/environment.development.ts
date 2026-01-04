@@ -1,4 +1,4 @@
 export const environment = {
-  apiUrl: 'http://localhost:3000',
+  apiUrl: 'http://gtsdev-001-site34.atempurl.com/v1',
   isMock: false,
 };

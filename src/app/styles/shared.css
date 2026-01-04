@@ -58,6 +58,7 @@
   .status {
     display: flex;
     align-items: center;
+    margin: 0 auto;
     gap: 8px;
     border-radius: 4px;
     height: fit-content;
@@ -77,7 +78,7 @@
         background-color: #259800;
       }
     }
-    &.inactive {
+    &.inActive {
       background-color: #ffe0e0;
       color: #ff383c;
       & > span:first-child {

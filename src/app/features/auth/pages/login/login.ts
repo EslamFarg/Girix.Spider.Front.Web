@@ -15,7 +15,7 @@ import { pipe } from 'rxjs';
   styleUrl: './login.css',
 })
 export class Login extends BaseComponent {
-  isRememberMe = false;
+  isRememberMe = true;
   initialFormValue = {
     emailOrPhone: this.fb.control<string>('batman@gmail.com', [Validators.required]),
     password: this.fb.control<string>('Aa1235@@', [Validators.required]),
@@ -34,6 +34,7 @@ export class Login extends BaseComponent {
     this.authService.login(this.fg.getRawValue()).subscribe({
       next: (data) => {
         if(this.isRememberMe){
+          console.log(data);
           this.authService.save('userDetails', data);
         }
         this.messageService.add({

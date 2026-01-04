@@ -5,10 +5,11 @@ import { inject } from '@angular/core';
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const token = authService.get<IUserDetails>('userDetails')?.token;
-  if (token) {
+  const forgetPasswordToken = authService.get('forgotPasswordToken');
+  if (token || forgetPasswordToken) {
     req = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token ?? forgetPasswordToken ?? ''}`,
       },
     });
   }

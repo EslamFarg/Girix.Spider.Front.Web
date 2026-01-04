@@ -6,7 +6,8 @@
   <router-outlet />
 </main>
 <p-progress-spinner
-  class="fixed! left-1/2! z-100 top-1/2! -translate-x-1/2! -translate-y-1/2! opacity-0 transition-all"
+  class="fixed! left-1/2! -z-100 top-1/2! -translate-x-1/2! -translate-y-1/2! opacity-0 transition-all"
   [class.opacity-100]="isLoading()"
+  [class.opacity-z-100!]="isLoading()"
   ariaLabel="loading"
 />

@@ -1,21 +1,37 @@
 <div class="p-4 h-full overflow-auto no-scrollbar">
-  <app-section-wrapper  >
+  <app-section-wrapper>
     <div class="flex h-fit items-start gap-2 border w-full flex-col sm:flex-row">
       <!-- search -->
       <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="w-full sm:flex-1">
         <app-input-error-message-handler [fc]="fg.get('text')">
-          <input class="w-full bg-transparent!" pInputText type="text" formControlName="text" placeholder="بحث" />
-          <p-inputgroup-addon>
-            <i class="pi pi-filter"></i>
+          <input class="w-full bg-transparent! text-dark-line!" pInputText type="text" formControlName="text" placeholder="بحث" />
+          <p-inputgroup-addon class="cursor-pointer">
+            <div class="relative flex items-center justify-center">
+              <i class="pi pi-filter" (click)="filterMenu.toggle($event)"></i>
+              <p-menu
+                dir="rtl"
+                class="*:top-full! *:left-0!"
+                #filterMenu
+                [model]="filterMenuItems"
+                [popup]="true"
+                [style]="{ insetInlineEnd: '100%' }"
+              />
+            </div>
           </p-inputgroup-addon>
+
           <p-inputgroup-addon>
-            <i class="pi pi-search"></i>
+            <div class="cursor-pointer flex" (click)="onSubmit()">
+              <i class="pi pi-search"></i>
+            </div>
           </p-inputgroup-addon>
         </app-input-error-message-handler>
       </form>
-
-
-      <p-select [options]="periodOptions" optionLabel="label" placeholder="كل الطلبات" class="h-fit hidden! sm:block w-40" />
+      <p-select
+        [options]="periodOptions"
+        optionLabel="label"
+        placeholder="كل الطلبات"
+        class="h-fit hidden! sm:block w-40"
+      />
     </div>
 
     <div class="w-full overflow-auto custom-scroll my-2 sm:my-4">
@@ -36,23 +52,31 @@
           </tr>
         </thead>
         <tbody>
-          @for (item of [1,2,3,4,5,6,7]; track $index) {
+          @for (order of items(); track $index) {
           <tr>
-            <td>م</td>
-            <td>123456</td>
-            <td>20 يناير 2026 / 03:56:22 ص</td>
-            <td>محمد احمد محمود</td>
-            <td>0123456789</td>
-            <td>سفري</td>
+            <td>{{ getRowNumber($index, orderService.searchRequestModel.pageIndex) }}</td>
+            <td>{{ order.orderNumber }}</td>
+            <!-- date and time -->
+            <td>{{ order.createdAt | date : 'dd/MM/yyyy h:mm a' }}</td>
+            <td>{{ order.customerName }}</td>
+            <td>{{ order.customerPhone }}</td>
+            <td>{{ order.customerAdress }}</td>
             <td>
+              @if (order.isCollected) {
               <div class="status active">
                 <span></span>
                 <span>مدفوع</span>
               </div>
+              }@else {
+              <div class="status inActive">
+                <span></span>
+                <span>غير مدفوع</span>
+              </div>
+              }
             </td>
-            <td>60.00</td>
-            <td>60.00</td>
-            <td>120.00 $</td>
+            <td>{{ order.netOrder }}</td>
+            <td>{{ order.netOrder }}</td>
+            <td>{{ order.netOrder }} $</td>
             <td>
               <div class="actions">
                 <button type="button" class="print">
@@ -92,6 +116,11 @@
       </table>
     </div>
 
-    <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
+    <p-paginator
+      (onPageChange)="onPageChange($event)"
+      [first]="first"
+      [rows]="rows"
+      [totalRecords]="orderService.searchRequestModel.totalRowsCount"
+    />
   </app-section-wrapper>
 </div>
