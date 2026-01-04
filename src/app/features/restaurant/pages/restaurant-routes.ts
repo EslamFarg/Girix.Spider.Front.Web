@@ -2,7 +2,7 @@ import { Route } from '@angular/router';
  
 import { Tables } from './tables/tables';
 import { Rooms } from './rooms/rooms';
-import { Cabins } from './cabins/cabins';
+import { Huts } from './huts/huts';
 
 export default [
   {
@@ -14,7 +14,7 @@ export default [
     component: Rooms,
   },
   {
-    path: 'cabins',
-    component: Cabins,
+    path: 'huts',
+    component: Huts,
   },
 ] satisfies Route[];

@@ -48,16 +48,16 @@
       <thead>
         <tr class="">
           <th>#</th>
-          <th>الطاولات</th>
+          <th>الاكواخ</th>
           <th>السعر</th>
           <th>الأدوات</th>
         </tr>
       </thead>
       <tbody>
-        @for (item of [1,2,3,4,5,6,7]; track $index) {
+        @for (item of items(); track $index) {
         <tr class="">
-          <td>م</td>
-          <td>3123</td>
+          <td>{{ getRowNumber($index, hutService.searchRequestModel.pageIndex) }}</td>
+          <td>{{item.name}}</td>
           <td>50.00</td>
           <td>
             <div class="actions">
@@ -99,6 +99,6 @@
       </tbody>
     </table>
 
-    <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
+    <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="hutService.searchRequestModel.totalRowsCount" />
   </app-section-wrapper>
 </div>

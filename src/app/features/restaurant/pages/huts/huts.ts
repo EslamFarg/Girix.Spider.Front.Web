@@ -1,5 +1,5 @@
 import { BaseComponent } from '@/components/base-component/base-component';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { InputGroupAddon } from "primeng/inputgroupaddon";
@@ -7,21 +7,36 @@ import { InputErrorMessageHandler } from "@/components/input-error-message-handl
 import { Select } from "primeng/select";
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
-import { Paginator } from "primeng/paginator";
+import { Paginator, PaginatorState } from "primeng/paginator";
+import { HutService, IHutRowResponse } from '../../services/hut-service';
 
 @Component({
-  selector: 'app-cabins',
+  selector: 'app-huts',
   imports: [Button, ReactiveFormsModule, InputGroupAddon, InputErrorMessageHandler, Select, InputTextModule, SectionWrapper, Paginator],
-  templateUrl: './cabins.html',
-  styleUrl: './cabins.css',
+  templateUrl: './huts.html',
+  styleUrl: './huts.css',
 })
-export class Cabins extends BaseComponent {
+export class Huts extends BaseComponent<IHutRowResponse> {
   initialSearchFormValue = {
     text: this.fb.control<string>('', [Validators.required]),
     categoryId: this.fb.control<number>(0, [Validators.required]),
   };
   fg = this.fb.group(this.initialSearchFormValue);
 
+  hutService=inject(HutService);
+
+  constructor() {
+    super();
+
+    this.hutService.resetSearchRequestModel();
+
+    //get page 1 of 10 orders
+    this.hutService.search().subscribe({
+      next: (res) => {
+        this.items.set(res.value.rows);
+      },
+    });
+  }
 
   periodOptions = [
     { label: 'اليوم', value: 1 },
@@ -34,5 +49,13 @@ export class Cabins extends BaseComponent {
 
   first = 0;
   rows = 10;
-  onPageChange(event: any) {}
+   onPageChange(event: PaginatorState) {
+    console.log(event);
+    this.hutService.search({ pageIndex: event.page! + 1 }).subscribe({
+      next: (res) => {
+        this.items.set(res.value.rows);
+      },
+    });
+  }
+
 }

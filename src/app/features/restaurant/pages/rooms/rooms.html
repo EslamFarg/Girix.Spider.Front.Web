@@ -47,10 +47,10 @@
         </tr>
       </thead>
       <tbody>
-        @for (item of [1,2,3,4,5,6,7]; track $index) {
+        @for (item of items(); track $index) {
         <tr class="">
-          <td>م</td>
-          <td>3123</td>
+          <td>{{ getRowNumber($index, roomService.searchRequestModel.pageIndex) }}</td>
+          <td>{{item.name}}</td>
           <td>
             <div class="actions">
               <button type="button" class="edit">
@@ -91,6 +91,6 @@
       </tbody>
     </table>
 
-    <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
+    <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="roomService.searchRequestModel.totalRowsCount" />
   </app-section-wrapper>
 </div>

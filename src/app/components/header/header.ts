@@ -102,8 +102,8 @@ export class Header extends BaseComponent {
         },
         {
           label: 'الاكواخ',
-          imgUrl: headerIcons.restaurant.children.cabins,
-          routerLink: '/restaurant/cabins',
+          imgUrl: headerIcons.restaurant.children.huts,
+          routerLink: '/restaurant/huts',
         },
         {
           label: 'الغرفه',
