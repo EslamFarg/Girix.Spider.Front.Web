@@ -24,4 +24,8 @@ export class BaseComponent<ItemType = any> {
 
   items = signal<ItemType[]>([]);
   getRowNumber = (index: number,pageNumber: number) => (index + 1) + ((pageNumber - 1) * 10);
+
+
+
+  
 }

@@ -31,8 +31,8 @@ import { omitKeys } from '@/lib/helpers';
   styleUrl: './huts.css',
 })
 export class Huts extends BaseComponent<IHutRowResponse> {
-    currentItem: IHutDtoResponse | null = null;
-  
+  currentItem: IHutDtoResponse | null = null;
+
   initialFormValue = {
     id: this.fb.control<number>(0, []),
     name: this.fb.control<string>('', [
@@ -64,7 +64,7 @@ export class Huts extends BaseComponent<IHutRowResponse> {
   resetState() {
     this.fg = this.fb.group(this.initialFormValue);
     this.hutService.resetSearchRequestModel();
- this.currentItem = null;
+    this.currentItem = null;
     //get page 1 of 10 orders
     this.hutService.search().subscribe({
       next: (res) => {
@@ -80,17 +80,16 @@ export class Huts extends BaseComponent<IHutRowResponse> {
       return;
     }
 
-
     if ((this.fg.value?.id ?? 0) > 0) {
       this.hutService.update(this.fg.getRawValue()).subscribe({
-        next: ()=>{
-          this.resetState()
+        next: () => {
+          this.resetState();
         },
       });
     } else {
       this.hutService.create(omitKeys(this.fg.getRawValue(), ['id'])).subscribe({
-        next: ()=>{
-          this.resetState()
+        next: () => {
+          this.resetState();
         },
       });
     }
@@ -117,10 +116,32 @@ export class Huts extends BaseComponent<IHutRowResponse> {
     });
   }
 
-  deleteHut(id: number) {
-    this.hutService.delete(id).subscribe({
-      next: ()=>{
-        this.resetState();
+  deleteHut(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف الكوخ؟',
+      header: 'حذف الكوخ',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.hutService.delete(id).subscribe({
+          next: () => {
+            this.resetState();
+          },
+        });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
       },
     });
   }

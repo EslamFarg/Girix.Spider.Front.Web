@@ -105,11 +105,34 @@ export class Tables extends BaseComponent<ITableRowResponse> {
     });
   }
 
-  deleteTable(id: number) {
-    this.tableService.delete(id).subscribe({
+  deleteTable(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف الطاولة؟',
+      header: 'حذف الطاولة',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.tableService.delete(id).subscribe({
       next: () => {
         this.resetState();
       },
     });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
+      },
+    });
+    
   }
 }

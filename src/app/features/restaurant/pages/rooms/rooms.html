@@ -31,11 +31,7 @@
         class="flex-1 md:flex-none border-dark-line! bg-dark-line! text-white! py-1! md:px-8!"
         pButton
       >
-        @if(currentItem) {
-        تحديث
-        } @else {
-        حفظ
-        }
+        @if(currentItem) { تحديث } @else { حفظ }
       </button>
       <!-- <button type="button" class="flex-1 md:flex-none p-button-outlined border-dark-line! text-dark-line! py-1! md:px-8!" pButton>
         حذف
@@ -93,7 +89,7 @@
                   />
                 </svg>
               </button>
-              <button type="button" class="delete" (click)="deleteRoom(item.id)">
+              <button type="button" class="delete" (click)="deleteRoom(item.id, $event)">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"

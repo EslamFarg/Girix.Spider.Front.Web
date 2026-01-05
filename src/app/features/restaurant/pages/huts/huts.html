@@ -89,7 +89,7 @@
         <tr class="">
           <td>{{ getRowNumber($index, hutService.searchRequestModel.pageIndex) }}</td>
           <td>{{ item.name }}</td>
-          <td>{{item.pricePerHour}}</td>
+          <td>{{ item.pricePerHour }}</td>
           <td>
             <div class="actions">
               <button type="button" class="edit" (click)="fetchAndBindTableData(item.id)">
@@ -110,7 +110,7 @@
                   />
                 </svg>
               </button>
-              <button type="button" class="delete" (click)="deleteHut(item.id)">
+              <button type="button" class="delete" (click)="deleteHut(item.id, $event)">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"
