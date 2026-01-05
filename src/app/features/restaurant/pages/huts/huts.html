@@ -1,46 +1,77 @@
 <div class="h-full overflow-auto no-scrollbar p-4">
   <app-section-wrapper class="flex flex-col gap-5">
     <!-- search -->
-    <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="flex items-start gap-2 border w-full *:flex-1">
+    <form
+      #form
+      id="hutForm"
+      [formGroup]="fg"
+      (ngSubmit)="onSubmit()"
+      class="flex items-start gap-2 border w-full *:flex-1"
+    >
       <div>
         <label for="">اسم الكوخ</label>
-        <app-input-error-message-handler [fc]="fg.get('text')">
-          <input class="w-full bg-transparent!" pInputText type="text" formControlName="text" placeholder="الاسم" />
+        <app-input-error-message-handler [fc]="fg.get('name')">
+          <input
+            class="w-full bg-transparent!"
+            maxlength="100"
+            pInputText
+            type="text"
+            formControlName="name"
+            placeholder="الاسم"
+          />
         </app-input-error-message-handler>
       </div>
       <div>
         <label for="">سعر الكوخ / الساعه</label>
-        <app-input-error-message-handler [fc]="fg.get('text')">
-          <input class="w-full bg-transparent!" pInputText type="text" formControlName="text" placeholder="0.00" />
+        <app-input-error-message-handler [fc]="fg.get('pricePerHour')">
+          <input
+            class="w-full bg-transparent!"
+            appAllowNumbers
+            [allowDecimal]="true"
+            [max]="100_000"
+            pInputText
+            type="text"
+            formControlName="pricePerHour"
+            placeholder="0.00"
+          />
         </app-input-error-message-handler>
       </div>
     </form>
 
     <!-- actions -->
     <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 my-4">
-      <p-button
-        class="flex-1 md:flex-none"
-        styleClass="border-dark-line! bg-dark-line! text-white! py-1! w-full  md:px-8!"
-        label="حفظ"
-      />
-      <p-button
-        class="flex-1 md:flex-none"
-        styleClass="border-dark-line! text-dark-line! py-1!  w-full md:px-8!"
-        label="حذف"
-        variant="outlined"
-      />
-      <p-button
-        class="flex-1 md:flex-none"
-        styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
-        label="جديد"
-        variant="outlined"
-      />
-      <p-button
-        class="flex-1 md:flex-none"
-        styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
-        label="طباعة"
-        variant="outlined"
-      />
+      <button
+        class="flex-1 md:flex-none border-dark-line! bg-dark-line! text-white! py-1! md:px-8!"
+        pButton
+        form="hutForm"
+        type="submit"
+      >
+        حفظ
+      </button>
+      <!-- <button
+        class="flex-1 md:flex-none border-dark-line! text-dark-line! py-1! md:px-8! p-button-outlined"
+        type="button"
+        pButton
+      >
+        حذف
+      </button> -->
+      <button
+        class="flex-1 md:flex-none border-dark-line! text-dark-line! py-1! md:px-8! p-button-outlined"
+        form="hutForm"
+        pButton
+        type="reset"
+      >
+        جديد
+      </button>
+      @if (currentItem) {
+      <button
+        type="button"
+        class="flex-1 md:flex-none p-button-outlined border-dark-line! text-dark-line! py-1! md:px-8!"
+        pButton
+      >
+        طباعة
+      </button>
+      }
     </div>
 
     <!-- data -->
@@ -57,11 +88,11 @@
         @for (item of items(); track $index) {
         <tr class="">
           <td>{{ getRowNumber($index, hutService.searchRequestModel.pageIndex) }}</td>
-          <td>{{item.name}}</td>
-          <td>50.00</td>
+          <td>{{ item.name }}</td>
+          <td>{{item.pricePerHour}}</td>
           <td>
             <div class="actions">
-              <button type="button" class="edit">
+              <button type="button" class="edit" (click)="fetchAndBindTableData(item.id)">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"
@@ -79,7 +110,7 @@
                   />
                 </svg>
               </button>
-              <button type="button" class="delete">
+              <button type="button" class="delete" (click)="deleteHut(item.id)">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"
@@ -99,6 +130,11 @@
       </tbody>
     </table>
 
-    <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="hutService.searchRequestModel.totalRowsCount" />
+    <p-paginator
+      (onPageChange)="onPageChange($event)"
+      [first]="first"
+      [rows]="rows"
+      [totalRecords]="hutService.searchRequestModel.totalRowsCount"
+    />
   </app-section-wrapper>
 </div>

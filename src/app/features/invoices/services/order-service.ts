@@ -31,7 +31,7 @@ export interface IOrderRowResponse {
 @Injectable({
   providedIn: 'root',
 })
-export class OrderService extends BaseService<OrderSearchEnum, IOrderRowResponse> {
+export class OrderService extends BaseService<OrderSearchEnum, IOrderRowResponse,any,any,any> {
   override apiRoute = 'Order';
 
 

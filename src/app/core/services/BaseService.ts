@@ -44,7 +44,13 @@ export enum SearchColumEnum {
 // id '0' is the default value
 type BaseSearchEnum<SearchEnumExtension> = SearchColumEnum.Id | SearchEnumExtension;
 
-export default class BaseService<SearchEnum = any, SearchResultType = any> {
+export default class BaseService<
+  SearchEnum = any,
+  SearchResultType = any,
+  ICreateDto = any,
+  IUpdateDto = any,
+  IGetByIdDto = any
+> {
   static apiBaseUrl = environment.apiUrl;
   apiRoute = '';
   get apiUrl() {
@@ -151,6 +157,43 @@ export default class BaseService<SearchEnum = any, SearchResultType = any> {
         })
       );
   }
+
+  create(createDto: ICreateDto) {
+    return this.http.post<number>(`${this.apiUrl}/Create`, createDto).pipe(
+      tap({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'تم الحفظ', detail: 'لقد قمت بالحفظ بنجاح' });
+        },
+      })
+    );
+  }
+  update(createDto: IUpdateDto) {
+    return this.http.put<number>(`${this.apiUrl}/Update`, createDto).pipe(
+      tap({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'تم الحفظ', detail: 'لقد قمت بالحفظ بنجاح' });
+        },
+      })
+    );
+  }
+
+  delete(id: number) {
+    return this.http.delete<boolean>(`${this.apiUrl}/${id}`).pipe(
+      tap({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'تم الحذف', detail: 'لقد قمت بالحذف بنجاح' });
+        },
+      })
+    );
+  }
+
+  getById(id: number) {
+    return this.http.get<IGetByIdDto>(`${this.apiUrl}/${id}`);
+  }
+
+  //
+  //local storage
+  //
 
   /**
    * Save/update data to localStorage

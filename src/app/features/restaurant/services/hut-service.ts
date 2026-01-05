@@ -7,18 +7,41 @@ export enum HutSearchEnum {
   IsAvaliable = SearchColumEnum.IsAvaliable,
 }
 
+export interface IHutCreateDto {
+  name: string;
+  pricePerHour: number;
+}
+export interface IHutUpdateDto {
+  id: number;
+  name: string;
+  pricePerHour: number;
+}
+
 export interface IHutRowResponse {
-  id: number
-  name: string
-  pricePerHour: number
-  isAvailable: boolean
-  reservedTo: any
-  reservedFrom: any
-  orderId: number
+  id: number;
+  name: string;
+  pricePerHour: number;
+  isAvailable: boolean;
+  reservedTo: any;
+  reservedFrom: any;
+  orderId: number;
+}
+export interface IHutDtoResponse {
+  id: number;
+  name: string;
+  isAvailable: boolean;
+  reservedFrom: string;
+  orderId: number;
 }
 @Injectable({
   providedIn: 'root',
 })
-export class HutService extends BaseService<HutSearchEnum, IHutRowResponse> {
+export class HutService extends BaseService<
+  HutSearchEnum,
+  IHutRowResponse,
+  IHutCreateDto,
+  IHutUpdateDto,
+  IHutDtoResponse
+> {
   override apiRoute = 'Hut';
 }

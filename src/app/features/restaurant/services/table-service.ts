@@ -6,19 +6,39 @@ export enum TableSearchEnum {
   Name = SearchColumEnum.Name,
   IsAvaliable = SearchColumEnum.IsAvaliable,
 }
-export interface ITableRowResponse {
-  id: number
-  name: string
-  pricePerHour: number
-  isAvailable: boolean
-  reservedTo: any
-  reservedFrom: any
-  orderId: number
+export interface ITableCreateDto {
+  name: string;
 }
+export interface ITableUpdateDto {
+  id: number;
+  name: string;
+}
+export interface ITableRowResponse {
+  id: number;
+  name: string;
+  pricePerHour: number;
+  isAvailable: boolean;
+  reservedTo: any;
+  reservedFrom: any;
+  orderId: number;
+}
+export interface ITableDtoResponse {
+  id: number;
+  name: string;
+  isAvailable: boolean;
+  reservedFrom: string;
+  orderId: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
-export class TableService  extends BaseService<TableSearchEnum, ITableRowResponse> {
+export class TableService extends BaseService<
+  TableSearchEnum,
+  ITableRowResponse,
+  ITableCreateDto,
+  ITableUpdateDto,
+  ITableDtoResponse
+> {
   override apiRoute = 'Table';
-  
 }

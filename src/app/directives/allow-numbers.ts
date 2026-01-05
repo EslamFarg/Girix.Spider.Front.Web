@@ -6,10 +6,7 @@ import { BaseComponent } from '@/components/base-component/base-component';
 @Directive({
   selector: '[appAllowNumbers]',
 })
-export class AllowNumbers extends BaseComponent {
-  constructor() {
-    super();
-  }
+export class AllowNumbers  {
 
   @Input() max: number = Infinity;
   @Input() min: number = 0;

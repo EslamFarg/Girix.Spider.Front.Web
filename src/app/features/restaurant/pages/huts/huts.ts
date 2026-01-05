@@ -1,41 +1,57 @@
 import { BaseComponent } from '@/components/base-component/base-component';
 import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { Button } from 'primeng/button';
-import { InputGroupAddon } from "primeng/inputgroupaddon";
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
-import { Select } from "primeng/select";
+import { Button, ButtonDirective } from 'primeng/button';
+import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { Select } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
-import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
-import { Paginator, PaginatorState } from "primeng/paginator";
-import { HutService, IHutRowResponse } from '../../services/hut-service';
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { Paginator, PaginatorState } from 'primeng/paginator';
+import { HutService, IHutDtoResponse, IHutRowResponse } from '../../services/hut-service';
+import { AllowNumbers } from '@/directives/allow-numbers';
+import { noSymbolsAllowed } from '@/lib/text-validators';
+import { omitKeys } from '@/lib/helpers';
 
 @Component({
   selector: 'app-huts',
-  imports: [Button, ReactiveFormsModule, InputGroupAddon, InputErrorMessageHandler, Select, InputTextModule, SectionWrapper, Paginator],
+  imports: [
+    Button,
+    ReactiveFormsModule,
+    InputGroupAddon,
+    InputErrorMessageHandler,
+    Select,
+    InputTextModule,
+    SectionWrapper,
+    Paginator,
+    AllowNumbers,
+    ButtonDirective,
+  ],
   templateUrl: './huts.html',
   styleUrl: './huts.css',
 })
 export class Huts extends BaseComponent<IHutRowResponse> {
-  initialSearchFormValue = {
-    text: this.fb.control<string>('', [Validators.required]),
-    categoryId: this.fb.control<number>(0, [Validators.required]),
+    currentItem: IHutDtoResponse | null = null;
+  
+  initialFormValue = {
+    id: this.fb.control<number>(0, []),
+    name: this.fb.control<string>('', [
+      noSymbolsAllowed,
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(100),
+    ]),
+    pricePerHour: this.fb.control<number>(0, [Validators.required, Validators.min(1), Validators.max(100_000)]),
   };
-  fg = this.fb.group(this.initialSearchFormValue);
 
-  hutService=inject(HutService);
+  fg = this.fb.group(this.initialFormValue);
+
+  hutService = inject(HutService);
 
   constructor() {
     super();
 
-    this.hutService.resetSearchRequestModel();
-
-    //get page 1 of 10 orders
-    this.hutService.search().subscribe({
-      next: (res) => {
-        this.items.set(res.value.rows);
-      },
-    });
+    this.resetState();
   }
 
   periodOptions = [
@@ -45,11 +61,45 @@ export class Huts extends BaseComponent<IHutRowResponse> {
     { label: 'السنة', value: 4 },
   ];
 
-  onSubmit() {}
+  resetState() {
+    this.fg = this.fb.group(this.initialFormValue);
+    this.hutService.resetSearchRequestModel();
+ this.currentItem = null;
+    //get page 1 of 10 orders
+    this.hutService.search().subscribe({
+      next: (res) => {
+        this.items.set(res.value.rows);
+      },
+    });
+  }
+
+  onSubmit() {
+    console.log(this.fg.value);
+    if (this.fg.invalid) {
+      this.fg.markAllAsTouched();
+      return;
+    }
+
+
+    if ((this.fg.value?.id ?? 0) > 0) {
+      this.hutService.update(this.fg.getRawValue()).subscribe({
+        next: ()=>{
+          this.resetState()
+        },
+      });
+    } else {
+      this.hutService.create(omitKeys(this.fg.getRawValue(), ['id'])).subscribe({
+        next: ()=>{
+          this.resetState()
+        },
+      });
+    }
+  }
 
   first = 0;
   rows = 10;
-   onPageChange(event: PaginatorState) {
+
+  onPageChange(event: PaginatorState) {
     console.log(event);
     this.hutService.search({ pageIndex: event.page! + 1 }).subscribe({
       next: (res) => {
@@ -58,4 +108,20 @@ export class Huts extends BaseComponent<IHutRowResponse> {
     });
   }
 
+  fetchAndBindTableData(tableId: number) {
+    return this.hutService.getById(tableId).subscribe({
+      next: (res) => {
+        this.fg.patchValue(res);
+        this.currentItem = res;
+      },
+    });
+  }
+
+  deleteHut(id: number) {
+    this.hutService.delete(id).subscribe({
+      next: ()=>{
+        this.resetState();
+      },
+    });
+  }
 }
