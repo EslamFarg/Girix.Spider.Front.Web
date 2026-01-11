@@ -56,17 +56,18 @@ export class Tables extends BaseComponent<ITableRowResponse> {
     this.resetState();
   }
 
-  resetState() {
-    this.fg = this.fb.group(this.initialFormValue);
+  resetState = () => {
+    this.resetForm();
     this.tableService.resetSearchRequestModel();
-    this.currentItem = null;
+
     //get page 1 of 10 orders
     this.tableService.search().subscribe({
       next: (res) => {
+        this.first = 0;
         this.items.set(res.value.rows);
       },
     });
-  }
+  };
 
   onSubmit() {
     if (this.fg.invalid) {
@@ -75,6 +76,7 @@ export class Tables extends BaseComponent<ITableRowResponse> {
     }
 
     if ((this.fg.value?.id ?? 0) > 0) {
+      // update
       this.tableService.update(this.fg.getRawValue()).subscribe({
         next: this.resetState,
       });
@@ -85,8 +87,14 @@ export class Tables extends BaseComponent<ITableRowResponse> {
     }
   }
 
+  resetForm = () => {
+    this.fg = this.fb.group(this.initialFormValue);
+    this.currentItem = null;
+  };
+
   first = 0;
   rows = 10;
+
   onPageChange(event: PaginatorState) {
     console.log(event);
     this.tableService.search({ pageIndex: event.page! + 1 }).subscribe({
@@ -124,15 +132,14 @@ export class Tables extends BaseComponent<ITableRowResponse> {
 
       accept: () => {
         this.tableService.delete(id).subscribe({
-      next: () => {
-        this.resetState();
-      },
-    });
+          next: () => {
+            this.resetState();
+          },
+        });
       },
       reject: () => {
         this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
       },
     });
-    
   }
 }

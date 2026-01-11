@@ -7,10 +7,11 @@ import { Select } from "primeng/select";
 import { Paginator } from "primeng/paginator";
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { BaseComponent } from '@/components/base-component/base-component';
+import { InputText } from "primeng/inputtext";
 
 @Component({
   selector: 'app-collective-payments',
-  imports: [CollectivePaymentNav, SectionWrapper, InputErrorMessageHandler, InputGroupAddon, Select, Paginator,ReactiveFormsModule],
+  imports: [CollectivePaymentNav, SectionWrapper, InputErrorMessageHandler, InputGroupAddon, Select, Paginator, ReactiveFormsModule, InputText],
   templateUrl: './collective-payments.html',
   styleUrl: './collective-payments.css',
 })

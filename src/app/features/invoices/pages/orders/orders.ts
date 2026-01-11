@@ -32,7 +32,8 @@ import { MenuItem } from 'primeng/api';
 })
 export class Orders extends BaseComponent<IOrderRowResponse> {
   initialSearchFormValue = {
-    text: this.fb.control<string>('', [Validators.required]),
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+    searchEnum: this.fb.control<OrderSearchEnum>(OrderSearchEnum.OrderNumber, [Validators.required]),
   };
   fg = this.fb.group(this.initialSearchFormValue);
 
@@ -40,19 +41,19 @@ export class Orders extends BaseComponent<IOrderRowResponse> {
   filterMenuItems: MenuItem[] = [
     {
       label: 'اسم العميل',
-      command: (event) => (this.orderService.searchRequestModel.orderSearchEnum = OrderSearchEnum.CustomerName),
+      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.CustomerName }),
     },
     {
       label: 'رقم الطلب',
-      command: (event) => (this.orderService.searchRequestModel.orderSearchEnum = OrderSearchEnum.OrderNumber),
+      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderNumber}),
     },
     {
       label: 'موقع الطلب',
-      command: (event) => (this.orderService.searchRequestModel.orderSearchEnum = OrderSearchEnum.OrderPlace),
+      command: (event) =>  this.fg.patchValue({  searchEnum:OrderSearchEnum.OrderPlace}),
     },
     {
       label: 'نوع الطلب',
-      command: (event) => (this.orderService.searchRequestModel.orderSearchEnum = OrderSearchEnum.OrderType),
+      command: (event) =>  this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderType}),
     },
   ];
   constructor() {
@@ -82,8 +83,8 @@ export class Orders extends BaseComponent<IOrderRowResponse> {
           {
             pageIndex: 1,
           },
-          undefined,
-          [this.fg.getRawValue().text]
+          this.fg.getRawValue().searchEnum,
+          [this.fg.getRawValue().searchTerm]
         )
         .subscribe({
           next: (res) => {

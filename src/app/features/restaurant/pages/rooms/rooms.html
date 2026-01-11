@@ -3,6 +3,7 @@
     <!-- search -->
     <form
       #form
+       (reset)="resetForm()"
       id="roomForm"
       [formGroup]="fg"
       (ngSubmit)="onSubmit()"
@@ -33,9 +34,6 @@
       >
         @if(currentItem) { تحديث } @else { حفظ }
       </button>
-      <!-- <button type="button" class="flex-1 md:flex-none p-button-outlined border-dark-line! text-dark-line! py-1! md:px-8!" pButton>
-        حذف
-      </button> -->
       <button
         type="reset"
         form="roomForm"
@@ -44,15 +42,6 @@
       >
         جديد
       </button>
-      <!-- @if (currentItem) {
-      <button
-        type="button"
-        class="flex-1 md:flex-none p-button-outlined border-dark-line! text-dark-line! py-1! md:px-8!"
-        pButton
-      >
-        طباعة
-      </button>
-      } -->
     </div>
 
     <!-- data -->

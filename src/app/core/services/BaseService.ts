@@ -167,6 +167,7 @@ export default class BaseService<
       })
     );
   }
+
   update(createDto: IUpdateDto) {
     return this.http.put<number>(`${this.apiUrl}/Update`, createDto).pipe(
       tap({
@@ -187,9 +188,7 @@ export default class BaseService<
     );
   }
 
-  getById(id: number) {
-    return this.http.get<IGetByIdDto>(`${this.apiUrl}/${id}`);
-  }
+  getById = (id: number) => this.http.get<IGetByIdDto>(`${this.apiUrl}/${id}`);
 
   //
   //local storage
@@ -198,9 +197,7 @@ export default class BaseService<
   /**
    * Save/update data to localStorage
    */
-  save(key: localStorageKey, data: any) {
-    localStorage.setItem(key, JSON.stringify(data));
-  }
+  save = (key: localStorageKey, data: any) => localStorage.setItem(key, JSON.stringify(data));
 
   /**
    * Get data from localStorage
@@ -214,7 +211,5 @@ export default class BaseService<
   /**
    * Remove data from localStorage
    */
-  remove(key: localStorageKey) {
-    localStorage.removeItem(key);
-  }
+  remove = (key: localStorageKey) => localStorage.removeItem(key);
 }

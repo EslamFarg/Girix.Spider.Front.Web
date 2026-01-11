@@ -61,45 +61,46 @@ export class Huts extends BaseComponent<IHutRowResponse> {
     { label: 'السنة', value: 4 },
   ];
 
-  resetState() {
-    this.fg = this.fb.group(this.initialFormValue);
+  resetState = () => {
+    this.resetForm();
     this.hutService.resetSearchRequestModel();
-    this.currentItem = null;
     //get page 1 of 10 orders
     this.hutService.search().subscribe({
       next: (res) => {
         this.items.set(res.value.rows);
+        this.first = 0;
       },
     });
-  }
+  };
 
   onSubmit() {
-    console.log(this.fg.value);
     if (this.fg.invalid) {
       this.fg.markAllAsTouched();
       return;
     }
 
     if ((this.fg.value?.id ?? 0) > 0) {
+      // update
       this.hutService.update(this.fg.getRawValue()).subscribe({
-        next: () => {
-          this.resetState();
-        },
+        next: this.resetState,
       });
     } else {
+      // create
       this.hutService.create(omitKeys(this.fg.getRawValue(), ['id'])).subscribe({
-        next: () => {
-          this.resetState();
-        },
+        next: this.resetState,
       });
     }
   }
+
+  resetForm = () => {
+    this.fg = this.fb.group(this.initialFormValue);
+    this.currentItem = null;
+  };
 
   first = 0;
   rows = 10;
 
   onPageChange(event: PaginatorState) {
-    console.log(event);
     this.hutService.search({ pageIndex: event.page! + 1 }).subscribe({
       next: (res) => {
         this.items.set(res.value.rows);

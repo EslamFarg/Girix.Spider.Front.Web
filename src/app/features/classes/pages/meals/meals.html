@@ -3,7 +3,7 @@
 
   <app-section-wrapper>
     <!-- search -->
-    <div class="flex h-fit items-start gap-2 border w-full">
+    <div class="flex h-fit items-start gap-2   w-full">
       <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="flex-1">
         <app-input-error-message-handler [fc]="fg.get('text')">
           <input class="w-full bg-transparent!" pInputText type="text" formControlName="text" placeholder="بحث" />

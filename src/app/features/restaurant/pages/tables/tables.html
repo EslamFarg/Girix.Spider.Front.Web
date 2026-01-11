@@ -4,6 +4,7 @@
     <form
       id="tableForm"
       #form
+      (reset)="resetForm()"
       [formGroup]="fg"
       (ngSubmit)="onSubmit()"
       class="flex flex-1 w-full items-start gap-2 *:flex-1"
@@ -31,15 +32,8 @@
         class="flex-1 md:flex-none border-dark-line! bg-dark-line! text-white! py-1! md:px-8!"
         pButton
       >
-        حفظ
+        @if(currentItem) { تحديث } @else { حفظ }
       </button>
-      <!-- <button
-        type="button"
-        class="flex-1 md:flex-none p-button-outlined border-dark-line! text-dark-line! py-1! md:px-8!"
-        pButton
-      >
-        حذف
-      </button> -->
       <button
         type="reset"
         form="tableForm"
@@ -48,15 +42,6 @@
       >
         جديد
       </button>
-      @if (currentItem) {
-      <button
-        type="button"
-        class="flex-1 md:flex-none p-button-outlined border-dark-line! text-dark-line! py-1! md:px-8!"
-        pButton
-      >
-        طباعة
-      </button>
-      }
     </div>
 
     <!-- data -->

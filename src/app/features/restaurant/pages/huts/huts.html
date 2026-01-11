@@ -3,6 +3,7 @@
     <!-- search -->
     <form
       #form
+      (reset)="resetForm()"
       id="hutForm"
       [formGroup]="fg"
       (ngSubmit)="onSubmit()"
@@ -46,15 +47,8 @@
         form="hutForm"
         type="submit"
       >
-        حفظ
+        @if(currentItem) { تحديث } @else { حفظ }
       </button>
-      <!-- <button
-        class="flex-1 md:flex-none border-dark-line! text-dark-line! py-1! md:px-8! p-button-outlined"
-        type="button"
-        pButton
-      >
-        حذف
-      </button> -->
       <button
         class="flex-1 md:flex-none border-dark-line! text-dark-line! py-1! md:px-8! p-button-outlined"
         form="hutForm"
@@ -63,15 +57,6 @@
       >
         جديد
       </button>
-      @if (currentItem) {
-      <button
-        type="button"
-        class="flex-1 md:flex-none p-button-outlined border-dark-line! text-dark-line! py-1! md:px-8!"
-        pButton
-      >
-        طباعة
-      </button>
-      }
     </div>
 
     <!-- data -->

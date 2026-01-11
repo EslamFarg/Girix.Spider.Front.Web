@@ -6,6 +6,12 @@ export function mustIncludeLetters(control: AbstractControl): ValidationErrors |
   return reg.test(control.value) ? null : { mustIncludeLetters: true };
 }
 
+export function onlyNumbersAllowed(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) return null;
+  const reg = /^[0-9]*$/;
+  return reg.test(control.value) ? null : { onlyNumbersAllowed: true };
+}
+
 export function noSymbolsAllowed(control: AbstractControl): ValidationErrors | null {
   if (!control.value) return null;
   const reg = /^[a-zA-Z0-9\u0600-\u06FF\s]*$/;

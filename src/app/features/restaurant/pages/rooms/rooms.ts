@@ -56,18 +56,17 @@ export class Rooms extends BaseComponent<IRoomRowResponse> {
     this.resetState();
   }
 
-  resetState() {
-    this.fg = this.fb.group(this.initialFormValue);
-    this.currentItem = null;
+  resetState = () => {
+    this.resetForm();
     this.roomService.resetSearchRequestModel();
-
     //get page 1 of 10 orders
     this.roomService.search().subscribe({
       next: (res) => {
         this.items.set(res.value.rows);
+        this.first = 0;
       },
     });
-  }
+  };
 
   onSubmit() {
     if (this.fg.invalid) {
@@ -86,6 +85,10 @@ export class Rooms extends BaseComponent<IRoomRowResponse> {
     }
   }
 
+  resetForm = () => {
+    this.fg = this.fb.group(this.initialFormValue);
+    this.currentItem = null;
+  };
   first = 0;
   rows = 10;
   onPageChange(event: PaginatorState) {

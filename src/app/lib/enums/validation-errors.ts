@@ -40,6 +40,9 @@ export const ValidationErrorsEnum: any = {
   lessThanPurchasePrice() {
     return {ar:'سعر البيع يجب أن يكون أكبر من سعر الشراء',en:'The selling price must be greater than the purchase price'};
   },
+  onlyNumbersAllowed() {
+    return {ar:'مسموح فقط بالارقام',en:'Only numbers are allowed'};
+  },
   mustIncludeLetters() {
     return {ar:'يجب ان يحتوي الاسم على حرف واحد على الاقل',en:'The name must include at least one letter'};
   },

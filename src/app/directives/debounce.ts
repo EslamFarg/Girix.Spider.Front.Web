@@ -1,43 +1,35 @@
-import {
-  Directive,
-  EventEmitter,
-  HostListener,
-  Input,
-  Output,
-} from '@angular/core';
-import { debounceTime, Subject } from 'rxjs';
+import { Directive, ElementRef, EventEmitter, HostListener, inject, input, Input, output, Output } from '@angular/core';
+import { debounceTime, fromEvent, Subject, Subscription } from 'rxjs';
 
 @Directive({
-  selector: '[appDebounce]'
+  selector: '[appDebounce]',
 })
 export class Debounce {
+  debounceTime = input<number>(300);
+  debounceEvent = input.required<string>();
+  debounced = output();
 
-  @Input() debounceTime = 300;
-  @Output() debounced = new EventEmitter();
+  el = inject<ElementRef<HTMLElement>>(ElementRef);
+  private sub?: Subscription;
 
-  private clicks = new Subject<void>();
-
-  constructor() {
-    this.clicks
-      .pipe(debounceTime(this.debounceTime))
-      .subscribe(() => this.debounced.emit());
+  ngOnInit() {
+    this.sub = fromEvent(this.el.nativeElement, this.debounceEvent())
+      .pipe(debounceTime(this.debounceTime()))
+      .subscribe((e) => this.debounced.emit());
   }
 
-  @HostListener('click', ['$event'])
-  onClick(e: Event) {
-    if (e.target instanceof HTMLInputElement) {
-      return;
-    }
-    this.clicks.next();
+  ngOnDestroy() {
+    this.sub?.unsubscribe();
   }
 
-  @HostListener('keyup.enter', ['$event'])
-  @HostListener('input', ['$event'])
-  onChange(e: Event) {
-    if ((e.target as HTMLInputElement).value.trim() == '') {
-      return;
-    }
-    this.clicks.next();
-  }
+ 
 
+  // @HostListener('keyup.enter', ['$event'])
+  // @HostListener('input', ['$event'])
+  // onChange(e: Event) {
+  //   if ((e.target as HTMLInputElement).value.trim() == '') {
+  //     return;
+  //   }
+  //   this.clicks.next();
+  // }
 }
