@@ -1,5 +1,5 @@
 import { BaseComponent } from '@/components/base-component/base-component';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -12,6 +12,7 @@ import { DatePipe } from '@angular/common';
 import { Menu } from 'primeng/menu';
 import { Button } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
+import { Debounce } from '@/directives/debounce';
 
 @Component({
   selector: 'app-orders',
@@ -26,6 +27,7 @@ import { MenuItem } from 'primeng/api';
     DatePipe,
     Menu,
     Button,
+    Debounce,
   ],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
@@ -33,74 +35,101 @@ import { MenuItem } from 'primeng/api';
 export class Orders extends BaseComponent<IOrderRowResponse> {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
-    searchEnum: this.fb.control<OrderSearchEnum>(OrderSearchEnum.OrderNumber, [Validators.required]),
+    searchEnum: this.fb.control<OrderSearchEnum>(OrderSearchEnum.CustomerName, [Validators.required]),
+    fromDate: this.fb.control<string | null>(null, []),
+    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
   };
   fg = this.fb.group(this.initialSearchFormValue);
 
   orderService = inject(OrderService);
-  filterMenuItems: MenuItem[] = [
+  filterMenuItems = signal<MenuItem[]>([
     {
       label: 'اسم العميل',
       command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.CustomerName }),
     },
     {
       label: 'رقم الطلب',
-      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderNumber}),
+      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderNumber }),
     },
     {
       label: 'موقع الطلب',
-      command: (event) =>  this.fg.patchValue({  searchEnum:OrderSearchEnum.OrderPlace}),
+      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderPlace }),
     },
     {
       label: 'نوع الطلب',
-      command: (event) =>  this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderType}),
+      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderType }),
     },
-  ];
+  ]);
+
   constructor() {
     super();
 
-    this.orderService.resetSearchRequestModel();
-
-    //get page 1 of 10 orders
-    this.orderService.search().subscribe({
-      next: (res) => {
-        this.items.set(res.value.rows);
-      },
-    });
+    this.searchOrders(1);
   }
 
   periodOptions = [
-    { label: 'اليوم', value: 1 },
-    { label: 'الاسبوع', value: 2 },
-    { label: 'الشهر', value: 3 },
-    { label: 'السنة', value: 4 },
+    { label: 'الكل', value: null },
+    { label: 'اخر يوم', value: this.getPreviousUTCDate(1) },
+    { label: 'اخر اسبوع', value: this.getPreviousUTCDate(7) },
+    { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
+    { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  onSubmit() {
-    if (this.fg.valid) {
-      this.orderService
-        .search(
-          {
-            pageIndex: 1,
-          },
-          this.fg.getRawValue().searchEnum,
-          [this.fg.getRawValue().searchTerm]
-        )
-        .subscribe({
-          next: (res) => {
-            this.items.set(res.value.rows);
-          },
-        });
-    }
+  searchOrders(pageIndex: number) {
+    this.orderService
+      .search(
+        {
+          pageIndex: pageIndex,
+          pageSize: 10,
+        },
+        this.fg.getRawValue().searchEnum,
+        [this.fg.getRawValue().searchTerm],
+        this.fg.getRawValue().fromDate,
+        this.fg.getRawValue().toDate
+      )
+      .subscribe({
+        next: (res) => {
+          this.items.set(res.value.rows);
+          this.paginationInfo = {
+            pageIndex: pageIndex,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          };
+        },
+      });
   }
+
+  onSubmit = () => this.fg.valid && this.searchOrders(1);
 
   first = 0;
   rows = 10;
-  onPageChange(event: PaginatorState) {
-    console.log(event);
-    this.orderService.search({ pageIndex: event.page! + 1 }).subscribe({
-      next: (res) => {
-        this.items.set(res.value.rows);
+  onPageChange = (event: PaginatorState) => this.searchOrders(event.page! + 1);
+  deleteOrder(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف الطلب؟',
+      header: 'حذف الطلب',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.orderService.delete(id).subscribe({
+          next: () => {
+            this.searchOrders(1);
+          },
+        });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
       },
     });
   }

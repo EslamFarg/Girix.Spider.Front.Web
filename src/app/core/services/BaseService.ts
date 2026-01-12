@@ -41,9 +41,6 @@ export enum SearchColumEnum {
   IsCompany = 13,
 }
 
-// id '0' is the default value
-type BaseSearchEnum<SearchEnumExtension> = SearchColumEnum.Id | SearchEnumExtension;
-
 export default class BaseService<
   SearchEnum = any,
   SearchResultType = any,
@@ -61,50 +58,25 @@ export default class BaseService<
   router = inject(Router);
   messageService = inject(MessageService);
 
-  searchRequestModel: {
-    pageIndex: number;
-    totalRowsCount: number;
-    pageSize: number;
-    totalPagesCount: number;
-    searchValues: string[];
-    orderSearchEnum: BaseSearchEnum<SearchEnum>;
-  } = {
-    pageIndex: 1,
-    totalRowsCount: 0,
-    totalPagesCount: 0,
-    pageSize: 10,
-    searchValues: [],
-    orderSearchEnum: SearchColumEnum.Id,
-  };
-
-  resetSearchRequestModel() {
-    this.searchRequestModel = {
-      pageIndex: 1,
-      totalRowsCount: 0,
-      totalPagesCount: 0,
-      pageSize: 10,
-      searchValues: [],
-      orderSearchEnum: SearchColumEnum.Id,
-    };
-  }
-
   /**
    * @param paginationInfo default = { pageIndex: 1, pageSize: 10 }
    * @param orderSearchEnum default = 0 AKA 'Id'
    * @param searchValues default = []
+   * @param fromDate UTC date string, default = null
+   * @param toDate UTC date string, default = new Date().toISOString()
    * @description paginated search
    */
   search(
     paginationInfo: Partial<{ pageIndex: number; pageSize: number }> = {
       pageIndex: 1,
-      pageSize: this.searchRequestModel.pageSize,
+      pageSize: 10,
     },
-    orderSearchEnum: BaseSearchEnum<SearchEnum> = this.searchRequestModel.orderSearchEnum,
-    searchValues: string[] = this.searchRequestModel.searchValues
+    orderSearchEnum: SearchEnum,
+    searchValues: string[] = [],
+    fromDate: string | null = null, //start | past
+    toDate: string = new Date().toISOString() //end
   ) {
-    const pageIndex = paginationInfo?.pageIndex || this.searchRequestModel.pageIndex;
-    const pageSize = paginationInfo?.pageSize || this.searchRequestModel.pageSize;
-
+    
     if (this.isMock) {
       return new Observable<ISearchResponse<SearchResultType>>((observer) => {
         observer.next({
@@ -128,34 +100,22 @@ export default class BaseService<
       });
     }
 
-    return this.http
-      .post<ISearchResponse<SearchResultType>>(`${this.apiUrl}/Search`, {
-        criteriaDto: {
-          paginationInfo: {
-            pageIndex,
-            pageSize,
-          },
+    return this.http.post<ISearchResponse<SearchResultType>>(`${this.apiUrl}/Search`, {
+      criteriaDto: {
+        paginationInfo: {
+          pageIndex: paginationInfo.pageIndex,
+          pageSize: paginationInfo?.pageSize ?? 10,
         },
-        searchFilters: [
-          {
-            column: orderSearchEnum,
-            values: searchValues,
-          },
-        ],
-      })
-      .pipe(
-        tap({
-          next: (res) => {
-            Object.assign(this.searchRequestModel, {
-              pageIndex,
-              totalRowsCount: res.value.paginationInfo.totalRowsCount,
-              totalPagesCount: res.value.paginationInfo.totalPagesCount,
-              searchValues: searchValues,
-              orderSearchEnum: orderSearchEnum,
-            });
-          },
-        })
-      );
+      },
+      searchFilters: [
+        {
+          column: orderSearchEnum,
+          values: searchValues,
+        },
+      ],
+      fromDate: fromDate,
+      toDate: toDate,
+    });
   }
 
   create(createDto: ICreateDto) {

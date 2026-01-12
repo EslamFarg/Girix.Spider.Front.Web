@@ -8,7 +8,7 @@ import { Select } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { IRoomDtoResponse, IRoomRowResponse, RoomService } from '../../services/room-service';
+import { IRoomDtoResponse, IRoomRowResponse, RoomSearchEnum, RoomService } from '../../services/room-service';
 import { noSymbolsAllowed } from '@/lib/text-validators';
 import { omitKeys } from '@/lib/helpers';
 
@@ -33,6 +33,7 @@ export class Rooms extends BaseComponent<IRoomRowResponse> {
 
   initialFormValue = {
     id: this.fb.control<number>(0, []),
+    searchEnum: this.fb.control<RoomSearchEnum>(RoomSearchEnum.Name, []),
     name: this.fb.control<string>('', [
       Validators.required,
       Validators.minLength(3),
@@ -58,9 +59,8 @@ export class Rooms extends BaseComponent<IRoomRowResponse> {
 
   resetState = () => {
     this.resetForm();
-    this.roomService.resetSearchRequestModel();
-    //get page 1 of 10 orders
-    this.roomService.search().subscribe({
+     //get page 1 of 10 orders
+    this.roomService.search( { pageIndex: 1 }, this.fg.getRawValue().searchEnum).subscribe({
       next: (res) => {
         this.items.set(res.value.rows);
         this.first = 0;
@@ -93,7 +93,7 @@ export class Rooms extends BaseComponent<IRoomRowResponse> {
   rows = 10;
   onPageChange(event: PaginatorState) {
     console.log(event);
-    this.roomService.search({ pageIndex: event.page! + 1 }).subscribe({
+    this.roomService.search({ pageIndex: event.page! + 1 }, this.fg.getRawValue().searchEnum).subscribe({
       next: (res) => {
         this.items.set(res.value.rows);
       },

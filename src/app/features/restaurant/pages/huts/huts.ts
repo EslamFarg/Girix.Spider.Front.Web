@@ -8,7 +8,7 @@ import { Select } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { HutService, IHutDtoResponse, IHutRowResponse } from '../../services/hut-service';
+import { HutSearchEnum, HutService, IHutDtoResponse, IHutRowResponse } from '../../services/hut-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { noSymbolsAllowed } from '@/lib/text-validators';
 import { omitKeys } from '@/lib/helpers';
@@ -35,6 +35,7 @@ export class Huts extends BaseComponent<IHutRowResponse> {
 
   initialFormValue = {
     id: this.fb.control<number>(0, []),
+    searchEnum: this.fb.control<HutSearchEnum>(HutSearchEnum.Name, []),
     name: this.fb.control<string>('', [
       noSymbolsAllowed,
       Validators.required,
@@ -63,9 +64,8 @@ export class Huts extends BaseComponent<IHutRowResponse> {
 
   resetState = () => {
     this.resetForm();
-    this.hutService.resetSearchRequestModel();
     //get page 1 of 10 orders
-    this.hutService.search().subscribe({
+    this.hutService.search({ pageIndex: 1 }, this.fg.getRawValue().searchEnum).subscribe({
       next: (res) => {
         this.items.set(res.value.rows);
         this.first = 0;
@@ -101,7 +101,7 @@ export class Huts extends BaseComponent<IHutRowResponse> {
   rows = 10;
 
   onPageChange(event: PaginatorState) {
-    this.hutService.search({ pageIndex: event.page! + 1 }).subscribe({
+    this.hutService.search({ pageIndex: event.page! + 1 }, this.fg.getRawValue().searchEnum).subscribe({
       next: (res) => {
         this.items.set(res.value.rows);
       },

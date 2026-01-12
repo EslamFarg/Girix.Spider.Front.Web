@@ -72,7 +72,7 @@
       <tbody>
         @for (item of items(); track $index) {
         <tr class="">
-          <td>{{ getRowNumber($index, hutService.searchRequestModel.pageIndex) }}</td>
+          <td>{{ getRowNumber($index, paginationInfo.pageIndex) }}</td>
           <td>{{ item.name }}</td>
           <td>{{ item.pricePerHour }}</td>
           <td>
@@ -119,7 +119,7 @@
       (onPageChange)="onPageChange($event)"
       [first]="first"
       [rows]="rows"
-      [totalRecords]="hutService.searchRequestModel.totalRowsCount"
+      [totalRecords]="paginationInfo.totalRowsCount"
     />
   </app-section-wrapper>
 </div>

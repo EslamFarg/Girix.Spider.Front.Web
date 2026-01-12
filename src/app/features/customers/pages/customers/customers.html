@@ -41,7 +41,7 @@
         <tbody>
           @for (customer of items(); track $index) {
           <tr class="">
-            <td>{{ getRowNumber($index, customersService.searchRequestModel.pageIndex) }}</td>
+            <td>{{ getRowNumber($index, paginationInfo.pageIndex) }}</td>
             <td>{{ customer.name }}</td>
             <td>{{ customer?.phoneNumber ?? customer.secondaryMobileNumber }}</td>
             <td>
@@ -102,7 +102,7 @@
       (onPageChange)="onPageChange($event)"
       [first]="first"
       [rows]="rows"
-      [totalRecords]="customersService.searchRequestModel.totalRowsCount"
+      [totalRecords]="paginationInfo.totalRowsCount"
     />
   </app-section-wrapper>
 </div>

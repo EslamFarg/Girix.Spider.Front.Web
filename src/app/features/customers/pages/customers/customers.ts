@@ -61,10 +61,9 @@ export class Customers extends BaseComponent<ICustomerRowResponse> {
 
   resetState = () => {
     this.resetForm();
-    this.customersService.resetSearchRequestModel();
-
+ 
     //get page 1 of 10 orders
-    this.customersService.search().subscribe({
+    this.customersService.search( { pageIndex: 1 }, this.fg.getRawValue().searchEnum).subscribe({
       next: (res) => {
         this.first = 0;
         this.items.set(res.value.rows);
@@ -82,7 +81,7 @@ export class Customers extends BaseComponent<ICustomerRowResponse> {
     let searchValues: any[] = [fgRawValue.searchTerm];
     if (fgRawValue.searchEnum === CustomerSearchEnum.IsCompany) searchValues.push('true');
 
-    this.customersService.search({ pageIndex: 1, pageSize: 10 }, fgRawValue.searchEnum, searchValues).subscribe({
+    this.customersService.search({ pageIndex: 1 }, fgRawValue.searchEnum, searchValues).subscribe({
       next: (res) => {
         this.items.set(res.value.rows);
         this.first = 0;
@@ -96,7 +95,7 @@ export class Customers extends BaseComponent<ICustomerRowResponse> {
   rows = 10;
 
   onPageChange(event: PaginatorState) {
-    this.customersService.search({ pageIndex: event.page! + 1 }).subscribe({
+    this.customersService.search({ pageIndex: event.page! + 1 }, this.fg.getRawValue().searchEnum).subscribe({
       next: (res) => {
         this.items.set(res.value.rows);
       },

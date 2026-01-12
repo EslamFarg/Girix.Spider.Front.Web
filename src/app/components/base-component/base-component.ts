@@ -23,9 +23,22 @@ export class BaseComponent<ItemType = any> {
   layoutService = inject(LayoutService);
 
   items = signal<ItemType[]>([]);
-  getRowNumber = (index: number,pageNumber: number) => (index + 1) + ((pageNumber - 1) * 10);
+  getRowNumber = (index: number, pageNumber: number) => index + 1 + (pageNumber - 1) * 10;
+
+  paginationInfo: {
+    pageIndex: number;
+    totalRowsCount: number;
+     totalPagesCount: number;
+  } = {
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0,
+   };
 
 
-
-  
+  getPreviousUTCDate( days: number ) {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    return date;
+  }
 }

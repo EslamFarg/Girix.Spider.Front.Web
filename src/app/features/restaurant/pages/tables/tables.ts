@@ -8,7 +8,7 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { ITableDtoResponse, ITableRowResponse, TableService } from '../../services/table-service';
+import { ITableDtoResponse, ITableRowResponse, TableSearchEnum, TableService } from '../../services/table-service';
 import { noSymbolsAllowed } from '@/lib/text-validators';
 import { omitKeys } from '@/lib/helpers';
 
@@ -32,6 +32,7 @@ export class Tables extends BaseComponent<ITableRowResponse> {
   currentItem: ITableDtoResponse | null = null;
   initialFormValue = {
     id: this.fb.control<number>(0, []),
+    searchEnum: this.fb.control<TableSearchEnum>(TableSearchEnum.Name, []),
     name: this.fb.control<string>('', [
       Validators.required,
       Validators.minLength(3),
@@ -58,10 +59,9 @@ export class Tables extends BaseComponent<ITableRowResponse> {
 
   resetState = () => {
     this.resetForm();
-    this.tableService.resetSearchRequestModel();
 
     //get page 1 of 10 orders
-    this.tableService.search().subscribe({
+    this.tableService.search({ pageIndex: 1 }, this.fg.getRawValue().searchEnum).subscribe({
       next: (res) => {
         this.first = 0;
         this.items.set(res.value.rows);
@@ -97,7 +97,7 @@ export class Tables extends BaseComponent<ITableRowResponse> {
 
   onPageChange(event: PaginatorState) {
     console.log(event);
-    this.tableService.search({ pageIndex: event.page! + 1 }).subscribe({
+    this.tableService.search({ pageIndex: event.page! + 1 }, this.fg.getRawValue().searchEnum).subscribe({
       next: (res) => {
         this.items.set(res.value.rows);
       },
