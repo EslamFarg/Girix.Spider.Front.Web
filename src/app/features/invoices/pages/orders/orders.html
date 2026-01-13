@@ -134,8 +134,8 @@
 
     <p-paginator
       (onPageChange)="onPageChange($event)"
-      [first]="first"
-      [rows]="rows"
+      [first]="(paginationInfo.pageIndex -1) * 10"
+      [rows]="10"
       [totalRecords]="paginationInfo.totalRowsCount"
     />
   </app-section-wrapper>

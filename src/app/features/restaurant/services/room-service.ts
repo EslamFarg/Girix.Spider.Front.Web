@@ -30,9 +30,25 @@ export interface IRoomDtoResponse {
   reservedFrom: string;
   orderId: number;
 }
+
+export interface IRoomSearchResponse {
+  rows: IRoomRowResponse[];
+  paginationInfo: {
+    totalRowsCount: number;
+    totalPagesCount: number;
+    currentPageIndex: number;
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
-export class RoomService extends BaseService<RoomSearchEnum, IRoomRowResponse, IRoomCreateDto, IRoomUpdateDto,IRoomDtoResponse> {
+export class RoomService extends BaseService<
+  RoomSearchEnum,
+  IRoomCreateDto,
+  IRoomUpdateDto,
+  IRoomDtoResponse,
+  IRoomSearchResponse
+> {
   override apiRoute = 'Room';
 }

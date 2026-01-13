@@ -3,15 +3,17 @@
     <!-- search -->
     <form
       #form
-      (reset)="resetForm()"
+      (reset)="resetHutForm()"
       id="hutForm"
-      [formGroup]="fg"
-      (ngSubmit)="onSubmit()"
-      class="flex items-start gap-2 border w-full *:flex-1"
+      [formGroup]="hutFg"
+      appDebounce
+      debounceEvent="submit"
+      (debounced)="onHutFormSubmit()"
+      class="flex items-start gap-2 w-full *:flex-1"
     >
       <div>
         <label for="">اسم الكوخ</label>
-        <app-input-error-message-handler [fc]="fg.get('name')">
+        <app-input-error-message-handler [fc]="hutFg.get('name')">
           <input
             class="w-full bg-transparent!"
             maxlength="100"
@@ -24,7 +26,7 @@
       </div>
       <div>
         <label for="">سعر الكوخ / الساعه</label>
-        <app-input-error-message-handler [fc]="fg.get('pricePerHour')">
+        <app-input-error-message-handler [fc]="hutFg.get('pricePerHour')">
           <input
             class="w-full bg-transparent!"
             appAllowNumbers
@@ -71,7 +73,7 @@
       </thead>
       <tbody>
         @for (item of items(); track $index) {
-        <tr class="">
+        <tr class="" [class.*:border-y-green-500!]="item.id === currentItem?.id">
           <td>{{ getRowNumber($index, paginationInfo.pageIndex) }}</td>
           <td>{{ item.name }}</td>
           <td>{{ item.pricePerHour }}</td>
@@ -117,8 +119,8 @@
 
     <p-paginator
       (onPageChange)="onPageChange($event)"
-      [first]="first"
-      [rows]="rows"
+      [first]="(paginationInfo.pageIndex - 1) * 10"
+      [rows]="10"
       [totalRecords]="paginationInfo.totalRowsCount"
     />
   </app-section-wrapper>

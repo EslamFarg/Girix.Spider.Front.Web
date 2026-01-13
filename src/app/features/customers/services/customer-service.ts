@@ -72,12 +72,43 @@ export interface ICustomerDtoResponse {
   isCompany: boolean;
 }
 
+export interface ICustomerSearchResponse {
+  menuItems: {
+    rows: {
+      id: number;
+      name: string;
+      categoryId: number;
+      categoryName: string;
+      price: number;
+      costPrice: number;
+      tax: number;
+      priceWithTax: number;
+      priceWithSelectiveTax: number;
+      selectiveTax: number;
+      description: string;
+      images: {
+        id: number;
+        fullPath: string;
+      }[];
+      isAddition: true;
+      additionMenuItem: {
+        id: number;
+        name: string;
+      }[];
+    }[];
+    paginationInfo: {
+      totalRowsCount: number;
+      totalPagesCount: number;
+      currentPageIndex: number;
+    };
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class CustomerService extends BaseService<
   CustomerSearchEnum,
-  ICustomerRowResponse,
   ICustomerCreateDto,
   ICustomerUpdateDto,
   ICustomerDtoResponse

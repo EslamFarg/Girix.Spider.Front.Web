@@ -34,17 +34,24 @@ export interface IHutDtoResponse {
   orderId: number;
 }
 
-
+export interface IHutSearchResponse {
+  rows: IHutRowResponse[];
+  paginationInfo: {
+    totalRowsCount: number;
+    totalPagesCount: number;
+    currentPageIndex: number;
+  };
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class HutService extends BaseService<
   HutSearchEnum,
-  IHutRowResponse,
   IHutCreateDto,
   IHutUpdateDto,
-  IHutDtoResponse
+  IHutDtoResponse,
+  IHutSearchResponse
 > {
   override apiRoute = 'Hut';
 }

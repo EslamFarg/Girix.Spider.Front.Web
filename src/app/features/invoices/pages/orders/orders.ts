@@ -101,9 +101,8 @@ export class Orders extends BaseComponent<IOrderRowResponse> {
 
   onSubmit = () => this.fg.valid && this.searchOrders(1);
 
-  first = 0;
-  rows = 10;
   onPageChange = (event: PaginatorState) => this.searchOrders(event.page! + 1);
+
   deleteOrder(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
@@ -121,16 +120,8 @@ export class Orders extends BaseComponent<IOrderRowResponse> {
         severity: 'danger',
       },
 
-      accept: () => {
-        this.orderService.delete(id).subscribe({
-          next: () => {
-            this.searchOrders(1);
-          },
-        });
-      },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
-      },
+      accept: () => this.orderService.delete(id).subscribe({ next: () => this.searchOrders(1) }),
+      reject: () => this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' }),
     });
   }
 }

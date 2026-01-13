@@ -13,7 +13,7 @@ import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { MenuItem } from 'primeng/api';
 import { IProductRowResponse, ProductSearchEnum, ProductService } from '../../services/product-service';
 import { Debounce } from '@/directives/debounce';
-import { Menu } from "primeng/menu";
+import { Menu } from 'primeng/menu';
 
 @Component({
   selector: 'app-products',
@@ -30,8 +30,8 @@ import { Menu } from "primeng/menu";
     ProductsNav,
     SectionWrapper,
     Debounce,
-    Menu
-],
+    Menu,
+  ],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
@@ -44,7 +44,7 @@ export class Products extends BaseComponent<IProductRowResponse> {
   };
   fg = this.fb.group(this.initialSearchFormValue);
 
-  orderService = inject(ProductService);
+  productService = inject(ProductService);
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'الاسم',
@@ -71,7 +71,7 @@ export class Products extends BaseComponent<IProductRowResponse> {
   ];
 
   searchProducts(pageIndex: number) {
-    this.orderService
+    this.productService
       .search(
         {
           pageIndex: pageIndex,
@@ -84,11 +84,11 @@ export class Products extends BaseComponent<IProductRowResponse> {
       )
       .subscribe({
         next: (res) => {
-          this.items.set(res.value.rows);
+          this.items.set(res.value.menuItems.rows);
           this.paginationInfo = {
-            pageIndex: pageIndex,
-            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            pageIndex,
+            totalPagesCount: res.value.menuItems.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.menuItems.paginationInfo.totalRowsCount,
           };
         },
       });
@@ -96,7 +96,35 @@ export class Products extends BaseComponent<IProductRowResponse> {
 
   onSubmit = () => this.fg.valid && this.searchProducts(1);
 
-  first = 0;
-  rows = 10;
   onPageChange = (event: PaginatorState) => this.searchProducts(event.page! + 1);
+
+  deleteProduct(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف المنتج',
+      header: 'حذف المنتج',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.productService.delete(id).subscribe({
+          next: () => {
+            this.searchProducts(1);
+          },
+        });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
+      },
+    });
+  }
 }

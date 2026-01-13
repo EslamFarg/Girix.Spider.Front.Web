@@ -1,23 +1,45 @@
-<div class="p-4 h-full overflow-auto  no-scrollbar">
+<div class="p-4 h-full overflow-auto no-scrollbar">
   <app-meals-nav class="block mb-4" />
 
   <app-section-wrapper>
     <!-- search -->
-    <div class="flex h-fit items-start gap-2   w-full">
-      <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="flex-1">
-        <app-input-error-message-handler [fc]="fg.get('text')">
-          <input class="w-full bg-transparent!" pInputText type="text" formControlName="text" placeholder="بحث" />
-          <p-inputgroup-addon>
-            <i class="pi pi-filter"></i>
+    <form
+      #form
+      [formGroup]="fg"
+      appDebounce
+      debounceEvent="submit"
+      (debounced)="onSubmit()"
+      class="flex h-fit items-start gap-2 w-full"
+    >
+      <div class="flex-1">
+        <app-input-error-message-handler [fc]="fg.get('searchTerm')">
+          <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
+          <p-inputgroup-addon class="relative">
+            <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+            <p-menu
+              dir="rtl"
+              [class]="`*:top-full! *:left-0! `"
+              #filterMenu
+              [model]="filterMenuItems()"
+              [popup]="true"
+              [style]="{ insetInlineEnd: '100%' }"
+            />
           </p-inputgroup-addon>
           <p-inputgroup-addon>
             <i class="pi pi-search"></i>
           </p-inputgroup-addon>
         </app-input-error-message-handler>
-      </form>
+      </div>
 
-      <p-select [options]="periodOptions" optionLabel="label" placeholder="الكل" class="h-fit hidden! sm:flex! w-40" />
-    </div>
+      <p-select
+        [options]="periodOptions"
+        formControlName="fromDate"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="الكل"
+        class="h-fit hidden! sm:flex! w-40"
+      />
+    </form>
 
     <table class="my-2 sm:my-4 w-full main-table">
       <thead>
@@ -33,20 +55,22 @@
         </tr>
       </thead>
       <tbody>
-        @for (item of [1,2,3,4,5,6,7]; track $index) {
+        @for (item of items(); track $index) {
         <tr class="">
-          <td>م</td>
+          <td>{{ getRowNumber($index, paginationInfo.pageIndex) }}</td>
           <td>
-            <img class="w-10 aspect-square mx-auto" appImgFallback src="/images/placeholders/menu-item.png" alt="" />
+            <img
+              class="w-10 aspect-square mx-auto object-fit-cover"
+              appImgFallback
+              [src]="baseUrl+((item.images?.[0]?.fullPath)??'')"
+              alt=""
+            />
           </td>
-          <td>ماكرونه بالجمبري</td>
-          <td>أطباق الماكرونه</td>
-          <td>
-            وصف كبيير وصف كبير وصف كبيير وصف كبير وصف كبيير وصف كبير وصف كبيير وصف كبير وصف كبيير وصف كبير وصف كبيير وصف
-            كبير
-          </td>
-          <td class="font-bold">15.00</td>
-          <td class="font-bold">120.00 $</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.categoryName }}</td>
+          <td>{{ item.description }}</td>
+          <td class="font-bold">{{ item.tax }}</td>
+          <td class="font-bold">${{ item.price }}</td>
           <td>
             <div class="actions">
               <button type="button" class="edit">
@@ -87,6 +111,11 @@
       </tbody>
     </table>
 
-    <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
+    <p-paginator
+      (onPageChange)="onPageChange($event)"
+      [first]="(paginationInfo.pageIndex - 1) * 10"
+      [rows]="10"
+      [totalRecords]="paginationInfo.totalRowsCount"
+    />
   </app-section-wrapper>
 </div>

@@ -28,12 +28,29 @@ export interface IOrderRowResponse {
   isCollected: boolean;
 }
 
+export interface IOrderSearchResponseValue {
+  rows: IOrderRowResponse[];
+  paginationInfo: {
+    totalRowsCount: number;
+    totalPagesCount: number;
+    currentPageIndex: number;
+  };
+}
+
+export interface ICategoryRowResponse {
+  id: number;
+  name: string;
+  printerName: string;
+  isOnCasher: boolean;
+  attachment: {
+    id: number;
+    fullPath: string;
+  }[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
-export class OrderService extends BaseService<OrderSearchEnum, IOrderRowResponse,any,any,any> {
+export class OrderService extends BaseService<OrderSearchEnum, any, any, IOrderSearchResponseValue> {
   override apiRoute = 'Order';
-
-
-  
 }

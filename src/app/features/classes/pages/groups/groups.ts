@@ -1,41 +1,113 @@
 import { BaseComponent } from '@/components/base-component/base-component';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
- import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
-import { PaginatorModule } from 'primeng/paginator';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
-import { GroupsNav } from "../../components/groups-nav/groups-nav";
-import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
+import { GroupsNav } from '../../components/groups-nav/groups-nav';
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { Debounce } from '@/directives/debounce';
+import { IGroupRowResponse, GroupSearchEnum, GroupService } from '../../services/group-service';
+import { MenuItem } from 'primeng/api';
+import { Menu } from "primeng/menu";
 
 @Component({
   selector: 'app-groups',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon, InputTextModule, SelectModule, PaginatorModule, GroupsNav, SectionWrapper],
+  imports: [
+    ReactiveFormsModule,
+    InputErrorMessageHandler,
+    InputGroupAddon,
+    InputTextModule,
+    SelectModule,
+    PaginatorModule,
+    GroupsNav,
+    SectionWrapper,
+    Debounce,
+    Menu
+],
   templateUrl: './groups.html',
   styleUrl: './groups.css',
 })
-export class Groups extends BaseComponent {
+export class Groups extends BaseComponent<IGroupRowResponse> {
   initialSearchFormValue = {
-    text: this.fb.control<string>('', [Validators.required]),
-    categoryId: this.fb.control<number>(0, [Validators.required]),
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+    searchEnum: this.fb.control<GroupSearchEnum>(GroupSearchEnum.Name, [Validators.required]),
+    fromDate: this.fb.control<string | null>(null, []),
+    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
   };
   fg = this.fb.group(this.initialSearchFormValue);
 
+  groupService = inject(GroupService);
+  filterMenuItems = signal<MenuItem[]>([
+    {
+      label: 'الاسم',
+      command: (event) => this.fg.patchValue({ searchEnum: GroupSearchEnum.Name }),
+    },
+  ]);
 
+  constructor() {
+    super();
 
-  periodOptions=[
-    {label:'اليوم',value:1},
-    {label:'الاسبوع',value:2},
-    {label:'الشهر',value:3},
-    {label:'السنة',value:4},
-  ]
+    this.searchGroups(1);
+  }
 
-  onSubmit() {}
+  periodOptions = [
+    { label: 'الكل', value: null },
+    { label: 'اخر يوم', value: this.getPreviousUTCDate(1) },
+    { label: 'اخر اسبوع', value: this.getPreviousUTCDate(7) },
+    { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
+    { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
+  ];
 
+  searchGroups(pageIndex: number) {
+    this.groupService
+      .search(
+        {
+          pageIndex: pageIndex,
+          pageSize: 10,
+        },
+        this.fg.getRawValue().searchEnum,
+        [this.fg.getRawValue().searchTerm],
+        this.fg.getRawValue().fromDate,
+        this.fg.getRawValue().toDate
+      )
+      .subscribe({
+        next: (res) => {
+          this.items.set(res.value.rows);
+          this.paginationInfo = {
+            pageIndex,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          };
+        },
+      });
+  }
 
-  first = 0;
-  rows = 10;
-  onPageChange(event: any) {}
+  onSubmit = () => this.fg.valid && this.searchGroups(1);
 
+  onPageChange = (event: PaginatorState) => this.searchGroups(event.page! + 1);
+
+  deleteGroup(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف الوجبة؟',
+      header: 'حذف الوجبة؟',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => this.groupService.delete(id).subscribe({ next: () => this.searchGroups(1) }),
+      reject: () => this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' }),
+    });
+  }
 }

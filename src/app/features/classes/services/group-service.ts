@@ -1,8 +1,34 @@
+import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
+
+export interface IGroupRowResponse {
+  id: number;
+  name: string;
+  printerName: string;
+  isOnCasher: boolean;
+  attachment: { id: number; fullPath: string }[];
+}
+
+export interface IGroupSearchResponseValue {
+  rows: IGroupRowResponse[];
+  paginationInfo: {
+    totalRowsCount: number;
+    totalPagesCount: number;
+    currentPageIndex: number;
+  };
+}
+ 
+
+//MenuItems : id,Name
+
+export enum GroupSearchEnum {
+  Id = SearchColumEnum.Id,
+  Name = SearchColumEnum.Name,
+}
 
 @Injectable({
   providedIn: 'root',
 })
-export class GroupService {
-  
+export class GroupService extends BaseService<GroupSearchEnum, any, any, any, IGroupSearchResponseValue> {
+  override apiRoute = 'Category';
 }

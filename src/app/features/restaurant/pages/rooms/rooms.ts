@@ -1,5 +1,5 @@
 import { BaseComponent } from '@/components/base-component/base-component';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
@@ -11,6 +11,8 @@ import { Paginator, PaginatorState } from 'primeng/paginator';
 import { IRoomDtoResponse, IRoomRowResponse, RoomSearchEnum, RoomService } from '../../services/room-service';
 import { noSymbolsAllowed } from '@/lib/text-validators';
 import { omitKeys } from '@/lib/helpers';
+import { Debounce } from '@/directives/debounce';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-rooms',
@@ -24,6 +26,7 @@ import { omitKeys } from '@/lib/helpers';
     SectionWrapper,
     Paginator,
     ButtonDirective,
+    Debounce,
   ],
   templateUrl: './rooms.html',
   styleUrl: './rooms.css',
@@ -31,7 +34,7 @@ import { omitKeys } from '@/lib/helpers';
 export class Rooms extends BaseComponent<IRoomRowResponse> {
   currentItem: IRoomDtoResponse | null = null;
 
-  initialFormValue = {
+  initialRoomFormValue = {
     id: this.fb.control<number>(0, []),
     searchEnum: this.fb.control<RoomSearchEnum>(RoomSearchEnum.Name, []),
     name: this.fb.control<string>('', [
@@ -41,69 +44,104 @@ export class Rooms extends BaseComponent<IRoomRowResponse> {
       noSymbolsAllowed,
     ]),
   };
-  fg = this.fb.group(this.initialFormValue);
+
+  roomFg = this.fb.group(this.initialRoomFormValue);
+
+  initialSearchFormValue = {
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+    searchEnum: this.fb.control<RoomSearchEnum>(RoomSearchEnum.Name, [Validators.required]),
+    fromDate: this.fb.control<string | null>(null, []),
+    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
+  };
+
+  searchFg = this.fb.group(this.initialSearchFormValue);
+
+  resetRoomForm = () => {
+    this.roomFg = this.fb.group(this.initialRoomFormValue);
+    this.currentItem = null;
+  };
 
   periodOptions = [
-    { label: 'اليوم', value: 1 },
-    { label: 'الاسبوع', value: 2 },
-    { label: 'الشهر', value: 3 },
-    { label: 'السنة', value: 4 },
+    { label: 'الكل', value: null },
+    { label: 'اخر يوم', value: this.getPreviousUTCDate(1) },
+    { label: 'اخر اسبوع', value: this.getPreviousUTCDate(7) },
+    { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
+    { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
+
+  filterMenuItems = signal<MenuItem[]>([
+    {
+      label: 'الاسم',
+      command: (event) => this.searchFg.patchValue({ searchEnum: RoomSearchEnum.Name }),
+    },
+    {
+      label: 'متاح',
+      command: (event) => this.searchFg.patchValue({ searchEnum: RoomSearchEnum.IsAvaliable }),
+    },
+  ]);
 
   roomService = inject(RoomService);
 
   constructor() {
     super();
-    this.resetState();
+
+    this.searchRooms(1);
   }
 
-  resetState = () => {
-    this.resetForm();
-     //get page 1 of 10 orders
-    this.roomService.search( { pageIndex: 1 }, this.fg.getRawValue().searchEnum).subscribe({
-      next: (res) => {
-        this.items.set(res.value.rows);
-        this.first = 0;
-      },
-    });
-  };
+  searchRooms(pageIndex: number) {
+    this.roomService
+      .search(
+        {
+          pageIndex: pageIndex,
+          pageSize: 10,
+        },
+        this.searchFg.getRawValue().searchEnum,
+        [this.searchFg.getRawValue().searchTerm],
+        this.searchFg.getRawValue().fromDate,
+        this.searchFg.getRawValue().toDate
+      )
+      .subscribe({
+        next: (res) => {
+          this.items.set(res.value.rows);
+          this.paginationInfo = {
+            pageIndex,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          };
+        },
+      });
+  }
 
-  onSubmit() {
-    if (this.fg.invalid) {
-      this.fg.markAllAsTouched();
+  onRoomFormSubmit() {
+    if (this.roomFg.invalid) {
+      this.roomFg.markAllAsTouched();
       return;
     }
 
-    if ((this.fg.value?.id ?? 0) > 0) {
-      this.roomService.update(this.fg.getRawValue()).subscribe({
-        next: this.resetState,
+    if (this.currentItem) {
+      this.roomService.update(this.roomFg.getRawValue()).subscribe({
+        next: () => {
+          this.searchRooms(1);
+          this.resetRoomForm();
+        },
       });
     } else {
-      this.roomService.create(omitKeys(this.fg.getRawValue(), ['id'])).subscribe({
-        next: this.resetState,
+      this.roomService.create(omitKeys(this.roomFg.getRawValue(), ['id'])).subscribe({
+        next: () => {
+          this.searchRooms(1);
+          this.resetRoomForm();
+        },
       });
     }
   }
 
-  resetForm = () => {
-    this.fg = this.fb.group(this.initialFormValue);
-    this.currentItem = null;
-  };
-  first = 0;
-  rows = 10;
-  onPageChange(event: PaginatorState) {
-    console.log(event);
-    this.roomService.search({ pageIndex: event.page! + 1 }, this.fg.getRawValue().searchEnum).subscribe({
-      next: (res) => {
-        this.items.set(res.value.rows);
-      },
-    });
-  }
+  onPageChange = (event: PaginatorState) => this.searchRooms(event.page! + 1);
+  onSearchSubmit = () => this.searchFg.valid && this.searchRooms(1);
 
-  fetchAndBindTableData(tableId: number) {
-    return this.roomService.getById(tableId).subscribe({
+  fetchAndBindTableData(roomId: number) {
+    return this.roomService.getById(roomId).subscribe({
       next: (res) => {
-        this.fg.patchValue(res);
+        this.roomFg.patchValue(res);
         this.currentItem = res;
       },
     });
@@ -126,16 +164,8 @@ export class Rooms extends BaseComponent<IRoomRowResponse> {
         severity: 'danger',
       },
 
-      accept: () => {
-        this.roomService.delete(id).subscribe({
-          next: () => {
-            this.resetState();
-          },
-        });
-      },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
-      },
+      accept: () => this.roomService.delete(id).subscribe({ next: () => this.searchRooms(1) }),
+      reject: () => this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' }),
     });
   }
 }

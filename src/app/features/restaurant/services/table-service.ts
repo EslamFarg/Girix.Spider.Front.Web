@@ -30,15 +30,24 @@ export interface ITableDtoResponse {
   orderId: number;
 }
 
+export interface ITableSearchResponse {
+  rows: ITableRowResponse[];
+  paginationInfo: {
+    totalRowsCount: number;
+    totalPagesCount: number;
+    currentPageIndex: number;
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class TableService extends BaseService<
   TableSearchEnum,
-  ITableRowResponse,
   ITableCreateDto,
   ITableUpdateDto,
-  ITableDtoResponse
+  ITableDtoResponse,
+  ITableSearchResponse
 > {
   override apiRoute = 'Table';
 }

@@ -4,14 +4,16 @@
     <form
       id="tableForm"
       #form
-      (reset)="resetForm()"
-      [formGroup]="fg"
-      (ngSubmit)="onSubmit()"
+      (reset)="resetTableForm()"
+      [formGroup]="tableFg"
+      appDebounce
+      debounceEvent="submit"
+      (debounced)="onTableFormSubmit()"
       class="flex flex-1 w-full items-start gap-2 *:flex-1"
     >
       <div>
         <label for="">اسم الطاوله</label>
-        <app-input-error-message-handler [fc]="fg.get('name')">
+        <app-input-error-message-handler [fc]="tableFg.get('name')">
           <input
             class="w-full bg-transparent!"
             maxlength="100"
@@ -102,8 +104,8 @@
 
     <p-paginator
       (onPageChange)="onPageChange($event)"
-      [first]="first"
-      [rows]="rows"
+      [first]="(paginationInfo.pageIndex - 1) * 10"
+      [rows]="10"
       [totalRecords]="paginationInfo.totalRowsCount"
     />
   </app-section-wrapper>

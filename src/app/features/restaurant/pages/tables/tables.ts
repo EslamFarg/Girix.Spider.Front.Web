@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -11,6 +11,8 @@ import { Paginator, PaginatorState } from 'primeng/paginator';
 import { ITableDtoResponse, ITableRowResponse, TableSearchEnum, TableService } from '../../services/table-service';
 import { noSymbolsAllowed } from '@/lib/text-validators';
 import { omitKeys } from '@/lib/helpers';
+import { MenuItem } from 'primeng/api';
+import { Debounce } from '@/directives/debounce';
 
 @Component({
   selector: 'app-tables',
@@ -24,15 +26,16 @@ import { omitKeys } from '@/lib/helpers';
     SectionWrapper,
     Paginator,
     ButtonDirective,
+    Debounce,
   ],
   templateUrl: './tables.html',
   styleUrl: './tables.css',
 })
 export class Tables extends BaseComponent<ITableRowResponse> {
   currentItem: ITableDtoResponse | null = null;
-  initialFormValue = {
+
+  initialTableFormValue = {
     id: this.fb.control<number>(0, []),
-    searchEnum: this.fb.control<TableSearchEnum>(TableSearchEnum.Name, []),
     name: this.fb.control<string>('', [
       Validators.required,
       Validators.minLength(3),
@@ -40,74 +43,54 @@ export class Tables extends BaseComponent<ITableRowResponse> {
       noSymbolsAllowed,
     ]),
   };
-  fg = this.fb.group(this.initialFormValue);
 
-  periodOptions = [
-    { label: 'اليوم', value: 1 },
-    { label: 'الاسبوع', value: 2 },
-    { label: 'الشهر', value: 3 },
-    { label: 'السنة', value: 4 },
-  ];
+  tableFg = this.fb.group(this.initialTableFormValue);
+
+  initialSearchFormValue = {
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+    searchEnum: this.fb.control<TableSearchEnum>(TableSearchEnum.Name, [Validators.required]),
+    fromDate: this.fb.control<string | null>(null, []),
+    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
+  };
+
+  searchFg = this.fb.group(this.initialSearchFormValue);
 
   tableService = inject(TableService);
+
+  resetTableForm = () => {
+    this.tableFg = this.fb.group(this.initialTableFormValue);
+    this.currentItem = null;
+  };
 
   constructor() {
     super();
 
-    this.resetState();
+    this.searchTables(1);
   }
 
-  resetState = () => {
-    this.resetForm();
+  filterMenuItems = signal<MenuItem[]>([
+    {
+      label: 'الاسم',
+      command: (event) => this.searchFg.patchValue({ searchEnum: TableSearchEnum.Name }),
+    },
+    {
+      label: 'متاح',
+      command: (event) => this.searchFg.patchValue({ searchEnum: TableSearchEnum.IsAvaliable }),
+    },
+  ]);
 
-    //get page 1 of 10 orders
-    this.tableService.search({ pageIndex: 1 }, this.fg.getRawValue().searchEnum).subscribe({
-      next: (res) => {
-        this.first = 0;
-        this.items.set(res.value.rows);
-      },
-    });
-  };
-
-  onSubmit() {
-    if (this.fg.invalid) {
-      this.fg.markAllAsTouched();
-      return;
-    }
-
-    if ((this.fg.value?.id ?? 0) > 0) {
-      // update
-      this.tableService.update(this.fg.getRawValue()).subscribe({
-        next: this.resetState,
-      });
-    } else {
-      this.tableService.create(omitKeys(this.fg.getRawValue(), ['id'])).subscribe({
-        next: this.resetState,
-      });
-    }
-  }
-
-  resetForm = () => {
-    this.fg = this.fb.group(this.initialFormValue);
-    this.currentItem = null;
-  };
-
-  first = 0;
-  rows = 10;
-
-  onPageChange(event: PaginatorState) {
-    console.log(event);
-    this.tableService.search({ pageIndex: event.page! + 1 }, this.fg.getRawValue().searchEnum).subscribe({
-      next: (res) => {
-        this.items.set(res.value.rows);
-      },
-    });
-  }
+  periodOptions = [
+    { label: 'الكل', value: null },
+    { label: 'اخر يوم', value: this.getPreviousUTCDate(1) },
+    { label: 'اخر اسبوع', value: this.getPreviousUTCDate(7) },
+    { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
+    { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
+  ];
 
   fetchAndBindTableData(tableId: number) {
     return this.tableService.getById(tableId).subscribe({
       next: (res) => {
-        this.fg.patchValue(res);
+        this.tableFg.patchValue(res);
         this.currentItem = res;
       },
     });
@@ -133,7 +116,7 @@ export class Tables extends BaseComponent<ITableRowResponse> {
       accept: () => {
         this.tableService.delete(id).subscribe({
           next: () => {
-            this.resetState();
+            this.searchTables(1);
           },
         });
       },
@@ -141,5 +124,56 @@ export class Tables extends BaseComponent<ITableRowResponse> {
         this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
       },
     });
+  }
+
+  searchTables(pageIndex: number) {
+    this.tableService
+      .search(
+        {
+          pageIndex: pageIndex,
+          pageSize: 10,
+        },
+        this.searchFg.getRawValue().searchEnum,
+        [this.searchFg.getRawValue().searchTerm],
+        this.searchFg.getRawValue().fromDate,
+        this.searchFg.getRawValue().toDate
+      )
+      .subscribe({
+        next: (res) => {
+          this.items.set(res.value.rows);
+          this.paginationInfo = {
+            pageIndex,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          };
+        },
+      });
+  }
+
+  onSearchSubmit = () => this.searchFg.valid && this.searchTables(1);
+
+  onPageChange = (event: PaginatorState) => this.searchTables(event.page! + 1);
+
+  onTableFormSubmit() {
+    if (this.tableFg.invalid) {
+      this.tableFg.markAllAsTouched();
+      return;
+    }
+
+    if (this.currentItem) {
+      this.tableService.update(this.tableFg.getRawValue()).subscribe({
+        next: () => {
+          this.searchTables(1);
+          this.resetTableForm();
+        },
+      });
+    } else {
+      this.tableService.create(omitKeys(this.tableFg.getRawValue(), ['id'])).subscribe({
+        next: () => {
+          this.searchTables(1);
+          this.resetTableForm();
+        },
+      });
+    }
   }
 }

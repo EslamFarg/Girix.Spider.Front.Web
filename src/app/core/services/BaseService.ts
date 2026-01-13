@@ -6,15 +6,8 @@ import { MessageService } from 'primeng/api';
 import { Observable, tap } from 'rxjs';
 
 type localStorageKey = 'userDetails' | 'token' | 'forgotPasswordEmail' | 'forgotPasswordToken';
-export interface ISearchResponse<T> {
-  value: {
-    rows: T[];
-    paginationInfo: {
-      currentPageIndex: number;
-      totalRowsCount: number;
-      totalPagesCount: number;
-    };
-  };
+export interface IBaseSearchResponse<T> {
+  value: T;
   isSuccess: boolean;
   isFailure: boolean;
   error: {
@@ -43,10 +36,10 @@ export enum SearchColumEnum {
 
 export default class BaseService<
   SearchEnum = any,
-  SearchResultType = any,
   ICreateDto = any,
   IUpdateDto = any,
-  IGetByIdDto = any
+  IGetByIdDto = any,
+  ISearchResponseValue = any
 > {
   static apiBaseUrl = environment.apiUrl;
   apiRoute = '';
@@ -76,18 +69,10 @@ export default class BaseService<
     fromDate: string | null = null, //start | past
     toDate: string = new Date().toISOString() //end
   ) {
-    
     if (this.isMock) {
-      return new Observable<ISearchResponse<SearchResultType>>((observer) => {
+      return new Observable<IBaseSearchResponse<ISearchResponseValue>>((observer) => {
         observer.next({
-          value: {
-            rows: [],
-            paginationInfo: {
-              currentPageIndex: 0,
-              totalRowsCount: 0,
-              totalPagesCount: 0,
-            },
-          },
+          value: {} as ISearchResponseValue,
           isSuccess: true,
           isFailure: false,
           error: {
@@ -100,7 +85,7 @@ export default class BaseService<
       });
     }
 
-    return this.http.post<ISearchResponse<SearchResultType>>(`${this.apiUrl}/Search`, {
+    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(`${this.apiUrl}/Search`, {
       criteriaDto: {
         paginationInfo: {
           pageIndex: paginationInfo.pageIndex,

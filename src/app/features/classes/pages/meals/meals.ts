@@ -1,41 +1,109 @@
 import { BaseComponent } from '@/components/base-component/base-component';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
-import { PaginatorModule } from 'primeng/paginator';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
-import { MealsNav } from "../../components/meals-nav/meals-nav";
-import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
+import { MealsNav } from '../../components/meals-nav/meals-nav';
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { IMealRowResponse, MealSearchEnum, MealService } from '../../services/meal-service';
+import { MenuItem } from 'primeng/api';
+import { Menu } from 'primeng/menu';
+import { ImgFallback } from '@/directives/img-fallback';
+import { Debounce } from "@/directives/debounce";
 
 @Component({
   selector: 'app-meals',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon, InputTextModule, SelectModule, PaginatorModule, MealsNav, SectionWrapper],
+  imports: [
+    ReactiveFormsModule,
+    InputErrorMessageHandler,
+    InputGroupAddon,
+    InputTextModule,
+    SelectModule,
+    PaginatorModule,
+    MealsNav,
+    SectionWrapper,
+    Menu,
+    ImgFallback,
+    Debounce
+],
   templateUrl: './meals.html',
   styleUrl: './meals.css',
 })
-export class Meals extends BaseComponent {
+export class Meals extends BaseComponent<IMealRowResponse> {
   initialSearchFormValue = {
-    text: this.fb.control<string>('', [Validators.required]),
-    categoryId: this.fb.control<number>(0, [Validators.required]),
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+    searchEnum: this.fb.control<MealSearchEnum>(MealSearchEnum.Name, [Validators.required]),
+    fromDate: this.fb.control<string | null>(null, []),
+    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
   };
   fg = this.fb.group(this.initialSearchFormValue);
 
+  orderService = inject(MealService);
+  filterMenuItems = signal<MenuItem[]>([
+    {
+      label: 'الاسم',
+      command: (event) => this.fg.patchValue({ searchEnum: MealSearchEnum.Name }),
+    },
+    {
+      label: 'اسم الفئة',
+      command: (event) => this.fg.patchValue({ searchEnum: MealSearchEnum.CategoryName }),
+    },
+  ]);
 
+  constructor() {
+    super();
 
-  periodOptions=[
-    {label:'اليوم',value:1},
-    {label:'الاسبوع',value:2},
-    {label:'الشهر',value:3},
-    {label:'السنة',value:4},
-  ]
+    this.searchMeals(1);
+  }
 
-  onSubmit() {}
+  periodOptions = [
+    { label: 'الكل', value: null },
+    { label: 'اخر يوم', value: this.getPreviousUTCDate(1) },
+    { label: 'اخر اسبوع', value: this.getPreviousUTCDate(7) },
+    { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
+    { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
+  ];
 
+  searchMeals(pageIndex: number) {
+    this.orderService
+      .search(
+        {
+          pageIndex: pageIndex,
+          pageSize: 10,
+        },
+        this.fg.getRawValue().searchEnum,
+        [this.fg.getRawValue().searchTerm],
+        this.fg.getRawValue().fromDate,
+        this.fg.getRawValue().toDate
+      )
+      .subscribe({
+        next: (res) => {
+          this.items.set(res.value.rows);
+          this.paginationInfo = {
+            pageIndex,// this.isIdenticalSearch() ? pageIndex : 1,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            // searchEnum: this.fg.getRawValue().searchEnum,
+            // searchTerm: this.fg.getRawValue().searchTerm,
+            // fromDate: this.fg.getRawValue().fromDate,
+            // toDate: this.fg.getRawValue().toDate,
+          };
+        },
+      });
+  }
+  // isIdenticalSearch() {
+  //   return (
+  //     this.fg.getRawValue().searchTerm === this.paginationInfo.searchTerm &&
+  //     this.fg.getRawValue().searchEnum === this.paginationInfo.searchEnum &&
+  //     this.fg.getRawValue().fromDate === this.paginationInfo.fromDate &&
+  //     this.fg.getRawValue().toDate === this.paginationInfo.toDate
+  //   );
+  // }
+  onSubmit = () => this.fg.valid && this.searchMeals(1);
 
-  first = 0;
-  rows = 10;
-  onPageChange(event: any) {}
-
+  
+  onPageChange = (event: PaginatorState) => this.searchMeals(event.page! + 1);
 }

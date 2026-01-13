@@ -1,6 +1,5 @@
 import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
-//MenuItems : Name,CategoryName,CategoryId
 
 export interface IProductRowResponse {
   id: number;
@@ -25,6 +24,32 @@ export interface IProductRowResponse {
   }[];
 }
 
+
+export interface IProductSearchResponseValue {
+  menuItems: {
+    rows: IProductRowResponse[];
+    paginationInfo: {
+      totalRowsCount: number;
+      totalPagesCount: number;
+      currentPageIndex: number;
+    };
+  };
+  categoriesDtos: IProductCategoryRowResponse[];
+}
+export interface IProductCategoryRowResponse {
+  id: number;
+  name: string;
+  printerName: string;
+  isOnCasher: boolean;
+  attachment: {
+    id: number;
+    fullPath: string;
+  }[];
+}
+
+
+//MenuItems : Name,CategoryName,CategoryId
+
 export enum ProductSearchEnum {
   Name = SearchColumEnum.Name,
   CategoryName = SearchColumEnum.CategoryName,
@@ -34,6 +59,6 @@ export enum ProductSearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class ProductService extends BaseService<ProductSearchEnum, IProductRowResponse, any, any, any> {
-  override apiRoute = 'Order';
+export class ProductService extends BaseService<ProductSearchEnum, any, any, any, IProductSearchResponseValue> {
+  override apiRoute = 'MenuItem';
 }

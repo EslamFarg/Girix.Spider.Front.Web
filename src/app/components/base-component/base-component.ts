@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-base-component',
@@ -15,6 +16,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 export class BaseComponent<ItemType = any> {
   nullableFb = inject(FormBuilder);
   fb = this.nullableFb.nonNullable;
+  baseUrl = environment.apiUrl.replace('/v1', '');
   router = inject(Router);
   sanitizer = inject(DomSanitizer);
   confirmationService = inject(ConfirmationService);
@@ -28,15 +30,14 @@ export class BaseComponent<ItemType = any> {
   paginationInfo: {
     pageIndex: number;
     totalRowsCount: number;
-     totalPagesCount: number;
+    totalPagesCount: number;
   } = {
     pageIndex: 1,
     totalRowsCount: 0,
     totalPagesCount: 0,
-   };
+  };
 
-
-  getPreviousUTCDate( days: number ) {
+  getPreviousUTCDate(days: number) {
     const date = new Date();
     date.setDate(date.getDate() - days);
     return date;
