@@ -43,7 +43,7 @@ export interface ICategoryRowResponse {
   }[];
 }
 
-//MenuItems : Name,CategoryName
+//Meals  : Name,CategoryName
 
 export enum MealSearchEnum {
   Name = SearchColumEnum.Name,

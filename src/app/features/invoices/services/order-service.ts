@@ -53,4 +53,7 @@ export interface ICategoryRowResponse {
 })
 export class OrderService extends BaseService<OrderSearchEnum, any, any, IOrderSearchResponseValue> {
   override apiRoute = 'Order';
+
+
+
 }

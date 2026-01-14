@@ -7,7 +7,7 @@ import { debounceTime, fromEvent, Subject, Subscription } from 'rxjs';
 export class Debounce {
   debounceTime = input<number>(300);
   debounceEvent = input.required<string>();
-  debounced = output();
+  debounced = output<Event>();
 
   el = inject<ElementRef<HTMLElement>>(ElementRef);
   private sub?: Subscription;
@@ -15,14 +15,12 @@ export class Debounce {
   ngOnInit() {
     this.sub = fromEvent(this.el.nativeElement, this.debounceEvent())
       .pipe(debounceTime(this.debounceTime()))
-      .subscribe((e) => this.debounced.emit());
+      .subscribe((e) => this.debounced.emit(e));
   }
 
   ngOnDestroy() {
     this.sub?.unsubscribe();
   }
-
- 
 
   // @HostListener('keyup.enter', ['$event'])
   // @HostListener('input', ['$event'])

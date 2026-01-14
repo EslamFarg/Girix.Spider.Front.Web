@@ -11,7 +11,7 @@ import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Debounce } from '@/directives/debounce';
 import { IGroupRowResponse, GroupSearchEnum, GroupService } from '../../services/group-service';
 import { MenuItem } from 'primeng/api';
-import { Menu } from "primeng/menu";
+import { Menu } from 'primeng/menu';
 
 @Component({
   selector: 'app-groups',
@@ -25,8 +25,8 @@ import { Menu } from "primeng/menu";
     GroupsNav,
     SectionWrapper,
     Debounce,
-    Menu
-],
+    Menu,
+  ],
   templateUrl: './groups.html',
   styleUrl: './groups.css',
 })
@@ -63,16 +63,15 @@ export class Groups extends BaseComponent<IGroupRowResponse> {
 
   searchGroups(pageIndex: number) {
     this.groupService
-      .search(
-        {
+      .search({
+        paginationInfo: {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        this.fg.getRawValue().searchEnum,
-        [this.fg.getRawValue().searchTerm],
-        this.fg.getRawValue().fromDate,
-        this.fg.getRawValue().toDate
-      )
+        searchEnum: this.fg.getRawValue().searchEnum,
+        searchValues: [this.fg.getRawValue().searchTerm],
+        fromDate: this.fg.getRawValue().fromDate,
+      })
       .subscribe({
         next: (res) => {
           this.items.set(res.value.rows);

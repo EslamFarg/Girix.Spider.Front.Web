@@ -70,16 +70,15 @@ export class Refunds extends BaseComponent {
 
   searchOrders(pageIndex: number) {
     this.orderService
-      .search(
-        {
+      .search({
+        paginationInfo: {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        this.fg.getRawValue().searchEnum,
-        [this.fg.getRawValue().searchTerm],
-        this.fg.getRawValue().fromDate,
-        this.fg.getRawValue().toDate
-      )
+        searchEnum: this.fg.getRawValue().searchEnum,
+        searchValues: [this.fg.getRawValue().searchTerm],
+        fromDate: this.fg.getRawValue().fromDate,
+      })
       .subscribe({
         next: (res) => {
           this.items.set(res.value.rows);

@@ -128,16 +128,15 @@ export class Tables extends BaseComponent<ITableRowResponse> {
 
   searchTables(pageIndex: number) {
     this.tableService
-      .search(
-        {
+      .search({
+        paginationInfo: {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        this.searchFg.getRawValue().searchEnum,
-        [this.searchFg.getRawValue().searchTerm],
-        this.searchFg.getRawValue().fromDate,
-        this.searchFg.getRawValue().toDate
-      )
+        searchEnum: this.searchFg.getRawValue().searchEnum,
+        searchValues: [this.searchFg.getRawValue().searchTerm],
+        fromDate: this.searchFg.getRawValue().fromDate,
+      })
       .subscribe({
         next: (res) => {
           this.items.set(res.value.rows);

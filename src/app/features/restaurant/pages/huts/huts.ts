@@ -100,16 +100,15 @@ export class Huts extends BaseComponent<IHutRowResponse> {
 
   searchHuts(pageIndex: number) {
     this.hutService
-      .search(
-        {
+      .search({
+        paginationInfo: {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        this.searchFg.getRawValue().searchEnum,
-        [this.searchFg.getRawValue().searchTerm],
-        this.searchFg.getRawValue().fromDate,
-        this.searchFg.getRawValue().toDate
-      )
+        searchEnum: this.searchFg.getRawValue().searchEnum,
+        searchValues: [this.searchFg.getRawValue().searchTerm],
+        fromDate: this.searchFg.getRawValue().fromDate,
+      })
       .subscribe({
         next: (res) => {
           this.items.set(res.value.rows);

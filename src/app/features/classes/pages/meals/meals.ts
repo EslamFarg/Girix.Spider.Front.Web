@@ -12,7 +12,7 @@ import { IMealRowResponse, MealSearchEnum, MealService } from '../../services/me
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { ImgFallback } from '@/directives/img-fallback';
-import { Debounce } from "@/directives/debounce";
+import { Debounce } from '@/directives/debounce';
 
 @Component({
   selector: 'app-meals',
@@ -27,8 +27,8 @@ import { Debounce } from "@/directives/debounce";
     SectionWrapper,
     Menu,
     ImgFallback,
-    Debounce
-],
+    Debounce,
+  ],
   templateUrl: './meals.html',
   styleUrl: './meals.css',
 })
@@ -69,21 +69,20 @@ export class Meals extends BaseComponent<IMealRowResponse> {
 
   searchMeals(pageIndex: number) {
     this.orderService
-      .search(
-        {
+      .search({
+        paginationInfo: {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        this.fg.getRawValue().searchEnum,
-        [this.fg.getRawValue().searchTerm],
-        this.fg.getRawValue().fromDate,
-        this.fg.getRawValue().toDate
-      )
+        searchEnum: this.fg.getRawValue().searchEnum,
+        searchValues: [this.fg.getRawValue().searchTerm],
+        fromDate: this.fg.getRawValue().fromDate,
+      })
       .subscribe({
         next: (res) => {
           this.items.set(res.value.rows);
           this.paginationInfo = {
-            pageIndex,// this.isIdenticalSearch() ? pageIndex : 1,
+            pageIndex, // this.isIdenticalSearch() ? pageIndex : 1,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,
             // searchEnum: this.fg.getRawValue().searchEnum,
@@ -104,6 +103,5 @@ export class Meals extends BaseComponent<IMealRowResponse> {
   // }
   onSubmit = () => this.fg.valid && this.searchMeals(1);
 
-  
   onPageChange = (event: PaginatorState) => this.searchMeals(event.page! + 1);
 }

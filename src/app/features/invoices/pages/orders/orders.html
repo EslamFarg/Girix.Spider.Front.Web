@@ -18,9 +18,9 @@
             formControlName="searchTerm"
             placeholder="بحث"
           />
-          <p-inputgroup-addon class="cursor-pointer">
+          <p-inputgroup-addon  >
             <div class="relative flex items-center justify-center">
-              <i class="pi pi-filter" (click)="filterMenu.toggle($event)"></i>
+              <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
               <p-menu
                 dir="rtl"
                 [class]="`*:top-full! *:left-0! `"

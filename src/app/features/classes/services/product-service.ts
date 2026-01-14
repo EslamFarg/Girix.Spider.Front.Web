@@ -24,7 +24,6 @@ export interface IProductRowResponse {
   }[];
 }
 
-
 export interface IProductSearchResponseValue {
   menuItems: {
     rows: IProductRowResponse[];
@@ -36,6 +35,7 @@ export interface IProductSearchResponseValue {
   };
   categoriesDtos: IProductCategoryRowResponse[];
 }
+
 export interface IProductCategoryRowResponse {
   id: number;
   name: string;

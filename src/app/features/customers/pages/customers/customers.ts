@@ -56,51 +56,46 @@ export class Customers extends BaseComponent<ICustomerRowResponse> {
   constructor() {
     super();
 
-    this.resetState();
+    this.searchCustomers(1);
   }
 
-  resetState = () => {
-    this.resetForm();
- 
-    //get page 1 of 10 orders
-    this.customersService.search( { pageIndex: 1 }, this.fg.getRawValue().searchEnum).subscribe({
-      next: (res) => {
-        this.first = 0;
-        this.items.set(res.value.rows);
-      },
-    });
-  };
-
-  onSubmit() {
-    if (this.fg.invalid) {
-      this.fg.markAllAsTouched();
-      return;
-    }
-
+  searchCustomers(pageIndex: number) {
     const fgRawValue = this.fg.getRawValue();
+
     let searchValues: any[] = [fgRawValue.searchTerm];
     if (fgRawValue.searchEnum === CustomerSearchEnum.IsCompany) searchValues.push('true');
 
-    this.customersService.search({ pageIndex: 1 }, fgRawValue.searchEnum, searchValues).subscribe({
-      next: (res) => {
-        this.items.set(res.value.rows);
-        this.first = 0;
-      },
-    });
+    this.customersService
+      .search({
+        paginationInfo: {
+          pageIndex: pageIndex,
+          pageSize: 10,
+        },
+        searchEnum: this.fg.getRawValue().searchEnum,
+        searchValues: searchValues,
+        fromDate: null,
+      })
+      .subscribe({
+        next: (res) => {
+          this.items.set(res.value.rows);
+          this.paginationInfo = {
+            pageIndex,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          };
+        },
+      });
+  }
+
+  onSearchSubmit() {
+    if (this.fg.invalid) return this.fg.markAllAsTouched();
+
+    this.searchCustomers(1);
   }
 
   resetForm = () => (this.fg = this.fb.group(this.initialFormValue));
 
-  first = 0;
-  rows = 10;
-
-  onPageChange(event: PaginatorState) {
-    this.customersService.search({ pageIndex: event.page! + 1 }, this.fg.getRawValue().searchEnum).subscribe({
-      next: (res) => {
-        this.items.set(res.value.rows);
-      },
-    });
-  }
+  onPageChange = (event: PaginatorState) => this.searchCustomers(event.page! + 1);
 
   deleteCustomer(id: number, event: Event) {
     this.confirmationService.confirm({
@@ -122,7 +117,7 @@ export class Customers extends BaseComponent<ICustomerRowResponse> {
       accept: () => {
         this.customersService.delete(id).subscribe({
           next: () => {
-            this.resetState();
+            this.searchCustomers(1);
           },
         });
       },

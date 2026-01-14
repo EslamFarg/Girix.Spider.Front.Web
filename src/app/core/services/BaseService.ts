@@ -38,7 +38,7 @@ export default class BaseService<
   SearchEnum = any,
   ICreateDto = any,
   IUpdateDto = any,
-  IGetByIdDto = any,
+  IGetByIdDto = any ,
   ISearchResponseValue = any
 > {
   static apiBaseUrl = environment.apiUrl;
@@ -59,16 +59,13 @@ export default class BaseService<
    * @param toDate UTC date string, default = new Date().toISOString()
    * @description paginated search
    */
-  search(
-    paginationInfo: Partial<{ pageIndex: number; pageSize: number }> = {
-      pageIndex: 1,
-      pageSize: 10,
-    },
-    orderSearchEnum: SearchEnum,
-    searchValues: string[] = [],
-    fromDate: string | null = null, //start | past
-    toDate: string = new Date().toISOString() //end
-  ) {
+  search(criteriaDto: {
+    paginationInfo: Partial<{ pageIndex: number; pageSize: number }>;
+    searchEnum?: SearchEnum;
+    searchValues: string[];
+    fromDate: string | null; //start | past
+    toDate?: string; //end;
+  }) {
     if (this.isMock) {
       return new Observable<IBaseSearchResponse<ISearchResponseValue>>((observer) => {
         observer.next({
@@ -85,22 +82,25 @@ export default class BaseService<
       });
     }
 
-    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(`${this.apiUrl}/Search`, {
-      criteriaDto: {
-        paginationInfo: {
-          pageIndex: paginationInfo.pageIndex,
-          pageSize: paginationInfo?.pageSize ?? 10,
+    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(
+      `${this.apiUrl}/Search`,
+      {
+        criteriaDto: {
+          paginationInfo: {
+            pageIndex: criteriaDto?.paginationInfo.pageIndex ?? 1,
+            pageSize: criteriaDto?.paginationInfo?.pageSize ?? 10,
+          },
         },
-      },
-      searchFilters: [
-        {
-          column: orderSearchEnum,
-          values: searchValues,
-        },
-      ],
-      fromDate: fromDate,
-      toDate: toDate,
-    });
+        searchFilters: [
+          {
+            column: criteriaDto?.searchEnum,
+            values: criteriaDto?.searchValues ?? [],
+          },
+        ],
+        fromDate: criteriaDto?.fromDate?? null,
+        toDate: criteriaDto?.toDate ?? new Date().toISOString(),
+      }
+    );
   }
 
   create(createDto: ICreateDto) {

@@ -3,7 +3,7 @@
 
   <app-section-wrapper>
     <!-- search -->
-    <form #form [formGroup]="fg" appDebounce debounceEvent="submit" (debounced)="onSubmit()" class="flex h-fit items-start gap-2   w-full">
+    <form #form [formGroup]="fg" appDebounce debounceEvent="submit" (debounced)="onSearchSubmit()" class="flex h-fit items-start gap-2   w-full">
       <div class="flex-1">
         <app-input-error-message-handler [fc]="fg.get('searchTerm')">
           <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
@@ -100,8 +100,8 @@
 
     <p-paginator
       (onPageChange)="onPageChange($event)"
-      [first]="first"
-      [rows]="rows"
+      [first]="(paginationInfo.pageIndex - 1) * 10"
+      [rows]="10"
       [totalRecords]="paginationInfo.totalRowsCount"
     />
   </app-section-wrapper>

@@ -52,19 +52,27 @@
       #itemsContainer
       class="no-scrollbar grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-6 gap-3.5 pt-10 h-full overflow-auto"
       style="row-gap: 50px"
+      appDebounce
+      debounceEvent="scroll"
+      (debounced)="onMenuScroll($event)"
     >
-      @for (item of menuItems; track $index) {
-      <div class="text-white bg-form-bg rounded-xl flex flex-col gap-1.5 p-3 items-center justify-center">
+      <!--  -->
+      @for (item of menuItems(); track $index) {
+ 
+      <div
+        [style]="`animation-delay: ${item.index * 0.05}s`"
+        class="slide-in h-fit text-white bg-form-bg rounded-xl flex flex-col gap-1.5 p-3 items-center justify-center"
+      >
         <div class="h-8 w-20 relative rounded-full">
           <div
             class="absolute w-full aspect-square bottom-0 left-0 rounded-full"
             style="box-shadow: 0px 3.13px 15.63px 0px #ffffff40"
           >
             <img
-              class="w-full h-full object-cover"
+              class="w-full rounded-full h-full object-cover"
               appImgFallback
               fallBackLink="/images/placeholders/menu-item.png"
-              [src]="item.imageUrl"
+              [src]="baseUrl + item.imageUrl"
               alt=""
             />
           </div>
@@ -93,6 +101,7 @@
           </button>
         </div>
       </div>
+ 
       }
     </div>
   </section>
