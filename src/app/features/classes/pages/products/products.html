@@ -1,6 +1,6 @@
-<div class="p-4 h-full overflow-auto no-scrollbar">
-  <app-products-nav class="block mb-4" />
-  <app-section-wrapper>
+<div class="p-4 h-full overflow-auto no-scrollbar ">
+  <app-products-nav class="block mb-4 "  />
+  <app-section-wrapper class=" " styleClass="no-scrollbar">
     <!-- search -->
 
     <form
@@ -9,7 +9,7 @@
       appDebounce
       debounceEvent="submit"
       (debounced)="onSubmit()"
-      class="flex h-fit items-start gap-2 w-full"
+      class="flex h-fit items-start gap-2 w-full "
     >
       <div class="flex-1">
         <app-input-error-message-handler [fc]="fg.get('searchTerm')">
@@ -41,8 +41,8 @@
       />
     </form>
 
-    <div class="w-full overflow-auto custom-scroll">
-      <table class="my-2 sm:my-4 w-full main-table">
+    <div class="w-full overflow-auto no-scrollbar">
+      <table class="my-2 sm:my-4 w-full main-table ">
         <thead>
           <tr class="">
             <th>#</th>

@@ -15,17 +15,19 @@ export interface IOrderRowResponse {
   orderType: number;
   paymentType: number;
   customerId: number;
-  customerName: any;
-  customerPhone: any;
-  customerSecondaryPhone: any;
-  customerAdress: any;
-  deliveryId: any;
+  customerName: string;
+  customerPhone: string;
+  customerSecondaryPhone: string;
+  customerAdress: string;
+  deliveryId: number;
   placeType: number;
   placeRefId: number;
   priceForPlace: number;
   createdAt: string;
   netOrder: number;
   isCollected: boolean;
+  payingCash: number;
+  payingNetwork: number;
 }
 
 export interface IOrderSearchResponseValue {
@@ -53,7 +55,4 @@ export interface ICategoryRowResponse {
 })
 export class OrderService extends BaseService<OrderSearchEnum, any, any, IOrderSearchResponseValue> {
   override apiRoute = 'Order';
-
-
-
 }

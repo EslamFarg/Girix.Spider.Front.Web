@@ -26,19 +26,22 @@ export interface ICustomerRowResponse {
 }
 
 export interface ICustomerCreateDto {
-  nameAr: string;
-  nameEn: string;
-  phoneNumber: string;
-  secondaryMobileNumber: string;
-  city: string;
-  district: string;
-  street: string;
-  buildingNumber: string;
-  apartment: string;
-  landmark: string;
-  postalCode: string;
-  isCompany: boolean;
+  nameAr: string
+  nameEn: string
+  phoneNumber: string
+  secondaryMobileNumber: string
+  city: string
+  district: string
+  street: string
+  buildingNumber: string
+  apartment: string
+  landmark: string
+  postalCode: string
+  commercialRegister: string
+  taxNumber: string
+  isCompany: boolean
 }
+
 
 export interface ICustomerUpdateDto {
   id: number;

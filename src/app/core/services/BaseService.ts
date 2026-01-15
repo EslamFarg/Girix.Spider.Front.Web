@@ -38,7 +38,7 @@ export default class BaseService<
   SearchEnum = any,
   ICreateDto = any,
   IUpdateDto = any,
-  IGetByIdDto = any ,
+  IGetByIdDto = any,
   ISearchResponseValue = any
 > {
   static apiBaseUrl = environment.apiUrl;
@@ -61,10 +61,10 @@ export default class BaseService<
    */
   search(criteriaDto: {
     paginationInfo: Partial<{ pageIndex: number; pageSize: number }>;
-    searchEnum?: SearchEnum;
-    searchValues: string[];
+    searchFilters: { column: SearchEnum; values: string[] }[];
     fromDate: string | null; //start | past
     toDate?: string; //end;
+    removeDateFilter?: boolean;
   }) {
     if (this.isMock) {
       return new Observable<IBaseSearchResponse<ISearchResponseValue>>((observer) => {
@@ -82,25 +82,34 @@ export default class BaseService<
       });
     }
 
-    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(
-      `${this.apiUrl}/Search`,
-      {
-        criteriaDto: {
-          paginationInfo: {
-            pageIndex: criteriaDto?.paginationInfo.pageIndex ?? 1,
-            pageSize: criteriaDto?.paginationInfo?.pageSize ?? 10,
-          },
+    let body: any = {
+      criteriaDto: {
+        paginationInfo: {
+          pageIndex: criteriaDto?.paginationInfo.pageIndex ?? 1,
+          pageSize: criteriaDto?.paginationInfo?.pageSize ?? 10,
         },
-        searchFilters: [
-          {
-            column: criteriaDto?.searchEnum,
-            values: criteriaDto?.searchValues ?? [],
-          },
-        ],
-        fromDate: criteriaDto?.fromDate?? null,
-        toDate: criteriaDto?.toDate ?? new Date().toISOString(),
-      }
-    );
+      },
+      searchFilters: criteriaDto.searchFilters.map((x) => ({
+        column: x.column,
+        values: x.values.map((y) => y.trim()),
+      })),
+      fromDate: criteriaDto?.fromDate ?? null,
+      toDate: criteriaDto?.toDate ?? new Date().toISOString(),
+    };
+
+    // if (criteriaDto.removeDateFilter) {
+    //    body = {
+    //     criteriaDto: {
+    //       paginationInfo: {
+    //         pageIndex: criteriaDto?.paginationInfo.pageIndex ?? 1,
+    //         pageSize: criteriaDto?.paginationInfo?.pageSize ?? 10,
+    //       },
+    //     },
+    //     searchFilters: criteriaDto.searchFilters,
+    //   };
+    // }
+
+    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(`${this.apiUrl}/Search`, body);
   }
 
   create(createDto: ICreateDto) {

@@ -90,17 +90,19 @@ export class Rooms extends BaseComponent<IRoomRowResponse> {
 
   searchRooms(pageIndex: number) {
     this.roomService
-      .search(
-        {
-          paginationInfo: {
+      .search({
+        paginationInfo: {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        searchEnum:  this.searchFg.getRawValue().searchEnum,
-        searchValues:  [this.searchFg.getRawValue().searchTerm],
-        fromDate:  this.searchFg.getRawValue().fromDate,
-        }
-      )
+        searchFilters: [
+          {
+            column: this.searchFg.getRawValue().searchEnum,
+            values: [this.searchFg.getRawValue().searchTerm],
+          },
+        ],
+        fromDate: this.searchFg.getRawValue().fromDate,
+      })
       .subscribe({
         next: (res) => {
           this.items.set(res.value.rows);

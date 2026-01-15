@@ -71,8 +71,12 @@ export class Customers extends BaseComponent<ICustomerRowResponse> {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        searchEnum: this.fg.getRawValue().searchEnum,
-        searchValues: searchValues,
+        searchFilters: [
+          {
+            column: this.fg.getRawValue().searchEnum,
+            values: searchValues,
+          },
+        ],
         fromDate: null,
       })
       .subscribe({

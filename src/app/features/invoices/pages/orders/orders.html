@@ -1,12 +1,12 @@
 <div class="p-4 h-full overflow-auto no-scrollbar">
-  <app-section-wrapper>
+  <app-section-wrapper class="h-full">
     <form
       #form
       [formGroup]="fg"
       appDebounce
       debounceEvent="submit"
       (debounced)="onSubmit()"
-      class="flex h-fit items-start gap-2 w-full flex-col sm:flex-row"
+      class="flex  h-fit items-start gap-2 w-full flex-col sm:flex-row"
     >
       <!-- search -->
       <div class="w-full sm:flex-1">
@@ -90,9 +90,9 @@
               </div>
               }
             </td>
-            <td>{{ order.netOrder }}</td>
-            <td>{{ order.netOrder }}</td>
-            <td>{{ order.netOrder }} $</td>
+            <td>${{ order.payingCash }}</td>
+            <td>${{ order.payingNetwork }}</td>
+            <td>${{ order.netOrder }}</td>
             <td>
               <div class="actions">
                 <button type="button" class="print">

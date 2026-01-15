@@ -1,3 +1,4 @@
+import { IPaginatedResponse } from '@/core/interfaces/responses';
 import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
 
@@ -17,7 +18,6 @@ export interface IGroupSearchResponseValue {
     currentPageIndex: number;
   };
 }
- 
 
 //MenuItems : id,Name
 
@@ -31,4 +31,13 @@ export enum GroupSearchEnum {
 })
 export class GroupService extends BaseService<GroupSearchEnum, any, any, any, IGroupSearchResponseValue> {
   override apiRoute = 'Category';
+
+  getList(IsOnCasher: boolean = false, paginationInfo: { pageIndex: number; pageSize: number }) {
+    return this.http.post<IPaginatedResponse<IGroupRowResponse>>(
+      `${this.apiUrl}/ListCategoriesOnCasher?IsOnCasher=${IsOnCasher}`,
+      {
+        paginationInfo,
+      }
+    );
+  }
 }

@@ -75,8 +75,12 @@ export class Refunds extends BaseComponent {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        searchEnum: this.fg.getRawValue().searchEnum,
-        searchValues: [this.fg.getRawValue().searchTerm],
+        searchFilters: [
+          {
+            column: this.fg.getRawValue().searchEnum,
+            values: [this.fg.getRawValue().searchTerm],
+          },
+        ],
         fromDate: this.fg.getRawValue().fromDate,
       })
       .subscribe({

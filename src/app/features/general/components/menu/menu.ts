@@ -9,6 +9,9 @@ import { IMealRowResponse } from '@/features/classes/services/meal-service';
 import { IProductRowResponse } from '@/features/classes/services/product-service';
 import { GeneralService, ProductAndMealsSearchEnum } from '../../services/general-service';
 import { Debounce } from '@/directives/debounce';
+import { MenuItem } from 'primeng/api';
+import { Menu as pMenu } from 'primeng/menu';
+import { IGroupRowResponse } from '@/features/classes/services/group-service';
 export interface IMenuItem {
   id: number;
   label: string;
@@ -32,16 +35,13 @@ export interface IMenuItem {
     ImgFallback,
     InputGroupAddonModule,
     Debounce,
+    pMenu,
   ],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
 })
 export class Menu extends BaseComponent {
-  initialSearchFormValue = {
-    text: this.fb.control<string>('', [Validators.required]),
-    categoryId: this.fb.control<number>(0, [Validators.required]),
-  };
-  fg = this.fb.group(this.initialSearchFormValue);
+  groups=input<IGroupRowResponse[]>([]);
 
   filterCategories = [
     {
@@ -72,14 +72,22 @@ export class Menu extends BaseComponent {
 
   menuItems = signal<IMenuItem[]>([]);
 
-  selectCategory(categoryId: number) {
-    this.fg.get('categoryId')?.setValue(+categoryId);
+  selectCategory(category: { id: number; label: string }) {
+    const previousCategoryId = this.menuSearchFg.getRawValue().category?.id;
+
+    if (previousCategoryId === category.id) {
+      this.menuSearchFg.patchValue({ category: null });
+      return;
+    }
+
+    this.menuSearchFg.patchValue({ category });
   }
 
   //
   nav = viewChild<ElementRef<HTMLElement>>('nav');
   form = viewChild<ElementRef<HTMLElement>>('form');
   itemsContainer = viewChild<ElementRef<HTMLElement>>('itemsContainer');
+
   ngAfterViewInit() {
     const navHeight = +(this.nav()?.nativeElement.offsetHeight ?? 0);
     const formHeight = +(this.form()?.nativeElement.offsetHeight ?? 0);
@@ -94,46 +102,66 @@ export class Menu extends BaseComponent {
     searchEnum: this.fb.control<ProductAndMealsSearchEnum>(ProductAndMealsSearchEnum.Name, [Validators.required]),
     fromDate: this.fb.control<string | null>(null, []),
     toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
+    category: this.fb.control<{ id: number; label: string } | null>(null, []),
   };
 
   menuSearchFg = this.fb.group(this.initialMenuSearchFgValue);
+
+  filterMenuItems = signal<MenuItem[]>([
+    {
+      label: 'الاسم',
+      command: (event) => this.menuSearchFg.patchValue({ searchEnum: ProductAndMealsSearchEnum.Name }),
+    },
+    {
+      label: 'الفئة',
+      command: (event) => this.menuSearchFg.patchValue({ searchEnum: ProductAndMealsSearchEnum.CategoryName }),
+    },
+  ]);
 
   constructor() {
     super();
 
     this.searchProductsAndMeals(1);
-
-    // setInterval(() => {
-    //   this.menuItems.update((pre) => {
-    //     return pre.concat([
-    //       {
-    //         id: 1,
-    //         label: 'بيتزا',
-    //         category: {
-    //           id: 1,
-    //           label: 'بيتزا',
-    //         },
-    //         imageUrl: '/images/placeholders/menu-item.png',
-    //         price: 100,
-    //       },
-    //     ]);
-    //   });
-    // }, 100);
   }
 
   lestPageSize = 0;
   currentPageItemIx = 0;
 
+  previousSearchCriteria = this.menuSearchFg.getRawValue();
+  isPreviousSearchCriteriaIdentical() {
+    const isIdentical =
+      this.previousSearchCriteria.searchTerm === this.menuSearchFg.getRawValue().searchTerm &&
+      this.previousSearchCriteria.searchEnum === this.menuSearchFg.getRawValue().searchEnum &&
+      this.previousSearchCriteria.category === this.menuSearchFg.getRawValue().category;
+    return isIdentical;
+  }
+
   searchProductsAndMeals(pageIndex: number) {
+    if (!this.isPreviousSearchCriteriaIdentical()) pageIndex = 1;
+
+    const searchFilters = [
+      {
+        column: this.menuSearchFg.getRawValue().searchEnum,
+        values: [this.menuSearchFg.getRawValue().searchTerm],
+      },
+    ];
+
+    if (this.menuSearchFg.getRawValue().category) {
+      searchFilters.push({
+        column: ProductAndMealsSearchEnum.CategoryId,
+        values: [this.menuSearchFg.getRawValue().category!.id.toString()],
+      });
+    }
+
     this.generalService
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        searchEnum: this.menuSearchFg.getRawValue().searchEnum,
-        searchValues: [this.menuSearchFg.getRawValue().searchTerm],
+        searchFilters,
         fromDate: this.menuSearchFg.getRawValue().fromDate,
+        removeDateFilter:true
       })
       .subscribe({
         next: (res) => {
@@ -146,23 +174,18 @@ export class Menu extends BaseComponent {
 
             if (index % 2 == 0) {
               if (res.value.menuItems.rows.length > index / 2) {
-                console.log(index, 'index % 2 map Product');
                 newItem = this.mapProductToMenuItem(res.value.menuItems.rows[index / 2], index);
               } else {
-                console.log(index, 'index % 2 map Meal');
                 newItem = this.mapMealToMenuItem(res.value.meals.rows[index / 2], index);
               }
             } else {
               if (res.value.meals.rows.length > index / 2) {
-                console.log(index, ' map Meal');
                 newItem = this.mapMealToMenuItem(res.value.meals.rows[(index - 1) / 2], index);
               } else {
-                console.log(index, 'map Product');
                 newItem = this.mapProductToMenuItem(res.value.menuItems.rows[(index - 1) / 2], index);
               }
             }
 
-            console.log(newItem);
             newItems.push(newItem);
           }
 
@@ -174,16 +197,21 @@ export class Menu extends BaseComponent {
               (res.value.meals.paginationInfo.totalRowsCount + res.value.menuItems.paginationInfo.totalRowsCount) / 2,
           };
 
-          this.menuItems.update((pre) => pre.concat(newItems));
+          if (this.isPreviousSearchCriteriaIdentical()) {
+            this.menuItems.update((pre) => pre.concat(newItems));
+          } else {
+            this.menuItems.set(newItems);
+          }
+
+          this.previousSearchCriteria = this.menuSearchFg.getRawValue();
 
           const menuEl = this.itemsContainer()!.nativeElement;
-          console.log(menuEl.scrollHeight, menuEl.scrollTop, menuEl.clientHeight);
+
           setTimeout(() => {
-            menuEl.scrollBy({
-              top: menuEl.scrollHeight  - 20,
-              behavior: 'smooth',
-            });
-          }, 1000);
+            const newScrollTop = menuEl.scrollHeight - menuEl.clientHeight - 2;
+
+            menuEl.scrollTop = newScrollTop;
+          }, 500);
         },
       });
   }
@@ -222,12 +250,16 @@ export class Menu extends BaseComponent {
 
   onMenuScroll(event: Event) {
     const menuContainer = event.target as HTMLElement;
-    console.log(menuContainer.scrollHeight, menuContainer.scrollTop, menuContainer.clientHeight);
-   if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 5) {
-  console.log('end');
-  this.searchProductsAndMeals(this.paginationInfo.pageIndex + 1);
-}
+    if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
+      this.searchProductsAndMeals(this.paginationInfo.pageIndex + 1);
+    }
   }
 
-  onSubmit() {}
+  onSubmitSearch() {
+    if (this.menuSearchFg.invalid) {
+      this.menuSearchFg.markAllAsTouched();
+      return;
+    }
+    this.searchProductsAndMeals(this.paginationInfo.pageIndex);
+  }
 }

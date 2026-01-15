@@ -133,8 +133,12 @@ export class Tables extends BaseComponent<ITableRowResponse> {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        searchEnum: this.searchFg.getRawValue().searchEnum,
-        searchValues: [this.searchFg.getRawValue().searchTerm],
+        searchFilters: [
+          {
+            column: this.searchFg.getRawValue().searchEnum,
+            values: [this.searchFg.getRawValue().searchTerm],
+          },
+        ],
         fromDate: this.searchFg.getRawValue().fromDate,
       })
       .subscribe({

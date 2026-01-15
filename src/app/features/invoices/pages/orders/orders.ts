@@ -33,15 +33,18 @@ import { Debounce } from '@/directives/debounce';
   styleUrl: './orders.css',
 })
 export class Orders extends BaseComponent<IOrderRowResponse> {
+
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<OrderSearchEnum>(OrderSearchEnum.CustomerName, [Validators.required]),
     fromDate: this.fb.control<string | null>(null, []),
     toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
   };
+
   fg = this.fb.group(this.initialSearchFormValue);
 
   orderService = inject(OrderService);
+  
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'اسم العميل',
@@ -82,8 +85,12 @@ export class Orders extends BaseComponent<IOrderRowResponse> {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        searchEnum: this.fg.getRawValue().searchEnum,
-        searchValues: [this.fg.getRawValue().searchTerm],
+        searchFilters: [
+          {
+            column: this.fg.getRawValue().searchEnum,
+            values: [this.fg.getRawValue().searchTerm],
+          },
+        ],
         fromDate: this.fg.getRawValue().fromDate,
       })
       .subscribe({
