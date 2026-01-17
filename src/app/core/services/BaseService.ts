@@ -39,7 +39,7 @@ export default class BaseService<
   ICreateDto = any,
   IUpdateDto = any,
   IGetByIdDto = any,
-  ISearchResponseValue = any
+  ISearchResponseValue = any,
 > {
   static apiBaseUrl = environment.apiUrl;
   apiRoute = '';
@@ -51,6 +51,25 @@ export default class BaseService<
   router = inject(Router);
   messageService = inject(MessageService);
 
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
   /**
    * @param paginationInfo default = { pageIndex: 1, pageSize: 10 }
    * @param orderSearchEnum default = 0 AKA 'Id'
@@ -65,6 +84,7 @@ export default class BaseService<
     fromDate: string | null; //start | past
     toDate?: string; //end;
     removeDateFilter?: boolean;
+    endpoint?: string;
   }) {
     if (this.isMock) {
       return new Observable<IBaseSearchResponse<ISearchResponseValue>>((observer) => {
@@ -109,7 +129,10 @@ export default class BaseService<
     //   };
     // }
 
-    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(`${this.apiUrl}/Search`, body);
+    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(
+      `${this.apiUrl}/${criteriaDto.endpoint ?? 'Search'}`,
+      body,
+    );
   }
 
   create(createDto: ICreateDto) {
@@ -118,7 +141,7 @@ export default class BaseService<
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'تم الحفظ', detail: 'لقد قمت بالحفظ بنجاح' });
         },
-      })
+      }),
     );
   }
 
@@ -128,7 +151,7 @@ export default class BaseService<
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'تم الحفظ', detail: 'لقد قمت بالحفظ بنجاح' });
         },
-      })
+      }),
     );
   }
 
@@ -138,7 +161,7 @@ export default class BaseService<
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'تم الحذف', detail: 'لقد قمت بالحذف بنجاح' });
         },
-      })
+      }),
     );
   }
 

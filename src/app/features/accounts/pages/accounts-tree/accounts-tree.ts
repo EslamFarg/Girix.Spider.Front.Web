@@ -1,11 +1,15 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { TreeModule } from 'primeng/tree';
-import { TreeNode } from 'primeng/api';
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
-import { Select } from "primeng/select";
-import { Button } from "primeng/button";
-import { InputText } from "primeng/inputtext";
+import { MenuItem, TreeNode } from 'primeng/api';
+import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { Select } from 'primeng/select';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { BaseComponent } from '@/components/base-component/base-component';
+import { FinancialAccountSearchEnum, FinancialAccountService } from '../../services/financial-account-service';
+import { Validators } from '@angular/forms';
+import { PaginatorState } from 'primeng/paginator';
 
 @Component({
   selector: 'app-accounts-tree',
@@ -13,8 +17,10 @@ import { InputText } from "primeng/inputtext";
   templateUrl: './accounts-tree.html',
   styleUrl: './accounts-tree.css',
 })
-export class AccountsTree {
-  files = signal<TreeNode[]>([
+export class AccountsTree extends BaseComponent {
+  financialAccountService = inject(FinancialAccountService);
+
+  financialAccounts = signal<TreeNode[]>([
     {
       label: 'حسابات',
       children: [
@@ -41,4 +47,112 @@ export class AccountsTree {
       children: [{ label: 'تقرير 1' }, { label: 'تقرير 2' }, { label: 'تقرير 3' }, { label: 'تقرير 4' }],
     },
   ]);
+
+  initialSearchFormValue = {
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+    searchEnum: this.fb.control<FinancialAccountSearchEnum>(FinancialAccountSearchEnum.Name, [Validators.required]),
+    fromDate: this.fb.control<string | null>(null, []),
+    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
+  };
+  fg = this.fb.group(this.initialSearchFormValue);
+
+  filterMenuItems = signal<MenuItem[]>([
+    {
+      label: 'الاسم',
+      command: (event) => this.fg.patchValue({ searchEnum: FinancialAccountSearchEnum.Name }),
+    },
+    {
+      label: 'FinNumber',
+      command: (event) => this.fg.patchValue({ searchEnum: FinancialAccountSearchEnum.FinNumber }),
+    },
+  ]);
+
+  constructor() {
+    super();
+
+    this.searchFinancialAccounts(1);
+  }
+
+  periodOptions = [
+    { label: 'الكل', value: null },
+    { label: 'اخر يوم', value: this.getPreviousUTCDate(1) },
+    { label: 'اخر اسبوع', value: this.getPreviousUTCDate(7) },
+    { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
+    { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
+  ];
+
+  searchFinancialAccounts(pageIndex: number) {
+    this.financialAccountService
+      .search({
+        paginationInfo: {
+          pageIndex: pageIndex,
+          pageSize: 10,
+        },
+        searchFilters: [
+          {
+            column: this.fg.getRawValue().searchEnum,
+            values: [this.fg.getRawValue().searchTerm],
+          },
+        ],
+        fromDate: this.fg.getRawValue().fromDate,
+        endpoint: 'GetFinancialAccountTree',
+      })
+      .subscribe({
+        next: (res) => {
+          const mappedFinancialAccounts: TreeNode[] = res.value.rows.map((item) => ({
+            label: item.name,
+            data: item.id,
+            children: item.children.map((child) => ({
+              label: child.name,
+              data: child.id,
+              children: child.children.map((grandChild) => ({
+                label: grandChild.name,
+                data: grandChild.id,
+              })),
+            })),
+          }));
+
+          this.financialAccounts.set(mappedFinancialAccounts);
+          this.paginationInfo = {
+            pageIndex,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          };
+        },
+      });
+  }
+
+  onSubmit = () => this.fg.valid && this.searchFinancialAccounts(1);
+
+  onPageChange = (event: PaginatorState) => this.searchFinancialAccounts(event.page! + 1);
+
+  deleteFinancialAccount(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف المنتج',
+      header: 'حذف المنتج',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.financialAccountService.delete(id).subscribe({
+          next: () => {
+            this.searchFinancialAccounts(1);
+          },
+        });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
+      },
+    });
+  }
 }
