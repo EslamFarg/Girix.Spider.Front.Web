@@ -1,7 +1,10 @@
 <div class="container w-full h-full xl:grid grid-cols-5 gap-4 overflow-hidden">
-  <app-menu  [groups]="groups()" class="hidden xl:inline-block col-span-3" />
+  <app-menu (menuItemChange)="onMenuItemChange($event)" [groups]="groups()" class="hidden xl:inline-block col-span-3" />
 
-  <div class="flex w-full flex-col gap-4 h-full custom-scroll overflow-auto p-4 xl:ps-0 xl:col-span-2">
+  <form
+    [formGroup]="orderFg"
+    class="flex w-full flex-col gap-4 h-full no-scrollbar overflow-auto p-4 xl:ps-0 xl:col-span-2"
+  >
     <!-- actions btns -->
     <div class="flex gap-2 *:flex-1 *:max-w-25 w-full justify-end">
       <p-button
@@ -53,51 +56,125 @@
     </div>
 
     <!-- location btns -->
-    <div class="flex gap-2 location-btns *:flex-1 w-full justify-end">
-      <p-button
-        styleClass="text-dark-line! py-1! w-full bg-text-lighter! border-transparent! text-sm!"
-        label="سفري"
-        variant="outlined"
+    <div
+      class="flex gap-2 location-btns *:border-0! *:flex-1 w-full justify-end h-[34px] *:h-full *:flex *:items-center *:justify-center *:rounded-lg"
+      style="--p-button-primary-background: var(--color-text-lighter); --p-button-primary-color: var(--color-dark-line)"
+    >
+      <input
+        type="radio"
+        hidden
+        name="orderType"
+        id="takeAway"
+        [value]="OrderLocationType.Takeaway"
+        #takeAwayRadio
+        formControlName="orderType"
       />
-      <p-button
-        [style]="{ 'box-shadow': ' 0px 0px 15px 0px #FFFFFF80 inset' }"
-        styleClass="text-white! py-1! w-full bg-dark-bg-2! border-transparent! text-sm!"
-        label="محلي"
+      <label class="py-1! w-full text-sm!" [class.location-active]="takeAwayRadio.checked" pButton for="takeAway"
+        ><span>سفري</span></label
+      >
+      <!--  -->
+      <input
+        type="radio"
+        hidden
+        #localRadio
+        name="orderType"
+        id="local"
+        formControlName="orderType"
+        [value]="OrderLocationType.DineIn"
       />
-      <p-button
-        styleClass="text-dark-line! py-1! w-full bg-text-lighter! border-transparent! text-sm!"
-        label="توصيل"
-        variant="outlined"
+      <label class="py-1! w-full text-sm!" pButton [class.location-active]="localRadio.checked" for="local"
+        ><span>محلي</span></label
+      >
+      <!--  -->
+      <input
+        type="radio"
+        hidden
+        #deliveryRadio
+        name="orderType"
+        id="delivery"
+        formControlName="orderType"
+        [value]="OrderLocationType.Delivery"
       />
+      <label class="py-1! w-full text-sm!" [class.location-active]="deliveryRadio.checked" pButton for="delivery"
+        ><span>توصيل</span></label
+      >
     </div>
 
     <!-- local space options -->
-    <div class="flex flex-col gap-4 sm:gap-0 sm:flex-row w-full border border-text-light rounded-[14px] p-3">
-      <div class="flex gap-2 *:flex-1 flex-1 justify-end">
-        <p-button
-          styleClass="text-dark-line! py-1! w-full bg-text-lighter! border-transparent! text-sm!"
-          label="طاوله"
-          variant="outlined"
-        />
-        <p-button
-          [style]="{ 'box-shadow': ' 0px 0px 15px 0px #FFFFFF80 inset' }"
-          styleClass="text-white! py-1! w-full bg-dark-bg-2! border-transparent! text-sm!"
-          label="غرفه"
-        />
-        <p-button
-          styleClass="text-dark-line! py-1! w-full bg-text-lighter! border-transparent! text-sm!"
-          label="كوخ"
-          variant="outlined"
-        />
+    @if (localRadio.checked) {
+      <div class="flex flex-col gap-4 sm:gap-0 sm:flex-row w-full border border-text-light rounded-[14px] p-3">
+        <!-- local space btns -->
+        <div
+          class="flex gap-2 local-btns *:border-0! *:flex-1 w-full justify-end h-[34px] *:h-full *:flex *:items-center *:justify-center *:rounded-lg"
+          style="
+            --p-button-primary-background: var(--color-text-lighter);
+            --p-button-primary-color: var(--color-dark-line);
+          "
+        >
+          <input
+            type="radio"
+            hidden
+            name="placeType"
+            id="tableRadio"
+            [value]="OrderLocationType.Takeaway"
+            #tableRadio
+            formControlName="placeType"
+          />
+          <label
+            (click)="TableDialogVisible = true"
+            class="py-1! w-full text-sm!"
+            [class.location-active]="tableRadio.checked"
+            pButton
+            for="tableRadio"
+            ><span>طاوله</span></label
+          >
+          <!--  -->
+          <input
+            type="radio"
+            hidden
+            #roomRadio
+            name="placeType"
+            id="roomRadio"
+            formControlName="placeType"
+            [value]="OrderLocationType.DineIn"
+          />
+          <label
+            (click)="RoomDialogVisible = true"
+            class="py-1! w-full text-sm!"
+            pButton
+            [class.location-active]="roomRadio.checked"
+            for="roomRadio"
+            ><span>غرفه</span></label
+          >
+          <!--  -->
+          <input
+            type="radio"
+            hidden
+            #hutRadio
+            name="placeType"
+            id="hutRadio"
+            formControlName="placeType"
+            [value]="OrderLocationType.Delivery"
+          />
+          <label
+            (click)="HutDialogVisible = true"
+            class="py-1! w-full text-sm!"
+            [class.location-active]="hutRadio.checked"
+            pButton
+            for="hutRadio"
+            ><span>كوخ</span></label
+          >
+        </div>
+
+        <div class="px-3 text-text-gray text-xl font-light hidden sm:block">|</div>
+        <div
+          class="border border-text-light rounded-lg sm:w-1/2 py-1.25 px-3 text-dark-bg-2 font-bold text-xs flex items-center justify-between"
+        >
+          <span>كوخ 1</span>
+          <span>02:00:00</span>
+        </div>
       </div>
-      <div class="px-3 text-text-gray text-xl font-light hidden sm:block">|</div>
-      <div
-        class="border border-text-light rounded-lg sm:w-1/2 py-1.25 px-3 text-dark-bg-2 font-bold text-xs flex items-center justify-between"
-      >
-        <span>كوخ 1</span>
-        <span>02:00:00</span>
-      </div>
-    </div>
+    }
 
     <!-- order items -->
     <div class="p-2 border border-text-light rounded-[14px] w-full min-h-fit overflow-hidden">
@@ -115,114 +192,125 @@
             </tr>
           </thead>
           <tbody class="text-sm">
-            @for (item of [1,2,3,4,5,6,7]; track $index) {
-            <tr class="text-xs *:py-1">
-              <!-- actions -->
-              <td>
-                <div class="flex items-center gap-2">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M10.7517 1.24995C12.7517 1.37495 14.6267 2.37495 16.0017 3.74995C17.6267 5.49995 18.5017 7.62495 18.5017 10.125C18.5017 12.125 17.7517 14 16.5017 15.625C15.2517 17.125 13.5017 18.25 11.5017 18.625C9.50174 18.9999 7.50174 18.75 5.75174 17.75C4.00174 16.7499 2.62674 15.25 1.87674 13.375C1.12674 11.5 1.00174 9.37495 1.62674 7.49995C2.25174 5.49995 3.37674 3.87495 5.12674 2.74995C6.75174 1.62495 8.75174 1.12495 10.7517 1.24995ZM11.3767 17.375C13.0017 16.9999 14.5017 16.125 15.6267 14.75C16.6267 13.375 17.2517 11.75 17.1267 9.99995C17.1267 7.99995 16.3767 5.99995 15.0017 4.62495C13.7517 3.37495 12.2517 2.62495 10.5017 2.49995C8.87674 2.37495 7.12674 2.74995 5.75174 3.74995C4.37674 4.74995 3.37674 6.12495 2.87674 7.87495C2.37674 9.49995 2.37674 11.25 3.12674 12.875C3.87674 14.5 5.00174 15.75 6.50174 16.625C8.00174 17.5 9.75174 17.75 11.3767 17.375ZM9.87674 9.37495L12.8767 6.24995L13.7517 7.12495L10.7517 10.2499L13.7517 13.375L12.8767 14.2499L9.87674 11.1249L6.87674 14.2499L6.00174 13.375L9.00174 10.2499L6.00174 7.12495L6.87674 6.24995L9.87674 9.37495Z"
-                      fill="black"
-                    />
-                  </svg>
-                  <svg
-                    class="cursor-pointer"
-                    (click)="showDialog()"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6.875 3.125H4.79167C3.87119 3.125 3.125 3.87119 3.125 4.79167V6.875C3.125 7.79547 3.87119 8.54167 4.79167 8.54167H6.875C7.79547 8.54167 8.54167 7.79547 8.54167 6.875V4.79167C8.54167 3.87119 7.79547 3.125 6.875 3.125Z"
-                      stroke="#393C49"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M14.1654 3.125V5.83333M14.1654 5.83333V8.54167M14.1654 5.83333H11.457M14.1654 5.83333H16.8737"
-                      stroke="#393C49"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M6.875 11.4584H4.79167C3.87119 11.4584 3.125 12.2046 3.125 13.125V15.2084C3.125 16.1288 3.87119 16.875 4.79167 16.875H6.875C7.79547 16.875 8.54167 16.1288 8.54167 15.2084V13.125C8.54167 12.2046 7.79547 11.4584 6.875 11.4584Z"
-                      stroke="#393C49"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M15.207 11.4584H13.1237C12.2032 11.4584 11.457 12.2046 11.457 13.125V15.2084C11.457 16.1288 12.2032 16.875 13.1237 16.875H15.207C16.1275 16.875 16.8737 16.1288 16.8737 15.2084V13.125C16.8737 12.2046 16.1275 11.4584 15.207 11.4584Z"
-                      stroke="#393C49"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </div>
-              </td>
-              <!-- items -->
-              <td>
-                <div class="flex flex-col gap-1 text-center px-4">
-                  <span class="">ماكرونه</span>
-                  <div class="flex items-center justify-center gap-2">
-                    @for (item of ['بيبسي','ماكروني','أرز']; track $index) {
-                    <div class="relative border border-text-light rounded-md">
-                      <div class="py-0.5 px-1 text-[10px] font-semibold">{{ item }}</div>
-                      <div
-                        class="flex items-center justify-center rounded-full bg-text-lighter w-3 text-[#FA8D7B] font-bold text-[10px] aspect-square leading-none absolute -top-1.5 -left-1.5"
-                      >
-                        <span class="h-fit">1</span>
-                      </div>
-                    </div>
-                    }
+            @for (orderMenuItem of orderMenuItems; track $index) {
+              <tr class="text-xs *:py-1 fade-in">
+                <!-- actions -->
+                <td>
+                  <div class="flex items-center gap-2">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M10.7517 1.24995C12.7517 1.37495 14.6267 2.37495 16.0017 3.74995C17.6267 5.49995 18.5017 7.62495 18.5017 10.125C18.5017 12.125 17.7517 14 16.5017 15.625C15.2517 17.125 13.5017 18.25 11.5017 18.625C9.50174 18.9999 7.50174 18.75 5.75174 17.75C4.00174 16.7499 2.62674 15.25 1.87674 13.375C1.12674 11.5 1.00174 9.37495 1.62674 7.49995C2.25174 5.49995 3.37674 3.87495 5.12674 2.74995C6.75174 1.62495 8.75174 1.12495 10.7517 1.24995ZM11.3767 17.375C13.0017 16.9999 14.5017 16.125 15.6267 14.75C16.6267 13.375 17.2517 11.75 17.1267 9.99995C17.1267 7.99995 16.3767 5.99995 15.0017 4.62495C13.7517 3.37495 12.2517 2.62495 10.5017 2.49995C8.87674 2.37495 7.12674 2.74995 5.75174 3.74995C4.37674 4.74995 3.37674 6.12495 2.87674 7.87495C2.37674 9.49995 2.37674 11.25 3.12674 12.875C3.87674 14.5 5.00174 15.75 6.50174 16.625C8.00174 17.5 9.75174 17.75 11.3767 17.375ZM9.87674 9.37495L12.8767 6.24995L13.7517 7.12495L10.7517 10.2499L13.7517 13.375L12.8767 14.2499L9.87674 11.1249L6.87674 14.2499L6.00174 13.375L9.00174 10.2499L6.00174 7.12495L6.87674 6.24995L9.87674 9.37495Z"
+                        fill="black"
+                      />
+                    </svg>
+                    <svg
+                      class="cursor-pointer"
+                      (click)="showDialog()"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M6.875 3.125H4.79167C3.87119 3.125 3.125 3.87119 3.125 4.79167V6.875C3.125 7.79547 3.87119 8.54167 4.79167 8.54167H6.875C7.79547 8.54167 8.54167 7.79547 8.54167 6.875V4.79167C8.54167 3.87119 7.79547 3.125 6.875 3.125Z"
+                        stroke="#393C49"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M14.1654 3.125V5.83333M14.1654 5.83333V8.54167M14.1654 5.83333H11.457M14.1654 5.83333H16.8737"
+                        stroke="#393C49"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M6.875 11.4584H4.79167C3.87119 11.4584 3.125 12.2046 3.125 13.125V15.2084C3.125 16.1288 3.87119 16.875 4.79167 16.875H6.875C7.79547 16.875 8.54167 16.1288 8.54167 15.2084V13.125C8.54167 12.2046 7.79547 11.4584 6.875 11.4584Z"
+                        stroke="#393C49"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M15.207 11.4584H13.1237C12.2032 11.4584 11.457 12.2046 11.457 13.125V15.2084C11.457 16.1288 12.2032 16.875 13.1237 16.875H15.207C16.1275 16.875 16.8737 16.1288 16.8737 15.2084V13.125C16.8737 12.2046 16.1275 11.4584 15.207 11.4584Z"
+                        stroke="#393C49"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
                   </div>
-                </div>
-              </td>
-              <!-- quantity -->
-              <td>
-                <div class="flex items-center justify-center gap-2 px-4">
-                  <button type="button" class="bg-text-gray p-2 rounded">
-                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
-                        fill="#393C49"
-                      />
-                    </svg>
-                  </button>
-                  <span class="font-bold">2</span>
-                  <button type="button" class="bg-text-gray p-2 rounded">
-                    <svg width="8" height="8" viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
-                        fill="#393C49"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-              <!-- price -->
-              <td>
-                <div
-                  class="mx-auto font-semibold border border-text-light rounded text-center w-fit h-fit px-2 py-0.5 leading-none"
-                >
-                  500
-                </div>
-              </td>
-              <!-- total -->
-              <td class="font-semibold">1000</td>
-              <!-- tax -->
-              <td class="font-semibold">50</td>
-              <!-- net -->
-              <td class="font-semibold">1050</td>
-            </tr>
+                </td>
+                <!-- items -->
+                <td>
+                  <div class="flex flex-col gap-1 text-center px-4">
+                    <span class="">{{ orderMenuItem.menuItem.label }}</span>
+                    <div class="flex items-center justify-center gap-2">
+                      @for (item of ['بيبسي', 'ماكروني', 'أرز']; track $index) {
+                        <div class="relative border border-text-light rounded-md">
+                          <div class="py-0.5 px-1 text-[10px] font-semibold">{{ item }}</div>
+                          <div
+                            class="flex items-center justify-center rounded-full bg-text-lighter w-3 text-[#FA8D7B] font-bold text-[10px] aspect-square leading-none absolute -top-1.5 -left-1.5"
+                          >
+                            <span class="h-fit">1</span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </td>
+                <!-- quantity -->
+                <td>
+                  <div class="flex items-center justify-center gap-2 px-4">
+                    <!-- add quantity -->
+                    <button
+                      (click)="onAddOrderMenuItemQuantity($index, 1)"
+                      type="button"
+                      class="bg-text-gray p-2 rounded cursor-pointer"
+                    >
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
+                          fill="#393C49"
+                        />
+                      </svg>
+                    </button>
+                    <!-- quantity -->
+                    <span class="font-bold">{{ orderMenuItem.quantity }}</span>
+                    <!-- reduce quantity -->
+                    <button
+                      (click)="onReduceOrderMenuItemQuantity($index, 1)"
+                      type="button"
+                      class="bg-text-gray p-2 rounded cursor-pointer"
+                    >
+                      <svg width="8" height="8" viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
+                          fill="#393C49"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+                <!-- price -->
+                <td>
+                  <div
+                    class="mx-auto font-semibold border border-text-light rounded text-center w-fit h-fit px-2 py-0.5 leading-none"
+                  >
+                    500
+                  </div>
+                </td>
+                <!-- total -->
+                <td class="font-semibold"><span>1000</span></td>
+                <!-- tax -->
+                <td class="font-semibold"><span>50</span></td>
+                <!-- net -->
+                <td class="font-semibold"><span>1050</span></td>
+              </tr>
             }
           </tbody>
         </table>
@@ -284,15 +372,9 @@
         variant="outlined"
       />
     </div>
-  </div>
+  </form>
 
-  <p-drawer
-    [(visible)]="isMenuVisible"
-    header=""
-    class="xl:hidden"
-    position="right"
-    styleClass="w-full! bg-white!"
-  >
+  <p-drawer [(visible)]="isMenuVisible" header="" class="xl:hidden" position="right" styleClass="w-full! bg-white!">
     <app-menu [groups]="groups()" />
   </p-drawer>
 </div>
@@ -315,33 +397,123 @@
   <p class="font-bold text-center text-dark-bg-2 text-lg">الاضافات</p>
 
   <div class="grid grid-cols-4 gap-2">
-    @for (item of [1,2,3,4,5]; track $index) {
-    <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-center p-2">
-      <img class="w-20" appImgFallback fallBackLink="/images/placeholders/menu-item.png" src="" alt="" />
-      <div class="flex items-center justify-between w-full text-dark-line font-bold">
-        <span>بيبسي</span>
-        <span>1.03</span>
+    @for (item of [1, 2, 3, 4, 5]; track $index) {
+      <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-center p-2">
+        <img class="w-20" appImgFallback fallBackLink="/images/placeholders/menu-item.png" src="" alt="" />
+        <div class="flex items-center justify-between w-full text-dark-line font-bold">
+          <span>بيبسي</span>
+          <span>1.03</span>
+        </div>
+        <div class="flex items-center justify-center gap-4">
+          <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
+                fill="#ffffff"
+              />
+            </svg>
+          </button>
+          <span class="font-bold text-dark-line">2</span>
+          <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
+            <svg width="8" height="8" viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
+                fill="#ffffff"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
-      <div class="flex items-center justify-center gap-4">
-        <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
-          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
-              fill="#ffffff"
-            />
-          </svg>
-        </button>
-        <span class="font-bold text-dark-line">2</span>
-        <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
-          <svg width="8" height="8" viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
-              fill="#ffffff"
-            />
-          </svg>
-        </button>
-      </div>
-    </div>
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
+      styleClass=" bg-[#EA7C69]! text-white! px-6!"
+      [text]="true"
+      class="mx-auto"
+      severity="secondary"
+      (click)="visible = false"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- Hut -->
+<p-dialog
+  [(visible)]="HutDialogVisible"
+  [modal]="true"
+  [style]="{ width: '80%', maxWidth: '50rem' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-text-lighter!"
+  class="addition-dialog"
+>
+  <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الكوخ</p>
+
+  <div class="grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-[90px_20px]">
+    @for (item of [1, 2, 3, 4, 5, 5, 6, 7]; track $index) {
+      <app-cabin-card class="max-w-[250px]" />
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
+      styleClass=" bg-[#EA7C69]! text-white! px-6!"
+      [text]="true"
+      class="mx-auto"
+      severity="secondary"
+      (click)="visible = false"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- Room -->
+<p-dialog
+  [(visible)]="RoomDialogVisible"
+  [modal]="true"
+  [style]="{ width: '80%', maxWidth: '50rem' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-text-lighter!"
+  class="addition-dialog"
+>
+  <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الغرفة</p>
+
+  <div class="grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-[90px_20px]">
+    @for (item of [1, 2, 3, 4, 5, 5, 6, 7]; track $index) {
+      <app-room-card class="max-w-[250px]" />
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
+      styleClass=" bg-[#EA7C69]! text-white! px-6!"
+      [text]="true"
+      class="mx-auto"
+      severity="secondary"
+      (click)="visible = false"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- Table -->
+<p-dialog
+  [(visible)]="TableDialogVisible"
+  [modal]="true"
+  [style]="{ width: '80%', maxWidth: '50rem' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-text-lighter!"
+  class="addition-dialog"
+>
+  <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الكوخ</p>
+
+  <div class="grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-[90px_20px]">
+    @for (item of [1, 2, 3, 4, 5, 5, 6, 7]; track $index) {
+      <app-table-card class="max-w-[250px]" />
     }
   </div>
 

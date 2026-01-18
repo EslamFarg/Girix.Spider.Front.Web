@@ -9,6 +9,9 @@
   color: white;
 }
 
+
+ 
+
 .slide-in{
   transform: translateY(-100%);
   opacity: 0;

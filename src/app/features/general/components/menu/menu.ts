@@ -1,5 +1,5 @@
 import { BaseComponent } from '@/components/base-component/base-component';
-import { Component, ElementRef, inject, input, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
@@ -12,6 +12,7 @@ import { Debounce } from '@/directives/debounce';
 import { MenuItem } from 'primeng/api';
 import { Menu as pMenu } from 'primeng/menu';
 import { IGroupRowResponse } from '@/features/classes/services/group-service';
+import { AllowNumbers } from '@/directives/allow-numbers';
 export interface IMenuItem {
   id: number;
   label: string;
@@ -26,6 +27,11 @@ export interface IMenuItem {
   meal: IMealRowResponse | null;
 }
 
+export interface IOrderMenuItem {
+  menuItem: IMenuItem;
+  quantity: number;
+}
+
 @Component({
   selector: 'app-menu',
   imports: [
@@ -36,12 +42,14 @@ export interface IMenuItem {
     InputGroupAddonModule,
     Debounce,
     pMenu,
+    AllowNumbers,
   ],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
 })
 export class Menu extends BaseComponent {
-  groups=input<IGroupRowResponse[]>([]);
+  groups = input<IGroupRowResponse[]>([]);
+  menuItemChange = output<IOrderMenuItem>();
 
   filterCategories = [
     {
@@ -157,11 +165,11 @@ export class Menu extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 10,
+          pageSize: 15,
         },
         searchFilters,
         fromDate: this.menuSearchFg.getRawValue().fromDate,
-        removeDateFilter:true
+        removeDateFilter: true,
       })
       .subscribe({
         next: (res) => {
@@ -250,6 +258,8 @@ export class Menu extends BaseComponent {
 
   onMenuScroll(event: Event) {
     const menuContainer = event.target as HTMLElement;
+
+    // if at bottom
     if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
       this.searchProductsAndMeals(this.paginationInfo.pageIndex + 1);
     }
@@ -261,5 +271,13 @@ export class Menu extends BaseComponent {
       return;
     }
     this.searchProductsAndMeals(this.paginationInfo.pageIndex);
+  }
+
+  addMenuItem(menuItem: IMenuItem, quantity: number) {
+    this.menuItemChange.emit({ menuItem, quantity });
+  }
+
+  removeMenuItem(menuItem: IMenuItem, quantity: number) {
+    this.menuItemChange.emit({ menuItem, quantity: -quantity });
   }
 }

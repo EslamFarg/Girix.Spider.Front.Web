@@ -63,21 +63,21 @@
     <!-- categories | groups -->
     <nav #nav class="flex gap-2 w-full overflow-auto custom-scroll min-h-max">
       @for (item of groups(); track $index) {
-      <button
-        class="bg-text-lighter min-w-max xl:min-w-fit flex-1 cursor-pointer transition-all text-dark-line text-sm p-2 font-semibold rounded-lg text-center"
-        [class.filter-category-active]="menuSearchFg.get('category')?.value?.id == item.id"
-        style="box-shadow: 0px 0px 10px 0px #ffffff33 inset"
-        type="button"
-        (click)="selectCategory({ label: item.name, id: item.id })"
-      >
-        {{ item.name }}
-      </button>
+        <button
+          class="bg-text-lighter min-w-max xl:min-w-fit flex-1 cursor-pointer transition-all text-dark-line text-sm p-2 font-semibold rounded-lg text-center"
+          [class.filter-category-active]="menuSearchFg.get('category')?.value?.id == item.id"
+          style="box-shadow: 0px 0px 10px 0px #ffffff33 inset"
+          type="button"
+          (click)="selectCategory({ label: item.name, id: item.id })"
+        >
+          {{ item.name }}
+        </button>
       }
     </nav>
 
     <div
       #itemsContainer
-      class="no-scrollbar scroll-smooth w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-6 gap-3.5 pt-10 h-full overflow-y-auto overflow-x-hidden"
+      class="no-scrollbar scroll-smooth auto-rows-min w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-6 gap-3.5 pt-10 h-full overflow-y-auto overflow-x-hidden"
       style="row-gap: 50px"
       appDebounce
       debounceEvent="scroll"
@@ -85,53 +85,61 @@
     >
       <!--  -->
       @for (item of menuItems(); track $index) {
-
-      <div
-        [style]="`animation-delay: ${item.index * 0.05}s`"
-        class="slide-in h-fit text-white bg-form-bg rounded-xl flex flex-col gap-1.5 p-3 items-center justify-center"
-      >
-        <div class="h-8 w-20 relative rounded-full">
-          <div
-            class="absolute w-full aspect-square bottom-0 left-0 rounded-full"
-            style="box-shadow: 0px 3.13px 15.63px 0px #ffffff40"
+        <div
+          [style]="`animation-delay: ${item.index * 0.05}s`"
+          class="slide-in h-fit text-white bg-form-bg rounded-xl flex flex-col gap-1.5 p-3 items-center justify-center"
+        >
+          <div class="h-8 w-20 relative rounded-full">
+            <div
+              class="absolute w-full aspect-square bottom-0 left-0 rounded-full"
+              style="box-shadow: 0px 3.13px 15.63px 0px #ffffff40"
+            >
+              <img
+                class="w-full rounded-full h-full object-cover"
+                appImgFallback
+                fallBackLink="/images/placeholders/menu-item.png"
+                [src]="baseUrl + item.imageUrl"
+                alt=""
+              />
+            </div>
+          </div>
+          <p
+            class="text-[11px] whitespace-nowrap font-bold w-full text-ellipsis overflow-hidden text-center"
+            [title]="item.label"
           >
-            <img
-              class="w-full rounded-full h-full object-cover"
-              appImgFallback
-              fallBackLink="/images/placeholders/menu-item.png"
-              [src]="baseUrl + item.imageUrl"
-              alt=""
+            {{ item.label }}
+          </p>
+          <div class="flex items-center justify-between w-full">
+            <button type="button" class="underline text-[8px] font-semibold">تفاصيل</button>
+            <span class="text-xs font-bold">{{ item.price }}</span>
+          </div>
+
+          <div class="flex items-center gap-2 w-full justify-between">
+            <button
+              (click)="addMenuItem(item, +quantity.value)"
+              type="button"
+              class="p-1.5 text-text-lighter leading-none rounded bg-text-gray flex items-center justify-center cursor-pointer"
+            >
+              <i class="pi pi-plus text-[8px]!"></i>
+            </button>
+            <input
+              class="text-xs font-bold flex-1 w-full text-center outline-none no-input-spinner"
+              #quantity
+              appAllowNumbers
+              type="number"
+              [min]="1"
+              [max]="1000"
+              [defaultValue]="1"
             />
+            <button
+              (click)="removeMenuItem(item, +quantity.value)"
+              type="button"
+              class="p-1.5 text-text-lighter leading-none rounded bg-text-gray flex items-center justify-center cursor-pointer"
+            >
+              <i class="pi pi-minus text-[8px]!"></i>
+            </button>
           </div>
         </div>
-        <p
-          class="text-[11px] whitespace-nowrap font-bold w-full text-ellipsis overflow-hidden text-center"
-          [title]="item.label"
-        >
-          {{ item.label }}
-        </p>
-        <div class="flex items-center justify-between w-full">
-          <button type="button" class="underline text-[8px] font-semibold">تفاصيل</button>
-          <span class="text-xs font-bold">{{ item.price }}</span>
-        </div>
-
-        <div class="flex items-center gap-2 w-full justify-between">
-          <button
-            type="button"
-            class="p-1.5 text-text-lighter leading-none rounded bg-text-gray flex items-center justify-center cursor-pointer"
-          >
-            <i class="pi pi-plus text-[8px]!"></i>
-          </button>
-          <span class="text-xs font-bold">1</span>
-          <button
-            type="button"
-            class="p-1.5 text-text-lighter leading-none rounded bg-text-gray flex items-center justify-center cursor-pointer"
-          >
-            <i class="pi pi-minus text-[8px]!"></i>
-          </button>
-        </div>
-      </div>
-
       }
     </div>
   </section>
