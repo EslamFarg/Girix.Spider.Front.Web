@@ -12,6 +12,9 @@ import { errorInterceptor } from './core/interceptors/error-interceptor';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { jwtInterceptor } from './features/auth/interceptors/jwt-interceptor';
+import {provideTranslateService, provideTranslateLoader} from "@ngx-translate/core";
+import {provideTranslateHttpLoader} from "@ngx-translate/http-loader";
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -31,5 +34,14 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
+    provideHttpClient(),
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({
+        prefix: '/i18n/',
+        suffix: '.json'
+      }),
+      fallbackLang: 'ar',
+      lang: 'ar'
+    })
   ],
 };

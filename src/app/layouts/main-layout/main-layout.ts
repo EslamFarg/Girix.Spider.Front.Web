@@ -17,7 +17,6 @@ export class MainLayout extends BaseComponent {
     super();
     console.log('MainLayout');
   }
-  isLoading = this.layoutService.isLoading;
   header = viewChild<Header>('header');
   mainEl = viewChild<ElementRef<HTMLElement>>('main');
 

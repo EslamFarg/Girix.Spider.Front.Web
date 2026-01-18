@@ -13,15 +13,9 @@ import { MenuItem } from 'primeng/api';
 import { Menu as pMenu } from 'primeng/menu';
 import { IGroupRowResponse } from '@/features/classes/services/group-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
+import { ButtonDirective } from 'primeng/button';
 export interface IMenuItem {
-  id: number;
-  label: string;
-  category: {
-    id: number;
-    label: string;
-  };
-  price: number;
-  imageUrl: string;
+  id: string;
   index: number;
   product: IProductRowResponse | null;
   meal: IMealRowResponse | null;
@@ -29,6 +23,7 @@ export interface IMenuItem {
 
 export interface IOrderMenuItem {
   menuItem: IMenuItem;
+  additions: IProductRowResponse[];
   quantity: number;
 }
 
@@ -43,6 +38,7 @@ export interface IOrderMenuItem {
     Debounce,
     pMenu,
     AllowNumbers,
+    ButtonDirective,
   ],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
@@ -145,7 +141,11 @@ export class Menu extends BaseComponent {
   }
 
   searchProductsAndMeals(pageIndex: number) {
-    if (!this.isPreviousSearchCriteriaIdentical()) pageIndex = 1;
+    if (this.isPreviousSearchCriteriaIdentical()) {
+      //handle stopping pagination if no more data
+    } else {
+      pageIndex = 1;
+    }
 
     const searchFilters = [
       {
@@ -173,29 +173,39 @@ export class Menu extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
-          const newItems: IMenuItem[] = [];
+          let newItems: IMenuItem[] = [];
           const length = res.value.menuItems.rows.length + res.value.meals.rows.length;
-          this.lestPageSize = length;
-
-          for (let index = 0; index < length; index++) {
-            let newItem: IMenuItem;
-
-            if (index % 2 == 0) {
-              if (res.value.menuItems.rows.length > index / 2) {
-                newItem = this.mapProductToMenuItem(res.value.menuItems.rows[index / 2], index);
-              } else {
-                newItem = this.mapMealToMenuItem(res.value.meals.rows[index / 2], index);
-              }
-            } else {
-              if (res.value.meals.rows.length > index / 2) {
-                newItem = this.mapMealToMenuItem(res.value.meals.rows[(index - 1) / 2], index);
-              } else {
-                newItem = this.mapProductToMenuItem(res.value.menuItems.rows[(index - 1) / 2], index);
-              }
-            }
-
-            newItems.push(newItem);
+          if (length <= 0) {
+            return;
           }
+          // this.lestPageSize = length;
+
+          // for (let index = 0; index < length; index++) {
+          //   let newItem: IMenuItem;
+
+          //   if (index % 2 == 0) {
+          //     if (res.value.menuItems.rows.length > index / 2) {
+          //       newItem = this.mapProductToMenuItem(res.value.menuItems.rows[index / 2], index);
+          //     } else {
+          //       newItem = this.mapMealToMenuItem(res.value.meals.rows[index / 2], index);
+          //     }
+          //   } else {
+          //     if (res.value.meals.rows.length > index / 2) {
+          //       newItem = this.mapMealToMenuItem(res.value.meals.rows[(index - 1) / 2], index);
+          //     } else {
+          //       newItem = this.mapProductToMenuItem(res.value.menuItems.rows[(index - 1) / 2], index);
+          //     }
+          //   }
+
+          //   newItems.push(newItem);
+          // }
+
+          newItems = newItems.concat(res.value.meals.rows.map((item, index) => this.mapMealToMenuItem(item, index)));
+          newItems = newItems.concat(
+            res.value.menuItems.rows.map((item, index) =>
+              this.mapProductToMenuItem(item, res.value.meals.rows.length + index),
+            ),
+          );
 
           this.paginationInfo = {
             pageIndex,
@@ -226,15 +236,8 @@ export class Menu extends BaseComponent {
 
   mapProductToMenuItem(product: IProductRowResponse, index: number): IMenuItem {
     return {
-      id: product.id,
-      label: product.name,
-      category: {
-        id: product.categoryId,
-        label: product.categoryName,
-      },
+      id: 'product-' + product.id,
       index,
-      imageUrl: product.images.find((image) => image.fullPath)?.fullPath!,
-      price: product.price,
       product: product,
       meal: null,
     };
@@ -242,15 +245,8 @@ export class Menu extends BaseComponent {
 
   mapMealToMenuItem(meal: IMealRowResponse, index: number): IMenuItem {
     return {
-      id: meal.id,
-      label: meal.name,
-      category: {
-        id: meal.categoryId,
-        label: meal.categoryName,
-      },
+      id: 'meal-' + meal.id,
       index,
-      imageUrl: meal.images.find((image) => image.fullPath)?.fullPath!,
-      price: meal.price,
       product: null,
       meal: meal,
     };
@@ -274,10 +270,10 @@ export class Menu extends BaseComponent {
   }
 
   addMenuItem(menuItem: IMenuItem, quantity: number) {
-    this.menuItemChange.emit({ menuItem, quantity });
+    this.menuItemChange.emit({ menuItem, quantity, additions: [] });
   }
 
   removeMenuItem(menuItem: IMenuItem, quantity: number) {
-    this.menuItemChange.emit({ menuItem, quantity: -quantity });
+    this.menuItemChange.emit({ menuItem, quantity: -quantity, additions: [] });
   }
 }

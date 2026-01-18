@@ -1,4 +1,5 @@
-import { Component, input } from '@angular/core';
+import { IRoomRowResponse } from '@/features/restaurant/services/room-service';
+import { Component, input, signal } from '@angular/core';
 
 export enum RoomStatus {
   Available = 0,
@@ -14,10 +15,20 @@ export enum RoomStatus {
 })
 export class RoomCard {
   RoomStatus = RoomStatus;
-  cabinStatus = input<RoomStatus>(RoomStatus.Available);
+  hutStatus = signal<RoomStatus>(RoomStatus.Available);
+
+  data = input.required<IRoomRowResponse>();
+
+  ngOnInit() {
+    if (this.data().isAvailable) {
+      this.hutStatus.set(RoomStatus.Available);
+    } else {
+      this.hutStatus.set(RoomStatus.Reserved);
+    }
+  }
 
   get roomStatusClass() {
-    switch (this.cabinStatus()) {
+    switch (this.hutStatus()) {
       case RoomStatus.Available:
         return 'replacements-available';
       case RoomStatus.Reserved:

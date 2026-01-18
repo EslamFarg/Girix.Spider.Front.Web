@@ -1,19 +1,24 @@
-.cabin-available {
-  --color: 80, 209, 170;
+.hut-available {
+  --color: black;
+  &:hover {
+    --color: 80, 209, 170;
+    & .bordered {
+      border-color: rgb(var(--color));
+    }
+  }
   border-color: rgb(var(--color));
   color: rgb(var(--color));
 }
 
-
-.cabin-reserved {
+.hut-reserved {
   --color: 255, 56, 60;
   /* border-color: var(--color); */
-  
+
   color: rgb(var(--color));
 }
 
-.cabin-on-hold {
+.hut-on-hold {
   --color: 255, 141, 40;
   /* border-color: rgb(var(--color)) */
-  color: rgb(var(--color))
+  color: rgb(var(--color));
 }

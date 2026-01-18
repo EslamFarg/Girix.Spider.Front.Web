@@ -1,4 +1,5 @@
-import { Component, input } from '@angular/core';
+import { ITableRowResponse } from '@/features/restaurant/services/table-service';
+import { Component, input, signal } from '@angular/core';
 export enum TableStatus {
   Available = 0,
   Reserved = 1,
@@ -11,11 +12,21 @@ export enum TableStatus {
   styleUrl: './table-card.css',
 })
 export class TableCard {
-TableStatus = TableStatus;
-  cabinStatus = input<TableStatus>(TableStatus.Available);
+  TableStatus = TableStatus;
+  tableStatus = signal<TableStatus>(TableStatus.Available);
+  data = input.required<ITableRowResponse>();
+
+  ngOnInit() {
+ 
+    if (this.data().isAvailable) {
+      this.tableStatus.set(TableStatus.Available);
+    } else {
+      this.tableStatus.set(TableStatus.Reserved);
+    }
+  }
 
   get roomStatusClass() {
-    switch (this.cabinStatus()) {
+    switch (this.tableStatus()) {
       case TableStatus.Available:
         return 'replacements-available';
       case TableStatus.Reserved:

@@ -1,0 +1,157 @@
+{
+  "header": {
+    "logout": { "label": "تسجيل الخروج" },
+    "nav": {
+      "home": {
+        "label": "الرئيسية"
+      },
+      "invoices": {
+        "label": "الفواتير",
+        "orders": {
+          "label": "الطلبات"
+        },
+        "refunds": {
+          "label": "المرتجعات"
+        }
+      },
+      "classes": {
+        "label": "الأصناف",
+        "products": {
+          "label": "المنتجات"
+        },
+        "meals": {
+          "label": "الوجبات"
+        },
+        "groups": {
+          "label": "المجموعات"
+        }
+      },
+      "restaurant": {
+        "label": "المطعم",
+        "tables": {
+          "label": "الطاولات"
+        },
+        "huts": {
+          "label": "الاكواخ"
+        },
+        "rooms": {
+          "label": "الغرف"
+        }
+      },
+      "customers": {
+        "label": "العملاء",
+        "addCustomer": {
+          "label": "اضافة عميل"
+        }
+      },
+      "storage": {
+        "label": "المخزون",
+        "openingBalances": {
+          "label": "الارصده الافتتاحيه"
+        },
+        "purchases": {
+          "label": "المشتريات"
+        },
+        "purchasesRefunds": {
+          "label": "مرتجعات المشتريات"
+        },
+        "inventory": {
+          "label": "تسويه جرديه"
+        }
+      },
+      "replacements": {
+        "label": "التبديلات",
+        "rooms": {
+          "label": "الغرف"
+        },
+        "huts": {
+          "label": "الاكواخ"
+        },
+        "tables": {
+          "label": "الطاولات"
+        },
+        "deliveries": {
+          "label": "ديليفري"
+        }
+      },
+      "collections": {
+        "label": "التحصيلات",
+        "all": {
+          "label": "الكل"
+        },
+        "tables": {
+          "label": "الطاولات"
+        },
+        "rooms": {
+          "label": "الغرف"
+        },
+        "huts": {
+          "label": "الاكواخ"
+        },
+        "deliveries": {
+          "label": "ديليفري"
+        }
+      },
+      "accounts": {
+        "label": "الحسابات",
+        "journals": {
+          "label": "القيود"
+        },
+        "collectiveReceipts": {
+          "label": "سند قبض مجمع"
+        },
+        "collectivePayments": {
+          "label": "سند صرف مجمع"
+        },
+        "accountsTree": {
+          "label": "شجره الحسابات"
+        }
+      },
+      "delivery": {
+        "label": "الديليفري",
+        "deliveryMen": {
+          "label": "بيانات الديليفري"
+        }
+      },
+      "users": {
+        "label": "المستخدمين",
+        "addUser": {
+          "label": "إضافه مستخدم"
+        }
+      },
+      "settings": {
+        "label": "الاعدادات",
+        "program": {
+          "label": "إعدادات البرنامج"
+        },
+        "financial": {
+          "label": "إعدادات الماليه"
+        },
+        "dailyOpeningClosing": {
+          "label": "إداره فتح/ غلق اليوميه"
+        },
+        "qr": {
+          "label": "طابعه ال QR"
+        },
+        "defaultAccounts": {
+          "label": "إعدادات الحسابات الإفتراضيه"
+        },
+        "addPrinter": {
+          "label": "إضافه طابعه"
+        },
+        "printer": {
+          "label": "اعدادات الطابعه"
+        }
+      },
+      "appInfo": {
+        "label": "بيانات البرنامج",
+        "profile": {
+          "label": "الملف الشخصي"
+        },
+        "restaurant": {
+          "label": "بيانات المطعم"
+        }
+      }
+    }
+  }
+}

@@ -47,7 +47,6 @@ export interface IProductCategoryRowResponse {
   }[];
 }
 
-
 //MenuItems : Name,CategoryName,CategoryId
 
 export enum ProductSearchEnum {
@@ -61,4 +60,14 @@ export enum ProductSearchEnum {
 })
 export class ProductService extends BaseService<ProductSearchEnum, any, any, any, IProductSearchResponseValue> {
   override apiRoute = 'MenuItem';
+
+  getAdditions(dto:{ paginationInfo: { pageIndex: number, pageSize: number } }) {
+    return this.http.post<{
+      rows: IProductRowResponse[];
+      paginationInfo: {
+        totalRowsCount: number;
+        totalPagesCount: number;
+      };
+    }>(`${this.apiUrl}/GetListIsAdditionMenuItem?IsAddtion=true`, dto);
+  }
 }

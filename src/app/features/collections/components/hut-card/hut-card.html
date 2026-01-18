@@ -1,14 +1,19 @@
-<div [class]="'relative text-black cursor-pointer ' + cabinStatusClass">
+<div [class]="'relative text-black cursor-pointer ' + hutStatusClass">
   <div
-    class="absolute w-4/6 cabin rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded-xl"
+    class="absolute w-4/6 hut rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded-xl"
     style="
-      background: linear-gradient(306deg, rgba(201, 205, 209, 0) 46.91%, rgb(201, 205, 209,.4) 80.82%, rgba(201, 205, 209, 1) 91.82%);
+      background: linear-gradient(
+        306deg,
+        rgba(201, 205, 209, 0) 46.91%,
+        rgb(201, 205, 209, 0.4) 80.82%,
+        rgba(201, 205, 209, 1) 91.82%
+      );
       backdrop-filter: blur(30.445161819458008px);
       box-shadow: -4px -4px 6.09px 0px rgba(var(--color), 0.5);
     "
   ></div>
   <div
-    style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #a3a3a34d   "
+    style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #a3a3a34d"
     class="flex border-2 z-10 relative bordered border-transparent aspect-[calc(110/72)] available items-center justify-center bg-white/80 rounded-2xl"
   >
     <span class="font-bold">R{{ 1 + 1 }}</span>

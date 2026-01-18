@@ -48,4 +48,7 @@ export class GeneralService extends BaseService<
   IProductsAndMealsSearchResponseValue
 > {
   override apiRoute = 'MenuIteamAndMeal';
+
+
+  
 }

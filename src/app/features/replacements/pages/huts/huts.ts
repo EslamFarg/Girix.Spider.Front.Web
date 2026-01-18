@@ -9,7 +9,7 @@ import { Replacements, SpacesEnum } from '../../services/replacements';
 import { Paginator } from 'primeng/paginator';
 import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdown';
 @Component({
-  selector: 'app-cabins',
+  selector: 'app-huts',
   imports: [
     InputTextModule,
     SectionWrapper,
@@ -19,10 +19,10 @@ import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdo
     Paginator,
     CountdownComponent,
   ],
-  templateUrl: './cabins.html',
-  styleUrl: './cabins.css',
+  templateUrl: './huts.html',
+  styleUrl: './huts.css',
 })
-export class Cabins extends BaseComponent {
+export class Huts extends BaseComponent {
   initialSearchFormValue = {
     text: this.fb.control<string>('', [Validators.required]),
     categoryId: this.fb.control<number>(0, [Validators.required]),
@@ -37,17 +37,17 @@ export class Cabins extends BaseComponent {
 
   replacementsService = inject(Replacements);
   openDialog() {
-    this.replacementsService.openDialog(SpacesEnum.Cabins);
+    this.replacementsService.openDialog(SpacesEnum.Huts);
   }
 
   //countdown
   // countDownEles = viewChildren<CountdownComponent>('countdown');
-  countdownConfig: CountdownConfig = { format: 'hh:mm:ss', leftTime: 60*60*2 };
+  countdownConfig: CountdownConfig = { format: 'hh:mm:ss', leftTime: 60 * 60 * 2 };
   handleCountdownEvent(event: CountdownEvent) {}
 
   ngAfterViewInit() {
     // this.countDownEles().forEach((ele) => {
-      // ele.begin();
+    // ele.begin();
     // });
   }
 }

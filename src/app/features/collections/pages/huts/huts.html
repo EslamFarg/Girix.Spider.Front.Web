@@ -26,30 +26,35 @@
 
   <!-- items grid -->
   <div class="grid grid-cols-6 my-4 mt-25" style="row-gap: 8rem; column-gap: 6rem">
-    @for (item of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 ]; track $index) {
-    <div
-      class="relative text-black cursor-pointer"
-      [class.cabin-available]="$index % 3 == 0"
-      [class.cabin-reserved]="$index % 4 == 1"
-      [class.cabin-on-hold]="$index % 5 == 1"
-      (click)="openCollectionInvoiceDialog()"
-    >
+    @for (item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]; track $index) {
       <div
-        class="absolute w-4/6 cabin rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded"
-        style="
-          background: linear-gradient(147deg, rgba(255, 255, 255, 0.5) 6.91%, rgba(153, 153, 153, 0.5) 91.82%);
-          backdrop-filter: blur(30.445161819458008px);
-          box-shadow: -4px -4px 6.09px 0px rgba(var(--color), 0.5);
-        "
-      ></div>
-      <div
-        style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
-        class="flex border-2 z-10 relative border-transparent aspect-[calc(110/72)] available items-center justify-center bg-[#E2E2E2] rounded-2xl"
+        class="relative text-black cursor-pointer"
+        [class.hut-available]="$index % 3 == 0"
+        [class.hut-reserved]="$index % 4 == 1"
+        [class.hut-on-hold]="$index % 5 == 1"
+        (click)="openCollectionInvoiceDialog()"
       >
-        <span class="font-bold">R{{ $index + 1 }}</span>
+        <div
+          class="absolute w-4/6 hut rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded"
+          style="
+            background: linear-gradient(147deg, rgba(255, 255, 255, 0.5) 6.91%, rgba(153, 153, 153, 0.5) 91.82%);
+            backdrop-filter: blur(30.445161819458008px);
+            box-shadow: -4px -4px 6.09px 0px rgba(var(--color), 0.5);
+          "
+        ></div>
+        <div
+          style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
+          class="flex border-2 z-10 relative border-transparent aspect-[calc(110/72)] available items-center justify-center bg-[#E2E2E2] rounded-2xl"
+        >
+          <span class="font-bold">R{{ $index + 1 }}</span>
+        </div>
+        <countdown
+          #countdown
+          class="mx-auto w-fit block"
+          [config]="countdownConfig"
+          (event)="handleCountdownEvent($event)"
+        />
       </div>
-      <countdown  #countdown class="mx-auto w-fit block" [config]="countdownConfig" (event)="handleCountdownEvent($event)" />
-    </div>
     }
   </div>
 

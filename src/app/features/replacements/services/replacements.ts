@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 
 export enum SpacesEnum {
   Rooms,
-  Cabins,
+  Huts,
   Tables,
   Deliveries,
 }

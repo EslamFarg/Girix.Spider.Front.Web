@@ -1,9 +1,9 @@
 import { Route } from '@angular/router';
- 
+
 import { All } from '@/features/collections/pages/all/all';
 import { Tables } from '@/features/collections/pages/tables/tables';
 import { Rooms } from '@/features/collections/pages/rooms/rooms';
-import { Cabins } from '@/features/collections/pages/cabins/cabins';
+import { Huts } from '@/features/collections/pages/huts/huts';
 import { Deliveries } from '@/features/collections/pages/deliveries/deliveries';
 
 export default [
@@ -20,8 +20,8 @@ export default [
     component: Rooms,
   },
   {
-    path: 'cabins',
-    component: Cabins,
+    path: 'huts',
+    component: Huts,
   },
   {
     path: 'deliveries',

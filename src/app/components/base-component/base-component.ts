@@ -6,6 +6,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { environment } from '../../../environments/environment';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-base-component',
@@ -23,6 +24,9 @@ export class BaseComponent<ItemType = any> {
   messageService = inject(MessageService);
   authService = inject(AuthService);
   layoutService = inject(LayoutService);
+  translateService = inject(TranslateService);
+
+  isLoading = this.layoutService.isLoading;
 
   items = signal<ItemType[]>([]);
   getRowNumber = (index: number, pageNumber: number) => index + 1 + (pageNumber - 1) * 10;
@@ -41,5 +45,19 @@ export class BaseComponent<ItemType = any> {
     const date = new Date();
     date.setDate(date.getDate() - days);
     return date;
+  }
+
+  translate = (key: string) => this.translateService.instant(key);
+
+  formatMinutesToHHMMSS(totalMinutes: number): string {
+    const totalSeconds = Math.floor(totalMinutes * 60);
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    const pad = (n: number) => n.toString().padStart(2, '0');
+
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   }
 }

@@ -1,4 +1,4 @@
-<div class="xl:p-4 xl:pe-0 h-full">
+<div class="xl:p-4 xl:pe-0 h-full" [class.cursor-wait]="isLoading()" >
   <section class="border border-text-light rounded-[14px] p-4 flex flex-col gap-3 h-full">
     <!-- search -->
     <form #form [formGroup]="menuSearchFg" appDebounce debounceEvent="submit" (debounced)="onSubmitSearch()">
@@ -98,27 +98,38 @@
                 class="w-full rounded-full h-full object-cover"
                 appImgFallback
                 fallBackLink="/images/placeholders/menu-item.png"
-                [src]="baseUrl + item.imageUrl"
+                [src]="
+                  item.meal ? baseUrl + item.meal.images?.[0]?.fullPath : baseUrl + item.product?.images?.[0]?.fullPath
+                "
                 alt=""
               />
             </div>
           </div>
+          @let label = item.meal ? item.meal.name : item.product?.name;
           <p
             class="text-[11px] whitespace-nowrap font-bold w-full text-ellipsis overflow-hidden text-center"
-            [title]="item.label"
+            [title]="label"
           >
-            {{ item.label }}
+            {{ label }}
           </p>
           <div class="flex items-center justify-between w-full">
             <button type="button" class="underline text-[8px] font-semibold">تفاصيل</button>
-            <span class="text-xs font-bold">{{ item.price }}</span>
+            @let price = item.meal ? item.meal.price : item.product?.price;
+
+            <span class="text-xs font-bold">{{ price }}</span>
           </div>
 
           <div class="flex items-center gap-2 w-full justify-between">
+            <!-- add -->
             <button
               (click)="addMenuItem(item, +quantity.value)"
               type="button"
-              class="p-1.5 text-text-lighter leading-none rounded bg-text-gray flex items-center justify-center cursor-pointer"
+              pButton
+              class="p-1.5! border-0!  leading-none rounded   flex items-center justify-center cursor-pointer"
+              style="
+                --p-button-primary-background: var(--color-text-gray);
+                --p-button-primary-color: var(--color-text-lighter);
+              "
             >
               <i class="pi pi-plus text-[8px]!"></i>
             </button>
@@ -131,10 +142,18 @@
               [max]="1000"
               [defaultValue]="1"
             />
+            <!-- remove -->
             <button
               (click)="removeMenuItem(item, +quantity.value)"
               type="button"
-              class="p-1.5 text-text-lighter leading-none rounded bg-text-gray flex items-center justify-center cursor-pointer"
+              pButton
+              class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
+              style="
+                --p-button-primary-background: var(--color-text-gray);
+                --p-button-primary-color: var(--color-text-lighter);
+                --p-button-primary-hover-background: red;
+                --p-button-primary-active-background: rgba(255, 0, 0, 0.538);
+              "
             >
               <i class="pi pi-minus text-[8px]!"></i>
             </button>

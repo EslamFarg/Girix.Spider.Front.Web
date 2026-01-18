@@ -8,7 +8,7 @@ import { Menu } from 'primeng/menu';
 import { ProgressBarModule, ProgressBar } from 'primeng/progressbar';
 import { LayoutService } from '@/layouts/services/layout-service';
 export interface IMainNavItem {
-  label: string;
+  labelKey: string;
   imgUrl: string;
   action?: string;
   routerLink: string;
@@ -16,7 +16,7 @@ export interface IMainNavItem {
 }
 
 export interface ISubNavItem {
-  label: string;
+  labelKey: string;
   imgUrl: string;
   routerLink: string;
   subLinks?: string[];
@@ -30,7 +30,6 @@ export interface ISubNavItem {
 })
 export class Header extends BaseComponent {
   header = viewChild<ElementRef<HTMLElement>>('header');
-  isLoading = this.layoutService.isLoading;
   nav = viewChild<ElementRef<HTMLElement>>('nav');
   menuItems: MenuItem[] = [
     {
@@ -47,275 +46,275 @@ export class Header extends BaseComponent {
 
   navItems: IMainNavItem[] = [
     {
-      label: 'الرئيسية',
+      labelKey: 'home',
       imgUrl: headerIcons.home.imgUrl,
       routerLink: '/',
     },
     {
-      label: 'الفواتير',
+      labelKey: 'invoices',
       imgUrl: headerIcons.invoices.imgUrl,
       routerLink: '/invoices',
       children: [
         {
-          label: 'الطلبات',
+          labelKey: 'orders',
           imgUrl: headerIcons.invoices.children.orders,
           routerLink: '/invoices/orders',
         },
         {
-          label: 'المرتجعات',
+          labelKey: 'refunds',
           imgUrl: headerIcons.invoices.children.refunds,
           routerLink: '/invoices/refunds',
         },
       ],
     },
     {
-      label: 'الأصناف',
+      labelKey: 'classes',
       imgUrl: headerIcons.classes.imgUrl,
       routerLink: '/classes',
       children: [
         {
-          label: 'المنتجات',
+          labelKey: 'products',
           imgUrl: headerIcons.classes.children.products,
           routerLink: '/classes/products',
         },
         {
-          label: 'الوجبات',
+          labelKey: 'meals',
           imgUrl: headerIcons.classes.children.meals,
           routerLink: '/classes/meals',
         },
         {
-          label: 'المجموعات',
+          labelKey: 'groups',
           imgUrl: headerIcons.classes.children.groups,
           routerLink: '/classes/groups',
         },
       ],
     },
     {
-      label: 'المطعم',
+      labelKey: 'restaurant',
       imgUrl: headerIcons.restaurant.imgUrl,
       routerLink: '/restaurant',
       children: [
         {
-          label: 'الطاولات',
+          labelKey: 'tables',
           imgUrl: headerIcons.restaurant.children.tables,
           routerLink: '/restaurant/tables',
         },
         {
-          label: 'الاكواخ',
+          labelKey: 'huts',
           imgUrl: headerIcons.restaurant.children.huts,
           routerLink: '/restaurant/huts',
         },
         {
-          label: 'الغرفه',
+          labelKey: 'rooms',
           imgUrl: headerIcons.restaurant.children.rooms,
           routerLink: '/restaurant/rooms',
         },
       ],
     },
     {
-      label: 'العملاء',
+      labelKey: 'customers',
       imgUrl: headerIcons.customers.imgUrl,
       routerLink: '/customers',
       children: [
         {
-          label: 'إضافه عميل',
+          labelKey: 'addCustomer',
           imgUrl: headerIcons.customers.children.add,
           routerLink: '/customers/add',
         },
       ],
     },
     {
-      label: 'المخزون',
+      labelKey: 'storage',
       imgUrl: headerIcons.storage.imgUrl,
       routerLink: '/storage',
       children: [
         {
-          label: 'الارصده الافتتاحيه',
+          labelKey: 'openingBalances',
           imgUrl: headerIcons.storage.children.openingBalances,
           routerLink: '/storage/opening-balances',
         },
         {
-          label: 'المشتريات',
+          labelKey: 'purchases',
           imgUrl: headerIcons.storage.children.purchases,
           routerLink: '/storage/purchases',
         },
         {
-          label: 'مرتجعات مشتريات',
+          labelKey: 'purchasesRefunds',
           imgUrl: headerIcons.storage.children.purchasesReturns,
           routerLink: '/storage/purchases-refunds',
         },
         {
-          label: 'تسويه جرديه',
+          labelKey: 'inventory',
           imgUrl: headerIcons.storage.children.inventory,
           routerLink: '/storage/inventory',
         },
       ],
     },
     {
-      label: 'التبديلات',
+      labelKey: 'replacements',
       imgUrl: headerIcons.replacements.imgUrl,
       routerLink: '/replacements',
       children: [
         {
-          label: 'غرف',
+          labelKey: 'غرف',
           imgUrl: headerIcons.replacements.children.rooms,
           routerLink: '/replacements/rooms',
         },
         {
-          label: 'اكواخ',
-          imgUrl: headerIcons.replacements.children.cabins,
-          routerLink: '/replacements/cabins',
+          labelKey: 'اكواخ',
+          imgUrl: headerIcons.replacements.children.huts,
+          routerLink: '/replacements/huts',
         },
         {
-          label: 'طاولات',
+          labelKey: 'طاولات',
           imgUrl: headerIcons.replacements.children.tables,
           routerLink: '/replacements/tables',
         },
         {
-          label: 'ديليفري',
+          labelKey: 'ديليفري',
           imgUrl: headerIcons.replacements.children.deliveries,
           routerLink: '/replacements/deliveries',
         },
       ],
     },
     {
-      label: 'التحصيلات',
+      labelKey: 'collections',
       imgUrl: headerIcons.collections.imgUrl,
       routerLink: '/collections',
       children: [
         {
-          label: 'الكل',
+          labelKey: 'all',
           imgUrl: headerIcons.collections.children.all,
           routerLink: '/collections/all',
         },
         {
-          label: 'الطاولات',
+          labelKey: 'tables',
           imgUrl: headerIcons.collections.children.tables,
           routerLink: '/collections/tables',
         },
         {
-          label: 'غرف',
+          labelKey: 'rooms',
           imgUrl: headerIcons.collections.children.rooms,
           routerLink: '/collections/rooms',
         },
         {
-          label: 'أكواخ',
-          imgUrl: headerIcons.collections.children.cabins,
-          routerLink: '/collections/cabins',
+          labelKey: 'huts',
+          imgUrl: headerIcons.collections.children.huts,
+          routerLink: '/collections/huts',
         },
         {
-          label: 'ديليفري',
+          labelKey: 'deliveries',
           imgUrl: headerIcons.collections.children.deliveries,
           routerLink: '/collections/deliveries',
         },
       ],
     },
     {
-      label: 'الحسابات',
+      labelKey: 'accounts',
       imgUrl: headerIcons.accounts.imgUrl,
       routerLink: '/accounts',
       children: [
         {
-          label: 'القيود',
+          labelKey: 'journals',
           imgUrl: headerIcons.accounts.children.journals,
           routerLink: '/accounts/journals',
         },
         {
-          label: 'سند قبض مجمع',
+          labelKey: 'collectiveReceipts',
           imgUrl: headerIcons.accounts.children.collectiveReceipts,
           routerLink: '/accounts/collective-receipts',
         },
         {
-          label: 'سند صرف مجمع',
+          labelKey: 'collectivePayments',
           imgUrl: headerIcons.accounts.children.collectivePayments,
           routerLink: '/accounts/collective-payments',
         },
         {
-          label: 'شجره الحسابات',
+          labelKey: 'accountsTree',
           imgUrl: headerIcons.accounts.children.accountsTree,
           routerLink: '/accounts/accounts-tree',
         },
       ],
     },
     {
-      label: 'الديليفري',
+      labelKey: 'delivery',
       imgUrl: headerIcons.deliveries.imgUrl,
       routerLink: '/deliveries',
       children: [
         {
-          label: 'بيانات الديليفري',
+          labelKey: 'deliveryMen',
           imgUrl: headerIcons.deliveries.children.deliveryMen,
           routerLink: '/deliveries/delivery-men',
         },
       ],
     },
     {
-      label: 'المستخدمين',
+      labelKey: 'users',
       imgUrl: headerIcons.users.imgUrl,
       routerLink: '/users',
       children: [
         {
-          label: 'إضافه مستخدم',
+          labelKey: 'addUser',
           imgUrl: headerIcons.users.children.add,
           routerLink: '/users/add',
         },
       ],
     },
     {
-      label: 'الإعدادات',
+      labelKey: 'settings',
       imgUrl: headerIcons.settings.imgUrl,
       routerLink: '/settings',
       children: [
         {
-          label: 'إعدادات البرنامج',
+          labelKey: 'program',
           imgUrl: headerIcons.settings.children.program,
           routerLink: '/settings/program',
           subLinks: ['/settings/program/language', '/settings/program/support', '/settings/program/about'],
         },
         {
-          label: 'إعدادات الماليه',
+          labelKey: 'financial',
           imgUrl: headerIcons.settings.children.financial,
           routerLink: '/settings/financial',
         },
         {
-          label: 'إداره فتح/ غلق اليوميه',
+          labelKey: 'dailyOpeningClosing',
           imgUrl: headerIcons.settings.children.dailyOpeningClosing,
           routerLink: '/settings/daily-opening-closing',
         },
         {
-          label: 'طابعه ال QR',
+          labelKey: 'qr',
           imgUrl: headerIcons.settings.children.qr,
           routerLink: '/settings/qr',
         },
         {
-          label: 'إعدادات الحسابات الإفتراضيه',
+          labelKey: 'defaultAccounts',
           imgUrl: headerIcons.settings.children.defaultAccounts,
           routerLink: '/settings/default-accounts',
         },
         {
-          label: 'إضافه طابعه',
+          labelKey: 'addPrinter',
           imgUrl: headerIcons.settings.children.addPrinter,
           routerLink: '/settings/add-printer',
         },
         {
-          label: 'اعدادات الطابعه',
+          labelKey: 'printer',
           imgUrl: headerIcons.settings.children.printerSettings,
           routerLink: '/settings/printer',
         },
       ],
     },
     {
-      label: 'بيانات البرنامج',
+      labelKey: 'appInfo',
       imgUrl: headerIcons.appInfo.imgUrl,
       routerLink: '/app-info',
       children: [
         {
-          label: 'الملف الشخصي',
+          labelKey: "profile",
           imgUrl: headerIcons.appInfo.children.profile,
           routerLink: '/app-info/profile',
         },
         {
-          label: 'بيانات المطعم',
+          labelKey: "restaurant",
           imgUrl: headerIcons.appInfo.children.restaurant,
           routerLink: '/app-info/restaurant',
         },
