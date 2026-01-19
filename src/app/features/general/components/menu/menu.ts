@@ -19,12 +19,17 @@ export interface IMenuItem {
   index: number;
   product: IProductRowResponse | null;
   meal: IMealRowResponse | null;
+  quantity: number;
+}
+
+export interface IMenuItemAddition {
+  product: IProductRowResponse;
+  quantity: number;
 }
 
 export interface IOrderMenuItem {
   menuItem: IMenuItem;
-  additions: IProductRowResponse[];
-  quantity: number;
+  additions: IMenuItemAddition[];
 }
 
 @Component({
@@ -240,6 +245,7 @@ export class Menu extends BaseComponent {
       index,
       product: product,
       meal: null,
+      quantity: 1,
     };
   }
 
@@ -249,6 +255,7 @@ export class Menu extends BaseComponent {
       index,
       product: null,
       meal: meal,
+      quantity: 1,
     };
   }
 
@@ -270,10 +277,10 @@ export class Menu extends BaseComponent {
   }
 
   addMenuItem(menuItem: IMenuItem, quantity: number) {
-    this.menuItemChange.emit({ menuItem, quantity, additions: [] });
+    this.menuItemChange.emit({ menuItem: { ...menuItem, quantity }, additions: [] });
   }
 
   removeMenuItem(menuItem: IMenuItem, quantity: number) {
-    this.menuItemChange.emit({ menuItem, quantity: -quantity, additions: [] });
+    this.menuItemChange.emit({ menuItem: { ...menuItem, quantity: -quantity }, additions: [] });
   }
 }

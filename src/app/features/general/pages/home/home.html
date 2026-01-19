@@ -212,7 +212,7 @@
             </tr>
           </thead>
           <tbody class="text-sm">
-            @for (orderMenuItem of orderMenuItems; track $index) {
+            @for (orderMenuItem of orderMenuItems(); track $index) {
               <tr class="text-xs *:py-1 fade-in">
                 <!-- actions -->
                 <td>
@@ -237,7 +237,7 @@
                     <!-- additions -->
                     <svg
                       class="cursor-pointer"
-                      (click)="showAdditionsDialog()"
+                      (click)="showAdditionsDialog($index)"
                       width="20"
                       height="20"
                       viewBox="0 0 20 20"
@@ -284,18 +284,35 @@
                         : orderMenuItem.menuItem.product?.name;
                     <span class="">{{ label }}</span>
                     <!--  additional items -->
-                    <div class="flex items-center justify-center gap-2 overflow-visible!">
-                      @for (item of ['بيبسي', 'ماكروني', 'أرز']; track $index) {
-                        <div class="relative border border-text-light rounded-md overflow-visible!">
-                          <div class="py-0.5 px-1 text-[10px] font-semibold">{{ item }}</div>
+                    <p-carousel
+                      [value]="orderMenuItems()[$index].additions"
+                      [numVisible]="3"
+                      [numScroll]="1"
+                      [circular]="false"
+                      [responsiveOptions]="orderRecipeAdditionsResponsiveOptions"
+                      contentClass="-mt-1.5"
+                      [showIndicators]="false"
+                      [hidden]="orderMenuItems()[$index].additions.length === 0"
+                      dir="lrt"
+                      class="max-w-70 [&_.p-carousel-prev-button>*]:h-fit! [&_.p-carousel-prev-button>*]:p-0! [&_.p-carousel-next-button>*]:h-fit! [&_.p-carousel-next-button>*]:p-0!"
+                    >
+                      <ng-template let-addition #item>
+                        <div class="relative pt-1.5 pl-1.5">
+                          <div class="border border-text-light rounded-md overflow-visible!">
+                            <div
+                              class="py-0.5 px-1 text-[10px] font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                            >
+                              {{ addition.product.name }}
+                            </div>
+                          </div>
                           <div
-                            class="flex items-center justify-center rounded-full bg-text-lighter w-3 text-[#FA8D7B] font-bold text-[10px] aspect-square leading-none absolute -top-1.5 -left-1.5"
+                            class="flex items-center justify-center rounded-full bg-text-lighter w-3 text-[#FA8D7B] font-bold text-[10px] aspect-square leading-none absolute -top-0 -left-0"
                           >
-                            <span class="h-fit">1</span>
+                            <span class="h-fit">{{ addition.quantity }}</span>
                           </div>
                         </div>
-                      }
-                    </div>
+                      </ng-template>
+                    </p-carousel>
                   </div>
                 </td>
                 <!-- quantity -->
@@ -320,7 +337,7 @@
                       </svg>
                     </button>
                     <!-- quantity -->
-                    <span class="font-bold">{{ orderMenuItem.quantity }}</span>
+                    <span class="font-bold">{{ orderMenuItem.menuItem.quantity }}</span>
                     <!-- reduce quantity -->
                     <button
                       pButton
@@ -357,12 +374,12 @@
                 </td>
                 <!-- total -->
                 <td class="font-semibold">
-                  <span>{{ (+(unitPrice ?? 0) * orderMenuItem.quantity).toFixed(2) }}</span>
+                  <div class="scale-in">{{ (+(unitPrice ?? 0) * orderMenuItem.menuItem.quantity).toFixed(2) }}</div>
                 </td>
                 <!-- tax -->
-                <td class="font-semibold"><span>50</span></td>
+                <td class="font-semibold"><div class="scale-in">50</div></td>
                 <!-- net -->
-                <td class="font-semibold"><span>1050</span></td>
+                <td class="font-semibold"><div class="scale-in">1050</div></td>
               </tr>
             }
           </tbody>
@@ -451,31 +468,50 @@
   <p class="font-bold text-center text-dark-bg-2 text-lg">الاضافات</p>
 
   <div class="flex-1 overflow-auto no-scrollbar" appDebounce debounceEvent="scroll" (debounced)="onHutsScroll($event)">
-    <div class="grid grid-cols-4 gap-2"  >
-      @for (item of additions(); track $index) {
-        <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-center p-2">
+    <div class="grid grid-cols-4 gap-2">
+      @for (item of additionsProducts(); track $index) {
+        <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-between p-2">
           <img class="w-20" appImgFallback fallBackLink="/images/placeholders/menu-item.png" src="" alt="" />
           <div class="flex items-center justify-between w-full text-dark-line font-bold">
             <span class="w-full text-ellipsis overflow-hidden">{{ item.name }}</span>
             <span>{{ item.price.toFixed(2) }}</span>
           </div>
-          <div class="flex items-center justify-center gap-4">
-            <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
-              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
-                  fill="#ffffff"
-                />
-              </svg>
+          <div class="w-full flex items-center justify-center gap-4">
+            <button
+              (click)="addAddition(item, +additionQuantity.value)"
+              type="button"
+              pButton
+              class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
+              style="
+                --p-button-primary-background: var(--color-text-gray);
+                --p-button-primary-color: var(--color-text-lighter);
+              "
+            >
+              <i class="pi pi-plus text-[8px]!"></i>
             </button>
-            <span class="font-bold text-dark-line">2</span>
-            <button type="button" class="bg-text-gray p-2 rounded cursor-pointer">
-              <svg width="8" height="8" viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
-                  fill="#ffffff"
-                />
-              </svg>
+            <input
+              #additionQuantity
+              appAllowNumbers
+              type="number"
+              [min]="1"
+              [max]="1000"
+              [defaultValue]="1"
+              class="font-bold text-dark-line w-full flex-1 text-center outline-none no-input-spinner"
+            />
+            <!-- remove -->
+            <button
+              (click)="removeAddition(item, +additionQuantity.value)"
+              type="button"
+              pButton
+              class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
+              style="
+                --p-button-primary-background: var(--color-text-gray);
+                --p-button-primary-color: var(--color-text-lighter);
+                --p-button-primary-hover-background: red;
+                --p-button-primary-active-background: rgba(255, 0, 0, 0.538);
+              "
+            >
+              <i class="pi pi-minus text-[8px]!"></i>
             </button>
           </div>
         </div>
@@ -484,15 +520,38 @@
   </div>
 
   <ng-template #footer>
-    <p-button
-      label="Cancel"
-      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
-      styleClass=" bg-[#EA7C69]! text-white! px-6!"
-      [text]="true"
-      class="mx-auto"
-      severity="secondary"
-      (click)="additionsDialogVisible = false"
-    />
+    <app-slider [template]="additionTemplate" [items]="orderMenuItems()[currentMenuItemIx()].additions" [config]="{ itemWidth: 100 }" />
+
+    <ng-template #additionTemplate let-addition>
+      <div class="relative pt-1.5 pl-1.5">
+        <div class="border border-text-light rounded-md overflow-visible!">
+          <img [src]="baseUrl + addition.product?.images[0]?.fullPath" appImgFallback alt="" class="w-10" />
+          <span class="py-0.5 px-1 text-[10px] font-semibold overflow-hidden text-ellipsis whitespace-nowrap">{{
+            addition.product.name
+          }}</span>
+        </div>
+        <div
+          class="flex items-center justify-center rounded-full bg-text-lighter w-3 text-[#FA8D7B] font-bold text-[10px] aspect-square leading-none absolute -top-0 -left-0"
+        >
+          <span class="h-fit">{{ addition.quantity }}</span>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- <p-galleria
+      [value]="orderMenuItems()[currentMenuItemIx()].additions"
+      [responsiveOptions]="[]"
+      [containerStyle]="{ 'max-width': '640px' }"
+      [numVisible]="5"
+
+      class="[&_.p-galleria-thumbnail-item]:overflow-hidden! w-full"
+      dir="ltr"
+    >
+ 
+      <ng-template #thumbnail let-addition>
+        
+      </ng-template>
+    </p-galleria> -->
   </ng-template>
 </p-dialog>
 

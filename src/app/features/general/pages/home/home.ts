@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { IMenuItem, IOrderMenuItem, Menu } from '../../components/menu/menu';
 import { ButtonModule } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -13,6 +13,8 @@ import { IProductRowResponse, ProductSearchEnum, ProductService } from '@/featur
 import { IMealRowResponse } from '@/features/classes/services/meal-service';
 import { GroupService, IGroupRowResponse, IGroupSearchResponseValue } from '@/features/classes/services/group-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
+import { GalleriaModule } from 'primeng/galleria';
+import { Slider } from '../../components/slider/slider';
 import {
   IOrderCreateCustomerRequest,
   IOrderCreateItem,
@@ -30,6 +32,7 @@ import { HutSearchEnum, HutService, IHutRowResponse } from '@/features/restauran
 import { Debounce } from '@/directives/debounce';
 import { ITableRowResponse, TableSearchEnum, TableService } from '@/features/restaurant/services/table-service';
 import { IRoomRowResponse, RoomSearchEnum, RoomService } from '@/features/restaurant/services/room-service';
+import { Carousel } from 'primeng/carousel';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -66,6 +69,8 @@ interface IOrderCreateFgValue {
     TableCard,
     DatePipe,
     Debounce,
+    Carousel,
+    GalleriaModule,Slider
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -117,11 +122,7 @@ export class Home extends BaseComponent {
 
   orderFg = this.fb.group(this.initialOrderFgValue);
 
-  orderMenuItems: IOrderMenuItem[] = [];
-
-  showAdditionsDialog() {
-    this.additionsDialogVisible = true;
-  }
+  orderMenuItems = signal<IOrderMenuItem[]>([]);
 
   /**
    *
@@ -141,40 +142,73 @@ export class Home extends BaseComponent {
   }
 
   onMenuItemChange(changedItem: IOrderMenuItem) {
-    const existingItemIx = this.orderMenuItems.findIndex((item) => item.menuItem.id == changedItem.menuItem.id);
+    const existingItem = this.orderMenuItems().find((item) => item.menuItem.id == changedItem.menuItem.id);
 
-    if (existingItemIx > -1) {
-      const futureQuantity = this.orderMenuItems[existingItemIx].quantity + changedItem.quantity;
+    if (existingItem) {
+      const futureQuantity = existingItem.menuItem.quantity + changedItem.menuItem.quantity;
 
       if (futureQuantity >= 1000) {
-        this.orderMenuItems[existingItemIx].quantity = 1000;
+        this.orderMenuItems.update((items) =>
+          items.map((item) =>
+            item.menuItem.id == existingItem.menuItem.id
+              ? { ...item, menuItem: { ...item.menuItem, quantity: 1000 } }
+              : item,
+          ),
+        );
         return;
       }
 
-      this.orderMenuItems[existingItemIx].quantity += changedItem.quantity;
-      if (this.orderMenuItems[existingItemIx].quantity <= 0) this.orderMenuItems.splice(existingItemIx, 1);
+      if (futureQuantity <= 0) {
+        this.orderMenuItems.update((items) => items.filter((item) => item.menuItem.id != changedItem.menuItem.id));
+        return;
+      }
+
+      this.orderMenuItems.update((items) =>
+        items.map((item) =>
+          item.menuItem.id == existingItem.menuItem.id
+            ? { ...item, menuItem: { ...item.menuItem, quantity: futureQuantity } }
+            : item,
+        ),
+      );
     } else {
-      if (changedItem.quantity <= 0) return;
-      this.orderMenuItems.push(changedItem);
+      if (changedItem.menuItem.quantity <= 0) return;
+      this.orderMenuItems.update((items) => items.concat(changedItem));
     }
   }
 
   onReduceOrderMenuItemQuantity(index: number, quantity: number) {
-    this.orderMenuItems[index].quantity -= quantity;
-    if (this.orderMenuItems[index].quantity <= 0) this.orderMenuItems.splice(index, 1);
+    const oldQuantity = this.orderMenuItems()[index].menuItem.quantity;
+
+    if (oldQuantity - quantity <= 0) {
+      this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
+    } else {
+      this.orderMenuItems.update((items) =>
+        items.map((item, i) =>
+          i == index ? { ...item, menuItem: { ...item.menuItem, quantity: oldQuantity - quantity } } : item,
+        ),
+      );
+    }
   }
 
   onAddOrderMenuItemQuantity(index: number, quantity: number) {
-    const futureQuantity = this.orderMenuItems[index].quantity + quantity;
+    const futureQuantity = this.orderMenuItems()[index].menuItem.quantity + quantity;
+
     if (futureQuantity >= 1000) {
-      this.orderMenuItems[index].quantity = 1000;
+      this.orderMenuItems.update((items) =>
+        items.map((item, i) => (i == index ? { ...item, menuItem: { ...item.menuItem, quantity: 1000 } } : item)),
+      );
+      return;
     } else {
-      this.orderMenuItems[index].quantity += quantity;
+      this.orderMenuItems.update((items) =>
+        items.map((item, i) =>
+          i == index ? { ...item, menuItem: { ...item.menuItem, quantity: futureQuantity } } : item,
+        ),
+      );
     }
   }
 
   onRemoveOrderMenuItem(index: number) {
-    this.orderMenuItems.splice(index, 1);
+    this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
   }
 
   onSubmitCreateOrder() {
@@ -341,8 +375,53 @@ export class Home extends BaseComponent {
   //
   //additions
 
+  orderRecipeAdditionsResponsiveOptions = [
+    {
+      breakpoint: '1400px',
+      numVisible: 3,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '1199px',
+      numVisible: 3,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '767px',
+      numVisible: 2,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '575px',
+      numVisible: 1,
+      numScroll: 1,
+    },
+  ];
+  additionsDialogResponsiveOptions = [
+    {
+      breakpoint: '1400px',
+      numVisible: 7,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '1199px',
+      numVisible: 5,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '767px',
+      numVisible: 4,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '575px',
+      numVisible: 2,
+      numScroll: 1,
+    },
+  ];
   productService = inject(ProductService);
-  additions = signal<IProductRowResponse[]>([]);
+  additionsProducts = signal<IProductRowResponse[]>([]);
+  currentMenuItemIx = signal(0);
   additionPaginationInfo: {
     pageIndex: number;
     totalPagesCount: number;
@@ -363,7 +442,7 @@ export class Home extends BaseComponent {
       .subscribe({
         next: (res) => {
           if (res.rows.length > 0) {
-            this.additions.update((prev) => prev.concat(res.rows));
+            this.additionsProducts.update((prev) => prev.concat(res.rows));
             this.additionPaginationInfo = {
               pageIndex,
               totalPagesCount: res.paginationInfo.totalPagesCount,
@@ -381,4 +460,78 @@ export class Home extends BaseComponent {
       this.searchAdditions(this.additionPaginationInfo.pageIndex + 1);
     }
   }
+
+  showAdditionsDialog(currentMenuItemIx: number) {
+    this.currentMenuItemIx.set(currentMenuItemIx);
+    this.additionsDialogVisible = true;
+  }
+
+  addAddition(item: IProductRowResponse, quantity: number) {
+    const previousAdditionIx = this.orderMenuItems()[this.currentMenuItemIx()].additions.findIndex(
+      (addition) => addition.product.id === item.id,
+    );
+
+    if (previousAdditionIx > -1) {
+      const previousAddition = this.orderMenuItems()[this.currentMenuItemIx()].additions[previousAdditionIx];
+
+      //check if new quantity is less or equal 1000
+      if (previousAddition.quantity + quantity > 1000) {
+        this._updateAdditionQuantity(1000, previousAdditionIx, item);
+      } else {
+        this._updateAdditionQuantity((previousAddition.quantity += quantity), previousAdditionIx, item);
+      }
+    } else {
+      this._updateAdditionQuantity(quantity, previousAdditionIx, item);
+    }
+  }
+
+  removeAddition(item: IProductRowResponse, quantity: number) {
+    const previousAdditionQuantity = this.orderMenuItems()[this.currentMenuItemIx()].additions.find(
+      (addition) => addition.product.id === item.id,
+    )!.quantity;
+
+    this._updateAdditionQuantity(previousAdditionQuantity - quantity, -1, item);
+  }
+
+  _updateAdditionQuantity(quantity: number, additionIx: number, item: IProductRowResponse) {
+    if (additionIx > -1) {
+      //update quantity
+      if (quantity > 0) {
+        this.orderMenuItems.update((orderItems) =>
+          orderItems.map((orderItem, i) =>
+            i == this.currentMenuItemIx()
+              ? {
+                  ...orderItem,
+                  additions: orderItem.additions.map((addition, j) =>
+                    j == additionIx ? { ...addition, quantity } : addition,
+                  ),
+                }
+              : orderItem,
+          ),
+        );
+      } else {
+        this.orderMenuItems.update((orderItems) =>
+          orderItems.map((orderItem, i) =>
+            i == this.currentMenuItemIx()
+              ? {
+                  ...orderItem,
+                  additions: orderItem.additions.filter((addition, j) => j != additionIx),
+                }
+              : orderItem,
+          ),
+        );
+      }
+    } else {
+      //add new
+      this.orderMenuItems.update((orderItems) =>
+        orderItems.map((orderItem, i) =>
+          i == this.currentMenuItemIx()
+            ? { ...orderItem, additions: orderItem.additions.concat({ product: item, quantity: quantity }) }
+            : orderItem,
+        ),
+      );
+    }
+  }
+
+ 
 }

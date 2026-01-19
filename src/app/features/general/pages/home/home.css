@@ -11,19 +11,33 @@
 }
 
 .fade-in {
-  &   * {
-    overflow: hidden;
+  & td > * {
     animation: fadeIn 0.5s linear forwards;
+  }
+}
+
+.scale-in{
+  /* jump */
+  animation: scale-in 0.5s ease-in-out forwards;
+}
+@keyframes scale-in {
+  0% {
+    scale: 2;
+  }
+  100% {
+    scale: 1;
   }
 }
 
 @keyframes fadeIn {
   0% {
     opacity:0;
+    overflow: hidden;
     max-height: 0;
   }
   100% {
     opacity: 1;
+    overflow: visible;
     max-height: 100px;
   }
 }
