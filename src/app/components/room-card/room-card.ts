@@ -1,5 +1,5 @@
 import { IRoomRowResponse } from '@/features/restaurant/services/room-service';
-import { Component, input, signal } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 
 export enum RoomStatus {
   Available = 0,
@@ -27,16 +27,17 @@ export class RoomCard {
     }
   }
 
-  get roomStatusClass() {
+    roomStatusClass= computed(() => {
     switch (this.hutStatus()) {
       case RoomStatus.Available:
-        return 'replacements-available';
+        return 'room-available';
       case RoomStatus.Reserved:
-        return 'replacements-reserved';
+        return 'room-reserved';
       case RoomStatus.OnHold:
-        return 'replacements-on-hold';
+        return 'room-on-hold';
       default:
         return '';
     }
-  }
+    
+  })
 }

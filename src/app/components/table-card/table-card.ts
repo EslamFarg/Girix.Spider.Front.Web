@@ -1,5 +1,5 @@
 import { ITableRowResponse } from '@/features/restaurant/services/table-service';
-import { Component, input, signal } from '@angular/core';
+import { Component, input, signal, computed } from '@angular/core';
 export enum TableStatus {
   Available = 0,
   Reserved = 1,
@@ -17,7 +17,6 @@ export class TableCard {
   data = input.required<ITableRowResponse>();
 
   ngOnInit() {
- 
     if (this.data().isAvailable) {
       this.tableStatus.set(TableStatus.Available);
     } else {
@@ -25,16 +24,16 @@ export class TableCard {
     }
   }
 
-  get roomStatusClass() {
+  tableStatusClass = computed(() => {
     switch (this.tableStatus()) {
       case TableStatus.Available:
-        return 'replacements-available';
+        return ' table-available';
       case TableStatus.Reserved:
-        return 'replacements-reserved';
+        return ' table-reserved';
       case TableStatus.OnHold:
-        return 'replacements-on-hold';
+        return ' table-on-hold';
       default:
         return '';
     }
-  }
+  });
 }

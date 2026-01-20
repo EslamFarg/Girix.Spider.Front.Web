@@ -9,6 +9,7 @@ import { NgTemplateOutlet } from '@angular/common';
 })
 export class Slider {
   items = input<any[]>();
+  valueVar=0;
   config = input<{
     itemWidth: number;
   }>({

@@ -1,4 +1,4 @@
-<app-section-wrapper class="block mt-4 p-4 overflow-auto custom-scroll">
+<app-section-wrapper class="block mt-4 p-4 overflow-auto custom-scroll h-full" styleClass="no-scrollbar">
   <!-- search -->
   <form #form [formGroup]="fg" (ngSubmit)="onSubmit()">
     <app-input-error-message-handler [fc]="fg.get('text')">
@@ -26,11 +26,22 @@
 
   <!-- items grid -->
   <div
-    class="grid gap-4 sm:grid-cols-3 sm:gap-[1rem_2rem] md:grid-cols-4 md:gap-[2rem_4rem] lg:grid-cols-5 lg:gap-[3rem_6rem] xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8"
-    style="row-gap: 4rem; column-gap: 7rem"
-  >
+    class="grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-7 md:grid-cols-4 md:gap-9 xl:grid-cols-6 xl:gap-[4rem_7rem]  my-4 mt-8"
+   >
     @for (item of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 ]; track $index) {
-    <div
+      <app-room-card
+      (click)="openDialog()"
+        [data]="{
+          id: $index,
+          name: 'string',
+          pricePerHour: $index * 10,
+          isAvailable: $index % 2 == 0,
+          reservedTo: '2026-10-01T00:00:00Z',
+          reservedFrom: '2026-01-01T00:00:00Z',
+          orderId: $index,
+        }"
+      />
+    <!-- <div
       style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
       class="flex border cursor-pointer border-[#393C49] aspect-[0.89] available items-center justify-center bg-white rounded"
       [class.replacements-available]="$index % 3 == 0"
@@ -38,7 +49,7 @@
       (click)="openDialog()"
     >
       <span class="text-black font-bold">R{{ $index + 1 }}</span>
-    </div>
+    </div> -->
     }
   </div>
 

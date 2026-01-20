@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Replacements, SpacesEnum } from '../../services/replacements';
 import { Paginator } from 'primeng/paginator';
 import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdown';
+import { HutCard } from '@/components/hut-card/hut-card';
 @Component({
   selector: 'app-huts',
   imports: [
@@ -18,6 +19,7 @@ import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdo
     ReactiveFormsModule,
     Paginator,
     CountdownComponent,
+    HutCard
   ],
   templateUrl: './huts.html',
   styleUrl: './huts.css',
@@ -31,6 +33,11 @@ export class Huts extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
   onSubmit() {}
 
+  dateNow = new Date();
+  getFutureDate() {
+    this.dateNow.setDate(this.dateNow.getDate() + 1);
+    return this.dateNow.toISOString();
+  }
   first = 0;
   rows = 10;
   onPageChange(event: any) {}

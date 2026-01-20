@@ -1,6 +1,6 @@
 <div class="p-4 h-full overflow-auto custom-scroll">
   <app-section-wrapper>
-    <div class="grid grid-cols-4 gap-4 flex-1 my-4">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 my-4">
       <!-- invoice number -->
       <div>
         <label for="productName">رقم التسويه</label>
@@ -173,55 +173,74 @@
         </tr>
       </thead>
       <tbody>
-        @for (item of [1,2,3,4,5,6,7]; track $index) {
-        <tr class="">
-          <td class="w-[50px]">م</td>
-          <td>123456</td>
-          <td>كرسبي</td>
-          <td>1</td>
-          <td>120.00</td>
-          <td>100.00</td>
-          <td>34</td>
-          <td>30</td>
-          <td>0</td>
-          <td>5</td>
-          <td>
-            <div class="actions">
-              <button type="button" class="edit bg-[#34C759]/40! rounded-lg!">
-                <svg width="11" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M3.8982 7.7958C3.6294 7.7958 3.3606 7.6938 3.1554 7.4886L0.3078 4.641C-0.1026 4.2306 -0.1026 3.5658 0.3078 3.1566C0.7182 2.7462 1.3818 2.745 1.7922 3.1554L3.8982 5.2614L8.8518 0.3078C9.2622 -0.1026 9.9258 -0.1026 10.3362 0.3078C10.7466 0.7182 10.7466 1.383 10.3362 1.7934L4.641 7.4886C4.4358 7.6938 4.167 7.7958 3.8982 7.7958Z"
-                    fill="#34C759"
-                  />
-                </svg>
-              </button>
-              <button type="button" class="delete">
-                <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    opacity="0.4"
-                    d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z"
-                    fill="#FF383C"
-                  />
-                  <path
-                    d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z"
-                    fill="#FF383C"
-                  />
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
+        @for (item of [1, 2, 3, 4, 5, 6, 7]; track $index) {
+          <tr class="">
+            <td class="w-[50px]">م</td>
+            <td>123456</td>
+            <td>كرسبي</td>
+            <td>1</td>
+            <td>120.00</td>
+            <td>100.00</td>
+            <td>34</td>
+            <td>30</td>
+            <td>0</td>
+            <td>5</td>
+            <td>
+              <div class="actions">
+                <button type="button" class="edit bg-[#34C759]/40! rounded-lg!">
+                  <svg width="11" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M3.8982 7.7958C3.6294 7.7958 3.3606 7.6938 3.1554 7.4886L0.3078 4.641C-0.1026 4.2306 -0.1026 3.5658 0.3078 3.1566C0.7182 2.7462 1.3818 2.745 1.7922 3.1554L3.8982 5.2614L8.8518 0.3078C9.2622 -0.1026 9.9258 -0.1026 10.3362 0.3078C10.7466 0.7182 10.7466 1.383 10.3362 1.7934L4.641 7.4886C4.4358 7.6938 4.167 7.7958 3.8982 7.7958Z"
+                      fill="#34C759"
+                    />
+                  </svg>
+                </button>
+                <button type="button" class="delete">
+                  <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      opacity="0.4"
+                      d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z"
+                      fill="#FF383C"
+                    />
+                    <path
+                      d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z"
+                      fill="#FF383C"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
         }
       </tbody>
     </table>
-    <div class="flex justify-between gap-4">
+    <div class="flex flex-col md:flex-row justify-between gap-4">
       <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
-    <div class="flex items-center gap-2 justify-end">
-      <p-button styleClass="border-dark-line! bg-dark-line! text-white! py-1! px-8!" label="حفظ" />
-      <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="حذف" variant="outlined" />
-      <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="جديد" variant="outlined" />
-      <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="طباعة" variant="outlined" />
-    </div>
+      <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 mb-4">
+        <p-button
+          class="flex-1 md:flex-none"
+          styleClass="border-dark-line! bg-dark-line! text-white! py-1! w-full  md:px-8!"
+          label="حفظ"
+        />
+        <p-button
+          class="flex-1 md:flex-none"
+          styleClass="border-dark-line! text-dark-line! py-1!  w-full md:px-8!"
+          label="حذف"
+          variant="outlined"
+        />
+        <p-button
+          class="flex-1 md:flex-none"
+          styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
+          label="جديد"
+          variant="outlined"
+        />
+        <p-button
+          class="flex-1 md:flex-none"
+          styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
+          label="طباعة"
+          variant="outlined"
+        />
+      </div>
     </div>
   </app-section-wrapper>
 </div>

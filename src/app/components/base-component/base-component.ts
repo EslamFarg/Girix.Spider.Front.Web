@@ -27,6 +27,7 @@ export class BaseComponent<ItemType = any> {
   translateService = inject(TranslateService);
 
   isLoading = this.layoutService.isLoading;
+ 
 
   items = signal<ItemType[]>([]);
   getRowNumber = (index: number, pageNumber: number) => index + 1 + (pageNumber - 1) * 10;

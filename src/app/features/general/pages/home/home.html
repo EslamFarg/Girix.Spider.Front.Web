@@ -277,42 +277,37 @@
                   </div>
                 </td>
                 <td>
-                  <div class="flex flex-col gap-1 text-center px-4">
+                  <div class="flex flex-col gap-1 text-center px-4 items-center">
                     @let label =
                       orderMenuItem.menuItem.meal
                         ? orderMenuItem.menuItem.meal.name
                         : orderMenuItem.menuItem.product?.name;
-                    <span class="">{{ label }}</span>
+                    <div class="overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">{{ label }}</div>
                     <!--  additional items -->
-                    <p-carousel
-                      [value]="orderMenuItems()[$index].additions"
-                      [numVisible]="3"
-                      [numScroll]="1"
-                      [circular]="false"
-                      [responsiveOptions]="orderRecipeAdditionsResponsiveOptions"
-                      contentClass="-mt-1.5"
-                      [showIndicators]="false"
-                      [hidden]="orderMenuItems()[$index].additions.length === 0"
-                      dir="lrt"
-                      class="max-w-70 [&_.p-carousel-prev-button>*]:h-fit! [&_.p-carousel-prev-button>*]:p-0! [&_.p-carousel-next-button>*]:h-fit! [&_.p-carousel-next-button>*]:p-0!"
-                    >
-                      <ng-template let-addition #item>
-                        <div class="relative pt-1.5 pl-1.5">
-                          <div class="border border-text-light rounded-md overflow-visible!">
-                            <div
-                              class="py-0.5 px-1 text-[10px] font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-                            >
-                              {{ addition.product.name }}
-                            </div>
-                          </div>
+                    <app-slider
+                      [class]="`max-w-[300px] -mt-1.5 overflow-hidden xl:max-w-[250px] [&_.nav-btn]:p-1! [&_.nav-btn_*]:text-sm!  `"
+                      [template]="additionTemplate"
+                      [items]="orderMenuItems()[$index].additions"
+                      [config]="{ itemWidth: 70 }"
+                    />
+
+                    <ng-template #additionTemplate let-addition>
+                      <div class="relative pt-1.5 pl-1.5">
+                        <div class="border border-text-light rounded-md overflow-visible!">
                           <div
-                            class="flex items-center justify-center rounded-full bg-text-lighter w-3 text-[#FA8D7B] font-bold text-[10px] aspect-square leading-none absolute -top-0 -left-0"
+                          [title]="addition.product.name"
+                            class="py-0.5 px-1 text-[10px] font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                           >
-                            <span class="h-fit">{{ addition.quantity }}</span>
+                            {{ addition.product.name }}
                           </div>
                         </div>
-                      </ng-template>
-                    </p-carousel>
+                        <div
+                          class="flex items-center justify-center rounded-full bg-text-lighter w-3 text-[#FA8D7B] font-bold text-[10px] aspect-square leading-none absolute -top-0 -left-0"
+                        >
+                          <span class="h-fit">{{ addition.quantity }}</span>
+                        </div>
+                      </div>
+                    </ng-template>
                   </div>
                 </td>
                 <!-- quantity -->
@@ -520,7 +515,11 @@
   </div>
 
   <ng-template #footer>
-    <app-slider [template]="additionTemplate" [items]="orderMenuItems()[currentMenuItemIx()].additions" [config]="{ itemWidth: 100 }" />
+    <app-slider
+      [template]="additionTemplate"
+      [items]="orderMenuItems()[currentMenuItemIx()].additions"
+      [config]="{ itemWidth: 100 }"
+    />
 
     <ng-template #additionTemplate let-addition>
       <div class="relative pt-1.5 pl-1.5">

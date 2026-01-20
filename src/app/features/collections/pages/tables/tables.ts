@@ -8,10 +8,11 @@ import { InputErrorMessageHandler } from "@/components/input-error-message-handl
 import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
 import { InputText } from "primeng/inputtext";
 import { CollectionsService } from '../../services/collections-service';
+import { TableCard } from '@/components/table-card/table-card';
 
 @Component({
   selector: 'app-tables',
-  imports: [Paginator, InputGroupAddon, InputErrorMessageHandler, SectionWrapper, InputText,ReactiveFormsModule],
+  imports: [Paginator, InputGroupAddon, InputErrorMessageHandler, SectionWrapper, InputText,ReactiveFormsModule,TableCard],
   templateUrl: './tables.html',
   styleUrl: './tables.css',
 })

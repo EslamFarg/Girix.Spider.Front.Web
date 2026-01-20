@@ -7,10 +7,11 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { Paginator } from 'primeng/paginator';
 import { Replacements, SpacesEnum } from '../../services/replacements';
+import { RoomCard } from '@/components/room-card/room-card';
 
 @Component({
   selector: 'app-rooms',
-  imports: [SectionWrapper, InputErrorMessageHandler, InputGroupAddon, ReactiveFormsModule, InputTextModule, Paginator],
+  imports: [SectionWrapper, InputErrorMessageHandler, InputGroupAddon, ReactiveFormsModule, InputTextModule, Paginator,RoomCard],
   templateUrl: './rooms.html',
   styleUrl: './rooms.css',
 })

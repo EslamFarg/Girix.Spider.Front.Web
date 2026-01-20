@@ -1,4 +1,4 @@
-<app-section-wrapper class="block mt-4 p-4 overflow-auto custom-scroll">
+<app-section-wrapper class="block p-4 pt-8 overflow-auto custom-scroll h-full" styleClass="no-scrollbar">
   <!-- search -->
   <form #form [formGroup]="fg" (ngSubmit)="onSubmit()">
     <app-input-error-message-handler [fc]="fg.get('text')">
@@ -25,10 +25,27 @@
   </form>
 
   <!-- items grid -->
-  <div class="grid grid-cols-6 my-4 mt-25" style="row-gap: 8rem; column-gap: 6rem">
+  <div
+    class="grid grid-cols-2 gap-[6rem_1.5rem] sm:grid-cols-3 sm:gap-[7rem_2rem] md:grid-cols-4 md:gap-[7rem_2rem] lg:grid-cols-5 lg:gap-[7rem_3rem] xl:grid-cols-6 xl:gap-[7rem_4rem] my-4"
+  >
     @for (item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]; track $index) {
-      <div
-        class="relative text-black cursor-pointer"
+      <app-hut-card
+        (click)="openDialog()"
+        class="self-end"
+        [class.mt-[50%]]="$first"
+        [data]="{
+          id: $index,
+          name: 'string',
+          pricePerHour: $index * 10,
+          isAvailable: $index % 2 === 1,
+          reservedTo: $index % 4 === 0 ? getFutureDate() : '2026-10-01T00:00:00Z',
+          reservedFrom: '2026-01-01T00:00:00Z',
+          orderId: $index,
+        }"
+      />
+      <!-- <div
+        class="relative text-black cursor-pointer self-end"
+        
         [class.hut-available]="$index % 3 == 0"
         [class.hut-reserved]="$index % 4 == 1"
         [class.hut-on-hold]="$index % 5 == 1"
@@ -54,11 +71,9 @@
           [config]="countdownConfig"
           (event)="handleCountdownEvent($event)"
         />
-      </div>
+      </div> -->
     }
   </div>
-
-  <button class="hover:bg-amber-500">click</button>
 
   <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
 </app-section-wrapper>

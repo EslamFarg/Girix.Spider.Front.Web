@@ -58,7 +58,6 @@ export class Products extends BaseComponent<IProductRowResponse> {
 
   constructor() {
     super();
-
     this.searchProducts(1);
   }
 

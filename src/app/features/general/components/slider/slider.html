@@ -1,7 +1,8 @@
 <div class="flex gap-2 items-center w-full" style="--p-button-primary-background:transparent;--p-button-primary-color:black">
-  <button (click)="scrollRight()" pButton class="border-0!">
+  <button (click)="scrollRight()" pButton class="border-0! nav-btn">
     <i class="pi pi-chevron-right"></i>
   </button>
+
   <div class="flex-1 overflow-hidden">
     <div class="flex items-center w-full overflow-auto no-scrollbar" #itemsContainer>
       @for (item of items(); track $index) {
@@ -11,7 +12,8 @@
       }
     </div>
   </div>
-  <button (click)="scrollLeft()" pButton class="border-0!">
+
+  <button (click)="scrollLeft()" pButton class="border-0! nav-btn">
     <i class="pi pi-chevron-left"></i>
   </button>
 </div>

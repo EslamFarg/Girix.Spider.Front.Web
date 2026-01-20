@@ -24,9 +24,9 @@ import {
   OrderService,
   OrderLocationType,
 } from '@/features/invoices/services/order-service';
-import { HutCard } from '@/features/collections/components/hut-card/hut-card';
-import { RoomCard } from '@/features/collections/components/room-card/room-card';
-import { TableCard } from '@/features/collections/components/table-card/table-card';
+import { HutCard } from '@/components/hut-card/hut-card';
+import { RoomCard } from '@/components/room-card/room-card';
+import { TableCard } from '@/components/table-card/table-card';
 import { DatePipe } from '@angular/common';
 import { HutSearchEnum, HutService, IHutRowResponse } from '@/features/restaurant/services/hut-service';
 import { Debounce } from '@/directives/debounce';
@@ -176,20 +176,6 @@ export class Home extends BaseComponent {
     }
   }
 
-  onReduceOrderMenuItemQuantity(index: number, quantity: number) {
-    const oldQuantity = this.orderMenuItems()[index].menuItem.quantity;
-
-    if (oldQuantity - quantity <= 0) {
-      this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
-    } else {
-      this.orderMenuItems.update((items) =>
-        items.map((item, i) =>
-          i == index ? { ...item, menuItem: { ...item.menuItem, quantity: oldQuantity - quantity } } : item,
-        ),
-      );
-    }
-  }
-
   onAddOrderMenuItemQuantity(index: number, quantity: number) {
     const futureQuantity = this.orderMenuItems()[index].menuItem.quantity + quantity;
 
@@ -202,6 +188,20 @@ export class Home extends BaseComponent {
       this.orderMenuItems.update((items) =>
         items.map((item, i) =>
           i == index ? { ...item, menuItem: { ...item.menuItem, quantity: futureQuantity } } : item,
+        ),
+      );
+    }
+  }
+
+  onReduceOrderMenuItemQuantity(index: number, quantity: number) {
+    const oldQuantity = this.orderMenuItems()[index].menuItem.quantity;
+
+    if (oldQuantity - quantity <= 0) {
+      this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
+    } else {
+      this.orderMenuItems.update((items) =>
+        items.map((item, i) =>
+          i == index ? { ...item, menuItem: { ...item.menuItem, quantity: oldQuantity - quantity } } : item,
         ),
       );
     }

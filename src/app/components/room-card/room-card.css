@@ -1,0 +1,24 @@
+.room-available {
+  --color: black;
+  &:hover {
+    --color: 80, 209, 170;
+    & .bordered {
+      border-color: rgb(var(--color));
+    }
+  }
+  border-color: rgb(var(--color));
+  color: rgb(var(--color));
+}
+
+.room-reserved {
+  --color: 255, 56, 60;
+  /* border-color: var(--color); */
+
+  color: rgb(var(--color));
+}
+
+.room-on-hold {
+  --color: 255, 141, 40;
+  /* border-color: rgb(var(--color)) */
+  color: rgb(var(--color));
+}

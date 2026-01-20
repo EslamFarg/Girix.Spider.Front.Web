@@ -156,22 +156,22 @@ export class Header extends BaseComponent {
       routerLink: '/replacements',
       children: [
         {
-          labelKey: 'غرف',
+          labelKey: 'rooms',
           imgUrl: headerIcons.replacements.children.rooms,
           routerLink: '/replacements/rooms',
         },
         {
-          labelKey: 'اكواخ',
+          labelKey: 'huts',
           imgUrl: headerIcons.replacements.children.huts,
           routerLink: '/replacements/huts',
         },
         {
-          labelKey: 'طاولات',
+          labelKey: 'tables',
           imgUrl: headerIcons.replacements.children.tables,
           routerLink: '/replacements/tables',
         },
         {
-          labelKey: 'ديليفري',
+          labelKey: 'deliveries',
           imgUrl: headerIcons.replacements.children.deliveries,
           routerLink: '/replacements/deliveries',
         },

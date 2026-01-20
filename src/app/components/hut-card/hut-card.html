@@ -1,4 +1,4 @@
-<div [class]="'relative text-black cursor-pointer ' + hutStatusClass">
+<div [class]="'relative text-black cursor-pointer ' + hutStatusClass()">
   <div
     class="absolute w-4/6 hut rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded-xl"
     style="
@@ -14,12 +14,13 @@
   ></div>
   <div
     style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #a3a3a34d"
-    class="flex border-2 z-10 relative bordered border-transparent aspect-[calc(110/72)] available items-center justify-center bg-white/80 rounded-2xl"
+    class="flex border-2 z-10 relative bordered border-transparent aspect-[calc(110/72)] items-center justify-center bg-white/80 rounded-2xl"
   >
     <span class="font-bold">R{{ 1 + 1 }}</span>
   </div>
   <countdown
     #countdown
+    dir="ltr"
     class="mx-auto w-fit block font-bold"
     [config]="countdownConfig"
     (event)="handleCountdownEvent($event)"
