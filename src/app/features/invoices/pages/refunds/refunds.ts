@@ -1,4 +1,4 @@
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
@@ -68,6 +68,13 @@ export class Refunds extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
+  refunds = signal<any[]>([]);
+  refundsPaginationInfo = signal<IPaginationInfo>({
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  });
+
   searchOrders(pageIndex: number) {
     this.orderService
       .search({
@@ -85,12 +92,12 @@ export class Refunds extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
-          this.items.set(res.value.rows);
-          this.paginationInfo = {
-            pageIndex: pageIndex,
+          this.refunds.set(res.value.rows);
+          this.refundsPaginationInfo.set({
+            pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
+          });
         },
       });
   }

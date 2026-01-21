@@ -1,4 +1,4 @@
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
@@ -35,7 +35,7 @@ import { Menu } from 'primeng/menu';
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
-export class Products extends BaseComponent<IProductRowResponse> {
+export class Products extends BaseComponent  {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<ProductSearchEnum>(ProductSearchEnum.Name, [Validators.required]),
@@ -69,6 +69,14 @@ export class Products extends BaseComponent<IProductRowResponse> {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
+
+   products = signal<IProductRowResponse[]>([]);
+    productsPaginationInfo:IPaginationInfo={
+      pageIndex:1,
+      totalPagesCount:0,
+      totalRowsCount:0
+    }
+
   searchProducts(pageIndex: number) {
     this.productService
       .search({
@@ -86,8 +94,8 @@ export class Products extends BaseComponent<IProductRowResponse> {
       })
       .subscribe({
         next: (res) => {
-          this.items.set(res.value.menuItems.rows);
-          this.paginationInfo = {
+          this.products.set(res.value.menuItems.rows);
+          this.productsPaginationInfo = {
             pageIndex,
             totalPagesCount: res.value.menuItems.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.menuItems.paginationInfo.totalRowsCount,

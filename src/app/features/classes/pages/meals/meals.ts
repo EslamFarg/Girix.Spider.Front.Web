@@ -1,4 +1,4 @@
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
@@ -32,7 +32,7 @@ import { Debounce } from '@/directives/debounce';
   templateUrl: './meals.html',
   styleUrl: './meals.css',
 })
-export class Meals extends BaseComponent<IMealRowResponse> {
+export class Meals extends BaseComponent  {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<MealSearchEnum>(MealSearchEnum.Name, [Validators.required]),
@@ -67,6 +67,13 @@ export class Meals extends BaseComponent<IMealRowResponse> {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
+  meals = signal<IMealRowResponse[]>([]);
+  mealsPaginationInfo:IPaginationInfo={
+    pageIndex:1,
+    totalPagesCount:0,
+    totalRowsCount:0
+  }
+
   searchMeals(pageIndex: number) {
     this.orderService
       .search({
@@ -84,8 +91,8 @@ export class Meals extends BaseComponent<IMealRowResponse> {
       })
       .subscribe({
         next: (res) => {
-          this.items.set(res.value.rows);
-          this.paginationInfo = {
+          this.meals.set(res.value.rows);
+          this.mealsPaginationInfo = {
             pageIndex, // this.isIdenticalSearch() ? pageIndex : 1,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,

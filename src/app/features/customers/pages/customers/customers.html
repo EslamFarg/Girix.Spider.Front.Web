@@ -39,9 +39,9 @@
           </tr>
         </thead>
         <tbody>
-          @for (customer of items(); track $index) {
+          @for (customer of customers(); track $index) {
           <tr class="">
-            <td>{{ getRowNumber($index, paginationInfo.pageIndex) }}</td>
+            <td>{{ getRowNumber($index, customersPaginationInfo.pageIndex) }}</td>
             <td>{{ customer.name }}</td>
             <td>{{ customer?.phoneNumber ?? customer.secondaryMobileNumber }}</td>
             <td>
@@ -100,9 +100,9 @@
 
     <p-paginator
       (onPageChange)="onPageChange($event)"
-      [first]="(paginationInfo.pageIndex - 1) * 10"
+      [first]="(customersPaginationInfo.pageIndex - 1) * 10"
       [rows]="10"
-      [totalRecords]="paginationInfo.totalRowsCount"
+      [totalRecords]="customersPaginationInfo.totalRowsCount"
     />
   </app-section-wrapper>
 </div>

@@ -1,14 +1,19 @@
-import { BaseComponent } from '@/components/base-component/base-component';
-import { Component, EventEmitter, inject, ViewChild, viewChildren, ViewChildren } from '@angular/core';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
+import { Component, EventEmitter, inject, signal, ViewChild, viewChildren, ViewChildren } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
-import { Replacements, SpacesEnum } from '../../services/replacements';
-import { Paginator } from 'primeng/paginator';
+import { ReplacementsService, SpacesEnum } from '../../services/replacements-service';
+import { Paginator, PaginatorState } from 'primeng/paginator';
 import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdown';
 import { HutCard } from '@/components/hut-card/hut-card';
+import { date } from '@primeuix/themes/aura/datepicker';
+import { HutSearchEnum, HutService, IHutDtoResponse, IHutRowResponse } from '@/features/restaurant/services/hut-service';
+import { noSymbolsAllowed } from '@/lib/text-validators';
+import { MenuItem } from 'primeng/api';
+import { omitKeys } from '@/lib/helpers';
 @Component({
   selector: 'app-huts',
   imports: [
@@ -19,33 +24,26 @@ import { HutCard } from '@/components/hut-card/hut-card';
     ReactiveFormsModule,
     Paginator,
     CountdownComponent,
-    HutCard
+    HutCard,
   ],
   templateUrl: './huts.html',
   styleUrl: './huts.css',
 })
 export class Huts extends BaseComponent {
-  initialSearchFormValue = {
-    text: this.fb.control<string>('', [Validators.required]),
-    categoryId: this.fb.control<number>(0, [Validators.required]),
-  };
-
-  fg = this.fb.group(this.initialSearchFormValue);
-  onSubmit() {}
-
   dateNow = new Date();
   getFutureDate() {
-    this.dateNow.setDate(this.dateNow.getDate() + 1);
-    return this.dateNow.toISOString();
+    const date = new Date(this.dateNow);
+    date.setDate(date.getDate() + 1);
+    return date.toISOString();
   }
-  first = 0;
-  rows = 10;
-  onPageChange(event: any) {}
+  getPastDate() {
+    const date = new Date(this.dateNow);
+    date.setDate(date.getDate() - 1);
+    return date.toISOString();
+  }
 
-  replacementsService = inject(Replacements);
-  openDialog() {
-    this.replacementsService.openDialog(SpacesEnum.Huts);
-  }
+  replacementsService = inject(ReplacementsService);
+  openDialog = this.replacementsService.openDialog;
 
   //countdown
   // countDownEles = viewChildren<CountdownComponent>('countdown');
@@ -57,4 +55,90 @@ export class Huts extends BaseComponent {
     // ele.begin();
     // });
   }
+
+  currentItem: IHutDtoResponse | null = null;
+
+  initialSearchFormValue = {
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+    searchEnum: this.fb.control<HutSearchEnum>(HutSearchEnum.Name, [Validators.required]),
+    fromDate: this.fb.control<string | null>(null, []),
+    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
+  };
+
+  searchFg = this.fb.group(this.initialSearchFormValue);
+
+  hutService = inject(HutService);
+
+  resetHutForm = () => (this.currentItem = null);
+
+  fetchAndBindTableData(tableId: number) {
+    return this.hutService.getById(tableId).subscribe({
+      next: (res) => {
+        this.currentItem = res;
+      },
+    });
+  }
+
+  filterMenuItems = signal<MenuItem[]>([
+    {
+      label: 'الاسم',
+      command: (event) => this.searchFg.patchValue({ searchEnum: HutSearchEnum.Name }),
+    },
+    {
+      label: 'متاح',
+      command: (event) => this.searchFg.patchValue({ searchEnum: HutSearchEnum.IsAvaliable }),
+    },
+  ]);
+
+  constructor() {
+    super();
+
+    this.searchHuts(1);
+  }
+
+  periodOptions = [
+    { label: 'الكل', value: null },
+    { label: 'اخر يوم', value: this.getPreviousUTCDate(1) },
+    { label: 'اخر اسبوع', value: this.getPreviousUTCDate(7) },
+    { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
+    { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
+  ];
+
+  huts=signal<IHutRowResponse[]>([]);
+  hutsPaginationInfo:IPaginationInfo={
+    pageIndex:1,
+    totalPagesCount:0,
+    totalRowsCount:0
+  }
+  searchHuts(pageIndex: number) {
+    this.hutService
+      .search({
+        paginationInfo: {
+          pageIndex: pageIndex,
+          pageSize: 10,
+        },
+        searchFilters: [
+          {
+            column: this.searchFg.getRawValue().searchEnum,
+            values: [this.searchFg.getRawValue().searchTerm],
+          },
+        ],
+        fromDate: this.searchFg.getRawValue().fromDate,
+      })
+      .subscribe({
+        next: (res) => {
+          this.huts.set(res.value.rows);
+          this.hutsPaginationInfo = {
+            pageIndex,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          };
+        },
+      });
+  }
+
+  onSearchSubmit = () => this.searchFg.valid && this.searchHuts(1);
+
+  onPageChange = (event: PaginatorState) => this.searchHuts(event.page! + 1);
+ 
 }

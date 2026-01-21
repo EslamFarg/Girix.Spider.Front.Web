@@ -1,4 +1,4 @@
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
@@ -145,6 +145,12 @@ export class Menu extends BaseComponent {
     return isIdentical;
   }
 
+  menuItemsPaginationInfo:IPaginationInfo={
+    pageIndex:1,
+    totalPagesCount:0,
+    totalRowsCount:0
+  }
+  
   searchProductsAndMeals(pageIndex: number) {
     if (this.isPreviousSearchCriteriaIdentical()) {
       //handle stopping pagination if no more data
@@ -212,7 +218,7 @@ export class Menu extends BaseComponent {
             ),
           );
 
-          this.paginationInfo = {
+          this.menuItemsPaginationInfo = {
             pageIndex,
             totalPagesCount:
               (res.value.meals.paginationInfo.totalPagesCount + res.value.menuItems.paginationInfo.totalPagesCount) / 2,
@@ -264,7 +270,7 @@ export class Menu extends BaseComponent {
 
     // if at bottom
     if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
-      this.searchProductsAndMeals(this.paginationInfo.pageIndex + 1);
+      this.searchProductsAndMeals(this.menuItemsPaginationInfo.pageIndex + 1);
     }
   }
 
@@ -273,7 +279,7 @@ export class Menu extends BaseComponent {
       this.menuSearchFg.markAllAsTouched();
       return;
     }
-    this.searchProductsAndMeals(this.paginationInfo.pageIndex);
+    this.searchProductsAndMeals(this.menuItemsPaginationInfo.pageIndex);
   }
 
   addMenuItem(menuItem: IMenuItem, quantity: number) {

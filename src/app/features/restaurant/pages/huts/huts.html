@@ -72,9 +72,9 @@
         </tr>
       </thead>
       <tbody>
-        @for (item of items(); track $index) {
+        @for (item of huts(); track $index) {
         <tr class="" [class.*:border-y-green-500!]="item.id === currentItem?.id">
-          <td>{{ getRowNumber($index, paginationInfo.pageIndex) }}</td>
+          <td>{{ getRowNumber($index, hutsPaginationInfo.pageIndex) }}</td>
           <td>{{ item.name }}</td>
           <td>{{ item.pricePerHour }}</td>
           <td>
@@ -119,9 +119,9 @@
 
     <p-paginator
       (onPageChange)="onPageChange($event)"
-      [first]="(paginationInfo.pageIndex - 1) * 10"
+      [first]="(hutsPaginationInfo.pageIndex - 1) * 10"
       [rows]="10"
-      [totalRecords]="paginationInfo.totalRowsCount"
+      [totalRecords]="hutsPaginationInfo.totalRowsCount"
     />
   </app-section-wrapper>
 </div>

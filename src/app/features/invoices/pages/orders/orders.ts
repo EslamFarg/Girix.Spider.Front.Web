@@ -1,4 +1,4 @@
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, inject, signal } from '@angular/core';
 import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
@@ -32,8 +32,7 @@ import { Debounce } from '@/directives/debounce';
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })
-export class Orders extends BaseComponent<IOrderRowResponse> {
-
+export class Orders extends BaseComponent {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<OrderSearchEnum>(OrderSearchEnum.CustomerName, [Validators.required]),
@@ -44,7 +43,7 @@ export class Orders extends BaseComponent<IOrderRowResponse> {
   fg = this.fb.group(this.initialSearchFormValue);
 
   orderService = inject(OrderService);
-  
+
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'اسم العميل',
@@ -78,6 +77,13 @@ export class Orders extends BaseComponent<IOrderRowResponse> {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
+  orders = signal<IOrderRowResponse[]>([]);
+  ordersPaginationInfo = signal<IPaginationInfo>({
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  });
+
   searchOrders(pageIndex: number) {
     this.orderService
       .search({
@@ -95,12 +101,12 @@ export class Orders extends BaseComponent<IOrderRowResponse> {
       })
       .subscribe({
         next: (res) => {
-          this.items.set(res.value.rows);
-          this.paginationInfo = {
-            pageIndex: pageIndex,
+          this.orders.set(res.value.rows);
+          this.ordersPaginationInfo.set({
+            pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
+          });
         },
       });
   }

@@ -1,8 +1,14 @@
 <app-section-wrapper class="block p-4 pt-8 overflow-auto no-scrollbar h-full" styleClass="no-scrollbar">
   <!-- search -->
-  <form #form [formGroup]="fg" (ngSubmit)="onSubmit()">
-    <app-input-error-message-handler [fc]="fg.get('text')">
-      <input class="w-full bg-transparent! h-8!" pInputText type="text" formControlName="text" placeholder="بحث" />
+  <form #form [formGroup]="searchFg" (ngSubmit)="onSearchSubmit()">
+    <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
+      <input
+        class="w-full bg-transparent! h-8!"
+        pInputText
+        type="text"
+        formControlName="searchTerm"
+        placeholder="بحث"
+      />
       <p-inputgroup-addon class="p-0!">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -26,32 +32,17 @@
 
   <!-- items grid -->
   <div
-    class="grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-7 md:grid-cols-4 md:gap-9 xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8 "
+    class="grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-7 md:grid-cols-4 md:gap-9 xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8"
   >
-    @for (item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]; track $index) {
-      <app-table-card
-      (click)="openDialog()"
-        [data]="{
-          id: $index,
-          name: 'string',
-          pricePerHour: $index * 10,
-          isAvailable: $index % 2 == 0,
-          reservedTo: '2026-10-01T00:00:00Z',
-          reservedFrom: '2026-01-01T00:00:00Z',
-          orderId: $index,
-        }"
-      />
-      <!-- <div
-      style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
-      class="flex border cursor-pointer border-[#393C49] aspect-square available items-center justify-center bg-white rounded-full"
-      [class.replacements-available]="$index % 3 == 0"
-      [class.replacements-reserved]="$index % 4 == 1"
-      (click)="openDialog()"
-    >
-      <span class="text-black font-bold">R{{ $index + 1 }}</span>
-    </div> -->
+    @for (item of tables(); track $index) {
+      <app-table-card (click)="openDialog({ data: item, localSpaceType: localSpacesEnum.Tables })" [data]="item" />
     }
   </div>
 
-  <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
+  <p-paginator
+    (onPageChange)="onPageChange($event)"
+    [first]="0"
+    [rows]="10"
+    [totalRecords]="tablesPaginationInfo.totalRowsCount"
+  />
 </app-section-wrapper>

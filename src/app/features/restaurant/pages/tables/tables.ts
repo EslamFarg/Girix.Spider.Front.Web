@@ -3,7 +3,7 @@ import { Button, ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Select } from 'primeng/select';
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
@@ -31,7 +31,7 @@ import { Debounce } from '@/directives/debounce';
   templateUrl: './tables.html',
   styleUrl: './tables.css',
 })
-export class Tables extends BaseComponent<ITableRowResponse> {
+export class Tables extends BaseComponent  {
   currentItem: ITableDtoResponse | null = null;
 
   initialTableFormValue = {
@@ -126,6 +126,14 @@ export class Tables extends BaseComponent<ITableRowResponse> {
     });
   }
 
+  tables = signal<ITableRowResponse[]>([]);
+  
+    tablesPaginationInfo: IPaginationInfo = {
+      pageIndex: 1,
+      totalRowsCount: 0,
+      totalPagesCount: 0,
+    };
+
   searchTables(pageIndex: number) {
     this.tableService
       .search({
@@ -143,8 +151,8 @@ export class Tables extends BaseComponent<ITableRowResponse> {
       })
       .subscribe({
         next: (res) => {
-          this.items.set(res.value.rows);
-          this.paginationInfo = {
+          this.tables.set(res.value.rows);
+          this.tablesPaginationInfo = {
             pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,
@@ -156,6 +164,8 @@ export class Tables extends BaseComponent<ITableRowResponse> {
   onSearchSubmit = () => this.searchFg.valid && this.searchTables(1);
 
   onPageChange = (event: PaginatorState) => this.searchTables(event.page! + 1);
+
+  
 
   onTableFormSubmit() {
     if (this.tableFg.invalid) {

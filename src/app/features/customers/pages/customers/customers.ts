@@ -1,5 +1,5 @@
-import { BaseComponent } from '@/components/base-component/base-component';
-import { Component, inject } from '@angular/core';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
+import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
@@ -37,7 +37,7 @@ import { Debounce } from '@/directives/debounce';
   templateUrl: './customers.html',
   styleUrl: './customers.css',
 })
-export class Customers extends BaseComponent<ICustomerRowResponse> {
+export class Customers extends BaseComponent  {
   initialFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<CustomerSearchEnum>(CustomerSearchEnum.Name, [Validators.required]),
@@ -59,6 +59,15 @@ export class Customers extends BaseComponent<ICustomerRowResponse> {
     this.searchCustomers(1);
   }
 
+
+  customers = signal<ICustomerRowResponse[]>([]);
+
+  customersPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0,
+  };
+  
   searchCustomers(pageIndex: number) {
     const fgRawValue = this.fg.getRawValue();
 
@@ -81,8 +90,8 @@ export class Customers extends BaseComponent<ICustomerRowResponse> {
       })
       .subscribe({
         next: (res) => {
-          this.items.set(res.value.rows);
-          this.paginationInfo = {
+          this.customers.set(res.value.rows);
+          this.customersPaginationInfo = {
             pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,

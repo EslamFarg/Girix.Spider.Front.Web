@@ -56,9 +56,9 @@
         </tr>
       </thead>
       <tbody>
-        @for (table of items(); track $index) {
+        @for (table of tables(); track $index) {
         <tr class="">
-          <td>{{ getRowNumber($index, paginationInfo.pageIndex) }}</td>
+          <td>{{ getRowNumber($index, tablesPaginationInfo.pageIndex) }}</td>
           <td>{{ table.name }}</td>
           <td>
             <div class="actions">
@@ -104,9 +104,9 @@
 
     <p-paginator
       (onPageChange)="onPageChange($event)"
-      [first]="(paginationInfo.pageIndex - 1) * 10"
+      [first]="(tablesPaginationInfo.pageIndex - 1) * 10"
       [rows]="10"
-      [totalRecords]="paginationInfo.totalRowsCount"
+      [totalRecords]="tablesPaginationInfo.totalRowsCount"
     />
   </app-section-wrapper>
 </div>

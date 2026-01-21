@@ -1,4 +1,4 @@
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button, ButtonDirective } from 'primeng/button';
@@ -31,7 +31,7 @@ import { MenuItem } from 'primeng/api';
   templateUrl: './rooms.html',
   styleUrl: './rooms.css',
 })
-export class Rooms extends BaseComponent<IRoomRowResponse> {
+export class Rooms extends BaseComponent  {
   currentItem: IRoomDtoResponse | null = null;
 
   initialRoomFormValue = {
@@ -88,6 +88,13 @@ export class Rooms extends BaseComponent<IRoomRowResponse> {
     this.searchRooms(1);
   }
 
+  rooms= signal<IRoomRowResponse[]>([]);
+  roomsPaginationInfo = signal<IPaginationInfo>({
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  });
+
   searchRooms(pageIndex: number) {
     this.roomService
       .search({
@@ -105,12 +112,12 @@ export class Rooms extends BaseComponent<IRoomRowResponse> {
       })
       .subscribe({
         next: (res) => {
-          this.items.set(res.value.rows);
-          this.paginationInfo = {
+          this.rooms.set(res.value.rows);
+          this.roomsPaginationInfo.set({
             pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
+          });
         },
       });
   }

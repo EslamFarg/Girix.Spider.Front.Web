@@ -6,8 +6,8 @@ import { InputErrorMessageHandler } from '@/components/input-error-message-handl
 import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
-import { BaseComponent } from '@/components/base-component/base-component';
-import { FinancialAccountSearchEnum, FinancialAccountService } from '../../services/financial-account-service';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
+import { FinancialAccountSearchEnum, FinancialAccountService, ITreeFinancialAccountResponseRow } from '../../services/financial-account-service';
 import { Validators } from '@angular/forms';
 import { PaginatorState } from 'primeng/paginator';
 
@@ -20,7 +20,7 @@ import { PaginatorState } from 'primeng/paginator';
 export class AccountsTree extends BaseComponent {
   financialAccountService = inject(FinancialAccountService);
 
-  financialAccounts = signal<TreeNode[]>([
+  financialAccountsNodes = signal<TreeNode[]>([
     {
       label: 'حسابات',
       children: [
@@ -81,6 +81,14 @@ export class AccountsTree extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
+
+  financialAccounts= signal<ITreeFinancialAccountResponseRow[]>([])
+  financialAccountsPaginationInfo :IPaginationInfo={
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0
+  }
+
   searchFinancialAccounts(pageIndex: number) {
     this.financialAccountService
       .search({
@@ -112,8 +120,8 @@ export class AccountsTree extends BaseComponent {
             })),
           }));
 
-          this.financialAccounts.set(mappedFinancialAccounts);
-          this.paginationInfo = {
+          this.financialAccountsNodes.set(mappedFinancialAccounts);
+          this.financialAccountsPaginationInfo = {
             pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,

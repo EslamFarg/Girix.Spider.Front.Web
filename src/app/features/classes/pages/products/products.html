@@ -57,9 +57,9 @@
           </tr>
         </thead>
         <tbody>
-          @for (item of items(); track $index) {
+          @for (item of products(); track $index) {
           <tr class="">
-            <td>{{ getRowNumber($index, paginationInfo.pageIndex) }}</td>
+            <td>{{ getRowNumber($index, productsPaginationInfo.pageIndex) }}</td>
             <td>
               <img
                 class="w-10 aspect-square object-fit-cover mx-auto"
@@ -127,9 +127,9 @@
 
     <p-paginator
       (onPageChange)="onPageChange($event)"
-      [first]="(paginationInfo.pageIndex - 1) * 10"
+      [first]="(productsPaginationInfo.pageIndex - 1) * 10"
       [rows]="10"
-      [totalRecords]="paginationInfo.totalRowsCount"
+      [totalRecords]="productsPaginationInfo.totalRowsCount"
     />
   </app-section-wrapper>
 </div>

@@ -1,0 +1,157 @@
+<router-outlet />
+
+<p-dialog
+  header=" "
+  [modal]="true"
+  [visible]="isVisible()"
+  [style]="{ width: '100%', maxWidth: '800px' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-base-bg!"
+  (onHide)="closeDialog()"
+  contentStyleClass="no-scrollbar"
+>
+  <div [class]="`flex flex-col gap-6 items-center justify-center ${isLoading() ? 'opacity-70 cursor-wait' : ''}`">
+    @switch (currentItem()?.localSpaceType) {
+      <!--  -->
+      @case (SpacesEnum.Rooms) {
+        <app-room-card [data]="currentItem()?.data!" />
+      }
+      @case (SpacesEnum.Huts) {
+        <app-hut-card class="mt-12 w-25" [data]="currentItem()?.data!" />
+      }
+      @case (SpacesEnum.Tables) {
+        <app-table-card [data]="currentItem()?.data!" />
+      }
+    }
+
+    <!-- nav -->
+    <div class="flex gap-2 justify-center replacement-dialog-nav">
+      <p-button
+        styleClass=" py-1! w-full   border-transparent! text-sm!"
+        label="طاوله"
+        class="w-25"
+        [attr.style]=""
+        [class.replacement-dialog-nav-active]="changeToSpace() == SpacesEnum.Tables"
+        (onClick)="setChangeToSpace(SpacesEnum.Tables)"
+      />
+      <p-button
+        styleClass="  py-1! w-full   border-transparent! text-sm!"
+        label="غرفه"
+        class="w-25"
+        [class.replacement-dialog-nav-active]="changeToSpace() == SpacesEnum.Rooms"
+        (onClick)="setChangeToSpace(SpacesEnum.Rooms)"
+      />
+      <p-button
+        styleClass="  py-1! w-full    border-transparent! text-sm!"
+        label="كوخ"
+        class="w-25"
+        [class.replacement-dialog-nav-active]="changeToSpace() == SpacesEnum.Huts"
+        (onClick)="setChangeToSpace(SpacesEnum.Huts)"
+      />
+    </div>
+
+    <!-- cards -->
+    @switch (changeToSpace()) {
+      <!--  -->
+      @case (SpacesEnum.Tables) {
+        <div class="flex my-4 gap-8 w-full overflow-auto custom-scroll pb-2 *:w-25 *:min-w-25 relative z-1">
+          @for (table of tables(); track $index) {
+            <app-table-card
+              (click)="
+                chooseItem({
+                  data: table,
+                  localSpaceType: SpacesEnum.Tables,
+                })
+              "
+              [data]="table"
+            />
+          }
+        </div>
+      }
+      <!--  -->
+      @case (SpacesEnum.Rooms) {
+        <div class="flex my-4 gap-8 w-full overflow-auto custom-scroll pb-2 *:w-25 *:min-w-25 relative z-1">
+          @for (room of rooms(); track $index) {
+            <app-room-card
+              (click)="
+                chooseItem({
+                  data: room,
+                  localSpaceType: SpacesEnum.Rooms,
+                })
+              "
+              [data]="room"
+            />
+          }
+        </div>
+      }
+      <!--  -->
+      @case (SpacesEnum.Huts) {
+        <div class="flex my-4 gap-8 w-full overflow-auto custom-scroll pt-10 pb-2 *:w-25 *:min-w-25 relative z-1">
+          @for (hut of huts(); track $index) {
+            <app-hut-card
+              (click)="
+                chooseItem({
+                  data: hut,
+                  localSpaceType: SpacesEnum.Huts,
+                })
+              "
+              [data]="hut"
+            />
+          }
+        </div>
+      }
+    }
+
+    <!--  -->
+    @if (changeToSpace() == localSpacesEnum.Huts) {
+      <form
+        [formGroup]="hutChangeFg"
+        class="flex w-full *:flex-1 [&_p-select]:h-[46px]! [&_input]:h-[46px]! items-start gap-4 relative z-2  "
+      >
+        <div>
+          <label for="productName">مدة الحجز</label>
+          <app-input-error-message-handler [fc]="hutChangeFg.get('durationMinutes')">
+            <p-select
+              [options]="durationMinutesOptions"
+              formControlName="durationMinutes"
+              placeholder="إختر المجموعه"
+              class="w-full!"
+            />
+          </app-input-error-message-handler>
+        </div>
+        <div>
+          <label for="costPrice">رقم / اسم الكوخ</label>
+          <app-input-error-message-handler [fc]="hutChangeFg.get('name')">
+            <input
+              pInputText
+              id="costPrice"
+              class="cursor-not-allowed"
+              formControlName="name"
+              aria-describedby="costPrice-help"
+              placeholder="H1"
+            />
+          </app-input-error-message-handler>
+        </div>
+        <div>
+          <label for="costPrice">سعر الكوخ في الساعة</label>
+          <app-input-error-message-handler [fc]="hutChangeFg.get('pricePerHour')">
+            <input
+              pInputText
+              id="costPrice"
+              class="cursor-not-allowed"
+              formControlName="pricePerHour"
+              aria-describedby="costPrice-help"
+              placeholder="50.00"
+            />
+          </app-input-error-message-handler>
+        </div>
+      </form>
+    }
+
+    <!--  -->
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancel" severity="secondary" (click)="closeDialog()" />
+      <p-button label="Save" (click)="submitItemChange()" />
+    </div>
+  </div>
+</p-dialog>

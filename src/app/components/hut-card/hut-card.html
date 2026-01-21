@@ -16,7 +16,12 @@
     style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #a3a3a34d"
     class="flex border-2 z-10 relative bordered border-transparent aspect-[calc(110/72)] items-center justify-center bg-white/80 rounded-2xl"
   >
-    <span class="font-bold">R{{ 1 + 1 }}</span>
+    <div
+      [title]="data()?.name"
+      class="font-bold mx-auto w-[95%] text-center text-ellipsis overflow-hidden whitespace-nowrap"
+    >
+      {{ data()?.name }}
+    </div>
   </div>
   <countdown
     #countdown

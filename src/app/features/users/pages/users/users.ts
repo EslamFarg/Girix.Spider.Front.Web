@@ -1,27 +1,39 @@
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { Paginator, PaginatorState } from "primeng/paginator";
-import { UsersNav } from "../../components/users-nav/users-nav";
-import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
-import { InputGroupAddon } from "primeng/inputgroupaddon";
-import { Select } from "primeng/select";
-import { InputText } from "primeng/inputtext";
+import { Paginator, PaginatorState } from 'primeng/paginator';
+import { UsersNav } from '../../components/users-nav/users-nav';
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { Select } from 'primeng/select';
+import { InputText } from 'primeng/inputtext';
 import { IUserRowResponse, UserSearchEnum, UserService } from '../../services/user-service';
 import { MenuItem } from 'primeng/api';
-import { Debounce } from "@/directives/debounce";
-import { Menu } from "primeng/menu";
-import { RouterLink } from "@angular/router";
+import { Debounce } from '@/directives/debounce';
+import { Menu } from 'primeng/menu';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-users',
-  imports: [Paginator, UsersNav, SectionWrapper, InputErrorMessageHandler, InputGroupAddon, Select, ReactiveFormsModule, InputText, Debounce, Menu, RouterLink],
+  imports: [
+    Paginator,
+    UsersNav,
+    SectionWrapper,
+    InputErrorMessageHandler,
+    InputGroupAddon,
+    Select,
+    ReactiveFormsModule,
+    InputText,
+    Debounce,
+    Menu,
+    RouterLink,
+  ],
   templateUrl: './users.html',
   styleUrl: './users.css',
 })
-export class Users  extends BaseComponent<IUserRowResponse> {
- initialSearchFormValue = {
+export class Users extends BaseComponent {
+  initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<UserSearchEnum>(UserSearchEnum.Name, [Validators.required]),
     fromDate: this.fb.control<string | null>(null, []),
@@ -55,6 +67,14 @@ export class Users  extends BaseComponent<IUserRowResponse> {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
+  users = signal<IUserRowResponse[]>([]);
+
+  usersPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0,
+  };
+
   searchUsers(pageIndex: number) {
     this.userService
       .search({
@@ -73,8 +93,8 @@ export class Users  extends BaseComponent<IUserRowResponse> {
       .subscribe({
         next: (res) => {
           //@ts-ignore
-          this.items.set(res.rows);
-          this.paginationInfo = {
+          this.users.set(res.rows);
+          this.usersPaginationInfo = {
             pageIndex,
             //@ts-ignore
             totalPagesCount: res.paginationInfo.totalPagesCount,
@@ -118,5 +138,4 @@ export class Users  extends BaseComponent<IUserRowResponse> {
       },
     });
   }
-
 }

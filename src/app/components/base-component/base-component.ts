@@ -7,14 +7,21 @@ import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { environment } from '../../../environments/environment';
 import { TranslateService } from '@ngx-translate/core';
-
+import { SpacesEnum } from '@/features/replacements/services/replacements-service';
+export interface IPaginationInfo {
+  pageIndex: number;
+  totalRowsCount: number;
+  totalPagesCount: number;
+}
 @Component({
   selector: 'app-base-component',
   imports: [],
   templateUrl: './base-component.html',
   styleUrl: './base-component.css',
 })
-export class BaseComponent<ItemType = any> {
+export class BaseComponent {
+  localSpacesEnum = SpacesEnum;
+  //
   nullableFb = inject(FormBuilder);
   fb = this.nullableFb.nonNullable;
   baseUrl = environment.apiUrl.replace('/v1', '');
@@ -27,20 +34,9 @@ export class BaseComponent<ItemType = any> {
   translateService = inject(TranslateService);
 
   isLoading = this.layoutService.isLoading;
- 
 
-  items = signal<ItemType[]>([]);
   getRowNumber = (index: number, pageNumber: number) => index + 1 + (pageNumber - 1) * 10;
-
-  paginationInfo: {
-    pageIndex: number;
-    totalRowsCount: number;
-    totalPagesCount: number;
-  } = {
-    pageIndex: 1,
-    totalRowsCount: 0,
-    totalPagesCount: 0,
-  };
+  getRowsNumbers = (pageIndex: number) => (pageIndex - 1) * 10;
 
   getPreviousUTCDate(days: number) {
     const date = new Date();

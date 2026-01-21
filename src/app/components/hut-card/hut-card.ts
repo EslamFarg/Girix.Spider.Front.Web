@@ -35,29 +35,39 @@ export class HutCard {
     formatDate: (opts) => {
       const currentDateTime = new Date().getTime();
       // const reservedFromTime = new Date(this.data().reservedFrom).getTime();
-      const reservedToTime = new Date(this.data().reservedTo).getTime();
+      const reservedToDate = new Date(this.data().reservedTo);
+      const reservedToTime = reservedToDate.getTime();
       const isPastReservation = currentDateTime > reservedToTime;
 
-      if (!isPastReservation) {
-        const date = new Date(opts.date);
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        const seconds = date.getSeconds().toString().padStart(2, '0');
-        return `${hours}:${minutes}:${seconds}`;
+      if (!this.data().isAvailable) {
+        if (!isPastReservation) {
+          const timeDiff = (reservedToTime - currentDateTime) / 1000;
+          const hours = Math.floor(timeDiff / (60 * 60))
+            .toString()
+            .padStart(2, '0');
+          const minutes = Math.floor((timeDiff % (60 * 60)) / 60)
+            .toString()
+            .padStart(2, '0');
+          const seconds = Math.floor((timeDiff % 60) )
+            .toString()
+            .padStart(2, '0');
+          return `${hours}:${minutes}:${seconds}`;
+        } else {
+          //count up from reservedToTime to currentDateTime
+          const timeDiff = (currentDateTime - reservedToTime)/1000;
+          const hours = Math.floor(timeDiff / ( 60 * 60))
+            .toString()
+            .padStart(2, '0');
+          const minutes = Math.floor((timeDiff % ( 60 * 60)) / ( 60))
+            .toString()
+            .padStart(2, '0');
+          const seconds = Math.floor((timeDiff % ( 60)) )
+            .toString()
+            .padStart(2, '0');
+          return `-${hours}:${minutes}:${seconds}`;
+        }
       } else {
-        //count up from reservedToTime to currentDateTime
-        const timeDiff = currentDateTime - reservedToTime;
-        const hours = Math.floor(timeDiff / (1000 * 60 * 60))
-          .toString()
-          .padStart(2, '0');
-        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))
-          .toString()
-          .padStart(2, '0');
-        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000)
-          .toString()
-          .padStart(2, '0');
-        console.log(`-${hours}:${minutes}:${seconds}`);
-        return `-${hours}:${minutes}:${seconds}`;
+        return '00:00:00';
       }
     },
   };
@@ -71,18 +81,19 @@ export class HutCard {
   };
 
   ngOnInit() {
+    console.log('-------------------------');
     if (this.data().isAvailable) {
       this.hutStatus.set(HutStatus.Available);
+      console.log(this.hutStatusClass());
     } else {
-      console.log('not', this.data().isAvailable);
       const currentDateTime = new Date().getTime();
       // const reservedFromTime = new Date(this.data().reservedFrom).getTime();
       const reservedToTime = new Date(this.data().reservedTo).getTime();
       const isPastReservation = currentDateTime > reservedToTime;
 
       console.log(`
-        currentDateTime: ${currentDateTime}
-        reservedToTime: ${reservedToTime}
+        currentDateTime: ${new Date(currentDateTime).toISOString()}
+        reservedToTime: ${new Date(reservedToTime).toISOString()}
         isPastReservation: ${isPastReservation}
         `);
 
@@ -112,7 +123,6 @@ export class HutCard {
   }
 
   hutStatusClass = computed(() => {
-    console.log(this.hutStatus());
     switch (this.hutStatus()) {
       case HutStatus.Available:
         return 'hut-available';

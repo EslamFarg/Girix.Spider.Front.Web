@@ -75,7 +75,6 @@ export interface IOrderCreateRequest {
   customerRequest: IOrderCreateCustomerRequest;
 }
 
-
 export interface IOrderCreateItem {
   menuItemId: number;
   mealId: number;
@@ -97,9 +96,21 @@ export interface IOrderCreateCustomerRequest {
   addressDescription: string;
 }
 
+// local place replacement
+export interface ILocalPlaceChangeRequest {
+  id: number;
+  placeType: number;
+  placeRefId: number;
+  durationMinutes: number | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class OrderService extends BaseService<OrderSearchEnum, IOrderCreateRequest, any, IOrderSearchResponseValue> {
   override apiRoute = 'Order';
+
+  changeLocalPlace(dto: ILocalPlaceChangeRequest) {
+    return this.http.post<any>(`${this.apiUrl}/change-place`, dto);
+  }
 }

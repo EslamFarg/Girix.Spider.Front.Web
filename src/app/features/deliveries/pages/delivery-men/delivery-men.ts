@@ -6,7 +6,7 @@ import { InputGroupAddon } from "primeng/inputgroupaddon";
 import { Select } from "primeng/select";
 import { Paginator, PaginatorState } from "primeng/paginator";
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { InputText } from "primeng/inputtext";
 import { DeliverySearchEnum, DeliveryService, IDeliveryRowResponse } from '../../services/delivery-service';
 import { MenuItem } from 'primeng/api';
@@ -20,7 +20,7 @@ import { RouterLink } from "@angular/router";
   templateUrl: './delivery-men.html',
   styleUrl: './delivery-men.css',
 })
-export class DeliveryMen  extends BaseComponent<IDeliveryRowResponse> {
+export class DeliveryMen  extends BaseComponent  {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<DeliverySearchEnum>(DeliverySearchEnum.Name, [Validators.required]),
@@ -55,6 +55,14 @@ export class DeliveryMen  extends BaseComponent<IDeliveryRowResponse> {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
+  deliveryMen = signal<IDeliveryRowResponse[]>([]);
+  
+    deliveryMenPaginationInfo: IPaginationInfo = {
+      pageIndex: 1,
+      totalRowsCount: 0,
+      totalPagesCount: 0,
+    };
+
   searchDeliverys(pageIndex: number) {
     this.deliveryService
       .search({
@@ -72,8 +80,8 @@ export class DeliveryMen  extends BaseComponent<IDeliveryRowResponse> {
       })
       .subscribe({
         next: (res) => {
-          this.items.set(res.value.rows);
-          this.paginationInfo = {
+          this.deliveryMen.set(res.value.rows);
+          this.deliveryMenPaginationInfo = {
             pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,

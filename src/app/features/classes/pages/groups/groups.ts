@@ -1,4 +1,4 @@
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
@@ -30,7 +30,7 @@ import { Menu } from 'primeng/menu';
   templateUrl: './groups.html',
   styleUrl: './groups.css',
 })
-export class Groups extends BaseComponent<IGroupRowResponse> {
+export class Groups extends BaseComponent  {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<GroupSearchEnum>(GroupSearchEnum.Name, [Validators.required]),
@@ -60,7 +60,12 @@ export class Groups extends BaseComponent<IGroupRowResponse> {
     { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
-
+groups = signal<IGroupRowResponse[]>([]);
+groupsPaginationInfo:IPaginationInfo={
+  pageIndex:1,
+  totalPagesCount:0,
+  totalRowsCount:0
+}
   searchGroups(pageIndex: number) {
     this.groupService
       .search({
@@ -78,8 +83,8 @@ export class Groups extends BaseComponent<IGroupRowResponse> {
       })
       .subscribe({
         next: (res) => {
-          this.items.set(res.value.rows);
-          this.paginationInfo = {
+          this.groups.set(res.value.rows);
+          this.groupsPaginationInfo = {
             pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,

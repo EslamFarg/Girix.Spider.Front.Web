@@ -1,4 +1,4 @@
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button, ButtonDirective } from 'primeng/button';
@@ -33,7 +33,7 @@ import { Debounce } from '@/directives/debounce';
   templateUrl: './huts.html',
   styleUrl: './huts.css',
 })
-export class Huts extends BaseComponent<IHutRowResponse> {
+export class Huts extends BaseComponent  {
   currentItem: IHutDtoResponse | null = null;
 
   initialHutFormValue = {
@@ -98,6 +98,13 @@ export class Huts extends BaseComponent<IHutRowResponse> {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
+ huts=signal<IHutRowResponse[]>([]);
+  hutsPaginationInfo:IPaginationInfo={
+    pageIndex:1,
+    totalPagesCount:0,
+    totalRowsCount:0
+  }
+
   searchHuts(pageIndex: number) {
     this.hutService
       .search({
@@ -115,8 +122,8 @@ export class Huts extends BaseComponent<IHutRowResponse> {
       })
       .subscribe({
         next: (res) => {
-          this.items.set(res.value.rows);
-          this.paginationInfo = {
+          this.huts.set(res.value.rows);
+          this.hutsPaginationInfo = {
             pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,

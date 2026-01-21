@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ReplacementDialog } from './replacement-dialog';
+import { RepalcementsLayout } from './repalcements-layout';
 
-describe('ReplacementDialog', () => {
-  let component: ReplacementDialog;
-  let fixture: ComponentFixture<ReplacementDialog>;
+describe('RepalcementsLayout', () => {
+  let component: RepalcementsLayout;
+  let fixture: ComponentFixture<RepalcementsLayout>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ReplacementDialog]
+      imports: [RepalcementsLayout]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ReplacementDialog);
+    fixture = TestBed.createComponent(RepalcementsLayout);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

@@ -1,18 +1,26 @@
 import { BaseComponent } from '@/components/base-component/base-component';
-import { Replacements, SpacesEnum } from '@/features/replacements/services/replacements';
+import {    SpacesEnum } from '@/features/replacements/services/replacements-service';
 import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { Paginator } from "primeng/paginator";
-import { InputGroupAddon } from "primeng/inputgroupaddon";
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
-import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
-import { InputText } from "primeng/inputtext";
+import { Paginator } from 'primeng/paginator';
+import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { InputText } from 'primeng/inputtext';
 import { CollectionsService } from '../../services/collections-service';
 import { TableCard } from '@/components/table-card/table-card';
 
 @Component({
   selector: 'app-tables',
-  imports: [Paginator, InputGroupAddon, InputErrorMessageHandler, SectionWrapper, InputText,ReactiveFormsModule,TableCard],
+  imports: [
+    Paginator,
+    InputGroupAddon,
+    InputErrorMessageHandler,
+    SectionWrapper,
+    InputText,
+    ReactiveFormsModule,
+    TableCard,
+  ],
   templateUrl: './tables.html',
   styleUrl: './tables.css',
 })
@@ -28,13 +36,8 @@ export class Tables extends BaseComponent {
   rows = 10;
   onPageChange(event: any) {}
 
-
-
-  
-
   collectionsService = inject(CollectionsService);
-    openCollectionInvoiceDialog() {
-      this.collectionsService.openCollectionInvoiceDialog();
-    }
-
+  openCollectionInvoiceDialog() {
+    this.collectionsService.openCollectionInvoiceDialog();
+  }
 }
