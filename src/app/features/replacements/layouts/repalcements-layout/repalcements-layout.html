@@ -13,13 +13,13 @@
   <div [class]="`flex flex-col gap-6 items-center justify-center ${isLoading() ? 'opacity-70 cursor-wait' : ''}`">
     @switch (currentItem()?.localSpaceType) {
       <!--  -->
-      @case (SpacesEnum.Rooms) {
+      @case (SpaceTypeEnum.Room) {
         <app-room-card [data]="currentItem()?.data!" />
       }
-      @case (SpacesEnum.Huts) {
+      @case (SpaceTypeEnum.Hut) {
         <app-hut-card class="mt-12 w-25" [data]="currentItem()?.data!" />
       }
-      @case (SpacesEnum.Tables) {
+      @case (SpaceTypeEnum.Table) {
         <app-table-card [data]="currentItem()?.data!" />
       }
     }
@@ -31,82 +31,87 @@
         label="طاوله"
         class="w-25"
         [attr.style]=""
-        [class.replacement-dialog-nav-active]="changeToSpace() == SpacesEnum.Tables"
-        (onClick)="setChangeToSpace(SpacesEnum.Tables)"
+        [class.replacement-dialog-nav-active]="changeToSpace() == SpaceTypeEnum.Table"
+        (onClick)="setChangeToSpace(SpaceTypeEnum.Table)"
       />
       <p-button
         styleClass="  py-1! w-full   border-transparent! text-sm!"
         label="غرفه"
         class="w-25"
-        [class.replacement-dialog-nav-active]="changeToSpace() == SpacesEnum.Rooms"
-        (onClick)="setChangeToSpace(SpacesEnum.Rooms)"
+        [class.replacement-dialog-nav-active]="changeToSpace() == SpaceTypeEnum.Room"
+        (onClick)="setChangeToSpace(SpaceTypeEnum.Room)"
       />
       <p-button
         styleClass="  py-1! w-full    border-transparent! text-sm!"
         label="كوخ"
         class="w-25"
-        [class.replacement-dialog-nav-active]="changeToSpace() == SpacesEnum.Huts"
-        (onClick)="setChangeToSpace(SpacesEnum.Huts)"
+        [class.replacement-dialog-nav-active]="changeToSpace() == SpaceTypeEnum.Hut"
+        (onClick)="setChangeToSpace(SpaceTypeEnum.Hut)"
       />
     </div>
 
     <!-- cards -->
-    @switch (changeToSpace()) {
-      <!--  -->
-      @case (SpacesEnum.Tables) {
-        <div class="flex my-4 gap-8 w-full overflow-auto custom-scroll pb-2 *:w-25 *:min-w-25 relative z-1">
-          @for (table of tables(); track $index) {
-            <app-table-card
-              (click)="
-                chooseItem({
-                  data: table,
-                  localSpaceType: SpacesEnum.Tables,
-                })
-              "
-              [data]="table"
-            />
-          }
-        </div>
+    <div class="w-full overflow-auto custom-scroll" (scroll)="onScroll($event)">
+      @switch (changeToSpace()) {
+        <!--  -->
+        @case (SpaceTypeEnum.Table) {
+          <div class="flex my-4 gap-8 w-fit pb-2 *:w-25 *:min-w-25 relative z-1">
+            @for (table of tables(); track $index) {
+              <app-table-card
+                [class.active]="table.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Table"
+                (click)="
+                  chooseItem({
+                    data: table,
+                    localSpaceType: SpaceTypeEnum.Table,
+                  })
+                "
+                [data]="table"
+              />
+            }
+          </div>
+        }
+        <!--  -->
+        @case (SpaceTypeEnum.Room) {
+          <div class="flex my-4 gap-8 w-fit pb-2 *:w-25 *:min-w-25 relative z-1">
+            @for (room of rooms(); track $index) {
+              <app-room-card
+                [class.active]="room.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Room"
+                (click)="
+                  chooseItem({
+                    data: room,
+                    localSpaceType: SpaceTypeEnum.Room,
+                  })
+                "
+                [data]="room"
+              />
+            }
+          </div>
+        }
+        <!--  -->
+        @case (SpaceTypeEnum.Hut) {
+          <div class="flex my-4 gap-8 w-fit pt-11 pb-2 *:w-25 *:min-w-25 relative z-1">
+            @for (hut of huts(); track $index) {
+              <app-hut-card
+                [class.active]="hut.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Hut"
+                (click)="
+                  chooseItem({
+                    data: hut,
+                    localSpaceType: SpaceTypeEnum.Hut,
+                  })
+                "
+                [data]="hut"
+              />
+            }
+          </div>
+        }
       }
-      <!--  -->
-      @case (SpacesEnum.Rooms) {
-        <div class="flex my-4 gap-8 w-full overflow-auto custom-scroll pb-2 *:w-25 *:min-w-25 relative z-1">
-          @for (room of rooms(); track $index) {
-            <app-room-card
-              (click)="
-                chooseItem({
-                  data: room,
-                  localSpaceType: SpacesEnum.Rooms,
-                })
-              "
-              [data]="room"
-            />
-          }
-        </div>
-      }
-      <!--  -->
-      @case (SpacesEnum.Huts) {
-        <div class="flex my-4 gap-8 w-full overflow-auto custom-scroll pt-10 pb-2 *:w-25 *:min-w-25 relative z-1">
-          @for (hut of huts(); track $index) {
-            <app-hut-card
-              (click)="
-                chooseItem({
-                  data: hut,
-                  localSpaceType: SpacesEnum.Huts,
-                })
-              "
-              [data]="hut"
-            />
-          }
-        </div>
-      }
-    }
+    </div>
 
     <!--  -->
-    @if (changeToSpace() == localSpacesEnum.Huts) {
+    @if (changeToSpace() == localSpaceTypeEnum.Hut) {
       <form
         [formGroup]="hutChangeFg"
-        class="flex w-full *:flex-1 [&_p-select]:h-[46px]! [&_input]:h-[46px]! items-start gap-4 relative z-2  "
+        class="flex w-full *:flex-1 [&_p-select]:h-[46px]! [&_input]:h-[46px]! items-start gap-4 relative z-2"
       >
         <div>
           <label for="productName">مدة الحجز</label>

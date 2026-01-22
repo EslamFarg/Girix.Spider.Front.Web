@@ -5,12 +5,17 @@ import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
-import { ReplacementsService, SpacesEnum } from '../../services/replacements-service';
+import { ReplacementsService, SpaceTypeEnum } from '../../services/replacements-service';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdown';
 import { HutCard } from '@/components/hut-card/hut-card';
 import { date } from '@primeuix/themes/aura/datepicker';
-import { HutSearchEnum, HutService, IHutDtoResponse, IHutRowResponse } from '@/features/restaurant/services/hut-service';
+import {
+  HutSearchEnum,
+  HutService,
+  IHutDtoResponse,
+  IHutRowResponse,
+} from '@/features/restaurant/services/hut-service';
 import { noSymbolsAllowed } from '@/lib/text-validators';
 import { MenuItem } from 'primeng/api';
 import { omitKeys } from '@/lib/helpers';
@@ -104,12 +109,12 @@ export class Huts extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  huts=signal<IHutRowResponse[]>([]);
-  hutsPaginationInfo:IPaginationInfo={
-    pageIndex:1,
-    totalPagesCount:0,
-    totalRowsCount:0
-  }
+  huts = signal<IHutRowResponse[]>([]);
+  hutsPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
   searchHuts(pageIndex: number) {
     this.hutService
       .search({
@@ -140,5 +145,4 @@ export class Huts extends BaseComponent {
   onSearchSubmit = () => this.searchFg.valid && this.searchHuts(1);
 
   onPageChange = (event: PaginatorState) => this.searchHuts(event.page! + 1);
- 
 }

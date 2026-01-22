@@ -29,6 +29,6 @@ export class App {
         this.translate.use('ar');
 
         //go to replacements
-        this.router.navigate(['replacements/huts']);
+        // this.router.navigate(['replacements/huts']);
     }
 }

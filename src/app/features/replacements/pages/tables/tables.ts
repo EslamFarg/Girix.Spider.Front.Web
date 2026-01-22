@@ -5,7 +5,7 @@ import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
-import { ReplacementsService, SpacesEnum } from '../../services/replacements-service';
+import { ReplacementsService, SpaceTypeEnum } from '../../services/replacements-service';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { TableCard } from '@/components/table-card/table-card';
 import { CountdownConfig, CountdownEvent } from 'ngx-countdown';

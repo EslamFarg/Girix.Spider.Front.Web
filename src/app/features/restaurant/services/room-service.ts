@@ -13,7 +13,7 @@ export interface IRoomUpdateDto {
   id: number;
   name: string;
 }
-export interface IRoomRowResponse {
+export interface IRoomSearchRowResponse {
   id: number;
   name: string;
   pricePerHour: number;
@@ -23,7 +23,18 @@ export interface IRoomRowResponse {
   orderId: number;
 }
 
-export interface IRoomDtoResponse {
+export interface IRoomSearchResponse {
+  rows: IRoomSearchRowResponse[];
+  paginationInfo: {
+    totalRowsCount: number;
+    totalPagesCount: number;
+    currentPageIndex: number;
+  };
+}
+
+//get by id
+
+export interface IRoomReadResponse {
   id: number;
   name: string;
   isAvailable: boolean;
@@ -31,14 +42,6 @@ export interface IRoomDtoResponse {
   orderId: number;
 }
 
-export interface IRoomSearchResponse {
-  rows: IRoomRowResponse[];
-  paginationInfo: {
-    totalRowsCount: number;
-    totalPagesCount: number;
-    currentPageIndex: number;
-  };
-}
 
 @Injectable({
   providedIn: 'root',
@@ -47,7 +50,7 @@ export class RoomService extends BaseService<
   RoomSearchEnum,
   IRoomCreateDto,
   IRoomUpdateDto,
-  IRoomDtoResponse,
+  IRoomReadResponse,
   IRoomSearchResponse
 > {
   override apiRoute = 'Room';

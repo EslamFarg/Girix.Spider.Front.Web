@@ -31,7 +31,7 @@ import { Debounce } from '@/directives/debounce';
   templateUrl: './tables.html',
   styleUrl: './tables.css',
 })
-export class Tables extends BaseComponent  {
+export class Tables extends BaseComponent {
   currentItem: ITableDtoResponse | null = null;
 
   initialTableFormValue = {
@@ -127,12 +127,12 @@ export class Tables extends BaseComponent  {
   }
 
   tables = signal<ITableRowResponse[]>([]);
-  
-    tablesPaginationInfo: IPaginationInfo = {
-      pageIndex: 1,
-      totalRowsCount: 0,
-      totalPagesCount: 0,
-    };
+
+  tablesPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0,
+  };
 
   searchTables(pageIndex: number) {
     this.tableService
@@ -164,8 +164,6 @@ export class Tables extends BaseComponent  {
   onSearchSubmit = () => this.searchFg.valid && this.searchTables(1);
 
   onPageChange = (event: PaginatorState) => this.searchTables(event.page! + 1);
-
-  
 
   onTableFormSubmit() {
     if (this.tableFg.invalid) {

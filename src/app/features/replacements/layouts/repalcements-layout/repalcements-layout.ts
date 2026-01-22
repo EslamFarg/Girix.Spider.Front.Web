@@ -1,6 +1,6 @@
 import { IRoomRowResponse, RoomSearchEnum, RoomService } from '@/features/restaurant/services/room-service';
 import { Component, effect, inject, signal } from '@angular/core';
-import { ILocalSpaceItem, ReplacementsService, SpacesEnum } from '../../services/replacements-service';
+import { ILocalSpaceItem, ReplacementsService, SpaceTypeEnum } from '../../services/replacements-service';
 import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdown';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { Button } from 'primeng/button';
@@ -39,29 +39,30 @@ type allowedDurationMinute = 30 | 60 | 90 | 120 | 150 | 180;
   styleUrl: './repalcements-layout.css',
 })
 export class RepalcementsLayout extends BaseComponent {
-  SpacesEnum = SpacesEnum;
+  SpaceTypeEnum = SpaceTypeEnum;
 
   //
 
   replacementsService = inject(ReplacementsService);
   isVisible = this.replacementsService.isDialogVisible;
   currentItem = this.replacementsService.currentItem;
-  changeToSpace = signal<SpacesEnum>(SpacesEnum.Rooms);
+  changeToSpace = signal<SpaceTypeEnum>(SpaceTypeEnum.Room);
   orderService = inject(OrderService);
   countdownConfig: CountdownConfig = { format: 'hh:mm:ss', leftTime: 60 * 60 * 2 };
   handleCountdownEvent(event: CountdownEvent) {}
   closeDialog = this.replacementsService.closeDialog;
 
-  setChangeToSpace(spaceType: SpacesEnum) {
+  setChangeToSpace(spaceType: SpaceTypeEnum) {
     this.changeToSpace.set(spaceType);
+    this.hutChangeFg.reset();
     switch (spaceType) {
-      case SpacesEnum.Rooms:
+      case SpaceTypeEnum.Room:
         this.searchRooms(1);
         break;
-      case SpacesEnum.Huts:
+      case SpaceTypeEnum.Hut:
         this.searchHuts(1);
         break;
-      case SpacesEnum.Tables:
+      case SpaceTypeEnum.Table:
         this.searchTables(1);
         break;
     }
@@ -77,13 +78,13 @@ export class RepalcementsLayout extends BaseComponent {
     // this.router.events.subscribe(() => {
     //   if (this.isVisible() && this.currentItem()) {
     //     switch (this.changeToSpace()) {
-    //       case SpacesEnum.Rooms:
+    //       case SpaceTypeEnum.Rooms:
     //         this.searchRooms(1);
     //         break;
-    //       case SpacesEnum.Huts:
+    //       case SpaceTypeEnum.Huts:
     //         this.searchHuts(1);
     //         break;
-    //       case SpacesEnum.Tables:
+    //       case SpaceTypeEnum.Tables:
     //         this.searchTables(1);
     //         break;
     //     }
@@ -93,13 +94,13 @@ export class RepalcementsLayout extends BaseComponent {
     effect(() => {
       if (this.isVisible() && this.currentItem()) {
         switch (this.changeToSpace()) {
-          case SpacesEnum.Rooms:
+          case SpaceTypeEnum.Room:
             this.searchRooms(1);
             break;
-          case SpacesEnum.Huts:
+          case SpaceTypeEnum.Hut:
             this.searchHuts(1);
             break;
-          case SpacesEnum.Tables:
+          case SpaceTypeEnum.Table:
             this.searchTables(1);
             break;
         }
@@ -109,6 +110,12 @@ export class RepalcementsLayout extends BaseComponent {
 
   changeToItem = signal<ILocalSpaceItem | null>(null);
   chooseItem(item: ILocalSpaceItem) {
+    if (item.localSpaceType == SpaceTypeEnum.Hut) {
+      this.hutChangeFg.patchValue({
+        name: item.data.name,
+        pricePerHour: item.data.pricePerHour,
+      });
+    }
     this.changeToItem.set(item);
   }
 
@@ -118,11 +125,13 @@ export class RepalcementsLayout extends BaseComponent {
     if (!item) {
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب اختيار المكان' });
     }
-    
-    if (item?.localSpaceType == this.localSpacesEnum.Huts && this.hutChangeFg.invalid) {
+
+    if (item?.localSpaceType == this.localSpaceTypeEnum.Hut && this.hutChangeFg.invalid) {
       this.hutChangeFg.markAllAsTouched();
       return;
     }
+
+    console.log(item)
 
     this.orderService
       .changeLocalPlace({
@@ -138,7 +147,7 @@ export class RepalcementsLayout extends BaseComponent {
           this.closeDialog();
         },
         error: (err) => {
-          this.messageService.add({ severity: 'error', summary: 'خطأ', detail: err.error.detail });
+          this.messageService.add({ severity: 'error', summary: err.title, detail: err.detail });
         },
       });
   }
@@ -167,8 +176,8 @@ export class RepalcementsLayout extends BaseComponent {
         },
         searchFilters: [
           {
-            column: RoomSearchEnum.Name,
-            values: [''],
+            column: RoomSearchEnum.IsAvaliable,
+            values: ['true'],
           },
         ],
         fromDate: null,
@@ -187,12 +196,23 @@ export class RepalcementsLayout extends BaseComponent {
         },
       });
   }
-  onRoomsScroll(event: Event) {
-    const menuContainer = event.target as HTMLElement;
+  onScroll(event: Event) {
+    let scrollingContainer = event.target as HTMLElement;
 
-    // if at bottom
-    if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
-      this.searchRooms(this.roomPaginationInfo.pageIndex + 1);
+    const rightOffset = Math.abs(scrollingContainer.scrollLeft) + scrollingContainer.offsetWidth;
+
+    if ( rightOffset < scrollingContainer.scrollWidth - 5) return;
+
+    switch (this.changeToSpace()) {
+      case SpaceTypeEnum.Room:
+        this.searchRooms(this.roomPaginationInfo.pageIndex + 1);
+        break;
+      case SpaceTypeEnum.Hut:
+        this.searchHuts(this.hutPaginationInfo.pageIndex + 1);
+        break;
+      case SpaceTypeEnum.Table:
+        this.searchTables(this.tablePaginationInfo.pageIndex + 1);
+        break;
     }
   }
 
@@ -226,8 +246,8 @@ export class RepalcementsLayout extends BaseComponent {
         },
         searchFilters: [
           {
-            column: HutSearchEnum.Name,
-            values: [''],
+            column: HutSearchEnum.IsAvaliable,
+            values: ['true'],
           },
         ],
         fromDate: null,
@@ -278,8 +298,8 @@ export class RepalcementsLayout extends BaseComponent {
         },
         searchFilters: [
           {
-            column: TableSearchEnum.Name,
-            values: [''],
+            column: TableSearchEnum.IsAvaliable,
+            values: ['true'],
           },
         ],
         fromDate: null,

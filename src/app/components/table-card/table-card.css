@@ -1,3 +1,15 @@
+:host {
+  --color: black;
+
+  &.active {
+    --color: 80, 209, 170 !important;
+    & .bordered {
+      border-color: rgb(var(--color));
+    }
+  }
+  border-color: rgb(var(--color));
+  color: rgb(var(--color));
+}
 .table-available {
   --color: black;
   &:hover {

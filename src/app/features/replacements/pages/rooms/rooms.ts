@@ -6,10 +6,15 @@ import { BaseComponent, IPaginationInfo } from '@/components/base-component/base
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { ReplacementsService, SpacesEnum } from '../../services/replacements-service';
+import { ReplacementsService, SpaceTypeEnum } from '../../services/replacements-service';
 import { RoomCard } from '@/components/room-card/room-card';
 import { CountdownConfig, CountdownEvent } from 'ngx-countdown';
-import { IRoomDtoResponse, IRoomRowResponse, RoomSearchEnum, RoomService } from '@/features/restaurant/services/room-service';
+import {
+  IRoomReadResponse,
+  IRoomSearchRowResponse,
+  RoomSearchEnum,
+  RoomService,
+} from '@/features/restaurant/services/room-service';
 import { MenuItem } from 'primeng/api';
 
 @Component({
@@ -53,7 +58,7 @@ export class Rooms extends BaseComponent {
     // });
   }
 
-  currentItem: IRoomDtoResponse | null = null;
+  currentItem: IRoomReadResponse | null = null;
 
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
@@ -101,12 +106,12 @@ export class Rooms extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  rooms=signal<IRoomRowResponse[]>([]);
-  roomsPaginationInfo:IPaginationInfo={
-    pageIndex:1,
-    totalPagesCount:0,
-    totalRowsCount:0
-  }
+  rooms = signal<IRoomSearchRowResponse[]>([]);
+  roomsPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
   searchRooms(pageIndex: number) {
     this.roomService
       .search({
@@ -137,5 +142,4 @@ export class Rooms extends BaseComponent {
   onSearchSubmit = () => this.searchFg.valid && this.searchRooms(1);
 
   onPageChange = (event: PaginatorState) => this.searchRooms(event.page! + 1);
- 
 }

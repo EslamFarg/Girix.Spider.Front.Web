@@ -1,5 +1,5 @@
 import { BaseComponent } from '@/components/base-component/base-component';
-import {    SpacesEnum } from '@/features/replacements/services/replacements-service';
+import { SpaceTypeEnum } from '@/features/replacements/services/replacements-service';
 import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Paginator } from 'primeng/paginator';

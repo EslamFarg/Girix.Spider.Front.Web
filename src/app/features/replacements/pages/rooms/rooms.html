@@ -39,27 +39,19 @@
         (click)="
           openDialog({
             data: item,
-            localSpaceType: localSpacesEnum.Rooms,
+            localSpaceType: localSpaceTypeEnum.Room,
           })
         "
         [data]="item"
-      />
-      <!-- <div
-      style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
-      class="flex border cursor-pointer border-[#393C49] aspect-[0.89] available items-center justify-center bg-white rounded"
-      [class.replacements-available]="$index % 3 == 0"
-      [class.replacements-reserved]="$index % 4 == 1"
-      (click)="openDialog()"
-    >
-      <span class="text-black font-bold">R{{ $index + 1 }}</span>
-    </div> -->
+      /> 
     }
   </div>
 
   <p-paginator
     (onPageChange)="onPageChange($event)"
-    [first]="(roomsPaginationInfo.pageIndex - 1) * 10"
+    [first]="getCurrentRowsIx(roomsPaginationInfo.pageIndex)"
     [rows]="10"
+    [showFirstLastIcon]="false"
     [totalRecords]="roomsPaginationInfo.totalRowsCount"
   />
 </app-section-wrapper>

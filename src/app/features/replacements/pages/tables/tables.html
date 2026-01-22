@@ -35,13 +35,14 @@
     class="grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-7 md:grid-cols-4 md:gap-9 xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8"
   >
     @for (item of tables(); track $index) {
-      <app-table-card (click)="openDialog({ data: item, localSpaceType: localSpacesEnum.Tables })" [data]="item" />
+      <app-table-card (click)="openDialog({ data: item, localSpaceType: localSpaceTypeEnum.Table })" [data]="item" />
     }
   </div>
 
   <p-paginator
     (onPageChange)="onPageChange($event)"
-    [first]="0"
+    [first]="getCurrentRowsIx(tablesPaginationInfo.pageIndex)"
+    [showFirstLastIcon]="false"
     [rows]="10"
     [totalRecords]="tablesPaginationInfo.totalRowsCount"
   />

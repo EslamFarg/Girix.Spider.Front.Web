@@ -1,4 +1,4 @@
-<app-section-wrapper class="block p-4 pt-8 overflow-auto custom-scroll h-full" styleClass="no-scrollbar">
+<app-section-wrapper class="block p-4 md:pt-8 overflow-auto custom-scroll h-full" styleClass="no-scrollbar">
   <!-- search -->
   <form #form [formGroup]="searchFg" (ngSubmit)="onSearchSubmit()">
     <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
@@ -44,7 +44,7 @@
   >
     @for (item of huts(); track item.id) {
       <app-hut-card
-        (click)="openDialog({ data: item, localSpaceType: localSpacesEnum.Huts })"
+        (click)="openDialog({ data: item, localSpaceType: localSpaceTypeEnum.Hut })"
         class="self-end"
         [class.mt-[50%]]="$first"
         [data]="item"
@@ -54,7 +54,8 @@
 
   <p-paginator
     (onPageChange)="onPageChange($event)"
-    [first]="(hutsPaginationInfo.pageIndex - 1) * 10"
+    [showFirstLastIcon]="false"
+    [first]="getCurrentRowsIx(hutsPaginationInfo.pageIndex)"
     [rows]="10"
     [totalRecords]="hutsPaginationInfo.totalRowsCount"
   />

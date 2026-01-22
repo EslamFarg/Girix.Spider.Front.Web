@@ -1,8 +1,8 @@
 <app-section-wrapper class="block mt-4 p-4 overflow-auto custom-scroll">
   <!-- search -->
-  <form #form [formGroup]="fg" (ngSubmit)="onSubmit()">
-    <app-input-error-message-handler [fc]="fg.get('text')">
-      <input class="w-full bg-transparent! h-8!" pInputText type="text" formControlName="text" placeholder="بحث" />
+  <form #form [formGroup]="searchFg" (ngSubmit)="onSearchSubmit()">
+    <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
+      <input class="w-full bg-transparent! h-8!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
       <p-inputgroup-addon class="p-0!">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -26,37 +26,21 @@
 
   <!-- items grid -->
   <div class="grid grid-cols-6 my-4 mt-25" style="row-gap: 8rem; column-gap: 6rem">
-    @for (item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]; track $index) {
-      <div
-        class="relative text-black cursor-pointer"
-        [class.hut-available]="$index % 3 == 0"
-        [class.hut-reserved]="$index % 4 == 1"
-        [class.hut-on-hold]="$index % 5 == 1"
-        (click)="openCollectionInvoiceDialog()"
-      >
-        <div
-          class="absolute w-4/6 hut rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded"
-          style="
-            background: linear-gradient(147deg, rgba(255, 255, 255, 0.5) 6.91%, rgba(153, 153, 153, 0.5) 91.82%);
-            backdrop-filter: blur(30.445161819458008px);
-            box-shadow: -4px -4px 6.09px 0px rgba(var(--color), 0.5);
-          "
-        ></div>
-        <div
-          style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
-          class="flex border-2 z-10 relative border-transparent aspect-[calc(110/72)] available items-center justify-center bg-[#E2E2E2] rounded-2xl"
-        >
-          <span class="font-bold">R{{ $index + 1 }}</span>
-        </div>
-        <countdown
-          #countdown
-          class="mx-auto w-fit block"
-          [config]="countdownConfig"
-          (event)="handleCountdownEvent($event)"
-        />
-      </div>
+    @for (hut of huts(); track $index) {
+      <app-hut-card
+        (click)="openCollectionInvoiceDialog(hut.orderId, !hut.isAvailable)"
+        class="self-end"
+        [class.mt-[50%]]="$first"
+        [data]="hut"
+      />
     }
   </div>
 
-  <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
+  <p-paginator
+    (onPageChange)="onPageChange($event)"
+    [first]="getCurrentRowsIx(1)"
+    [showFirstLastIcon]="false"
+    [rows]="10"
+    [totalRecords]="120"
+  />
 </app-section-wrapper>

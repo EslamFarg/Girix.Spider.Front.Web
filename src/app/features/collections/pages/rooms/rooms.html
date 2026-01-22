@@ -25,19 +25,28 @@
   </form>
 
   <!-- items grid -->
-  <div class="grid gap-4 sm:grid-cols-3 sm:gap-[1rem_2rem] md:grid-cols-4 md:gap-[2rem_4rem] lg:grid-cols-5 lg:gap-[3rem_6rem] xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8" style="row-gap: 4rem; column-gap: 7rem">
-    @for (item of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 ]; track $index) {
-    <div
-      style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #ffffff4d inset"
-      class="flex border cursor-pointer border-[#393C49] aspect-[0.89] available items-center justify-center bg-white rounded"
-      [class.replacements-available]="$index % 3 == 0"
-      [class.replacements-reserved]="$index % 4 == 1"
-      (click)="openCollectionInvoiceDialog()"
-    >
-      <span class="text-black font-bold">R{{ $index + 1 }}</span>
-    </div>
+  <div
+    class="grid gap-4 sm:grid-cols-3 sm:gap-[1rem_2rem] md:grid-cols-4 md:gap-[2rem_4rem] lg:grid-cols-5 lg:gap-[3rem_6rem] xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8"
+    style="row-gap: 4rem; column-gap: 7rem"
+  >
+    @for (item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]; track $index) {
+      <app-room-card
+        (click)="
+          openDialog({
+            data: item,
+            localSpaceType: localSpaceTypeEnum.Room,
+          })
+        "
+        [data]="item"
+      />
     }
   </div>
 
-  <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
+  <p-paginator
+    (onPageChange)="onPageChange($event)"
+    [first]="getCurrentRowsIx(1)"
+    [showFirstLastIcon]="false"
+    [rows]="10"
+    [totalRecords]="120"
+  />
 </app-section-wrapper>
