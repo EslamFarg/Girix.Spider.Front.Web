@@ -1,4 +1,4 @@
-import { ITableRowResponse } from '@/features/restaurant/services/table-service';
+import { ITableSearchRow } from '@/features/restaurant/services/table-service';
 import { Component, input, signal, computed } from '@angular/core';
 export enum TableStatus {
   Available = 0,
@@ -14,7 +14,7 @@ export enum TableStatus {
 export class TableCard {
   TableStatus = TableStatus;
   tableStatus = signal<TableStatus>(TableStatus.Available);
-  data = input.required<ITableRowResponse>();
+  data = input.required<ITableSearchRow>();
 
   ngOnInit() {
     if (this.data().isAvailable) {

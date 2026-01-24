@@ -1,8 +1,14 @@
 <app-section-wrapper class="block mt-4 p-4 overflow-auto custom-scroll">
   <!-- search -->
-  <form #form [formGroup]="fg" (ngSubmit)="onSubmit()">
-    <app-input-error-message-handler [fc]="fg.get('text')">
-      <input class="w-full bg-transparent! h-8!" pInputText type="text" formControlName="text" placeholder="بحث" />
+  <form #form [formGroup]="searchFg" (ngSubmit)="onSearchSubmit()">
+    <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
+      <input
+        class="w-full bg-transparent! h-8!"
+        pInputText
+        type="text"
+        formControlName="searchTerm"
+        placeholder="بحث"
+      />
       <p-inputgroup-addon class="p-0!">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -29,16 +35,8 @@
     class="grid gap-4 sm:grid-cols-3 sm:gap-[1rem_2rem] md:grid-cols-4 md:gap-[2rem_4rem] lg:grid-cols-5 lg:gap-[3rem_6rem] xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8"
     style="row-gap: 4rem; column-gap: 7rem"
   >
-    @for (item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]; track $index) {
-      <app-room-card
-        (click)="
-          openDialog({
-            data: item,
-            localSpaceType: localSpaceTypeEnum.Room,
-          })
-        "
-        [data]="item"
-      />
+    @for (room of rooms(); track $index) {
+      <app-room-card (click)="openCollectionDialog(room.orderId, room.isAvailable)" [data]="room" />
     }
   </div>
 
@@ -47,6 +45,6 @@
     [first]="getCurrentRowsIx(1)"
     [showFirstLastIcon]="false"
     [rows]="10"
-    [totalRecords]="120"
+    [totalRecords]="roomsPaginationInfo().totalRowsCount"
   />
 </app-section-wrapper>

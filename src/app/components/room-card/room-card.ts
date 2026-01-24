@@ -1,4 +1,4 @@
-import { IRoomRowResponse } from '@/features/restaurant/services/room-service';
+import { IRoomSearchRow } from '@/features/restaurant/services/room-service';
 import { Component, computed, input, signal } from '@angular/core';
 
 export enum RoomStatus {
@@ -17,7 +17,7 @@ export class RoomCard {
   RoomStatus = RoomStatus;
   hutStatus = signal<RoomStatus>(RoomStatus.Available);
 
-  data = input.required<IRoomRowResponse>();
+  data = input.required<IRoomSearchRow>();
 
   ngOnInit() {
     if (this.data().isAvailable) {

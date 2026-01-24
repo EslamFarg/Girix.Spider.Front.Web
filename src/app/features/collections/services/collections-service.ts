@@ -18,7 +18,7 @@ export class CollectionsService extends BaseService {
   currentItem = signal<IOrderReadResponse | null>(null);
   orderService=inject(OrderService);
 
-  openCollectionInvoiceDialog = (orderId: number, isCollected: boolean) => {
+  openCollectionDialog = (orderId: number, isCollected: boolean) => {
     if (isCollected) {
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الطلب محصل' });
       return;

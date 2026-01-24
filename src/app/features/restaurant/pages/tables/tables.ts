@@ -8,7 +8,7 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { ITableDtoResponse, ITableRowResponse, TableSearchEnum, TableService } from '../../services/table-service';
+import { ITableReadResponse, ITableSearchRow, TableSearchEnum, TableService } from '../../services/table-service';
 import { noSymbolsAllowed } from '@/lib/text-validators';
 import { omitKeys } from '@/lib/helpers';
 import { MenuItem } from 'primeng/api';
@@ -32,7 +32,7 @@ import { Debounce } from '@/directives/debounce';
   styleUrl: './tables.css',
 })
 export class Tables extends BaseComponent {
-  currentItem: ITableDtoResponse | null = null;
+  currentItem: ITableReadResponse | null = null;
 
   initialTableFormValue = {
     id: this.fb.control<number>(0, []),
@@ -126,7 +126,7 @@ export class Tables extends BaseComponent {
     });
   }
 
-  tables = signal<ITableRowResponse[]>([]);
+  tables = signal<ITableSearchRow[]>([]);
 
   tablesPaginationInfo: IPaginationInfo = {
     pageIndex: 1,

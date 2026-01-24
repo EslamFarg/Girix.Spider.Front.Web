@@ -28,10 +28,10 @@ import { HutCard } from '@/components/hut-card/hut-card';
 import { RoomCard } from '@/components/room-card/room-card';
 import { TableCard } from '@/components/table-card/table-card';
 import { DatePipe } from '@angular/common';
-import { HutSearchEnum, HutService, IHutRowResponse } from '@/features/restaurant/services/hut-service';
+import { HutSearchEnum, HutService, IHutSearchRow } from '@/features/restaurant/services/hut-service';
 import { Debounce } from '@/directives/debounce';
-import { ITableRowResponse, TableSearchEnum, TableService } from '@/features/restaurant/services/table-service';
-import { IRoomRowResponse, RoomSearchEnum, RoomService } from '@/features/restaurant/services/room-service';
+import { ITableSearchRow, TableSearchEnum, TableService } from '@/features/restaurant/services/table-service';
+import { IRoomSearchRow, RoomSearchEnum, RoomService } from '@/features/restaurant/services/room-service';
 import { Carousel } from 'primeng/carousel';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
@@ -70,7 +70,8 @@ interface IOrderCreateFgValue {
     DatePipe,
     Debounce,
     Carousel,
-    GalleriaModule,Slider
+    GalleriaModule,
+    Slider,
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -225,7 +226,7 @@ export class Home extends BaseComponent {
   //huts
 
   hutService = inject(HutService);
-  huts = signal<IHutRowResponse[]>([]);
+  huts = signal<IHutSearchRow[]>([]);
   hutPaginationInfo: {
     pageIndex: number;
     totalPagesCount: number;
@@ -275,7 +276,7 @@ export class Home extends BaseComponent {
   //tables
 
   tableService = inject(TableService);
-  tables = signal<ITableRowResponse[]>([]);
+  tables = signal<ITableSearchRow[]>([]);
   tablePaginationInfo: {
     pageIndex: number;
     totalPagesCount: number;
@@ -325,7 +326,7 @@ export class Home extends BaseComponent {
   //rooms
 
   roomService = inject(RoomService);
-  rooms = signal<IRoomRowResponse[]>([]);
+  rooms = signal<IRoomSearchRow[]>([]);
   roomPaginationInfo: {
     pageIndex: number;
     totalPagesCount: number;
@@ -532,6 +533,4 @@ export class Home extends BaseComponent {
       );
     }
   }
-
- 
 }

@@ -1,4 +1,4 @@
-import { IRoomRowResponse, RoomSearchEnum, RoomService } from '@/features/restaurant/services/room-service';
+import { IRoomSearchRow, RoomSearchEnum, RoomService } from '@/features/restaurant/services/room-service';
 import { Component, effect, inject, signal } from '@angular/core';
 import { ILocalSpaceItem, ReplacementsService, SpaceTypeEnum } from '../../services/replacements-service';
 import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdown';
@@ -8,8 +8,8 @@ import { Dialog } from 'primeng/dialog';
 import { Select } from 'primeng/select';
 import { InputText } from 'primeng/inputtext';
 import { RouterOutlet } from '@angular/router';
-import { HutService, IHutRowResponse, HutSearchEnum } from '@/features/restaurant/services/hut-service';
-import { ITableRowResponse, TableSearchEnum, TableService } from '@/features/restaurant/services/table-service';
+import { HutService, IHutSearchRow, HutSearchEnum } from '@/features/restaurant/services/hut-service';
+import { ITableSearchRow, TableSearchEnum, TableService } from '@/features/restaurant/services/table-service';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { HutCard } from '@/components/hut-card/hut-card';
 import { RoomCard } from '@/components/room-card/room-card';
@@ -131,7 +131,7 @@ export class RepalcementsLayout extends BaseComponent {
       return;
     }
 
-    console.log(item)
+    console.log(item);
 
     this.orderService
       .changeLocalPlace({
@@ -161,7 +161,7 @@ export class RepalcementsLayout extends BaseComponent {
   //dialog rooms
 
   roomService = inject(RoomService);
-  rooms = signal<IRoomRowResponse[]>([]);
+  rooms = signal<IRoomSearchRow[]>([]);
   roomPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,
@@ -201,7 +201,7 @@ export class RepalcementsLayout extends BaseComponent {
 
     const rightOffset = Math.abs(scrollingContainer.scrollLeft) + scrollingContainer.offsetWidth;
 
-    if ( rightOffset < scrollingContainer.scrollWidth - 5) return;
+    if (rightOffset < scrollingContainer.scrollWidth - 5) return;
 
     switch (this.changeToSpace()) {
       case SpaceTypeEnum.Room:
@@ -231,7 +231,7 @@ export class RepalcementsLayout extends BaseComponent {
   hutChangeFg = this.fb.group(this.hutChangeFgInitialValue);
 
   hutService = inject(HutService);
-  huts = signal<IHutRowResponse[]>([]);
+  huts = signal<IHutSearchRow[]>([]);
   hutPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,
@@ -283,7 +283,7 @@ export class RepalcementsLayout extends BaseComponent {
   //dialog tables
 
   tableService = inject(TableService);
-  tables = signal<ITableRowResponse[]>([]);
+  tables = signal<ITableSearchRow[]>([]);
   tablePaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,

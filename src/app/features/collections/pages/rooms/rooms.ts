@@ -1,23 +1,38 @@
-import { BaseComponent } from '@/components/base-component/base-component';
-import { Component, inject } from '@angular/core';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
+import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { Paginator } from "primeng/paginator";
-import { InputGroupAddon } from "primeng/inputgroupaddon";
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
-import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
+import { Paginator, PaginatorState } from 'primeng/paginator';
+import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { CollectionsService } from '../../services/collections-service';
-import { InputText } from "primeng/inputtext";
-import { RoomCard } from "@/components/room-card/room-card";
-import { IRoomRowResponse } from '@/features/restaurant/services/room-service';
+import { InputText } from 'primeng/inputtext';
+import { RoomCard } from '@/components/room-card/room-card';
+import {
+  IRoomReadResponse,
+  IRoomSearchResponse,
+  IRoomSearchRow,
+  RoomSearchEnum,
+  RoomService,
+} from '@/features/restaurant/services/room-service';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-rooms',
-  imports: [Paginator, InputGroupAddon, InputErrorMessageHandler, SectionWrapper, ReactiveFormsModule, InputText, RoomCard],
+  imports: [
+    Paginator,
+    InputGroupAddon,
+    InputErrorMessageHandler,
+    SectionWrapper,
+    ReactiveFormsModule,
+    InputText,
+    RoomCard,
+  ],
   templateUrl: './rooms.html',
   styleUrl: './rooms.css',
 })
 export class Rooms extends BaseComponent {
- dateNow = new Date();
+  dateNow = new Date();
   getFutureDate() {
     const date = new Date(this.dateNow);
     date.setDate(date.getDate() + 1);
@@ -30,12 +45,7 @@ export class Rooms extends BaseComponent {
   }
 
   collectionsService = inject(CollectionsService);
-  openDialog = this.collectionsService.openCollectionInvoiceDialog;
-
-  //countdown
-  // countDownEles = viewChildren<CountdownComponent>('countdown');
-  countdownConfig: CountdownConfig = { format: 'hh:mm:ss', leftTime: 60 * 60 * 2 };
-  handleCountdownEvent(event: CountdownEvent) {}
+  openCollectionDialog = this.collectionsService.openCollectionDialog;
 
   ngAfterViewInit() {
     // this.countDownEles().forEach((ele) => {
@@ -43,7 +53,7 @@ export class Rooms extends BaseComponent {
     // });
   }
 
-  currentItem: IRoomDtoResponse | null = null;
+  currentItem: IRoomReadResponse | null = null;
 
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
@@ -91,12 +101,12 @@ export class Rooms extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  rooms = signal<IRoomRowResponse[]>([]);
-  roomsPaginationInfo: IPaginationInfo = {
+  rooms = signal<IRoomSearchRow[]>([]);
+  roomsPaginationInfo = signal<IPaginationInfo>({
     pageIndex: 1,
     totalPagesCount: 0,
     totalRowsCount: 0,
-  };
+  });
   searchRooms(pageIndex: number) {
     this.roomService
       .search({
@@ -115,11 +125,11 @@ export class Rooms extends BaseComponent {
       .subscribe({
         next: (res) => {
           this.rooms.set(res.value.rows);
-          this.roomsPaginationInfo = {
+          this.roomsPaginationInfo.set({
             pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
+          });
         },
       });
   }
@@ -127,6 +137,4 @@ export class Rooms extends BaseComponent {
   onSearchSubmit = () => this.searchFg.valid && this.searchRooms(1);
 
   onPageChange = (event: PaginatorState) => this.searchRooms(event.page! + 1);
-   
-
 }

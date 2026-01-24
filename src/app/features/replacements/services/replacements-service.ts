@@ -1,7 +1,7 @@
 import BaseService from '@/core/services/BaseService';
-import { IHutRowResponse } from '@/features/restaurant/services/hut-service';
-import { IRoomRowResponse } from '@/features/restaurant/services/room-service';
-import { ITableRowResponse } from '@/features/restaurant/services/table-service';
+import { IHutSearchRow } from '@/features/restaurant/services/hut-service';
+import { IRoomSearchRow } from '@/features/restaurant/services/room-service';
+import { ITableSearchRow } from '@/features/restaurant/services/table-service';
 import { computed, Injectable, signal } from '@angular/core';
 
 export enum SpaceTypeEnum {
@@ -12,7 +12,7 @@ export enum SpaceTypeEnum {
 }
 
 export interface ILocalSpaceItem {
-  data: IRoomRowResponse | IHutRowResponse | ITableRowResponse;
+  data: IRoomSearchRow | IHutSearchRow | ITableSearchRow;
   localSpaceType: SpaceTypeEnum;
 }
 

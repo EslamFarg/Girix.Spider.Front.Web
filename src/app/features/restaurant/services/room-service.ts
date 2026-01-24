@@ -6,14 +6,18 @@ export enum RoomSearchEnum {
   Name = SearchColumEnum.Name,
   IsAvaliable = SearchColumEnum.IsAvaliable,
 }
-export interface IRoomCreateDto {
+export interface IRoomCreateRequest {
   name: string;
 }
-export interface IRoomUpdateDto {
+export interface IRoomUpdateRequest {
   id: number;
   name: string;
 }
-export interface IRoomSearchRowResponse {
+
+
+//search
+
+export interface IRoomSearchRow {
   id: number;
   name: string;
   pricePerHour: number;
@@ -24,7 +28,7 @@ export interface IRoomSearchRowResponse {
 }
 
 export interface IRoomSearchResponse {
-  rows: IRoomSearchRowResponse[];
+  rows: IRoomSearchRow[];
   paginationInfo: {
     totalRowsCount: number;
     totalPagesCount: number;
@@ -48,8 +52,8 @@ export interface IRoomReadResponse {
 })
 export class RoomService extends BaseService<
   RoomSearchEnum,
-  IRoomCreateDto,
-  IRoomUpdateDto,
+  IRoomCreateRequest,
+  IRoomUpdateRequest,
   IRoomReadResponse,
   IRoomSearchResponse
 > {

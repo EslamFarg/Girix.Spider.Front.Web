@@ -6,14 +6,16 @@ export enum TableSearchEnum {
   Name = SearchColumEnum.Name,
   IsAvaliable = SearchColumEnum.IsAvaliable,
 }
-export interface ITableCreateDto {
+export interface ITableCreateRequest {
   name: string;
 }
-export interface ITableUpdateDto {
+export interface ITableUpdateRequest {
   id: number;
   name: string;
 }
-export interface ITableRowResponse {
+
+//search
+export interface ITableSearchRow  {
   id: number;
   name: string;
   pricePerHour: number;
@@ -22,16 +24,10 @@ export interface ITableRowResponse {
   reservedFrom: any;
   orderId: number;
 }
-export interface ITableDtoResponse {
-  id: number;
-  name: string;
-  isAvailable: boolean;
-  reservedFrom: string;
-  orderId: number;
-}
+
 
 export interface ITableSearchResponse {
-  rows: ITableRowResponse[];
+  rows: ITableSearchRow[];
   paginationInfo: {
     totalRowsCount: number;
     totalPagesCount: number;
@@ -39,14 +35,23 @@ export interface ITableSearchResponse {
   };
 }
 
+//get by id
+export interface ITableReadResponse {
+  id: number;
+  name: string;
+  isAvailable: boolean;
+  reservedFrom: string;
+  orderId: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class TableService extends BaseService<
   TableSearchEnum,
-  ITableCreateDto,
-  ITableUpdateDto,
-  ITableDtoResponse,
+  ITableCreateRequest,
+  ITableUpdateRequest,
+  ITableReadResponse,
   ITableSearchResponse
 > {
   override apiRoute = 'Table';

@@ -10,8 +10,8 @@ import { Paginator, PaginatorState } from 'primeng/paginator';
 import { TableCard } from '@/components/table-card/table-card';
 import { CountdownConfig, CountdownEvent } from 'ngx-countdown';
 import {
-  ITableDtoResponse,
-  ITableRowResponse,
+  ITableReadResponse,
+  ITableSearchRow,
   TableSearchEnum,
   TableService,
 } from '@/features/restaurant/services/table-service';
@@ -58,7 +58,7 @@ export class Tables extends BaseComponent {
     // });
   }
 
-  currentItem: ITableDtoResponse | null = null;
+  currentItem: ITableReadResponse | null = null;
 
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
@@ -106,7 +106,7 @@ export class Tables extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  tables = signal<ITableRowResponse[]>([]);
+  tables = signal<ITableSearchRow[]>([]);
 
   tablesPaginationInfo: IPaginationInfo = {
     pageIndex: 1,

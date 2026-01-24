@@ -8,7 +8,7 @@ import { Select } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { HutSearchEnum, HutService, IHutDtoResponse, IHutRowResponse } from '../../services/hut-service';
+import { HutSearchEnum, HutService, IHutReadResponse, IHutSearchRow } from '../../services/hut-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { noSymbolsAllowed } from '@/lib/text-validators';
 import { omitKeys } from '@/lib/helpers';
@@ -33,8 +33,8 @@ import { Debounce } from '@/directives/debounce';
   templateUrl: './huts.html',
   styleUrl: './huts.css',
 })
-export class Huts extends BaseComponent  {
-  currentItem: IHutDtoResponse | null = null;
+export class Huts extends BaseComponent {
+  currentItem: IHutReadResponse | null = null;
 
   initialHutFormValue = {
     id: this.fb.control<number>(0, []),
@@ -98,12 +98,12 @@ export class Huts extends BaseComponent  {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
- huts=signal<IHutRowResponse[]>([]);
-  hutsPaginationInfo:IPaginationInfo={
-    pageIndex:1,
-    totalPagesCount:0,
-    totalRowsCount:0
-  }
+  huts = signal<IHutSearchRow[]>([]);
+  hutsPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
 
   searchHuts(pageIndex: number) {
     this.hutService

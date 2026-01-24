@@ -28,7 +28,7 @@
   <div class="grid grid-cols-6 my-4 mt-25" style="row-gap: 8rem; column-gap: 6rem">
     @for (hut of huts(); track $index) {
       <app-hut-card
-        (click)="openCollectionInvoiceDialog(hut.orderId, !hut.isAvailable)"
+        (click)="openCollectionDialog(hut.orderId, !hut.isAvailable)"
         class="self-end"
         [class.mt-[50%]]="$first"
         [data]="hut"
@@ -41,6 +41,6 @@
     [first]="getCurrentRowsIx(1)"
     [showFirstLastIcon]="false"
     [rows]="10"
-    [totalRecords]="120"
+    [totalRecords]="hutsPaginationInfo().totalRowsCount"
   />
 </app-section-wrapper>

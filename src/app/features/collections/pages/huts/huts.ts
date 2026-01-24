@@ -9,7 +9,7 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { CollectionsService } from '../../services/collections-service';
 import { InputText } from 'primeng/inputtext';
 import { HutCard } from "@/components/hut-card/hut-card";
-import { IHutDtoResponse, HutSearchEnum, HutService, IHutRowResponse } from '@/features/restaurant/services/hut-service';
+import { IHutReadResponse, HutSearchEnum, HutService, IHutSearchRow  } from '@/features/restaurant/services/hut-service';
 import { MenuItem } from 'primeng/api';
 
 @Component({
@@ -41,7 +41,7 @@ export class Huts extends BaseComponent {
   }
  
   collectionsService = inject(CollectionsService);
-  openCollectionInvoiceDialog = this.collectionsService.openCollectionInvoiceDialog;
+  openCollectionDialog = this.collectionsService.openCollectionDialog;
 
   //countdown
   // countDownEles = viewChildren<CountdownComponent>('countdown');
@@ -54,7 +54,7 @@ export class Huts extends BaseComponent {
     // });
   }
 
-  currentItem: IHutDtoResponse | null = null;
+  currentItem: IHutReadResponse | null = null;
 
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
@@ -102,12 +102,12 @@ export class Huts extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  huts = signal<IHutRowResponse[]>([]);
-  hutsPaginationInfo: IPaginationInfo = {
+  huts = signal<IHutSearchRow[]>([]);
+  hutsPaginationInfo=signal<IPaginationInfo>({
     pageIndex: 1,
     totalPagesCount: 0,
     totalRowsCount: 0,
-  };
+  });
   searchHuts(pageIndex: number) {
     this.hutService
       .search({
@@ -126,11 +126,11 @@ export class Huts extends BaseComponent {
       .subscribe({
         next: (res) => {
           this.huts.set(res.value.rows);
-          this.hutsPaginationInfo = {
+          this.hutsPaginationInfo.set({
             pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
+          });
         },
       });
   }

@@ -8,7 +8,7 @@ import { Select } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { IRoomDtoResponse, IRoomRowResponse, RoomSearchEnum, RoomService } from '../../services/room-service';
+import { IRoomReadResponse, IRoomSearchRow, RoomSearchEnum, RoomService } from '../../services/room-service';
 import { noSymbolsAllowed } from '@/lib/text-validators';
 import { omitKeys } from '@/lib/helpers';
 import { Debounce } from '@/directives/debounce';
@@ -31,8 +31,8 @@ import { MenuItem } from 'primeng/api';
   templateUrl: './rooms.html',
   styleUrl: './rooms.css',
 })
-export class Rooms extends BaseComponent  {
-  currentItem: IRoomDtoResponse | null = null;
+export class Rooms extends BaseComponent {
+  currentItem: IRoomReadResponse | null = null;
 
   initialRoomFormValue = {
     id: this.fb.control<number>(0, []),
@@ -88,7 +88,7 @@ export class Rooms extends BaseComponent  {
     this.searchRooms(1);
   }
 
-  rooms= signal<IRoomRowResponse[]>([]);
+  rooms = signal<IRoomSearchRow[]>([]);
   roomsPaginationInfo = signal<IPaginationInfo>({
     pageIndex: 1,
     totalPagesCount: 0,

@@ -10,12 +10,7 @@ import { Paginator, PaginatorState } from 'primeng/paginator';
 import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdown';
 import { HutCard } from '@/components/hut-card/hut-card';
 import { date } from '@primeuix/themes/aura/datepicker';
-import {
-  HutSearchEnum,
-  HutService,
-  IHutDtoResponse,
-  IHutRowResponse,
-} from '@/features/restaurant/services/hut-service';
+import { HutSearchEnum, HutService, IHutReadResponse, IHutSearchRow } from '@/features/restaurant/services/hut-service';
 import { noSymbolsAllowed } from '@/lib/text-validators';
 import { MenuItem } from 'primeng/api';
 import { omitKeys } from '@/lib/helpers';
@@ -61,7 +56,7 @@ export class Huts extends BaseComponent {
     // });
   }
 
-  currentItem: IHutDtoResponse | null = null;
+  currentItem: IHutReadResponse | null = null;
 
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
@@ -109,7 +104,7 @@ export class Huts extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  huts = signal<IHutRowResponse[]>([]);
+  huts = signal<IHutSearchRow[]>([]);
   hutsPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,

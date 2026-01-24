@@ -137,7 +137,7 @@ export class All extends BaseComponent {
   ///
   collectionsService = inject(CollectionsService);
 
-  openCollectionInvoiceDialog = this.collectionsService.openCollectionInvoiceDialog;
+  openCollectionDialog = this.collectionsService.openCollectionDialog;
 
   isInvoiceTypeChangeDialogVisible = false;
 

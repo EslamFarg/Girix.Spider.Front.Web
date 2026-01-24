@@ -11,7 +11,7 @@ import { RoomCard } from '@/components/room-card/room-card';
 import { CountdownConfig, CountdownEvent } from 'ngx-countdown';
 import {
   IRoomReadResponse,
-  IRoomSearchRowResponse,
+  IRoomSearchRow,
   RoomSearchEnum,
   RoomService,
 } from '@/features/restaurant/services/room-service';
@@ -106,7 +106,7 @@ export class Rooms extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  rooms = signal<IRoomSearchRowResponse[]>([]);
+  rooms = signal<IRoomSearchRow[]>([]);
   roomsPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,

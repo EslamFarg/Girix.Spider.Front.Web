@@ -1,4 +1,4 @@
-import { IHutRowResponse } from '@/features/restaurant/services/hut-service';
+import { IHutSearchRow } from '@/features/restaurant/services/hut-service';
 import { Component, computed, inject, input, signal, viewChild } from '@angular/core';
 import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdown';
 
@@ -18,7 +18,7 @@ export class HutCard {
   //enum
   HutStatus = HutStatus;
 
-  data = input.required<IHutRowResponse>();
+  data = input.required<IHutSearchRow>();
   // id: number;
   // name: string;
   // pricePerHour: number;
