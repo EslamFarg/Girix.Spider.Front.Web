@@ -140,7 +140,7 @@ export class Header extends BaseComponent {
         },
         {
           labelKey: 'purchasesRefunds',
-          imgUrl: headerIcons.storage.children.purchasesReturns,
+          imgUrl: headerIcons.storage.children.purchasesRefunds,
           routerLink: '/storage/purchases-refunds',
         },
         {

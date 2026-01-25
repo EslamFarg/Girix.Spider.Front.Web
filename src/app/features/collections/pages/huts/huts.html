@@ -1,4 +1,4 @@
-<app-section-wrapper class="block mt-4 p-4 overflow-auto custom-scroll">
+<app-section-wrapper class="block p-4 md:pt-8 overflow-auto custom-scroll h-full" styleClass="no-scrollbar">
   <!-- search -->
   <form #form [formGroup]="searchFg" (ngSubmit)="onSearchSubmit()">
     <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
@@ -25,10 +25,10 @@
   </form>
 
   <!-- items grid -->
-  <div class="grid grid-cols-6 my-4 mt-25" style="row-gap: 8rem; column-gap: 6rem">
+  <div class="grid grid-cols-2 gap-[6rem_1.5rem] sm:grid-cols-3 sm:gap-[7rem_2rem] md:grid-cols-4 md:gap-[7rem_2rem] lg:grid-cols-5 lg:gap-[7rem_3rem] xl:grid-cols-6 xl:gap-[7rem_4rem] my-4">
     @for (hut of huts(); track $index) {
       <app-hut-card
-        (click)="openCollectionDialog(hut.orderId, !hut.isAvailable)"
+        (click)="openCollectionDialog(hut.orderId, hut.isAvailable)"
         class="self-end"
         [class.mt-[50%]]="$first"
         [data]="hut"

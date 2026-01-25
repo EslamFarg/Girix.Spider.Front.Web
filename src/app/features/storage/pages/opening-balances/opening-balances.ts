@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { OpeningBalancesNav } from "../../components/opening-balances-nav/opening-balances-nav";
-import { InputGroupAddon } from "primeng/inputgroupaddon";
+ import { InputGroupAddon } from "primeng/inputgroupaddon";
 import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
 import { Select } from "primeng/select";
 import { BaseComponent } from '@/components/base-component/base-component';
@@ -11,7 +10,7 @@ import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
 
 @Component({
   selector: 'app-opening-balances',
-  imports: [OpeningBalancesNav, InputGroupAddon, InputErrorMessageHandler, Select, Paginator, ReactiveFormsModule, InputTextModule, SectionWrapper],
+  imports: [  InputGroupAddon, InputErrorMessageHandler, Select, Paginator, ReactiveFormsModule, InputTextModule, SectionWrapper],
   templateUrl: './opening-balances.html',
   styleUrl: './opening-balances.css',
 })

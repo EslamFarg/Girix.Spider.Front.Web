@@ -1,0 +1,22 @@
+import { Component } from '@angular/core';
+import { ISectionLink, SectionNav } from '@/components/section-nav/section-nav';
+import { RouterOutlet } from '@angular/router';
+
+@Component({
+  selector: 'app-customers-layout',
+  imports: [SectionNav,RouterOutlet],
+  templateUrl: './customers-layout.html',
+  styleUrl: './customers-layout.css',
+})
+export class CustomersLayout {
+  links: ISectionLink[] = [
+    {
+      labelKey: 'customers.explorer',
+      url: '/customers',
+    },
+    {
+      labelKey: 'customers.add',
+      url: '/customers/add',
+    },
+  ];
+}

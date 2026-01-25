@@ -8,7 +8,6 @@ import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { ImgFallback } from '@/directives/img-fallback';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { ProductsNav } from '../../components/products-nav/products-nav';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { MenuItem } from 'primeng/api';
 import { IProductRowResponse, ProductSearchEnum, ProductService } from '../../services/product-service';
@@ -27,7 +26,6 @@ import { Menu } from 'primeng/menu';
     ImgFallback,
     RouterLink,
     RouterLinkActive,
-    ProductsNav,
     SectionWrapper,
     Debounce,
     Menu,
@@ -35,7 +33,7 @@ import { Menu } from 'primeng/menu';
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
-export class Products extends BaseComponent  {
+export class Products extends BaseComponent {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<ProductSearchEnum>(ProductSearchEnum.Name, [Validators.required]),
@@ -69,13 +67,12 @@ export class Products extends BaseComponent  {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-
-   products = signal<IProductRowResponse[]>([]);
-    productsPaginationInfo:IPaginationInfo={
-      pageIndex:1,
-      totalPagesCount:0,
-      totalRowsCount:0
-    }
+  products = signal<IProductRowResponse[]>([]);
+  productsPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
 
   searchProducts(pageIndex: number) {
     this.productService

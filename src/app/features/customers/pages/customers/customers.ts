@@ -4,11 +4,9 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { PurchasesNav } from '@/features/storage/components/purchases-nav/purchases-nav';
-import { InputGroupAddon } from 'primeng/inputgroupaddon';
+ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { CustomersNav } from '../../components/customers-nav/customers-nav';
-import { InputText } from 'primeng/inputtext';
+ import { InputText } from 'primeng/inputtext';
 import {
   CustomerSearchEnum,
   CustomerService,
@@ -29,8 +27,7 @@ import { Debounce } from '@/directives/debounce';
     InputGroupAddon,
     ReactiveFormsModule,
     Paginator,
-    CustomersNav,
-    InputText,
+     InputText,
     RouterLink,
     Debounce,
   ],

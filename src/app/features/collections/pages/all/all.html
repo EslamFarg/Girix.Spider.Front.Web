@@ -3,8 +3,8 @@
     <!-- search -->
     <div class="flex h-fit items-start gap-2 w-full">
       <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="flex-1">
-        <app-input-error-message-handler [fc]="fg.get('text')">
-          <input class="w-full bg-transparent!" pInputText type="text" formControlName="text" placeholder="بحث" />
+        <app-input-error-message-handler [fc]="fg.get('searchTerm')">
+          <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
           <p-inputgroup-addon>
             <i class="pi pi-filter"></i>
           </p-inputgroup-addon>

@@ -1,6 +1,4 @@
-<div class="p-4 h-full overflow-auto no-scrollbar">
-  <app-customers-nav class="block mb-4" />
-
+  
   <app-section-wrapper>
     <!-- search -->
     <form #form [formGroup]="fg" appDebounce debounceEvent="submit" (debounced)="onSearchSubmit()" class="flex h-fit items-start gap-2   w-full">
@@ -105,4 +103,4 @@
       [totalRecords]="customersPaginationInfo.totalRowsCount"
     />
   </app-section-wrapper>
-</div>
+ 

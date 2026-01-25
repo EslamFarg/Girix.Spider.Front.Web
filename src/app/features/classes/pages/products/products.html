@@ -1,63 +1,61 @@
-<div class="p-4 h-full overflow-auto no-scrollbar ">
-  <app-products-nav class="block mb-4 "  />
-  <app-section-wrapper class=" " styleClass="no-scrollbar">
-    <!-- search -->
+<app-section-wrapper class=" " styleClass="no-scrollbar">
+  <!-- search -->
 
-    <form
-      #form
-      [formGroup]="fg"
-      appDebounce
-      debounceEvent="submit"
-      (debounced)="onSubmit()"
-      class="flex h-fit items-start gap-2 w-full "
-    >
-      <div class="flex-1">
-        <app-input-error-message-handler [fc]="fg.get('searchTerm')">
-          <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
-          <p-inputgroup-addon class="relative">
-            <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
-            <p-menu
-              dir="rtl"
-              [class]="`*:top-full! *:left-0! `"
-              #filterMenu
-              [model]="filterMenuItems()"
-              [popup]="true"
-              [style]="{ insetInlineEnd: '100%' }"
-            />
-          </p-inputgroup-addon>
-          <p-inputgroup-addon>
-            <i class="pi pi-search"></i>
-          </p-inputgroup-addon>
-        </app-input-error-message-handler>
-      </div>
+  <form
+    #form
+    [formGroup]="fg"
+    appDebounce
+    debounceEvent="submit"
+    (debounced)="onSubmit()"
+    class="flex h-fit items-start gap-2 w-full"
+  >
+    <div class="flex-1">
+      <app-input-error-message-handler [fc]="fg.get('searchTerm')">
+        <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
+        <p-inputgroup-addon class="relative">
+          <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+          <p-menu
+            dir="rtl"
+            [class]="`*:top-full! *:left-0! `"
+            #filterMenu
+            [model]="filterMenuItems()"
+            [popup]="true"
+            [style]="{ insetInlineEnd: '100%' }"
+          />
+        </p-inputgroup-addon>
+        <p-inputgroup-addon>
+          <i class="pi pi-search"></i>
+        </p-inputgroup-addon>
+      </app-input-error-message-handler>
+    </div>
 
-      <p-select
-        [options]="periodOptions"
-        formControlName="fromDate"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="الكل"
-        class="h-fit hidden! sm:flex! w-40"
-      />
-    </form>
+    <p-select
+      [options]="periodOptions"
+      formControlName="fromDate"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="الكل"
+      class="h-fit hidden! sm:flex! w-40"
+    />
+  </form>
 
-    <div class="w-full overflow-auto no-scrollbar">
-      <table class="my-2 sm:my-4 w-full main-table ">
-        <thead>
-          <tr class="">
-            <th>#</th>
-            <th>صوره المنتج</th>
-            <th>اسم المنتج</th>
-            <th>المجموعه</th>
-            <th>وصف المنتج</th>
-            <th>المنتج كاضافه</th>
-            <th>قيمه الضريبه</th>
-            <th>سعر المنتج</th>
-            <th>الأدوات</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of products(); track $index) {
+  <div class="w-full overflow-auto no-scrollbar">
+    <table class="my-2 sm:my-4 w-full main-table">
+      <thead>
+        <tr class="">
+          <th>#</th>
+          <th>صوره المنتج</th>
+          <th>اسم المنتج</th>
+          <th>المجموعه</th>
+          <th>وصف المنتج</th>
+          <th>المنتج كاضافه</th>
+          <th>قيمه الضريبه</th>
+          <th>سعر المنتج</th>
+          <th>الأدوات</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of products(); track $index) {
           <tr class="">
             <td>{{ getRowNumber($index, productsPaginationInfo.pageIndex) }}</td>
             <td>
@@ -65,7 +63,7 @@
                 class="w-10 aspect-square object-fit-cover mx-auto"
                 appImgFallback
                 decoding="async"
-                [src]="baseUrl+((item.images?.[0]?.fullPath)??'')"
+                [src]="baseUrl + (item.images?.[0]?.fullPath ?? '')"
                 alt=""
               />
             </td>
@@ -120,16 +118,15 @@
               </div>
             </td>
           </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+        }
+      </tbody>
+    </table>
+  </div>
 
-    <p-paginator
-      (onPageChange)="onPageChange($event)"
-      [first]="(productsPaginationInfo.pageIndex - 1) * 10"
-      [rows]="10"
-      [totalRecords]="productsPaginationInfo.totalRowsCount"
-    />
-  </app-section-wrapper>
-</div>
+  <p-paginator
+    (onPageChange)="onPageChange($event)"
+    [first]="(productsPaginationInfo.pageIndex - 1) * 10"
+    [rows]="10"
+    [totalRecords]="productsPaginationInfo.totalRowsCount"
+  />
+</app-section-wrapper>

@@ -7,48 +7,72 @@ import { EditProduct } from '@/features/classes/pages/edit-product/edit-product'
 import { AddMeal } from './add-meal/add-meal';
 import { AddGroup } from './add-group/add-group';
 import { EditGroup } from './edit-group/edit-group';
+import { ProductsLayout } from '../layouts/products-layout/products-layout';
+import { MealsLayout } from '../layouts/meals-layout/meals-layout';
+import { GroupsLayout } from '../layouts/groups-layout/groups-layout';
 
 export default [
   //products
   {
     path: 'products',
-    component: Products,
-  },
-  {
-    path: 'products/add',
-    component: AddProduct,
-  },
+    component: ProductsLayout,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: Products,
+      },
+      {
+        path: 'add',
+        component: AddProduct,
+      },
 
-  {
-    path: 'products/:id/edit',
-    component: EditProduct,
+      {
+        path: ':id/edit',
+        component: EditProduct,
+      },
+    ],
   },
   //melas
   {
     path: 'meals',
-    component: Meals,
-  },
-  {
-    path: 'meals/add',
-    component: AddMeal,
-  },
+    component: MealsLayout,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: Meals,
+      },
+      {
+        path: 'add',
+        component: AddMeal,
+      },
 
-  {
-    path: 'meals/:id/edit',
-    component: EditProduct,
+      {
+        path: ':id/edit',
+        component: EditProduct,
+      },
+    ],
   },
   //groups
   {
     path: 'groups',
-    component: Groups,
-  },
-  {
-    path: 'groups/add',
-    component: AddGroup,
-  },
+    component: GroupsLayout,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: Groups,
+      },
+      {
+        path: 'add',
+        component: AddGroup,
+      },
 
-  {
-    path: 'groups/:id/edit',
-    component: EditGroup,
+      {
+        path: ':id/edit',
+        component: EditGroup,
+      },
+    ],
   },
 ] satisfies Route[];

@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { PurchasesNav } from "../../components/purchases-nav/purchases-nav";
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
+ import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
 import { InputGroupAddon } from "primeng/inputgroupaddon";
 import { Select } from "primeng/select";
 import { Paginator } from "primeng/paginator";
@@ -11,7 +10,7 @@ import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
 
 @Component({
   selector: 'app-purchases',
-  imports: [PurchasesNav, InputErrorMessageHandler, InputGroupAddon, Select, Paginator, ReactiveFormsModule, InputTextModule, SectionWrapper],
+  imports: [  InputErrorMessageHandler, InputGroupAddon, Select, Paginator, ReactiveFormsModule, InputTextModule, SectionWrapper],
   templateUrl: './purchases.html',
   styleUrl: './purchases.css',
 })

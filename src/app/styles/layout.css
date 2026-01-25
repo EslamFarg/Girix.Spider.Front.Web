@@ -1,0 +1,13 @@
+.no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none !important;
+  }
+}
+.no-scrollbar {
+  &::-webkit-scrollbar-thumb {
+    display: none !important;
+  }
+}
+.app-layout {
+  @apply p-4 h-full overflow-auto;
+}

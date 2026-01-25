@@ -120,31 +120,34 @@ export class RepalcementsLayout extends BaseComponent {
   }
 
   submitItemChange() {
-    const item = this.changeToItem();
+    const changeToItem = this.changeToItem();
+    const orderId=this.currentItem()?.data.orderId;
 
-    if (!item) {
+    if (!changeToItem) {
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب اختيار المكان' });
+      return;
     }
 
-    if (item?.localSpaceType == this.localSpaceTypeEnum.Hut && this.hutChangeFg.invalid) {
+    if (changeToItem?.localSpaceType == this.localSpaceTypeEnum.Hut && this.hutChangeFg.invalid) {
       this.hutChangeFg.markAllAsTouched();
       return;
     }
 
-    console.log(item);
+    console.log(changeToItem);
 
     this.orderService
       .changeLocalPlace({
         durationMinutes: this.hutChangeFg.get('durationMinutes')?.value ?? null,
-        id: item!.data.orderId,
-        placeType: item!.localSpaceType,
-        placeRefId: item!.data.id,
+        id: orderId!,
+        placeType: changeToItem!.localSpaceType,
+        placeRefId: changeToItem!.data.id,
       })
       .subscribe({
         next: () => {
           this.changeToItem.set(null);
           this.currentItem.set(null);
           this.closeDialog();
+          this.messageService.add({ severity: 'success', summary: 'تم الحفظ', detail: 'لقد قمت بالحفظ بنجاح' });
         },
         error: (err) => {
           this.messageService.add({ severity: 'error', summary: err.title, detail: err.detail });

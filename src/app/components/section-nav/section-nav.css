@@ -1,0 +1,9 @@
+:host{
+  display: block;
+}
+
+.sub-nav-active-link{
+  font-weight: 700;
+  background-color: var(--color-dark-bg-1) !important;
+  color: white !important;
+}

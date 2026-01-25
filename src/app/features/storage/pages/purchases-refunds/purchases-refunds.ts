@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { PurchasesRefundsNav } from '../../components/purchases-refunds-nav/purchases-refunds-nav';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+ import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Select } from 'primeng/select';
 import { Paginator } from 'primeng/paginator';
@@ -12,8 +11,7 @@ import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
 @Component({
   selector: 'app-purchases-refunds',
   imports: [
-    PurchasesRefundsNav,
-    InputErrorMessageHandler,
+     InputErrorMessageHandler,
     InputGroupAddon,
     Select,
     Paginator,

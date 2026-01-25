@@ -1,0 +1,17 @@
+<div class="flex items-center gap-2 sm:gap-4 text-sm sm:text-base">
+  @for (link of links(); track $index) {
+    <a
+      pButton
+      style="
+        --p-button-primary-color: var(--color-dark-bg-1);
+        --p-button-primary-background: transparent;
+        --p-button-primary-border-color: var(--color-dark-line);
+      "
+      [routerLink]="link.url"
+      routerLinkActive="sub-nav-active-link"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="border flex-1 sm:flex-none text-center py-1! px-4! sm:px-7! rounded font-semibold"
+      >{{ link.labelKey | translate }}</a
+    >
+  }
+</div>

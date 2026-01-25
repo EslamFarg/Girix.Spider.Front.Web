@@ -6,8 +6,7 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
-import { GroupsNav } from '../../components/groups-nav/groups-nav';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+ import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Debounce } from '@/directives/debounce';
 import { IGroupRowResponse, GroupSearchEnum, GroupService } from '../../services/group-service';
 import { MenuItem } from 'primeng/api';
@@ -22,8 +21,7 @@ import { Menu } from 'primeng/menu';
     InputTextModule,
     SelectModule,
     PaginatorModule,
-    GroupsNav,
-    SectionWrapper,
+     SectionWrapper,
     Debounce,
     Menu,
   ],
