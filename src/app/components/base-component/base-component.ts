@@ -3,7 +3,7 @@ import { LayoutService } from '@/layouts/services/layout-service';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { environment } from '../../../environments/environment';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,6 +13,11 @@ export interface IPaginationInfo {
   totalRowsCount: number;
   totalPagesCount: number;
 }
+export enum FormMode {
+  Create,
+  Update,
+  View,
+}
 @Component({
   selector: 'app-base-component',
   imports: [],
@@ -21,17 +26,20 @@ export interface IPaginationInfo {
 })
 export class BaseComponent {
   localSpaceTypeEnum = SpaceTypeEnum;
+  FormMode = FormMode;
   //
   nullableFb = inject(FormBuilder);
   fb = this.nullableFb.nonNullable;
   baseUrl = environment.apiUrl.replace('/v1', '');
   router = inject(Router);
+  activatedRoute = inject(ActivatedRoute);
   sanitizer = inject(DomSanitizer);
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
   authService = inject(AuthService);
   layoutService = inject(LayoutService);
   translateService = inject(TranslateService);
+  dateNowIso = new Date().toISOString();
 
   isLoading = this.layoutService.isLoading;
 
@@ -56,5 +64,11 @@ export class BaseComponent {
     const pad = (n: number) => n.toString().padStart(2, '0');
 
     return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  }
+
+  get routeId() {
+    const id = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+
+    return id;
   }
 }

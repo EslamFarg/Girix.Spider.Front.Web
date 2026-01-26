@@ -1,11 +1,11 @@
 import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
 import { IMealRowResponse } from '@/features/classes/services/meal-service';
-import { IProductRowResponse } from '@/features/classes/services/product-service';
+import { IProductSearchRow } from '@/features/classes/services/product-service';
 import { Injectable } from '@angular/core';
 
 export interface IProductsAndMealsSearchResponseValue {
   menuItems: {
-    rows: IProductRowResponse[];
+    rows: IProductSearchRow[];
     paginationInfo: {
       currentPageIndex: number;
       totalRowsCount: number;

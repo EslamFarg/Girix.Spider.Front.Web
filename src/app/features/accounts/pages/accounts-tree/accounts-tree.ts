@@ -103,8 +103,7 @@ export class AccountsTree extends BaseComponent {
           },
         ],
         fromDate: this.fg.getRawValue().fromDate,
-        endpoint: 'GetFinancialAccountTree',
-      })
+       })
       .subscribe({
         next: (res) => {
           const mappedFinancialAccounts: TreeNode[] = res.value.rows.map((item) => ({

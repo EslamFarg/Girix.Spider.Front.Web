@@ -7,6 +7,8 @@ import { EditCollectiveReceipt } from './edit-collective-receipt/edit-collective
 import { AccountsTree } from './accounts-tree/accounts-tree';
 import { AddCollectivePayment } from './add-collective-payment/add-collective-payment';
 import { EditCollectivePayment } from './edit-collective-payment/edit-collective-payment';
+import { CollectivePaymentsLayout } from '../layouts/collective-payments-layout/collective-payments-layout';
+import { CollectiveReceiptsLayout } from '../layouts/collective-receipts-layout/collective-receipts-layout';
 
 export default [
   {
@@ -16,29 +18,45 @@ export default [
   //collective payments
   {
     path: 'collective-payments',
-    component: CollectivePayments,
+    component: CollectivePaymentsLayout,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: CollectivePayments,
+      },
+      {
+        path: 'collective-payments/add',
+        component: AddCollectivePayment,
+      },
+      {
+        path: 'collective-payments/:id/edit',
+        component: EditCollectivePayment,
+      },
+    ],
   },
-  {
-    path: 'collective-payments/add',
-    component: AddCollectivePayment,
-  },
-  {
-    path: 'collective-payments/:id/edit',
-    component: EditCollectivePayment,
-  },
+
   //collective receipts
   {
     path: 'collective-receipts',
-    component: CollectiveReceipts,
+    component: CollectiveReceiptsLayout,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: CollectiveReceipts,
+      },
+      {
+        path: 'collective-receipts/add',
+        component: AddCollectiveReceipt,
+      },
+      {
+        path: 'collective-receipts/:id/edit',
+        component: EditCollectiveReceipt,
+      },
+    ],
   },
-  {
-    path: 'collective-receipts/add',
-    component: AddCollectiveReceipt,
-  },
-  {
-    path: 'collective-receipts/:id/edit',
-    component: EditCollectiveReceipt,
-  },
+
   //accounts tree
   {
     path: 'accounts-tree',

@@ -6,7 +6,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ImgFallback } from '@/directives/img-fallback';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { IMealRowResponse } from '@/features/classes/services/meal-service';
-import { IProductRowResponse } from '@/features/classes/services/product-service';
+import { IProductSearchRow } from '@/features/classes/services/product-service';
 import { GeneralService, ProductAndMealsSearchEnum } from '../../services/general-service';
 import { Debounce } from '@/directives/debounce';
 import { MenuItem } from 'primeng/api';
@@ -17,13 +17,13 @@ import { ButtonDirective } from 'primeng/button';
 export interface IMenuItem {
   id: string;
   index: number;
-  product: IProductRowResponse | null;
+  product: IProductSearchRow | null;
   meal: IMealRowResponse | null;
   quantity: number;
 }
 
 export interface IMenuItemAddition {
-  product: IProductRowResponse;
+  product: IProductSearchRow;
   quantity: number;
 }
 
@@ -142,15 +142,18 @@ export class Menu extends BaseComponent {
       this.previousSearchCriteria.searchTerm === this.menuSearchFg.getRawValue().searchTerm &&
       this.previousSearchCriteria.searchEnum === this.menuSearchFg.getRawValue().searchEnum &&
       this.previousSearchCriteria.category === this.menuSearchFg.getRawValue().category;
+
+    console.log(this.previousSearchCriteria, this.menuSearchFg.getRawValue(), isIdentical);
+
     return isIdentical;
   }
 
-  menuItemsPaginationInfo:IPaginationInfo={
-    pageIndex:1,
-    totalPagesCount:0,
-    totalRowsCount:0
-  }
-  
+  menuItemsPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
+
   searchProductsAndMeals(pageIndex: number) {
     if (this.isPreviousSearchCriteriaIdentical()) {
       //handle stopping pagination if no more data
@@ -186,8 +189,15 @@ export class Menu extends BaseComponent {
         next: (res) => {
           let newItems: IMenuItem[] = [];
           const length = res.value.menuItems.rows.length + res.value.meals.rows.length;
-          if (length <= 0) {
-            return;
+          if (length > 0) {
+            this.menuItemsPaginationInfo = {
+              pageIndex,
+              totalPagesCount:
+                (res.value.meals.paginationInfo.totalPagesCount + res.value.menuItems.paginationInfo.totalPagesCount) /
+                2,
+              totalRowsCount:
+                (res.value.meals.paginationInfo.totalRowsCount + res.value.menuItems.paginationInfo.totalRowsCount) / 2,
+            };
           }
           // this.lestPageSize = length;
 
@@ -218,17 +228,12 @@ export class Menu extends BaseComponent {
             ),
           );
 
-          this.menuItemsPaginationInfo = {
-            pageIndex,
-            totalPagesCount:
-              (res.value.meals.paginationInfo.totalPagesCount + res.value.menuItems.paginationInfo.totalPagesCount) / 2,
-            totalRowsCount:
-              (res.value.meals.paginationInfo.totalRowsCount + res.value.menuItems.paginationInfo.totalRowsCount) / 2,
-          };
+          console.log('isPreviousSearchCriteriaIdentical: ', this.isPreviousSearchCriteriaIdentical());
 
           if (this.isPreviousSearchCriteriaIdentical()) {
             this.menuItems.update((pre) => pre.concat(newItems));
           } else {
+            console.log('setting newItems', newItems);
             this.menuItems.set(newItems);
           }
 
@@ -245,7 +250,7 @@ export class Menu extends BaseComponent {
       });
   }
 
-  mapProductToMenuItem(product: IProductRowResponse, index: number): IMenuItem {
+  mapProductToMenuItem(product: IProductSearchRow, index: number): IMenuItem {
     return {
       id: 'product-' + product.id,
       index,

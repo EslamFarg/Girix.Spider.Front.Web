@@ -10,7 +10,7 @@ import { ImgFallback } from '@/directives/img-fallback';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { MenuItem } from 'primeng/api';
-import { IProductRowResponse, ProductSearchEnum, ProductService } from '../../services/product-service';
+import { IProductSearchRow, ProductSearchEnum, ProductService } from '../../services/product-service';
 import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
 
@@ -67,7 +67,7 @@ export class Products extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  products = signal<IProductRowResponse[]>([]);
+  products = signal<IProductSearchRow[]>([]);
   productsPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,

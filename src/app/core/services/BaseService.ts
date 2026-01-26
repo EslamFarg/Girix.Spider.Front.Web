@@ -34,7 +34,15 @@ export enum SearchColumEnum {
   IsCompany = 13,
 }
 
-export default class BaseService<
+export interface IEndpoints {
+  create: string;
+  update: string;
+  getById: string;
+  delete: string;
+  search: string;
+}
+
+export default abstract class BaseService<
   SearchEnum = any,
   ICreateDto = any,
   IUpdateDto = any,
@@ -42,25 +50,29 @@ export default class BaseService<
   ISearchResponseValue = any,
 > {
   static apiBaseUrl = environment.apiUrl;
+  private endpoints: IEndpoints = {
+    create: 'Create',
+    update: '',
+    getById: '/',
+    delete: '',
+    search: 'Search',
+  };
+
+  protected patchEndpoints(endpoints: Partial<IEndpoints>) {
+    console.log(endpoints);
+    this.endpoints = { ...this.endpoints, ...endpoints };
+  }
+
   apiRoute = '';
   get apiUrl() {
     return `${BaseService.apiBaseUrl}/${this.apiRoute}`;
   }
   isMock = environment.isMock;
+
   http = inject(HttpClient);
   router = inject(Router);
   messageService = inject(MessageService);
 
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
   //
   //
   //
@@ -84,7 +96,6 @@ export default class BaseService<
     fromDate: string | null; //start | past
     toDate?: string; //end;
     removeDateFilter?: boolean;
-    endpoint?: string;
   }) {
     if (this.isMock) {
       return new Observable<IBaseSearchResponse<ISearchResponseValue>>((observer) => {
@@ -129,14 +140,11 @@ export default class BaseService<
     //   };
     // }
 
-    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(
-      `${this.apiUrl}/${criteriaDto.endpoint ?? 'Search'}`,
-      body,
-    );
+    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(`${this.apiUrl}/${this.endpoints.search}`, body);
   }
 
   create(createDto: ICreateDto) {
-    return this.http.post<number>(`${this.apiUrl}/Create`, createDto).pipe(
+    return this.http.post<number>(`${this.apiUrl}/${this.endpoints.create}`, createDto).pipe(
       tap({
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'تم الحفظ', detail: 'لقد قمت بالحفظ بنجاح' });
@@ -165,7 +173,7 @@ export default class BaseService<
     );
   }
 
-  getById = (id: number) => this.http.get<IGetByIdDto>(`${this.apiUrl}/${id}`);
+  getById = (id: number) => this.http.get<IGetByIdDto>(`${this.apiUrl}/${this.endpoints.getById}${id}`);
 
   //
   //local storage

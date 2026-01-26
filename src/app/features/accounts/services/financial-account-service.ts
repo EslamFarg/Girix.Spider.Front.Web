@@ -38,4 +38,11 @@ export class FinancialAccountService extends BaseService<
   IFinancialAccountSearchResponseValue
 > {
   override apiRoute = 'FinancialAccount';
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.patchEndpoints({ search: 'GetFinancialAccountTree' });
+  }
 }

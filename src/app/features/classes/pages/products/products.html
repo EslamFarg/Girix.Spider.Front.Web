@@ -39,7 +39,7 @@
     />
   </form>
 
-  <div class="w-full overflow-auto no-scrollbar">
+  <div class="w-full overflow-auto  ">
     <table class="my-2 sm:my-4 w-full main-table">
       <thead>
         <tr class="">
@@ -84,7 +84,7 @@
             <td class="font-bold">${{ item.price }}</td>
             <td>
               <div class="actions">
-                <button type="button" class="edit">
+                <a [routerLink]="`${item.id}/edit`" type="button" class="edit">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       opacity="0.4"
@@ -101,7 +101,7 @@
                       fill="#1F1D2B"
                     />
                   </svg>
-                </button>
+                </a>
                 <button type="button" (click)="deleteProduct(item.id, $event)" class="delete">
                   <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path

@@ -4,6 +4,7 @@ import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { ProductForm } from '../../components/product-form/product-form';
+import { BaseComponent } from '@/components/base-component/base-component';
 
 @Component({
   selector: 'app-add-product',
@@ -11,4 +12,5 @@ import { ProductForm } from '../../components/product-form/product-form';
   templateUrl: './add-product.html',
   styleUrl: './add-product.css',
 })
-export class AddProduct {}
+export class AddProduct extends BaseComponent {
+}

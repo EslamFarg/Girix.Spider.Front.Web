@@ -1,7 +1,7 @@
 import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
 
-export interface IProductRowResponse {
+export interface IProductSearchRow {
   id: number;
   name: string;
   categoryId: number;
@@ -26,7 +26,7 @@ export interface IProductRowResponse {
 
 export interface IProductSearchResponseValue {
   menuItems: {
-    rows: IProductRowResponse[];
+    rows: IProductSearchRow[];
     paginationInfo: {
       totalRowsCount: number;
       totalPagesCount: number;
@@ -47,6 +47,74 @@ export interface IProductCategoryRowResponse {
   }[];
 }
 
+//create
+export interface IProductCreateRequest {
+  nameEn: string;
+  nameAr: string;
+
+  descriptionEn: string;
+  descriptionAr: string;
+
+  price: number;
+  costPrice: number;
+  tax: number;
+  selectiveTax: number;
+
+  categoryId: number;
+
+  isAddition: boolean;
+  idsAdditionMenuItem: number[];
+
+  images: File[];
+}
+
+//update
+export interface IProductUpdateRequest {
+  id: number;
+  nameEn: string;
+  nameAr: string;
+
+  descriptionEn: string;
+  descriptionAr: string;
+
+  price: number;
+  costPrice: number;
+  tax: number;
+  selectiveTax: number;
+
+  categoryId: number;
+
+  isAddition: boolean;
+  idsAdditionMenuItem: number[];
+
+  imagesAdd: File[];
+  listIdsOfDeleteImages: number[];
+}
+
+//get by id
+
+export interface IProductReadResponse {
+  id: number;
+  name: string;
+  categoryId: number;
+  categoryName: string;
+  price: number;
+  costPrice: number;
+  tax: number;
+  priceWithTax: number;
+  selectiveTax: number;
+  description: string;
+  isAddition: boolean;
+  additionMenuItem: {
+    id: number;
+    name: string;
+  }[];
+  images: {
+    id: number;
+    fullPath: string;
+  }[];
+}
+
 //MenuItems : Name,CategoryName,CategoryId
 
 export enum ProductSearchEnum {
@@ -58,12 +126,26 @@ export enum ProductSearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class ProductService extends BaseService<ProductSearchEnum, any, any, any, IProductSearchResponseValue> {
+export class ProductService extends BaseService<
+  ProductSearchEnum,
+  IProductCreateRequest,
+  IProductUpdateRequest,
+  IProductReadResponse,
+  IProductSearchResponseValue
+> {
   override apiRoute = 'MenuItem';
+  
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.patchEndpoints({ getById: 'GetById?MenuItemId=' });
+  }
 
-  getAdditions(dto:{ paginationInfo: { pageIndex: number, pageSize: number } }) {
+  getAdditions(dto: { paginationInfo: { pageIndex: number; pageSize: number } }) {
     return this.http.post<{
-      rows: IProductRowResponse[];
+      rows: IProductSearchRow[];
       paginationInfo: {
         totalRowsCount: number;
         totalPagesCount: number;

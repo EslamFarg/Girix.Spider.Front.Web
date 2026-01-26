@@ -9,12 +9,12 @@ import { DrawerModule } from 'primeng/drawer';
 import { GeneralService, ProductAndMealsSearchEnum } from '../../services/general-service';
 import { BaseComponent } from '@/components/base-component/base-component';
 import { FormArray, FormControl, Validators, ɵInternalFormsSharedModule, ReactiveFormsModule } from '@angular/forms';
-import { IProductRowResponse, ProductSearchEnum, ProductService } from '@/features/classes/services/product-service';
+import { IProductSearchRow, ProductSearchEnum, ProductService } from '@/features/classes/services/product-service';
 import { IMealRowResponse } from '@/features/classes/services/meal-service';
 import { GroupService, IGroupRowResponse, IGroupSearchResponseValue } from '@/features/classes/services/group-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { GalleriaModule } from 'primeng/galleria';
-import { Slider } from '../../components/slider/slider';
+import { Slider } from '../../../../components/slider/slider';
 import {
   IOrderCreateCustomerRequest,
   IOrderCreateItem,
@@ -421,7 +421,7 @@ export class Home extends BaseComponent {
     },
   ];
   productService = inject(ProductService);
-  additionsProducts = signal<IProductRowResponse[]>([]);
+  additionsProducts = signal<IProductSearchRow[]>([]);
   currentMenuItemIx = signal(0);
   additionPaginationInfo: {
     pageIndex: number;
@@ -467,7 +467,7 @@ export class Home extends BaseComponent {
     this.additionsDialogVisible = true;
   }
 
-  addAddition(item: IProductRowResponse, quantity: number) {
+  addAddition(item: IProductSearchRow, quantity: number) {
     const previousAdditionIx = this.orderMenuItems()[this.currentMenuItemIx()].additions.findIndex(
       (addition) => addition.product.id === item.id,
     );
@@ -486,7 +486,7 @@ export class Home extends BaseComponent {
     }
   }
 
-  removeAddition(item: IProductRowResponse, quantity: number) {
+  removeAddition(item: IProductSearchRow, quantity: number) {
     const previousAdditionQuantity = this.orderMenuItems()[this.currentMenuItemIx()].additions.find(
       (addition) => addition.product.id === item.id,
     )!.quantity;
@@ -494,7 +494,7 @@ export class Home extends BaseComponent {
     this._updateAdditionQuantity(previousAdditionQuantity - quantity, -1, item);
   }
 
-  _updateAdditionQuantity(quantity: number, additionIx: number, item: IProductRowResponse) {
+  _updateAdditionQuantity(quantity: number, additionIx: number, item: IProductSearchRow) {
     if (additionIx > -1) {
       //update quantity
       if (quantity > 0) {
