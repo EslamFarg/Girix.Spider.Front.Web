@@ -464,7 +464,7 @@
 
   <div class="flex-1 overflow-auto no-scrollbar" appDebounce debounceEvent="scroll" (debounced)="onHutsScroll($event)">
     <div class="grid grid-cols-4 gap-2">
-      @for (item of additionsProducts(); track $index) {
+      @for (item of additionProducts(); track $index) {
         <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-between p-2">
           <img class="w-20" appImgFallback fallBackLink="/images/placeholders/menu-item.png" src="" alt="" />
           <div class="flex items-center justify-between w-full text-dark-line font-bold">

@@ -1,12 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
-@import 'primeicons/primeicons.css';
-@import './app/styles/fonts.css';
-@import './app/styles/shared.css';
-@import './app/styles/layout.css';
-@import './app/styles/primeng-overrides.css';
-
 @theme {
   --color-main-bg: #111921;
   --color-secondary-bg: #192633;
@@ -25,6 +19,14 @@
   --color-text-light: #d3dce6;
   --color-text-lighter: #e0e6e9;
  }
+@import 'primeicons/primeicons.css';
+@import './app/styles/fonts.css';
+@import './app/styles/layout.css';
+@import './app/styles/primeng-overrides.css';
+@import './app/styles/animations.css';
+@import './app/styles/shared.css';
+
+
 
 :root {
   --p-paginator-background: transparent !important;

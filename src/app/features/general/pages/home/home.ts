@@ -421,8 +421,8 @@ export class Home extends BaseComponent {
     },
   ];
   productService = inject(ProductService);
-  additionsProducts = signal<IProductSearchRow[]>([]);
   currentMenuItemIx = signal(0);
+  additionProducts = signal<IProductSearchRow[]>([]);
   additionPaginationInfo: {
     pageIndex: number;
     totalPagesCount: number;
@@ -435,15 +435,18 @@ export class Home extends BaseComponent {
   searchAdditions(pageIndex: number) {
     this.productService
       .getAdditions({
-        paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 20,
+        dto: {
+          paginationInfo: {
+            pageIndex: pageIndex,
+            pageSize: 20,
+          },
         },
+        isAddtion: true,
       })
       .subscribe({
         next: (res) => {
           if (res.rows.length > 0) {
-            this.additionsProducts.update((prev) => prev.concat(res.rows));
+            this.additionProducts.update((prev) => prev.concat(res.rows));
             this.additionPaginationInfo = {
               pageIndex,
               totalPagesCount: res.paginationInfo.totalPagesCount,

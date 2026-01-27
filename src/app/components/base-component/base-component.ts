@@ -8,6 +8,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { environment } from '../../../environments/environment';
 import { TranslateService } from '@ngx-translate/core';
 import { SpaceTypeEnum } from '@/features/replacements/services/replacements-service';
+import { BehaviorSubject, debounceTime, Observable, Subject } from 'rxjs';
 export interface IPaginationInfo {
   pageIndex: number;
   totalRowsCount: number;
@@ -18,6 +19,12 @@ export enum FormMode {
   Update,
   View,
 }
+
+export interface IDebounceMapValue<T = any> {
+  subject: Subject<T>;
+  callback: (e: T) => void;
+}
+
 @Component({
   selector: 'app-base-component',
   imports: [],
@@ -40,6 +47,24 @@ export class BaseComponent {
   layoutService = inject(LayoutService);
   translateService = inject(TranslateService);
   dateNowIso = new Date().toISOString();
+  debounceMap: Map<string, IDebounceMapValue> = new Map();
+  setDebounceItem<T>(key: string, callback: (e: T) => void) {
+    this.debounceMap.set(key, { subject: new Subject<T>(), callback });
+
+    this.debounceMap.get(key)?.subject.pipe(debounceTime(400)).subscribe({
+      next: callback,
+    });
+  }
+
+  emitDebounceItem = (key: string, value: any) => this.debounceMap.get(key)?.subject.next(value);
+
+  constructor() {
+    //go through each debounceMap value and subscribe to it with 500ms debounce
+  }
+
+  ngOnDestroy() {
+    this.debounceMap.forEach((value) => value.subject.complete());
+  }
 
   isLoading = this.layoutService.isLoading;
 

@@ -121,6 +121,7 @@ export enum ProductSearchEnum {
   Name = SearchColumEnum.Name,
   CategoryName = SearchColumEnum.CategoryName,
   CategoryId = SearchColumEnum.CategoryId,
+  IsAddition = SearchColumEnum.IsAddition,
 }
 
 @Injectable({
@@ -134,7 +135,7 @@ export class ProductService extends BaseService<
   IProductSearchResponseValue
 > {
   override apiRoute = 'MenuItem';
-  
+
   /**
    *
    */
@@ -143,13 +144,13 @@ export class ProductService extends BaseService<
     this.patchEndpoints({ getById: 'GetById?MenuItemId=' });
   }
 
-  getAdditions(dto: { paginationInfo: { pageIndex: number; pageSize: number } }) {
+  getAdditions(params: { dto: { paginationInfo: { pageIndex: number; pageSize: number } }; isAddtion?: boolean }) {
     return this.http.post<{
       rows: IProductSearchRow[];
       paginationInfo: {
         totalRowsCount: number;
         totalPagesCount: number;
       };
-    }>(`${this.apiUrl}/GetListIsAdditionMenuItem?IsAddtion=true`, dto);
+    }>(`${this.apiUrl}/GetListIsAdditionMenuItem?IsAddtion=${params.dto}`, params.dto);
   }
 }

@@ -24,7 +24,7 @@ export class Slider {
     if (slider) {
       console.log('slider scroll by -100');
       slider.scrollBy({
-        left: -100,
+        left: -this.config().itemWidth,
         behavior: 'smooth',
       });
     }
@@ -35,7 +35,7 @@ export class Slider {
 
     if (slider) {
       slider.scrollBy({
-        left: 100,
+        left: this.config().itemWidth,
         behavior: 'smooth',
       });
     }

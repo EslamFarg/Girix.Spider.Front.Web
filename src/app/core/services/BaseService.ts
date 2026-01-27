@@ -32,6 +32,9 @@ export enum SearchColumEnum {
   CategoryName = 11,
   CategoryId = 12,
   IsCompany = 13,
+  OrderIsCollectes = 14,
+  IsAddition = 15,
+  ReservedTo = 16,
 }
 
 export interface IEndpoints {

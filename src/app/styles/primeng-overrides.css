@@ -1,3 +1,8 @@
+:root{
+  --p-button-primary-hover-background: #5b5b5b1b !important;
+  --p-button-primary-active-background: #5b5b5b1b !important;
+}
+
 .p-inputgroup {
   box-shadow: var(--p-inputtext-shadow);
 }
@@ -43,16 +48,20 @@
 
 .p-inputgroup {
   .p-inputgroupaddon + .p-inputtext,
+  .p-inputgroupaddon + .p-select,
+  .p-select:has(+ .p-inputgroupaddon),
   .p-inputtext:has(+ .p-inputgroupaddon) {
     box-shadow: none !important;
   }
 
+  .p-select:has(+ .p-inputgroupaddon),
   .p-inputtext:has(+ .p-inputgroupaddon) {
     border-inline-end-color: transparent !important;
     border-start-end-radius: 0 !important;
     border-end-end-radius: 0 !important;
   }
 
+  .p-inputgroupaddon + .p-select ,
   .p-inputgroupaddon + .p-inputtext {
     border-inline-start-color: transparent !important;
     border-start-start-radius: 0 !important;
