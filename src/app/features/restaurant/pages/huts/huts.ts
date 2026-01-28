@@ -162,7 +162,7 @@ export class Huts extends BaseComponent {
     if (this.hutFg.invalid) return;
 
     if (this.currentItem) {
-      this.hutService.update(this.hutFg.getRawValue()).subscribe({
+      this.hutService.put(this.hutFg.getRawValue()).subscribe({
         next: () => {
           this.searchHuts(1);
           this.resetHutForm();

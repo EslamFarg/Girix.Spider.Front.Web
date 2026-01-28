@@ -144,13 +144,13 @@ export class ProductService extends BaseService<
     this.patchEndpoints({ getById: 'GetById?MenuItemId=' });
   }
 
-  getAdditions(params: { dto: { paginationInfo: { pageIndex: number; pageSize: number } }; isAddtion?: boolean }) {
+  getAdditions(params: { dto: { paginationInfo: { pageIndex: number; pageSize: number } }; isAddition?: boolean }) {
     return this.http.post<{
       rows: IProductSearchRow[];
       paginationInfo: {
         totalRowsCount: number;
         totalPagesCount: number;
       };
-    }>(`${this.apiUrl}/GetListIsAdditionMenuItem?IsAddtion=${params.dto}`, params.dto);
+    }>(`${this.apiUrl}/GetListIsAdditionMenuItem?IsAddtion=${params.isAddition}`, params.dto);
   }
 }

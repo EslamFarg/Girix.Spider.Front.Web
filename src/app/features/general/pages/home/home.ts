@@ -272,7 +272,20 @@ export class Home extends BaseComponent {
       this.searchHuts(this.hutPaginationInfo.pageIndex + 1);
     }
   }
-
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
   //tables
 
   tableService = inject(TableService);
@@ -322,7 +335,13 @@ export class Home extends BaseComponent {
       this.searchTables(this.tablePaginationInfo.pageIndex + 1);
     }
   }
-
+  //
+  //
+  //
+  //
+  //
+  //
+  //
   //rooms
 
   roomService = inject(RoomService);
@@ -373,6 +392,14 @@ export class Home extends BaseComponent {
     }
   }
 
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
   //
   //additions
 
@@ -441,7 +468,7 @@ export class Home extends BaseComponent {
             pageSize: 20,
           },
         },
-        isAddtion: true,
+        isAddition: true,
       })
       .subscribe({
         next: (res) => {

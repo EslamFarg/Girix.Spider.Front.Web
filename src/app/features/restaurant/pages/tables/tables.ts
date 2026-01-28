@@ -172,7 +172,7 @@ export class Tables extends BaseComponent {
     }
 
     if (this.currentItem) {
-      this.tableService.update(this.tableFg.getRawValue()).subscribe({
+      this.tableService.put(this.tableFg.getRawValue()).subscribe({
         next: () => {
           this.searchTables(1);
           this.resetTableForm();

@@ -1,5 +1,5 @@
 import BaseService from '@/core/services/BaseService';
- import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 
@@ -18,7 +18,7 @@ export interface IUserDetails {
     {
       id: number;
       name: string;
-    }
+    },
   ];
   setting: {
     name: string;
@@ -30,7 +30,16 @@ export interface IUserDetails {
   providedIn: 'root',
 })
 export class AuthService extends BaseService {
-  userDetails = signal<IUserDetails | null>(this.get('userDetails'));
+  // userDetails = signal<IUserDetails | null>(this.get('userDetails'));
+  userDetails = signal<IUserDetails | null>({
+    email: '',
+    fullName: '',
+    phoneNumber: '',
+    token: '',
+    userId: '123',
+    groups: [{ id: 0, name: '' }],
+    setting: { name: '', phoneNumber: '' },
+  });
   isAuthenticated = computed(() => this.userDetails() !== null);
   override apiRoute = 'Auth';
 
@@ -68,7 +77,7 @@ export class AuthService extends BaseService {
           this.userDetails.set(userDetails);
           this.router.navigate(['/']);
         },
-      })
+      }),
     );
   }
 
@@ -108,7 +117,7 @@ export class AuthService extends BaseService {
           next: (result) => {
             this.save('forgotPasswordToken', result.token);
           },
-        })
+        }),
       );
     }
 
@@ -125,7 +134,7 @@ export class AuthService extends BaseService {
           next: (result) => {
             this.save('forgotPasswordToken', result.token);
           },
-        })
+        }),
       );
   }
 

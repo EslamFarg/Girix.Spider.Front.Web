@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, OnInit, signal } from '@angular/core';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
@@ -26,6 +26,7 @@ import { noSymbolsAllowed } from '@/lib/text-validators';
 
 type ProductFgValue = { [key in keyof IProductCreateRequest]: FormControl<IProductCreateRequest[key]> } & {
   images: FormControl<{ id: number; fullPath: string }[]>;
+  allImages: FormControl<IFormImage[]>;
 };
 
 interface IFormImage {
@@ -80,28 +81,66 @@ export class ProductForm extends BaseComponent implements OnInit {
     selectiveTax: this.fb.control<number>(0, [Validators.required]),
     //category = group
     isAddition: this.fb.control<boolean>(false, [Validators.required]),
-    idsAdditionMenuItem: this.fb.control<number[]>([], [Validators.required]),
-    images: this.fb.control<File[] & { id: number; fullPath: string }[]>([], [Validators.required]),
+    idsAdditionMenuItem: this.fb.control<number[]>([], []),
+    images: this.fb.control<File[] & { id: number; fullPath: string }[]>([], []),
     //@ts-ignore
+    //ts ignore to allow null for now
     categoryId: this.fb.control<number | null>(null, [Validators.required]),
+    //
+    //
     //update only props
     id: this.fb.control<number>(0, []),
     imagesAdd: this.fb.control<File[]>([], []),
     listIdsOfDeleteImages: this.fb.control<number[]>([], []),
+    //
+    //
+    //for validation message only
+    allImages: this.fb.control<IFormImage[]>(
+      [],
+      [Validators.required, Validators.minLength(1), Validators.maxLength(6)],
+    ),
   };
 
   productService = inject(ProductService);
   productFg = this.fb.group(this.initialProductFgValue);
+  /**
+   *
+   */
+  constructor() {
+    super();
+    effect(() => {
+      console.log(this.allImages());
+    });
+  }
 
   ngOnInit() {
     this.searchGroups(1);
     this.searchAdditions(1);
 
+    this.productFg.get('isAddition')?.valueChanges.subscribe((isAddition) => {
+      if(isAddition) {
+        this.productFg.get('idsAdditionMenuItem')?.disable();
+        this.productFg.get('idsAdditionMenuItem')?.patchValue([]);
+      } else {
+        this.productFg.get('idsAdditionMenuItem')?.enable();
+      }
+    })
+
     switch (this.formMode()) {
       case FormMode.Update:
         this.productService.getById(this.routeId).subscribe((product) => {
-          this.productFg.patchValue(product);
+          this.productFg.patchValue({
+            ...product,
+            nameAr: product.name,
+            nameEn: product.name,
+            descriptionAr: product.description,
+            descriptionEn: product.description,
+            idsAdditionMenuItem: product.additionMenuItem.map((item) => item.id),
+          });
           this.existingImages.set(product.images);
+          this.currentImage.set(product.images[0]);
+          this.currentGroup.set({ id: product.categoryId, name: product.categoryName });
+          this.currentAdditions.set(product.additionMenuItem);
         });
         break;
       default:
@@ -121,33 +160,63 @@ export class ProductForm extends BaseComponent implements OnInit {
       nameEn: this.productFg.value.nameAr?.trim(),
       descriptionEn: this.productFg.value.descriptionAr?.trim(),
       images: this.newImages().map((image) => image.file!),
+      allImages: [...this.allImages()],
     });
     if (this.productFg.invalid) {
       console.log('invalid');
+      console.log(this.productFg.value);
       this.productFg.markAllAsTouched();
       return;
     }
 
-    let formValue;
+    let formValues: { [key: string]: string | Blob } = {};
+
     switch (this.formMode()) {
       case FormMode.Create:
-        formValue = omitKeys(this.productFg.value, ['id', 'imagesAdd', 'listIdsOfDeleteImages']);
+        formValues = omitKeys(this.productFg.value, ['id', 'imagesAdd', 'listIdsOfDeleteImages', 'allImages']);
         break;
       case FormMode.Update:
-        formValue = omitKeys(this.productFg.value, ['images']);
-        break;
-      default:
+        formValues = omitKeys(this.productFg.value, ['images', 'allImages']);
         break;
     }
+    const formData = new FormData();
 
-    console.log(formValue);
+    Array.from(Object.entries(formValues)).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((val) => formData.append(key, val));
+      } else {
+        formData.append(key, value);
+      }
+    });
+    switch (this.formMode()) {
+      case FormMode.Create:
+        this.productService.create(formData).subscribe({
+          next: (res) => {
+            console.log(res);
+          },
+        });
+        break;
+      case FormMode.Update:
+        this.productService.patch(formData).subscribe({
+          next: (res) => {
+            console.log(res);
+          },
+        });
+        break;
+    }
   }
 
   //
   //
   //
   //
-  currentImageIx = signal(0);
+  //
+  //
+  //
+  //images
+  //
+  //
+  currentImage = signal<IFormImage | null>(null);
   existingImages = signal<IFormImage[]>([]);
   newImages = signal<IFormImage[]>([]);
   allImages = computed<IFormImage[]>(() => [
@@ -159,7 +228,10 @@ export class ProductForm extends BaseComponent implements OnInit {
 
     if (input.files && input.files.length > 0) {
       const futureLength = this.newImages().length + input.files.length;
-      if (futureLength > 6) return;
+      if (futureLength > 6) {
+        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن اختيار اكثر من 6 صورة' });
+        return;
+      }
       Array.from(input.files).forEach((file, ix) => {
         const randomKey = Date.now() * Math.random();
         this.newImages.update((images) => [
@@ -167,20 +239,25 @@ export class ProductForm extends BaseComponent implements OnInit {
           { file, fullPath: URL.createObjectURL(file), id: 'new-image-' + randomKey, ix },
         ]);
       });
+      this.productFg.patchValue({
+        allImages: [...this.allImages()],
+      });
+      this.currentImage.set(this.allImages()[0]);
     }
 
     input.value = '';
   }
   onDeleteImage() {
-    const isImageNew = this.newImages().some((i) => i.ix === this.currentImageIx());
+    const isImageNew = this.newImages().some((i) => i.id === this.currentImage()?.id);
     if (isImageNew) {
-      this.newImages.update((images) => images.filter((i) => i.ix !== this.currentImageIx()));
+      this.newImages.update((images) => images.filter((i) => i.id !== this.currentImage()?.id));
     } else {
-      this.existingImages.update((images) => images.filter((i) => i.ix !== this.currentImageIx()));
+      this.existingImages.update((images) => images.filter((i) => i.id !== this.currentImage()?.id));
     }
-    this.currentImageIx.set(0);
+    this.currentImage.set(this.allImages()[0]);
   }
-  onSelectImage = (ix: number) => this.currentImageIx.set(ix);
+
+  onSelectImage = (ix: number) => this.currentImage.set(this.allImages()[ix]);
 
   //
   //
@@ -188,7 +265,7 @@ export class ProductForm extends BaseComponent implements OnInit {
   //
   //
   //
-  //
+  //groups
   //
   //
   //
@@ -196,12 +273,28 @@ export class ProductForm extends BaseComponent implements OnInit {
   closeGroupsDialog = () => this.isGroupsDialogVisible.set(false);
   openGroupsDialog = () => this.isGroupsDialogVisible.set(true);
   groupService = inject(GroupService);
+  currentGroup = signal<{ id: number; name: string } | null>(null);
   groups = signal<IGroupRowResponse[]>([]);
+  displayedGroups = computed(() => {
+    const groups = this.groups();
+    const current = this.currentGroup();
+
+    if (!current) return groups;
+
+    const exists = groups.some((g) => g.id === current.id);
+
+    if (exists) {
+      return groups.map((g) => (g.id === current.id ? { ...g, ...current } : g));
+    }
+
+    return [current, ...groups];
+  });
   groupsPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
+
   searchGroups(pageIndex: number, searchValue: string = '') {
     this.groupService
       .search({
@@ -251,11 +344,29 @@ export class ProductForm extends BaseComponent implements OnInit {
   //
   //
   //
+  //additions
   //
   //
   //
-  //
+  currentAdditions = signal<{ id: number; name: string }[]>([]);
   additionProducts = signal<IProductSearchRow[]>([]);
+  displayedAdditions = computed(() => {
+    const current = this.currentAdditions();
+    const products = this.additionProducts();
+
+    if (!current.length) return products;
+
+    const currentMap = new Map(current.map((a) => [a.id, a]));
+
+    // Replace matching ones, keep the rest
+    const merged = products.map((p) => (currentMap.has(p.id) ? { ...p, ...currentMap.get(p.id)! } : p));
+
+    // Inject ones not present in current page
+    const missing = current.filter((c) => !products.some((p) => p.id === c.id));
+
+    // Usually best UX: current selections first
+    return [...missing, ...merged];
+  });
   additionPaginationInfo: {
     pageIndex: number;
     totalPagesCount: number;

@@ -129,7 +129,7 @@ export class Rooms extends BaseComponent {
     }
 
     if (this.currentItem) {
-      this.roomService.update(this.roomFg.getRawValue()).subscribe({
+      this.roomService.put(this.roomFg.getRawValue()).subscribe({
         next: () => {
           this.searchRooms(1);
           this.resetRoomForm();

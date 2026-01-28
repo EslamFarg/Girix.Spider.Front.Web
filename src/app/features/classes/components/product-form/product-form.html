@@ -9,14 +9,14 @@
     form="productForm"
     type="submit"
   >
-    حفظ
+    @if (formMode() === FormMode.Create) {
+      حفظ
+    } @else {
+      تعديل
+    }
   </button>
-  <button pButton class="border-dark-line! text-dark-line! py-1! md:px-8!" variant="outlined">حذف</button>
   <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
     جديد
-  </button>
-  <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
-    طباعة
   </button>
 </div>
 
@@ -60,10 +60,10 @@
       }
       <label
         for="fileInput"
-        class="flex cursor-pointer items-center justify-center border-2 border-dark-line aspect-square rounded-lg h-fit mb-4 overflow-hidden"
+        class="flex cursor-pointer items-center justify-center border-2 border-dark-line aspect-square rounded-lg h-fit mb-2 overflow-hidden"
       >
         @if (allImages().length > 0) {
-          <img [src]="allImages()[currentImageIx()].fullPath" alt="" class="w-full object-cover aspect-square" />
+          <img [src]="allImages()[currentImage()?.ix ?? 0].fullPath" alt="" class="w-full object-cover aspect-square" />
         } @else {
           <svg width="92" height="96" viewBox="0 0 92 96" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -76,6 +76,7 @@
           </svg>
         }
       </label>
+
       <ng-template let-image #imageTemplate>
         <div class="group" (click)="onSelectImage(image.ix)">
           <img
@@ -86,25 +87,20 @@
           />
         </div>
       </ng-template>
-      <app-slider class="w-full h-fit" [items]="allImages()" [config]="{ itemWidth: 48 }" [template]="imageTemplate">
-      </app-slider>
-      <!-- <p-carousel
-        class="w-full max-w-60 mx-auto"
-        [value]="allImages()"
-        [numVisible]="3"
-        [numScroll]="1"
-        [showNavigators]="allImages().length > 3"
-        [circular]="false"
-        [showIndicators]="false"
+      <span></span>
+      <app-input-error-message-handler [fc]="productFg.get('allImages')" class="inline" />
+
+      <app-slider
+        class="block w-full h-fit mt-2"
+        [items]="allImages()"
+        [config]="{ itemWidth: 48 }"
+        [template]="imageTemplate"
       >
-        <ng-template let-image #item>
-          <img [src]="image.fullPath" appImgFallback class="w-10 h-10 mx-auto rounded-full" alt="" />
-        </ng-template>
-      </p-carousel> -->
+      </app-slider>
     </div>
     <div class="grid lg:grid-cols-3 gap-4 flex-1">
       <div>
-        <label for="productName" >اسم المنتج</label>
+        <label for="productName">اسم المنتج</label>
         <app-input-error-message-handler [fc]="productFg.get('nameAr')">
           <input
             pInputText
@@ -147,7 +143,7 @@
         <label for="productName">المجموعة</label>
         <app-input-error-message-handler [fc]="productFg.get('categoryId')">
           <p-select
-            [options]="groups()"
+            [options]="displayedGroups()"
             optionLabel="name"
             optionValue="id"
             [virtualScroll]="true"
@@ -177,13 +173,13 @@
       </div>
       <div>
         <label for="productName">الضريبه</label>
-        <app-input-error-message-handler  [fc]="productFg.get('tax')">
+        <app-input-error-message-handler [fc]="productFg.get('tax')">
           <p-select [options]="[0, 1, 5, 14, 15]" formControlName="tax" placeholder="إختر الضريبه" class="w-full!" />
         </app-input-error-message-handler>
       </div>
       <div>
         <label for="productName">الضريبه الانتقائيه</label>
-        <app-input-error-message-handler   [fc]="productFg.get('selectiveTax')">
+        <app-input-error-message-handler [fc]="productFg.get('selectiveTax')">
           <p-select
             [options]="[0, 25, 50, 75, 100]"
             formControlName="selectiveTax"
@@ -205,7 +201,7 @@
         <app-input-error-message-handler [fc]="productFg.get('idsAdditionMenuItem')">
           <p-multiselect
             optionValue="id"
-            [options]="additionProducts()"
+            [options]="displayedAdditions()"
             optionLabel="name"
             [virtualScroll]="true"
             formControlName="idsAdditionMenuItem"

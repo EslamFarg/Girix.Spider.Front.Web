@@ -146,7 +146,7 @@ export default abstract class BaseService<
     return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(`${this.apiUrl}/${this.endpoints.search}`, body);
   }
 
-  create(createDto: ICreateDto) {
+  create<IDefaultCreateDto=ICreateDto>(createDto: IDefaultCreateDto) {
     return this.http.post<number>(`${this.apiUrl}/${this.endpoints.create}`, createDto).pipe(
       tap({
         next: () => {
@@ -156,8 +156,18 @@ export default abstract class BaseService<
     );
   }
 
-  update(createDto: IUpdateDto) {
+  put<IDefaultUpdateDto=IUpdateDto>(createDto: IDefaultUpdateDto) {
     return this.http.put<number>(`${this.apiUrl}/Update`, createDto).pipe(
+      tap({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'تم الحفظ', detail: 'لقد قمت بالحفظ بنجاح' });
+        },
+      }),
+    );
+  }
+
+  patch<IDefaultUpdateDto=IUpdateDto>(createDto: IDefaultUpdateDto) {
+    return this.http.patch<number>(`${this.apiUrl}/Update`, createDto).pipe(
       tap({
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'تم الحفظ', detail: 'لقد قمت بالحفظ بنجاح' });

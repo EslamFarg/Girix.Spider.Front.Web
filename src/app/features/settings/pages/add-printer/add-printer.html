@@ -7,7 +7,7 @@
       <app-input-error-message-handler>
         <input type="text" pInputText id="productPrice" aria-describedby="productPrice-help" placeholder="الاسم" />
         <p-inputgroup-addon class="p-0! overflow-hidden">
-          <span class="bg-dark-bg-1 flex items-center justify-center cursor-pointer h-full w-full rounded-inherit">
+          <span (click)="printScreen()" class="bg-dark-bg-1 flex items-center justify-center cursor-pointer h-full w-full rounded-inherit">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M8 14.666C7.16667 14.666 6.38622 14.5078 5.65867 14.1913C4.93111 13.8749 4.29778 13.4471 3.75867 12.908C3.21956 12.3689 2.79178 11.7356 2.47533 11.008C2.15889 10.2805 2.00044 9.49979 2 8.66602H3.33333C3.33333 9.96602 3.78622 11.0689 4.692 11.9747C5.59778 12.8805 6.70044 13.3331 8 13.3327C9.29956 13.3322 10.4024 12.8796 11.3087 11.9747C12.2149 11.0698 12.6676 9.9669 12.6667 8.66602C12.6658 7.36513 12.2131 6.26246 11.3087 5.35802C10.4042 4.45357 9.30133 4.00068 8 3.99935H7.9L8.93333 5.03268L8 5.99935L5.33333 3.33268L8 0.666016L8.93333 1.63268L7.9 2.66602H8C8.83333 2.66602 9.614 2.82446 10.342 3.14135C11.07 3.45824 11.7033 3.88602 12.242 4.42468C12.7807 4.96335 13.2084 5.59668 13.5253 6.32468C13.8422 7.05268 14.0004 7.83313 14 8.66602C13.9996 9.49891 13.8413 10.2796 13.5253 11.008C13.2093 11.7365 12.7816 12.3698 12.242 12.908C11.7024 13.4462 11.0691 13.874 10.342 14.1913C9.61489 14.5087 8.83422 14.6669 8 14.666Z"

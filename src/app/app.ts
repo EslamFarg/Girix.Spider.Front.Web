@@ -3,13 +3,17 @@ import { Router, RouterOutlet } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
-import { CollectionDialog } from "./features/collections/components/collection-dialog/collection-dialog";
-import {
-    TranslateService,
-    TranslatePipe,
-    TranslateDirective
-} from "@ngx-translate/core";
+import { CollectionDialog } from './features/collections/components/collection-dialog/collection-dialog';
+import { TranslateService, TranslatePipe, TranslateDirective } from '@ngx-translate/core';
 
+declare global {
+  interface Window {
+    electronAPI: {
+      getPrinters: () => Promise<any[]>;
+      ping: (msg: string) => Promise<string>;
+    };
+  }
+}
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, ConfirmDialogModule, ToastModule, CollectionDialog],
@@ -23,12 +27,12 @@ export class App {
   private translate = inject(TranslateService);
   router = inject(Router);
 
-    constructor() {
-        this.translate.addLangs(['ar', 'en']);
-        this.translate.setFallbackLang('ar');
-        this.translate.use('ar');
+  constructor() {
+    this.translate.addLangs(['ar', 'en']);
+    this.translate.setFallbackLang('ar');
+    this.translate.use('ar');
 
-        //go to replacements
-        // this.router.navigate(['replacements/huts']);
-    }
+    //go to replacements
+    // this.router.navigate(['replacements/huts']);
+  }
 }
