@@ -1,7 +1,7 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
 import { ImgFallback } from '@/directives/img-fallback';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';

@@ -4,7 +4,7 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { UsersNav } from '../../components/users-nav/users-nav';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Select } from 'primeng/select';
 import { InputText } from 'primeng/inputtext';

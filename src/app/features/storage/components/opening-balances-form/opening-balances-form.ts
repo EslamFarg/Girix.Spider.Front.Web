@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { Button } from "primeng/button";
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
-import { Textarea } from "primeng/textarea";
- import { DatePickerModule } from 'primeng/datepicker';
-import { InputGroupAddon } from "primeng/inputgroupaddon";
+import { Button } from 'primeng/button';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
+import { Textarea } from 'primeng/textarea';
+import { DatePickerModule } from 'primeng/datepicker';
+import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
@@ -12,6 +12,4 @@ import { InputTextModule } from 'primeng/inputtext';
   templateUrl: './opening-balances-form.html',
   styleUrl: './opening-balances-form.css',
 })
-export class OpeningBalancesForm {
-
-}
+export class OpeningBalancesForm {}

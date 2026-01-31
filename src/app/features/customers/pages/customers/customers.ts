@@ -2,19 +2,19 @@ import { BaseComponent, IPaginationInfo } from '@/components/base-component/base
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Select } from 'primeng/select';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
- import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Paginator, PaginatorState } from 'primeng/paginator';
- import { InputText } from 'primeng/inputtext';
+import { InputText } from 'primeng/inputtext';
 import {
   CustomerSearchEnum,
   CustomerService,
   ICustomerDtoResponse,
   ICustomerRowResponse,
 } from '../../services/customer-service';
-import { noSymbolsAllowed, onlyNumbersAllowed } from '@/lib/text-validators';
-import { omitKeys } from '@/lib/helpers';
+import { noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
+import { omitKeys } from '@/yn-ng/utils/helpers';
 import { RouterLink } from '@angular/router';
 import { Debounce } from '@/directives/debounce';
 
@@ -27,14 +27,14 @@ import { Debounce } from '@/directives/debounce';
     InputGroupAddon,
     ReactiveFormsModule,
     Paginator,
-     InputText,
+    InputText,
     RouterLink,
     Debounce,
   ],
   templateUrl: './customers.html',
   styleUrl: './customers.css',
 })
-export class Customers extends BaseComponent  {
+export class Customers extends BaseComponent {
   initialFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<CustomerSearchEnum>(CustomerSearchEnum.Name, [Validators.required]),
@@ -56,7 +56,6 @@ export class Customers extends BaseComponent  {
     this.searchCustomers(1);
   }
 
-
   customers = signal<ICustomerRowResponse[]>([]);
 
   customersPaginationInfo: IPaginationInfo = {
@@ -64,7 +63,7 @@ export class Customers extends BaseComponent  {
     totalRowsCount: 0,
     totalPagesCount: 0,
   };
-  
+
   searchCustomers(pageIndex: number) {
     const fgRawValue = this.fg.getRawValue();
 

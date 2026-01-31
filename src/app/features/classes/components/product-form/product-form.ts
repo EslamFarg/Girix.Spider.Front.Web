@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, input, OnInit, signal } from '@angular/core';
 import { Button, ButtonDirective } from 'primeng/button';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectFilterEvent, SelectLazyLoadEvent, SelectModule } from 'primeng/select';
@@ -16,25 +16,15 @@ import {
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GroupSearchEnum, GroupService, IGroupRowResponse } from '../../services/group-service';
 import { ImgOnly } from '@/directives/img-only';
-import { omitKeys } from '@/lib/helpers';
+import { omitKeys } from '@/yn-ng/utils/helpers';
 import { Slider } from '@/components/slider/slider';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Dialog } from 'primeng/dialog';
 import { BehaviorSubject, debounce, debounceTime, Subject, tap } from 'rxjs';
 import { AllowNumbers } from '@/directives/allow-numbers';
-import { noSymbolsAllowed } from '@/lib/text-validators';
-
-type ProductFgValue = { [key in keyof IProductCreateRequest]: FormControl<IProductCreateRequest[key]> } & {
-  images: FormControl<{ id: number; fullPath: string }[]>;
-  allImages: FormControl<IFormImage[]>;
-};
-
-interface IFormImage {
-  ix?: number;
-  id?: any;
-  fullPath: string;
-  file?: File;
-}
+import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
+import { ProductFgControls } from './types';
+import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 
 @Component({
   selector: 'app-product-form',
@@ -60,7 +50,7 @@ interface IFormImage {
 export class ProductForm extends BaseComponent implements OnInit {
   formMode = input.required<FormMode>();
 
-  initialProductFgValue: ProductFgValue = {
+  initialProductFgValue: ProductFgControls = {
     nameEn: this.fb.control<string>('', [Validators.required]),
     nameAr: this.fb.control<string>('', [
       Validators.required,
@@ -118,13 +108,13 @@ export class ProductForm extends BaseComponent implements OnInit {
     this.searchAdditions(1);
 
     this.productFg.get('isAddition')?.valueChanges.subscribe((isAddition) => {
-      if(isAddition) {
+      if (isAddition) {
         this.productFg.get('idsAdditionMenuItem')?.disable();
         this.productFg.get('idsAdditionMenuItem')?.patchValue([]);
       } else {
         this.productFg.get('idsAdditionMenuItem')?.enable();
       }
-    })
+    });
 
     switch (this.formMode()) {
       case FormMode.Update:

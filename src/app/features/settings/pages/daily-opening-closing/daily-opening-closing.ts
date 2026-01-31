@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { BaseComponent } from '@/components/base-component/base-component';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,14 +8,13 @@ import { InputText } from 'primeng/inputtext';
 import { RouterLinkActive, RouterLinkWithHref } from '@angular/router';
 import { Button } from 'primeng/button';
 import { CarouselModule, Carousel } from 'primeng/carousel';
-import { Textarea } from "primeng/textarea";
+import { Textarea } from 'primeng/textarea';
 
-enum DocFormSections{
+enum DocFormSections {
   opening = 1,
   closing = 2,
-  deficitReduction = 3
+  deficitReduction = 3,
 }
-
 
 @Component({
   selector: 'app-daily-opening-closing',
@@ -29,8 +28,8 @@ enum DocFormSections{
     RouterLinkWithHref,
     Button,
     Carousel,
-    Textarea
-],
+    Textarea,
+  ],
   templateUrl: './daily-opening-closing.html',
   styleUrl: './daily-opening-closing.css',
 })
@@ -55,11 +54,7 @@ export class DailyOpeningClosing extends BaseComponent {
   rows = 10;
   onPageChange(event: any) {}
 
-  sectionIds:DocFormSections[] = [
-    DocFormSections.opening,
-    DocFormSections.closing,
-    DocFormSections.deficitReduction
-  ];
+  sectionIds: DocFormSections[] = [DocFormSections.opening, DocFormSections.closing, DocFormSections.deficitReduction];
   responsiveOptions = [
     {
       breakpoint: '1400px',

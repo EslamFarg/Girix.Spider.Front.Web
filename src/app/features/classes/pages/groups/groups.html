@@ -29,6 +29,8 @@
       </app-input-error-message-handler>
     </div>
 
+    
+
     <p-select
       [options]="periodOptions"
       formControlName="fromDate"
@@ -50,18 +52,24 @@
     </thead>
     <tbody>
       @for (item of groups(); track $index) {
-        <tr class="">
-          <td>{{ getRowNumber($index, groupsPaginationInfo.pageIndex) }}</td>
-          <td>{{ item.name }}</td>
+        <tr [style]="`--ix:${$index}`">
           <td>
-            <input
-              type="checkbox"
-              tabIndex="-1"
-              [checked]="item.isOnCasher"
-              class="w-5 h-5 accent-dark-line cursor-pointer hover:accent-white/50 pointer-events-none"
-              name=""
-              id=""
-            />
+            <div>{{ getRowNumber($index, groupsPaginationInfo.pageIndex) }}</div>
+          </td>
+          <td>
+            <div>{{ item.name }}</div>
+          </td>
+          <td>
+            <div>
+              <input
+                type="checkbox"
+                tabIndex="-1"
+                [checked]="item.isOnCasher"
+                class="w-5 h-5 accent-dark-line cursor-pointer hover:accent-white/50 pointer-events-none"
+                name=""
+                id=""
+              />
+            </div>
           </td>
           <td>
             <div class="actions">

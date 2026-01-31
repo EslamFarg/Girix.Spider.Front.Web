@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputText } from 'primeng/inputtext';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Button } from 'primeng/button';
 import { Paginator } from 'primeng/paginator';
@@ -52,7 +52,7 @@ export class AddPrinter extends BaseComponent {
       .catch((e) => console.log(e));
   }
 
-  printScreen(){
-    window.print()
+  printScreen() {
+    window.print();
   }
 }

@@ -2,7 +2,7 @@ import { IRoomSearchRow, RoomSearchEnum, RoomService } from '@/features/restaura
 import { Component, effect, inject, signal } from '@angular/core';
 import { ILocalSpaceItem, ReplacementsService, SpaceTypeEnum } from '../../services/replacements-service';
 import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdown';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { Select } from 'primeng/select';
@@ -121,7 +121,7 @@ export class RepalcementsLayout extends BaseComponent {
 
   submitItemChange() {
     const changeToItem = this.changeToItem();
-    const orderId=this.currentItem()?.data.orderId;
+    const orderId = this.currentItem()?.data.orderId;
 
     if (!changeToItem) {
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب اختيار المكان' });

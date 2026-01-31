@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
-import { Select } from "primeng/select";
-import { Button } from "primeng/button";
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
+import { Select } from 'primeng/select';
+import { Button } from 'primeng/button';
 
 @Component({
   selector: 'app-printer',
@@ -10,8 +10,4 @@ import { Button } from "primeng/button";
   templateUrl: './printer.html',
   styleUrl: './printer.css',
 })
-export class Printer {
-
-}
-
- 
+export class Printer {}

@@ -39,7 +39,7 @@
     />
   </form>
 
-  <div class="w-full overflow-auto  ">
+  <div class="w-full overflow-auto">
     <table class="my-2 sm:my-4 w-full main-table">
       <thead>
         <tr class="">
@@ -56,32 +56,48 @@
       </thead>
       <tbody>
         @for (item of products(); track $index) {
-          <tr class="">
-            <td>{{ getRowNumber($index, productsPaginationInfo.pageIndex) }}</td>
+          <tr [style]="`--ix:${$index}`">
             <td>
-              <img
-                class="w-10 aspect-square object-fit-cover mx-auto"
-                appImgFallback
-                decoding="async"
-                [src]="baseUrl + (item.images?.[0]?.fullPath ?? '')"
-                alt=""
-              />
+              <div>{{ getRowNumber($index, productsPaginationInfo.pageIndex) }}</div>
             </td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.categoryName }}</td>
-            <td>{{ item.description }}</td>
             <td>
-              <input
-                type="checkbox"
-                tabindex="-1"
-                [checked]="item.isAddition"
-                class="w-5 h-5 accent-dark-line cursor-pointer hover:accent-white/50 pointer-events-none"
-                name=""
-                id=""
-              />
+              <div class="rounded-full shadow-md shadow-black/30 w-fit mx-auto">
+                <img
+                  class="w-10 aspect-square rounded-full object-cover"
+                  appImgFallback
+                  decoding="async"
+                  [src]="baseUrl + (item.images?.[0]?.fullPath ?? '')"
+                  alt=""
+                />
+              </div>
             </td>
-            <td class="font-bold">{{ item.tax }}</td>
-            <td class="font-bold">${{ item.price }}</td>
+            <td>
+              <div>{{ item.name }}</div>
+            </td>
+            <td>
+              <div>{{ item.categoryName }}</div>
+            </td>
+            <td>
+              <div>{{ item.description }}</div>
+            </td>
+            <td>
+              <div>
+                <input
+                  type="checkbox"
+                  tabindex="-1"
+                  [checked]="item.isAddition"
+                  class="w-5 h-5 accent-dark-line cursor-pointer hover:accent-white/50 pointer-events-none"
+                  name=""
+                  id=""
+                />
+              </div>
+            </td>
+            <td class="font-bold">
+              <div>{{ item.tax }}</div>
+            </td>
+            <td class="font-bold">
+              <div>${{ item.price }}</div>
+            </td>
             <td>
               <div class="actions">
                 <a [routerLink]="`${item.id}/edit`" type="button" class="edit">
@@ -114,7 +130,6 @@
                       fill="#FF383C"
                     />
                   </svg>
- 
                 </button>
               </div>
             </td>

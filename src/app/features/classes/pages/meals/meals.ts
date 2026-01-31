@@ -1,12 +1,12 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
- import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { IMealRowResponse, MealSearchEnum, MealService } from '../../services/meal-service';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
@@ -22,7 +22,7 @@ import { Debounce } from '@/directives/debounce';
     InputTextModule,
     SelectModule,
     PaginatorModule,
-     SectionWrapper,
+    SectionWrapper,
     Menu,
     ImgFallback,
     Debounce,
@@ -30,7 +30,7 @@ import { Debounce } from '@/directives/debounce';
   templateUrl: './meals.html',
   styleUrl: './meals.css',
 })
-export class Meals extends BaseComponent  {
+export class Meals extends BaseComponent {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<MealSearchEnum>(MealSearchEnum.Name, [Validators.required]),
@@ -66,11 +66,11 @@ export class Meals extends BaseComponent  {
   ];
 
   meals = signal<IMealRowResponse[]>([]);
-  mealsPaginationInfo:IPaginationInfo={
-    pageIndex:1,
-    totalPagesCount:0,
-    totalRowsCount:0
-  }
+  mealsPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
 
   searchMeals(pageIndex: number) {
     this.orderService

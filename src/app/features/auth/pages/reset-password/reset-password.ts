@@ -1,7 +1,7 @@
 import { BaseComponent } from '@/components/base-component/base-component';
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { Password } from 'primeng/password';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';

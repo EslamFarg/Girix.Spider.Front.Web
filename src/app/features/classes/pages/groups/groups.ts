@@ -1,17 +1,16 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
- import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Debounce } from '@/directives/debounce';
 import { IGroupRowResponse, GroupSearchEnum, GroupService } from '../../services/group-service';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-
 @Component({
   selector: 'app-groups',
   imports: [
@@ -21,14 +20,14 @@ import { Menu } from 'primeng/menu';
     InputTextModule,
     SelectModule,
     PaginatorModule,
-     SectionWrapper,
+    SectionWrapper,
     Debounce,
     Menu,
   ],
   templateUrl: './groups.html',
   styleUrl: './groups.css',
 })
-export class Groups extends BaseComponent  {
+export class Groups extends BaseComponent {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<GroupSearchEnum>(GroupSearchEnum.Name, [Validators.required]),
@@ -58,12 +57,12 @@ export class Groups extends BaseComponent  {
     { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
-groups = signal<IGroupRowResponse[]>([]);
-groupsPaginationInfo:IPaginationInfo={
-  pageIndex:1,
-  totalPagesCount:0,
-  totalRowsCount:0
-}
+  groups = signal<IGroupRowResponse[]>([]);
+  groupsPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
   searchGroups(pageIndex: number) {
     this.groupService
       .search({
@@ -98,8 +97,8 @@ groupsPaginationInfo:IPaginationInfo={
   deleteGroup(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف الوجبة؟',
-      header: 'حذف الوجبة؟',
+      message: 'هل انت متاكد من حذف الطابعة',
+      header: 'حذف الطابعة',
       icon: 'pi pi-info-circle',
       rejectLabel: 'الغاء',
       rejectButtonProps: {

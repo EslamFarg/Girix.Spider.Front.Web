@@ -4,12 +4,12 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdown';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { CollectionsService } from '../../services/collections-service';
 import { InputText } from 'primeng/inputtext';
-import { HutCard } from "@/components/hut-card/hut-card";
-import { IHutReadResponse, HutSearchEnum, HutService, IHutSearchRow  } from '@/features/restaurant/services/hut-service';
+import { HutCard } from '@/components/hut-card/hut-card';
+import { IHutReadResponse, HutSearchEnum, HutService, IHutSearchRow } from '@/features/restaurant/services/hut-service';
 import { MenuItem } from 'primeng/api';
 
 @Component({
@@ -22,13 +22,13 @@ import { MenuItem } from 'primeng/api';
     InputGroupAddon,
     ReactiveFormsModule,
     InputText,
-    HutCard
-],
+    HutCard,
+  ],
   templateUrl: './huts.html',
   styleUrl: './huts.css',
 })
 export class Huts extends BaseComponent {
-   dateNow = new Date();
+  dateNow = new Date();
   getFutureDate() {
     const date = new Date(this.dateNow);
     date.setDate(date.getDate() + 1);
@@ -39,7 +39,7 @@ export class Huts extends BaseComponent {
     date.setDate(date.getDate() - 1);
     return date.toISOString();
   }
- 
+
   collectionsService = inject(CollectionsService);
   openCollectionDialog = this.collectionsService.openCollectionDialog;
 
@@ -103,7 +103,7 @@ export class Huts extends BaseComponent {
   ];
 
   huts = signal<IHutSearchRow[]>([]);
-  hutsPaginationInfo=signal<IPaginationInfo>({
+  hutsPaginationInfo = signal<IPaginationInfo>({
     pageIndex: 1,
     totalPagesCount: 0,
     totalRowsCount: 0,
@@ -138,6 +138,4 @@ export class Huts extends BaseComponent {
   onSearchSubmit = () => this.searchFg.valid && this.searchHuts(1);
 
   onPageChange = (event: PaginatorState) => this.searchHuts(event.page! + 1);
-
- 
 }

@@ -1,7 +1,7 @@
 import { BaseComponent } from '@/components/base-component/base-component';
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputText } from 'primeng/inputtext';
 import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
@@ -19,7 +19,6 @@ export class ForgotPassword extends BaseComponent {
   fg = this.fb.group(this.initialFormValue);
 
   onSubmit() {
-
     if (this.fg.invalid) {
       this.fg.markAllAsTouched();
       return;

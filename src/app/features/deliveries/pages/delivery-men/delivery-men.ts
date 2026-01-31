@@ -1,26 +1,38 @@
 import { Component, inject, signal } from '@angular/core';
-import { DeliveriesNav } from "../../components/deliveries-nav/deliveries-nav";
-import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
-import { InputGroupAddon } from "primeng/inputgroupaddon";
-import { Select } from "primeng/select";
-import { Paginator, PaginatorState } from "primeng/paginator";
+import { DeliveriesNav } from '../../components/deliveries-nav/deliveries-nav';
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
+import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { Select } from 'primeng/select';
+import { Paginator, PaginatorState } from 'primeng/paginator';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { InputText } from "primeng/inputtext";
+import { InputText } from 'primeng/inputtext';
 import { DeliverySearchEnum, DeliveryService, IDeliveryRowResponse } from '../../services/delivery-service';
 import { MenuItem } from 'primeng/api';
-import { Debounce } from "@/directives/debounce";
-import { Menu } from "primeng/menu";
-import { RouterLink } from "@angular/router";
+import { Debounce } from '@/directives/debounce';
+import { Menu } from 'primeng/menu';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-delivery-men',
-  imports: [DeliveriesNav, SectionWrapper, InputErrorMessageHandler, InputGroupAddon, Select, Paginator, ReactiveFormsModule, InputText, Debounce, Menu, RouterLink],
+  imports: [
+    DeliveriesNav,
+    SectionWrapper,
+    InputErrorMessageHandler,
+    InputGroupAddon,
+    Select,
+    Paginator,
+    ReactiveFormsModule,
+    InputText,
+    Debounce,
+    Menu,
+    RouterLink,
+  ],
   templateUrl: './delivery-men.html',
   styleUrl: './delivery-men.css',
 })
-export class DeliveryMen  extends BaseComponent  {
+export class DeliveryMen extends BaseComponent {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<DeliverySearchEnum>(DeliverySearchEnum.Name, [Validators.required]),
@@ -56,12 +68,12 @@ export class DeliveryMen  extends BaseComponent  {
   ];
 
   deliveryMen = signal<IDeliveryRowResponse[]>([]);
-  
-    deliveryMenPaginationInfo: IPaginationInfo = {
-      pageIndex: 1,
-      totalRowsCount: 0,
-      totalPagesCount: 0,
-    };
+
+  deliveryMenPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0,
+  };
 
   searchDeliverys(pageIndex: number) {
     this.deliveryService

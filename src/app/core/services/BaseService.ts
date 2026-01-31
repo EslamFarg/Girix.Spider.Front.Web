@@ -146,7 +146,7 @@ export default abstract class BaseService<
     return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(`${this.apiUrl}/${this.endpoints.search}`, body);
   }
 
-  create<IDefaultCreateDto=ICreateDto>(createDto: IDefaultCreateDto) {
+  create<IDefaultCreateDto=ICreateDto>(createDto: IDefaultCreateDto | FormData) {
     return this.http.post<number>(`${this.apiUrl}/${this.endpoints.create}`, createDto).pipe(
       tap({
         next: () => {

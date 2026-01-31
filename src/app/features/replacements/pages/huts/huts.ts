@@ -2,7 +2,7 @@ import { BaseComponent, IPaginationInfo } from '@/components/base-component/base
 import { Component, EventEmitter, inject, signal, ViewChild, viewChildren, ViewChildren } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { ReplacementsService, SpaceTypeEnum } from '../../services/replacements-service';
@@ -11,9 +11,9 @@ import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdo
 import { HutCard } from '@/components/hut-card/hut-card';
 import { date } from '@primeuix/themes/aura/datepicker';
 import { HutSearchEnum, HutService, IHutReadResponse, IHutSearchRow } from '@/features/restaurant/services/hut-service';
-import { noSymbolsAllowed } from '@/lib/text-validators';
+import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { MenuItem } from 'primeng/api';
-import { omitKeys } from '@/lib/helpers';
+import { omitKeys } from '@/yn-ng/utils/helpers';
 @Component({
   selector: 'app-huts',
   imports: [

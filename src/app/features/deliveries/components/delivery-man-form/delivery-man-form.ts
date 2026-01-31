@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { Button } from "primeng/button";
-import { InputErrorMessageHandler } from "@/components/input-error-message-handler/input-error-message-handler";
-import { InputText } from "primeng/inputtext";
-import { Textarea } from "primeng/textarea";
+import { Button } from 'primeng/button';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
+import { InputText } from 'primeng/inputtext';
+import { Textarea } from 'primeng/textarea';
 
 @Component({
   selector: 'app-delivery-man-form',
@@ -10,6 +10,4 @@ import { Textarea } from "primeng/textarea";
   templateUrl: './delivery-man-form.html',
   styleUrl: './delivery-man-form.css',
 })
-export class DeliveryManForm {
-
-}
+export class DeliveryManForm {}

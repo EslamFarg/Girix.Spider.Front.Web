@@ -25,17 +25,17 @@
 </div>
 
 <div class="mt-6 flex flex-col md:flex-row gap-4">
-  <div class="p-10 flex items-center justify-center border-2 border-dark-line rounded-lg min-h-full  ">
-      <svg width="92" height="96" viewBox="0 0 92 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M36.105 32.98V53.475C36.105 54.4475 35.1475 55.23 33.9575 55.23C32.7675 55.23 31.81 54.4475 31.81 53.475V32.98M26.7675 32.98V53.475C26.7675 54.4475 25.81 55.23 24.62 55.23C23.43 55.23 22.4725 54.4475 22.4725 53.475V32.98M35.5375 93.9975V71.1225C35.5375 68.715 35.5525 67.63 38.595 64.5825C41.64 61.5375 41.6525 60.3475 41.6525 58.045V36.285C41.6525 34.455 40.18 32.985 38.3525 32.985H36.1075M22.4775 32.985H20.2275C18.3975 32.985 16.9275 34.455 16.9275 36.285L16.935 58.045C16.945 60.3475 16.96 61.5375 20.0025 64.5825C23.045 67.6275 23.0625 68.715 23.0525 71.12L23.04 93.9975L13.715 94C8.2275 94 4.005 89.58 3.81 84.1L1.5 19.3075L13.445 1.5H77.805L89.745 19.3075L87.435 84.1C87.24 89.58 83.0175 94 77.53 94L69.335 93.9975V64.1925C73.5025 61.23 76.0975 55.5525 76.105 49.38C76.105 40.04 70.28 32.4675 63.0925 32.465H63.085C55.8975 32.465 50.0725 40.04 50.0725 49.38C50.08 55.5525 52.6725 61.23 56.8375 64.1925V93.9975M31.815 32.985H26.7725M35.535 94H56.835M26.75 19.56V12.085C26.75 10.2575 28.2225 8.785 30.05 8.785H61.19C63.02 8.785 64.4925 10.2575 64.4925 12.085V19.56H26.75Z"
-          stroke="#252836"
-          stroke-width="3"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-    </div>
+  <div class="p-10 flex items-center justify-center border-2 border-dark-line rounded-lg min-h-full">
+    <svg width="92" height="96" viewBox="0 0 92 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M36.105 32.98V53.475C36.105 54.4475 35.1475 55.23 33.9575 55.23C32.7675 55.23 31.81 54.4475 31.81 53.475V32.98M26.7675 32.98V53.475C26.7675 54.4475 25.81 55.23 24.62 55.23C23.43 55.23 22.4725 54.4475 22.4725 53.475V32.98M35.5375 93.9975V71.1225C35.5375 68.715 35.5525 67.63 38.595 64.5825C41.64 61.5375 41.6525 60.3475 41.6525 58.045V36.285C41.6525 34.455 40.18 32.985 38.3525 32.985H36.1075M22.4775 32.985H20.2275C18.3975 32.985 16.9275 34.455 16.9275 36.285L16.935 58.045C16.945 60.3475 16.96 61.5375 20.0025 64.5825C23.045 67.6275 23.0625 68.715 23.0525 71.12L23.04 93.9975L13.715 94C8.2275 94 4.005 89.58 3.81 84.1L1.5 19.3075L13.445 1.5H77.805L89.745 19.3075L87.435 84.1C87.24 89.58 83.0175 94 77.53 94L69.335 93.9975V64.1925C73.5025 61.23 76.0975 55.5525 76.105 49.38C76.105 40.04 70.28 32.4675 63.0925 32.465H63.085C55.8975 32.465 50.0725 40.04 50.0725 49.38C50.08 55.5525 52.6725 61.23 56.8375 64.1925V93.9975M31.815 32.985H26.7725M35.535 94H56.835M26.75 19.56V12.085C26.75 10.2575 28.2225 8.785 30.05 8.785H61.19C63.02 8.785 64.4925 10.2575 64.4925 12.085V19.56H26.75Z"
+        stroke="#252836"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </div>
   <div class="grid md:grid-cols-2 gap-4 flex-1">
     <div>
       <label for="productName">اسم الوجبه</label>
@@ -45,9 +45,17 @@
     </div>
 
     <div>
-      <label for="productName">المجموعة</label>
-      <app-input-error-message-handler>
-        <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
+      <label for="productName">الطابعة</label>
+      <app-input-error-message-handler [grouped]="false">
+        <ng-select
+          class="app-select"
+          [items]="printers()"
+          formControlName="fromDate"
+          bindLabel="name"
+          bindValue="id"
+          placeholder="الكل"
+        />
+        <p-select [options]="printers()"/>
       </app-input-error-message-handler>
     </div>
 
@@ -58,7 +66,7 @@
       <label for="productName" class="text-dark-line text-sm font-semibold">يعتبر المنتج كاضافه</label>
     </div>
 
-    <div class="  md:col-span-2">
+    <div class="md:col-span-2">
       <label for="productName">البيان</label>
       <app-input-error-message-handler>
         <textarea

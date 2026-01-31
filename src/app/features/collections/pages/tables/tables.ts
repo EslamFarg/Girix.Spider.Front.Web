@@ -4,7 +4,7 @@ import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputText } from 'primeng/inputtext';
 import { CollectionsService } from '../../services/collections-service';
@@ -28,9 +28,8 @@ import { TableService } from '@/features/restaurant/services/table-service';
   styleUrl: './tables.css',
 })
 export class Tables extends BaseComponent {
-   collectionsService = inject(CollectionsService);
+  collectionsService = inject(CollectionsService);
   openCollectionDialog = this.collectionsService.openCollectionDialog;
- 
 
   ngAfterViewInit() {
     // this.countDownEles().forEach((ele) => {
@@ -87,7 +86,7 @@ export class Tables extends BaseComponent {
   ];
 
   tables = signal<ITableSearchRow[]>([]);
-  tablesPaginationInfo=signal<IPaginationInfo>({
+  tablesPaginationInfo = signal<IPaginationInfo>({
     pageIndex: 1,
     totalPagesCount: 0,
     totalRowsCount: 0,

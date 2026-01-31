@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { InputErrorMessageHandler } from '@/components/input-error-message-handler/input-error-message-handler';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
 import { BaseComponent } from '@/components/base-component/base-component';
 import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -28,12 +28,10 @@ export class Login extends BaseComponent {
       this.fg.markAllAsTouched();
       return;
     }
-    
 
-    
     this.authService.login(this.fg.getRawValue()).subscribe({
       next: (data) => {
-        if(this.isRememberMe){
+        if (this.isRememberMe) {
           console.log(data);
           this.authService.save('userDetails', data);
         }

@@ -32,6 +32,14 @@ export enum GroupSearchEnum {
 export class GroupService extends BaseService<GroupSearchEnum, any, any, any, IGroupSearchResponseValue> {
   override apiRoute = 'Category';
 
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.patchEndpoints({ getById: 'GetById?id=' });
+  }
+
   getList(IsOnCasher: boolean = false, paginationInfo: { pageIndex: number; pageSize: number }) {
     return this.http.post<IPaginatedResponse<IGroupRowResponse>>(
       `${this.apiUrl}/ListCategoriesOnCasher?IsOnCasher=${IsOnCasher}`,
