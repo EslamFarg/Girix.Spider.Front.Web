@@ -285,7 +285,9 @@
                     <div class="overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">{{ label }}</div>
                     <!--  additional items -->
                     <app-slider
-                      [class]="`max-w-[300px] -mt-1.5 overflow-hidden xl:max-w-[250px] [&_.nav-btn]:p-1! [&_.nav-btn_*]:text-sm!  `"
+                      [class]="
+                        `max-w-[300px] -mt-1.5 overflow-hidden xl:max-w-[250px] [&_.nav-btn]:p-1! [&_.nav-btn_*]:text-sm!  `
+                      "
                       [template]="additionTemplate"
                       [items]="orderMenuItems()[$index].additions"
                       [config]="{ itemWidth: 70 }"
@@ -295,7 +297,7 @@
                       <div class="relative pt-1.5 pl-1.5">
                         <div class="border border-text-light rounded-md overflow-visible!">
                           <div
-                          [title]="addition.product.name"
+                            [title]="addition.product.name"
                             class="py-0.5 px-1 text-[10px] font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                           >
                             {{ addition.product.name }}
@@ -462,7 +464,12 @@
 
   <p class="font-bold text-center text-dark-bg-2 text-lg">الاضافات</p>
 
-  <div class="flex-1 overflow-auto no-scrollbar" appDebounce debounceEvent="scroll" (debounced)="onHutsScroll($event)">
+  <div
+    class="flex-1 overflow-auto no-scrollbar"
+    appDebounce
+    [domEvents]="['scroll']"
+    (debounced)="onHutsScroll($event)"
+  >
     <div class="grid grid-cols-4 gap-2">
       @for (item of additionProducts(); track $index) {
         <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-between p-2">
@@ -566,7 +573,12 @@
 >
   <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الكوخ</p>
 
-  <div class="flex-1 overflow-auto no-scrollbar" appDebounce debounceEvent="scroll" (debounced)="onHutsScroll($event)">
+  <div
+    class="flex-1 overflow-auto no-scrollbar"
+    appDebounce
+    [domEvents]="['scroll']"
+    (debounced)="onHutsScroll($event)"
+  >
     <div class="h-fit grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-[90px_20px]">
       @for (item of huts(); track $index) {
         <app-hut-card [data]="item" class="max-w-[250px]" />
@@ -599,7 +611,12 @@
 >
   <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الغرفة</p>
 
-  <div class="flex-1 overflow-auto no-scrollbar" appDebounce debounceEvent="scroll" (debounced)="onRoomsScroll($event)">
+  <div
+    class="flex-1 overflow-auto no-scrollbar"
+    appDebounce
+    [domEvents]="['scroll']"
+    (debounced)="onRoomsScroll($event)"
+  >
     <div class="h-fit grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5">
       @for (item of rooms(); track $index) {
         <app-room-card [data]="item" class="max-w-[250px]" />
@@ -634,7 +651,7 @@
   <div
     class="flex-1 overflow-auto no-scrollbar"
     appDebounce
-    debounceEvent="scroll"
+    [domEvents]="['scroll']"
     (debounced)="onTablesScroll($event)"
   >
     <div class="h-fit grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5">

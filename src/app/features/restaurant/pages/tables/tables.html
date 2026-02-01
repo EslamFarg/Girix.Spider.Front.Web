@@ -7,7 +7,7 @@
       (reset)="resetTableForm()"
       [formGroup]="tableFg"
       appDebounce
-      debounceEvent="submit"
+      [domEvents]="['submit']"
       (debounced)="onTableFormSubmit()"
       class="flex flex-1 w-full items-start gap-2 *:flex-1"
     >

@@ -2,7 +2,7 @@ import { IPaginatedResponse } from '@/core/interfaces/responses';
 import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
 
-export interface IGroupRowResponse {
+export interface IGroupSearchRow {
   id: number;
   name: string;
   printerName: string;
@@ -11,12 +11,26 @@ export interface IGroupRowResponse {
 }
 
 export interface IGroupSearchResponseValue {
-  rows: IGroupRowResponse[];
+  rows: IGroupSearchRow[];
   paginationInfo: {
     totalRowsCount: number;
     totalPagesCount: number;
     currentPageIndex: number;
   };
+}
+
+export interface IGroupReadResponse {
+  id: number;
+  name: string;
+  printerId: number;
+  printerName: string;
+  isOnCasher: boolean;
+  attachment: IGroupAttachment[];
+}
+
+export interface IGroupAttachment {
+  id: number;
+  fullPath: string;
 }
 
 //MenuItems : id,Name
@@ -29,7 +43,13 @@ export enum GroupSearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class GroupService extends BaseService<GroupSearchEnum, any, any, any, IGroupSearchResponseValue> {
+export class GroupService extends BaseService<
+  GroupSearchEnum,
+  any,
+  any,
+  IGroupReadResponse,
+  IGroupSearchResponseValue
+> {
   override apiRoute = 'Category';
 
   /**
@@ -41,11 +61,11 @@ export class GroupService extends BaseService<GroupSearchEnum, any, any, any, IG
   }
 
   getList(IsOnCasher: boolean = false, paginationInfo: { pageIndex: number; pageSize: number }) {
-    return this.http.post<IPaginatedResponse<IGroupRowResponse>>(
+    return this.http.post<IPaginatedResponse<IGroupSearchRow>>(
       `${this.apiUrl}/ListCategoriesOnCasher?IsOnCasher=${IsOnCasher}`,
       {
         paginationInfo,
-      }
+      },
     );
   }
 }

@@ -1,7 +1,7 @@
-<div class="xl:p-4 xl:pe-0 h-full" [class.cursor-wait]="isLoading()" >
+<div class="xl:p-4 xl:pe-0 h-full" [class.cursor-wait]="isLoading()">
   <section class="border border-text-light rounded-[14px] p-4 flex flex-col gap-3 h-full">
     <!-- search -->
-    <form #form [formGroup]="menuSearchFg" appDebounce debounceEvent="submit" (debounced)="onSubmitSearch()">
+    <form #form [formGroup]="menuSearchFg" appDebounce [domEvents]="['submit']" (debounced)="onSubmitSearch()">
       <app-input-error-message-handler [fc]="menuSearchFg.get('searchTerm')">
         <input
           class="w-full bg-transparent! h-8!"
@@ -80,7 +80,7 @@
       class="no-scrollbar scroll-smooth auto-rows-min w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-6 gap-3.5 pt-10 h-full overflow-y-auto overflow-x-hidden"
       style="row-gap: 50px"
       appDebounce
-      debounceEvent="scroll"
+      [domEvents]="['scroll']"
       (debounced)="onMenuScroll($event)"
     >
       <!--  -->
@@ -125,7 +125,7 @@
               (click)="addMenuItem(item, +quantity.value)"
               type="button"
               pButton
-              class="p-1.5! border-0!  leading-none rounded   flex items-center justify-center cursor-pointer"
+              class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
               style="
                 --p-button-primary-background: var(--color-text-gray);
                 --p-button-primary-color: var(--color-text-lighter);

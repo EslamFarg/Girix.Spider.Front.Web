@@ -7,7 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { IMealRowResponse, MealSearchEnum, MealService } from '../../services/meal-service';
+import { IMealSearchRow, MealSearchEnum, MealService } from '../../services/meal-service';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { ImgFallback } from '@/directives/img-fallback';
@@ -65,7 +65,7 @@ export class Meals extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  meals = signal<IMealRowResponse[]>([]);
+  meals = signal<IMealSearchRow[]>([]);
   mealsPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,

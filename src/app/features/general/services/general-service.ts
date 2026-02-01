@@ -1,5 +1,5 @@
 import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
-import { IMealRowResponse } from '@/features/classes/services/meal-service';
+import { IMealSearchRow } from '@/features/classes/services/meal-service';
 import { IProductSearchRow } from '@/features/classes/services/product-service';
 import { Injectable } from '@angular/core';
 
@@ -13,7 +13,7 @@ export interface IProductsAndMealsSearchResponseValue {
     };
   };
   meals: {
-    rows: IMealRowResponse[];
+    rows: IMealSearchRow[];
     paginationInfo: {
       currentPageIndex: number;
       totalRowsCount: number;

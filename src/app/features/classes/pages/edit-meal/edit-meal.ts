@@ -3,6 +3,7 @@ import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Button } from 'primeng/button';
 import { GroupForm } from '../../components/group-form/group-form';
 import { MealForm } from '../../components/meal-form/meal-form';
+import { BaseComponent } from '@/components/base-component/base-component';
 
 @Component({
   selector: 'app-edit-meal',
@@ -10,4 +11,4 @@ import { MealForm } from '../../components/meal-form/meal-form';
   templateUrl: './edit-meal.html',
   styleUrl: './edit-meal.css',
 })
-export class EditMeal {}
+export class EditMeal extends BaseComponent {}

@@ -1,19 +1,32 @@
-import { Directive, ElementRef, EventEmitter, HostListener, inject, input, Input, output, Output } from '@angular/core';
-import { debounceTime, fromEvent, Subject, Subscription } from 'rxjs';
-
+import { Directive, ElementRef, EventEmitter, HostListener, inject, input, Input, output, Output, OutputEmitterRef } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { debounceTime, fromEvent, merge, Observable, Subject, Subscription } from 'rxjs';
+import { outputToObservable } from '@angular/core/rxjs-interop';
 @Directive({
   selector: '[appDebounce]',
 })
 export class Debounce {
   debounceTime = input<number>(300);
-  debounceEvent = input.required<string>();
-  debounced = output<Event>();
 
-  el = inject<ElementRef<HTMLElement>>(ElementRef);
+  // DOM events
+  domEvents = input<string[]>([]);
+
+  // Angular outputs / EventEmitters
+  events$ = input<OutputEmitterRef<any>[]>([]);
+
+  debounced = output<any>();
+
+  el = inject(ElementRef<HTMLElement>);
   private sub?: Subscription;
 
   ngOnInit() {
-    this.sub = fromEvent(this.el.nativeElement, this.debounceEvent())
+    const dom$ = this.domEvents().map((e) => fromEvent(this.el.nativeElement, e));
+
+    const streams = this.events$().map(e =>
+      outputToObservable(e)
+    );
+
+    this.sub = merge(...dom$, ...streams )
       .pipe(debounceTime(this.debounceTime()))
       .subscribe((e) => this.debounced.emit(e));
   }

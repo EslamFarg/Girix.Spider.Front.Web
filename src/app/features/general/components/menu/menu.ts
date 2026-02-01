@@ -5,20 +5,20 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { InputTextModule } from 'primeng/inputtext';
 import { ImgFallback } from '@/directives/img-fallback';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { IMealRowResponse } from '@/features/classes/services/meal-service';
+import { IMealSearchRow } from '@/features/classes/services/meal-service';
 import { IProductSearchRow } from '@/features/classes/services/product-service';
 import { GeneralService, ProductAndMealsSearchEnum } from '../../services/general-service';
 import { Debounce } from '@/directives/debounce';
 import { MenuItem } from 'primeng/api';
 import { Menu as pMenu } from 'primeng/menu';
-import { IGroupRowResponse } from '@/features/classes/services/group-service';
+import { IGroupSearchRow } from '@/features/classes/services/group-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { ButtonDirective } from 'primeng/button';
 export interface IMenuItem {
   id: string;
   index: number;
   product: IProductSearchRow | null;
-  meal: IMealRowResponse | null;
+  meal: IMealSearchRow | null;
   quantity: number;
 }
 
@@ -49,7 +49,7 @@ export interface IOrderMenuItem {
   styleUrl: './menu.css',
 })
 export class Menu extends BaseComponent {
-  groups = input<IGroupRowResponse[]>([]);
+  groups = input<IGroupSearchRow[]>([]);
   menuItemChange = output<IOrderMenuItem>();
 
   filterCategories = [
@@ -260,7 +260,7 @@ export class Menu extends BaseComponent {
     };
   }
 
-  mapMealToMenuItem(meal: IMealRowResponse, index: number): IMenuItem {
+  mapMealToMenuItem(meal: IMealSearchRow, index: number): IMenuItem {
     return {
       id: 'meal-' + meal.id,
       index,

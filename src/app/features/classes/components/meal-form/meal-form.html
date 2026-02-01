@@ -1,97 +1,214 @@
-<div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2">
-  <p-button
-    class="flex-1 md:flex-none"
-    styleClass="border-dark-line! bg-dark-line! text-white! py-1! w-full  md:px-8!"
-    label="حفظ"
-  />
-  <p-button
-    class="flex-1 md:flex-none"
-    styleClass="border-dark-line! text-dark-line! py-1!  w-full md:px-8!"
-    label="حذف"
-    variant="outlined"
-  />
-  <p-button
-    class="flex-1 md:flex-none"
-    styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
-    label="جديد"
-    variant="outlined"
-  />
-  <p-button
-    class="flex-1 md:flex-none"
-    styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
-    label="طباعة"
-    variant="outlined"
-  />
+<div
+  class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
+  style="--p-button-primary-background: transparent"
+>
+  <button
+    pButton
+    style="--p-button-primary-background: var(--color-dark-line)"
+    class="border-dark-line! text-white! py-1! md:px-8! md:flex-none"
+    form="productForm"
+    type="submit"
+  >
+    @if (formMode() === FormMode.Create) {
+      حفظ
+    } @else {
+      تعديل
+    }
+  </button>
+  <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
+    جديد
+  </button>
 </div>
 
 <div class="mt-6">
   <div class="flex flex-col md:flex-row gap-4">
-    <div>
-      <div class="p-10 flex items-center justify-center border-2 border-dark-line rounded-lg h-fit mb-4">
-        <svg width="92" height="96" viewBox="0 0 92 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M36.105 32.98V53.475C36.105 54.4475 35.1475 55.23 33.9575 55.23C32.7675 55.23 31.81 54.4475 31.81 53.475V32.98M26.7675 32.98V53.475C26.7675 54.4475 25.81 55.23 24.62 55.23C23.43 55.23 22.4725 54.4475 22.4725 53.475V32.98M35.5375 93.9975V71.1225C35.5375 68.715 35.5525 67.63 38.595 64.5825C41.64 61.5375 41.6525 60.3475 41.6525 58.045V36.285C41.6525 34.455 40.18 32.985 38.3525 32.985H36.1075M22.4775 32.985H20.2275C18.3975 32.985 16.9275 34.455 16.9275 36.285L16.935 58.045C16.945 60.3475 16.96 61.5375 20.0025 64.5825C23.045 67.6275 23.0625 68.715 23.0525 71.12L23.04 93.9975L13.715 94C8.2275 94 4.005 89.58 3.81 84.1L1.5 19.3075L13.445 1.5H77.805L89.745 19.3075L87.435 84.1C87.24 89.58 83.0175 94 77.53 94L69.335 93.9975V64.1925C73.5025 61.23 76.0975 55.5525 76.105 49.38C76.105 40.04 70.28 32.4675 63.0925 32.465H63.085C55.8975 32.465 50.0725 40.04 50.0725 49.38C50.08 55.5525 52.6725 61.23 56.8375 64.1925V93.9975M31.815 32.985H26.7725M35.535 94H56.835M26.75 19.56V12.085C26.75 10.2575 28.2225 8.785 30.05 8.785H61.19C63.02 8.785 64.4925 10.2575 64.4925 12.085V19.56H26.75Z"
-            stroke="#252836"
-            stroke-width="3"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </div>
-      <p-carousel
-        class="w-full max-w-60 mx-auto"
-        [value]="[1, 2, 3, 1, 1, 1, 1]"
-        [numVisible]="3"
-        [numScroll]="1"
-        [circular]="false"
-        [showIndicators]="false"
+    <div class="md:flex-1 md:max-w-50 lg:max-w-60 relative">
+      <input
+        multiple
+        appImgOnly
+        id="fileInput"
+        type="file"
+        hidden
+        #fileInput
+        (change)="onImagesFilesSelected($event)"
+      />
+      @if (allImages().length > 0) {
+        <button
+          (click)="onDeleteImage()"
+          type="button"
+          class="absolute animate-shake cursor-pointer backdrop-blur-[10px] transition-all top-2 z-10 left-2 p-1.5 rounded border border-transparent hover:bg-red-500/10 hover:border-red-500/50 group"
+        >
+          <svg
+            class="group-hover:scale-125 transition-all"
+            width="15"
+            height="16"
+            viewBox="0 0 15 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              opacity="0.4"
+              d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z"
+              fill="#FF383C"
+            />
+            <path
+              d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z"
+              fill="#FF383C"
+            />
+          </svg>
+        </button>
+      }
+      <label
+        for="fileInput"
+        class="flex cursor-pointer items-center justify-center border-2 border-dark-line aspect-square rounded-lg h-fit mb-2 overflow-hidden"
       >
-        <ng-template let-product #item>
-          <img src="/images/placeholders/menu-item.png" class="w-10 h-10 mx-auto rounded-full" alt="" />
-        </ng-template>
-      </p-carousel>
+        @if (allImages().length > 0) {
+          <img [src]="allImages()[currentImage()?.ix ?? 0].fullPath" alt="" class="w-full object-cover aspect-square" />
+        } @else {
+          <svg width="92" height="96" viewBox="0 0 92 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M36.105 32.98V53.475C36.105 54.4475 35.1475 55.23 33.9575 55.23C32.7675 55.23 31.81 54.4475 31.81 53.475V32.98M26.7675 32.98V53.475C26.7675 54.4475 25.81 55.23 24.62 55.23C23.43 55.23 22.4725 54.4475 22.4725 53.475V32.98M35.5375 93.9975V71.1225C35.5375 68.715 35.5525 67.63 38.595 64.5825C41.64 61.5375 41.6525 60.3475 41.6525 58.045V36.285C41.6525 34.455 40.18 32.985 38.3525 32.985H36.1075M22.4775 32.985H20.2275C18.3975 32.985 16.9275 34.455 16.9275 36.285L16.935 58.045C16.945 60.3475 16.96 61.5375 20.0025 64.5825C23.045 67.6275 23.0625 68.715 23.0525 71.12L23.04 93.9975L13.715 94C8.2275 94 4.005 89.58 3.81 84.1L1.5 19.3075L13.445 1.5H77.805L89.745 19.3075L87.435 84.1C87.24 89.58 83.0175 94 77.53 94L69.335 93.9975V64.1925C73.5025 61.23 76.0975 55.5525 76.105 49.38C76.105 40.04 70.28 32.4675 63.0925 32.465H63.085C55.8975 32.465 50.0725 40.04 50.0725 49.38C50.08 55.5525 52.6725 61.23 56.8375 64.1925V93.9975M31.815 32.985H26.7725M35.535 94H56.835M26.75 19.56V12.085C26.75 10.2575 28.2225 8.785 30.05 8.785H61.19C63.02 8.785 64.4925 10.2575 64.4925 12.085V19.56H26.75Z"
+              stroke="#252836"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        }
+      </label>
+
+      <ng-template let-image #imageTemplate>
+        <div class="group" (click)="onSelectImage(image.ix)">
+          <img
+            [src]="image.fullPath"
+            appImgFallback
+            class="min-w-full! aspect-square object-cover !mx-auto rounded-full shadow cursor-pointer group-hover:shadow-md group-hover:shadow-green-700/50 group-hover:scale-80 transition-all"
+            alt=""
+          />
+        </div>
+      </ng-template>
+      <span></span>
+      <app-input-error-message-handler [fc]="productFg.get('allImages')" class="inline" />
+
+      <app-slider
+        class="block w-full h-fit mt-2"
+        [items]="allImages()"
+        [config]="{ itemWidth: 48 }"
+        [template]="imageTemplate"
+      >
+      </app-slider>
     </div>
     <div class="grid md:grid-cols-3 gap-4 flex-1">
       <div>
         <label for="productName">اسم الوجبه</label>
         <app-input-error-message-handler>
-          <input pInputText id="productName" aria-describedby="productName-help" placeholder="الاسم" />
+          <input
+            pInputText
+            id="productName"
+            class="app-input"
+            aria-describedby="productName-help"
+            placeholder="الاسم"
+          />
         </app-input-error-message-handler>
       </div>
       <div>
         <label for="productPrice">سعر الوجبه</label>
         <app-input-error-message-handler>
-          <input pInputText id="productPrice" aria-describedby="productPrice-help" placeholder="السعر" />
+          <input
+            pInputText
+            id="productPrice"
+            class="app-input"
+            aria-describedby="productPrice-help"
+            placeholder="السعر"
+          />
         </app-input-error-message-handler>
       </div>
       <div>
         <label for="costPrice">سعر التكلفه</label>
         <app-input-error-message-handler>
-          <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="السعر" />
+          <input pInputText id="costPrice" class="app-input" aria-describedby="costPrice-help" placeholder="السعر" />
         </app-input-error-message-handler>
       </div>
       <div>
         <label for="productName">المجموعة</label>
-        <app-input-error-message-handler>
-          <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
+        <app-input-error-message-handler [grouped]="false">
+          <ng-select
+            class="app-select"
+            [items]="displayedGroups()"
+            formControlName="categoryId"
+            bindLabel="name"
+            bindValue="id"
+            placeholder="الكل"
+            #groupSelect
+            appDebounce
+            [events$]="[groupSelect.searchEvent, groupSelect.scrollToEnd]"
+            (debounced)="debouncedGroupsSearch($event)"
+          />
         </app-input-error-message-handler>
       </div>
       <div>
         <label for="productName">الضريبه</label>
         <app-input-error-message-handler>
-          <p-select [options]="[]" optionLabel="name" placeholder="إختر الضريبه" class="w-full!" />
+          <p-select [options]="[]" optionLabel="name" placeholder="إختر الضريبه" class="w-full! app-input" />
         </app-input-error-message-handler>
       </div>
       <div>
         <label for="productName">الضريبه الانتقائيه</label>
         <app-input-error-message-handler>
-          <p-select [options]="[]" optionLabel="name" placeholder="إختر الضريبه" class="w-full!" />
+          <p-select [options]="[]" optionLabel="name" placeholder="إختر الضريبه" class="w-full! app-input" />
         </app-input-error-message-handler>
       </div>
       <div class="md:col-span-3">
         <label for="productName">المنتجات</label>
-        <app-input-error-message-handler>
-          <p-select [options]="[]" optionLabel="name" placeholder="المنتجات" class="w-full!" />
+        <app-input-error-message-handler [grouped]="false">
+          <ng-select
+            class="app-select"
+            [items]="displayedProducts()"
+            bindLabel="name"
+            bindValue="id"
+            [multiple]="true"
+            [closeOnSelect]="false"
+            placeholder="الكل"
+            #productSelect
+            appDebounce
+            [events$]="[productSelect.searchEvent, productSelect.scrollToEnd]"
+            (debounced)="debouncedProductsSearch($event)"
+          >
+            <ng-template ng-label-tmp let-item="item" let-clear="clear" let-item$="item$" let-index="index">
+              <div class="flex items-center gap-2">
+                <span class="ng-value-label flex! items-center gap-2">
+                  <div class="rounded-full w-fit shadow shadow-black/30">
+                    <img
+                      appImgFallback
+                      [src]="baseUrl + item.images?.[0]?.fullPath"
+                      class="object-cover rounded-full aspect-square"
+                      width="20px"
+                      height="20px"
+                    />
+                  </div>
+                  {{ item.name }}
+                  <input id="item-{{ index }}" type="checkbox" [ngModel]="item$.selected" /> {{ item.name }}
+                </span>
+                <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true">×</span>
+              </div>
+            </ng-template>
+
+            <ng-template ng-option-tmp let-item="item">
+              <div class="flex items-center gap-2">
+                <div class="rounded-full w-fit shadow shadow-black/30">
+                  <img
+                    class="object-cover rounded-full aspect-square"
+                    [src]="baseUrl + item.images?.[0]?.fullPath"
+                    appImgFallback
+                    width="20px"
+                    height="20px"
+                  />
+                </div>
+
+                {{ item.name }}
+              </div>
+            </ng-template>
+          </ng-select>
         </app-input-error-message-handler>
       </div>
     </div>
@@ -104,6 +221,7 @@
         cols="30"
         pTextarea
         id="productName"
+        class="app-input h-auto!"
         aria-describedby="productName-help"
         placeholder="البيان"
       ></textarea>

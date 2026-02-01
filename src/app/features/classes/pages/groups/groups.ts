@@ -8,7 +8,7 @@ import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Debounce } from '@/directives/debounce';
-import { IGroupRowResponse, GroupSearchEnum, GroupService } from '../../services/group-service';
+import { IGroupSearchRow, GroupSearchEnum, GroupService } from '../../services/group-service';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 @Component({
@@ -57,7 +57,7 @@ export class Groups extends BaseComponent {
     { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
-  groups = signal<IGroupRowResponse[]>([]);
+  groups = signal<IGroupSearchRow[]>([]);
   groupsPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,

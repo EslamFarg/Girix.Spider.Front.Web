@@ -7,7 +7,7 @@
       id="hutForm"
       [formGroup]="hutFg"
       appDebounce
-      debounceEvent="submit"
+      [domEvents]="['submit']"
       (debounced)="onHutFormSubmit()"
       class="flex items-start gap-2 w-full *:flex-1"
     >

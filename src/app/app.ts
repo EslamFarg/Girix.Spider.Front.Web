@@ -36,3 +36,5 @@ export class App {
     // this.router.navigate(['replacements/huts']);
   }
 }
+
+

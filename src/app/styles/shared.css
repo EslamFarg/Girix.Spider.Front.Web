@@ -148,7 +148,6 @@
     opacity: 0;
     transform: translateY(50px);
     max-height: 0;
-    padding: 0;
   }
   to {
     opacity: 1;
@@ -167,10 +166,14 @@ label:has(+ app-input-error-message-handler) {
 
 .app-input,
 .app-input input,
-label + app-input-error-message-handler select,
+.app-input inp.p-select,
+.app-input select,
+.app-input textarea
+/* label + app-input-error-message-handler select,
 label + app-input-error-message-handler textarea,
 label + app-input-error-message-handler .p-select,
-label + app-input-error-message-handler input {
+label + app-input-error-message-handler input  */
+{
   --p-select-padding-x: 4px !important;
   --p-select-padding-y: 4px !important;
   background-color: white !important;
@@ -193,17 +196,26 @@ label + app-input-error-message-handler input {
 
 .app-input,
 .app-input input,
+.app-input inp.p-select,
+.app-input select
+/* .app-input input,
 label + app-input-error-message-handler select,
 label + app-input-error-message-handler .p-select,
-label + app-input-error-message-handler input {
+label + app-input-error-message-handler input  */
+{
   height: 32px;
 }
-.app-input,
+
+.app-input
 .app-input input,
-label + app-input-error-message-handler textarea,
+.app-input inp.p-select,
+.app-input select,
+.app-input textarea
+/* label + app-input-error-message-handler textarea,
 label + app-input-error-message-handler select,
 label + app-input-error-message-handler .p-select,
-label + app-input-error-message-handler input {
+label + app-input-error-message-handler input */
+ {
   padding: 2px 8px !important;
 }
 
@@ -240,10 +252,12 @@ label + app-input-error-message-handler input {
   & .ng-select-container {
     border: 1px solid var(--p-form-field-border-color);
     background-color: var(--p-form-field-background);
-    padding: var(--p-form-field-padding-y) var(--p-form-field-padding-x);
+    /* padding: var(--p-form-field-padding-y) var(--p-form-field-padding-x); */
     color: var(--p-form-field-color);
     border-radius: var(--p-form-field-border-radius) !important;
     height: auto;
+    min-height: 32px;
+    height: 32px;
     transition:
       background var(--p-form-field-transition-duration),
       color var(--p-form-field-transition-duration),
@@ -251,11 +265,11 @@ label + app-input-error-message-handler input {
       outline-color var(--p-form-field-transition-duration),
       box-shadow var(--p-form-field-transition-duration);
     & .ng-value-container {
-      padding-left: 0;
-      & .ng-input {
+      /* padding-left: 0; */
+      /* & .ng-input {
         top: 50%;
         transform: translateY(-50%);
-      }
+      } */
     }
 
     &:hover {
@@ -267,7 +281,7 @@ label + app-input-error-message-handler input {
     animation: popIn 0.15s ease-in-out;
     background-color: transparent;
     overflow: hidden;
-    margin-top: 0px !important;
+    /* margin-top: 0px !important; */
     border-radius: var(--p-form-field-border-radius);
     & .ng-option.ng-option-marked,
     & .ng-option {
@@ -282,8 +296,24 @@ label + app-input-error-message-handler input {
     &.ng-select-bottom {
       top: calc(100% + 2px);
     }
+    &.ng-select-top {
+    bottom: calc(100% + 2px);
+    }
   }
-
+  /* & .ng-value {
+    z-index: 2;
+  } */
+  & .ng-input {
+    /* &:has(input[aria-expanded='true']) {
+      position: absolute;
+      z-index: 3 !important;
+    } */
+    /* padding-right: 6px !important; */
+    /* & input {
+      height: auto !important;
+      cursor: text;
+    } */
+  }
   &:not(&.ng-select-disable).ng-select-focused {
     & .ng-select-container {
       border-color: var(--p-form-field-focus-border-color);
@@ -293,12 +323,12 @@ label + app-input-error-message-handler input {
       outline-offset: var(--p-form-field-focus-ring-offset);
     }
   }
-  & .ng-placeholder{
+  /* & .ng-placeholder {
     z-index: 2;
-  }
-  &.ng-select-single .ng-select-container .ng-value-container .ng-input {
+  } */
+  /* &.ng-select-single .ng-select-container .ng-value-container .ng-input {
     top: 50%;
     z-index: 1;
     transform: translateY(-50%);
-  }
+  } */
 }

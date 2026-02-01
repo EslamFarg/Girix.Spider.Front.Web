@@ -1,49 +1,57 @@
-  
-  <app-section-wrapper>
-    <!-- search -->
-    <form #form [formGroup]="fg" appDebounce debounceEvent="submit" (debounced)="onSearchSubmit()" class="flex h-fit items-start gap-2   w-full">
-      <div class="flex-1">
-        <app-input-error-message-handler [fc]="fg.get('searchTerm')">
-          <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
-          <!-- <p-inputgroup-addon>
+<app-section-wrapper>
+  <!-- search -->
+  <form
+    #form
+    [formGroup]="fg"
+    appDebounce
+    [domEvents]="['submit']"
+    (debounced)="onSearchSubmit()"
+    class="flex h-fit items-start gap-2 w-full"
+  >
+    <div class="flex-1">
+      <app-input-error-message-handler [fc]="fg.get('searchTerm')">
+        <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
+        <!-- <p-inputgroup-addon>
             <i class="pi pi-filter"></i>
           </p-inputgroup-addon> -->
-          <p-inputgroup-addon>
-            <button type="submit" class="flex cursor-pointer"><i class="pi pi-search"></i></button>
-          </p-inputgroup-addon>
-        </app-input-error-message-handler>
-      </div>
+        <p-inputgroup-addon>
+          <button type="submit" class="flex cursor-pointer"><i class="pi pi-search"></i></button>
+        </p-inputgroup-addon>
+      </app-input-error-message-handler>
+    </div>
 
-      <p-select
-        [options]="periodOptions"
-        formControlName="searchEnum"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="الكل"
-        class="h-fit hidden! sm:flex! w-40"
-      />
-    </form>
+    <p-select
+      [options]="periodOptions"
+      formControlName="searchEnum"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="الكل"
+      class="h-fit hidden! sm:flex! w-40"
+    />
+  </form>
 
-    <div class="w-full overflow-auto custom-scroll">
-      <table class="my-4 w-full main-table">
-        <thead>
-          <tr class="">
-            <th>#</th>
-            <th>اسم العميل</th>
-            <th>رقم الجوال</th>
-            <th>العنوان</th>
-            <th>شركه</th>
-            <th>الأدوات</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (customer of customers(); track $index) {
+  <div class="w-full overflow-auto custom-scroll">
+    <table class="my-4 w-full main-table">
+      <thead>
+        <tr class="">
+          <th>#</th>
+          <th>اسم العميل</th>
+          <th>رقم الجوال</th>
+          <th>العنوان</th>
+          <th>شركه</th>
+          <th>الأدوات</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (customer of customers(); track $index) {
           <tr class="">
             <td>{{ getRowNumber($index, customersPaginationInfo.pageIndex) }}</td>
             <td>{{ customer.name }}</td>
             <td>{{ customer?.phoneNumber ?? customer.secondaryMobileNumber }}</td>
             <td>
-              {{`${customer.city} ${customer.district?', '+customer.district:''} ${customer.street ?', '+customer.street:''}`}}
+              {{
+                `${customer.city} ${customer.district ? ', ' + customer.district : ''} ${customer.street ? ', ' + customer.street : ''}`
+              }}
             </td>
             <td>
               <input
@@ -91,16 +99,15 @@
               </div>
             </td>
           </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+        }
+      </tbody>
+    </table>
+  </div>
 
-    <p-paginator
-      (onPageChange)="onPageChange($event)"
-      [first]="(customersPaginationInfo.pageIndex - 1) * 10"
-      [rows]="10"
-      [totalRecords]="customersPaginationInfo.totalRowsCount"
-    />
-  </app-section-wrapper>
- 
+  <p-paginator
+    (onPageChange)="onPageChange($event)"
+    [first]="(customersPaginationInfo.pageIndex - 1) * 10"
+    [rows]="10"
+    [totalRecords]="customersPaginationInfo.totalRowsCount"
+  />
+</app-section-wrapper>

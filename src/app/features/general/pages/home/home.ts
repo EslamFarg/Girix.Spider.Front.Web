@@ -10,8 +10,8 @@ import { GeneralService, ProductAndMealsSearchEnum } from '../../services/genera
 import { BaseComponent } from '@/components/base-component/base-component';
 import { FormArray, FormControl, Validators, ɵInternalFormsSharedModule, ReactiveFormsModule } from '@angular/forms';
 import { IProductSearchRow, ProductSearchEnum, ProductService } from '@/features/classes/services/product-service';
-import { IMealRowResponse } from '@/features/classes/services/meal-service';
-import { GroupService, IGroupRowResponse, IGroupSearchResponseValue } from '@/features/classes/services/group-service';
+import { IMealSearchRow } from '@/features/classes/services/meal-service';
+import { GroupService, IGroupSearchRow, IGroupSearchResponseValue } from '@/features/classes/services/group-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { GalleriaModule } from 'primeng/galleria';
 import { Slider } from '../../../../components/slider/slider';
@@ -92,7 +92,7 @@ export class Home extends BaseComponent {
   //
 
   groupsService = inject(GroupService);
-  groups = signal<IGroupRowResponse[]>([]);
+  groups = signal<IGroupSearchRow[]>([]);
   orderService = inject(OrderService);
 
   initialOrderFgValue: IOrderCreateFgValue = {

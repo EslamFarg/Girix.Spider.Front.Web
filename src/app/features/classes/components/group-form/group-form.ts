@@ -2,7 +2,7 @@ import { FormMode, IPaginationInfo } from '@/components/base-component/base-comp
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { Component, computed, effect, inject, input, OnInit, signal } from '@angular/core';
 import { BaseComponent } from '@/components/base-component/base-component';
-import { Button } from 'primeng/button';
+import { Button, ButtonDirective } from 'primeng/button';
 import { CarouselModule } from 'primeng/carousel';
 import { InputText } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -15,6 +15,8 @@ import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { IPrinterSearchRow, PrinterSearchEnum, PrinterService } from '@/features/settings/services/printer-service';
+import { Debounce } from '@/directives/debounce';
+import { ImgFallback } from '@/directives/img-fallback';
 
 @Component({
   selector: 'app-group-form',
@@ -26,6 +28,9 @@ import { IPrinterSearchRow, PrinterSearchEnum, PrinterService } from '@/features
     CarouselModule,
     TextareaModule,
     NgSelectComponent,
+    Debounce,
+    ButtonDirective,
+    ImgFallback,
   ],
   templateUrl: './group-form.html',
   styleUrl: './group-form.css',
@@ -66,9 +71,6 @@ export class GroupForm extends BaseComponent implements OnInit {
    */
   constructor() {
     super();
-    effect(() => {
-      console.log(this.allImages());
-    });
   }
 
   ngOnInit() {
@@ -80,17 +82,20 @@ export class GroupForm extends BaseComponent implements OnInit {
           this.groupFg.patchValue({
             ...group,
           });
-          this.existingImages.set(group.images);
-          this.currentImage.set(group.images[0]);
+          this.currentImage.set(group.attachment[0]);
+          this.currentPrinter.set({
+            id: group.printerId,
+            name: group.printerName,
+          });
         });
         break;
       default:
         break;
     }
 
-    this.setDebounceItem<{ searchValue: string; pageIndex: number }>('searchGroups', (e) =>
-      this.searchPrinters(e.pageIndex, e.searchValue),
-    );
+    // this.setDebounceItem<{ searchValue: string; pageIndex: number }>('searchGroups', (e) =>
+    //   this.searchPrinters(e.pageIndex, e.searchValue),
+    // );
   }
 
   onSubmitForm() {
@@ -125,6 +130,7 @@ export class GroupForm extends BaseComponent implements OnInit {
         formData.append(key, value);
       }
     });
+
     switch (this.formMode()) {
       case FormMode.Create:
         this.groupService.create(formData).subscribe({
@@ -154,47 +160,24 @@ export class GroupForm extends BaseComponent implements OnInit {
   //
   //
   currentImage = signal<IFormImage | null>(null);
-  existingImages = signal<IFormImage[]>([]);
-  newImages = signal<IFormImage[]>([]);
-  allImages = computed<IFormImage[]>(() => [
-    ...this.existingImages().map((image, ix) => ({ ...image, fullPath: this.baseUrl + image.fullPath, ix })),
-    ...this.newImages().map((image, ix) => ({ ...image, ix: ix + this.existingImages().length })),
-  ]);
   onImagesFilesSelected(event: Event) {
     const input = event.target as HTMLInputElement;
 
     if (input.files && input.files.length > 0) {
-      const futureLength = this.newImages().length + input.files.length;
-      if (futureLength > 6) {
-        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن اختيار اكثر من 6 صورة' });
+      if (input.files.length > 1) {
+        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن اختيار اكثر من صورة' });
         return;
       }
-      Array.from(input.files).forEach((file, ix) => {
-        const randomKey = Date.now() * Math.random();
-        this.newImages.update((images) => [
-          ...images,
-          { file, fullPath: URL.createObjectURL(file), id: 'new-image-' + randomKey, ix },
-        ]);
-      });
-      // this.groupFg.patchValue({
-      //   allImages: [...this.allImages()],
-      // });
-      this.currentImage.set(this.allImages()[0]);
+      const file = input.files[0];
+
+      this.currentImage.set({ file, fullPath: URL.createObjectURL(file), id: 'new-image', ix: 0 });
     }
 
     input.value = '';
   }
   onDeleteImage() {
-    const isImageNew = this.newImages().some((i) => i.id === this.currentImage()?.id);
-    if (isImageNew) {
-      this.newImages.update((images) => images.filter((i) => i.id !== this.currentImage()?.id));
-    } else {
-      this.existingImages.update((images) => images.filter((i) => i.id !== this.currentImage()?.id));
-    }
-    this.currentImage.set(this.allImages()[0]);
+    this.currentImage.set(null);
   }
-
-  onSelectImage = (ix: number) => this.currentImage.set(this.allImages()[ix]);
 
   //
   //
@@ -224,11 +207,11 @@ export class GroupForm extends BaseComponent implements OnInit {
     return [current, ...printers];
   });
   printersPaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
+    pageIndex: 0,
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
-
+  previousSearchValue = '';
   searchPrinters(pageIndex: number, searchValue: string = '') {
     this.printerService
       .search({
@@ -262,14 +245,13 @@ export class GroupForm extends BaseComponent implements OnInit {
       });
   }
 
-  getNextPrintersPage(event: any) {
-    // console.log(event.last);
-    // if (event.first === 0) return;
-    // if (event.last === this.printers().length) {
-    //   this.emitDebounceItem('searchPrinters', { pageIndex: this.printersPaginationInfo.pageIndex + 1, searchValue: '' });
-    // }
-  }
-  onPrintersFilter(event: any) {
-    // this.debounceMap.get('searchPrinters')?.subject.next({ pageIndex: 1, searchValue: event.filter });
+  debouncedPrinterSearch(event: any) {
+    console.log(event);
+    const searchValue = event?.term ?? '';
+    if (this.previousSearchValue === searchValue) {
+      this.searchPrinters(this.printersPaginationInfo.pageIndex + 1, searchValue);
+    } else {
+      this.searchPrinters(1, searchValue);
+    }
   }
 }

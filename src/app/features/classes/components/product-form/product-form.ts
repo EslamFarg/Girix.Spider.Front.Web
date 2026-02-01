@@ -14,7 +14,7 @@ import {
   ProductService,
 } from '../../services/product-service';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { GroupSearchEnum, GroupService, IGroupRowResponse } from '../../services/group-service';
+import { GroupSearchEnum, GroupService, IGroupSearchRow } from '../../services/group-service';
 import { ImgOnly } from '@/directives/img-only';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { Slider } from '@/components/slider/slider';
@@ -264,7 +264,7 @@ export class ProductForm extends BaseComponent implements OnInit {
   openGroupsDialog = () => this.isGroupsDialogVisible.set(true);
   groupService = inject(GroupService);
   currentGroup = signal<{ id: number; name: string } | null>(null);
-  groups = signal<IGroupRowResponse[]>([]);
+  groups = signal<IGroupSearchRow[]>([]);
   displayedGroups = computed(() => {
     const groups = this.groups();
     const current = this.currentGroup();

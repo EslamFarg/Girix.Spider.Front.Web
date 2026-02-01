@@ -7,7 +7,7 @@
       id="roomForm"
       [formGroup]="roomFg"
       appDebounce
-      debounceEvent="submit"
+      [domEvents]="['submit']"
       (debounced)="onRoomFormSubmit()"
       class="flex flex-1 w-full items-start gap-2 *:flex-1"
     >

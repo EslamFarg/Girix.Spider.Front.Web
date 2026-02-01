@@ -1,67 +1,65 @@
- 
+<app-section-wrapper styleClass="no-scrollbar">
+  <!-- search -->
+  <form
+    #form
+    [formGroup]="fg"
+    appDebounce
+    [domEvents]="['submit']"
+    (debounced)="onSubmit()"
+    class="flex h-fit items-start gap-2 w-full"
+  >
+    <div class="flex-1">
+      <app-input-error-message-handler [fc]="fg.get('searchTerm')">
+        <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
+        <p-inputgroup-addon class="relative">
+          <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+          <p-menu
+            dir="rtl"
+            [class]="`*:top-full! *:left-0! `"
+            #filterMenu
+            [model]="filterMenuItems()"
+            [popup]="true"
+            [style]="{ insetInlineEnd: '100%' }"
+          />
+        </p-inputgroup-addon>
+        <p-inputgroup-addon>
+          <i class="pi pi-search"></i>
+        </p-inputgroup-addon>
+      </app-input-error-message-handler>
+    </div>
 
-  <app-section-wrapper styleClass="no-scrollbar">
-    <!-- search -->
-    <form
-      #form
-      [formGroup]="fg"
-      appDebounce
-      debounceEvent="submit"
-      (debounced)="onSubmit()"
-      class="flex h-fit items-start gap-2 w-full"
-    >
-      <div class="flex-1">
-        <app-input-error-message-handler [fc]="fg.get('searchTerm')">
-          <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
-          <p-inputgroup-addon class="relative">
-            <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
-            <p-menu
-              dir="rtl"
-              [class]="`*:top-full! *:left-0! `"
-              #filterMenu
-              [model]="filterMenuItems()"
-              [popup]="true"
-              [style]="{ insetInlineEnd: '100%' }"
-            />
-          </p-inputgroup-addon>
-          <p-inputgroup-addon>
-            <i class="pi pi-search"></i>
-          </p-inputgroup-addon>
-        </app-input-error-message-handler>
-      </div>
+    <p-select
+      [options]="periodOptions"
+      formControlName="fromDate"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="الكل"
+      class="h-fit hidden! sm:flex! w-40"
+    />
+  </form>
 
-      <p-select
-        [options]="periodOptions"
-        formControlName="fromDate"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="الكل"
-        class="h-fit hidden! sm:flex! w-40"
-      />
-    </form>
-
-    <table class="my-2 sm:my-4 w-full main-table">
-      <thead>
-        <tr class="">
-          <th>#</th>
-          <th>صوره الوجبة</th>
-          <th>اسم الوجبة</th>
-          <th>المجموعه</th>
-          <th>وصف الوجبة</th>
-          <th>قيمه الضريبه</th>
-          <th>سعر الوجبة</th>
-          <th>الأدوات</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (item of meals(); track $index) {
+  <table class="my-2 sm:my-4 w-full main-table">
+    <thead>
+      <tr class="">
+        <th>#</th>
+        <th>صوره الوجبة</th>
+        <th>اسم الوجبة</th>
+        <th>المجموعه</th>
+        <th>وصف الوجبة</th>
+        <th>قيمه الضريبه</th>
+        <th>سعر الوجبة</th>
+        <th>الأدوات</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of meals(); track $index) {
         <tr class="">
           <td>{{ getRowNumber($index, mealsPaginationInfo.pageIndex) }}</td>
           <td>
             <img
               class="w-10 aspect-square mx-auto object-fit-cover"
               appImgFallback
-              [src]="baseUrl+((item.images?.[0]?.fullPath)??'')"
+              [src]="baseUrl + (item.images?.[0]?.fullPath ?? '')"
               alt=""
             />
           </td>
@@ -106,15 +104,14 @@
             </div>
           </td>
         </tr>
-        }
-      </tbody>
-    </table>
+      }
+    </tbody>
+  </table>
 
-    <p-paginator
-      (onPageChange)="onPageChange($event)"
-      [first]="(mealsPaginationInfo.pageIndex - 1) * 10"
-      [rows]="10"
-      [totalRecords]="mealsPaginationInfo.totalRowsCount"
-    />
-  </app-section-wrapper>
- 
+  <p-paginator
+    (onPageChange)="onPageChange($event)"
+    [first]="(mealsPaginationInfo.pageIndex - 1) * 10"
+    [rows]="10"
+    [totalRecords]="mealsPaginationInfo.totalRowsCount"
+  />
+</app-section-wrapper>

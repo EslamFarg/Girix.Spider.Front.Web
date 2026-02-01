@@ -5,7 +5,7 @@
     #form
     [formGroup]="fg"
     appDebounce
-    debounceEvent="submit"
+    [domEvents]="['submit']"
     (debounced)="onSubmit()"
     class="flex h-fit items-start gap-2 w-full"
   >
