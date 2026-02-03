@@ -91,6 +91,7 @@ export class MealForm extends BaseComponent implements OnInit {
   ngOnInit() {
     this.searchGroups(1);
     this.searchProducts(1);
+    
     switch (this.formMode()) {
       case FormMode.Update:
         this.mealService.getById(this.routeId).subscribe((product) => {
@@ -140,6 +141,7 @@ export class MealForm extends BaseComponent implements OnInit {
         formValues = omitKeys(this.productFg.value, ['images', 'allImages']);
         break;
     }
+
     const formData = new FormData();
 
     Array.from(Object.entries(formValues)).forEach(([key, value]) => {
@@ -149,6 +151,7 @@ export class MealForm extends BaseComponent implements OnInit {
         formData.append(key, value);
       }
     });
+    
     switch (this.formMode()) {
       case FormMode.Create:
         this.productService.create(formData).subscribe({

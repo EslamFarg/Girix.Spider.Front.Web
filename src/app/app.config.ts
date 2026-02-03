@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 
 import { routes } from './app.routes';
 //
@@ -12,15 +12,14 @@ import { errorInterceptor } from './core/interceptors/error-interceptor';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { jwtInterceptor } from './features/auth/interceptors/jwt-interceptor';
-import {provideTranslateService, provideTranslateLoader} from "@ngx-translate/core";
-import {provideTranslateHttpLoader} from "@ngx-translate/http-loader";
-
+import { provideTranslateService, provideTranslateLoader } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptors([loadingInterceptor, errorInterceptor, jwtInterceptor])),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     ConfirmationService,
     MessageService,
     ConfirmDialogModule,
@@ -38,10 +37,10 @@ export const appConfig: ApplicationConfig = {
     provideTranslateService({
       loader: provideTranslateHttpLoader({
         prefix: '/i18n/',
-        suffix: '.json'
+        suffix: '.json',
       }),
       fallbackLang: 'ar',
-      lang: 'ar'
-    })
+      lang: 'ar',
+    }),
   ],
 };

@@ -1,6 +1,7 @@
 <div class="p-4 h-full overflow-auto custom-scroll">
   <app-deliveries-nav class="block mb-4" />
+
   <app-section-wrapper>
-    <app-delivery-man-form/>
+    <app-delivery-man-form [formMode]="FormMode.Update" [id]="id()" />
   </app-section-wrapper>
 </div>

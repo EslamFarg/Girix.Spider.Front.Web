@@ -18,6 +18,26 @@ export interface IDeliverySearchResponseValue {
     currentPageIndex: number;
   };
 }
+//
+
+export interface IDeliveryCreateRequest {}
+
+export interface IDeliveryUpdateRequest {}
+
+export interface IDeliveryReadResponse {
+  id: number;
+  name: string;
+  phoneNumber: string;
+  email: string;
+  address: string;
+  orderNumber: number;
+  description: string;
+  identityNumber: string;
+  attachment: {
+    id: number;
+    fullPath: string;
+  }[];
+}
 
 //MenuItems : Id,Name,PhoneNumber
 
@@ -30,6 +50,12 @@ export enum DeliverySearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class DeliveryService extends BaseService<DeliverySearchEnum, any, any, any, IDeliverySearchResponseValue> {
+export class DeliveryService extends BaseService<
+  DeliverySearchEnum,
+  IDeliveryCreateRequest,
+  IDeliveryUpdateRequest,
+  IDeliveryReadResponse,
+  IDeliverySearchResponseValue
+> {
   override apiRoute = 'Delivery';
 }

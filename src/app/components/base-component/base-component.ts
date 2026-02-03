@@ -14,6 +14,7 @@ export interface IPaginationInfo {
   totalRowsCount: number;
   totalPagesCount: number;
 }
+
 export enum FormMode {
   Create,
   Update,
@@ -48,6 +49,7 @@ export class BaseComponent {
   translateService = inject(TranslateService);
   dateNowIso = new Date().toISOString();
   debounceMap: Map<string, IDebounceMapValue> = new Map();
+  
   setDebounceItem<T>(key: string, callback: (e: T) => void) {
     this.debounceMap.set(key, { subject: new Subject<T>(), callback });
 

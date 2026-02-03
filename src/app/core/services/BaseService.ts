@@ -156,7 +156,7 @@ export default abstract class BaseService<
     );
   }
 
-  put<IDefaultUpdateDto=IUpdateDto>(createDto: IDefaultUpdateDto) {
+  put<IDefaultUpdateDto=IUpdateDto>(createDto: IDefaultUpdateDto | FormData) {
     return this.http.put<number>(`${this.apiUrl}/Update`, createDto).pipe(
       tap({
         next: () => {
@@ -166,7 +166,7 @@ export default abstract class BaseService<
     );
   }
 
-  patch<IDefaultUpdateDto=IUpdateDto>(createDto: IDefaultUpdateDto) {
+  patch<IDefaultUpdateDto=IUpdateDto>(createDto: IDefaultUpdateDto | FormData) {
     return this.http.patch<number>(`${this.apiUrl}/Update`, createDto).pipe(
       tap({
         next: () => {
