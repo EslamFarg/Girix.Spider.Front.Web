@@ -1,5 +1,6 @@
 import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
+import { ICustomerCreateRequest, ICustomerReadResponse, ICustomerSearchResponseValue, ICustomerUpdateRequest } from './customer-types';
 //Customer : Id,Name,PhoneNumber,IsCompany
 
 export enum CustomerSearchEnum {
@@ -9,112 +10,17 @@ export enum CustomerSearchEnum {
   IsCompany = SearchColumEnum.IsCompany,
 }
 
-export interface ICustomerRowResponse {
-  id: number;
-  name: string;
-  phoneNumber: string;
-  secondaryMobileNumber: string;
-  city: any;
-  district: any;
-  street: any;
-  buildingNumber: any;
-  apartment: any;
-  landmark: any;
-  postalCode: any;
-  orderNumbers: number;
-  isCompany: boolean;
-}
 
-export interface ICustomerCreateDto {
-  nameAr: string
-  nameEn: string
-  phoneNumber: string
-  secondaryMobileNumber: string
-  city: string
-  district: string
-  street: string
-  buildingNumber: string
-  apartment: string
-  landmark: string
-  postalCode: string
-  commercialRegister: string
-  taxNumber: string
-  isCompany: boolean
-}
-
-
-export interface ICustomerUpdateDto {
-  id: number;
-  nameAr: string;
-  nameEn: string;
-  phoneNumber: string;
-  secondaryMobileNumber: string;
-  city: string;
-  district: string;
-  street: string;
-  buildingNumber: string;
-  apartment: string;
-  landmark: string;
-  postalCode: string;
-  isCompany: boolean;
-}
-
-export interface ICustomerDtoResponse {
-  id: number;
-  name: string;
-  phoneNumber: string;
-  secondaryMobileNumber: string;
-  city: string;
-  district: string;
-  street: string;
-  buildingNumber: string;
-  apartment: string;
-  landmark: string;
-  postalCode: string;
-  orderNumbers: number;
-  isCompany: boolean;
-}
-
-export interface ICustomerSearchResponse {
-  menuItems: {
-    rows: {
-      id: number;
-      name: string;
-      categoryId: number;
-      categoryName: string;
-      price: number;
-      costPrice: number;
-      tax: number;
-      priceWithTax: number;
-      priceWithSelectiveTax: number;
-      selectiveTax: number;
-      description: string;
-      images: {
-        id: number;
-        fullPath: string;
-      }[];
-      isAddition: true;
-      additionMenuItem: {
-        id: number;
-        name: string;
-      }[];
-    }[];
-    paginationInfo: {
-      totalRowsCount: number;
-      totalPagesCount: number;
-      currentPageIndex: number;
-    };
-  };
-}
 
 @Injectable({
   providedIn: 'root',
 })
 export class CustomerService extends BaseService<
   CustomerSearchEnum,
-  ICustomerCreateDto,
-  ICustomerUpdateDto,
-  ICustomerDtoResponse
+  ICustomerCreateRequest,
+  ICustomerUpdateRequest,
+  ICustomerReadResponse,
+  ICustomerSearchResponseValue
 > {
   override apiRoute = 'Customer';
 }

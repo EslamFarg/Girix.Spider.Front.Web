@@ -10,13 +10,12 @@ import { InputText } from 'primeng/inputtext';
 import {
   CustomerSearchEnum,
   CustomerService,
-  ICustomerDtoResponse,
-  ICustomerRowResponse,
 } from '../../services/customer-service';
 import { noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { RouterLink } from '@angular/router';
 import { Debounce } from '@/directives/debounce';
+import { ICustomerSearchRow } from '../../services/customer-types';
 
 @Component({
   selector: 'app-customers',
@@ -56,7 +55,7 @@ export class Customers extends BaseComponent {
     this.searchCustomers(1);
   }
 
-  customers = signal<ICustomerRowResponse[]>([]);
+  customers = signal<ICustomerSearchRow[]>([]);
 
   customersPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
