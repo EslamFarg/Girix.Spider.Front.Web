@@ -155,7 +155,38 @@
     }
   },
 
-  
+  "form":{
+    "phoneNumber": "رقم الجوال",
+    "email": "البريد الالكتروني",
+    "deliveryName": "اسم الديليفري",
+    "address": "العنوان",
+    "identityNumber": "رقم الهويه",
+    "description": "البيان",
+    "userName": "اسم المستخدم",
+    "userType": "نوع المستخدم"
+    
+    
+  },
+
+
+  "actions":{
+    "save": "حفظ",
+    "cancel": "الغاء",
+    "new":"جديد",
+    "add": "اضافة",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "close": "اغلاق",
+    "print": "طباعه",
+    "download": "تحميل",
+    "search": "بحث",
+    "tools": "الادوات"
+  },
+
+  "deliveries": {
+    "explorer": "مستكشف الديليفري",
+    "add": "إضافة ديليفري جديد"
+  },
 
   "purchasesRefunds": {
     "explorer": "مستكشف المرتجعات",
@@ -184,5 +215,35 @@
   "groups": {
     "explorer": "مستكشف المجموعات",
     "add": "إضافة مجموعة جديدة"
+  },
+
+
+
+  "classes":{
+      "products":{
+        "productName":"اسم المنتج",
+        "productPrice":"سعر المنتج",
+        "costPrice":"سعر التكلفه",
+        "group":"المجموعه",
+        "tax":"الضريبه",
+        "excisetax":"الضريبه الانتقائيه",
+        "addproduct":"يعتبر المنتج كااضافه",
+        "productadditives":"اضافات المنتج",
+        "description":"البيان",
+        "productImage":"صوره المنتج",
+        "productDetail":"وصف المنتج",
+        "productAddition":"المنتج كاضافه",
+        "productTax":"قيمه الضريبه"
+      },
+      "groups":{
+        "groups":"المجموعات",
+        "show":"الظهور",
+        "groupName":"اسم المجموعه",
+        "printer":"الطابعه",
+        "showgroup":"إظهار المجموعه في شاشة الكاشير",
+        "description": "البيان",
+        "all":"الكل"
+
+      }
   }
 }

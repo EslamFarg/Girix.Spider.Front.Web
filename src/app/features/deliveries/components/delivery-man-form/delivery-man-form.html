@@ -10,9 +10,9 @@
     type="submit"
   >
     @if (formMode() === FormMode.Create) {
-      حفظ
+      {{ 'actions.save' | translate }}
     } @else {
-      تعديل
+      {{ 'actions.edit' | translate }}
     }
   </button>
   <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
@@ -79,57 +79,59 @@
   <!--  -->
   <div class="grid md:grid-cols-2 gap-4 flex-1">
     <div class="col-span-2 md:col-span-1">
-      <label for="productName">اسم الديليفري</label>
+      <label for="productName">{{'form.deliveryName' | translate}}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('nameAr')">
         <input
           pInputText
           id="nameAr"
           formControlName="nameAr"
           aria-describedby="productName-help"
-          placeholder="الاسم"
+          [placeholder]="'form.deliveryName' | translate"
+          id="productName"
         />
       </app-input-error-message-handler>
     </div>
     <!--  -->
     <div class="col-span-2 md:col-span-1">
-      <label for="productPrice">رقم الجوال</label>
-      <app-input-error-message-handler>
-        <input pInputText id="productPrice" aria-describedby="productPrice-help" placeholder="البريد الالكتروني" />
+      <label for="productPrice">{{'form.phoneNumber' | translate}}</label>
+      <app-input-error-message-handler [fc]="deliveryFg.get('phoneNumber')">
+        <input pInputText id="productPrice" formControlName="phoneNumber" aria-describedby="productPrice-help" [placeholder]="'form.phoneNumber' | translate" />
       </app-input-error-message-handler>
     </div>
     <!--  -->
     <div class="col-span-2 md:col-span-1">
-      <label for="costPrice">البريد الالكتروني</label>
-      <app-input-error-message-handler>
-        <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="رقم جوال" />
+      <label for="costPrice">{{'form.email' | translate}}</label>
+      <app-input-error-message-handler [fc]="deliveryFg.get('email')">
+        <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="email" [placeholder]="'form.email' | translate" />
       </app-input-error-message-handler>
     </div>
     <!--  -->
     <div class="col-span-2 md:col-span-1">
-      <label for="productName">العنوان</label>
-      <app-input-error-message-handler>
-        <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="العنوان " />
+      <label for="productAddress">{{'form.address' | translate}}</label>
+      <app-input-error-message-handler [fc]="deliveryFg.get('address')">
+        <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="address" id="productAddress" [placeholder]="'form.address' | translate" />
       </app-input-error-message-handler>
     </div>
     <!--  -->
     <div class="col-span-2 md:col-span-1">
-      <label for="productName">رقم الهويه</label>
-      <app-input-error-message-handler>
-        <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="رقم الهويه" />
+      <label for="identityNumber">{{'form.identityNumber' | translate}}</label>
+      <app-input-error-message-handler [fc]="deliveryFg.get('identityNumber')">
+        <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="identityNumber" id="identityNumber" [placeholder]="'form.identityNumber' | translate"/>
       </app-input-error-message-handler>
     </div>
     <!--  -->
     <div class="col-span-2">
-      <label for="productName">البيان</label>
-      <app-input-error-message-handler>
+      <label for="notes">{{'form.description' | translate}}</label>
+      <app-input-error-message-handler [fc]="deliveryFg.get('description')">
         <textarea
+        id="notes"
           rows="7"
           cols="30"
           pTextarea
-          id="productName"
           aria-describedby="productName-help"
-          placeholder="البيان"
+          [placeholder]="'form.description' | translate"
           class="w-full"
+          formControlName="description"
         ></textarea>
       </app-input-error-message-handler>
     </div>

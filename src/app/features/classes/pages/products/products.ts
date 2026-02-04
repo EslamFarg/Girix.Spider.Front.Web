@@ -13,6 +13,7 @@ import { MenuItem } from 'primeng/api';
 import { IProductSearchRow, ProductSearchEnum, ProductService } from '../../services/product-service';
 import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-products',
@@ -29,6 +30,7 @@ import { Menu } from 'primeng/menu';
     SectionWrapper,
     Debounce,
     Menu,
+    TranslatePipe
   ],
   templateUrl: './products.html',
   styleUrl: './products.css',

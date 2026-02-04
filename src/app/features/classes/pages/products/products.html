@@ -11,7 +11,7 @@
   >
     <div class="flex-1">
       <app-input-error-message-handler [fc]="fg.get('searchTerm')">
-        <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
+        <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" [placeholder]="'actions.search' | translate" />
         <p-inputgroup-addon class="relative">
           <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
           <p-menu
@@ -44,14 +44,14 @@
       <thead>
         <tr class="">
           <th>#</th>
-          <th>صوره المنتج</th>
-          <th>اسم المنتج</th>
-          <th>المجموعه</th>
-          <th>وصف المنتج</th>
-          <th>المنتج كاضافه</th>
-          <th>قيمه الضريبه</th>
-          <th>سعر المنتج</th>
-          <th>الأدوات</th>
+          <th>{{'classes.products.productImage' | translate}}</th>
+          <th>{{'classes.products.productName' | translate}}</th>
+          <th>{{'classes.products.group' | translate}}</th>
+          <th>{{'classes.products.productDetail' | translate}}</th>
+          <th>{{'classes.products.productAddition' | translate}}</th>
+          <th>{{'classes.products.productTax' | translate}}</th>
+          <th>{{'classes.products.productPrice' | translate}}</th>
+          <th>{{'actions.tools' | translate}}</th>
         </tr>
       </thead>
       <tbody>

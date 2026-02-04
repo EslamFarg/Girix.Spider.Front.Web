@@ -11,6 +11,7 @@ import { Debounce } from '@/directives/debounce';
 import { IGroupSearchRow, GroupSearchEnum, GroupService } from '../../services/group-service';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-groups',
   imports: [
@@ -23,6 +24,7 @@ import { Menu } from 'primeng/menu';
     SectionWrapper,
     Debounce,
     Menu,
+    TranslatePipe
   ],
   templateUrl: './groups.html',
   styleUrl: './groups.css',

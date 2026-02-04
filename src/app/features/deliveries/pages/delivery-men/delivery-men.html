@@ -13,7 +13,7 @@
     >
       <div class="flex-1">
         <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
-          <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
+          <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" [placeholder]="'actions.search' | translate" />
           <p-inputgroup-addon class="relative">
             <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
             <p-menu
@@ -45,10 +45,10 @@
       <thead>
         <tr class="">
           <th>#</th>
-          <th>اسم الديلفري</th>
-          <th>رقم الجوال</th>
-          <th>العنوان</th>
-          <th>الأدوات</th>
+          <th>{{'form.deliveryName' | translate}}</th>
+          <th>{{'form.phoneNumber' | translate}}</th>
+          <th>{{'form.address' | translate }}</th>
+          <th>{{'actions.tools' | translate}}</th>
         </tr>
       </thead>
       <tbody>
@@ -60,7 +60,7 @@
             <td>{{ item.address }}</td>
             <td>
               <div class="actions">
-                <a [routerLink]="`/delivery-men/${item.id}/edit`" class="edit">
+                <a [routerLink]="`/deliveries/delivery-men/${item.id}/edit`" class="edit">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       opacity="0.4"

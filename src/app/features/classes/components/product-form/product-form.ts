@@ -25,6 +25,7 @@ import { AllowNumbers } from '@/directives/allow-numbers';
 import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { ProductFgControls } from './types';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-product-form',
@@ -43,6 +44,7 @@ import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
     Dialog,
     MultiSelectModule,
     AllowNumbers,
+    TranslatePipe
   ],
   templateUrl: './product-form.html',
   styleUrl: './product-form.css',

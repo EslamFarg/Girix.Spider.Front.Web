@@ -1,12 +1,15 @@
-<div class="flex items-center gap-2 sm:gap-4 text-sm sm:text-base">
-  @for (link of links(); track $index) {
-    <a
-      pButton
-      style="
+<div class="flex items-center gap-2 sm:gap-4 text-sm sm:text-base"
+
+style="
         --p-button-primary-color: var(--color-dark-bg-1);
         --p-button-primary-background: transparent;
         --p-button-primary-border-color: var(--color-dark-line);
       "
+>
+  @for (link of links(); track $index) {
+    <a
+      pButton
+      
       [routerLink]="link.url"
       routerLinkActive="sub-nav-active-link"
       [routerLinkActiveOptions]="{ exact: true }"

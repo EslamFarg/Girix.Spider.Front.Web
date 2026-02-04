@@ -13,6 +13,7 @@ import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-delivery-men',
@@ -28,6 +29,7 @@ import { RouterLink } from '@angular/router';
     Debounce,
     Menu,
     RouterLink,
+    TranslatePipe
   ],
   templateUrl: './delivery-men.html',
   styleUrl: './delivery-men.css',

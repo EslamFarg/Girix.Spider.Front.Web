@@ -1,3 +1,64 @@
 {
   
+    "form":{
+    "phoneNumber": "phoneNumber",
+    "email": "email",
+    "deliveryName": "deliveryName",
+    "address": "address",
+    "identityNumber": "identityNumber",
+    "description": "description",
+    "userName": "userName",
+    "userType": "userType"
+    },
+    "actions":{
+    "save": "save",
+    "cancel": "cancel",
+    "new":"new",
+    "add": "add",
+    "edit": "edit",
+    "delete": "delete",
+    "close": "close",
+    "print": "print",
+    "download": "download",
+    "search": "search",
+    "tools": "tools"
+    },
+    "deliveries": {
+    "explorer": "explorer",
+    "add": "add"
+    },
+
+  "items": {
+    "products": {
+      "productName": "Product Name",
+      "productPrice": "Product Price",
+      "costPrice": "Cost Price",
+      "group": "Group",
+      "tax": "Tax",
+      "excisetax": "Excise Tax",
+      "addproduct": "Treat as Add-on Product",
+      "productadditives": "Product Additives",
+      "description": "Description",
+      "productImage":"Product Image",
+      "productDetail":"Product Detail",
+      "productAddition":"Product Additions",
+      "productTax":"Product Tax"
+    },
+       "groups":{
+        "groups":"groups",
+        "show":"show",
+        "groupName":"group name",
+        "printer":"printer",
+        "showgroup":"Show the group on the cashier screen",
+        "description": "description",
+        "all":"All"
+
+      }
+  }
+
+
+
+
+    
+   
 }

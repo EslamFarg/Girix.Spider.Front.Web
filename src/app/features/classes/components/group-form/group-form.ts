@@ -17,6 +17,7 @@ import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { IPrinterSearchRow, PrinterSearchEnum, PrinterService } from '@/features/settings/services/printer-service';
 import { Debounce } from '@/directives/debounce';
 import { ImgFallback } from '@/directives/img-fallback';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-group-form',
@@ -31,6 +32,7 @@ import { ImgFallback } from '@/directives/img-fallback';
     Debounce,
     ButtonDirective,
     ImgFallback,
+    TranslatePipe
   ],
   templateUrl: './group-form.html',
   styleUrl: './group-form.css',

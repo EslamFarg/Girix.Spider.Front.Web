@@ -10,13 +10,13 @@
     type="submit"
   >
     @if (formMode() === FormMode.Create) {
-      حفظ
+      {{ 'actions.save' | translate }}
     } @else {
-      تعديل
+      {{ 'actions.edit' | translate }}
     }
   </button>
   <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
-    جديد
+    {{'actions.new' | translate }}
   </button>
 </div>
 
@@ -74,14 +74,14 @@
   </div>
   <div class="grid md:grid-cols-2 gap-4 flex-1">
     <div>
-      <label for="productName">اسم المجموعه</label>
+      <label for="productName">{{'classes.groups.groupName' | translate}}</label>
       <app-input-error-message-handler>
-        <input pInputText id="productName" aria-describedby="productName-help" placeholder="الاسم" />
+        <input pInputText id="productName" aria-describedby="productName-help" [placeholder]="'classes.groups.groupName' | translate" />
       </app-input-error-message-handler>
     </div>
 
     <div>
-      <label for="productName">الطابعة</label>
+      <label for="productName">{{'classes.groups.printer' | translate}}</label>
       <app-input-error-message-handler [grouped]="false">
         <ng-select
           class="app-select"
@@ -102,19 +102,20 @@
       <app-input-error-message-handler>
         <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
       </app-input-error-message-handler>
-      <label for="productName" class="text-dark-line text-sm font-semibold">إظهار المجموعه في شاشة الكاشير</label>
+      <label for="productName" class="text-dark-line text-sm font-semibold">{{'classes.groups.showgroup' | translate}}</label>
     </div>
 
     <div class="md:col-span-2">
-      <label for="productName">البيان</label>
+      <label for="productName">{{'classes.groups.description' | translate}}</label>
       <app-input-error-message-handler>
         <textarea
           rows="5"
           cols="30"
+          class="w-full"
           pTextarea
           id="productName"
           aria-describedby="productName-help"
-          placeholder="البيان"
+          [placeholder]="'classes.groups.description' | translate"
         ></textarea>
       </app-input-error-message-handler>
     </div>

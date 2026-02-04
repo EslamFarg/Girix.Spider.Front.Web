@@ -27,7 +27,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((errorResponse: IApiError) => {
       layoutService.messageService.add({
         severity: 'error',
-        // summary: '!',
+        // summary: 'خطأ',
         detail: errorResponse.error.detail,
       });
       throw errorResponse.error;

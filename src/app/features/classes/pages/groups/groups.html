@@ -34,7 +34,7 @@
       formControlName="fromDate"
       optionLabel="label"
       optionValue="value"
-      placeholder="الكل"
+      [placeholder]="'classes.groups.all' | translate"
       class="h-fit hidden! sm:flex! w-40"
     />
   </form>
@@ -43,9 +43,9 @@
     <thead>
       <tr class="">
         <th>#</th>
-        <th>المجموعات</th>
-        <th>الظهور</th>
-        <th>الأدوات</th>
+        <th>{{'classes.groups.groups' | translate}}</th>
+        <th>{{'classes.groups.show' | translate}}</th>
+        <th>{{'actions.tools' | translate}}</th>
       </tr>
     </thead>
     <tbody>
