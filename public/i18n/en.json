@@ -8,7 +8,13 @@
     "identityNumber": "identityNumber",
     "description": "description",
     "userName": "userName",
-    "userType": "userType"
+    "userType": "userType",
+    "userCondition": "userCondition",
+    "cashierCollectionAccount": "Cashier Collection Account",
+"custodyAccount": "Custody Account",
+"cashPaymentAccount": "Cash Payment Account",
+"bankPaymentAccount": "Bank Payment Account"
+
     },
     "actions":{
     "save": "save",
@@ -21,7 +27,8 @@
     "print": "print",
     "download": "download",
     "search": "search",
-    "tools": "tools"
+    "tools": "tools",
+    "active":"active"
     },
     "deliveries": {
     "explorer": "explorer",

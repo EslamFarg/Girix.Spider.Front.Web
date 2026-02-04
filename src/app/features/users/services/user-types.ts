@@ -41,13 +41,14 @@ export interface IUserSearchResponseValue {
 
 
 export interface IUserReadResponse {
-  userId: number
+  userId: number 
   name: string
   email: string
   phoneNumber: string
-  cashierCollectionAccountId: number
-  custodyAccountId: number
-  cashPaymentAccountId: number
-  bankPaymentAccountId: number
-  groupId: number
+  cashierCollectionAccountId: number | null
+  custodyAccountId: number | null
+  cashPaymentAccountId: number | null
+  bankPaymentAccountId: number | null
+  groupId: number,
+  isActive: boolean 
 }

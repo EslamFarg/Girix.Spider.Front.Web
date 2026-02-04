@@ -14,6 +14,7 @@ import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
 import { RouterLink } from '@angular/router';
 import { IUserRowResponse } from '../../services/user-types';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-users',
@@ -29,6 +30,7 @@ import { IUserRowResponse } from '../../services/user-types';
     Debounce,
     Menu,
     RouterLink,
+    TranslatePipe
   ],
   templateUrl: './users.html',
   styleUrl: './users.css',

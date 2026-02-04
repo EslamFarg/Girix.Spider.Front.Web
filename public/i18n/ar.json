@@ -163,9 +163,12 @@
     "identityNumber": "رقم الهويه",
     "description": "البيان",
     "userName": "اسم المستخدم",
-    "userType": "نوع المستخدم"
-    
-    
+    "userType": "نوع المستخدم",
+    "userCondition": "حاله المستخدم",
+    "cashierCollectionAccount":"حساب تحصيل الكاشير",
+    "custodyAccount":"حساب العهده",
+    "cashPaymentAccount":"حساب المدفوعات كاش",
+    "bankPaymentAccount":"حساب المدفوعات شبكه"    
   },
 
 
@@ -180,7 +183,8 @@
     "print": "طباعه",
     "download": "تحميل",
     "search": "بحث",
-    "tools": "الادوات"
+    "tools": "الادوات",
+    "active":"نشط"
   },
 
   "deliveries": {

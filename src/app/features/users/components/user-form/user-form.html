@@ -23,7 +23,7 @@
 <form id="usersForm" class="mt-6 flex flex-col md:flex-row gap-4" (ngSubmit)="onSubmitForm()" [formGroup]="userFg">
   <!--  -->
   <div class="grid md:grid-cols-2 gap-4 flex-1">
-    <div class="col-span-2 md:col-span-1">
+    <div class=" md:col-span-1">
       <label for="productName">{{ 'form.userName' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('nameAr')">
         <input
@@ -37,7 +37,7 @@
       </app-input-error-message-handler>
     </div>
     <!--  -->
-    <div class="col-span-2 md:col-span-1">
+    <div class=" md:col-span-1">
       <label for="productPrice">{{ 'form.phoneNumber' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('phoneNumber')">
         <input
@@ -50,7 +50,7 @@
       </app-input-error-message-handler>
     </div>
     <!--  -->
-    <div class="col-span-2 md:col-span-1">
+    <div class=" md:col-span-1">
       <label for="costPrice">{{ 'form.email' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('email')">
         <input
@@ -63,19 +63,20 @@
       </app-input-error-message-handler>
     </div>
     <!--  -->
-    <!-- <div class="col-span-2 md:col-span-1">
+    <!-- <div class=" md:col-span-1">
       <label for="productAddress">{{'form.address' | translate}}</label>
       <app-input-error-message-handler [fc]="userFg.get('address')">
         <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="address" id="productAddress" [placeholder]="'form.address' | translate" />
       </app-input-error-message-handler>
     </div> -->
 
-    <div class="col-span-2 md:col-span-1">
+    <div class=" md:col-span-1">
       <label for="productName">{{ 'form.userType' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('groupId')">
         <p-select
-          [options]="[]"
-          optionLabel="name"
+          [options]="userTypes()"
+          optionValue="id"
+          optionLabel="nameAr"
           formControlName="groupId"
           [placeholder]="'form.userType' | translate"
           class="w-full!"
@@ -84,21 +85,61 @@
     </div>
 
     <div class="col-span-2 flex items-center h-fit gap-2 pb-1">
-      <app-input-error-message-handler [fc]="userFg.get('groupId')" class="w-fit">
-        <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
+      <app-input-error-message-handler [fc]="userFg.get('isActive')" class="w-fit">
+        <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" formControlName="isActive" />
       </app-input-error-message-handler>
-      <label for="productName" class="text-dark-line text-sm font-semibold">نشط</label>
+      <label for="productName" class="text-dark-line text-sm font-semibold">{{'actions.active' | translate}}</label>
     </div>
 
+    <div class=" ">
+      <label for="productName">{{'form.cashierCollectionAccount' | translate}}</label>
+      <app-input-error-message-handler [fc]="userFg.get('cashierCollectionAccountId')">
+        <p-select
+          [options]="cashierFinancialAccounts()"
+          optionLabel="name"
+          optionValue="id"
+          formControlName="cashierCollectionAccountId"
+          [placeholder]="'form.cashierCollectionAccount' | translate"
+          class="w-full!"
+        />
+      </app-input-error-message-handler>
+    </div>
+    <div class=" ">
+      <label for="productName">{{'form.custodyAccount' | translate}}</label>
+      <app-input-error-message-handler [fc]="userFg.get('custodyAccountId')">
+        <p-select
+          [options]="custodyAccounts()"
+          optionLabel="name"
+          optionValue="id"
+          formControlName="custodyAccountId"
+          [placeholder]="'form.custodyAccount' | translate"
+          class="w-full!"
+        />
+      </app-input-error-message-handler>
+    </div>
+   
+    <div class=" ">
+      <label for="productName">{{'form.cashPaymentAccount' | translate}}</label>
+      <app-input-error-message-handler [fc]="userFg.get('cashPaymentAccountId')">
+        <p-select
+          [options]="cashFinancialAccounts()"
+          optionLabel="name"
+          optionValue="id"
+          formControlName="cashPaymentAccountId"
+          [placeholder]="'form.cashPaymentAccount' | translate"
+          class="w-full!"
+        />
+      </app-input-error-message-handler>
+    </div>
     <div>
-      <label for="productName">{{ 'classes.products.group' | translate }}</label>
-      <app-input-error-message-handler [fc]="userFg.get('CHANGE')">
+      <label for="productName">{{'form.bankPaymentAccount' | translate}}</label>
+      <app-input-error-message-handler [fc]="userFg.get('bankPaymentAccountId')">
         <p-select
           [options]="bankFinancialAccounts()"
           optionLabel="name"
           optionValue="id"
-          formControlName="CHANGE"
-          [placeholder]="'CHANGE' | translate"
+          formControlName="bankPaymentAccountId"
+          [placeholder]="'form.bankPaymentAccount' | translate"
           class="w-full!"
         />
       </app-input-error-message-handler>

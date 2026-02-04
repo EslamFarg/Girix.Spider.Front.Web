@@ -17,6 +17,7 @@ import {
   ICashFinancialAccount,
   ICustodyFinancialAccount,
 } from '@/features/accounts/services/financial-account-types';
+import { IUserReadResponse } from '../../services/user-types';
 // import { IusersFgControls } from '@/features/deliveries/components/users-man-form/types';
 // import { usersService } from '@/features/deliveries/services/users-service';
 
@@ -60,9 +61,16 @@ export class UserForm extends BaseComponent {
       onlyNumbersAllowed,
       Validators.maxLength(13),
     ]),
+    isActive:this.fb.control(true, [Validators.required]),
     email: this.fb.control(null, [Validators.required, emailValidator]),
+    //ids
     groupId: this.fb.control(null, [Validators.required]),
-    id: this.fb.control(null, []),
+    cashierCollectionAccountId:this.fb.control(null, [Validators.required]),
+    custodyAccountId:this.fb.control(null, [Validators.required]),
+    cashPaymentAccountId:this.fb.control(null, [Validators.required]),
+    bankPaymentAccountId:this.fb.control(null, [Validators.required]),
+    //update only
+    userId: this.fb.control(null, []),
   };
 
   userFg = this.fb.group(this.initialusersFgValue);
@@ -74,6 +82,7 @@ export class UserForm extends BaseComponent {
 
   //
   cashFinancialAccounts = signal<ICashFinancialAccount[]>([]);
+  cashierFinancialAccounts = this.cashFinancialAccounts.asReadonly();
   bankFinancialAccounts = signal<IBankFinancialAccount[]>([]);
   custodyAccounts = signal<ICustodyFinancialAccount[]>([]);
 
@@ -104,8 +113,11 @@ export class UserForm extends BaseComponent {
         break;
       case FormMode.Update:
         //fetch
-        this.usersService.getById(this.id()!).subscribe((users) => {
-          //-> bind data
+        this.usersService.getById(this.id()!).subscribe((users:IUserReadResponse | any) => {
+          this.userFg.patchValue({...users,
+            nameAr: users.name,
+            nameEn: users.name,
+          });
         });
         break;
     }
@@ -122,14 +134,33 @@ export class UserForm extends BaseComponent {
       return;
     }
 
-    // switch (this.formMode()) {
-    //   case FormMode.Create:
-    //     this.usersService.create(dto).subscribe();
-    //     break;
-    //   case FormMode.Update:
 
-    //     this.usersService.put(dto).subscribe();
-    //     break;
-    // }
+    // let dto:{[key:string] : string | number}={};
+
+
+    // Object.entries(this.userFg.value).forEach(([key, value]:[string,any]) => {
+    //   if (Array.isArray(value)) {
+    //     value.forEach((val) => {
+    //       dto[key]=val
+    //     });
+    //   }else{
+    //     dto[key]=value
+    //   }
+    // })
+
+
+    // console.log(dto);
+
+
+
+
+    switch (this.formMode()) {
+      case FormMode.Create:
+        this.usersService.create(this.userFg.value).subscribe();
+        break;
+      case FormMode.Update:
+        this.usersService.put(this.userFg.value).subscribe();
+        break;
+    }
   }
 }

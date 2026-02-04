@@ -42,6 +42,7 @@ export interface IEndpoints {
   update: string;
   getById: string;
   delete: string;
+  put: string;
   search: string;
 }
 
@@ -56,6 +57,7 @@ export default abstract class BaseService<
   private endpoints: IEndpoints = {
     create: 'Create',
     update: '',
+    put: '',
     getById: '/',
     delete: '',
     search: 'Search',
@@ -157,7 +159,7 @@ export default abstract class BaseService<
   }
 
   put<IDefaultUpdateDto=IUpdateDto>(createDto: IDefaultUpdateDto | FormData) {
-    return this.http.put<number>(`${this.apiUrl}/Update`, createDto).pipe(
+    return this.http.put<number>(`${this.apiUrl}/${this.endpoints.update}`, createDto).pipe(
       tap({
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'تم الحفظ', detail: 'لقد قمت بالحفظ بنجاح' });

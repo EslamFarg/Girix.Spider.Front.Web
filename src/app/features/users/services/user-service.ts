@@ -34,6 +34,7 @@ export class UserService extends BaseService<
     super();
     this.patchEndpoints({
       create: '',
+      update: '',
     });
   }
 }
