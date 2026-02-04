@@ -8,10 +8,11 @@ import { Textarea } from 'primeng/textarea';
 import { BaseComponent, FormMode } from '@/components/base-component/base-component';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
+import { noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
 import { ICustomerFgControls } from './types';
 import { CustomerService } from '../../services/customer-service';
 import { ICustomerReadResponse } from '../../services/customer-types';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-customers-form',
@@ -25,6 +26,7 @@ import { ICustomerReadResponse } from '../../services/customer-types';
     TranslatePipe,
     ButtonDirective,
     ReactiveFormsModule,
+    RouterLink
   ],
   templateUrl: './customers-form.html',
   styleUrl: './customers-form.css',
@@ -44,13 +46,25 @@ export class CustomersForm extends BaseComponent implements OnInit {
   //
 
   initialCustomerFgValue: ICustomerFgControls = {
-    //todo: add controlls
-
-    //update only prop
-    id: this.fb.control(null, []),
+  id: this.fb.control(null,[]),
+  nameAr: this.fb.control(null,[Validators.required,noSymbolsAllowed]),
+  nameEn: this.fb.control(null,[Validators.required,noSymbolsAllowed]),
+  phoneNumber: this.fb.control(null,[Validators.required,onlyNumbersAllowed]),
+  secondaryMobileNumber: this.fb.control(null,[Validators.required,onlyNumbersAllowed]),
+  city: this.fb.control(null,[Validators.required]),
+  district: this.fb.control(null,[Validators.required]),
+  street: this.fb.control(null,[Validators.required]),
+  buildingNumber: this.fb.control(null,[Validators.required]),
+  apartment: this.fb.control(null,[Validators.required]),
+  landmark: this.fb.control(null,[Validators.required]),
+  postalCode: this.fb.control(null,[Validators.required]),
+  commercialRegister: this.fb.control(null,[Validators.required]),
+  taxNumber: this.fb.control(null,[Validators.required,onlyNumbersAllowed]),
+  numberOfFloor: this.fb.control(null,[Validators.required]),
+  isCompany: this.fb.control(true,[Validators.required]),
   };
 
-  userFg = this.fb.group(this.initialCustomerFgValue);
+  customerFg = this.fb.group(this.initialCustomerFgValue);
 
   //services
   customerService = inject(CustomerService);
@@ -75,30 +89,39 @@ export class CustomersForm extends BaseComponent implements OnInit {
         this.customerService.getById(this.id()!).subscribe((Customer) => {
           this.currentCustomer.set(Customer);
           //-> bind data
+          console.log('customer', Customer);
+          this.customerFg.patchValue({...Customer,
+            nameAr: Customer.name,
+            nameEn: Customer.name
+          });
         });
         break;
     }
   }
 
   onSubmitForm() {
-    // this.userFg.patchValue({
-    //   nameEn: this.userFg.value.nameAr?.trim(),
-    // });
+    this.customerFg.patchValue({
+      nameEn: this.customerFg.value.nameAr?.trim(),
+      landmark:this.customerFg.value.numberOfFloor
+    });
 
-    // debugger;
-    if (this.userFg.invalid) {
-      this.userFg.markAllAsTouched();
+    debugger;
+    console.log(this.customerFg.value);
+    if (this.customerFg.invalid) {
+      this.customerFg.markAllAsTouched();
       return;
     }
 
-    // switch (this.formMode()) {
-    //   case FormMode.Create:
-    //     this.CustomerService.create(dto).subscribe();
-    //     break;
-    //   case FormMode.Update:
+    // let dto={}
 
-    //     this.CustomerService.put(dto).subscribe();
-    //     break;
-    // }
+    switch (this.formMode()) {
+      case FormMode.Create:
+        this.customerService.create(this.customerFg.value).subscribe();
+        break;
+      case FormMode.Update:
+
+        this.customerService.put({...this.customerFg.value,id: Number(this.id())}).subscribe();
+        break;
+    }
   }
 }

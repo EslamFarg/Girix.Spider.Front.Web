@@ -12,6 +12,8 @@ import { ReceiptVoucherService } from '../../services/receipt-voucher-service';
 import { IReceiptVoucherCollectiveReceiptGetListRow } from '../../services/receipt-voucher-types';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { Debounce } from '@/directives/debounce';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-collective-receipts',
@@ -25,13 +27,16 @@ import { Debounce } from '@/directives/debounce';
     InputText,
     AllowNumbers,
     Debounce,
+    DatePipe,
+    CurrencyPipe,
+    TranslatePipe
   ],
   templateUrl: './collective-receipts.html',
   styleUrl: './collective-receipts.css',
 })
 export class CollectiveReceipts extends BaseComponent {
   initialSearchFormValue = {
-    paymentVoucherId: this.fb.control<number | null>(null, [Validators.maxLength(100)]),
+    receiptVoucherId: this.fb.control<number | null>(null, [Validators.maxLength(100)]),
   };
   fg = this.fb.group(this.initialSearchFormValue);
 
@@ -50,15 +55,15 @@ export class CollectiveReceipts extends BaseComponent {
   };
 
   getList(pageIndex: number) {
-    console.log('searching');
     this.receiptVoucerService
       .getList({
         criteria: { paginationInfo: { pageIndex, pageSize: 10 } },
-        paymentVoucherId: this.fg.getRawValue().paymentVoucherId ?? 0,
+        receiptVoucherId: this.fg.getRawValue().receiptVoucherId ?? 0,
       })
       .subscribe({
         next: (res) => {
           this.collectiveReceipts.set(res.rows);
+          console.log(this.collectiveReceipts());
           this.receiptVouchersPaginationInfo = {
             pageIndex,
             totalPagesCount: res.paginationInfo.totalPagesCount,
@@ -68,9 +73,7 @@ export class CollectiveReceipts extends BaseComponent {
       });
   }
 
-  log() {
-    console.log(this.fg.getRawValue());
-  }
+
 
   onSubmit = () => this.fg.valid && this.getList(1);
 
@@ -79,8 +82,8 @@ export class CollectiveReceipts extends BaseComponent {
   deleteCollectiveReceipt(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف المنتج',
-      header: 'حذف المنتج',
+      message: 'هل انت متاكد من حذف السند',
+      header: 'حذف السند',
       icon: 'pi pi-info-circle',
       rejectLabel: 'الغاء',
       rejectButtonProps: {

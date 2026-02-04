@@ -1,5 +1,5 @@
 export interface IReceiptVoucherGetListRequest {
-  paymentVoucherId: number;
+  receiptVoucherId: number;
   criteria: {
     paginationInfo: {
       pageIndex: number;
@@ -17,7 +17,7 @@ export interface IReceiptVoucherGetListResponse {
 
 export interface IReceiptVoucherCollectiveReceiptGetListRow {
   id: number;
-  voucherNo: string;
+  voucherNo: string | null;
   voucherDate: string;
   creditAccountId: number;
   creditAccountName: string;

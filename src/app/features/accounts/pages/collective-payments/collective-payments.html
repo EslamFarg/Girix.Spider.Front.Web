@@ -1,9 +1,9 @@
  
     <!-- search -->
     <div class="flex h-fit items-start gap-2   w-full">
-      <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="flex-1">
-        <app-input-error-message-handler [fc]="fg.get('text')">
-          <input class="w-full bg-transparent!" pInputText type="text" formControlName="text" placeholder="بحث" />
+      <form #form [formGroup]="fg" appDebounce [domEvents]="['submit']" (debounced)="onSubmit()"  class="flex-1">
+        <app-input-error-message-handler [fc]="fg.get('paymentVoucherId')">
+          <input class="w-full bg-transparent!" pInputText type="text" formControlName="paymentVoucherId" placeholder="بحث" />
           <p-inputgroup-addon>
             <i class="pi pi-filter"></i>
           </p-inputgroup-addon>
@@ -20,21 +20,21 @@
       <thead>
         <tr class="">
           <th>#</th>
-          <th>رقم السند</th>
-          <th>التاريخ</th>
-          <th>الرقم الدفتري</th>
-          <th>المبلغ</th>
-          <th>الأدوات</th>
+          <th>{{'form.voucherNumber' | translate}}</th>
+          <th>{{'form.date' | translate}}</th>
+          <th>{{'form.ledgerNumber' | translate}}</th>
+          <th>{{'form.amount' | translate }}</th>
+          <th>{{'actions.tools' | translate}}</th>
         </tr>
       </thead>
       <tbody>
-        @for (item of [1,2,3,4,5,6,7]; track $index) {
+        @for (collectivePayment of collectivePayments(); track $index) {
         <tr class="" [style]="`--ix:${$index}`">
-          <td><div>م</div></td>
-          <td><div>123456</div></td>
-          <td><div>July 1, 2024</div></td>
-          <td><div>0123456789</div></td>
-          <td><div>$120.00</div></td>
+          <td><div>{{getRowNumber($index, paymentVouchersPaginationInfo.pageIndex)}}</div></td>
+          <td><div>{{collectivePayment.id}}</div></td>
+          <td><div>{{collectivePayment.voucherDate | date: 'dd/MM/yyyy'}}</div></td>
+          <td><div>{{collectivePayment.voucherNo}}</div></td>
+          <td><div>{{collectivePayment.totalAmount | currency}}</div></td>
           <td>
             <div class="actions">
               <button type="button" class="print">
@@ -63,7 +63,7 @@
                   />
                 </svg>
               </button>
-              <button type="button" class="delete">
+              <button type="button" class="delete" (click)="deleteCollectiveReceipt(collectivePayment.id,$event)">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"
@@ -83,5 +83,5 @@
       </tbody>
     </table>
 
-    <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
+    <p-paginator (onPageChange)="onPageChange($event)" [first]="getCurrentRowsIx(paymentVouchersPaginationInfo.pageIndex)" [rows]="rows" [totalRecords]="paymentVouchersPaginationInfo.totalRowsCount" />
  
