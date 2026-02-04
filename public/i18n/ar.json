@@ -168,7 +168,28 @@
     "cashierCollectionAccount":"حساب تحصيل الكاشير",
     "custodyAccount":"حساب العهده",
     "cashPaymentAccount":"حساب المدفوعات كاش",
-    "bankPaymentAccount":"حساب المدفوعات شبكه"    
+    "bankPaymentAccount":"حساب المدفوعات شبكه",
+
+     "customerName": "اسم العميل",
+  "secondaryPhoneNumber": "رقم جوال إضافي",
+  "commercialRegister": "السجل التجاري",
+  "taxNumber": "الرقم الضريبي",
+  "city": "المدينة",
+  "district": "الحي",
+  "street": "الشارع",
+  "building": "العمارة",
+  "postalCode": "الرقم البريدي",
+  "floor": "الدور",
+  "apartment": "الشقة",
+  "isCompany": "العميل يعتبر شركة",
+  "company": "الشركه",
+   "voucherNumber":"رقم السند",
+  "date": "التاريخ",
+  "ledgerNumber": "الرقم الدفتري",
+  "amount": "المبلغ"
+  
+
+
   },
 
 

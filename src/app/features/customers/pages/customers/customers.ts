@@ -13,6 +13,7 @@ import { omitKeys } from '@/yn-ng/utils/helpers';
 import { RouterLink } from '@angular/router';
 import { Debounce } from '@/directives/debounce';
 import { ICustomerSearchRow } from '../../services/customer-types';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-customers',
@@ -26,6 +27,7 @@ import { ICustomerSearchRow } from '../../services/customer-types';
     InputText,
     RouterLink,
     Debounce,
+    TranslatePipe
   ],
   templateUrl: './customers.html',
   styleUrl: './customers.css',

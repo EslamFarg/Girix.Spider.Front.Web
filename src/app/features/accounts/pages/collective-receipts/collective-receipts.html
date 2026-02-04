@@ -1,12 +1,12 @@
 <!-- search -->
 <div class="flex h-fit items-start gap-2 w-full">
   <form #form [formGroup]="fg" appDebounce [domEvents]="['submit']" (debounced)="onSubmit()" class="flex-1">
-    <app-input-error-message-handler [fc]="fg.get('paymentVoucherId')">
+    <app-input-error-message-handler [fc]="fg.get('receiptVoucherId')">
       <input
         class="w-full bg-transparent! no-input-spinner"
         type="number"
         pInputText
-        formControlName="paymentVoucherId"
+        formControlName="receiptVoucherId"
         placeholder="بحث ب رقم السند"
       />
       <!-- <p-inputgroup-addon>
@@ -27,11 +27,11 @@
   <thead>
     <tr class="">
       <th>#</th>
-      <th>رقم السند</th>
-      <th>التاريخ</th>
-      <th>الرقم الدفتري</th>
-      <th>المبلغ</th>
-      <th>الأدوات</th>
+      <th>{{'form.voucherNumber' | translate}}</th>
+      <th>{{'form.date' | translate }}</th>
+      <th>{{'form.ledgerNumber' | translate}}</th>
+      <th>{{'form.amount' | translate }}</th>
+      <th>{{'actions.tools' | translate }}</th>
     </tr>
   </thead>
   <tbody>
@@ -39,11 +39,11 @@
       <tr class="" [style]="`--ix:${$index}`">
         <td><div>{{getRowNumber($index, receiptVouchersPaginationInfo.pageIndex)}}</div></td>
         <td>
-          <div>{{ collectiveReceipt.creditAccountId }}</div>
+          <div>{{ collectiveReceipt.id }}</div>
         </td>
-        <td><div>July 1, 2024</div></td>
-        <td><div>0123456789</div></td>
-        <td><div>$120.00</div></td>
+        <td><div>{{collectiveReceipt.voucherDate | date: 'dd/MM/yyyy'}}</div></td>
+        <td><div>{{collectiveReceipt.voucherNo}}</div></td>
+        <td><div>{{collectiveReceipt.totalAmount | currency}}</div></td>
         <td>
           <div class="actions">
             <button type="button" class="print">
@@ -72,7 +72,7 @@
                 />
               </svg>
             </button>
-            <button type="button" class="delete">
+            <button type="button" class="delete" (click)="deleteCollectiveReceipt(collectiveReceipt.id,$event)">
               <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   opacity="0.4"

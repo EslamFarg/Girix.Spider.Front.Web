@@ -23,4 +23,15 @@ export class CustomerService extends BaseService<
   ICustomerSearchResponseValue
 > {
   override apiRoute = 'Customer';
+
+
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.patchEndpoints({
+      update: 'Update',
+    })
+  }
 }

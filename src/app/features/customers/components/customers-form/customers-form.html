@@ -15,97 +15,100 @@
       {{ 'actions.edit' | translate }}
     }
   </button>
-  <button pButton class="border-dark-line! text-dark-line!" variant="outlined">
+  <button pButton [routerLink]="'/customers/add'" class="border-dark-line! text-dark-line!" variant="outlined">
     {{ 'actions.new' | translate }}
   </button>
 </div>
 
-<form id="customerForm" class="grid md:grid-cols-4 gap-4 flex-1" (ngSubmit)="onSubmitForm()" [formGroup]="userFg">
+<form id="customerForm" class="grid md:grid-cols-4 gap-4 flex-1" (ngSubmit)="onSubmitForm()" [formGroup]="customerFg">
   <div class="md:col-span-4">
-    <label for="customerName">اسم العميل</label>
-    <app-input-error-message-handler>
-      <input pInputText id="customerName" aria-describedby="customerName-help" placeholder="الاسم" />
+    <label for="customerName">{{'form.customerName' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('nameAr')">
+      <input pInputText id="customerName" aria-describedby="customerName-help" [placeholder]="'form.customerName' | translate"
+      formControlName="nameAr"
+      />
     </app-input-error-message-handler>
   </div>
   <div class="md:col-span-2">
-    <label for="phoneNumber">رقم الجوال</label>
-    <app-input-error-message-handler>
-      <input pInputText id="phoneNumber" aria-describedby="phoneNumber-help" placeholder="رقم جوال" />
+    <label for="phoneNumber">{{'form.phoneNumber' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('phoneNumber')">
+      <input pInputText id="phoneNumber" formControlName="phoneNumber" aria-describedby="phoneNumber-help" [placeholder]="'form.phoneNumber' | translate" />
     </app-input-error-message-handler>
   </div>
   <div class="md:col-span-2">
-    <label for="additional-phoneNumber">رقم جوال إضافي</label>
-    <app-input-error-message-handler>
+    <label for="additional-phoneNumber">{{'form.secondaryPhoneNumber' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('secondaryMobileNumber')">
       <input
         pInputText
         id="additional-phoneNumber"
         aria-describedby="additional-phoneNumber-help"
-        placeholder="رقم جوال"
+        [placeholder]="'form.secondaryPhoneNumber' | translate"
+        formControlName="secondaryMobileNumber"
       />
     </app-input-error-message-handler>
   </div>
 
   <div class="md:col-span-2">
-    <label for="commercialRegister">سجل تجاري</label>
-    <app-input-error-message-handler>
-      <input pInputText id="commercialRegister" aria-describedby="commercialRegister-help" placeholder="رقم " />
+    <label for="commercialRegister" >{{'form.commercialRegister' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('commercialRegister')">
+      <input pInputText id="commercialRegister" formControlName="commercialRegister" aria-describedby="commercialRegister-help" [placeholder]="'form.commercialRegister' | translate" />
     </app-input-error-message-handler>
   </div>
   <div class="md:col-span-2">
-    <label for="taxNumber">رقم ضريبي</label>
-    <app-input-error-message-handler>
-      <input pInputText id="taxNumber" aria-describedby="taxNumber-help" placeholder="رقم " />
+    <label for="taxNumber">{{'form.taxNumber' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('taxNumber')">
+      <input pInputText id="taxNumber" formControlName="taxNumber" aria-describedby="taxNumber-help" [placeholder]="'form.taxNumber' | translate" />
     </app-input-error-message-handler>
   </div>
   <div>
-    <label for="city">المدينه</label>
-    <app-input-error-message-handler>
-      <input pInputText id="city" aria-describedby="city-help" placeholder="المدينه " />
+    <label for="city">{{'form.city' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('city')">
+      <input pInputText id="city" formControlName="city" aria-describedby="city-help" [placeholder]="'form.city' | translate" />
     </app-input-error-message-handler>
   </div>
   <div>
-    <label for="district">الحي</label>
-    <app-input-error-message-handler>
-      <input pInputText id="district" aria-describedby="district-help" placeholder="الحي " />
+    <label for="district">{{'form.district' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('district')">
+      <input pInputText id="district" formControlName="district" aria-describedby="district-help" [placeholder]="'form.district' | translate" />
     </app-input-error-message-handler>
   </div>
   <div>
-    <label for="street">الشارع</label>
-    <app-input-error-message-handler>
-      <input pInputText id="street" aria-describedby="street-help" placeholder="الشارع " />
+    <label for="street">{{'form.street' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('street')">
+      <input pInputText id="street" formControlName="street" aria-describedby="street-help" [placeholder]="'form.street' | translate" />
     </app-input-error-message-handler>
   </div>
   <div>
-    <label for="buildingNumber">العماره</label>
-    <app-input-error-message-handler>
-      <input pInputText id="buildingNumber" aria-describedby="buildingNumber-help" placeholder="العماره " />
+    <label for="buildingNumber">{{'form.building' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('buildingNumber')">
+      <input pInputText id="buildingNumber" formControlName="buildingNumber" aria-describedby="buildingNumber-help" [placeholder]="'form.building' | translate" />
     </app-input-error-message-handler>
   </div>
   <div>
-    <label for="postalCode">الرقم البريدي</label>
-    <app-input-error-message-handler>
-      <input pInputText id="postalCode" aria-describedby="postalCode-help" placeholder="الرقم البريدي " />
+    <label for="postalCode">{{'form.postalCode' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('postalCode')">
+      <input pInputText id="postalCode" formControlName="postalCode" aria-describedby="postalCode-help" [placeholder]="'form.postalCode' | translate " />
     </app-input-error-message-handler>
   </div>
   <div>
-    <label for="productName">الدور</label>
-    <app-input-error-message-handler>
-      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="الدور " />
+    <label for="productName">{{'form.floor' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('numberOfFloor')">
+      <input pInputText id="costPrice" formControlName="numberOfFloor" aria-describedby="costPrice-help" [placeholder]="'form.floor' | translate" />
     </app-input-error-message-handler>
   </div>
   <div>
-    <label for="apartment">الشقه</label>
-    <app-input-error-message-handler>
-      <input pInputText id="apartment" aria-describedby="apartment-help" placeholder="الشقه " />
+    <label for="apartment">{{'form.apartment' | translate}}</label>
+    <app-input-error-message-handler [fc]="customerFg.get('apartment')">
+      <input pInputText id="apartment" formControlName="apartment" aria-describedby="apartment-help" [placeholder]="'form.apartment' | translate" />
     </app-input-error-message-handler>
   </div>
 
   <div class="flex flex-col justify-end">
     <div class="flex items-center h-fit gap-2 pb-1">
-      <app-input-error-message-handler>
-        <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
+      <app-input-error-message-handler [fc]="customerFg.get('isCompany')">
+        <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" formControlName="isCompany" />
       </app-input-error-message-handler>
-      <label for="productName" class="text-dark-line text-sm font-semibold">العميل يعتبر شركه</label>
+      <label for="productName" class="text-dark-line text-sm font-semibold">{{'form.isCompany' | translate}}</label>
     </div>
   </div>
 </form>

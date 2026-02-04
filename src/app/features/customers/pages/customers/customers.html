@@ -9,7 +9,7 @@
 >
   <div class="flex-1">
     <app-input-error-message-handler [fc]="fg.get('searchTerm')">
-      <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
+      <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" [placeholder]="'actions.search' | translate" />
       <!-- <p-inputgroup-addon>
             <i class="pi pi-filter"></i>
           </p-inputgroup-addon> -->
@@ -24,7 +24,7 @@
     formControlName="searchEnum"
     optionLabel="label"
     optionValue="value"
-    placeholder="الكل"
+    [placeholder]="'actions.all' | translate"
     class="h-fit hidden! sm:flex! w-40"
   />
 </form>
@@ -34,11 +34,11 @@
     <thead>
       <tr class="">
         <th>#</th>
-        <th>اسم العميل</th>
-        <th>رقم الجوال</th>
-        <th>العنوان</th>
-        <th>شركه</th>
-        <th>الأدوات</th>
+        <th>{{'form.customerName' | translate}}</th>
+        <th>{{'form.phoneNumber' | translate}}</th>
+        <th>{{'form.address' | translate}}</th>
+        <th>{{'form.company' | translate}}</th>
+        <th>{{'actions.tools' | translate }}</th>
       </tr>
     </thead>
     <tbody>
