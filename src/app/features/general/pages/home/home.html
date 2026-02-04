@@ -32,22 +32,23 @@
       <ul class="flex flex-col gap-2 *:text-xs *:font-bold *:flex *:items-center *:gap-2">
         <li>
           <span>رقم الفاتوره:</span>
-          <span>#12345</span>
+          <span>{{ isCreateMode() ? '#####' : '102' }}</span>
         </li>
         <li>
           <span>رقم الطلب:</span>
-          <span>102</span>
+          <span>{{ isCreateMode() ? '#####' : '102' }}</span>
         </li>
         <li>
           <span>رقم الكاشير:</span>
-          <span>22</span>
+          <span>{{ isCreateMode() ? '#####' : '102' }}</span>
         </li>
       </ul>
 
       <!-- left -->
       <ul class="flex flex-col gap-2 *:text-xs *:flex *:items-center *:gap-2">
-        <li>
-          <span>20 يناير 2026 04:25 م</span>
+        <li data="ltr">
+          <span>{{ dateNow | date: 'dd-MM-yyyy' }}</span>
+          <!-- 20 يناير 2026 04:25 م -->
         </li>
         <li>
           <span class="font-bold">اسم البائع:</span>
@@ -201,12 +202,15 @@
       <div class="w-full overflow-auto custom-scroll pb-0.5">
         <table class="text-dark-bg-2 text-center min-w-full">
           <thead>
-            <tr class="border-b border-text-gray *:pb-2 *:text-xs">
+            <tr class="border-b border-text-gray *:pb-2 *:text-xs *:font-bold">
               <th></th>
               <th class="px-2">الصنف</th>
               <th class="px-2">الكميه</th>
-              <th class="px-2">السعر</th>
-              <th class="px-2">المجموع</th>
+              <th class="px-2">
+                <div><span>السعر</span>&nbsp;<span class="text-xs font-light">(شامل الضريبه)</span></div>
+              </th>
+
+              <!-- <th class="px-2">المجموع</th> -->
               <th class="px-2">الضريبه</th>
               <th class="px-2">الاجمالي</th>
             </tr>
@@ -360,8 +364,8 @@
                 <!-- price -->
                 @let unitPrice =
                   orderMenuItem.menuItem.meal
-                    ? orderMenuItem.menuItem.meal.price
-                    : orderMenuItem.menuItem.product?.price;
+                    ? orderMenuItem.menuItem.meal.priceWithTax
+                    : orderMenuItem.menuItem.product?.priceWithTax;
                 <td>
                   <div
                     class="mx-auto font-semibold border border-text-light rounded text-center w-fit h-fit px-2 py-0.5 leading-none"
@@ -370,13 +374,17 @@
                   </div>
                 </td>
                 <!-- total -->
-                <td class="font-semibold">
+                <!-- <td class="font-semibold">
                   <div class="scale-in">{{ (+(unitPrice ?? 0) * orderMenuItem.menuItem.quantity).toFixed(2) }}</div>
-                </td>
+                </td> -->
                 <!-- tax -->
-                <td class="font-semibold"><div class="scale-in">50</div></td>
+                <td class="font-semibold">
+                  <div class="scale-in">{{ getMenuItemTaxValue(orderMenuItem) }}</div>
+                </td>
                 <!-- net -->
-                <td class="font-semibold"><div class="scale-in">1050</div></td>
+                <td class="font-semibold">
+                  <div class="scale-in">{{ getMenuItemNetValue(orderMenuItem) }}</div>
+                </td>
               </tr>
             }
           </tbody>
@@ -422,22 +430,32 @@
     </div>
 
     <!-- options -->
-    <div class="flex gap-2 location-btns *:flex-1 w-full justify-end">
-      <p-button
-        styleClass="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full  border-text-light! text-xs!"
-        label="بيانات العميل"
+    <div
+      class="flex gap-2 location-btns *:flex-1 w-full justify-end"
+      style="--p-button-primary-background: transparent"
+    >
+      <button
+        pButton
+        class="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full border-text-light! text-xs!"
         variant="outlined"
-      />
-      <p-button
-        styleClass="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full  border-text-light! text-xs!"
-        label="بيانات الدفع"
+        (click)="showCustomerDialog()"
+      >
+        بيانات العميل
+      </button>
+      <button
+        class="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full border-text-light! text-xs!"
+        pButton
         variant="outlined"
-      />
-      <p-button
-        styleClass="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full  border-text-light! text-xs!"
-        label="لوحه المفاتيح"
+      >
+        بيانات الدفع
+      </button>
+      <button
+        pButton
+        class="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full border-text-light! text-xs!"
         variant="outlined"
-      />
+      >
+        لوحه المفاتيح
+      </button>
     </div>
   </form>
 
@@ -670,6 +688,49 @@
       class="mx-auto"
       severity="secondary"
       (click)="TableDialogVisible = false"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- customer info -->
+<p-dialog
+  [(visible)]="customerDialogVisible"
+  [modal]="true"
+  [style]="{ width: '80%', maxWidth: '50rem' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-text-lighter!"
+  class="addition-dialog"
+  [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+>
+  <form id="customerForm" class="mt-6" [formGroup]="customerFg" (ngSubmit)="onSubmitCustomer()">
+    <div>
+      <label for="customerName">{{ 'forms.customerName' | translate }}</label>
+      <app-input-error-message-handler [fc]="customerFg.get('nameAr')">
+        <ng-select
+          class="app-select"
+          [items]="displayedPrinters()"
+          formControlName="customerName"
+          bindLabel="name"
+          bindValue="id"
+          placeholder="الكل"
+          #printerSelect
+          appDebounce
+          [events$]="[printerSelect.searchEvent, printerSelect.scrollToEnd]"
+          (debounced)="debouncedPrinterSearch($event)"
+        />
+      </app-input-error-message-handler>
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
+      styleClass=" bg-[#EA7C69]! text-white! px-6!"
+      [text]="true"
+      class="mx-auto"
+      severity="secondary"
+      (click)="RoomDialogVisible = false"
     />
   </ng-template>
 </p-dialog>

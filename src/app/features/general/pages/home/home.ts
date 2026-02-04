@@ -5,9 +5,10 @@ import { Dialog } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { AvatarModule } from 'primeng/avatar';
 import { ImgFallback } from '@/directives/img-fallback';
+import { Button, ButtonDirective } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { GeneralService, ProductAndMealsSearchEnum } from '../../services/general-service';
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, FormMode, IPaginationInfo } from '@/components/base-component/base-component';
 import { FormArray, FormControl, Validators, ɵInternalFormsSharedModule, ReactiveFormsModule } from '@angular/forms';
 import { IProductSearchRow, ProductSearchEnum, ProductService } from '@/features/classes/services/product-service';
 import { IMealSearchRow } from '@/features/classes/services/meal-service';
@@ -33,6 +34,11 @@ import { Debounce } from '@/directives/debounce';
 import { ITableSearchRow, TableSearchEnum, TableService } from '@/features/restaurant/services/table-service';
 import { IRoomSearchRow, RoomSearchEnum, RoomService } from '@/features/restaurant/services/room-service';
 import { Carousel } from 'primeng/carousel';
+import { OrderCalculationsService } from '../../services/order-calculations-service';
+import { TranslatePipe } from '@ngx-translate/core';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
+import { ICustomerSearchRow } from '@/features/customers/services/customer-types';
+import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -72,6 +78,11 @@ interface IOrderCreateFgValue {
     Carousel,
     GalleriaModule,
     Slider,
+    DatePipe,
+    TranslatePipe,
+    InputErrorMessageHandler,
+    Button,
+    ButtonDirective,
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -81,6 +92,9 @@ export class Home extends BaseComponent {
   OrderLocationType = OrderLocationType;
   OrderLocalType = OrderLocalType;
   OrderPaymentType = OrderPaymentType;
+  formMode = signal<FormMode>(FormMode.Create);
+  isCreateMode = computed(() => this.formMode() == FormMode.Create);
+
   //
   isMenuVisible: boolean = false;
 
@@ -122,7 +136,9 @@ export class Home extends BaseComponent {
   };
 
   orderFg = this.fb.group(this.initialOrderFgValue);
-
+  orderCalculationsService = inject(OrderCalculationsService);
+  getMenuItemTaxValue = this.orderCalculationsService.getMenuItemTaxValue;
+  getMenuItemNetValue = this.orderCalculationsService.getMenuItemNetValue;
   orderMenuItems = signal<IOrderMenuItem[]>([]);
 
   /**
@@ -400,8 +416,8 @@ export class Home extends BaseComponent {
   //
   //
   //
-  //
   //additions
+  //
 
   orderRecipeAdditionsResponsiveOptions = [
     {
@@ -562,5 +578,93 @@ export class Home extends BaseComponent {
         ),
       );
     }
+  }
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //customer info
+  //
+  customerDialogVisible = false;
+
+  showCustomerDialog() {
+    this.customerDialogVisible = true;
+  }
+
+  customerFgInitialValue = {
+    id: this.fb.control<number | null>(null, [Validators.required]),
+    nameAr: this.fb.control<string | null>(null, [Validators.required]),
+    nameEn: this.fb.control<string | null>(null, [Validators.required]),
+    phoneNumber: this.fb.control<string | null>(null, []),
+    secondaryMobileNumber: this.fb.control<string | null>(null, []),
+    addressDescription: this.fb.control<string | null>(null, [Validators.required]),
+  };
+
+  customerFg = this.fb.group(this.customerFgInitialValue);
+
+  customersSearchFgInitialValue = {
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+  };
+
+  customersSearchFg = this.fb.group(this.customersSearchFgInitialValue);
+
+  onSubmitCustomer() {
+    if (this.customerFg.invalid) {
+      this.customerFg.markAllAsTouched();
+      return;
+    }
+  }
+
+  customersService = inject(CustomerService);
+
+  customers = signal<ICustomerSearchRow[]>([]);
+
+  customersSearchPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0,
+  };
+
+  searchCustomers(pageIndex: number) {
+    this.customersService
+      .search({
+        paginationInfo: {
+          pageIndex: pageIndex,
+          pageSize: 10,
+        },
+        searchFilters: [
+          {
+            column: CustomerSearchEnum.Name,
+            values: [this.customersSearchFg.getRawValue().searchTerm ?? ''],
+          },
+        ],
+        fromDate: null,
+      })
+      .subscribe({
+        next: (res) => {
+          this.customers.set(res.value.rows);
+          this.customersSearchPaginationInfo = {
+            pageIndex,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          };
+        },
+      });
+  }
+
+  onCustomersSearchSubmit() {
+    if (this.customersSearchFg.invalid) return this.customersSearchFg.markAllAsTouched();
+
+    this.searchCustomers(1);
   }
 }

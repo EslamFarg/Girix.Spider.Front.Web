@@ -7,10 +7,7 @@ import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { InputText } from 'primeng/inputtext';
-import {
-  CustomerSearchEnum,
-  CustomerService,
-} from '../../services/customer-service';
+import { CustomerSearchEnum, CustomerService } from '../../services/customer-service';
 import { noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { RouterLink } from '@angular/router';
@@ -47,13 +44,12 @@ export class Customers extends BaseComponent {
     { label: 'شركة', value: CustomerSearchEnum.IsCompany },
   ];
 
-  customersService = inject(CustomerService);
-
   constructor() {
     super();
 
     this.searchCustomers(1);
   }
+  customersService = inject(CustomerService);
 
   customers = signal<ICustomerSearchRow[]>([]);
 
@@ -66,8 +62,19 @@ export class Customers extends BaseComponent {
   searchCustomers(pageIndex: number) {
     const fgRawValue = this.fg.getRawValue();
 
-    let searchValues: any[] = [fgRawValue.searchTerm];
-    if (fgRawValue.searchEnum === CustomerSearchEnum.IsCompany) searchValues.push('true');
+    let searchFilters: any[] = [
+      {
+        values: [fgRawValue.searchTerm],
+        column: CustomerSearchEnum.Name,
+      },
+    ];
+
+    if (fgRawValue.searchEnum === CustomerSearchEnum.IsCompany) {
+      searchFilters.push({
+        values: ['true'],
+        column: CustomerSearchEnum.IsCompany,
+      });
+    }
 
     this.customersService
       .search({
@@ -75,12 +82,7 @@ export class Customers extends BaseComponent {
           pageIndex: pageIndex,
           pageSize: 10,
         },
-        searchFilters: [
-          {
-            column: this.fg.getRawValue().searchEnum,
-            values: searchValues,
-          },
-        ],
+        searchFilters: searchFilters,
         fromDate: null,
       })
       .subscribe({

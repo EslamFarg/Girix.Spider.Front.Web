@@ -47,7 +47,8 @@ export class BaseComponent {
   authService = inject(AuthService);
   layoutService = inject(LayoutService);
   translateService = inject(TranslateService);
-  dateNowIso = new Date().toISOString();
+  dateNow = new Date();
+  dateNowIso = this.dateNow.toISOString();
   debounceMap: Map<string, IDebounceMapValue> = new Map();
   
   setDebounceItem<T>(key: string, callback: (e: T) => void) {

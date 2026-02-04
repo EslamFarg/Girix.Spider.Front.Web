@@ -32,7 +32,6 @@ import { MenuItem } from 'primeng/api';
   styleUrl: './rooms.css',
 })
 export class Rooms extends BaseComponent {
-  dateNow = new Date();
   getFutureDate() {
     const date = new Date(this.dateNow);
     date.setDate(date.getDate() + 1);

@@ -28,7 +28,6 @@ import { MenuItem } from 'primeng/api';
   styleUrl: './huts.css',
 })
 export class Huts extends BaseComponent {
-  dateNow = new Date();
   getFutureDate() {
     const date = new Date(this.dateNow);
     date.setDate(date.getDate() + 1);

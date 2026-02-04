@@ -30,7 +30,7 @@ import { omitKeys } from '@/yn-ng/utils/helpers';
   styleUrl: './huts.css',
 })
 export class Huts extends BaseComponent {
-  dateNow = new Date();
+ 
   getFutureDate() {
     const date = new Date(this.dateNow);
     date.setDate(date.getDate() + 1);

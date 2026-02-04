@@ -106,19 +106,21 @@
             </div>
           </div>
           @let label = item.meal ? item.meal.name : item.product?.name;
+          <!-- label -->
           <p
             class="text-[11px] whitespace-nowrap font-bold w-full text-ellipsis overflow-hidden text-center"
             [title]="label"
           >
             {{ label }}
           </p>
+          <!-- price -->
           <div class="flex items-center justify-between w-full">
             <button type="button" class="underline text-[8px] font-semibold">تفاصيل</button>
-            @let price = item.meal ? item.meal.price : item.product?.price;
+            @let price = item.meal ? item.meal.priceWithTax : item.product?.priceWithTax;
 
             <span class="text-xs font-bold">{{ price }}</span>
           </div>
-
+          <!-- quantity editor -->
           <div class="flex items-center gap-2 w-full justify-between">
             <!-- add -->
             <button
@@ -133,6 +135,7 @@
             >
               <i class="pi pi-plus text-[8px]!"></i>
             </button>
+            <!-- quantity -->
             <input
               class="text-xs font-bold flex-1 w-full text-center outline-none no-input-spinner"
               #quantity
