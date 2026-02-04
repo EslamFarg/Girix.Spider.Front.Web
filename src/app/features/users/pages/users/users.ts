@@ -8,11 +8,12 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Select } from 'primeng/select';
 import { InputText } from 'primeng/inputtext';
-import { IUserRowResponse, UserSearchEnum, UserService } from '../../services/user-service';
+import {   UserSearchEnum, UserService } from '../../services/user-service';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
 import { RouterLink } from '@angular/router';
+import { IUserRowResponse } from '../../services/user-types';
 
 @Component({
   selector: 'app-users',

@@ -1,22 +1,11 @@
 import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
-
-export interface IUserRowResponse {
-  userId: number;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  groupId: number;
-}
-
-export interface IUserSearchResponseValue {
-  rows: IUserRowResponse[];
-  paginationInfo: {
-    totalRowsCount: number;
-    totalPagesCount: number;
-    currentPageIndex: number;
-  };
-}
+import {
+  IUserCreateRequest,
+  IUserCreateUpdateRequest,
+  IUserReadResponse,
+  IUserSearchResponseValue,
+} from './user-types';
 
 //MenuItems : Id,Name,PhoneNumber
 
@@ -29,7 +18,22 @@ export enum UserSearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class UserService extends BaseService<UserSearchEnum, any, any, any, IUserSearchResponseValue> {
+export class UserService extends BaseService<
+  UserSearchEnum,
+  IUserCreateRequest,
+  IUserCreateUpdateRequest,
+  IUserReadResponse,
+  IUserSearchResponseValue
+> {
   override apiRoute = 'Users';
+
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.patchEndpoints({
+      create: '',
+    });
+  }
 }
- 

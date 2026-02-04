@@ -1,5 +1,5 @@
 <div
-  class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
+  class="w-full overflow-auto  flex items-center justify-end gap-2"
   style="--p-button-primary-background: transparent"
 >
   <button
@@ -16,67 +16,16 @@
     }
   </button>
   <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
-   {{ 'actions.new' | translate }}
+    {{ 'actions.new' | translate }}
   </button>
 </div>
 
-<!-- <div class="grid grid-cols-4 gap-4 flex-1">
-  <div class="col-span-2 ">
-    <label for="productName">اسم المستخدم</label>
-    <app-input-error-message-handler>
-      <input pInputText id="productName" aria-describedby="productName-help" placeholder="الاسم" />
-    </app-input-error-message-handler>
-  </div>
-  <div class="col-span-2">
-    <label for="productPrice">رقم الجوال</label>
-    <app-input-error-message-handler>
-      <input pInputText id="productPrice" aria-describedby="productPrice-help" placeholder="البريد الالكتروني" />
-    </app-input-error-message-handler>
-  </div>
-  <div class="col-span-2">
-    <label for="costPrice">البريد الالكتروني</label>
-    <app-input-error-message-handler>
-      <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="رقم جوال" />
-    </app-input-error-message-handler>
-  </div>
-
-
-  <div class="col-span-4 flex items-center h-fit gap-2 pb-1">
-    <app-input-error-message-handler>
-      <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
-    </app-input-error-message-handler>
-    <label for="productName" class="text-dark-line text-sm font-semibold">نشط</label>
-  </div>
-
-  <div class="col-span-1">
-    <label for="productName">البيان</label>
-    <app-input-error-message-handler>
-      <textarea
-        rows="7"
-        cols="30"
-        pTextarea
-        id="productName"
-        aria-describedby="productName-help"
-        placeholder="البيان"
-      ></textarea>
-    </app-input-error-message-handler>
-  </div>
-</div> -->
-
-
-
-<form
-  id="usersForm"
-  class="mt-6 flex flex-col md:flex-row gap-4"
-  (ngSubmit)="onSubmitForm()"
-  [formGroup]="usersFg"
->
-
+<form id="usersForm" class="mt-6 flex flex-col md:flex-row gap-4" (ngSubmit)="onSubmitForm()" [formGroup]="userFg">
   <!--  -->
   <div class="grid md:grid-cols-2 gap-4 flex-1">
     <div class="col-span-2 md:col-span-1">
-      <label for="productName">{{'form.userName' | translate}}</label>
-      <app-input-error-message-handler [fc]="usersFg.get('nameAr')">
+      <label for="productName">{{ 'form.userName' | translate }}</label>
+      <app-input-error-message-handler [fc]="userFg.get('nameAr')">
         <input
           pInputText
           id="nameAr"
@@ -89,49 +38,70 @@
     </div>
     <!--  -->
     <div class="col-span-2 md:col-span-1">
-      <label for="productPrice">{{'form.phoneNumber' | translate}}</label>
-      <app-input-error-message-handler [fc]="usersFg.get('phoneNumber')">
-        <input pInputText id="productPrice" formControlName="phoneNumber" aria-describedby="productPrice-help" [placeholder]="'form.phoneNumber' | translate" />
+      <label for="productPrice">{{ 'form.phoneNumber' | translate }}</label>
+      <app-input-error-message-handler [fc]="userFg.get('phoneNumber')">
+        <input
+          pInputText
+          id="productPrice"
+          formControlName="phoneNumber"
+          aria-describedby="productPrice-help"
+          [placeholder]="'form.phoneNumber' | translate"
+        />
       </app-input-error-message-handler>
     </div>
     <!--  -->
     <div class="col-span-2 md:col-span-1">
-      <label for="costPrice">{{'form.email' | translate}}</label>
-      <app-input-error-message-handler [fc]="usersFg.get('email')">
-        <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="email" [placeholder]="'form.email' | translate" />
+      <label for="costPrice">{{ 'form.email' | translate }}</label>
+      <app-input-error-message-handler [fc]="userFg.get('email')">
+        <input
+          pInputText
+          id="costPrice"
+          aria-describedby="costPrice-help"
+          formControlName="email"
+          [placeholder]="'form.email' | translate"
+        />
       </app-input-error-message-handler>
     </div>
     <!--  -->
     <!-- <div class="col-span-2 md:col-span-1">
       <label for="productAddress">{{'form.address' | translate}}</label>
-      <app-input-error-message-handler [fc]="usersFg.get('address')">
+      <app-input-error-message-handler [fc]="userFg.get('address')">
         <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="address" id="productAddress" [placeholder]="'form.address' | translate" />
       </app-input-error-message-handler>
     </div> -->
 
-      <div class="col-span-2 md:col-span-1">
-    <label for="productName">{{'form.userType' | translate}}</label>
-    <app-input-error-message-handler [fc]="usersFg.get('groupId')">
-      <p-select [options]="[]" optionLabel="name" formControlName="groupId" [placeholder]="'form.userType' | translate" class="w-full!" />
-    </app-input-error-message-handler>
-  </div>
-
-
-  <div class="col-span-2 flex items-center h-fit gap-2 pb-1">
-    <app-input-error-message-handler [fc]="usersFg.get('groupId')">
-      <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
-    </app-input-error-message-handler>
-    <label for="productName" class="text-dark-line text-sm font-semibold">نشط</label>
-  </div>
-
-    <!--  -->
-    <!-- <div class="col-span-2 md:col-span-1">
-      <label for="identityNumber">{{'form.identityNumber' | translate}}</label>
-      <app-input-error-message-handler [fc]="usersFg.get('identityNumber')">
-        <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="identityNumber" id="identityNumber" [placeholder]="'form.identityNumber' | translate"/>
+    <div class="col-span-2 md:col-span-1">
+      <label for="productName">{{ 'form.userType' | translate }}</label>
+      <app-input-error-message-handler [fc]="userFg.get('groupId')">
+        <p-select
+          [options]="[]"
+          optionLabel="name"
+          formControlName="groupId"
+          [placeholder]="'form.userType' | translate"
+          class="w-full!"
+        />
       </app-input-error-message-handler>
-    </div> -->
-    <!--  -->
+    </div>
 
+    <div class="col-span-2 flex items-center h-fit gap-2 pb-1">
+      <app-input-error-message-handler [fc]="userFg.get('groupId')" class="w-fit">
+        <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
+      </app-input-error-message-handler>
+      <label for="productName" class="text-dark-line text-sm font-semibold">نشط</label>
+    </div>
+
+    <div>
+      <label for="productName">{{ 'classes.products.group' | translate }}</label>
+      <app-input-error-message-handler [fc]="userFg.get('CHANGE')">
+        <p-select
+          [options]="bankFinancialAccounts()"
+          optionLabel="name"
+          optionValue="id"
+          formControlName="CHANGE"
+          [placeholder]="'CHANGE' | translate"
+          class="w-full!"
+        />
+      </app-input-error-message-handler>
+    </div>
   </div>
 </form>

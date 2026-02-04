@@ -11,21 +11,33 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { emailValidator, noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
 import { IusersFgControls } from './types';
 import { UserService } from '../../services/user-service';
+import { FinancialAccountService } from '@/features/accounts/services/financial-account-service';
+import {
+  IBankFinancialAccount,
+  ICashFinancialAccount,
+  ICustodyFinancialAccount,
+} from '@/features/accounts/services/financial-account-types';
 // import { IusersFgControls } from '@/features/deliveries/components/users-man-form/types';
 // import { usersService } from '@/features/deliveries/services/users-service';
 
 @Component({
   selector: 'app-user-form',
-  imports: [InputErrorMessageHandler, Button, InputText, Textarea,ButtonDirective, Select,TranslatePipe,ReactiveFormsModule],
+  imports: [
+    InputErrorMessageHandler,
+    Button,
+    InputText,
+    Textarea,
+    ButtonDirective,
+    Select,
+    TranslatePipe,
+    ReactiveFormsModule,
+  ],
   templateUrl: './user-form.html',
   styleUrl: './user-form.css',
 })
-export class UserForm extends BaseComponent{
-
+export class UserForm extends BaseComponent {
   formMode = input.required<FormMode>();
-  id=input.required<number | null>();
-
-
+  id = input.required<number | null>();
 
   initialusersFgValue: IusersFgControls = {
     nameAr: this.fb.control(null, [
@@ -42,22 +54,45 @@ export class UserForm extends BaseComponent{
       Validators.maxLength(100),
     ]),
 
-    phoneNumber:this.fb.control(null, [Validators.required, Validators.minLength(8), onlyNumbersAllowed,Validators.maxLength(13)]),
-    email:this.fb.control(null,[Validators.required,emailValidator]),
-    groupId:this.fb.control(null,[Validators.required]),
-    
-    // description:this.fb.control(null,[Validators.required]),
-    // identityNumber:this.fb.control(null,[Validators.required,onlyNumbersAllowed,Validators.minLength(14),Validators.maxLength(14)]),
-    // images: this.fb.control([], [Validators.required]),
-    //update only props
+    phoneNumber: this.fb.control(null, [
+      Validators.required,
+      Validators.minLength(8),
+      onlyNumbersAllowed,
+      Validators.maxLength(13),
+    ]),
+    email: this.fb.control(null, [Validators.required, emailValidator]),
+    groupId: this.fb.control(null, [Validators.required]),
     id: this.fb.control(null, []),
   };
 
-  usersFg = this.fb.group(this.initialusersFgValue);
+  userFg = this.fb.group(this.initialusersFgValue);
 
   //services
   usersService = inject(UserService);
+  financialAccountsService = inject(FinancialAccountService);
   currentusers: any;
+
+  //
+  cashFinancialAccounts = signal<ICashFinancialAccount[]>([]);
+  bankFinancialAccounts = signal<IBankFinancialAccount[]>([]);
+  custodyAccounts = signal<ICustodyFinancialAccount[]>([]);
+
+  userTypes = signal([
+    { id: 1, nameAr: 'Admin', nameEn: 'Admin' },
+    { id: 2, nameAr: 'Casher', nameEn: 'Casher' },
+    { id: 3, nameAr: 'Waiter', nameEn: 'Waiter' },
+  ]);
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.financialAccountsService.getCashAndBankAccountsAndCustodyAccounts().subscribe((cashBankCustodyAccounts) => {
+      this.cashFinancialAccounts.set(cashBankCustodyAccounts.cash);
+      this.bankFinancialAccounts.set(cashBankCustodyAccounts.bank);
+      this.custodyAccounts.set(cashBankCustodyAccounts.custody);
+    });
+  }
 
   //
   //
@@ -68,124 +103,33 @@ export class UserForm extends BaseComponent{
       case FormMode.Create:
         break;
       case FormMode.Update:
-        //fetch 
+        //fetch
         this.usersService.getById(this.id()!).subscribe((users) => {
           //-> bind data
-
-          this.currentusers.set(users)
-            
-          this.usersFg.patchValue({
-            nameAr: users.name,
-            ...users,
-            // ImagesAdd: [],
-          });
-
-          console.log(this.usersFg.value);
-     
-          console.log(users.attachment[0].fullPath);
-          this.currentImage.set({
-            
-            fullPath: this.baseUrl+users.attachment[0].fullPath,
-            id: users.attachment[0].id,
-          });
-          // this.usersFg.patchValue({
-          //   images: [users.attachment[0].fullPath],
-          // });
         });
         break;
     }
   }
 
   onSubmitForm() {
-    this.usersFg.patchValue({
-      nameEn: this.usersFg.value.nameAr?.trim(),
-    })
-    
+    this.userFg.patchValue({
+      nameEn: this.userFg.value.nameAr?.trim(),
+    });
 
-  
     // debugger;
-    if (this.usersFg.invalid) {
-      this.usersFg.markAllAsTouched();
+    if (this.userFg.invalid) {
+      this.userFg.markAllAsTouched();
       return;
     }
 
+    // switch (this.formMode()) {
+    //   case FormMode.Create:
+    //     this.usersService.create(dto).subscribe();
+    //     break;
+    //   case FormMode.Update:
 
-    const formData = new FormData();
-
-
-    Object.entries(this.usersFg.value).forEach(([key, value]:[string, any]) => {
-
-      if(Array.isArray(value)){
-        value.forEach((val)=>{
-          formData.append(key, val);
-        })
-      }else{
-        formData.append(key, value);
-      }
-    })
-
-
-    // console.log(formData);
-
-    switch (this.formMode()) {
-      case FormMode.Create:
-        this.usersService.create(formData).subscribe();
-        break;
-      case FormMode.Update:
-        // formData.append('images','');
-        
-        if(this.currentImage()?.file){
-
-          formData.delete('images');
-          formData.append('imagesAdd', this.currentImage()!.file!);
-     
-        }
-        console.log(formData);
-        this.usersService.put(formData).subscribe();
-        break;
-    }
+    //     this.usersService.put(dto).subscribe();
+    //     break;
+    // }
   }
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //images
-  //
-  //
-  currentImage = signal<IFormImage | null>(null);
-  onImagesFilesSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-
-    if (input.files && input.files.length > 0) {
-
- 
-      
-
-      if (input.files.length > 1) {
-        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن اختيار اكثر من صورة' });
-        return;
-      }
-      const file = input.files[0];
-
-      this.currentImage.set({ file, fullPath: URL.createObjectURL(file), id: 'new-image', ix: 0 });
-
-      //bind to form
-
-
-
-    
-    }
-
-    input.value = '';
-
-    console.log(this.usersFg.value);
-  }
-  onDeleteImage() {
-    this.currentImage.set(null);
-  }
-
-  
 }

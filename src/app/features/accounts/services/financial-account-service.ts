@@ -1,5 +1,6 @@
 import BaseService, { IBaseSearchResponse, SearchColumEnum } from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
+import { ICashBankCustodyAccounts } from './financial-account-types';
 
 export interface ITreeFinancialAccountResponseRow {
   id: number;
@@ -44,5 +45,11 @@ export class FinancialAccountService extends BaseService<
   constructor() {
     super();
     this.patchEndpoints({ search: 'GetFinancialAccountTree' });
+  }
+
+  getCashAndBankAccountsAndCustodyAccounts() {
+    return this.http.get<ICashBankCustodyAccounts>(
+      `${this.apiUrl}/GetCashAndBankAccountsAndCustodyAccounts`,
+    );
   }
 }
