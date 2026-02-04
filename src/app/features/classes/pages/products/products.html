@@ -141,7 +141,7 @@
 
   <p-paginator
     (onPageChange)="onPageChange($event)"
-    [first]="(productsPaginationInfo.pageIndex - 1) * 10"
+    [first]="getCurrentRowsIx(productsPaginationInfo.pageIndex)"
     [rows]="10"
     [totalRecords]="productsPaginationInfo.totalRowsCount"
   />

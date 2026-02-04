@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { CollectivePaymentNav } from '../../components/collective-payment-nav/collective-payment-nav';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+ import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Select } from 'primeng/select';
@@ -12,8 +11,7 @@ import { InputText } from 'primeng/inputtext';
 @Component({
   selector: 'app-collective-payments',
   imports: [
-    CollectivePaymentNav,
-    SectionWrapper,
+     SectionWrapper,
     InputErrorMessageHandler,
     InputGroupAddon,
     Select,

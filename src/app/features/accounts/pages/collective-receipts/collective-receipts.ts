@@ -1,14 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { CollectiveReceiptForm } from '../../components/collective-receipt-form/collective-receipt-form';
-import { CollectiveReceiptsNav } from '../../components/collective-receipts-nav/collective-receipts-nav';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Select } from 'primeng/select';
-import { Paginator } from 'primeng/paginator';
-import { BaseComponent } from '@/components/base-component/base-component';
+import { Paginator, PaginatorState } from 'primeng/paginator';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
+import { ReceiptVoucherService } from '../../services/receipt-voucher-service';
+import { IReceiptVoucherCollectiveReceiptGetListRow } from '../../services/receipt-voucher-types';
+import { AllowNumbers } from '@/directives/allow-numbers';
+import { Debounce } from '@/directives/debounce';
 
 @Component({
   selector: 'app-collective-receipts',
@@ -20,28 +23,86 @@ import { InputText } from 'primeng/inputtext';
     Select,
     Paginator,
     InputText,
-    CollectiveReceiptsNav,
+    AllowNumbers,
+    Debounce,
   ],
   templateUrl: './collective-receipts.html',
   styleUrl: './collective-receipts.css',
 })
 export class CollectiveReceipts extends BaseComponent {
   initialSearchFormValue = {
-    text: this.fb.control<string>('', [Validators.required]),
-    categoryId: this.fb.control<number>(0, [Validators.required]),
+    paymentVoucherId: this.fb.control<number | null>(null, [Validators.maxLength(100)]),
   };
   fg = this.fb.group(this.initialSearchFormValue);
 
-  periodOptions = [
-    { label: 'اليوم', value: 1 },
-    { label: 'الاسبوع', value: 2 },
-    { label: 'الشهر', value: 3 },
-    { label: 'السنة', value: 4 },
-  ];
+  receiptVoucerService = inject(ReceiptVoucherService);
 
-  onSubmit() {}
+  constructor() {
+    super();
+    this.getList(1);
+  }
 
-  first = 0;
-  rows = 10;
-  onPageChange(event: any) {}
+  collectiveReceipts = signal<IReceiptVoucherCollectiveReceiptGetListRow[]>([]);
+  receiptVouchersPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
+
+  getList(pageIndex: number) {
+    console.log('searching');
+    this.receiptVoucerService
+      .getList({
+        criteria: { paginationInfo: { pageIndex, pageSize: 10 } },
+        paymentVoucherId: this.fg.getRawValue().paymentVoucherId ?? 0,
+      })
+      .subscribe({
+        next: (res) => {
+          this.collectiveReceipts.set(res.rows);
+          this.receiptVouchersPaginationInfo = {
+            pageIndex,
+            totalPagesCount: res.paginationInfo.totalPagesCount,
+            totalRowsCount: res.paginationInfo.totalRowsCount,
+          };
+        },
+      });
+  }
+
+  log() {
+    console.log(this.fg.getRawValue());
+  }
+
+  onSubmit = () => this.fg.valid && this.getList(1);
+
+  onPageChange = (event: PaginatorState) => this.getList(event.page! + 1);
+
+  deleteCollectiveReceipt(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف المنتج',
+      header: 'حذف المنتج',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.receiptVoucerService.delete(id).subscribe({
+          next: () => {
+            this.getList(1);
+          },
+        });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
+      },
+    });
+  }
 }

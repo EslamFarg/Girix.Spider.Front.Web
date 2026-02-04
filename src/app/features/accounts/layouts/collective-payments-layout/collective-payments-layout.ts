@@ -1,22 +1,27 @@
 import { ISectionLink, SectionNav } from '@/components/section-nav/section-nav';
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 
 @Component({
   selector: 'app-collective-payments-layout',
-  imports: [SectionNav,RouterOutlet],
+  imports: [SectionNav, RouterOutlet, SectionWrapper],
   templateUrl: './collective-payments-layout.html',
   styleUrl: './collective-payments-layout.css',
 })
 export class CollectivePaymentsLayout {
-links: ISectionLink[] = [
+  /**
+   * مستكشف السندات
+   * إضافه سند صرف جديد
+   */
+  links: ISectionLink[] = [
     {
-      labelKey: 'products.explorer',
-      url: '/classes/products',
-     },
+      labelKey: 'TODO: Change',
+      url: '/accounts/collective-payments',
+    },
     {
-      labelKey: 'products.add',
-      url: '/classes/products/add',
-     },
+      labelKey: 'TODO: Change',
+      url: '/accounts/collective-payments/add',
+    },
   ];
 }

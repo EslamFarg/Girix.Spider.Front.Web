@@ -26,11 +26,11 @@ export default [
         component: CollectivePayments,
       },
       {
-        path: 'collective-payments/add',
+        path: 'add',
         component: AddCollectivePayment,
       },
       {
-        path: 'collective-payments/:id/edit',
+        path: ':id/edit',
         component: EditCollectivePayment,
       },
     ],
@@ -47,11 +47,11 @@ export default [
         component: CollectiveReceipts,
       },
       {
-        path: 'collective-receipts/add',
+        path: 'add',
         component: AddCollectiveReceipt,
       },
       {
-        path: 'collective-receipts/:id/edit',
+        path: ':id/edit',
         component: EditCollectiveReceipt,
       },
     ],

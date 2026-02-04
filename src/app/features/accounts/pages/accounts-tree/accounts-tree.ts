@@ -10,10 +10,10 @@ import { BaseComponent, IPaginationInfo } from '@/components/base-component/base
 import {
   FinancialAccountSearchEnum,
   FinancialAccountService,
-  ITreeFinancialAccountResponseRow,
-} from '../../services/financial-account-service';
+ } from '../../services/financial-account-service';
 import { Validators } from '@angular/forms';
 import { PaginatorState } from 'primeng/paginator';
+import { ITreeFinancialAccountSearchRow } from '../../services/financial-account-types';
 
 @Component({
   selector: 'app-accounts-tree',
@@ -85,7 +85,7 @@ export class AccountsTree extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  financialAccounts = signal<ITreeFinancialAccountResponseRow[]>([]);
+  financialAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
   financialAccountsPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalRowsCount: 0,

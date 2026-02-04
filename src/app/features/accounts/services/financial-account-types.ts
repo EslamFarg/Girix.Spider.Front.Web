@@ -39,3 +39,24 @@ export interface ICustodyFinancialAccount {
   accountGroup: number;
   accountStatus: number;
 }
+
+
+export interface ITreeFinancialAccountSearchRow {
+  id: number;
+  name: string;
+  parentId: any;
+  stage: number;
+  finNumber: string;
+  balanceNature: number;
+  finalAccountBalance: any;
+  children: ITreeFinancialAccountSearchRow[];
+}
+
+export interface IFinancialAccountSearchResponseValue {
+  rows: ITreeFinancialAccountSearchRow[];
+  paginationInfo: {
+    totalRowsCount: number;
+    totalPagesCount: number;
+    currentPageIndex: number;
+  };
+}

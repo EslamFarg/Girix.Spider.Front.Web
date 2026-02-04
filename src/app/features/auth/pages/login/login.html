@@ -1,6 +1,6 @@
 <div class="flex items-center justify-center h-screen">
   <section class="flex flex-col gap-6 p-10 w-120">
-    <h1 class="text-xl font-bold text-center select-none">الرجاء تسجيل الدخول</h1>
+    <h1 class="text-xl font-bold text-center select-none text-white">الرجاء تسجيل الدخول</h1>
     <form class="flex flex-col gap-4" [formGroup]="fg" (ngSubmit)="onSubmit()">
       <app-input-error-message-handler [fc]="fg.get('emailOrPhone')">
         <input
@@ -29,7 +29,7 @@
           [checked]="isRememberMe"
           (change)="isRememberMe = $event.target.checked"
         />
-        <label for="rememberMe" class="cursor-pointer">تذكرني</label>
+        <label for="rememberMe" class="cursor-pointer  text-white">تذكرني</label>
         <a routerLink="/auth/forgot-password" class="text-app-blue ms-auto text-sm">هل نسيت كلمة المرور ؟ </a>
       </div>
       <p-button
