@@ -155,7 +155,7 @@
     }
   },
 
-  "form":{
+  "form": {
     "phoneNumber": "رقم الجوال",
     "email": "البريد الالكتروني",
     "deliveryName": "اسم الديليفري",
@@ -165,38 +165,33 @@
     "userName": "اسم المستخدم",
     "userType": "نوع المستخدم",
     "userCondition": "حاله المستخدم",
-    "cashierCollectionAccount":"حساب تحصيل الكاشير",
-    "custodyAccount":"حساب العهده",
-    "cashPaymentAccount":"حساب المدفوعات كاش",
-    "bankPaymentAccount":"حساب المدفوعات شبكه",
-
-     "customerName": "اسم العميل",
-  "secondaryPhoneNumber": "رقم جوال إضافي",
-  "commercialRegister": "السجل التجاري",
-  "taxNumber": "الرقم الضريبي",
-  "city": "المدينة",
-  "district": "الحي",
-  "street": "الشارع",
-  "building": "العمارة",
-  "postalCode": "الرقم البريدي",
-  "floor": "الدور",
-  "apartment": "الشقة",
-  "isCompany": "العميل يعتبر شركة",
-  "company": "الشركه",
-   "voucherNumber":"رقم السند",
-  "date": "التاريخ",
-  "ledgerNumber": "الرقم الدفتري",
-  "amount": "المبلغ"
-  
-
-
+    "cashierCollectionAccount": "حساب تحصيل الكاشير",
+    "custodyAccount": "حساب العهده",
+    "cashPaymentAccount": "حساب المدفوعات كاش",
+    "bankPaymentAccount": "حساب المدفوعات شبكه",
+    "customerName": "اسم العميل",
+    "secondaryPhoneNumber": "رقم جوال إضافي",
+    "commercialRegister": "السجل التجاري",
+    "taxNumber": "الرقم الضريبي",
+    "city": "المدينة",
+    "district": "الحي",
+    "street": "الشارع",
+    "building": "العمارة",
+    "postalCode": "الرقم البريدي",
+    "floor": "الدور",
+    "apartment": "الشقة",
+    "isCompany": "العميل يعتبر شركة",
+    "company": "الشركه",
+    "voucherNumber": "رقم السند",
+    "date": "التاريخ",
+    "ledgerNumber": "الرقم الدفتري",
+    "amount": "المبلغ"
   },
 
-
-  "actions":{
+  "actions": {
     "save": "حفظ",
     "cancel": "الغاء",
-    "new":"جديد",
+    "new": "جديد",
     "add": "اضافة",
     "edit": "تعديل",
     "delete": "حذف",
@@ -205,7 +200,7 @@
     "download": "تحميل",
     "search": "بحث",
     "tools": "الادوات",
-    "active":"نشط"
+    "active": "نشط"
   },
 
   "deliveries": {
@@ -242,33 +237,30 @@
     "add": "إضافة مجموعة جديدة"
   },
 
-
-
-  "classes":{
-      "products":{
-        "productName":"اسم المنتج",
-        "productPrice":"سعر المنتج",
-        "costPrice":"سعر التكلفه",
-        "group":"المجموعه",
-        "tax":"الضريبه",
-        "excisetax":"الضريبه الانتقائيه",
-        "addproduct":"يعتبر المنتج كااضافه",
-        "productadditives":"اضافات المنتج",
-        "description":"البيان",
-        "productImage":"صوره المنتج",
-        "productDetail":"وصف المنتج",
-        "productAddition":"المنتج كاضافه",
-        "productTax":"قيمه الضريبه"
-      },
-      "groups":{
-        "groups":"المجموعات",
-        "show":"الظهور",
-        "groupName":"اسم المجموعه",
-        "printer":"الطابعه",
-        "showgroup":"إظهار المجموعه في شاشة الكاشير",
-        "description": "البيان",
-        "all":"الكل"
-
-      }
+  "classes": {
+    "products": {
+      "productName": "اسم المنتج",
+      "productPrice": "سعر المنتج",
+      "costPrice": "سعر التكلفه",
+      "group": "المجموعه",
+      "tax": "الضريبه",
+      "excisetax": "الضريبه الانتقائيه",
+      "addproduct": "يعتبر المنتج كااضافه",
+      "productadditives": "اضافات المنتج",
+      "description": "البيان",
+      "productImage": "صوره المنتج",
+      "productDetail": "وصف المنتج",
+      "productAddition": "المنتج كاضافه",
+      "productTax": "قيمه الضريبه"
+    },
+    "groups": {
+      "groups": "المجموعات",
+      "show": "الظهور",
+      "groupName": "اسم المجموعه",
+      "printer": "الطابعه",
+      "showgroup": "إظهار المجموعه في شاشة الكاشير",
+      "description": "البيان",
+      "all": "الكل"
+    }
   }
 }

@@ -700,23 +700,39 @@
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-text-lighter!"
   class="addition-dialog"
-  [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+  [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-  <form id="customerForm" class="mt-6" [formGroup]="customerFg" (ngSubmit)="onSubmitCustomer()">
+  <form id="customerForm" class="mt-6 overflow-visible" [formGroup]="customerFg" (ngSubmit)="onSubmitCustomer()">
     <div>
-      <label for="customerName">{{ 'forms.customerName' | translate }}</label>
+      <label for="customerName">{{ 'form.customerName' | translate }}</label>
       <app-input-error-message-handler [fc]="customerFg.get('nameAr')">
         <ng-select
-          class="app-select"
-          [items]="displayedPrinters()"
+          class="app-select w-full"
+          [items]="displayedCustomers()"
           formControlName="customerName"
           bindLabel="name"
           bindValue="id"
           placeholder="الكل"
-          #printerSelect
+          #customerSelect
           appDebounce
-          [events$]="[printerSelect.searchEvent, printerSelect.scrollToEnd]"
-          (debounced)="debouncedPrinterSearch($event)"
+          [events$]="[customerSelect.searchEvent, customerSelect.scrollToEnd]"
+          (debounced)="searchCustomers($event)"
+        />
+      </app-input-error-message-handler>
+    </div>
+    <div>
+      <label for="customerName">{{ 'form.customerName' | translate }}</label>
+      <app-input-error-message-handler [fc]="customerFg.get('nameAr')"
+        >>
+        <input
+          formControlName="customerName"
+          pInputText
+          aria-describedby="productName-help"
+          [placeholder]="'classes.products.productName' | translate"
+          #customerSelect
+          appDebounce
+          [events$]="[customerSelect.searchEvent, customerSelect.scrollToEnd]"
+          (debounced)="searchCustomers($event)"
         />
       </app-input-error-message-handler>
     </div>

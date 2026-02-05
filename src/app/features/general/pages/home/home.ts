@@ -39,6 +39,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { ICustomerSearchRow } from '@/features/customers/services/customer-types';
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -83,6 +84,7 @@ interface IOrderCreateFgValue {
     InputErrorMessageHandler,
     Button,
     ButtonDirective,
+    NgSelectComponent,
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -628,24 +630,24 @@ export class Home extends BaseComponent {
   customersService = inject(CustomerService);
 
   customers = signal<ICustomerSearchRow[]>([]);
-
+  displayedCustomers = computed(() => this.customers());
   customersSearchPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalRowsCount: 0,
     totalPagesCount: 0,
   };
 
-  searchCustomers(pageIndex: number) {
+  searchCustomers(data: { pageIndex: number; searchTerm?: string }) {
     this.customersService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
+          pageIndex: data.pageIndex,
           pageSize: 10,
         },
         searchFilters: [
           {
             column: CustomerSearchEnum.Name,
-            values: [this.customersSearchFg.getRawValue().searchTerm ?? ''],
+            values: [data.searchTerm ?? ''],
           },
         ],
         fromDate: null,
@@ -654,7 +656,7 @@ export class Home extends BaseComponent {
         next: (res) => {
           this.customers.set(res.value.rows);
           this.customersSearchPaginationInfo = {
-            pageIndex,
+            pageIndex: data.pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,
           };
@@ -665,6 +667,6 @@ export class Home extends BaseComponent {
   onCustomersSearchSubmit() {
     if (this.customersSearchFg.invalid) return this.customersSearchFg.markAllAsTouched();
 
-    this.searchCustomers(1);
+    this.searchCustomers({ pageIndex: 1, searchTerm: '' });
   }
 }
