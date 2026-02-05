@@ -92,7 +92,10 @@
           placeholder="الكل"
           #printerSelect
           appDebounce
-          [events$]="[printerSelect.searchEvent,printerSelect.scrollToEnd]"
+          [customEvents]="[
+            { key: 'searchEvent', value: printerSelect.searchEvent },
+            { key: 'scrollToEnd', value: printerSelect.scrollToEnd },
+          ]"
           (debounced)="debouncedPrinterSearch($event)"
         />
       </app-input-error-message-handler>

@@ -698,55 +698,96 @@
   [modal]="true"
   [style]="{ width: '80%', maxWidth: '50rem' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-text-lighter!"
+  styleClass="bg-white!"
   class="addition-dialog"
   [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-  <form id="customerForm" class="mt-6 overflow-visible" [formGroup]="customerFg" (ngSubmit)="onSubmitCustomer()">
-    <div>
-      <label for="customerName">{{ 'form.customerName' | translate }}</label>
-      <app-input-error-message-handler [fc]="customerFg.get('nameAr')">
-        <ng-select
-          class="app-select w-full"
-          [items]="displayedCustomers()"
-          formControlName="customerName"
-          bindLabel="name"
-          bindValue="id"
-          placeholder="الكل"
-          #customerSelect
-          appDebounce
-          [events$]="[customerSelect.searchEvent, customerSelect.scrollToEnd]"
-          (debounced)="searchCustomers($event)"
-        />
-      </app-input-error-message-handler>
-    </div>
-    <div>
-      <label for="customerName">{{ 'form.customerName' | translate }}</label>
-      <app-input-error-message-handler [fc]="customerFg.get('nameAr')"
-        >>
-        <input
-          formControlName="customerName"
-          pInputText
-          aria-describedby="productName-help"
-          [placeholder]="'classes.products.productName' | translate"
-          #customerSelect
-          appDebounce
-          [events$]="[customerSelect.searchEvent, customerSelect.scrollToEnd]"
-          (debounced)="searchCustomers($event)"
-        />
-      </app-input-error-message-handler>
-    </div>
-  </form>
+  <ng-template #headless>
+    <div class="flex flex-col p-4 gap-4">
+      <button class="cursor-pointer p-1 w-fit ms-auto" (click)="customerDialogVisible = false">
+        <i class="pi pi-times"></i>
+      </button>
+      <form
+        id="customerForm"
+        class="overflow-visible grid gap-4 md:grid-cols-2"
+        [formGroup]="customerFg"
+        (ngSubmit)="onSubmitCustomer()"
+      >
+        <!-- name (search) -->
+        <div>
+          <label for="customerName">{{ 'form.customerName' | translate }}</label>
+          <app-input-error-message-handler [fc]="customerFg.get('nameAr')">
+            <ng-select
+              class="app-select w-full"
+              [items]="displayedCustomers()"
+              formControlName="nameAr"
+              bindLabel="name"
+              bindValue="name"
+              placeholder="الكل"
+              #customerSelect
+              appDebounce
+              [customEvents]="[
+                { key: 'searchEvent', value: customerSelect.searchEvent },
+                { key: 'scrollToEnd', value: customerSelect.scrollToEnd },
+              ]"
+              (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
+              (change)="onCustomerSelected($event)"
+            />
+          </app-input-error-message-handler>
+        </div>
 
-  <ng-template #footer>
-    <p-button
-      label="Cancel"
-      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
-      styleClass=" bg-[#EA7C69]! text-white! px-6!"
-      [text]="true"
-      class="mx-auto"
-      severity="secondary"
-      (click)="RoomDialogVisible = false"
-    />
+        <!-- phone -->
+        <div>
+          <label for="phoneNumber">{{ 'form.phoneNumber' | translate }}</label>
+          <app-input-error-message-handler [fc]="customerFg.get('phoneNumber')">
+            <input
+              pInputText
+              formControlName="phoneNumber"
+              aria-describedby="phoneNumber-help"
+              [placeholder]="'form.phoneNumber' | translate"
+              #customerPhoneSearch
+              appDebounce
+              class="app-input"
+            />
+          </app-input-error-message-handler>
+        </div>
+
+        <!-- address -->
+        <div class="md:col-span-2">
+          <label for="customerAddress">{{ 'form.customerAddress' | translate }}</label>
+          <app-input-error-message-handler [fc]="customerFg.get('addressDescription')">
+            <input
+              pInputText
+              formControlName="addressDescription"
+              aria-describedby="productAddress-help"
+              [placeholder]="'form.customerAddress' | translate"
+              class="app-input"
+            />
+          </app-input-error-message-handler>
+        </div>
+      </form>
+      <!-- actions -->
+      <div
+        class="flex gap-2 location-btns *:flex-1 w-full justify-end pt-4"
+        style="--p-button-primary-background: transparent"
+      >
+        <button
+          pButton
+          class="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full border-text-light! text-xs!"
+          variant="outlined"
+          (click)="onSubmitCustomer()"
+        >
+          حفظ
+        </button>
+        <button
+          (click)="customerDialogVisible = false"
+          class="text-red-500! py-2! rounded-[14px]! *:font-bold! w-full border-red-500! text-xs!"
+          pButton
+          variant="outlined"
+        >
+          إلغاء
+        </button>
+      </div>
+    </div>
   </ng-template>
 </p-dialog>

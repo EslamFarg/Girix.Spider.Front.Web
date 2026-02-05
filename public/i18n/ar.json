@@ -157,6 +157,7 @@
 
   "form": {
     "phoneNumber": "رقم الجوال",
+    "number": "الرقم",
     "email": "البريد الالكتروني",
     "deliveryName": "اسم الديليفري",
     "address": "العنوان",
@@ -170,6 +171,7 @@
     "cashPaymentAccount": "حساب المدفوعات كاش",
     "bankPaymentAccount": "حساب المدفوعات شبكه",
     "customerName": "اسم العميل",
+    "customerAddress": "عنوان العميل",
     "secondaryPhoneNumber": "رقم جوال إضافي",
     "commercialRegister": "السجل التجاري",
     "taxNumber": "الرقم الضريبي",

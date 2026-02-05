@@ -158,6 +158,7 @@ export class Home extends BaseComponent {
     this.searchRooms(1);
     this.searchTables(1);
     this.searchAdditions(1);
+    this.searchCustomers({ pageIndex: 1, searchTerm: '' });
   }
 
   onMenuItemChange(changedItem: IOrderMenuItem) {
@@ -598,7 +599,14 @@ export class Home extends BaseComponent {
   //customer info
   //
   customerDialogVisible = false;
-
+  currentCustomer = signal<{
+    id: number;
+    nameAr: string;
+    nameEn: string;
+    phoneNumber: string;
+    secondaryMobileNumber: string;
+    addressDescription: string;
+  } | null>(null);
   showCustomerDialog() {
     this.customerDialogVisible = true;
   }
@@ -606,25 +614,35 @@ export class Home extends BaseComponent {
   customerFgInitialValue = {
     id: this.fb.control<number | null>(null, [Validators.required]),
     nameAr: this.fb.control<string | null>(null, [Validators.required]),
-    nameEn: this.fb.control<string | null>(null, [Validators.required]),
-    phoneNumber: this.fb.control<string | null>(null, []),
+    nameEn: this.fb.control<string | null>(null, []),
+    phoneNumber: this.fb.control<string | null>(null, [Validators.required]),
     secondaryMobileNumber: this.fb.control<string | null>(null, []),
     addressDescription: this.fb.control<string | null>(null, [Validators.required]),
   };
 
   customerFg = this.fb.group(this.customerFgInitialValue);
 
-  customersSearchFgInitialValue = {
-    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
-  };
+  // customersSearchFgInitialValue = {
+  //   searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+  // };
 
-  customersSearchFg = this.fb.group(this.customersSearchFgInitialValue);
+  // customersSearchFg = this.fb.group(this.customersSearchFgInitialValue);
 
   onSubmitCustomer() {
     if (this.customerFg.invalid) {
       this.customerFg.markAllAsTouched();
       return;
     }
+    this.currentCustomer.set({
+      id: this.customerFg.value.id!,
+      nameAr: this.customerFg.value.nameAr!,
+      nameEn: this.customerFg.value.nameEn!,
+      phoneNumber: this.customerFg.value.phoneNumber!,
+      secondaryMobileNumber: this.customerFg.value.secondaryMobileNumber!,
+      addressDescription: this.customerFg.value.addressDescription!,
+    });
+
+    this.customerDialogVisible = false;
   }
 
   customersService = inject(CustomerService);
@@ -637,6 +655,7 @@ export class Home extends BaseComponent {
     totalPagesCount: 0,
   };
 
+  previousCustomersSearchTerm: string = '';
   searchCustomers(data: { pageIndex: number; searchTerm?: string }) {
     this.customersService
       .search({
@@ -654,19 +673,41 @@ export class Home extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
-          this.customers.set(res.value.rows);
-          this.customersSearchPaginationInfo = {
-            pageIndex: data.pageIndex,
-            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
+          if (res.value.rows.length > 0) {
+            this.previousCustomersSearchTerm = data.searchTerm ?? '';
+            if (data.pageIndex == 1) {
+              this.customers.set(res.value.rows);
+            } else {
+              this.customers.update((prev) => prev.concat(res.value.rows));
+            }
+            this.customersSearchPaginationInfo = {
+              pageIndex: data.pageIndex,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
         },
       });
   }
+  onCustomerSelected(event: ICustomerSearchRow) {
+    console.log(event);
+    this.customerFg.patchValue({
+      id: event.id,
+      nameAr: event.name,
+      nameEn: event.name,
+      phoneNumber: event.phoneNumber,
+      secondaryMobileNumber: event.secondaryMobileNumber,
+      addressDescription: event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
+    });
+  }
+  onCustomersNameSearch(event: any, searchTerm: string = '') {
+    const isNewSearchTerm = searchTerm != this.previousCustomersSearchTerm;
 
-  onCustomersSearchSubmit() {
-    if (this.customersSearchFg.invalid) return this.customersSearchFg.markAllAsTouched();
-
-    this.searchCustomers({ pageIndex: 1, searchTerm: '' });
+    if (!searchTerm || searchTerm.length > 100) return;
+    if (isNewSearchTerm) {
+      this.searchCustomers({ pageIndex: 1, searchTerm });
+    } else {
+      this.searchCustomers({ pageIndex: this.customersSearchPaginationInfo.pageIndex + 1, searchTerm });
+    }
   }
 }
