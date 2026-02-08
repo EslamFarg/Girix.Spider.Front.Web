@@ -196,7 +196,7 @@ export class Home extends BaseComponent {
     }
   }
 
-  onAddOrderMenuItemQuantity(index: number, quantity: number) {
+  onOrderMenuItemQuantityChange(index: number, quantity: number) {
     const futureQuantity = this.orderMenuItems()[index].menuItem.quantity + quantity;
 
     if (futureQuantity >= 1000) {
@@ -204,6 +204,8 @@ export class Home extends BaseComponent {
         items.map((item, i) => (i == index ? { ...item, menuItem: { ...item.menuItem, quantity: 1000 } } : item)),
       );
       return;
+    } else if (futureQuantity <= 0) {
+     this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
     } else {
       this.orderMenuItems.update((items) =>
         items.map((item, i) =>
@@ -212,20 +214,36 @@ export class Home extends BaseComponent {
       );
     }
   }
+  // onAddOrderMenuItemQuantity(index: number, quantity: number) {
+  //   const futureQuantity = this.orderMenuItems()[index].menuItem.quantity + quantity;
 
-  onReduceOrderMenuItemQuantity(index: number, quantity: number) {
-    const oldQuantity = this.orderMenuItems()[index].menuItem.quantity;
+  //   if (futureQuantity >= 1000) {
+  //     this.orderMenuItems.update((items) =>
+  //       items.map((item, i) => (i == index ? { ...item, menuItem: { ...item.menuItem, quantity: 1000 } } : item)),
+  //     );
+  //     return;
+  //   } else {
+  //     this.orderMenuItems.update((items) =>
+  //       items.map((item, i) =>
+  //         i == index ? { ...item, menuItem: { ...item.menuItem, quantity: futureQuantity } } : item,
+  //       ),
+  //     );
+  //   }
+  // }
 
-    if (oldQuantity - quantity <= 0) {
-      this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
-    } else {
-      this.orderMenuItems.update((items) =>
-        items.map((item, i) =>
-          i == index ? { ...item, menuItem: { ...item.menuItem, quantity: oldQuantity - quantity } } : item,
-        ),
-      );
-    }
-  }
+  // onReduceOrderMenuItemQuantity(index: number, quantity: number) {
+  //   const oldQuantity = this.orderMenuItems()[index].menuItem.quantity;
+
+  //   if (oldQuantity - quantity <= 0) {
+  //     this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
+  //   } else {
+  //     this.orderMenuItems.update((items) =>
+  //       items.map((item, i) =>
+  //         i == index ? { ...item, menuItem: { ...item.menuItem, quantity: oldQuantity - quantity } } : item,
+  //       ),
+  //     );
+  //   }
+  // }
 
   onRemoveOrderMenuItem(index: number) {
     this.orderMenuItems.update((items) => items.filter((_, i) => i != index));

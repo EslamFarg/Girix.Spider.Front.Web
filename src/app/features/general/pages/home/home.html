@@ -321,13 +321,15 @@
                   <div class="flex items-center justify-center gap-2 px-4">
                     <!-- add quantity -->
                     <button
-                      (click)="onAddOrderMenuItemQuantity($index, 1)"
+                      (click)="onOrderMenuItemQuantityChange($index, 1)"
                       type="button"
                       pButton
                       class="border-0! px-2! rounded cursor-pointer"
                       style="
                         --p-button-primary-background: var(--color-text-gray);
                         --p-button-primary-color: var(--color-dark-line);
+                        --p-button-primary-hover-background: green;
+                        --p-button-primary-active-background: rgba(0, 255, 8, 0.538);
                       "
                     >
                       <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -338,11 +340,22 @@
                       </svg>
                     </button>
                     <!-- quantity -->
-                    <span class="font-bold">{{ orderMenuItem.menuItem.quantity }}</span>
+                    <!-- <span >{{ orderMenuItem.menuItem.quantity }}</span> -->
+                    <input
+                      class="text-xs font-bold flex-1 w-2  text-center outline-none no-input-spinner"
+                      #quantity
+                      appAllowNumbers
+                      type="number"
+                      [min]="1"
+                      [max]="1000"
+                      [value]="orderMenuItem.menuItem.quantity"
+                      (input)="onOrderMenuItemQuantityChange($index, +quantity.value - orderMenuItem.menuItem.quantity)"
+                    />
+ 
                     <!-- reduce quantity -->
                     <button
                       pButton
-                      (click)="onReduceOrderMenuItemQuantity($index, 1)"
+                      (click)="onOrderMenuItemQuantityChange($index, -1)"
                       type="button"
                       style="
                         --p-button-primary-background: var(--color-text-gray);
