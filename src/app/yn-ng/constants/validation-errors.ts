@@ -5,13 +5,13 @@ export const ValidationErrors = {
   required() {
     return { ar: 'هذا الحقل مطلوب', en: 'This field is required' };
   },
-  minlength({ requiredLength, actualLength }: { requiredLength: number; actualLength: number }) {
+  minLength({ requiredLength, actualLength }: { requiredLength: number; actualLength: number }) {
     return {
       ar: `يجب تعبئة هذا الحقل بحد اقل ${requiredLength}`,
       en: `You must fill this field with a minimum of ${requiredLength}`,
     };
   },
-  maxlength({ requiredLength, actualLength }: { requiredLength: number; actualLength: number }) {
+  maxLength({ requiredLength, actualLength }: { requiredLength: number; actualLength: number }) {
     return {
       ar: `يجب تعبئة هذا الحقل بحد اقصي ${requiredLength}`,
       en: `You must fill this field with a maximum of ${requiredLength}`,

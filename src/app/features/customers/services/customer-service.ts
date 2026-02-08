@@ -1,6 +1,13 @@
-import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
+import BaseService from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
-import { ICustomerCreateRequest, ICustomerReadResponse, ICustomerSearchResponseValue, ICustomerUpdateRequest } from './customer-types';
+import {
+  ICustomerCreateRequest,
+  ICustomerReadResponse,
+  ICustomerSearchResponseValue,
+  ICustomerUpdateRequest,
+} from './customer-types';
+import { BaseCrudService } from '@/core/services/BaseCrudService';
+import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
 //Customer : Id,Name,PhoneNumber,IsCompany
 
 export enum CustomerSearchEnum {
@@ -10,20 +17,13 @@ export enum CustomerSearchEnum {
   IsCompany = SearchColumEnum.IsCompany,
 }
 
-
-
 @Injectable({
   providedIn: 'root',
 })
-export class CustomerService extends BaseService<
-  CustomerSearchEnum,
-  ICustomerCreateRequest,
-  ICustomerUpdateRequest,
-  ICustomerReadResponse,
-  ICustomerSearchResponseValue
-> {
+export class CustomerService extends SearchableMixin(
+  BaseCrudService<ICustomerCreateRequest, ICustomerUpdateRequest, ICustomerReadResponse>,
+)<ICustomerSearchResponseValue, CustomerSearchEnum>() {
   override apiRoute = 'Customer';
-
 
   /**
    *
@@ -32,6 +32,6 @@ export class CustomerService extends BaseService<
     super();
     this.patchEndpoints({
       update: 'Update',
-    })
+    });
   }
 }

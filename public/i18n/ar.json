@@ -187,7 +187,9 @@
     "voucherNumber": "رقم السند",
     "date": "التاريخ",
     "ledgerNumber": "الرقم الدفتري",
-    "amount": "المبلغ"
+    "amount": "المبلغ",
+    "paid": "مدفوع",
+    "postponed": "معلق"
   },
 
   "actions": {

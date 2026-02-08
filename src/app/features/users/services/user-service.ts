@@ -1,4 +1,4 @@
-import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
+import BaseService from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
 import {
   IUserCreateRequest,
@@ -6,6 +6,8 @@ import {
   IUserReadResponse,
   IUserSearchResponseValue,
 } from './user-types';
+import { BaseCrudService } from '@/core/services/BaseCrudService';
+import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
 
 //MenuItems : Id,Name,PhoneNumber
 
@@ -18,13 +20,13 @@ export enum UserSearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class UserService extends BaseService<
-  UserSearchEnum,
-  IUserCreateRequest,
+export class UserService extends SearchableMixin(
+  BaseCrudService<
+   IUserCreateRequest,
   IUserCreateUpdateRequest,
-  IUserReadResponse,
-  IUserSearchResponseValue
-> {
+  IUserReadResponse
+ >
+)<IUserSearchResponseValue,UserSearchEnum >() {
   override apiRoute = 'Users';
 
   /**

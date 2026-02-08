@@ -1,4 +1,6 @@
-import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
+import { BaseCrudService } from '@/core/services/BaseCrudService';
+import BaseService from '@/core/services/BaseService';
+import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
 import { Injectable } from '@angular/core';
 
 export enum HutSearchEnum {
@@ -18,7 +20,7 @@ export interface IHutUpdateRequest {
 }
 
 //search
-export interface IHutSearchResponse {
+export interface IHutSearchResponseValue {
   rows: IHutSearchRow[];
   paginationInfo: {
     totalRowsCount: number;
@@ -46,17 +48,11 @@ export interface IHutReadResponse {
   orderId: number;
 }
 
-
-
 @Injectable({
   providedIn: 'root',
 })
-export class HutService extends BaseService<
-  HutSearchEnum,
-  IHutCreateRequest,
-  IHutUpdateRequest,
-  IHutReadResponse,
-  IHutSearchResponse
-> {
+export class HutService extends SearchableMixin(
+  BaseCrudService<IHutCreateRequest, IHutUpdateRequest, IHutReadResponse>,
+)<IHutSearchResponseValue, HutSearchEnum>() {
   override apiRoute = 'Hut';
 }

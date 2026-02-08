@@ -1,4 +1,6 @@
-import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
+import { BaseCrudService } from '@/core/services/BaseCrudService';
+import BaseService from '@/core/services/BaseService';
+import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -76,8 +78,8 @@ export interface IOrderCreateRequest {
 }
 
 export interface IOrderCreateItem {
-  menuItemId: number;
-  mealId: number;
+  menuItemId: number | null;
+  mealId: number | null;
   quantity: number;
   addons: IOrderCreateItemAddon[];
 }
@@ -131,10 +133,10 @@ export interface IOrderReadResponse {
   payingCash: number;
   payingNetwork: number;
   isCollected: boolean;
-  items: IOrderReadResponseItem[];
+  items: IOrderReadItem[];
 }
 
-export interface IOrderReadResponseItem {
+export interface IOrderReadItem {
   id: number;
   menuItemId: number;
   menuItemName: string;
@@ -163,13 +165,10 @@ export interface ILocalPlaceChangeRequest {
 @Injectable({
   providedIn: 'root',
 })
-export class OrderService extends BaseService<
-  OrderSearchEnum,
-  IOrderCreateRequest,
-  any,
-  IOrderReadResponse,
-  IOrderSearchResponseValue
-> {
+export class OrderService extends SearchableMixin(BaseCrudService<IOrderCreateRequest, any, IOrderReadResponse>)<
+  IOrderSearchResponseValue,
+  OrderSearchEnum
+>() {
   override apiRoute = 'Order';
 
   changeLocalPlace(dto: ILocalPlaceChangeRequest) {

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { IMenuItem, IOrderMenuItem, Menu } from '../../components/menu/menu';
 import { ButtonModule } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -9,7 +9,14 @@ import { Button, ButtonDirective } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { GeneralService, ProductAndMealsSearchEnum } from '../../services/general-service';
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components/base-component/base-component';
-import { FormArray, FormControl, Validators, ɵInternalFormsSharedModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormArray,
+  FormControl,
+  Validators,
+  ɵInternalFormsSharedModule,
+  ReactiveFormsModule,
+  ValidatorFn,
+} from '@angular/forms';
 import { IProductSearchRow, ProductSearchEnum, ProductService } from '@/features/classes/services/product-service';
 import { IMealSearchRow } from '@/features/classes/services/meal-service';
 import { GroupService, IGroupSearchRow, IGroupSearchResponseValue } from '@/features/classes/services/group-service';
@@ -24,6 +31,8 @@ import {
   OrderLocalType,
   OrderService,
   OrderLocationType,
+  IOrderReadResponse,
+  IOrderCreateItemAddon,
 } from '@/features/invoices/services/order-service';
 import { HutCard } from '@/components/hut-card/hut-card';
 import { RoomCard } from '@/components/room-card/room-card';
@@ -54,7 +63,7 @@ interface IOrderCreateFgValue {
   createAt: FormControl<string>;
   idempotencyKey: FormControl<string>;
   items: FormControl<IOrderCreateItem[]>;
-  customerRequest: FormControl<IOrderCreateCustomerRequest>;
+  customerRequest: FormControl<IOrderCreateCustomerRequest | null>;
 }
 
 @Component({
@@ -111,6 +120,23 @@ export class Home extends BaseComponent {
   groups = signal<IGroupSearchRow[]>([]);
   orderService = inject(OrderService);
 
+  existingOrder = signal<IOrderReadResponse | null>(null);
+
+  orderCreateItems = computed<IOrderCreateItem[]>(() => {
+    console.log(this.orderMenuItems());
+    return this.orderMenuItems().map((item) => ({
+      menuItemId: item.menuItem?.product?.id ?? null,
+      mealId: item.menuItem.meal?.id ?? null,
+      quantity: item.menuItem.quantity,
+      addons: item.additions.map(
+        (addition) =>
+          ({
+            additionalMenuItemId: Number(addition.product.id) ?? 0,
+            quantity: addition.quantity,
+          }) satisfies IOrderCreateItemAddon,
+      ),
+    }));
+  });
   initialOrderFgValue: IOrderCreateFgValue = {
     orderType: this.fb.control<OrderLocationType>(OrderLocationType.Takeaway, [Validators.required]),
     paymentType: this.fb.control<OrderPaymentType>(OrderPaymentType.Pending, [Validators.required]),
@@ -122,19 +148,9 @@ export class Home extends BaseComponent {
     payingCash: this.fb.control<number>(0, [Validators.required]),
     payingNetwork: this.fb.control<number>(0, [Validators.required]),
     createAt: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
-    idempotencyKey: this.fb.control<string>(Math.random().toString(), [Validators.required]),
-    items: this.fb.control<IOrderCreateItem[]>([], [Validators.required]),
-    customerRequest: this.fb.control<IOrderCreateCustomerRequest>(
-      {
-        id: 0,
-        nameAr: '',
-        nameEn: '',
-        phoneNumber: '',
-        secondaryMobileNumber: '',
-        addressDescription: '',
-      },
-      [Validators.required],
-    ),
+    idempotencyKey: this.fb.control<string>(Date.now() + Math.random().toString(), [Validators.required]),
+    items: this.fb.control<IOrderCreateItem[]>([], [Validators.minLength(1)]),
+    customerRequest: this.fb.control<IOrderCreateCustomerRequest | null>(null, [Validators.required]),
   };
 
   orderFg = this.fb.group(this.initialOrderFgValue);
@@ -163,7 +179,6 @@ export class Home extends BaseComponent {
 
   onMenuItemChange(changedItem: IOrderMenuItem) {
     const existingItem = this.orderMenuItems().find((item) => item.menuItem.id == changedItem.menuItem.id);
-
     if (existingItem) {
       const futureQuantity = existingItem.menuItem.quantity + changedItem.menuItem.quantity;
 
@@ -196,62 +211,42 @@ export class Home extends BaseComponent {
     }
   }
 
-  onOrderMenuItemQuantityChange(index: number, quantity: number) {
-    const futureQuantity = this.orderMenuItems()[index].menuItem.quantity + quantity;
-
-    if (futureQuantity >= 1000) {
+  onOrderMenuItemQuantityChange(index: number, newQuantity: number) {
+    if (newQuantity >= 1000) {
       this.orderMenuItems.update((items) =>
         items.map((item, i) => (i == index ? { ...item, menuItem: { ...item.menuItem, quantity: 1000 } } : item)),
       );
       return;
-    } else if (futureQuantity <= 0) {
-     this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
+    } else if (newQuantity <= 0) {
+      this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
     } else {
       this.orderMenuItems.update((items) =>
         items.map((item, i) =>
-          i == index ? { ...item, menuItem: { ...item.menuItem, quantity: futureQuantity } } : item,
+          i == index ? { ...item, menuItem: { ...item.menuItem, quantity: newQuantity } } : item,
         ),
       );
     }
   }
-  // onAddOrderMenuItemQuantity(index: number, quantity: number) {
-  //   const futureQuantity = this.orderMenuItems()[index].menuItem.quantity + quantity;
-
-  //   if (futureQuantity >= 1000) {
-  //     this.orderMenuItems.update((items) =>
-  //       items.map((item, i) => (i == index ? { ...item, menuItem: { ...item.menuItem, quantity: 1000 } } : item)),
-  //     );
-  //     return;
-  //   } else {
-  //     this.orderMenuItems.update((items) =>
-  //       items.map((item, i) =>
-  //         i == index ? { ...item, menuItem: { ...item.menuItem, quantity: futureQuantity } } : item,
-  //       ),
-  //     );
-  //   }
-  // }
-
-  // onReduceOrderMenuItemQuantity(index: number, quantity: number) {
-  //   const oldQuantity = this.orderMenuItems()[index].menuItem.quantity;
-
-  //   if (oldQuantity - quantity <= 0) {
-  //     this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
-  //   } else {
-  //     this.orderMenuItems.update((items) =>
-  //       items.map((item, i) =>
-  //         i == index ? { ...item, menuItem: { ...item.menuItem, quantity: oldQuantity - quantity } } : item,
-  //       ),
-  //     );
-  //   }
-  // }
 
   onRemoveOrderMenuItem(index: number) {
     this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
   }
 
   onSubmitCreateOrder() {
+    this.orderFg.patchValue({ items: this.orderCreateItems(), customerRequest: this.currentCustomer() });
     console.log(this.orderFg.value);
+    if (this.orderFg.invalid) {
+      console.log('invalid order');
+      this.orderFg.markAllAsTouched();
+      return;
+    }
+    console.log('valid order');
   }
+  //
+  //
+  //
+  //
+  //
   //
   //
   //
@@ -640,12 +635,6 @@ export class Home extends BaseComponent {
 
   customerFg = this.fb.group(this.customerFgInitialValue);
 
-  // customersSearchFgInitialValue = {
-  //   searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
-  // };
-
-  // customersSearchFg = this.fb.group(this.customersSearchFgInitialValue);
-
   onSubmitCustomer() {
     if (this.customerFg.invalid) {
       this.customerFg.markAllAsTouched();
@@ -728,4 +717,133 @@ export class Home extends BaseComponent {
       this.searchCustomers({ pageIndex: this.customersSearchPaginationInfo.pageIndex + 1, searchTerm });
     }
   }
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //payment info
+  //
+  paymentDialogVisible = false;
+  currentPayment = signal<{
+    isPaid: boolean;
+    cash: number;
+    network: number;
+  } | null>(null);
+  showPaymentDialog() {
+    this.paymentDialogVisible = true;
+  }
+
+  paymentFgInitialValue = {
+    isPaid: this.fb.control<boolean>(true, []),
+    cash: this.fb.control<number | null>(null, [Validators.required]),
+    network: this.fb.control<number | null>(null, [Validators.required]),
+  };
+
+  paymentFg = this.fb.group(this.paymentFgInitialValue);
+
+  isPaidListener = this.paymentFg.get('isPaid')?.valueChanges.subscribe((isPaid) => {
+    let validators: ValidatorFn[] = [];
+    const cashControl = this.paymentFg.get('cash');
+    const networkControl = this.paymentFg.get('network');
+    this.paymentFg.patchValue({
+      cash: 0,
+      network: 0,
+    });
+    if (isPaid) {
+      validators = [Validators.required];
+      cashControl?.disable();
+      networkControl?.disable();
+    }
+    cashControl?.setValidators(validators);
+    networkControl?.setValidators(validators);
+  });
+
+  onSubmitPayment() {
+    if (this.paymentFg.invalid) {
+      this.paymentFg.markAllAsTouched();
+      return;
+    }
+    this.currentPayment.set({
+      isPaid: this.paymentFg.value.isPaid ?? false,
+      cash: this.paymentFg.value.cash ?? 0,
+      network: this.paymentFg.value.network ?? 0,
+    });
+
+    this.paymentDialogVisible = false;
+  }
+
+  // paymentsService = inject(PaymentService);
+
+  // payments = signal<IPaymentSearchRow[]>([]);
+  // displayedPayments = computed(() => this.payments());
+  // paymentsSearchPaginationInfo: IPaginationInfo = {
+  //   pageIndex: 1,
+  //   totalRowsCount: 0,
+  //   totalPagesCount: 0,
+  // };
+
+  // previousPaymentsSearchTerm: string = '';
+  // searchPayments(data: { pageIndex: number; searchTerm?: string }) {
+  //   this.paymentsService
+  //     .search({
+  //       paginationInfo: {
+  //         pageIndex: data.pageIndex,
+  //         pageSize: 10,
+  //       },
+  //       searchFilters: [
+  //         {
+  //           column: PaymentSearchEnum.Name,
+  //           values: [data.searchTerm ?? ''],
+  //         },
+  //       ],
+  //       fromDate: null,
+  //     })
+  //     .subscribe({
+  //       next: (res) => {
+  //         if (res.value.rows.length > 0) {
+  //           this.previousPaymentsSearchTerm = data.searchTerm ?? '';
+  //           if (data.pageIndex == 1) {
+  //             this.payments.set(res.value.rows);
+  //           } else {
+  //             this.payments.update((prev) => prev.concat(res.value.rows));
+  //           }
+  //           this.paymentsSearchPaginationInfo = {
+  //             pageIndex: data.pageIndex,
+  //             totalPagesCount: res.value.paginationInfo.totalPagesCount,
+  //             totalRowsCount: res.value.paginationInfo.totalRowsCount,
+  //           };
+  //         }
+  //       },
+  //     });
+  // }
+  // onPaymentSelected(event: IPaymentSearchRow) {
+  //   console.log(event);
+  //   this.paymentFg.patchValue({
+  //     id: event.id,
+  //     nameAr: event.name,
+  //     nameEn: event.name,
+  //     phoneNumber: event.phoneNumber,
+  //     secondaryMobileNumber: event.secondaryMobileNumber,
+  //     addressDescription: event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
+  //   });
+  // }
+  // onPaymentsNameSearch(event: any, searchTerm: string = '') {
+  //   const isNewSearchTerm = searchTerm != this.previousPaymentsSearchTerm;
+
+  //   if (!searchTerm || searchTerm.length > 100) return;
+  //   if (isNewSearchTerm) {
+  //     this.searchPayments({ pageIndex: 1, searchTerm });
+  //   } else {
+  //     this.searchPayments({ pageIndex: this.paymentsSearchPaginationInfo.pageIndex + 1, searchTerm });
+  //   }
+  // }
 }

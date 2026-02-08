@@ -19,7 +19,7 @@ export class InputErrorMessageHandler {
     let error = '';
     if (this.fc()?.errors) {
       let key = Object.keys(this.fc()?.errors!)[0] as ValidationErrorKey;
-      error = ValidationErrors[key](this.fc()?.errors![key]).ar;
+       error = ValidationErrors[key](this.fc()?.errors![key]).ar;
     }
     return error;
   }

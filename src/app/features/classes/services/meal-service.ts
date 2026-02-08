@@ -1,4 +1,6 @@
-import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
+import { BaseCrudService } from '@/core/services/BaseCrudService';
+import BaseService from '@/core/services/BaseService';
+import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
 import { Injectable } from '@angular/core';
 
 export interface IMealSearchRow {
@@ -101,13 +103,9 @@ export enum MealSearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class MealService extends BaseService<
-  MealSearchEnum,
-  IMealCreateRequest,
-  IMealUpdateRequest,
-  IMealReadResponse,
-  IMealSearchResponseValue
-> {
+export class MealService extends SearchableMixin(
+  BaseCrudService<IMealCreateRequest, IMealUpdateRequest, IMealReadResponse>,
+)<IMealSearchResponseValue, MealSearchEnum>() {
   override apiRoute = 'Meals';
   /**
    *

@@ -1,4 +1,6 @@
-import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
+import { BaseCrudService } from '@/core/services/BaseCrudService';
+import BaseService from '@/core/services/BaseService';
+import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
 import { Injectable } from '@angular/core';
 
 export enum RoomSearchEnum {
@@ -13,7 +15,6 @@ export interface IRoomUpdateRequest {
   id: number;
   name: string;
 }
-
 
 //search
 
@@ -46,16 +47,11 @@ export interface IRoomReadResponse {
   orderId: number;
 }
 
-
 @Injectable({
   providedIn: 'root',
 })
-export class RoomService extends BaseService<
-  RoomSearchEnum,
-  IRoomCreateRequest,
-  IRoomUpdateRequest,
-  IRoomReadResponse,
-  IRoomSearchResponse
-> {
+export class RoomService extends SearchableMixin(
+  BaseCrudService<IRoomCreateRequest, IRoomUpdateRequest, IRoomReadResponse>,
+)<IRoomSearchResponse, RoomSearchEnum>() {
   override apiRoute = 'Room';
 }

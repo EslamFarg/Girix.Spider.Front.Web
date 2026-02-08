@@ -1,6 +1,5 @@
 {
-  
-    "form":{
+  "form": {
     "phoneNumber": "phoneNumber",
     "email": "email",
     "deliveryName": "deliveryName",
@@ -14,29 +13,30 @@
     "custodyAccount": "Custody Account",
     "cashPaymentAccount": "Cash Payment Account",
     "bankPaymentAccount": "Bank Payment Account",
-     "customerName": "Customer Name",
-  "secondaryPhoneNumber": "Additional Mobile Number",
-  "commercialRegister": "Commercial Register",
-  "taxNumber": "Tax Number",
-  "city": "City",
-  "district": "District",
-  "street": "Street",
-  "building": "Building",
-  "postalCode": "Postal Code",
-  "floor": "Floor",
-  "apartment": "Apartment",
-  "isCompany": "Customer Is a Company",
-  "company": "Company",
-     "voucherNumber": "Voucher Number",
-  "date": "Date",
-  "ledgerNumber": "Ledger Number",
-  "amount": "Amount"
-
-    },
-    "actions":{
+    "customerName": "Customer Name",
+    "secondaryPhoneNumber": "Additional Mobile Number",
+    "commercialRegister": "Commercial Register",
+    "taxNumber": "Tax Number",
+    "city": "City",
+    "district": "District",
+    "street": "Street",
+    "building": "Building",
+    "postalCode": "Postal Code",
+    "floor": "Floor",
+    "apartment": "Apartment",
+    "isCompany": "Customer Is a Company",
+    "company": "Company",
+    "voucherNumber": "Voucher Number",
+    "date": "Date",
+    "ledgerNumber": "Ledger Number",
+    "amount": "Amount",
+    "paid": "paid",
+    "postponed": "postponed"
+  },
+  "actions": {
     "save": "save",
     "cancel": "cancel",
-    "new":"new",
+    "new": "new",
     "add": "add",
     "edit": "edit",
     "delete": "delete",
@@ -45,12 +45,12 @@
     "download": "download",
     "search": "search",
     "tools": "tools",
-    "active":"active"
-    },
-    "deliveries": {
+    "active": "active"
+  },
+  "deliveries": {
     "explorer": "explorer",
     "add": "add"
-    },
+  },
 
   "items": {
     "products": {
@@ -63,26 +63,19 @@
       "addproduct": "Treat as Add-on Product",
       "productadditives": "Product Additives",
       "description": "Description",
-      "productImage":"Product Image",
-      "productDetail":"Product Detail",
-      "productAddition":"Product Additions",
-      "productTax":"Product Tax"
+      "productImage": "Product Image",
+      "productDetail": "Product Detail",
+      "productAddition": "Product Additions",
+      "productTax": "Product Tax"
     },
-       "groups":{
-        "groups":"groups",
-        "show":"show",
-        "groupName":"group name",
-        "printer":"printer",
-        "showgroup":"Show the group on the cashier screen",
-        "description": "description",
-        "all":"All"
-
-      }
+    "groups": {
+      "groups": "groups",
+      "show": "show",
+      "groupName": "group name",
+      "printer": "printer",
+      "showgroup": "Show the group on the cashier screen",
+      "description": "description",
+      "all": "All"
+    }
   }
-
-
-
-
-    
-   
 }

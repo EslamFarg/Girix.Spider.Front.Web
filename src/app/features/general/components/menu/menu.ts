@@ -52,33 +52,6 @@ export class Menu extends BaseComponent {
   groups = input<IGroupSearchRow[]>([]);
   menuItemChange = output<IOrderMenuItem>();
 
-  filterCategories = [
-    {
-      id: 1,
-      label: 'بيتزا',
-    },
-    {
-      id: 2,
-      label: 'أطباق ماكرونه',
-    },
-    {
-      id: 3,
-      label: 'كريبات',
-    },
-    {
-      id: 4,
-      label: 'برجر',
-    },
-    {
-      id: 5,
-      label: 'شوربه',
-    },
-    {
-      id: 6,
-      label: 'مشروبات ',
-    },
-  ];
-
   menuItems = signal<IMenuItem[]>([]);
 
   selectCategory(category: { id: number; label: string }) {
@@ -199,27 +172,6 @@ export class Menu extends BaseComponent {
                 (res.value.meals.paginationInfo.totalRowsCount + res.value.menuItems.paginationInfo.totalRowsCount) / 2,
             };
           }
-          // this.lestPageSize = length;
-
-          // for (let index = 0; index < length; index++) {
-          //   let newItem: IMenuItem;
-
-          //   if (index % 2 == 0) {
-          //     if (res.value.menuItems.rows.length > index / 2) {
-          //       newItem = this.mapProductToMenuItem(res.value.menuItems.rows[index / 2], index);
-          //     } else {
-          //       newItem = this.mapMealToMenuItem(res.value.meals.rows[index / 2], index);
-          //     }
-          //   } else {
-          //     if (res.value.meals.rows.length > index / 2) {
-          //       newItem = this.mapMealToMenuItem(res.value.meals.rows[(index - 1) / 2], index);
-          //     } else {
-          //       newItem = this.mapProductToMenuItem(res.value.menuItems.rows[(index - 1) / 2], index);
-          //     }
-          //   }
-
-          //   newItems.push(newItem);
-          // }
 
           newItems = newItems.concat(res.value.meals.rows.map((item, index) => this.mapMealToMenuItem(item, index)));
           newItems = newItems.concat(
@@ -270,11 +222,9 @@ export class Menu extends BaseComponent {
     };
   }
 
-  onMenuScroll(event: Event) {
-    const menuContainer = event.target as HTMLElement;
-
-    // if at bottom
+  onMenuScroll(event: Event, menuContainer: HTMLElement) {
     if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
+      // if at bottom
       this.searchProductsAndMeals(this.menuItemsPaginationInfo.pageIndex + 1);
     }
   }

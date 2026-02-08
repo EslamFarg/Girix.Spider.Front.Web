@@ -1,4 +1,6 @@
-import BaseService, { SearchColumEnum } from '@/core/services/BaseService';
+import { BaseCrudService } from '@/core/services/BaseCrudService';
+import BaseService from '@/core/services/BaseService';
+import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
 import { Injectable } from '@angular/core';
 
 export interface IProductSearchRow {
@@ -92,7 +94,6 @@ export interface IProductUpdateRequest {
 }
 
 //get by id
-
 export interface IProductReadResponse {
   id: number;
   name: string;
@@ -116,7 +117,6 @@ export interface IProductReadResponse {
 }
 
 //MenuItems : Name,CategoryName,CategoryId
-
 export enum ProductSearchEnum {
   Name = SearchColumEnum.Name,
   CategoryName = SearchColumEnum.CategoryName,
@@ -127,13 +127,10 @@ export enum ProductSearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class ProductService extends BaseService<
-  ProductSearchEnum,
-  IProductCreateRequest,
-  IProductUpdateRequest,
-  IProductReadResponse,
-  IProductSearchResponseValue
-> {
+export class ProductService extends SearchableMixin(
+  BaseCrudService<IProductCreateRequest, IProductUpdateRequest, IProductReadResponse>,
+)<IProductSearchResponseValue,ProductSearchEnum>() {
+
   override apiRoute = 'MenuItem';
 
   /**

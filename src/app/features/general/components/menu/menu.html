@@ -81,7 +81,7 @@
       style="row-gap: 50px"
       appDebounce
       [domEvents]="['scroll']"
-      (debounced)="onMenuScroll($event)"
+      (debounced)="onMenuScroll($event, itemsContainer)"
     >
       <!--  -->
       @for (item of menuItems(); track $index) {
