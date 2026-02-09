@@ -28,9 +28,9 @@ export class OrderCalculationsService {
 
   getMenuItemNetValue = (item: IOrderMenuItem) => {
     if (item.menuItem.meal) {
-      return (+(item.menuItem.meal.priceWithTax ?? 0) * item.menuItem.quantity).toFixed(2);
+      return (+(item.menuItem.meal.priceWithTax ?? 0) * item.menuItem.quantity);
     } else {
-      return (+(item.menuItem.product?.priceWithTax ?? 0) * item.menuItem.quantity).toFixed(2);
+      return (+(item.menuItem.product?.priceWithTax ?? 0) * item.menuItem.quantity);
     }
   };
 
@@ -42,4 +42,7 @@ export class OrderCalculationsService {
     const tax = item.priceWithTax - item.priceWithSelectiveTax;
     return tax * quantity;
   }
+
+
+ 
 }

@@ -13,6 +13,7 @@ import { Menu } from 'primeng/menu';
 import { Button } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
+import { PrintService } from '@/features/print/services/print-service';
 
 @Component({
   selector: 'app-orders',
@@ -134,6 +135,15 @@ export class Orders extends BaseComponent {
 
       accept: () => this.orderService.delete(id).subscribe({ next: () => this.searchOrders(1) }),
       reject: () => this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' }),
+    });
+  }
+
+  printService = inject(PrintService);
+  printOrder(id: number) {
+    this.orderService.getById(id).subscribe({
+      next: (order) => {
+        this.printService.printOrder(order);
+      },
     });
   }
 }

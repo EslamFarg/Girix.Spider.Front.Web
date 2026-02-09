@@ -1,7 +1,7 @@
 import { AuthService } from '@/features/auth/services/auth-service';
 import { LayoutService } from '@/layouts/services/layout-service';
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -9,6 +9,7 @@ import { environment } from '../../../environments/environment';
 import { TranslateService } from '@ngx-translate/core';
 import { SpaceTypeEnum } from '@/features/replacements/services/replacements-service';
 import { BehaviorSubject, debounceTime, Observable, Subject } from 'rxjs';
+import { LoadingService } from '@/yn-ng/services/loading-service';
 export interface IPaginationInfo {
   pageIndex: number;
   totalRowsCount: number;
@@ -45,11 +46,13 @@ export class BaseComponent {
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
   authService = inject(AuthService);
-  layoutService = inject(LayoutService);
+  // layoutService = inject(LayoutService);
+  loadingService = inject(LoadingService);
   translateService = inject(TranslateService);
   dateNow = new Date();
   dateNowIso = this.dateNow.toISOString();
   debounceMap: Map<string, IDebounceMapValue> = new Map();
+  isLoading = this.loadingService.isLoading;
   
   setDebounceItem<T>(key: string, callback: (e: T) => void) {
     this.debounceMap.set(key, { subject: new Subject<T>(), callback });
@@ -69,7 +72,6 @@ export class BaseComponent {
     this.debounceMap.forEach((value) => value.subject.complete());
   }
 
-  isLoading = this.layoutService.isLoading;
 
   getRowNumber = (index: number, pageNumber: number) => index + 1 + (pageNumber - 1) * 10;
   getCurrentRowsIx = (pageIndex: number) => (pageIndex - 1) * 10;
@@ -98,5 +100,9 @@ export class BaseComponent {
     const id = Number(this.activatedRoute.snapshot.paramMap.get('id'));
 
     return id;
+  }
+
+  getFormControl(form: FormGroup, controlName: string) {
+    return form.controls[controlName] as FormControl;
   }
 }

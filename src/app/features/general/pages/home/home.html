@@ -3,7 +3,7 @@
 
   <form
     [formGroup]="orderFg"
-    (ngSubmit)="onSubmitCreateOrder()"
+    (ngSubmit)="onSubmitOrder()"
     id="orderForm"
     class="flex w-full flex-col gap-4 h-full no-scrollbar overflow-auto p-4 xl:ps-0 xl:col-span-2"
   >
@@ -12,6 +12,16 @@
       class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
       style="--p-button-primary-background: transparent"
     >
+      <button
+        pButton
+        type="button"
+        (click)="isMenuVisible = true"
+        class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8! me-auto"
+        variant="outlined"
+        type="button"
+      >
+        المينيو
+      </button>
       <button
         pButton
         style="--p-button-primary-background: var(--color-dark-line)"
@@ -25,12 +35,25 @@
           {{ 'actions.edit' | translate }}
         }
       </button>
-      <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
+      <button
+        type="button"
+        pButton
+        class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
+        variant="outlined"
+      >
         {{ 'actions.new' | translate }}
       </button>
-      <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
-        {{ 'actions.print' | translate }}
-      </button>
+      @if (existingOrder()) {
+        <button
+          (click)="onPrint()"
+          type="button"
+          pButton
+          class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
+          variant="outlined"
+        >
+          {{ 'actions.print' | translate }}
+        </button>
+      }
     </div>
 
     <!-- receipt summary -->
@@ -461,6 +484,7 @@
       <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
         <button
           pButton
+          type="button"
           class="text-dark-line! py-2 lg:py-0! lg:leading-12.5 h-12.5 rounded-[14px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base! lg:text-lg! xl:text-xl!"
           variant="outlined"
           (click)="showCustomerDialog()"
@@ -468,10 +492,11 @@
           بيانات العميل
         </button>
       </app-input-error-message-handler>
-      <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
+      <app-input-error-message-handler [grouped]="false" [fc]="getPaymentInvalidControl()">
         <button
           class="text-dark-line! py-2 lg:py-0! lg:leading-12.5 h-12.5 rounded-[14px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base! lg:text-lg! xl:text-xl!"
           pButton
+          type="button"
           variant="outlined"
           (click)="showPaymentDialog()"
         >
@@ -480,6 +505,7 @@
       </app-input-error-message-handler>
       <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
         <button
+          type="button"
           pButton
           class="text-dark-line! py-2 lg:py-0! lg:leading-12.5 h-12.5 rounded-[14px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base! lg:text-lg! xl:text-xl!"
           variant="outlined"
@@ -724,22 +750,16 @@
       <button class="cursor-pointer p-1 w-fit ms-auto" (click)="customerDialogVisible = false">
         <i class="pi pi-times"></i>
       </button>
-      <form
-        id="customerForm"
-        class="overflow-visible grid gap-4 md:grid-cols-2"
-        [formGroup]="customerFg"
-        (ngSubmit)="onSubmitCustomer()"
-      >
+      <form id="customerForm" class="overflow-visible grid gap-4 md:grid-cols-2" [formGroup]="customerFg">
         <!-- name (search) -->
         <div>
           <label for="customerName">{{ 'form.customerName' | translate }}</label>
-          <app-input-error-message-handler [fc]="customerFg.get('nameAr')">
+          <app-input-error-message-handler [fc]="customerFg.get('id')">
             <ng-select
               class="app-select w-full"
               [items]="displayedCustomers()"
-              formControlName="nameAr"
+              formControlName="id"
               bindLabel="name"
-              bindValue="name"
               placeholder="الكل"
               #customerSelect
               appDebounce
@@ -784,7 +804,7 @@
         </div>
       </form>
       <!-- actions -->
-      <div
+      <!-- <div
         class="flex gap-2 location-btns *:flex-1 w-full justify-end pt-4"
         style="--p-button-primary-background: transparent"
       >
@@ -804,7 +824,7 @@
         >
           إلغاء
         </button>
-      </div>
+      </div> -->
     </div>
   </ng-template>
 </p-dialog>
@@ -824,22 +844,24 @@
       <button class="cursor-pointer p-1 w-fit ms-auto" (click)="paymentDialogVisible = false">
         <i class="pi pi-times"></i>
       </button>
-      <form
-        id="paymentForm"
-        class="overflow-visible grid gap-4 md:grid-cols-2"
-        [formGroup]="paymentFg"
-        (ngSubmit)="onSubmitPayment()"
-      >
+      <div id="paymentForm" class="overflow-visible grid gap-4 md:grid-cols-2">
         <!-- paid / postponed -->
         <div
           class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4 border-b border-b-text-light pb-4 [&_input]:w-5 [&_input]:aspect-square"
         >
           <div class="flex items-center gap-1">
-            <input type="radio" name="isPaid" id="paymentInfoPaid" [value]="true" formControlName="isPaid" />
+            <input
+              type="radio"
+              name="isPaid"
+              id="paymentInfoPaid"
+              [defaultChecked]="true"
+              (input)="isPaid.set(true)"
+              [value]="true"
+            />
             <label for="paymentInfoPaid">{{ 'form.paid' | translate }}</label>
           </div>
           <div class="flex items-center gap-1">
-            <input type="radio" name="isPaid" id="paymentInfoPostponed" [value]="false" formControlName="isPaid" />
+            <input type="radio" name="isPaid" id="paymentInfoPostponed" (input)="isPaid.set(false)" [value]="false" />
             <label for="paymentInfoPostponed">{{ 'form.postponed' | translate }}</label>
           </div>
         </div>
@@ -847,12 +869,14 @@
         <!-- cash -->
         <div>
           <label for="cash">{{ 'form.cash' | translate }}</label>
-          <app-input-error-message-handler [fc]="paymentFg.get('cash')">
+          <app-input-error-message-handler [fc]="orderFg.get('payingCash')">
             <input
               pInputText
-              formControlName="cash"
               aria-describedby="cash-help"
               [placeholder]="'form.cash' | translate"
+              [formControl]="getFormControl(orderFg, 'payingCash')"
+              appAllowNumbers
+              [allowDecimal]="true"
               #paymentPhoneSearch
               appDebounce
               class="app-input"
@@ -861,21 +885,23 @@
         </div>
 
         <!-- network -->
-        <div class="">
+        <div>
           <label for="network">{{ 'form.network' | translate }}</label>
-          <app-input-error-message-handler [fc]="paymentFg.get('network')">
+          <app-input-error-message-handler [fc]="orderFg.get('payingNetwork')">
             <input
               pInputText
-              formControlName="network"
+              appAllowNumbers
+              [allowDecimal]="true"
               aria-describedby="network-help"
+              [formControl]="getFormControl(orderFg, 'payingNetwork')"
               [placeholder]="'form.network' | translate"
               class="app-input"
             />
           </app-input-error-message-handler>
         </div>
-      </form>
+      </div>
       <!-- actions -->
-      <div
+      <!-- <div
         class="flex gap-2 location-btns *:flex-1 w-full justify-end pt-4"
         style="--p-button-primary-background: transparent"
       >
@@ -895,7 +921,7 @@
         >
           إلغاء
         </button>
-      </div>
+      </div> -->
     </div>
   </ng-template>
 </p-dialog>

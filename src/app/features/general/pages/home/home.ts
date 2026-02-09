@@ -49,21 +49,23 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { ICustomerSearchRow } from '@/features/customers/services/customer-types';
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
 import { NgSelectComponent } from '@ng-select/ng-select';
+import { PrintService } from '@/features/print/services/print-service';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
   orderType: FormControl<OrderLocationType>;
   paymentType: FormControl<OrderPaymentType>;
-  placeType: FormControl<OrderLocalType>;
-  placeRefId: FormControl<number>;
-  durationMinutes: FormControl<number>;
-  deliveryId: FormControl<number>;
-  payingCash: FormControl<number>;
-  payingNetwork: FormControl<number>;
+  placeType: FormControl<OrderLocalType | null>;
+  placeRefId: FormControl<number | null>;
+  durationMinutes: FormControl<number | null>;
+  deliveryId: FormControl<number | null>;
+  payingCash: FormControl<number | null>;
+  payingNetwork: FormControl<number | null>;
   createAt: FormControl<string>;
   idempotencyKey: FormControl<string>;
   items: FormControl<IOrderCreateItem[]>;
   customerRequest: FormControl<IOrderCreateCustomerRequest | null>;
+  placeName: FormControl<string | null>;
 }
 
 @Component({
@@ -140,17 +142,18 @@ export class Home extends BaseComponent {
   initialOrderFgValue: IOrderCreateFgValue = {
     orderType: this.fb.control<OrderLocationType>(OrderLocationType.Takeaway, [Validators.required]),
     paymentType: this.fb.control<OrderPaymentType>(OrderPaymentType.Pending, [Validators.required]),
-    placeType: this.fb.control<OrderLocalType>(OrderLocalType.Table, [Validators.required]),
+    placeType: this.fb.control<OrderLocalType | null>(null, []),
+    placeName: this.fb.control<string | null>(null, []),
     // hut/room/table id
-    placeRefId: this.fb.control<number>(0, [Validators.required]),
-    durationMinutes: this.fb.control<number>(0, [Validators.required]),
-    deliveryId: this.fb.control<number>(0, [Validators.required]),
-    payingCash: this.fb.control<number>(0, [Validators.required]),
-    payingNetwork: this.fb.control<number>(0, [Validators.required]),
+    placeRefId: this.fb.control<number | null>(null, []),
+    durationMinutes: this.fb.control<number | null>(null, []),
+    deliveryId: this.fb.control<number | null>(null, []),
+    payingCash: this.fb.control<number | null>(null, [Validators.required]),
+    payingNetwork: this.fb.control<number | null>(null, [Validators.required]),
     createAt: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
     idempotencyKey: this.fb.control<string>(Date.now() + Math.random().toString(), [Validators.required]),
     items: this.fb.control<IOrderCreateItem[]>([], [Validators.minLength(1)]),
-    customerRequest: this.fb.control<IOrderCreateCustomerRequest | null>(null, [Validators.required]),
+    customerRequest: this.fb.control<IOrderCreateCustomerRequest | null>(null, []),
   };
 
   orderFg = this.fb.group(this.initialOrderFgValue);
@@ -232,15 +235,20 @@ export class Home extends BaseComponent {
     this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
   }
 
-  onSubmitCreateOrder() {
-    this.orderFg.patchValue({ items: this.orderCreateItems(), customerRequest: this.currentCustomer() });
+  onSubmitOrder() {
+    this.orderFg.patchValue({
+      items: this.orderCreateItems(),
+      customerRequest: this.currentCustomer(),
+    });
     console.log(this.orderFg.value);
     if (this.orderFg.invalid) {
       console.log('invalid order');
       this.orderFg.markAllAsTouched();
       return;
     }
-    console.log('valid order');
+    this.orderService.create(this.orderFg.value).subscribe({
+      next: (res) => {},
+    });
   }
   //
   //
@@ -252,8 +260,27 @@ export class Home extends BaseComponent {
   //
   //
   //
+  //print
+  //
+
+  printService=inject(PrintService);
+
+  onPrint() {
+    // this.printService.printOrder();
+  }
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
   //
   //local space
+  //
 
   //huts
 
@@ -268,6 +295,7 @@ export class Home extends BaseComponent {
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
+
   searchHuts(pageIndex: number) {
     this.hutService
       .search({
@@ -296,6 +324,7 @@ export class Home extends BaseComponent {
         },
       });
   }
+
   onHutsScroll(event: Event) {
     const menuContainer = event.target as HTMLElement;
 
@@ -304,8 +333,6 @@ export class Home extends BaseComponent {
       this.searchHuts(this.hutPaginationInfo.pageIndex + 1);
     }
   }
-  //
-  //
   //
   //
   //
@@ -374,7 +401,11 @@ export class Home extends BaseComponent {
   //
   //
   //
+  //
+  //
+  //
   //rooms
+  //
 
   roomService = inject(RoomService);
   rooms = signal<IRoomSearchRow[]>([]);
@@ -424,6 +455,8 @@ export class Home extends BaseComponent {
     }
   }
 
+  //
+  //
   //
   //
   //
@@ -625,37 +658,41 @@ export class Home extends BaseComponent {
   }
 
   customerFgInitialValue = {
-    id: this.fb.control<number | null>(null, [Validators.required]),
-    nameAr: this.fb.control<string | null>(null, [Validators.required]),
-    nameEn: this.fb.control<string | null>(null, []),
-    phoneNumber: this.fb.control<string | null>(null, [Validators.required]),
-    secondaryMobileNumber: this.fb.control<string | null>(null, []),
-    addressDescription: this.fb.control<string | null>(null, [Validators.required]),
+    id: this.fb.control<number | null>(null, []),
+    phoneNumber: this.fb.control<string | null>(null, []),
+    addressDescription: this.fb.control<string | null>(null, []),
   };
 
   customerFg = this.fb.group(this.customerFgInitialValue);
 
-  onSubmitCustomer() {
-    if (this.customerFg.invalid) {
-      this.customerFg.markAllAsTouched();
-      return;
-    }
-    this.currentCustomer.set({
-      id: this.customerFg.value.id!,
-      nameAr: this.customerFg.value.nameAr!,
-      nameEn: this.customerFg.value.nameEn!,
-      phoneNumber: this.customerFg.value.phoneNumber!,
-      secondaryMobileNumber: this.customerFg.value.secondaryMobileNumber!,
-      addressDescription: this.customerFg.value.addressDescription!,
-    });
+  // onSubmitCustomer() {
+  //   if (this.customerFg.invalid) {
+  //     this.customerFg.markAllAsTouched();
+  //     return;
+  //   }
+  //   this.currentCustomer.set({
+  //     id: this.customerFg.value.id!,
+  //     nameAr: this.customerFg.value.nameAr!,
+  //     nameEn: this.customerFg.value.nameEn!,
+  //     phoneNumber: this.customerFg.value.phoneNumber!,
+  //     secondaryMobileNumber: this.customerFg.value.secondaryMobileNumber!,
+  //     addressDescription: this.customerFg.value.addressDescription!,
+  //   });
 
-    this.customerDialogVisible = false;
-  }
+  //   this.customerDialogVisible = false;
+  // }
 
   customersService = inject(CustomerService);
 
   customers = signal<ICustomerSearchRow[]>([]);
-  displayedCustomers = computed(() => this.customers());
+  displayedCustomers = computed(() => [
+    {
+      id: 0,
+      name: 'عميل نقدي',
+      phoneNumber: 0,
+    },
+    ...this.customers(),
+  ]);
   customersSearchPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalRowsCount: 0,
@@ -697,15 +734,29 @@ export class Home extends BaseComponent {
       });
   }
   onCustomerSelected(event: ICustomerSearchRow) {
-    console.log(event);
-    this.customerFg.patchValue({
-      id: event.id,
-      nameAr: event.name,
-      nameEn: event.name,
-      phoneNumber: event.phoneNumber,
-      secondaryMobileNumber: event.secondaryMobileNumber,
-      addressDescription: event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
-    });
+    console.log('selected customer: ', event);
+    if (event.id) {
+      this.customerFg.patchValue({
+        id: event.id,
+        phoneNumber: event.phoneNumber,
+        addressDescription: event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
+      });
+      this.currentCustomer.set({
+        id: event.id,
+        nameAr: event.name,
+        nameEn: event.name,
+        phoneNumber: event.phoneNumber,
+        secondaryMobileNumber: event.secondaryMobileNumber,
+        addressDescription: event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
+      });
+    } else {
+      this.customerFg.patchValue({
+        id: event.id,
+        phoneNumber: event.phoneNumber,
+        addressDescription: 'عميل نقدي',
+      });
+      this.currentCustomer.set(null);
+    }
   }
   onCustomersNameSearch(event: any, searchTerm: string = '') {
     const isNewSearchTerm = searchTerm != this.previousCustomersSearchTerm;
@@ -732,33 +783,53 @@ export class Home extends BaseComponent {
   //
   //payment info
   //
+
   paymentDialogVisible = false;
-  currentPayment = signal<{
-    isPaid: boolean;
-    cash: number;
-    network: number;
-  } | null>(null);
+
   showPaymentDialog() {
     this.paymentDialogVisible = true;
   }
 
-  paymentFgInitialValue = {
-    isPaid: this.fb.control<boolean>(true, []),
-    cash: this.fb.control<number | null>(null, [Validators.required]),
-    network: this.fb.control<number | null>(null, [Validators.required]),
-  };
-
-  paymentFg = this.fb.group(this.paymentFgInitialValue);
-
-  isPaidListener = this.paymentFg.get('isPaid')?.valueChanges.subscribe((isPaid) => {
-    let validators: ValidatorFn[] = [];
-    const cashControl = this.paymentFg.get('cash');
-    const networkControl = this.paymentFg.get('network');
-    this.paymentFg.patchValue({
-      cash: 0,
-      network: 0,
+  net = computed(() => {
+    const orderItems = this.orderMenuItems();
+    let net = 0;
+    orderItems.forEach((item) => {
+      net += this.getMenuItemNetValue(item);
     });
-    if (isPaid) {
+
+    return net;
+  });
+
+  netListener = effect(() => {
+    const net = this.net();
+    this.orderFg.patchValue({
+      payingCash: net,
+      payingNetwork: 0,
+    });
+  });
+
+  getPaymentInvalidControl() {
+    const cashControl = this.orderFg.get('payingCash');
+    const networkControl = this.orderFg.get('payingNetwork');
+    if (cashControl?.invalid && cashControl?.touched) {
+      return cashControl;
+    } else if (networkControl?.invalid && networkControl?.touched) {
+      return networkControl;
+    }
+    return null;
+  }
+
+  isPaid = signal<boolean>(false);
+
+  isPaidListener = effect(() => {
+    let validators: ValidatorFn[] = [];
+    const cashControl = this.orderFg.get('payingCash');
+    const networkControl = this.orderFg.get('payingNetwork');
+    this.orderFg.patchValue({
+      payingCash: 0,
+      payingNetwork: 0,
+    });
+    if (this.isPaid()) {
       validators = [Validators.required];
       cashControl?.disable();
       networkControl?.disable();
@@ -767,83 +838,23 @@ export class Home extends BaseComponent {
     networkControl?.setValidators(validators);
   });
 
-  onSubmitPayment() {
-    if (this.paymentFg.invalid) {
-      this.paymentFg.markAllAsTouched();
-      return;
-    }
-    this.currentPayment.set({
-      isPaid: this.paymentFg.value.isPaid ?? false,
-      cash: this.paymentFg.value.cash ?? 0,
-      network: this.paymentFg.value.network ?? 0,
-    });
+  cashInputSubscription = this.orderFg.get('payingCash')?.valueChanges.subscribe((value) => {
+    const net = this.net();
+    this.orderFg.patchValue(
+      {
+        payingNetwork: net - +(value ?? 0),
+      },
+      { emitEvent: false },
+    );
+  });
 
-    this.paymentDialogVisible = false;
-  }
-
-  // paymentsService = inject(PaymentService);
-
-  // payments = signal<IPaymentSearchRow[]>([]);
-  // displayedPayments = computed(() => this.payments());
-  // paymentsSearchPaginationInfo: IPaginationInfo = {
-  //   pageIndex: 1,
-  //   totalRowsCount: 0,
-  //   totalPagesCount: 0,
-  // };
-
-  // previousPaymentsSearchTerm: string = '';
-  // searchPayments(data: { pageIndex: number; searchTerm?: string }) {
-  //   this.paymentsService
-  //     .search({
-  //       paginationInfo: {
-  //         pageIndex: data.pageIndex,
-  //         pageSize: 10,
-  //       },
-  //       searchFilters: [
-  //         {
-  //           column: PaymentSearchEnum.Name,
-  //           values: [data.searchTerm ?? ''],
-  //         },
-  //       ],
-  //       fromDate: null,
-  //     })
-  //     .subscribe({
-  //       next: (res) => {
-  //         if (res.value.rows.length > 0) {
-  //           this.previousPaymentsSearchTerm = data.searchTerm ?? '';
-  //           if (data.pageIndex == 1) {
-  //             this.payments.set(res.value.rows);
-  //           } else {
-  //             this.payments.update((prev) => prev.concat(res.value.rows));
-  //           }
-  //           this.paymentsSearchPaginationInfo = {
-  //             pageIndex: data.pageIndex,
-  //             totalPagesCount: res.value.paginationInfo.totalPagesCount,
-  //             totalRowsCount: res.value.paginationInfo.totalRowsCount,
-  //           };
-  //         }
-  //       },
-  //     });
-  // }
-  // onPaymentSelected(event: IPaymentSearchRow) {
-  //   console.log(event);
-  //   this.paymentFg.patchValue({
-  //     id: event.id,
-  //     nameAr: event.name,
-  //     nameEn: event.name,
-  //     phoneNumber: event.phoneNumber,
-  //     secondaryMobileNumber: event.secondaryMobileNumber,
-  //     addressDescription: event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
-  //   });
-  // }
-  // onPaymentsNameSearch(event: any, searchTerm: string = '') {
-  //   const isNewSearchTerm = searchTerm != this.previousPaymentsSearchTerm;
-
-  //   if (!searchTerm || searchTerm.length > 100) return;
-  //   if (isNewSearchTerm) {
-  //     this.searchPayments({ pageIndex: 1, searchTerm });
-  //   } else {
-  //     this.searchPayments({ pageIndex: this.paymentsSearchPaginationInfo.pageIndex + 1, searchTerm });
-  //   }
-  // }
+  networkInputSubscription = this.orderFg.get('payingNetwork')?.valueChanges.subscribe((value) => {
+    const net = this.net();
+    this.orderFg.patchValue(
+      {
+        payingCash: net - +(value ?? 0),
+      },
+      { emitEvent: false },
+    );
+  });
 }

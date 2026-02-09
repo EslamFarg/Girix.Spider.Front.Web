@@ -12,8 +12,6 @@ export interface IBaseSearchResponse<T> {
 }
 
 export class BaseCrudService<ICreateDto = any, IUpdateDto = any, IGetByIdDto = any> extends BaseService {
-
-
   create<IDefaultCreateDto = ICreateDto>(createDto: IDefaultCreateDto | FormData) {
     return this.http.post<number>(`${this.apiUrl}/${this.endpoints.create}`, createDto).pipe(
       tap({

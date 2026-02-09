@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Observable, tap } from 'rxjs';
+import { LoadingService } from '@/yn-ng/services/loading-service';
 
 type localStorageKey = 'userDetails' | 'token' | 'forgotPasswordEmail' | 'forgotPasswordToken';
 export interface IEndpoints {
@@ -16,6 +17,7 @@ export interface IEndpoints {
 }
 export default abstract class BaseService {
   static apiBaseUrl = environment.apiUrl;
+  loadingService = inject(LoadingService);
 
   apiRoute = '';
   get apiUrl() {

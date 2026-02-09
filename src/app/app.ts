@@ -11,6 +11,7 @@ declare global {
     electronAPI: {
       getPrinters: () => Promise<any[]>;
       ping: (msg: string) => Promise<string>;
+      print: (html: string) => Promise<string>;
     };
   }
 }
@@ -36,5 +37,3 @@ export class App {
     // this.router.navigate(['replacements/huts']);
   }
 }
-
-
