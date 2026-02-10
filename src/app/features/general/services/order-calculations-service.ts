@@ -27,11 +27,18 @@ export class OrderCalculationsService {
   };
 
   getMenuItemNetValue = (item: IOrderMenuItem) => {
+    let itemNet = 0;
+    const additionsNet = item.additions.reduce(
+      (total, addition) => total + addition.product.priceWithTax * addition.quantity,
+      0,
+    );
     if (item.menuItem.meal) {
-      return (+(item.menuItem.meal.priceWithTax ?? 0) * item.menuItem.quantity);
+      return (itemNet = +(item.menuItem.meal.priceWithTax ?? 0) * item.menuItem.quantity);
     } else {
-      return (+(item.menuItem.product?.priceWithTax ?? 0) * item.menuItem.quantity);
+      return (itemNet = +(item.menuItem.product?.priceWithTax ?? 0) * item.menuItem.quantity);
     }
+
+    return itemNet + additionsNet;
   };
 
   getProductTaxValue(item: IProductSearchRow, quantity: number): number {
@@ -43,6 +50,11 @@ export class OrderCalculationsService {
     return tax * quantity;
   }
 
-
- 
+  getMenuItemWithSelectiveTax = (item: IOrderMenuItem) => {
+    if (item.menuItem.meal) {
+      return +(item.menuItem.meal.priceWithSelectiveTax ?? 0) * item.menuItem.quantity;
+    } else {
+      return +(item.menuItem.product?.priceWithSelectiveTax ?? 0) * item.menuItem.quantity;
+    }
+  };
 }

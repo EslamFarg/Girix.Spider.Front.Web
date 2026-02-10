@@ -137,95 +137,86 @@
     </div>
 
     <!-- local space options -->
-    @if (localRadio.checked) {
-      <div class="flex flex-col gap-4 sm:gap-0 sm:flex-row w-full border border-text-light rounded-[14px] p-3">
-        <!-- local space btns -->
-        <div
-          class="flex gap-2 local-btns *:border-0! *:flex-1 w-full justify-end h-[34px] *:h-full *:flex *:items-center *:justify-center *:rounded-lg"
-          style="
-            --p-button-primary-background: var(--color-text-lighter);
-            --p-button-primary-color: var(--color-dark-line);
-          "
-        >
-          <input
-            type="radio"
-            hidden
-            name="placeType"
-            id="tableRadio"
-            [value]="OrderLocationType.Takeaway"
-            #tableRadio
-            formControlName="placeType"
-          />
-          <label
-            (click)="TableDialogVisible = true"
-            class="py-1! w-full text-sm!"
-            [class.location-active]="tableRadio.checked"
-            pButton
-            for="tableRadio"
-            ><span>طاوله</span></label
-          >
-          <!--  -->
-          <input
-            type="radio"
-            hidden
-            #roomRadio
-            name="placeType"
-            id="roomRadio"
-            formControlName="placeType"
-            [value]="OrderLocationType.DineIn"
-          />
-          <label
-            (click)="RoomDialogVisible = true"
-            class="py-1! w-full text-sm!"
-            pButton
-            [class.location-active]="roomRadio.checked"
-            for="roomRadio"
-            ><span>غرفه</span></label
-          >
-          <!--  -->
-          <input
-            type="radio"
-            hidden
-            #hutRadio
-            name="placeType"
-            id="hutRadio"
-            formControlName="placeType"
-            [value]="OrderLocationType.Delivery"
-          />
-          <label
-            (click)="HutDialogVisible = true"
-            class="py-1! w-full text-sm!"
-            [class.location-active]="hutRadio.checked"
-            pButton
-            for="hutRadio"
-            ><span>كوخ</span></label
-          >
-        </div>
-
-        @if (OrderLocalType.Hut == orderFg.value.placeType && (orderFg.value.placeRefId ?? 0) > 0) {
-          <div class="px-3 text-text-gray text-xl font-light hidden sm:block">|</div>
+    <div>
+      @if (localRadio.checked) {
+        <div class="flex flex-col gap-4 sm:gap-0 sm:flex-row w-full border border-text-light rounded-[14px] p-3">
+          <!-- local space btns -->
           <div
-            class="border border-text-light rounded-lg sm:w-1/2 py-1.25 px-3 text-dark-bg-2 font-bold text-xs flex items-center justify-between"
+            class="flex gap-2 local-btns *:border-0! *:flex-1 w-full justify-end h-[34px] *:h-full *:flex *:items-center *:justify-center *:rounded-lg"
+            style="
+              --p-button-primary-background: var(--color-text-lighter);
+              --p-button-primary-color: var(--color-dark-line);
+            "
           >
-            <span>
-              <!-- @switch (orderFg.value!.placeType!) {
-              @case (OrderLocalType.Hut) {
-                
-              }
-              @case (OrderLocalType.Room) {
-                غرفه
-              }
-              @case (OrderLocalType.Table) {
-                طاوله
-              }
-            } -->
-              كوخ
-            </span>
-            <span>{{ formatMinutesToHHMMSS(orderFg.value.durationMinutes ?? 0) }}</span>
+            <input
+              type="radio"
+              hidden
+              name="placeType"
+              id="tableRadio"
+              [value]="OrderLocationType.Takeaway"
+              #tableRadio
+              formControlName="placeType"
+            />
+            <label
+              (click)="TableDialogVisible = true"
+              class="py-1! w-full text-sm!"
+              [class.location-active]="tableRadio.checked"
+              pButton
+              for="tableRadio"
+              ><span>طاوله</span></label
+            >
+            <!--  -->
+            <input
+              type="radio"
+              hidden
+              #roomRadio
+              name="placeType"
+              id="roomRadio"
+              formControlName="placeType"
+              [value]="OrderLocationType.DineIn"
+            />
+            <label
+              (click)="RoomDialogVisible = true"
+              class="py-1! w-full text-sm!"
+              pButton
+              [class.location-active]="roomRadio.checked"
+              for="roomRadio"
+              ><span>غرفه</span></label
+            >
+            <!--  -->
+            <input
+              type="radio"
+              hidden
+              #hutRadio
+              name="placeType"
+              id="hutRadio"
+              formControlName="placeType"
+              [value]="OrderLocationType.Delivery"
+            />
+            <label
+              (click)="HutDialogVisible = true"
+              class="py-1! w-full text-sm!"
+              [class.location-active]="hutRadio.checked"
+              pButton
+              for="hutRadio"
+              ><span>كوخ</span></label
+            >
           </div>
-        }
-      </div>
-    }
+
+          @if (OrderLocalType.Hut == orderFg.value.placeType && (orderFg.value.placeRefId ?? 0) > 0) {
+            <div class="px-3 text-text-gray text-xl font-light hidden sm:block">|</div>
+            <div
+              class="border border-text-light rounded-lg sm:w-1/2 py-1.25 px-3 text-dark-bg-2 font-bold text-xs flex items-center justify-between"
+            >
+              <span> كوخ </span>
+              <span>{{ formatMinutesToHHMMSS(orderFg.value.durationMinutes ?? 0) }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <app-input-error-message-handler class="w-fit block mx-auto" [fc]="orderFg.get('placeRefId')" />
+    </div>
 
     <!-- order items -->
     <div class="p-2 border border-text-light rounded-[14px] w-full min-h-fit overflow-hidden">
@@ -434,7 +425,7 @@
           </tbody>
         </table>
       </div>
-      <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('items')" />
+      <app-input-error-message-handler class="w-fit block mx-auto" [fc]="orderFg.get('items')" />
       <!-- items summary -->
       <div class="border-t border-text-light pt-2 mt-2">
         <!-- head -->
@@ -450,15 +441,15 @@
           <div class="absolute w-0.5 h-16 left-1/2 top-2 -translate-x-1/2 bg-dark-bg-2/20"></div>
           <div class="pe-1">
             <span>الخصم</span>
-            <div>123123</div>
+            <div>{{discountAmount()}}</div>
           </div>
           <div class="ps-1">
             <span>الخدمه</span>
-            <div>15.00</div>
+            <div>{{ serviceFee().toFixed(2) }}</div>
           </div>
           <div class="pe-1">
             <span>حجز الكوخ</span>
-            <div>145.00</div>
+            <div>{{ hutNet().toFixed(2) }}</div>
           </div>
           <div class="ps-1">
             <span>الضريبة</span>
@@ -468,7 +459,7 @@
             class="flex text-xs col-span-2 mt-1 pt-1 font-bold justify-between items-center border-t border-text-light text-dark-bg-2"
           >
             <span>الصافي</span>
-            <span>2300.00</span>
+            <span>{{net().toFixed(2)}}</span>
           </div>
         </div>
       </div>
@@ -544,7 +535,8 @@
     class="flex-1 overflow-auto no-scrollbar"
     appDebounce
     [domEvents]="['scroll']"
-    (debounced)="onHutsScroll($event)"
+    #additionsScroller
+    (debounced)="onHutsScroll($event, additionsScroller)"
   >
     <div class="grid grid-cols-4 gap-2">
       @for (item of additionProducts(); track $index) {
@@ -637,26 +629,62 @@
   <div
     class="flex-1 overflow-auto no-scrollbar"
     appDebounce
+    #hutsScroller
     [domEvents]="['scroll']"
-    (debounced)="onHutsScroll($event)"
+    (debounced)="onHutsScroll($event, hutsScroller)"
   >
     <div class="h-fit grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-[90px_20px]">
       @for (item of huts(); track $index) {
-        <app-hut-card [data]="item" class="max-w-[250px]" />
+        <app-hut-card [data]="item" (click)="onHutSelected(item)" class="max-w-[250px]" />
       }
     </div>
   </div>
 
+  <div class="grid grid-cols-3 gap-4 border-t border-dark-line  pt-4 [&_label]:mb-1 [&_label]:inline-block">
+    <!-- reservation time -->
+    <div>
+      <label for="">مدة الحجز</label>
+      <p-select
+        style="--p-select-background: #ffffff"
+        class="w-full border border-dark-line!"
+        [options]="[30, 60, 90, 120, 150, 180]"
+        [ngModel]="currentHutMinutes()"
+        (onChange)="onHutDurationChange($event)"
+      />
+    </div>
+    <!-- hut name/id -->
+    <div>
+      <label for="">رقم / اسم الكوخ</label>
+      <input
+        type="text"
+        name=""
+        class="w-full border border-dark-line!"
+        disabled
+        [value]="currentHut()?.name"
+        pInputText
+        id=""
+      />
+    </div>
+    <!-- hut price -->
+    <div>
+      <label for="">سعر الكوخ في الساعه</label>
+      <input
+        type="text"
+        name=""
+        class="w-full border border-dark-line!"
+        disabled
+        [value]="currentHutPrice().toFixed(2)"
+        pInputText
+        id=""
+      />
+    </div>
+  </div>
+
   <ng-template #footer>
-    <p-button
-      label="Cancel"
-      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
-      styleClass=" bg-[#EA7C69]! text-white! px-6!"
-      [text]="true"
-      class="mx-auto"
-      severity="secondary"
-      (click)="HutDialogVisible = false"
-    />
+    <div class="flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
+      <button pButton severity="secondary" class="bg-dark-bg-2" (click)="submitHut()">{{ 'form.save' | translate }}</button>
+      <button pButton severity="secondary" (click)="HutDialogVisible = false">{{ 'form.cancel' | translate }}</button>
+    </div>
   </ng-template>
 </p-dialog>
 
@@ -675,12 +703,13 @@
   <div
     class="flex-1 overflow-auto no-scrollbar"
     appDebounce
+    #roomsScroller
     [domEvents]="['scroll']"
-    (debounced)="onRoomsScroll($event)"
+    (debounced)="onRoomsScroll($event, roomsScroller)"
   >
     <div class="h-fit grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5">
       @for (item of rooms(); track $index) {
-        <app-room-card [data]="item" class="max-w-[250px]" />
+        <app-room-card [data]="item" (click)="onRoomSelected(item)" class="max-w-[250px]" />
       }
     </div>
   </div>
@@ -712,12 +741,13 @@
   <div
     class="flex-1 overflow-auto no-scrollbar"
     appDebounce
+    #tablesScroller
     [domEvents]="['scroll']"
-    (debounced)="onTablesScroll($event)"
+    (debounced)="onTablesScroll($event, tablesScroller)"
   >
     <div class="h-fit grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5">
       @for (item of tables(); track $index) {
-        <app-table-card [data]="item" class="max-w-[250px]" />
+        <app-table-card [data]="item" (click)="onTableSelected(item)" class="max-w-[250px]" />
       }
     </div>
   </div>
@@ -760,6 +790,7 @@
               [items]="displayedCustomers()"
               formControlName="id"
               bindLabel="name"
+              bindValue="id"
               placeholder="الكل"
               #customerSelect
               appDebounce

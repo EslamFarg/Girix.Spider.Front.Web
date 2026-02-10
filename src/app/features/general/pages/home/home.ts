@@ -16,6 +16,7 @@ import {
   ɵInternalFormsSharedModule,
   ReactiveFormsModule,
   ValidatorFn,
+  FormsModule,
 } from '@angular/forms';
 import { IProductSearchRow, ProductSearchEnum, ProductService } from '@/features/classes/services/product-service';
 import { IMealSearchRow } from '@/features/classes/services/meal-service';
@@ -50,6 +51,12 @@ import { ICustomerSearchRow } from '@/features/customers/services/customer-types
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { PrintService } from '@/features/print/services/print-service';
+import {
+  FinancialSettingsService,
+  IFinancialSettingsResponse,
+} from '@/features/settings/services/financial-settings-service';
+import { labeledRequiredValidator } from '@/yn-ng/utils/text-validators';
+import { Select, SelectChangeEvent } from 'primeng/select';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -66,6 +73,11 @@ interface IOrderCreateFgValue {
   items: FormControl<IOrderCreateItem[]>;
   customerRequest: FormControl<IOrderCreateCustomerRequest | null>;
   placeName: FormControl<string | null>;
+}
+
+enum DiscountType {
+  Amount = 1,
+  Percentage = 2,
 }
 
 @Component({
@@ -96,32 +108,32 @@ interface IOrderCreateFgValue {
     Button,
     ButtonDirective,
     NgSelectComponent,
+    Select,
+    FormsModule,
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home extends BaseComponent {
-  //enums
+  //
+  //
+  // enums
+  //
   OrderLocationType = OrderLocationType;
   OrderLocalType = OrderLocalType;
   OrderPaymentType = OrderPaymentType;
+  //
+  //
+  // state
+  //
   formMode = signal<FormMode>(FormMode.Create);
   isCreateMode = computed(() => this.formMode() == FormMode.Create);
-
   //
-  isMenuVisible: boolean = false;
-
-  //dialogs
-  additionsDialogVisible: boolean = false;
-  HutDialogVisible: boolean = false;
-  TableDialogVisible: boolean = false;
-  RoomDialogVisible: boolean = false;
   //
-
-  groupsService = inject(GroupService);
-  groups = signal<IGroupSearchRow[]>([]);
+  // order
+  //
   orderService = inject(OrderService);
-
+  financialSettingsService = inject(FinancialSettingsService);
   existingOrder = signal<IOrderReadResponse | null>(null);
 
   orderCreateItems = computed<IOrderCreateItem[]>(() => {
@@ -152,7 +164,7 @@ export class Home extends BaseComponent {
     payingNetwork: this.fb.control<number | null>(null, [Validators.required]),
     createAt: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
     idempotencyKey: this.fb.control<string>(Date.now() + Math.random().toString(), [Validators.required]),
-    items: this.fb.control<IOrderCreateItem[]>([], [Validators.minLength(1)]),
+    items: this.fb.control<IOrderCreateItem[]>([], [Validators.minLength(1), Validators.required]),
     customerRequest: this.fb.control<IOrderCreateCustomerRequest | null>(null, []),
   };
 
@@ -160,7 +172,19 @@ export class Home extends BaseComponent {
   orderCalculationsService = inject(OrderCalculationsService);
   getMenuItemTaxValue = this.orderCalculationsService.getMenuItemTaxValue;
   getMenuItemNetValue = this.orderCalculationsService.getMenuItemNetValue;
+  getMenuItemWithSelectiveTax = this.orderCalculationsService.getMenuItemWithSelectiveTax;
   orderMenuItems = signal<IOrderMenuItem[]>([]);
+
+  financialSettings = signal<IFinancialSettingsResponse>({
+    deliveryFee: 0,
+    deliveryFeeType: 0,
+    minimumSelectiveTax: 0,
+    discount: 0,
+    discountType: 0,
+    serviceFee: 0,
+    serviceFeeType: 0,
+    vat: 0,
+  });
 
   /**
    *
@@ -173,11 +197,30 @@ export class Home extends BaseComponent {
       },
     });
 
+    this.financialSettingsService.getSettings().subscribe((res) => this.financialSettings.set(res));
+
     this.searchHuts(1);
     this.searchRooms(1);
     this.searchTables(1);
     this.searchAdditions(1);
     this.searchCustomers({ pageIndex: 1, searchTerm: '' });
+
+    this.orderFg.get('orderType')?.valueChanges.subscribe((orderType) => {
+      const placeRefId = this.orderFg.get('placeRefId');
+      console.log(orderType);
+      switch (orderType) {
+        case OrderLocationType.Takeaway:
+        case OrderLocationType.Delivery:
+          placeRefId?.setValidators([]);
+          placeRefId?.patchValue(null);
+          break;
+        case OrderLocationType.DineIn:
+          placeRefId!.setValidators([labeledRequiredValidator('يرجى اختيار المكان', 'you must select a place')]);
+
+          break;
+      }
+      placeRefId?.updateValueAndValidity();
+    });
   }
 
   onMenuItemChange(changedItem: IOrderMenuItem) {
@@ -246,10 +289,79 @@ export class Home extends BaseComponent {
       this.orderFg.markAllAsTouched();
       return;
     }
+
+    console.log('valid order');
     this.orderService.create(this.orderFg.value).subscribe({
       next: (res) => {},
     });
   }
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //general calculations
+  //
+  serviceFee = computed(() => {
+    const itemsWithSelectiveTaxSum = this.orderMenuItems().reduce(
+      (total, item) => total + this.getMenuItemWithSelectiveTax(item),
+      0,
+    );
+
+    const serviceFee = itemsWithSelectiveTaxSum * (this.financialSettings().serviceFee / 100);
+    const serviceFeeAfterTax = serviceFee * (this.financialSettings().vat / 100);
+
+    return serviceFeeAfterTax;
+  });
+
+  discountAmount = computed(() => {
+    const discountValue = this.financialSettings().discount;
+    if (this.financialSettings().discountType == DiscountType.Amount) {
+      return discountValue;
+    } else if (this.financialSettings().discountType == DiscountType.Percentage) {
+      return this.orderItemsNet() * (discountValue / 100);
+    } else {
+      return 0;
+    }
+  });
+
+  orderItemsNet = computed(() => {
+    return this.orderMenuItems().reduce((total, item) => total + this.getMenuItemNetValue(item), 0);
+  });
+
+  net = computed(() => {
+    const net = this.orderItemsNet() + this.hutNet() + this.serviceFee();
+
+    return net;
+  });
+
+  netListener = effect(() => {
+    let net = this.net();
+
+    this.orderFg.patchValue({
+      payingCash: net,
+      payingNetwork: 0,
+    });
+  });
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //menu
+  //
+  isMenuVisible: boolean = false;
+  groupsService = inject(GroupService);
+  groups = signal<IGroupSearchRow[]>([]);
+
   //
   //
   //
@@ -263,7 +375,7 @@ export class Home extends BaseComponent {
   //print
   //
 
-  printService=inject(PrintService);
+  printService = inject(PrintService);
 
   onPrint() {
     // this.printService.printOrder();
@@ -283,9 +395,32 @@ export class Home extends BaseComponent {
   //
 
   //huts
+  HutDialogVisible: boolean = false;
 
   hutService = inject(HutService);
   huts = signal<IHutSearchRow[]>([]);
+  currentHut = signal<IHutSearchRow | null>(null);
+  currentHutMinutes = signal(30);
+  currentHutPrice = computed(() => {
+    const currentHut = this.currentHut();
+    if (!currentHut) return 0;
+
+    const hutHourPriceAfterVat = currentHut.pricePerHour * (1 + this.financialSettings().vat / 100);
+
+    return hutHourPriceAfterVat;
+  });
+  hutNet = computed(() => {
+    const hutPricePerHour = this.currentHut()?.pricePerHour ?? 0;
+    const vat = this.financialSettings().vat;
+    const minutes = this.currentHutMinutes();
+    const price = hutPricePerHour * (minutes / 60);
+
+    if (this.orderFg.value.placeType == OrderLocalType.Hut && this.currentHut()) {
+      return price * (1 + vat / 100);
+    } else {
+      return 0;
+    }
+  });
   hutPaginationInfo: {
     pageIndex: number;
     totalPagesCount: number;
@@ -325,15 +460,40 @@ export class Home extends BaseComponent {
       });
   }
 
-  onHutsScroll(event: Event) {
-    const menuContainer = event.target as HTMLElement;
-
+  onHutsScroll(event: Event, hutsScroller: HTMLElement) {
     // if at bottom
-    if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
+    if (hutsScroller.scrollTop + hutsScroller.clientHeight >= hutsScroller.scrollHeight - 1) {
       this.searchHuts(this.hutPaginationInfo.pageIndex + 1);
     }
   }
-  //
+
+  onHutSelected(hut: IHutSearchRow) {
+    if (hut.isAvailable) {
+      // this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
+      this.currentHut.set(hut);
+      // this.HutDialogVisible = false;
+    }
+  }
+
+  submitHut() {
+    const hut = this.currentHut();
+    if (!hut) {
+      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لم يتم اختيار كوخ' });
+      return;
+    }
+    this.orderFg.patchValue({
+      placeRefId: hut.id,
+      placeType: OrderLocalType.Hut,
+      durationMinutes: this.currentHutMinutes(),
+    });
+    this.HutDialogVisible = false;
+    this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع بنجاح' });
+  }
+
+  onHutDurationChange(duration: SelectChangeEvent) {
+    this.currentHutMinutes.set(duration.value);
+  }
+
   //
   //
   //
@@ -346,9 +506,12 @@ export class Home extends BaseComponent {
   //
   //
   //tables
+  //
+  TableDialogVisible: boolean = false;
 
   tableService = inject(TableService);
   tables = signal<ITableSearchRow[]>([]);
+
   tablePaginationInfo: {
     pageIndex: number;
     totalPagesCount: number;
@@ -386,12 +549,19 @@ export class Home extends BaseComponent {
         },
       });
   }
-  onTablesScroll(event: Event) {
-    const menuContainer = event.target as HTMLElement;
-
+  onTablesScroll(event: Event, tablesScroller: HTMLElement) {
     // if at bottom
-    if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
+    if (tablesScroller.scrollTop + tablesScroller.clientHeight >= tablesScroller.scrollHeight - 1) {
       this.searchTables(this.tablePaginationInfo.pageIndex + 1);
+    }
+  }
+  onTableSelected(table: ITableSearchRow) {
+    if (table.isAvailable) {
+      this.orderFg.patchValue({ placeRefId: table.id, placeType: OrderLocalType.Table });
+      this.TableDialogVisible = false;
+      this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
     }
   }
   //
@@ -404,8 +574,11 @@ export class Home extends BaseComponent {
   //
   //
   //
+  //
+  //
   //rooms
   //
+  RoomDialogVisible: boolean = false;
 
   roomService = inject(RoomService);
   rooms = signal<IRoomSearchRow[]>([]);
@@ -446,12 +619,20 @@ export class Home extends BaseComponent {
         },
       });
   }
-  onRoomsScroll(event: Event) {
-    const menuContainer = event.target as HTMLElement;
-
+  onRoomsScroll(event: Event, roomsScroller: HTMLElement) {
+    // console.log(roomsScroller);
     // if at bottom
-    if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
+    if (roomsScroller.scrollTop + roomsScroller.clientHeight >= roomsScroller.scrollHeight - 1) {
       this.searchRooms(this.roomPaginationInfo.pageIndex + 1);
+    }
+  }
+  onRoomSelected(room: IRoomSearchRow) {
+    if (room.isAvailable) {
+      this.orderFg.patchValue({ placeRefId: room.id, placeType: OrderLocalType.Room });
+      this.RoomDialogVisible = false;
+      this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع بنجاح' });
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
     }
   }
 
@@ -467,6 +648,7 @@ export class Home extends BaseComponent {
   //
   //additions
   //
+  additionsDialogVisible: boolean = false;
 
   orderRecipeAdditionsResponsiveOptions = [
     {
@@ -591,7 +773,7 @@ export class Home extends BaseComponent {
 
   _updateAdditionQuantity(quantity: number, additionIx: number, item: IProductSearchRow) {
     if (additionIx > -1) {
-      //update quantity
+      
       if (quantity > 0) {
         this.orderMenuItems.update((orderItems) =>
           orderItems.map((orderItem, i) =>
@@ -617,6 +799,7 @@ export class Home extends BaseComponent {
           ),
         );
       }
+      
     } else {
       //add new
       this.orderMenuItems.update((orderItems) =>
@@ -658,7 +841,7 @@ export class Home extends BaseComponent {
   }
 
   customerFgInitialValue = {
-    id: this.fb.control<number | null>(null, []),
+    id: this.fb.control<number | null>(0, []),
     phoneNumber: this.fb.control<string | null>(null, []),
     addressDescription: this.fb.control<string | null>(null, []),
   };
@@ -789,24 +972,6 @@ export class Home extends BaseComponent {
   showPaymentDialog() {
     this.paymentDialogVisible = true;
   }
-
-  net = computed(() => {
-    const orderItems = this.orderMenuItems();
-    let net = 0;
-    orderItems.forEach((item) => {
-      net += this.getMenuItemNetValue(item);
-    });
-
-    return net;
-  });
-
-  netListener = effect(() => {
-    const net = this.net();
-    this.orderFg.patchValue({
-      payingCash: net,
-      payingNetwork: 0,
-    });
-  });
 
   getPaymentInvalidControl() {
     const cashControl = this.orderFg.get('payingCash');

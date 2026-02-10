@@ -31,7 +31,9 @@
     "ledgerNumber": "Ledger Number",
     "amount": "Amount",
     "paid": "paid",
-    "postponed": "postponed"
+    "postponed": "postponed",
+    "save": "save",
+    "cancel": "cancel"
   },
   "actions": {
     "save": "save",

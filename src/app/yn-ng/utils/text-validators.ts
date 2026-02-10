@@ -48,3 +48,15 @@ export function mobileValidator(control: AbstractControl): ValidationErrors | nu
   const reg = /^01[0125][0-9]{8}$/;
   return reg.test(control.value) ? null : { mobile: true };
 }
+
+export function labeledRequiredValidator(messageAr: string, messageEn: string): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (control.value) return null;
+    return {
+      labeledRequired: {
+        messageAr,
+        messageEn,
+      },
+    };
+  };
+}

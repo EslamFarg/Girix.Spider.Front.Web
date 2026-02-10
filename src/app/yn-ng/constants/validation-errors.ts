@@ -5,6 +5,12 @@ export const ValidationErrors = {
   required() {
     return { ar: 'هذا الحقل مطلوب', en: 'This field is required' };
   },
+  labeledRequired(labels:{messageAr: string, messageEn: string}) {
+    return {
+      ar: labels.messageAr,
+      en: labels.messageEn,
+    };
+  },
   minLength({ requiredLength, actualLength }: { requiredLength: number; actualLength: number }) {
     return {
       ar: `يجب تعبئة هذا الحقل بحد اقل ${requiredLength}`,

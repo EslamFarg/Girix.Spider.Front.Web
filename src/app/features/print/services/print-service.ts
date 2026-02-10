@@ -24,20 +24,19 @@ export class PrintService extends BaseService {
       .print(
         `
         <style>
-        @page {
-           width: fit-content;
-           margin: 0;
-           padding: 4px;
-        }
+ 
           table {
             border-collapse: collapse;
           }
-          
+          th,td{
+            text-align: start;
+            padding: 4px;
+          }
           .border-b{
             border-bottom: 1px solid black;
           }
         </style>
-        <table dir="rtl" style="width: 100%">
+        <table dir="rtl" style="width: calc(80mm - 8px);margin: 0 auto">
           <thead>
             <tr>
               <th>الصنف</th>

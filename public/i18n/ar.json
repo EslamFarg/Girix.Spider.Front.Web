@@ -189,7 +189,9 @@
     "ledgerNumber": "الرقم الدفتري",
     "amount": "المبلغ",
     "paid": "مدفوع",
-    "postponed": "معلق"
+    "postponed": "معلق",
+    "save": "حفظ",
+    "cancel": "الغاء"
   },
 
   "actions": {
