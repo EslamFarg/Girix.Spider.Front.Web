@@ -9,14 +9,14 @@
   >
     <!-- actions btns -->
     <div
-      class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
+      class="w-full flex h-fit items-center justify-end gap-2"
       style="--p-button-primary-background: transparent"
     >
       <button
         pButton
         type="button"
         (click)="isMenuVisible = true"
-        class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8! me-auto"
+        class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8! xl:hidden! me-auto"
         variant="outlined"
         type="button"
       >
@@ -261,58 +261,60 @@
                       />
                     </svg>
                     <!-- additions -->
-                    <svg
-                      class="cursor-pointer"
-                      (click)="showAdditionsDialog($index)"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      class="cursor-pointer hover:text-blue-500 hover:scale-110 transition-all"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M6.875 3.125H4.79167C3.87119 3.125 3.125 3.87119 3.125 4.79167V6.875C3.125 7.79547 3.87119 8.54167 4.79167 8.54167H6.875C7.79547 8.54167 8.54167 7.79547 8.54167 6.875V4.79167C8.54167 3.87119 7.79547 3.125 6.875 3.125Z"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M14.1654 3.125V5.83333M14.1654 5.83333V8.54167M14.1654 5.83333H11.457M14.1654 5.83333H16.8737"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M6.875 11.4584H4.79167C3.87119 11.4584 3.125 12.2046 3.125 13.125V15.2084C3.125 16.1288 3.87119 16.875 4.79167 16.875H6.875C7.79547 16.875 8.54167 16.1288 8.54167 15.2084V13.125C8.54167 12.2046 7.79547 11.4584 6.875 11.4584Z"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M15.207 11.4584H13.1237C12.2032 11.4584 11.457 12.2046 11.457 13.125V15.2084C11.457 16.1288 12.2032 16.875 13.1237 16.875H15.207C16.1275 16.875 16.8737 16.1288 16.8737 15.2084V13.125C16.8737 12.2046 16.1275 11.4584 15.207 11.4584Z"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
+                    @if (orderMenuItem.menuItem.product) {
+                      <svg
+                        class="cursor-pointer"
+                        (click)="getProductAdditions(orderMenuItem.menuItem.product, $index)"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        class="cursor-pointer hover:text-blue-500 hover:scale-110 transition-all"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6.875 3.125H4.79167C3.87119 3.125 3.125 3.87119 3.125 4.79167V6.875C3.125 7.79547 3.87119 8.54167 4.79167 8.54167H6.875C7.79547 8.54167 8.54167 7.79547 8.54167 6.875V4.79167C8.54167 3.87119 7.79547 3.125 6.875 3.125Z"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M14.1654 3.125V5.83333M14.1654 5.83333V8.54167M14.1654 5.83333H11.457M14.1654 5.83333H16.8737"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M6.875 11.4584H4.79167C3.87119 11.4584 3.125 12.2046 3.125 13.125V15.2084C3.125 16.1288 3.87119 16.875 4.79167 16.875H6.875C7.79547 16.875 8.54167 16.1288 8.54167 15.2084V13.125C8.54167 12.2046 7.79547 11.4584 6.875 11.4584Z"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M15.207 11.4584H13.1237C12.2032 11.4584 11.457 12.2046 11.457 13.125V15.2084C11.457 16.1288 12.2032 16.875 13.1237 16.875H15.207C16.1275 16.875 16.8737 16.1288 16.8737 15.2084V13.125C16.8737 12.2046 16.1275 11.4584 15.207 11.4584Z"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    }
                   </div>
                 </td>
                 <td>
-                  <div class="flex flex-col gap-1 text-center px-4 items-center">
+                  <div class="flex flex-col gap-2 text-center px-4 items-center">
                     @let label =
                       orderMenuItem.menuItem.meal
                         ? orderMenuItem.menuItem.meal.name
                         : orderMenuItem.menuItem.product?.name;
-                    <div class="overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">{{ label }}</div>
+                    <div class="overflow-hidden text-ellipsis whitespace-nowrap max-w-37.5">{{ label }}</div>
                     <!--  additional items -->
                     <app-slider
                       [class]="
-                        `max-w-[300px] -mt-1.5 overflow-hidden xl:max-w-[250px] [&_.nav-btn]:p-1! [&_.nav-btn_*]:text-sm!  `
+                        `max-w-75 -mt-1.5 overflow-hidden xl:max-w-62.5 [&_.nav-btn]:p-1! [&_.nav-btn_*]:text-sm!  `
                       "
                       [template]="additionTemplate"
                       [items]="orderMenuItems()[$index].additions"
@@ -330,7 +332,7 @@
                           </div>
                         </div>
                         <div
-                          class="flex items-center justify-center rounded-full bg-text-lighter w-3 text-[#FA8D7B] font-bold text-[10px] aspect-square leading-none absolute -top-0 -left-0"
+                          class="flex items-center justify-center rounded-sm bg-text-lighter h-fit p-1 leading-none text-[#FA8D7B] font-bold text-[10px]   absolute -top-0 -left-0"
                         >
                           <span class="h-fit">{{ addition.quantity }}</span>
                         </div>
@@ -397,15 +399,12 @@
                   </div>
                 </td>
                 <!-- price -->
-                @let unitPrice =
-                  orderMenuItem.menuItem.meal
-                    ? orderMenuItem.menuItem.meal.priceWithTax
-                    : orderMenuItem.menuItem.product?.priceWithTax;
+
                 <td>
                   <div
                     class="mx-auto font-semibold border border-text-light rounded text-center w-fit h-fit px-2 py-0.5 leading-none"
                   >
-                    {{ unitPrice?.toFixed(2) }}
+                    {{ getMenuItemUnitPriceWithoutAdditionsWithTax(orderMenuItem)?.toFixed(2) }}
                   </div>
                 </td>
                 <!-- total -->
@@ -441,7 +440,7 @@
           <div class="absolute w-0.5 h-16 left-1/2 top-2 -translate-x-1/2 bg-dark-bg-2/20"></div>
           <div class="pe-1">
             <span>الخصم</span>
-            <div>{{discountAmount()}}</div>
+            <div>{{ discountAmount() }}</div>
           </div>
           <div class="ps-1">
             <span>الخدمه</span>
@@ -459,7 +458,7 @@
             class="flex text-xs col-span-2 mt-1 pt-1 font-bold justify-between items-center border-t border-text-light text-dark-bg-2"
           >
             <span>الصافي</span>
-            <span>{{net().toFixed(2)}}</span>
+            <span>{{ net().toFixed(2) }}</span>
           </div>
         </div>
       </div>
@@ -531,24 +530,19 @@
 
   <p class="font-bold text-center text-dark-bg-2 text-lg">الاضافات</p>
 
-  <div
-    class="flex-1 overflow-auto no-scrollbar"
-    appDebounce
-    [domEvents]="['scroll']"
-    #additionsScroller
-    (debounced)="onHutsScroll($event, additionsScroller)"
-  >
+  <div class="flex-1 overflow-auto no-scrollbar" appDebounce [domEvents]="['scroll']" #additionsScroller>
     <div class="grid grid-cols-4 gap-2">
       @for (item of additionProducts(); track $index) {
         <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-between p-2">
-          <img class="w-20" appImgFallback fallBackLink="/images/placeholders/menu-item.png" src="" alt="" />
+          <img class="w-20 h-20 object-cover rounded-md" appImgFallback fallBackLink="/images/placeholders/menu-item.png" [src]="baseUrl + item.images[0]?.fullPath" alt="" />
           <div class="flex items-center justify-between w-full text-dark-line font-bold">
             <span class="w-full text-ellipsis overflow-hidden">{{ item.name }}</span>
             <span>{{ item.price.toFixed(2) }}</span>
           </div>
           <div class="w-full flex items-center justify-center gap-4">
+            <!-- add -->
             <button
-              (click)="addAddition(item, +additionQuantity.value)"
+              (click)="addAdditionQuantity(item,+additionQuantity.value )"
               type="button"
               pButton
               class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
@@ -559,6 +553,7 @@
             >
               <i class="pi pi-plus text-[8px]!"></i>
             </button>
+            <!-- quantity -->
             <input
               #additionQuantity
               appAllowNumbers
@@ -570,7 +565,7 @@
             />
             <!-- remove -->
             <button
-              (click)="removeAddition(item, +additionQuantity.value)"
+              (click)="addAdditionQuantity(item, -additionQuantity.value )"
               type="button"
               pButton
               class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
@@ -593,21 +588,32 @@
     <app-slider
       [template]="additionTemplate"
       [items]="orderMenuItems()[currentMenuItemIx()].additions"
-      [config]="{ itemWidth: 100 }"
+      [config]="{ itemWidth: 80 }"
     />
 
     <ng-template #additionTemplate let-addition>
-      <div class="relative pt-1.5 pl-1.5">
-        <div class="border border-text-light rounded-md overflow-visible!">
-          <img [src]="baseUrl + addition.product?.images[0]?.fullPath" appImgFallback alt="" class="w-10" />
-          <span class="py-0.5 px-1 text-[10px] font-semibold overflow-hidden text-ellipsis whitespace-nowrap">{{
+      <div class="w-20 py-4" [title]="addition.product.name">
+        <div
+          class="border relative border-text-light rounded-md px-1 py-2 overflow-visible! flex flex-col gap-1 items-center justify-center"
+        >
+          <i
+            (click)="addAdditionQuantity(addition.product, null)"
+            class="pi pi-times-circle absolute text-lg! top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all hover:scale-115 hover:text-red-600"
+          ></i>
+          <img
+            [src]="baseUrl + addition.product?.images[0]?.fullPath"
+            appImgFallback
+            alt=""
+            class="rounded-md w-full aspect-square object-cover"
+          />
+          <span class="py-0.5 px-1 text-[10px] w-full font-bold overflow-hidden text-ellipsis whitespace-nowrap">{{
             addition.product.name
           }}</span>
-        </div>
-        <div
-          class="flex items-center justify-center rounded-full bg-text-lighter w-3 text-[#FA8D7B] font-bold text-[10px] aspect-square leading-none absolute -top-0 -left-0"
-        >
-          <span class="h-fit">{{ addition.quantity }}</span>
+          <div
+            class="flex items-center justify-center border rounded-sm p-0.5 bg-text-lighter h-fit text-green-500 font-bold text-[14px]  leading-none absolute -bottom-2.5 left-1/2 -translate-x-1/2"
+          >
+            <span class="h-fit">{{ addition.quantity }}</span>
+          </div>
         </div>
       </div>
     </ng-template>
@@ -640,7 +646,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-3 gap-4 border-t border-dark-line  pt-4 [&_label]:mb-1 [&_label]:inline-block">
+  <div class="grid grid-cols-3 gap-4 border-t border-dark-line pt-4 [&_label]:mb-1 [&_label]:inline-block">
     <!-- reservation time -->
     <div>
       <label for="">مدة الحجز</label>
@@ -682,7 +688,9 @@
 
   <ng-template #footer>
     <div class="flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
-      <button pButton severity="secondary" class="bg-dark-bg-2" (click)="submitHut()">{{ 'form.save' | translate }}</button>
+      <button pButton severity="secondary" class="bg-dark-bg-2" (click)="submitHut()">
+        {{ 'form.save' | translate }}
+      </button>
       <button pButton severity="secondary" (click)="HutDialogVisible = false">{{ 'form.cancel' | translate }}</button>
     </div>
   </ng-template>

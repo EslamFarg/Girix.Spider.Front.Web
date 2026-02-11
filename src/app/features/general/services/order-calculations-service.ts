@@ -19,11 +19,17 @@ import { IMealSearchRow } from '@/features/classes/services/meal-service';
 })
 export class OrderCalculationsService {
   getMenuItemTaxValue = (item: IOrderMenuItem) => {
+    let priceWithTax = 0;
+    let priceWithSelectiveTax = 0;
     if (item.menuItem.meal) {
-      return this.getMealTaxValue(item.menuItem.meal, item.menuItem.quantity);
+      priceWithTax = item.menuItem.meal.priceWithTax;
+      priceWithSelectiveTax = item.menuItem.meal.priceWithSelectiveTax;
     } else {
-      return this.getProductTaxValue(item.menuItem.product!, item.menuItem.quantity);
+      priceWithTax = item.menuItem.product!.priceWithTax;
+      priceWithSelectiveTax = item.menuItem.product!.priceWithSelectiveTax;
     }
+
+    return (priceWithTax - priceWithSelectiveTax) * item.menuItem.quantity;
   };
 
   getMenuItemNetValue = (item: IOrderMenuItem) => {
@@ -33,24 +39,52 @@ export class OrderCalculationsService {
       0,
     );
     if (item.menuItem.meal) {
-      return (itemNet = +(item.menuItem.meal.priceWithTax ?? 0) * item.menuItem.quantity);
+      itemNet = +(item.menuItem.meal.priceWithTax ?? 0);
     } else {
-      return (itemNet = +(item.menuItem.product?.priceWithTax ?? 0) * item.menuItem.quantity);
+      itemNet = +(item.menuItem.product?.priceWithTax ?? 0);
     }
 
-    return itemNet + additionsNet;
+    return (itemNet + additionsNet) * item.menuItem.quantity;
   };
 
   getProductTaxValue(item: IProductSearchRow, quantity: number): number {
     const tax = item.priceWithTax - item.priceWithSelectiveTax;
     return tax * quantity;
   }
+
+  getMenuItemUnitPriceWithoutAdditionsWithSelectiveTax = (item: IOrderMenuItem) =>
+    item.menuItem.meal ? item.menuItem.meal.priceWithSelectiveTax : item.menuItem.product?.priceWithSelectiveTax;
+
+  getMenuItemUnitPriceWithoutAdditionsWithTax = (item: IOrderMenuItem) =>
+    item.menuItem.meal ? item.menuItem.meal.priceWithTax : item.menuItem.product?.priceWithTax;
+
   getMealTaxValue(item: IMealSearchRow, quantity: number): number {
     const tax = item.priceWithTax - item.priceWithSelectiveTax;
     return tax * quantity;
   }
 
-  getMenuItemWithSelectiveTax = (item: IOrderMenuItem) => {
+  getMenuItemPriceWithSelectiveTaxWithoutAdditions = (item: IOrderMenuItem) => {
+    if (item.menuItem.meal) {
+      return +(item.menuItem.meal.priceWithSelectiveTax ?? 0) * item.menuItem.quantity;
+    } else {
+      return +(item.menuItem.product?.priceWithSelectiveTax ?? 0) * item.menuItem.quantity;
+    }
+  };
+  getMenuItemPriceWithAdditionsWithSelectiveTax = (item: IOrderMenuItem) => {
+    let unitPriceWithSelectiveTax = 0;
+    const addidtionsPriceWithSelectiveTax = item.additions.reduce(
+      (total, addition) => total + addition.product.priceWithSelectiveTax * addition.quantity,
+      0,
+    );
+    if (item.menuItem.meal) {
+      unitPriceWithSelectiveTax = item.menuItem.meal.priceWithSelectiveTax ?? 0;
+    } else {
+      unitPriceWithSelectiveTax = item.menuItem.product?.priceWithSelectiveTax ?? 0;
+    }
+
+    return (unitPriceWithSelectiveTax + addidtionsPriceWithSelectiveTax) * item.menuItem.quantity;
+  };
+  getMenuItemWithTaxWithoutAdditions = (item: IOrderMenuItem) => {
     if (item.menuItem.meal) {
       return +(item.menuItem.meal.priceWithSelectiveTax ?? 0) * item.menuItem.quantity;
     } else {

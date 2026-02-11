@@ -1,4 +1,8 @@
-<div class="flex gap-2 items-center w-full" style="--p-button-primary-background:transparent;--p-button-primary-color:black">
+<div
+  class="flex gap-2 items-center w-full"
+  [class.hidden]="!((items()?.length ?? 0) > 0)"
+  style="--p-button-primary-background: transparent; --p-button-primary-color: black"
+>
   <button (click)="scrollRight()" pButton class="border-0! nav-btn" type="button">
     <i class="pi pi-chevron-right"></i>
   </button>
@@ -7,7 +11,7 @@
     <div class="flex items-center w-full h-fit overflow-auto no-scrollbar" #itemsContainer>
       @for (item of items(); track $index) {
         <div class="px-1" [style]="`width: ${config().itemWidth}px;min-width: ${config().itemWidth}px`">
-          <ng-container *ngTemplateOutlet="template() ; context: {$implicit: item}"></ng-container>
+          <ng-container *ngTemplateOutlet="template(); context: { $implicit: item }"></ng-container>
         </div>
       }
     </div>

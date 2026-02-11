@@ -129,8 +129,7 @@ export enum ProductSearchEnum {
 })
 export class ProductService extends SearchableMixin(
   BaseCrudService<IProductCreateRequest, IProductUpdateRequest, IProductReadResponse>,
-)<IProductSearchResponseValue,ProductSearchEnum>() {
-
+)<IProductSearchResponseValue, ProductSearchEnum>() {
   override apiRoute = 'MenuItem';
 
   /**
@@ -141,7 +140,7 @@ export class ProductService extends SearchableMixin(
     this.patchEndpoints({ getById: 'GetById?MenuItemId=' });
   }
 
-  getAdditions(params: { dto: { paginationInfo: { pageIndex: number; pageSize: number } }; isAddition?: boolean }) {
+  getAllAdditions(params: { dto: { paginationInfo: { pageIndex: number; pageSize: number } }; isAddition?: boolean }) {
     return this.http.post<{
       rows: IProductSearchRow[];
       paginationInfo: {
@@ -149,5 +148,9 @@ export class ProductService extends SearchableMixin(
         totalPagesCount: number;
       };
     }>(`${this.apiUrl}/GetListIsAdditionMenuItem?IsAddtion=${params.isAddition}`, params.dto);
+  }
+
+  getAdditions(productId: number) {
+    return this.http.get<IProductSearchRow[]>(`${this.apiUrl}/MenuItemAdditionByMenuItemId?MenuItemId=${productId}`);
   }
 }

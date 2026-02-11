@@ -172,7 +172,14 @@ export class Home extends BaseComponent {
   orderCalculationsService = inject(OrderCalculationsService);
   getMenuItemTaxValue = this.orderCalculationsService.getMenuItemTaxValue;
   getMenuItemNetValue = this.orderCalculationsService.getMenuItemNetValue;
-  getMenuItemWithSelectiveTax = this.orderCalculationsService.getMenuItemWithSelectiveTax;
+  getMenuItemPriceWithAdditionsWithSelectiveTax =
+    this.orderCalculationsService.getMenuItemPriceWithAdditionsWithSelectiveTax;
+  getMenuItemPriceWithSelectiveTaxWithoutAdditions =
+    this.orderCalculationsService.getMenuItemPriceWithSelectiveTaxWithoutAdditions;
+  getMenuItemUnitPriceWithoutAdditionsWithSelectiveTax =
+    this.orderCalculationsService.getMenuItemUnitPriceWithoutAdditionsWithSelectiveTax;
+  getMenuItemUnitPriceWithoutAdditionsWithTax =
+    this.orderCalculationsService.getMenuItemUnitPriceWithoutAdditionsWithTax;
   orderMenuItems = signal<IOrderMenuItem[]>([]);
 
   financialSettings = signal<IFinancialSettingsResponse>({
@@ -202,7 +209,7 @@ export class Home extends BaseComponent {
     this.searchHuts(1);
     this.searchRooms(1);
     this.searchTables(1);
-    this.searchAdditions(1);
+    // this.searchAdditions(1);
     this.searchCustomers({ pageIndex: 1, searchTerm: '' });
 
     this.orderFg.get('orderType')?.valueChanges.subscribe((orderType) => {
@@ -307,7 +314,7 @@ export class Home extends BaseComponent {
   //
   serviceFee = computed(() => {
     const itemsWithSelectiveTaxSum = this.orderMenuItems().reduce(
-      (total, item) => total + this.getMenuItemWithSelectiveTax(item),
+      (total, item) => total + this.getMenuItemPriceWithAdditionsWithSelectiveTax(item),
       0,
     );
 
@@ -696,6 +703,7 @@ export class Home extends BaseComponent {
   ];
   productService = inject(ProductService);
   currentMenuItemIx = signal(0);
+  currentMenuItemAdditions = computed(() => this.orderMenuItems()[this.currentMenuItemIx()].additions);
   additionProducts = signal<IProductSearchRow[]>([]);
   additionPaginationInfo: {
     pageIndex: number;
@@ -706,110 +714,142 @@ export class Home extends BaseComponent {
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
-  searchAdditions(pageIndex: number) {
-    this.productService
-      .getAdditions({
-        dto: {
-          paginationInfo: {
-            pageIndex: pageIndex,
-            pageSize: 20,
-          },
-        },
-        isAddition: true,
-      })
-      .subscribe({
-        next: (res) => {
-          if (res.rows.length > 0) {
-            this.additionProducts.update((prev) => prev.concat(res.rows));
-            this.additionPaginationInfo = {
-              pageIndex,
-              totalPagesCount: res.paginationInfo.totalPagesCount,
-              totalRowsCount: res.paginationInfo.totalRowsCount,
-            };
-          }
-        },
-      });
-  }
-  onAdditionsScroll(event: Event) {
-    const menuContainer = event.target as HTMLElement;
+  // searchAdditions(pageIndex: number) {
+  //   this.productService
+  //     .getAdditions({
+  //       dto: {
+  //         paginationInfo: {
+  //           pageIndex: pageIndex,
+  //           pageSize: 20,
+  //         },
+  //       },
+  //       isAddition: true,
+  //     })
+  //     .subscribe({
+  //       next: (res) => {
+  //         if (res.rows.length > 0) {
+  //           this.additionProducts.update((prev) => prev.concat(res.rows));
+  //           this.additionPaginationInfo = {
+  //             pageIndex,
+  //             totalPagesCount: res.paginationInfo.totalPagesCount,
+  //             totalRowsCount: res.paginationInfo.totalRowsCount,
+  //           };
+  //         }
+  //       },
+  //     });
+  // }
+  // onAdditionsScroll(event: Event) {
+  //   const menuContainer = event.target as HTMLElement;
 
-    // if at bottom
-    if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
-      this.searchAdditions(this.additionPaginationInfo.pageIndex + 1);
-    }
-  }
+  //   // if at bottom
+  //   if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
+  //     this.searchAdditions(this.additionPaginationInfo.pageIndex + 1);
+  //   }
+  // }
 
-  showAdditionsDialog(currentMenuItemIx: number) {
-    this.currentMenuItemIx.set(currentMenuItemIx);
-    this.additionsDialogVisible = true;
-  }
+  // addAddition(item: IProductSearchRow, quantity: number) {
+  //   const futureQuantity =
+  //     this.orderMenuItems()[this.currentMenuItemIx()].additions.find((addition) => addition.product.id === item.id)!
+  //       .quantity + quantity;
 
-  addAddition(item: IProductSearchRow, quantity: number) {
-    const previousAdditionIx = this.orderMenuItems()[this.currentMenuItemIx()].additions.findIndex(
-      (addition) => addition.product.id === item.id,
+  //   this.updateAdditionQuantity(item, futureQuantity);
+  // }
+
+  // removeAddition(item: IProductSearchRow, quantity: number) {
+  //   this.updateAdditionQuantity(item, futureQuantity > 1000 ? 1000 : futureQuantity);
+  // }
+
+  addAdditionQuantity(addition: IProductSearchRow, quantity: number | null) {
+    const currentMenuItem = this.orderMenuItems()[this.currentMenuItemIx()];
+
+    const existingAddition = currentMenuItem.additions.find(
+      (existingAddition) => existingAddition.product.id === addition.id,
     );
 
-    if (previousAdditionIx > -1) {
-      const previousAddition = this.orderMenuItems()[this.currentMenuItemIx()].additions[previousAdditionIx];
+    const deleteAddition = () =>
+      this.orderMenuItems.update((orderItems) =>
+        orderItems.map((orderItem, i) =>
+          i == this.currentMenuItemIx()
+            ? {
+                ...orderItem,
+                additions: orderItem.additions.filter((existingAddition) => existingAddition.product.id != addition.id),
+              }
+            : orderItem,
+        ),
+      );
 
-      //check if new quantity is less or equal 1000
-      if (previousAddition.quantity + quantity > 1000) {
-        this._updateAdditionQuantity(1000, previousAdditionIx, item);
-      } else {
-        this._updateAdditionQuantity((previousAddition.quantity += quantity), previousAdditionIx, item);
-      }
-    } else {
-      this._updateAdditionQuantity(quantity, previousAdditionIx, item);
+    if (quantity == null) {
+      //delete addition
+      deleteAddition();
+      return;
     }
-  }
 
-  removeAddition(item: IProductSearchRow, quantity: number) {
-    const previousAdditionQuantity = this.orderMenuItems()[this.currentMenuItemIx()].additions.find(
-      (addition) => addition.product.id === item.id,
-    )!.quantity;
+    if (existingAddition) {
+      //adding quantity
+      const futureQuantity = existingAddition.quantity + quantity;
 
-    this._updateAdditionQuantity(previousAdditionQuantity - quantity, -1, item);
-  }
-
-  _updateAdditionQuantity(quantity: number, additionIx: number, item: IProductSearchRow) {
-    if (additionIx > -1) {
-      
-      if (quantity > 0) {
-        this.orderMenuItems.update((orderItems) =>
-          orderItems.map((orderItem, i) =>
-            i == this.currentMenuItemIx()
-              ? {
-                  ...orderItem,
-                  additions: orderItem.additions.map((addition, j) =>
-                    j == additionIx ? { ...addition, quantity } : addition,
-                  ),
-                }
-              : orderItem,
-          ),
-        );
-      } else {
-        this.orderMenuItems.update((orderItems) =>
-          orderItems.map((orderItem, i) =>
-            i == this.currentMenuItemIx()
-              ? {
-                  ...orderItem,
-                  additions: orderItem.additions.filter((addition, j) => j != additionIx),
-                }
-              : orderItem,
-          ),
-        );
+      if (futureQuantity <= 0) {
+        deleteAddition();
+        return;
       }
-      
+
+      currentMenuItem.additions.forEach((existingAddition) => {
+        if (existingAddition.product.id === addition.id) {
+          existingAddition.quantity = futureQuantity > 1000 ? 1000 : futureQuantity;
+        }
+      });
+
+      this.orderMenuItems.update((items) =>
+        items.map((item, i) => (i == this.currentMenuItemIx() ? currentMenuItem : item)),
+      );
     } else {
       //add new
       this.orderMenuItems.update((orderItems) =>
         orderItems.map((orderItem, i) =>
           i == this.currentMenuItemIx()
-            ? { ...orderItem, additions: orderItem.additions.concat({ product: item, quantity: quantity }) }
+            ? {
+                ...orderItem,
+                additions: orderItem.additions.concat({
+                  product: addition,
+                  quantity: quantity > 1000 ? 1000 : quantity,
+                }),
+              }
             : orderItem,
         ),
       );
     }
+
+    // if (existingAddition) {
+    //   // this.orderMenuItems.update((orderItems) =>
+    //   //   orderItems.map((orderItem, i) =>
+    //   //     i == this.currentMenuItemIx()
+    //   //       ? {
+    //   //           ...orderItem,
+    //   //           additions: orderItem.additions.map((addition, j) =>
+    //   //             j == additionIx ? { ...addition, quantity } : addition,
+    //   //           ),
+    //   //         }
+    //   //       : orderItem,
+    //   //   ),
+    //   // );
+    // }
+  }
+
+  getProductAdditions(product: IProductSearchRow, currentMenuItemIx: number) {
+    this.productService.getAdditions(product.id).subscribe({
+      next: (products) => {
+        if (products?.length > 0) {
+          this.additionProducts.set(products);
+          this.currentMenuItemIx.set(currentMenuItemIx);
+          this.additionsDialogVisible = true;
+        } else {
+          this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يوجد اضافات للمنتج' });
+        }
+      },
+      error: (error) => {
+        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يوجد اضافات للمنتج' });
+      },
+    });
   }
 
   //
