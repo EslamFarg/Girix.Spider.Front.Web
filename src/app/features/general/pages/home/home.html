@@ -8,10 +8,7 @@
     class="flex w-full flex-col gap-4 h-full no-scrollbar overflow-auto p-4 xl:ps-0 xl:col-span-2"
   >
     <!-- actions btns -->
-    <div
-      class="w-full flex h-fit items-center justify-end gap-2"
-      style="--p-button-primary-background: transparent"
-    >
+    <div class="w-full flex h-fit items-center justify-end gap-2" style="--p-button-primary-background: transparent">
       <button
         pButton
         type="button"
@@ -332,7 +329,7 @@
                           </div>
                         </div>
                         <div
-                          class="flex items-center justify-center rounded-sm bg-text-lighter h-fit p-1 leading-none text-[#FA8D7B] font-bold text-[10px]   absolute -top-0 -left-0"
+                          class="flex items-center justify-center rounded-sm bg-text-lighter h-fit p-1 leading-none text-[#FA8D7B] font-bold text-[10px] absolute -top-0 -left-0"
                         >
                           <span class="h-fit">{{ addition.quantity }}</span>
                         </div>
@@ -534,7 +531,13 @@
     <div class="grid grid-cols-4 gap-2">
       @for (item of additionProducts(); track $index) {
         <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-between p-2">
-          <img class="w-20 h-20 object-cover rounded-md" appImgFallback fallBackLink="/images/placeholders/menu-item.png" [src]="baseUrl + item.images[0]?.fullPath" alt="" />
+          <img
+            class="w-20 h-20 object-cover rounded-md"
+            appImgFallback
+            fallBackLink="/images/placeholders/menu-item.png"
+            [src]="baseUrl + item.images[0]?.fullPath"
+            alt=""
+          />
           <div class="flex items-center justify-between w-full text-dark-line font-bold">
             <span class="w-full text-ellipsis overflow-hidden">{{ item.name }}</span>
             <span>{{ item.price.toFixed(2) }}</span>
@@ -542,7 +545,7 @@
           <div class="w-full flex items-center justify-center gap-4">
             <!-- add -->
             <button
-              (click)="addAdditionQuantity(item,+additionQuantity.value )"
+              (click)="addAdditionQuantity(item, +additionQuantity.value)"
               type="button"
               pButton
               class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
@@ -565,7 +568,7 @@
             />
             <!-- remove -->
             <button
-              (click)="addAdditionQuantity(item, -additionQuantity.value )"
+              (click)="addAdditionQuantity(item, -additionQuantity.value)"
               type="button"
               pButton
               class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
@@ -610,7 +613,7 @@
             addition.product.name
           }}</span>
           <div
-            class="flex items-center justify-center border rounded-sm p-0.5 bg-text-lighter h-fit text-green-500 font-bold text-[14px]  leading-none absolute -bottom-2.5 left-1/2 -translate-x-1/2"
+            class="flex items-center justify-center border rounded-sm p-0.5 bg-text-lighter h-fit text-green-500 font-bold text-[14px] leading-none absolute -bottom-2.5 left-1/2 -translate-x-1/2"
           >
             <span class="h-fit">{{ addition.quantity }}</span>
           </div>
@@ -777,6 +780,7 @@
 <p-dialog
   [(visible)]="customerDialogVisible"
   [modal]="true"
+  (onHide)="closeFullKeyboard()"
   [style]="{ width: '80%', maxWidth: '50rem' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-white!"
@@ -837,10 +841,13 @@
               formControlName="addressDescription"
               aria-describedby="productAddress-help"
               [placeholder]="'form.customerAddress' | translate"
-              class="app-input"
+              class="app-input order-customer-address"
+              (click)="toggleKeyboard('.order-customer-address')"
             />
           </app-input-error-message-handler>
         </div>
+
+        <!-- <app-full-keyboard /> -->
       </form>
       <!-- actions -->
       <!-- <div

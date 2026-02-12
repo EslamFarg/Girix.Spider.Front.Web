@@ -14,6 +14,7 @@ import { Menu as pMenu } from 'primeng/menu';
 import { IGroupSearchRow } from '@/features/classes/services/group-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { ButtonDirective } from 'primeng/button';
+import { RouterLink } from "@angular/router";
 export interface IMenuItem {
   id: string;
   index: number;
@@ -44,7 +45,8 @@ export interface IOrderMenuItem {
     pMenu,
     AllowNumbers,
     ButtonDirective,
-  ],
+    RouterLink
+],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
 })
@@ -115,8 +117,6 @@ export class Menu extends BaseComponent {
       this.previousSearchCriteria.searchTerm === this.menuSearchFg.getRawValue().searchTerm &&
       this.previousSearchCriteria.searchEnum === this.menuSearchFg.getRawValue().searchEnum &&
       this.previousSearchCriteria.category === this.menuSearchFg.getRawValue().category;
-
-    console.log(this.previousSearchCriteria, this.menuSearchFg.getRawValue(), isIdentical);
 
     return isIdentical;
   }

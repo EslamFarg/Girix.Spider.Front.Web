@@ -115,7 +115,16 @@
           </p>
           <!-- price -->
           <div class="flex items-center justify-between w-full">
-            <button type="button" class="underline text-[8px] font-semibold">تفاصيل</button>
+            <a
+              [routerLink]="
+                item.meal
+                  ? ['classes', 'meals', item.meal!.id, 'edit']
+                  : ['classes', 'products', item.product!.id, 'edit']
+              "
+              type="button"
+              class="underline text-[8px] font-semibold"
+              >تفاصيل</a
+            >
             @let price = item.meal ? item.meal.priceWithTax : item.product?.priceWithTax;
 
             <span class="text-xs font-bold">{{ price }}</span>

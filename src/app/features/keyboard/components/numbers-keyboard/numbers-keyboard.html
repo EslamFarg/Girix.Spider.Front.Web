@@ -1,0 +1,14 @@
+<p-dialog
+  [visible]="isVisible()"
+  (visibleChange)="closeKeyboard()"
+  [modal]="true"
+  [style]="{ width: '80%', maxWidth: '50rem' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-white!"
+  class="addition-dialog"
+  [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
+>
+  <ng-template #headless>
+    <div class="flex flex-col p-4 gap-4"></div>
+  </ng-template>
+</p-dialog>

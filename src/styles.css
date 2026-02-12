@@ -47,3 +47,9 @@ body {
   margin: 0 auto;
   max-width: 1800px !important;
 }
+.hg-theme-default .hg-row > div:last-child {
+  margin-right: 5px !important;
+}
+.hg-theme-default .hg-row > div:first-child {
+  margin-right: 0px !important;
+}

@@ -1,0 +1,23 @@
+<!-- <p-dialog
+  [visible]="isVisible()"
+  (visibleChange)="closeKeyboard()"
+  [modal]="true"
+  [style]="{ width: '100%' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-white!"
+  class="addition-dialog"
+  [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
+>
+  <ng-template #headless >
+    <div class="full-keyboard"></div>
+  </ng-template>
+</p-dialog> -->
+
+<div
+  [class]="
+    `fixed bottom-0 left-0 w-full h-fit flex items-end justify-center opacity-0 pointer-events-none -z-50 
+    ${isVisible() && ' opacity-100 pointer-events-auto! z-999999999999999! '}`
+  "
+>
+  <div class="full-keyboard"></div>
+</div>

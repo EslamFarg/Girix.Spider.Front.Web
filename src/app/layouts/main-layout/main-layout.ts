@@ -5,10 +5,12 @@ import { Footer } from '@/components/footer/footer';
 import { Sidebar } from '@/components/sidebar/sidebar';
 import { BaseComponent } from '@/components/base-component/base-component';
 import { LayoutService } from '../services/layout-service';
+import { Dialog } from "primeng/dialog";
+import { FullKeyboard } from "@/features/keyboard/components/full-keyboard/full-keyboard";
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterOutlet, Sidebar, Header],
+  imports: [RouterOutlet, Sidebar, Header, Dialog, FullKeyboard],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css',
 })

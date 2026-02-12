@@ -57,6 +57,8 @@ import {
 } from '@/features/settings/services/financial-settings-service';
 import { labeledRequiredValidator } from '@/yn-ng/utils/text-validators';
 import { Select, SelectChangeEvent } from 'primeng/select';
+import { KeyboardService } from '@/features/keyboard/services/keyboard-service';
+import { FullKeyboard } from '@/features/keyboard/components/full-keyboard/full-keyboard';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -110,6 +112,7 @@ enum DiscountType {
     NgSelectComponent,
     Select,
     FormsModule,
+    FullKeyboard,
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -386,6 +389,28 @@ export class Home extends BaseComponent {
 
   onPrint() {
     // this.printService.printOrder();
+  }
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //keyboard
+  //
+
+  keyboardService = inject(KeyboardService);
+  closeFullKeyboard = this.keyboardService.closeFullKeyboard;
+
+  toggleKeyboard(inputClassSelector: string) {
+    // 'order-customer-address'
+    console.log('toggle keyboard');
+    this.keyboardService.triggerKeyboard(inputClassSelector, 'full-keyboard');
   }
 
   //
@@ -879,7 +904,12 @@ export class Home extends BaseComponent {
   showCustomerDialog() {
     this.customerDialogVisible = true;
   }
-
+  onCustomerInfoDialogVisibilityChange(visible: boolean) {
+    console.log('customer dialog visible', visible);
+    if (!visible) {
+       this.closeFullKeyboard();
+    }
+  }
   customerFgInitialValue = {
     id: this.fb.control<number | null>(0, []),
     phoneNumber: this.fb.control<string | null>(null, []),
@@ -991,6 +1021,7 @@ export class Home extends BaseComponent {
       this.searchCustomers({ pageIndex: this.customersSearchPaginationInfo.pageIndex + 1, searchTerm });
     }
   }
+
   //
   //
   //
