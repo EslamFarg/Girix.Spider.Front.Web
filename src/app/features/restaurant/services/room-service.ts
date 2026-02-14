@@ -1,6 +1,6 @@
 import { BaseCrudService } from '@/core/services/BaseCrudService';
+import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
-import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
 import { Injectable } from '@angular/core';
 
 export enum RoomSearchEnum {
@@ -50,8 +50,12 @@ export interface IRoomReadResponse {
 @Injectable({
   providedIn: 'root',
 })
-export class RoomService extends SearchableMixin(
-  BaseCrudService<IRoomCreateRequest, IRoomUpdateRequest, IRoomReadResponse>,
-)<IRoomSearchResponse, RoomSearchEnum>() {
+export class RoomService extends BaseSearchAndCrudService<
+  IRoomSearchResponse,
+  RoomSearchEnum,
+  IRoomCreateRequest,
+  IRoomUpdateRequest,
+  IRoomReadResponse
+> {
   override apiRoute = 'Room';
 }

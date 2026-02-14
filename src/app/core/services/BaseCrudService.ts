@@ -1,15 +1,6 @@
 import { Observable, tap } from 'rxjs';
 import BaseService from './BaseService';
-export interface IBaseSearchResponse<T> {
-  value: T;
-  isSuccess: boolean;
-  isFailure: boolean;
-  error: {
-    code: string;
-    args: any[];
-    errorType: number;
-  };
-}
+
 
 export class BaseCrudService<ICreateDto = any, IUpdateDto = any, IGetByIdDto = any> extends BaseService {
   create<IDefaultCreateDto = ICreateDto>(createDto: IDefaultCreateDto | FormData) {

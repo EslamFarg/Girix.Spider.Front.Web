@@ -1,6 +1,7 @@
 import { BaseCrudService } from '@/core/services/BaseCrudService';
+import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
-import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
+ 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -165,10 +166,13 @@ export interface ILocalPlaceChangeRequest {
 @Injectable({
   providedIn: 'root',
 })
-export class OrderService extends SearchableMixin(BaseCrudService<IOrderCreateRequest, any, IOrderReadResponse>)<
+export class OrderService extends BaseSearchAndCrudService<
   IOrderSearchResponseValue,
-  OrderSearchEnum
->() {
+  OrderSearchEnum,
+  IOrderCreateRequest,
+  any,
+  IOrderReadResponse
+> {
   override apiRoute = 'Order';
 
   changeLocalPlace(dto: ILocalPlaceChangeRequest) {

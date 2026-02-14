@@ -1,7 +1,7 @@
 import { BaseCrudService } from '@/core/services/BaseCrudService';
+import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
-import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
-import { Injectable } from '@angular/core';
+ import { Injectable } from '@angular/core';
 
 export enum PrinterSearchEnum {
   Name = SearchColumEnum.Name,
@@ -50,8 +50,6 @@ export interface IPrinterSearchResponseValue {
 @Injectable({
   providedIn: 'root',
 })
-export class PrinterService extends SearchableMixin(
-  BaseCrudService<IPrinterCreateRequest, IPrinterUpdateRequest, IPrinterReadResponse>,
-)<IPrinterSearchResponseValue, PrinterSearchEnum>() {
+export class PrinterService extends BaseSearchAndCrudService<IPrinterSearchResponseValue, PrinterSearchEnum,IPrinterCreateRequest, IPrinterUpdateRequest, IPrinterReadResponse> {
   override apiRoute = 'Printer';
 }

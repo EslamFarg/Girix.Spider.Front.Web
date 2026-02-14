@@ -7,7 +7,7 @@ import {
   IUserSearchResponseValue,
 } from './user-types';
 import { BaseCrudService } from '@/core/services/BaseCrudService';
-import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
+import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 
 //MenuItems : Id,Name,PhoneNumber
 
@@ -20,13 +20,13 @@ export enum UserSearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class UserService extends SearchableMixin(
-  BaseCrudService<
-   IUserCreateRequest,
+export class UserService extends BaseSearchAndCrudService<
+  IUserSearchResponseValue,
+  UserSearchEnum,
+  IUserCreateRequest,
   IUserCreateUpdateRequest,
   IUserReadResponse
- >
-)<IUserSearchResponseValue,UserSearchEnum >() {
+> {
   override apiRoute = 'Users';
 
   /**

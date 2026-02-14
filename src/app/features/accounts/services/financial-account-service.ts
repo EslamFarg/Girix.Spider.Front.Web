@@ -2,7 +2,7 @@ import BaseService from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
 import { ICashBankCustodyAccounts, IFinancialAccountSearchResponseValue } from './financial-account-types';
 import { BaseCrudService } from '@/core/services/BaseCrudService';
-import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
+import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 
 export enum FinancialAccountSearchEnum {
   Id = SearchColumEnum.Id,
@@ -13,10 +13,10 @@ export enum FinancialAccountSearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class FinancialAccountService extends SearchableMixin(BaseCrudService)<
+export class FinancialAccountService extends BaseSearchAndCrudService<
   IFinancialAccountSearchResponseValue,
   FinancialAccountSearchEnum
->() {
+> {
   override apiRoute = 'FinancialAccount';
   /**
    *

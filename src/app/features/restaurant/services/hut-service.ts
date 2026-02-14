@@ -1,6 +1,6 @@
 import { BaseCrudService } from '@/core/services/BaseCrudService';
+import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
-import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
 import { Injectable } from '@angular/core';
 
 export enum HutSearchEnum {
@@ -51,8 +51,12 @@ export interface IHutReadResponse {
 @Injectable({
   providedIn: 'root',
 })
-export class HutService extends SearchableMixin(
-  BaseCrudService<IHutCreateRequest, IHutUpdateRequest, IHutReadResponse>,
-)<IHutSearchResponseValue, HutSearchEnum>() {
+export class HutService extends BaseSearchAndCrudService<
+  IHutSearchResponseValue,
+  HutSearchEnum,
+  IHutCreateRequest,
+  IHutUpdateRequest,
+  IHutReadResponse
+> {
   override apiRoute = 'Hut';
 }

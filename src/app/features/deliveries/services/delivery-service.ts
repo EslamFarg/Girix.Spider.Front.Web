@@ -1,7 +1,7 @@
 import { BaseCrudService } from '@/core/services/BaseCrudService';
+import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
-import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
-import { Injectable } from '@angular/core';
+ import { Injectable } from '@angular/core';
 
 export interface IDeliveryRowResponse {
   id: number;
@@ -52,8 +52,12 @@ export enum DeliverySearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class DeliveryService extends SearchableMixin(
-  BaseCrudService<IDeliveryCreateRequest, IDeliveryUpdateRequest, IDeliveryReadResponse>,
-)<IDeliverySearchResponseValue, DeliverySearchEnum>() {
+export class DeliveryService extends BaseSearchAndCrudService<
+  IDeliverySearchResponseValue,
+  DeliverySearchEnum,
+  IDeliveryCreateRequest,
+  IDeliveryUpdateRequest,
+  IDeliveryReadResponse
+> {
   override apiRoute = 'Delivery';
 }

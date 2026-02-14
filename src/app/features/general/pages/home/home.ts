@@ -233,6 +233,15 @@ export class Home extends BaseComponent {
     });
   }
 
+  //
+  //
+  //
+  //
+  //
+  //
+  // menu items change
+  //
+
   onMenuItemChange(changedItem: IOrderMenuItem) {
     const existingItem = this.orderMenuItems().find((item) => item.menuItem.id == changedItem.menuItem.id);
     if (existingItem) {
@@ -288,6 +297,20 @@ export class Home extends BaseComponent {
     this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
   }
 
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  // order form
+  //
+
   onSubmitOrder() {
     this.orderFg.patchValue({
       items: this.orderCreateItems(),
@@ -305,6 +328,14 @@ export class Home extends BaseComponent {
       next: (res) => {},
     });
   }
+
+
+  resetOrderForm() {
+    
+  }
+
+  //
+  //
   //
   //
   //
@@ -315,6 +346,7 @@ export class Home extends BaseComponent {
   //
   //general calculations
   //
+
   serviceFee = computed(() => {
     const itemsWithSelectiveTaxSum = this.orderMenuItems().reduce(
       (total, item) => total + this.getMenuItemPriceWithAdditionsWithSelectiveTax(item),

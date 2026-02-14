@@ -7,7 +7,7 @@ import {
   ICustomerUpdateRequest,
 } from './customer-types';
 import { BaseCrudService } from '@/core/services/BaseCrudService';
-import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
+ import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 //Customer : Id,Name,PhoneNumber,IsCompany
 
 export enum CustomerSearchEnum {
@@ -20,9 +20,13 @@ export enum CustomerSearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class CustomerService extends SearchableMixin(
-  BaseCrudService<ICustomerCreateRequest, ICustomerUpdateRequest, ICustomerReadResponse>,
-)<ICustomerSearchResponseValue, CustomerSearchEnum>() {
+export class CustomerService extends BaseSearchAndCrudService<
+  ICustomerSearchResponseValue,
+  CustomerSearchEnum,
+  ICustomerCreateRequest,
+  ICustomerUpdateRequest,
+  ICustomerReadResponse
+> {
   override apiRoute = 'Customer';
 
   /**

@@ -1,6 +1,6 @@
 import { BaseCrudService } from '@/core/services/BaseCrudService';
+import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
-import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
 import { Injectable } from '@angular/core';
 
 export enum TableSearchEnum {
@@ -48,8 +48,12 @@ export interface ITableReadResponse {
 @Injectable({
   providedIn: 'root',
 })
-export class TableService extends SearchableMixin(
-  BaseCrudService<ITableCreateRequest, ITableUpdateRequest, ITableReadResponse>,
-)<ITableSearchResponse, TableSearchEnum>() {
+export class TableService extends BaseSearchAndCrudService<
+  ITableSearchResponse,
+  TableSearchEnum,
+  ITableCreateRequest,
+  ITableUpdateRequest,
+  ITableReadResponse
+> {
   override apiRoute = 'Table';
 }

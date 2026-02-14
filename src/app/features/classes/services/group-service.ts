@@ -1,7 +1,7 @@
 import { IPaginatedResponse } from '@/core/interfaces/responses';
 import { BaseCrudService } from '@/core/services/BaseCrudService';
+import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
-import { SearchableMixin, SearchColumEnum } from '@/core/services/interfaces';
 import { Injectable } from '@angular/core';
 
 export interface IGroupSearchRow {
@@ -45,10 +45,13 @@ export enum GroupSearchEnum {
 @Injectable({
   providedIn: 'root',
 })
-export class GroupService extends SearchableMixin(BaseCrudService<any, any, IGroupReadResponse>)<
+export class GroupService extends BaseSearchAndCrudService<
   IGroupSearchResponseValue,
-  GroupSearchEnum
->() {
+  GroupSearchEnum,
+  any,
+  any,
+  IGroupReadResponse
+> {
   override apiRoute = 'Category';
 
   /**
@@ -57,7 +60,6 @@ export class GroupService extends SearchableMixin(BaseCrudService<any, any, IGro
   constructor() {
     super();
     this.patchEndpoints({ getById: 'GetById?id=' });
-    
   }
 
   getList(IsOnCasher: boolean = false, paginationInfo: { pageIndex: number; pageSize: number }) {
