@@ -6,14 +6,13 @@ import { BaseComponent } from '@/components/base-component/base-component';
 @Directive({
   selector: '[appAllowNumbers]',
 })
-export class AllowNumbers  {
-
+export class AllowNumbers {
   @Input() max: number = Infinity;
   @Input() min: number = 0;
   @Input() fixed: number = 3;
 
   allowDecimal = input<boolean>(false);
-  oldValue: number  = 0;
+  oldValue: number = 0;
 
   @HostListener('keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
@@ -38,38 +37,6 @@ export class AllowNumbers  {
         event.preventDefault();
       }
     }
-
-
-    // if (+input.value >= this.max) {
-    //   input.value=this.oldValue.toString();
-    //   let message = this.localize(`الحد الاقصى هو ${this.max}`, `Max value is ${this.max}`);
-    //   this.toaster.warning(message);
-    //   event.preventDefault();
-    // }
-
-    // if (+input.value < this.min) {
-    //   input.value=this.oldValue.toString();
-    //   let message = this.localize(`لا يمكن ادخال قيمة اقل من ${this.min}`, `Value cannot be less than ${this.min}`);
-    //   this.toaster.warning(message);
-    //   event.preventDefault();
-    // }
-
-    // --- FIX START ---
-    // const start = input.selectionStart ?? 0;
-    // const end = input.selectionEnd! ?? 0;
-    // let oldValueString = input.value;
-    // if (end == 0&& start==0) {
-    //   oldValueString = oldValueString+event.key ;
-    // } else {
-    //   oldValueString = oldValueString
-    //     .split('')
-    //     .splice(start, end - start, event.key)
-    //     .join('');
-    // }
-
-    const currentValue = Number(input.value + event.key);
-
-    
   }
 
   @HostListener('input', ['$event'])
@@ -82,7 +49,7 @@ export class AllowNumbers  {
     //   }
     // }
     console.log('input.value', input.value);
-    if(input.value.includes('.')) {
+    if (input.value.includes('.')) {
       const parts = input.value.split('.');
       console.log('parts', parts);
       if (parts[1].length > this.fixed) {
@@ -92,9 +59,8 @@ export class AllowNumbers  {
       }
     }
 
-
     if (+input.value > this.max) {
-      input.value=this.max.toString();
+      input.value = this.max.toString();
       input.dispatchEvent(new Event('input', { bubbles: true }));
       // let message = this.localize(`الحد الاقصى هو ${this.max}`, `Max value is ${this.max}`);
       // this.toaster.warning(message);
@@ -103,18 +69,13 @@ export class AllowNumbers  {
     }
 
     if (+input.value < this.min) {
-      
-      input.value=this.min.toString();
+      input.value = this.min.toString();
       input.dispatchEvent(new Event('input', { bubbles: true }));
       // let message = this.localize(`لا يمكن ادخال قيمة اقل من ${this.min}`, `Value cannot be less than ${this.min}`);
       // this.toaster.warning(message);
       event.preventDefault();
       return;
     }
-
-
-    
-
 
     this.oldValue = +input.value;
   }

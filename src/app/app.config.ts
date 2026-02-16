@@ -14,11 +14,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { jwtInterceptor } from './features/auth/interceptors/jwt-interceptor';
 import { provideTranslateService, provideTranslateLoader } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { languageInterceptor } from './core/interceptors/language-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withInterceptors([loadingInterceptor, errorInterceptor, jwtInterceptor])),
+    provideHttpClient(withInterceptors([loadingInterceptor,languageInterceptor, errorInterceptor, jwtInterceptor])),
     provideRouter(routes, withComponentInputBinding()),
     ConfirmationService,
     MessageService,

@@ -180,8 +180,7 @@ export class Menu extends BaseComponent {
             ),
           );
 
-          console.log('isPreviousSearchCriteriaIdentical: ', this.isPreviousSearchCriteriaIdentical());
-
+ 
           if (this.isPreviousSearchCriteriaIdentical()) {
             this.menuItems.update((pre) => pre.concat(newItems));
           } else {

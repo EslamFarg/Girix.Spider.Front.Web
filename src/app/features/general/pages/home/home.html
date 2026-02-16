@@ -411,11 +411,11 @@
                 </td> -->
                 <!-- tax -->
                 <td class="font-semibold">
-                  <div class="scale-in">{{ getMenuItemTaxValue(orderMenuItem) }}</div>
+                  <div class="scale-in">{{ getMenuItemTaxValue(orderMenuItem).toFixed(2) }}</div>
                 </td>
                 <!-- net -->
                 <td class="font-semibold">
-                  <div class="scale-in">{{ getMenuItemNetValue(orderMenuItem) }}</div>
+                  <div class="scale-in">{{ getMenuItemNetValue(orderMenuItem).toFixed(2) }}</div>
                 </td>
               </tr>
             }
@@ -493,6 +493,7 @@
       </app-input-error-message-handler>
       <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
         <button
+          (click)="openNumbersKeyboard()"
           type="button"
           pButton
           class="text-dark-line! py-2 lg:py-0! lg:leading-12.5 h-12.5 rounded-[14px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base! lg:text-lg! xl:text-xl!"
@@ -843,7 +844,7 @@
               aria-describedby="productAddress-help"
               [placeholder]="'form.customerAddress' | translate"
               class="app-input order-customer-address"
-              (click)="toggleKeyboard('.order-customer-address')"
+              (click)="triggerFullKeyboard('.order-customer-address')"
             />
           </app-input-error-message-handler>
         </div>
@@ -892,7 +893,7 @@
         <i class="pi pi-times"></i>
       </button>
       <div id="paymentForm" class="overflow-visible grid gap-4 md:grid-cols-2">
-        <!-- paid / postponed -->
+        <!-- paid / postponed (radio) -->
         <div
           class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4 border-b border-b-text-light pb-4 [&_input]:w-5 [&_input]:aspect-square"
         >
@@ -923,10 +924,14 @@
               [placeholder]="'form.cash' | translate"
               [formControl]="getFormControl(orderFg, 'payingCash')"
               appAllowNumbers
+              noKeyboard
+              [max]="net()"
               [allowDecimal]="true"
-              #paymentPhoneSearch
+              #payingCash
+              id="payingCash"
               appDebounce
               class="app-input"
+              (click)="triggerNumbersKeyboard(payingCash)"
             />
           </app-input-error-message-handler>
         </div>
@@ -939,7 +944,12 @@
               pInputText
               appAllowNumbers
               [allowDecimal]="true"
+              [max]="net()"
+              id="payingNetwork"
               aria-describedby="network-help"
+              #payingNetwork
+              noKeyboard
+              (click)="triggerNumbersKeyboard(payingNetwork)"
               [formControl]="getFormControl(orderFg, 'payingNetwork')"
               [placeholder]="'form.network' | translate"
               class="app-input"
@@ -969,6 +979,7 @@
           إلغاء
         </button>
       </div> -->
+      <app-numbers-keyboard />
     </div>
   </ng-template>
 </p-dialog>

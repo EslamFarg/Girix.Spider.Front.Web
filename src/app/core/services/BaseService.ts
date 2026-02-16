@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { ChangeDetectorRef, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -18,7 +18,6 @@ export interface IEndpoints {
 export default abstract class BaseService {
   static apiBaseUrl = environment.apiUrl;
   loadingService = inject(LoadingService);
-
   apiRoute = '';
   get apiUrl() {
     return `${BaseService.apiBaseUrl}/${this.apiRoute}`;
@@ -29,7 +28,7 @@ export default abstract class BaseService {
   router = inject(Router);
   messageService = inject(MessageService);
 
-   endpoints: IEndpoints = {
+  endpoints: IEndpoints = {
     create: 'Create',
     update: '',
     put: '',
@@ -39,8 +38,7 @@ export default abstract class BaseService {
   };
 
   protected patchEndpoints(endpoints: Partial<IEndpoints>) {
-    console.log(endpoints);
-    this.endpoints = { ...this.endpoints, ...endpoints };
+     this.endpoints = { ...this.endpoints, ...endpoints };
   }
   //
   //local storage

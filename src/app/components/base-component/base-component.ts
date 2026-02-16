@@ -1,6 +1,6 @@
 import { AuthService } from '@/features/auth/services/auth-service';
 import { LayoutService } from '@/layouts/services/layout-service';
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,6 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { SpaceTypeEnum } from '@/features/replacements/services/replacements-service';
 import { BehaviorSubject, debounceTime, Observable, Subject } from 'rxjs';
 import { LoadingService } from '@/yn-ng/services/loading-service';
+import { AmountType } from '@/core/enums';
 export interface IPaginationInfo {
   pageIndex: number;
   totalRowsCount: number;
@@ -36,6 +37,7 @@ export interface IDebounceMapValue<T = any> {
 export class BaseComponent {
   localSpaceTypeEnum = SpaceTypeEnum;
   FormMode = FormMode;
+  AmountType=AmountType;
   //
   nullableFb = inject(FormBuilder);
   fb = this.nullableFb.nonNullable;
@@ -49,11 +51,12 @@ export class BaseComponent {
   // layoutService = inject(LayoutService);
   loadingService = inject(LoadingService);
   translateService = inject(TranslateService);
+  changeDetectionRef = inject(ChangeDetectorRef);
   dateNow = new Date();
   dateNowIso = this.dateNow.toISOString();
   debounceMap: Map<string, IDebounceMapValue> = new Map();
   isLoading = this.loadingService.isLoading;
-  
+
   setDebounceItem<T>(key: string, callback: (e: T) => void) {
     this.debounceMap.set(key, { subject: new Subject<T>(), callback });
 
@@ -71,7 +74,6 @@ export class BaseComponent {
   ngOnDestroy() {
     this.debounceMap.forEach((value) => value.subject.complete());
   }
-
 
   getRowNumber = (index: number, pageNumber: number) => index + 1 + (pageNumber - 1) * 10;
   getCurrentRowsIx = (pageIndex: number) => (pageIndex - 1) * 10;

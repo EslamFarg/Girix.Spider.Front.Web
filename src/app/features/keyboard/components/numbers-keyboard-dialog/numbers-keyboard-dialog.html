@@ -1,0 +1,14 @@
+<p-dialog
+  [(visible)]="keyboardService.isNumbersKeyboardVisible"
+  (onHide)="closeKeyboard()"
+  [draggable]="true"
+  [modal]="true"
+  [maskStyleClass]="'w-fit! h-fit!'"
+  [style]="{ minWidth: '250px', maxWidth: '300px' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-white!"
+  class="addition-dialog"
+  [contentStyleClass]="` ${isLoading() && 'opacity-50 cursor-wait '}`"
+>
+  <app-numbers-keyboard />
+</p-dialog>

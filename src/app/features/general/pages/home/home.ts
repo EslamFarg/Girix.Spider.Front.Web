@@ -59,6 +59,9 @@ import { labeledRequiredValidator } from '@/yn-ng/utils/text-validators';
 import { Select, SelectChangeEvent } from 'primeng/select';
 import { KeyboardService } from '@/features/keyboard/services/keyboard-service';
 import { FullKeyboard } from '@/features/keyboard/components/full-keyboard/full-keyboard';
+import { NumbersKeyboard } from '@/features/keyboard/components/numbers-keyboard/numbers-keyboard';
+import { AmountType } from '@/core/enums';
+import { FormControlNotifier } from '@/directives/form-control-notifier';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -113,6 +116,8 @@ enum DiscountType {
     Select,
     FormsModule,
     FullKeyboard,
+    NumbersKeyboard,
+    FormControlNotifier,
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -140,7 +145,6 @@ export class Home extends BaseComponent {
   existingOrder = signal<IOrderReadResponse | null>(null);
 
   orderCreateItems = computed<IOrderCreateItem[]>(() => {
-    console.log(this.orderMenuItems());
     return this.orderMenuItems().map((item) => ({
       menuItemId: item.menuItem?.product?.id ?? null,
       mealId: item.menuItem.meal?.id ?? null,
@@ -217,7 +221,7 @@ export class Home extends BaseComponent {
 
     this.orderFg.get('orderType')?.valueChanges.subscribe((orderType) => {
       const placeRefId = this.orderFg.get('placeRefId');
-      console.log(orderType);
+      this.orderLocationType.set(orderType);
       switch (orderType) {
         case OrderLocationType.Takeaway:
         case OrderLocationType.Delivery:
@@ -225,12 +229,18 @@ export class Home extends BaseComponent {
           placeRefId?.patchValue(null);
           break;
         case OrderLocationType.DineIn:
+          this.orderFg.patchValue({ placeType: OrderLocalType.Table });
+          placeRefId?.patchValue(null);
           placeRefId!.setValidators([labeledRequiredValidator('يرجى اختيار المكان', 'you must select a place')]);
 
           break;
       }
       placeRefId?.updateValueAndValidity();
     });
+
+    // this.orderFg.get('placeType')?.valueChanges.subscribe((placeType) => {
+    //   this.localPlaceType.set(placeType);
+    // });
   }
 
   //
@@ -324,15 +334,13 @@ export class Home extends BaseComponent {
     }
 
     console.log('valid order');
+    return;
     this.orderService.create(this.orderFg.value).subscribe({
       next: (res) => {},
     });
   }
 
-
-  resetOrderForm() {
-    
-  }
+  resetOrderForm() {}
 
   //
   //
@@ -347,15 +355,27 @@ export class Home extends BaseComponent {
   //general calculations
   //
 
+  orderLocationType = signal<OrderLocationType | null>(null);
+
+  totalMenuItemsTax = computed(() => {
+    return this.orderMenuItems().reduce((total, item) => total + this.getMenuItemTaxValue(item), 0);
+  });
+
   serviceFee = computed(() => {
+    if (this.orderLocationType() !== OrderLocationType.DineIn) return 0;
+
     const itemsWithSelectiveTaxSum = this.orderMenuItems().reduce(
       (total, item) => total + this.getMenuItemPriceWithAdditionsWithSelectiveTax(item),
       0,
     );
-
-    const serviceFee = itemsWithSelectiveTaxSum * (this.financialSettings().serviceFee / 100);
-    const serviceFeeAfterTax = serviceFee * (this.financialSettings().vat / 100);
-
+    let serviceFee = 0;
+    let serviceFeeAfterTax = 0;
+    if (this.financialSettings().serviceFeeType == AmountType.Percentage) {
+      serviceFee = itemsWithSelectiveTaxSum * (this.financialSettings().serviceFee / 100);
+      serviceFeeAfterTax = serviceFee * (this.financialSettings().vat / 100);
+    } else {
+      serviceFeeAfterTax = this.financialSettings().serviceFee * (1 + this.financialSettings().vat / 100);
+    }
     return serviceFeeAfterTax;
   });
 
@@ -375,7 +395,7 @@ export class Home extends BaseComponent {
   });
 
   net = computed(() => {
-    const net = this.orderItemsNet() + this.hutNet() + this.serviceFee();
+    const net = this.orderItemsNet() + this.hutNet() + this.serviceFee() - this.discountAmount();
 
     return net;
   });
@@ -438,11 +458,17 @@ export class Home extends BaseComponent {
 
   keyboardService = inject(KeyboardService);
   closeFullKeyboard = this.keyboardService.closeFullKeyboard;
+  openNumbersKeyboard = () => {
+    this.keyboardService.openNumbersKeyboard();
+    this.changeDetectionRef.markForCheck();
+  };
+  triggerFullKeyboard(inputClassSelector: string) {
+    this.keyboardService.triggerFullKeyboard(inputClassSelector, 'full-keyboard');
+  }
+  closeNumbersKeyboard = this.keyboardService.closeNumbersKeyboard;
 
-  toggleKeyboard(inputClassSelector: string) {
-    // 'order-customer-address'
-    console.log('toggle keyboard');
-    this.keyboardService.triggerKeyboard(inputClassSelector, 'full-keyboard');
+  triggerNumbersKeyboard(input: HTMLInputElement) {
+    this.keyboardService.triggerNumbersKeyboard(input);
   }
 
   //
@@ -937,9 +963,8 @@ export class Home extends BaseComponent {
     this.customerDialogVisible = true;
   }
   onCustomerInfoDialogVisibilityChange(visible: boolean) {
-    console.log('customer dialog visible', visible);
     if (!visible) {
-       this.closeFullKeyboard();
+      this.closeFullKeyboard();
     }
   }
   customerFgInitialValue = {
@@ -1019,7 +1044,6 @@ export class Home extends BaseComponent {
       });
   }
   onCustomerSelected(event: ICustomerSearchRow) {
-    console.log('selected customer: ', event);
     if (event.id) {
       this.customerFg.patchValue({
         id: event.id,
@@ -1111,6 +1135,7 @@ export class Home extends BaseComponent {
     this.orderFg.patchValue(
       {
         payingNetwork: net - +(value ?? 0),
+        payingCash: (value ?? 0) > net ? net : value,
       },
       { emitEvent: false },
     );
@@ -1121,6 +1146,7 @@ export class Home extends BaseComponent {
     this.orderFg.patchValue(
       {
         payingCash: net - +(value ?? 0),
+        payingNetwork: (value ?? 0) > net ? net : value,
       },
       { emitEvent: false },
     );

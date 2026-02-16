@@ -5,6 +5,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { CollectionDialog } from './features/collections/components/collection-dialog/collection-dialog';
 import { TranslateService, TranslatePipe, TranslateDirective } from '@ngx-translate/core';
+import { KeyboardService } from './features/keyboard/services/keyboard-service';
 
 declare global {
   interface Window {
@@ -26,13 +27,21 @@ export class App {
   protected readonly title = signal('restaurant-dashboard-angular');
 
   private translate = inject(TranslateService);
+  keyboardService = inject(KeyboardService);
   router = inject(Router);
 
   constructor() {
     this.translate.addLangs(['ar', 'en']);
     this.translate.setFallbackLang('ar');
     this.translate.use('ar');
-
+    document.onclick = (event: Event) => {
+      const target = event.target as HTMLInputElement;
+      //if target is an input field
+      if (target && target.tagName === 'INPUT' && (target.type === 'number' || target.type === 'text')) {
+        // if (target.hasAttribute('noKeyboard')) return;
+        this.keyboardService.currentNumbersKeyboardInput = target;
+      }
+    };
     //go to replacements
     // this.router.navigate(['replacements/huts']);
   }

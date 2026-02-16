@@ -191,7 +191,9 @@
     "paid": "مدفوع",
     "postponed": "معلق",
     "save": "حفظ",
-    "cancel": "الغاء"
+    "cancel": "الغاء",
+    "network": "شبكة",
+    "cash": "كاش"
   },
 
   "actions": {

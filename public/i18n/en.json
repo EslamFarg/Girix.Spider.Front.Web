@@ -33,7 +33,9 @@
     "paid": "paid",
     "postponed": "postponed",
     "save": "save",
-    "cancel": "cancel"
+    "cancel": "cancel",
+    "network": "اnetworkه",
+    "cash": "cash"
   },
   "actions": {
     "save": "save",

@@ -7,18 +7,18 @@ import { BaseComponent } from '@/components/base-component/base-component';
 import { LayoutService } from '../services/layout-service';
 import { Dialog } from "primeng/dialog";
 import { FullKeyboard } from "@/features/keyboard/components/full-keyboard/full-keyboard";
+import { NumbersKeyboardDialog } from "@/features/keyboard/components/numbers-keyboard-dialog/numbers-keyboard-dialog";
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterOutlet, Sidebar, Header, Dialog, FullKeyboard],
+  imports: [RouterOutlet, Sidebar, Header, Dialog, FullKeyboard, NumbersKeyboardDialog],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css',
 })
 export class MainLayout extends BaseComponent {
   constructor() {
     super();
-    console.log('MainLayout');
-  }
+   }
   header = viewChild<Header>('header');
   mainEl = viewChild<ElementRef<HTMLElement>>('main');
 

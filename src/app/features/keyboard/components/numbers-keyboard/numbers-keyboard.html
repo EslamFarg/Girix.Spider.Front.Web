@@ -1,14 +1,19 @@
-<p-dialog
-  [visible]="isVisible()"
-  (visibleChange)="closeKeyboard()"
-  [modal]="true"
-  [style]="{ width: '80%', maxWidth: '50rem' }"
-  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-white!"
-  class="addition-dialog"
-  [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
+<div
+  class="grid grid-cols-3 p-2 gap-1.5 bg-[#D1D5DBE5] text-2xl"
+  style="
+    --p-button-primary-background: #ffffff;
+    --p-button-primary-color: #000000;
+    --p-button-primary-border-color: transparent;
+  "
 >
-  <ng-template #headless>
-    <div class="flex flex-col p-4 gap-4"></div>
-  </ng-template>
-</p-dialog>
+  @for (btn of btns; track $index) {
+    <button
+      pButton
+      class="rounded-sm w-full py-2 cursor-pointer flex items-center justify-center"
+      style="box-shadow: 0px 1px 0px 0px #0000004d"
+      (click)="triggerNumbersBtn(btn.value)"
+    >
+      <span [innerHTML]="bypass(btn.label)"></span>
+    </button>
+  }
+</div>
