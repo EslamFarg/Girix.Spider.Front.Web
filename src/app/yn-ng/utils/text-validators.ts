@@ -51,7 +51,11 @@ export function mobileValidator(control: AbstractControl): ValidationErrors | nu
 
 export function labeledRequiredValidator(messageAr: string, messageEn: string): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    if (control.value) return null;
+    if (Array.isArray(control.value)) {
+      if (control.value.length > 0) return null;
+    } else if (control.value) {
+      return null;
+    }
     return {
       labeledRequired: {
         messageAr,

@@ -14,6 +14,7 @@ import { Button } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
 import { PrintService } from '@/features/print/services/print-service';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-orders',
@@ -29,7 +30,8 @@ import { PrintService } from '@/features/print/services/print-service';
     Menu,
     Button,
     Debounce,
-  ],
+    RouterLink
+],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })

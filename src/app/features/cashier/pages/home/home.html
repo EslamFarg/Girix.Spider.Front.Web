@@ -32,15 +32,16 @@
           {{ 'actions.edit' | translate }}
         }
       </button>
-      <button
+      <a
         type="button"
+        routerLink="/"
         pButton
         class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
         variant="outlined"
         (click)="resetOrderForm()"
       >
         {{ 'actions.new' | translate }}
-      </button>
+      </a>
       @if (existingOrder()) {
         <button
           (click)="onPrint()"
@@ -60,11 +61,11 @@
       <ul class="flex flex-col gap-2 *:text-xs *:font-bold *:flex *:items-center *:gap-2">
         <li>
           <span>رقم الفاتوره:</span>
-          <span>{{ isCreateMode() ? '#####' : '102' }}</span>
+          <span>{{ isCreateMode() ? '#####' : existingOrder()?.id }}</span>
         </li>
         <li>
           <span>رقم الطلب:</span>
-          <span>{{ isCreateMode() ? '#####' : '102' }}</span>
+          <span>{{ isCreateMode() ? '#####' : existingOrder()?.orderNumber }}</span>
         </li>
         <li>
           <span>رقم الكاشير:</span>
@@ -75,7 +76,7 @@
       <!-- left -->
       <ul class="flex flex-col gap-2 *:text-xs *:flex *:items-center *:gap-2">
         <li data="ltr">
-          <span>{{ dateNow | date: 'dd-MM-yyyy' }}</span>
+          <span>{{ (isCreateMode() ? dateNow : existingOrder()?.createdAt) | date: 'dd-MM-yyyy' }}</span>
           <!-- 20 يناير 2026 04:25 م -->
         </li>
         <li>
@@ -84,7 +85,7 @@
         </li>
         <li>
           <span class="font-bold">رقم الجوال:</span>
-          <span>0123456789</span>
+          <span>{{ existingOrder()?.customerPhone }}</span>
         </li>
       </ul>
     </div>
@@ -92,6 +93,7 @@
     <!-- location btns -->
     <div
       class="flex gap-2 location-btns *:border-0! *:flex-1 w-full justify-end min-h-[34px] h-[34px] *:h-full *:flex *:items-center *:justify-center *:rounded-lg"
+      [class.hidden]="!isCreateMode()"
       style="--p-button-primary-background: var(--color-text-lighter); --p-button-primary-color: var(--color-dark-line)"
     >
       <input
@@ -129,13 +131,20 @@
         formControlName="orderType"
         [value]="OrderLocationType.Delivery"
       />
-      <label class="py-1! w-full text-sm!" [class.location-active]="deliveryRadio.checked" pButton for="delivery"
+      <label
+        class="py-1! w-full text-sm!"
+        (click)="DeliveryDialogVisible = true"
+        [class.location-active]="deliveryRadio.checked"
+        pButton
+        for="delivery"
         ><span>توصيل</span></label
       >
     </div>
 
     <!-- local space options -->
-    <div>
+    <div [class.hidden]="!isCreateMode()">
+      <app-input-error-message-handler class="w-fit block mx-auto" [fc]="orderFg.get('deliveryId')" />
+
       @if (localRadio.checked) {
         <div class="flex flex-col gap-4 sm:gap-0 sm:flex-row w-full border border-text-light rounded-[14px] p-3">
           <!-- local space btns -->
@@ -427,30 +436,35 @@
       <div class="border-t border-text-light pt-2 mt-2">
         <!-- head -->
         <div class="bg-text-light grid grid-cols-3 text-xs font-bold text-dark-bg-2 py-1 px-2 rounded">
-          <span>المجموع</span>
-          <span class="mx-auto">8</span>
-          <span class="ms-auto">920.00</span>
+          <span>المجموع (شامل الضريبة)</span>
+          <span class="mx-auto">{{ this.orderMenuItems().length }}</span>
+          <span class="ms-auto">{{ orderItemsNet().toFixed(2) }}</span>
         </div>
         <!-- body -->
         <div
           class="p-4 pb-0 relative grid grid-cols-2 text-dark-bg-2 *:flex *:justify-between *:items-center gap-3 text-xs font-semibold"
+          [class.hidden]="!isCreateMode()"
         >
-          <div class="absolute w-0.5 h-16 left-1/2 top-2 -translate-x-1/2 bg-dark-bg-2/20"></div>
-          <div class="pe-1">
+          <div class="absolute w-0.5 h-[66%] left-1/2 top-2 -translate-x-1/2 bg-dark-bg-2/20"></div>
+          <div class="px-1">
             <span>الخصم</span>
             <div>{{ discountAmount() }}</div>
           </div>
-          <div class="ps-1">
+          <div class="px-1">
             <span>الخدمه</span>
             <div>{{ serviceFee().toFixed(2) }}</div>
           </div>
-          <div class="pe-1">
+          <div class="px-1">
             <span>حجز الكوخ</span>
             <div>{{ hutNet().toFixed(2) }}</div>
           </div>
-          <div class="ps-1">
+          <div class="px-1">
+            <span>الدليفري</span>
+            <div>{{ deliveryFee().toFixed(2) }}</div>
+          </div>
+          <div class="px-1">
             <span>الضريبة</span>
-            <div>30.00</div>
+            <div>{{ totalMenuItemsTax().toFixed(2) }}</div>
           </div>
           <div
             class="flex text-xs col-span-2 mt-1 pt-1 font-bold justify-between items-center border-t border-text-light text-dark-bg-2"
@@ -466,6 +480,7 @@
 
     <!-- options -->
     <div
+      [class.hidden]="!isCreateMode()"
       class="flex gap-2 location-btns *:flex-1 w-full justify-end"
       style="--p-button-primary-background: transparent"
     >
@@ -509,6 +524,28 @@
     <app-menu (menuItemChange)="onMenuItemChange($event)" [groups]="groups()" />
   </p-drawer>
 </div>
+
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!-- dialogs -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
 
 <!-- additions -->
 <p-dialog
@@ -982,4 +1019,86 @@
       <app-numbers-keyboard />
     </div>
   </ng-template>
+</p-dialog>
+
+<!-- Delivery -->
+<p-dialog
+  [(visible)]="DeliveryDialogVisible"
+  [modal]="true"
+  [style]="{ width: '80%', maxWidth: '50rem' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-text-lighter!"
+  class="addition-dialog"
+  [contentStyleClass]="`flex flex-col gap-4 ${isLoading() && 'opacity-50 cursor-wait'}`"
+>
+  <ng-template #header>
+    <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">إختر الدليفري</p>
+  </ng-template>
+  <div
+    class="flex gap-2 w-full justify-center pt-4"
+    style="--p-button-primary-background: #fff; --p-button-primary-color: #1f1d2b"
+  >
+    <button pButton [class.text-green-500!]="!isCompanyDelivery" (click)="changeDeliveryType(false)">دليفري</button>
+    <button pButton [class.text-green-500!]="isCompanyDelivery" (click)="changeDeliveryType(true)">شركة</button>
+  </div>
+  <div
+    class="flex-1 overflow-visible no-scrollbar"
+    appDebounce
+    #tablesScroller
+    [domEvents]="['scroll']"
+    (debounced)="onDeliveriesScroll($event, tablesScroller)"
+  >
+    <div
+      class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5 *:flex *:flex-col *:items-center *:justify-center *:border *:p-4! *:rounded-[14px] *:cursor-pointer"
+      style="--p-button-primary-background: #fff"
+    >
+      @if (isCompanyDelivery) {
+        @for (item of companyDeliveries(); track $index) {
+          <button pButton (click)="onDeliverySelected(item.id)">
+            <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                stroke="#000000"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <p class="text-center text-dark-bg-2 text-sm">
+              {{ item.name }}
+            </p>
+          </button>
+        } @empty {
+          <p-skeleton class="h-20" />
+          <p-skeleton class="h-20" />
+          <p-skeleton class="h-20" />
+        }
+      } @else {
+        @for (item of deliveries(); track $index) {
+          <button pButton class="relative overflow-visible!" (click)="onDeliverySelected(item.id)">
+            <span
+              class="absolute -top-2.5 -left-2.5 text-xs text-white bg-rose-600 rounded-full w-5 h-5 flex items-center justify-center"
+              >{{ item.orderNumber }}</span
+            >
+            <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                stroke="#000000"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <p class="text-center text-dark-bg-2 text-sm">
+              {{ item.name }}
+            </p>
+          </button>
+        } @empty {
+          <p-skeleton class="h-20" />
+          <p-skeleton class="h-20" />
+          <p-skeleton class="h-20" />
+        }
+      }
+    </div>
+  </div>
 </p-dialog>

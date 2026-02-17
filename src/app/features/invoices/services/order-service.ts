@@ -1,7 +1,7 @@
 import { BaseCrudService } from '@/core/services/BaseCrudService';
 import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
- 
+
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -163,6 +163,21 @@ export interface ILocalPlaceChangeRequest {
   durationMinutes: number | null;
 }
 
+//add items
+export interface IOrderAddItemsRequest {
+  id: number;
+  items: {
+    menuItemId: number | null;
+    mealId: number | null;
+    quantity: number;
+    addons: {
+      additionalMenuItemId: number;
+      quantity: number;
+    }[];
+  }[];
+  dateTime: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -177,5 +192,10 @@ export class OrderService extends BaseSearchAndCrudService<
 
   changeLocalPlace(dto: ILocalPlaceChangeRequest) {
     return this.http.put<any>(`${this.apiUrl}/change-place`, dto);
+  }
+
+  ///v1/Order/add-items
+  addItems(dto: IOrderAddItemsRequest) {
+    return this.http.post<any>(`${this.apiUrl}/add-items`, dto);
   }
 }

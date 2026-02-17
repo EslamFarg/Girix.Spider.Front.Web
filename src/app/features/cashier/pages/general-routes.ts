@@ -1,10 +1,14 @@
 import { Route } from '@angular/router';
-import { Home } from '@/features/general/pages/home/home';
+import { Home } from './home/home';
 
 export default [
   {
     path: '',
     pathMatch: 'full',
+    component: Home,
+  },
+  {
+    path: ':id',
     component: Home,
   },
 ] satisfies Route[];

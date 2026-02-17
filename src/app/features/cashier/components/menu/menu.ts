@@ -65,6 +65,8 @@ export class Menu extends BaseComponent {
     }
 
     this.menuSearchFg.patchValue({ category });
+
+    this.onSubmitSearch();
   }
 
   //
@@ -181,10 +183,9 @@ export class Menu extends BaseComponent {
           );
 
  
-          if (this.isPreviousSearchCriteriaIdentical()) {
+          if (this.isPreviousSearchCriteriaIdentical() && pageIndex > 1) {
             this.menuItems.update((pre) => pre.concat(newItems));
           } else {
-            console.log('setting newItems', newItems);
             this.menuItems.set(newItems);
           }
 

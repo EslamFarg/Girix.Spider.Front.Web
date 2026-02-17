@@ -113,8 +113,8 @@ export class KeyboardService extends BaseService {
       }
     }
     
-    this.currentNumbersKeyboardInput.dispatchEvent(new Event('input', { bubbles: true }));
     this.currentNumbersKeyboardInput.value = newValue;
+    this.currentNumbersKeyboardInput.dispatchEvent(new Event('input', { bubbles: true }));
   };
 
   //

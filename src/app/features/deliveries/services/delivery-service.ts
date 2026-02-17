@@ -1,19 +1,25 @@
 import { BaseCrudService } from '@/core/services/BaseCrudService';
 import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
- import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 
-export interface IDeliveryRowResponse {
+export interface IDeliverySearchRow {
   id: number;
   name: string;
   phoneNumber: string;
   email: string;
   address: string;
   orderNumber: number;
+  description: string;
+  identityNumber: string;
+  attachment: {
+    id: number;
+    fullPath: string;
+  }[];
 }
 
 export interface IDeliverySearchResponseValue {
-  rows: IDeliveryRowResponse[];
+  rows: IDeliverySearchRow[];
   paginationInfo: {
     totalRowsCount: number;
     totalPagesCount: number;

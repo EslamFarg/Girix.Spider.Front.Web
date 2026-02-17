@@ -13,7 +13,7 @@ export const routes: Routes = [
       {
         path: '',
         loadChildren: () =>
-          import('@/features/general/pages/general-routes').then((m) => m.default),
+          import('@/features/cashier/pages/general-routes').then((m) => m.default),
       },
       {
         path: 'invoices',

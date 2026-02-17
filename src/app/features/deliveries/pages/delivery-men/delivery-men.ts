@@ -8,7 +8,7 @@ import { Paginator, PaginatorState } from 'primeng/paginator';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { InputText } from 'primeng/inputtext';
-import { DeliverySearchEnum, DeliveryService, IDeliveryRowResponse } from '../../services/delivery-service';
+import { DeliverySearchEnum, DeliveryService, IDeliverySearchRow } from '../../services/delivery-service';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
@@ -69,7 +69,7 @@ export class DeliveryMen extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
   ];
 
-  deliveryMen = signal<IDeliveryRowResponse[]>([]);
+  deliveryMen = signal<IDeliverySearchRow[]>([]);
 
   deliveryMenPaginationInfo: IPaginationInfo = {
     pageIndex: 1,

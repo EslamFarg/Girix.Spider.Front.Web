@@ -26,8 +26,4 @@ import { ResetPassword } from "./reset-password/reset-password";
     path: 'reset-password',
     component: ResetPassword
   },
-  // {
-  //   path: 'register',
-  //   component: Login
-  // }
 ] satisfies Route[]

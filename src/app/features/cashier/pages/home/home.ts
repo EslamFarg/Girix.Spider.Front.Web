@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, input, OnInit, signal, untracked } from '@angular/core';
 import { IMenuItem, IOrderMenuItem, Menu } from '../../components/menu/menu';
 import { ButtonModule } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -8,7 +8,7 @@ import { ImgFallback } from '@/directives/img-fallback';
 import { Button, ButtonDirective } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { GeneralService, ProductAndMealsSearchEnum } from '../../services/general-service';
-import { BaseComponent, FormMode, IPaginationInfo } from '@/components/base-component/base-component';
+import { SkeletonModule } from 'primeng/skeleton';
 import {
   FormArray,
   FormControl,
@@ -23,7 +23,7 @@ import { IMealSearchRow } from '@/features/classes/services/meal-service';
 import { GroupService, IGroupSearchRow, IGroupSearchResponseValue } from '@/features/classes/services/group-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { GalleriaModule } from 'primeng/galleria';
-import { Slider } from '../../../../components/slider/slider';
+import { Slider, HutCard, RoomCard, TableCard, BaseComponent, FormMode, IPaginationInfo } from '@/components';
 import {
   IOrderCreateCustomerRequest,
   IOrderCreateItem,
@@ -35,9 +35,6 @@ import {
   IOrderReadResponse,
   IOrderCreateItemAddon,
 } from '@/features/invoices/services/order-service';
-import { HutCard } from '@/components/hut-card/hut-card';
-import { RoomCard } from '@/components/room-card/room-card';
-import { TableCard } from '@/components/table-card/table-card';
 import { DatePipe } from '@angular/common';
 import { HutSearchEnum, HutService, IHutSearchRow } from '@/features/restaurant/services/hut-service';
 import { Debounce } from '@/directives/debounce';
@@ -62,6 +59,12 @@ import { FullKeyboard } from '@/features/keyboard/components/full-keyboard/full-
 import { NumbersKeyboard } from '@/features/keyboard/components/numbers-keyboard/numbers-keyboard';
 import { AmountType } from '@/core/enums';
 import { FormControlNotifier } from '@/directives/form-control-notifier';
+import {
+  DeliverySearchEnum,
+  DeliveryService,
+  IDeliverySearchRow,
+} from '@/features/deliveries/services/delivery-service';
+import { RouterLink } from '@angular/router';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -118,11 +121,13 @@ enum DiscountType {
     FullKeyboard,
     NumbersKeyboard,
     FormControlNotifier,
+    SkeletonModule,
+    RouterLink,
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home extends BaseComponent {
+export class Home extends BaseComponent implements OnInit {
   //
   //
   // enums
@@ -136,6 +141,10 @@ export class Home extends BaseComponent {
   //
   formMode = signal<FormMode>(FormMode.Create);
   isCreateMode = computed(() => this.formMode() == FormMode.Create);
+  //
+  //
+  //
+  id = input<number>();
   //
   //
   // order
@@ -171,9 +180,33 @@ export class Home extends BaseComponent {
     payingNetwork: this.fb.control<number | null>(null, [Validators.required]),
     createAt: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
     idempotencyKey: this.fb.control<string>(Date.now() + Math.random().toString(), [Validators.required]),
-    items: this.fb.control<IOrderCreateItem[]>([], [Validators.minLength(1), Validators.required]),
+    items: this.fb.control<IOrderCreateItem[]>(
+      [],
+      [Validators.minLength(1), labeledRequiredValidator('يجب اختيار صنف', 'you must select an item')],
+    ),
     customerRequest: this.fb.control<IOrderCreateCustomerRequest | null>(null, []),
   };
+
+  registerValidators() {
+    const { orderType, paymentType, payingCash, payingNetwork, createAt, idempotencyKey, items } =
+      this.orderFg.controls;
+    items.setValidators([
+      Validators.minLength(1),
+      labeledRequiredValidator('يجب اختيار صنف', 'you must select an item'),
+    ]);
+    switch (this.formMode()) {
+      case FormMode.Create:
+        payingCash.setValidators([Validators.required]);
+        payingNetwork.setValidators([Validators.required]);
+        createAt.setValidators([Validators.required]);
+        orderType.setValidators([Validators.required]);
+        paymentType.setValidators([Validators.required]);
+        idempotencyKey.setValidators([Validators.required]);
+        break;
+      case FormMode.Update:
+        break;
+    }
+  }
 
   orderFg = this.fb.group(this.initialOrderFgValue);
   orderCalculationsService = inject(OrderCalculationsService);
@@ -205,7 +238,7 @@ export class Home extends BaseComponent {
    */
   constructor() {
     super();
-    this.groupsService.getList(false, { pageIndex: 0, pageSize: 0 }).subscribe({
+    this.groupsService.getList(true, { pageIndex: 0, pageSize: 0 }).subscribe({
       next: (res) => {
         this.groups.set(res.rows);
       },
@@ -216,31 +249,48 @@ export class Home extends BaseComponent {
     this.searchHuts(1);
     this.searchRooms(1);
     this.searchTables(1);
+    this.searchDeliveries(1);
     // this.searchAdditions(1);
     this.searchCustomers({ pageIndex: 1, searchTerm: '' });
 
     this.orderFg.get('orderType')?.valueChanges.subscribe((orderType) => {
       const placeRefId = this.orderFg.get('placeRefId');
+      const deliveryId = this.orderFg.get('deliveryId');
       this.orderLocationType.set(orderType);
+      placeRefId?.setValidators([]);
+      deliveryId?.setValidators([]);
+      this.orderFg?.patchValue({
+        placeRefId: null,
+        deliveryId: null,
+      });
       switch (orderType) {
         case OrderLocationType.Takeaway:
+          break;
         case OrderLocationType.Delivery:
-          placeRefId?.setValidators([]);
-          placeRefId?.patchValue(null);
+          deliveryId?.setValidators([labeledRequiredValidator('يرجى اختيار الدليفري', 'you must select a delivery')]);
           break;
         case OrderLocationType.DineIn:
           this.orderFg.patchValue({ placeType: OrderLocalType.Table });
-          placeRefId?.patchValue(null);
           placeRefId!.setValidators([labeledRequiredValidator('يرجى اختيار المكان', 'you must select a place')]);
 
           break;
       }
       placeRefId?.updateValueAndValidity();
+      deliveryId?.updateValueAndValidity();
     });
+
+    this.orderFg.setValidators;
 
     // this.orderFg.get('placeType')?.valueChanges.subscribe((placeType) => {
     //   this.localPlaceType.set(placeType);
     // });
+  }
+
+  ngOnInit(): void {
+    if (this.id()) {
+      this.formMode.set(FormMode.Update);
+      this.orderService.getById(this.id()!).subscribe((order) => this.existingOrder.set(order));
+    }
   }
 
   //
@@ -334,13 +384,37 @@ export class Home extends BaseComponent {
     }
 
     console.log('valid order');
-    return;
-    this.orderService.create(this.orderFg.value).subscribe({
-      next: (res) => {},
-    });
+    switch (this.formMode()) {
+      case FormMode.Create:
+        this.orderService.create(this.orderFg.value).subscribe({
+          next: (res) => {},
+          error: (err) => {
+            console.log(err);
+            this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم انشاء الطلب' });
+          },
+        });
+        break;
+      case FormMode.Update:
+        this.orderService
+          .addItems({
+            id: this.existingOrder()!.id,
+            items: this.orderCreateItems(),
+            dateTime: new Date().toString(),
+          })
+          .subscribe({
+            next: (res) => {},
+            error: (err) => {
+              console.log(err);
+              this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم تعديل الطلب' });
+            },
+          });
+        break;
+    }
   }
 
-  resetOrderForm() {}
+  resetOrderForm() {
+    this.orderMenuItems.set([]);
+  }
 
   //
   //
@@ -356,6 +430,25 @@ export class Home extends BaseComponent {
   //
 
   orderLocationType = signal<OrderLocationType | null>(null);
+
+  deliveryFee = computed(() => {
+    if (this.orderLocationType() !== OrderLocationType.Delivery) return 0;
+
+    const feeValue = this.financialSettings()?.deliveryFee;
+
+    if (this.financialSettings()?.deliveryFeeType == AmountType.Fixed) {
+      return feeValue * (1 + this.financialSettings()?.vat / 100);
+    } else {
+      const itemsWithSelectiveTaxSum = this.orderMenuItems().reduce(
+        (total, item) => total + this.getMenuItemPriceWithAdditionsWithSelectiveTax(item),
+        0,
+      );
+
+      const feeAmount = itemsWithSelectiveTaxSum * (feeValue / 100);
+      const feeAfterTax = feeAmount * (1 + this.financialSettings()?.vat / 100);
+      return feeAfterTax;
+    }
+  });
 
   totalMenuItemsTax = computed(() => {
     return this.orderMenuItems().reduce((total, item) => total + this.getMenuItemTaxValue(item), 0);
@@ -395,7 +488,7 @@ export class Home extends BaseComponent {
   });
 
   net = computed(() => {
-    const net = this.orderItemsNet() + this.hutNet() + this.serviceFee() - this.discountAmount();
+    const net = this.orderItemsNet() + this.hutNet() + this.serviceFee() + this.deliveryFee() - this.discountAmount();
 
     return net;
   });
@@ -730,6 +823,131 @@ export class Home extends BaseComponent {
   //
   //
   //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  // deliveries
+  //
+
+  DeliveryDialogVisible: boolean = false;
+
+  deliveryService = inject(DeliveryService);
+  deliveries = signal<IDeliverySearchRow[]>([]);
+  companyDeliveries = signal<ICustomerSearchRow[]>([]);
+
+  isCompanyDelivery: boolean = false;
+
+  changeDeliveryType(isCompany: boolean) {
+    this.isCompanyDelivery = isCompany;
+    this.orderFg.patchValue({
+      orderType: OrderLocationType.Delivery,
+      deliveryId: null,
+    });
+    this.searchDeliveries(1, isCompany);
+  }
+
+  deliveryPaginationInfo: {
+    pageIndex: number;
+    totalPagesCount: number;
+    totalRowsCount: number;
+  } = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
+  searchDeliveries(pageIndex: number, isCompany: boolean = false) {
+    if (isCompany) {
+      this.customersService
+        .search({
+          paginationInfo: {
+            pageIndex: pageIndex,
+            pageSize: 20,
+          },
+          searchFilters: [
+            {
+              column: CustomerSearchEnum.IsCompany,
+              values: ['true'],
+            },
+          ],
+          fromDate: null,
+        })
+        .subscribe({
+          next: (res) => {
+            if (res.value.rows.length > 0) {
+              if (pageIndex == 1) {
+                this.companyDeliveries.set(res.value.rows);
+              } else {
+                this.companyDeliveries.update((prev) => prev.concat(res.value.rows));
+              }
+
+              this.deliveryPaginationInfo = {
+                pageIndex,
+                totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                totalRowsCount: res.value.paginationInfo.totalRowsCount,
+              };
+            }
+          },
+        });
+    } else {
+      this.deliveryService
+        .search({
+          paginationInfo: {
+            pageIndex: pageIndex,
+            pageSize: 20,
+          },
+          searchFilters: [
+            {
+              column: DeliverySearchEnum.Name,
+              values: [''],
+            },
+          ],
+          fromDate: null,
+        })
+        .subscribe({
+          next: (res) => {
+            if (res.value.rows.length > 0) {
+              if (pageIndex == 1) {
+                this.deliveries.set(res.value.rows);
+              } else {
+                this.deliveries.update((prev) => prev.concat(res.value.rows));
+              }
+              this.deliveryPaginationInfo = {
+                pageIndex,
+                totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                totalRowsCount: res.value.paginationInfo.totalRowsCount,
+              };
+            }
+          },
+        });
+    }
+  }
+  onDeliveriesScroll(event: Event, deliveriesScroller: HTMLElement) {
+    // if at bottom
+    if (deliveriesScroller.scrollTop + deliveriesScroller.clientHeight >= deliveriesScroller.scrollHeight - 1) {
+      this.searchDeliveries(this.deliveryPaginationInfo.pageIndex + 1);
+    }
+  }
+  onDeliverySelected(deliveryId: number) {
+    // if (delivery.isAvailable) {
+    this.orderFg.patchValue({ deliveryId });
+    this.DeliveryDialogVisible = false;
+    this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الدليفري بنجاح' });
+    // } else {
+    //   this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
+    // }
+  }
+  //
+  //
+  //
+  //
+
   //
   //
   //
