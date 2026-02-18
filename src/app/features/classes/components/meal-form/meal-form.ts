@@ -4,20 +4,21 @@ import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
-import { FormsModule, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button, ButtonDirective } from 'primeng/button';
 import { CarouselModule } from 'primeng/carousel';
 import { InputText } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
-import { IMealFgControls } from './types';
+import { IMealFgControls, IMealProduct } from './types';
 import { MealService } from '../../services/meal-service';
 import { GroupSearchEnum, GroupService, IGroupSearchRow } from '../../services/group-service';
 import { IProductSearchRow, ProductSearchEnum, ProductService } from '../../services/product-service';
 import { Slider } from '@/components/slider/slider';
 import { NgSelectComponent, NgOptionTemplateDirective, NgLabelTemplateDirective } from '@ng-select/ng-select';
 import { Debounce } from '@/directives/debounce';
-import { ImgFallback } from "@/directives/img-fallback";
+import { ImgFallback } from '@/directives/img-fallback';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-meal-form',
@@ -34,8 +35,11 @@ import { ImgFallback } from "@/directives/img-fallback";
     ButtonDirective,
     ImgFallback,
     NgOptionTemplateDirective,
-    NgLabelTemplateDirective,FormsModule
-],
+    NgLabelTemplateDirective,
+    FormsModule,
+    ReactiveFormsModule,
+    TranslatePipe,
+  ],
   templateUrl: './meal-form.html',
   styleUrl: './meal-form.css',
 })
@@ -72,7 +76,7 @@ export class MealForm extends BaseComponent implements OnInit {
     //update only props
     id: this.fb.control(0, []),
     imagesAdd: this.fb.control([], []),
-    ListIdsOfDeleteImages: this.fb.control([], []),
+    listIdsOfDeleteImages: this.fb.control([], []),
     //
     //
     //for validation message only
@@ -80,7 +84,7 @@ export class MealForm extends BaseComponent implements OnInit {
   };
 
   mealService = inject(MealService);
-  productFg = this.fb.group(this.initialMealFgValue);
+  mealFg = this.fb.group(this.initialMealFgValue);
   /**
    *
    */
@@ -91,18 +95,18 @@ export class MealForm extends BaseComponent implements OnInit {
   ngOnInit() {
     this.searchGroups(1);
     this.searchProducts(1);
-    
+
     switch (this.formMode()) {
       case FormMode.Update:
-        this.mealService.getById(this.routeId).subscribe((product) => {
-          this.productFg.patchValue({
-            ...product,
+        this.mealService.getById(this.routeId).subscribe((meal) => {
+          this.mealFg.patchValue({
+            ...meal,
             images: [],
           });
-          this.existingImages.set(product.images);
-          this.currentImage.set(product.images[0]);
-          this.currentProducts.set(product.menuItems);
-          this.currentGroup.set({ id: product.categoryId, name: product.categoryName });
+          this.existingImages.set(meal.images);
+          this.currentImage.set(meal.images[0]);
+          this.currentProducts.set(meal.menuItems);
+          this.currentGroup.set({ id: meal.categoryId, name: meal.categoryName });
         });
         break;
       default:
@@ -118,16 +122,16 @@ export class MealForm extends BaseComponent implements OnInit {
   }
 
   onSubmitForm() {
-    this.productFg.patchValue({
-      nameEn: this.productFg.value.nameAr?.trim(),
-      descriptionEn: this.productFg.value.descriptionAr?.trim(),
+    this.mealFg.patchValue({
+      nameEn: this.mealFg.value.nameAr?.trim(),
+      descriptionEn: this.mealFg.value.descriptionAr?.trim(),
       images: this.newImages().map((image) => image.file!),
       allImages: [...this.allImages()],
     });
-    if (this.productFg.invalid) {
+    if (this.mealFg.invalid) {
       console.log('invalid');
-      console.log(this.productFg.value);
-      this.productFg.markAllAsTouched();
+      console.log(this.mealFg.value);
+      this.mealFg.markAllAsTouched();
       return;
     }
 
@@ -135,10 +139,10 @@ export class MealForm extends BaseComponent implements OnInit {
 
     switch (this.formMode()) {
       case FormMode.Create:
-        formValues = omitKeys(this.productFg.value, ['id', 'imagesAdd', 'listIdsOfDeleteImages', 'allImages']);
+        formValues = omitKeys(this.mealFg.value, ['id', 'imagesAdd', 'listIdsOfDeleteImages', 'allImages']);
         break;
       case FormMode.Update:
-        formValues = omitKeys(this.productFg.value, ['images', 'allImages']);
+        formValues = omitKeys(this.mealFg.value, ['images', 'allImages']);
         break;
     }
 
@@ -151,7 +155,7 @@ export class MealForm extends BaseComponent implements OnInit {
         formData.append(key, value);
       }
     });
-    
+
     switch (this.formMode()) {
       case FormMode.Create:
         this.productService.create(formData).subscribe({
@@ -196,14 +200,21 @@ export class MealForm extends BaseComponent implements OnInit {
         this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن اختيار اكثر من 6 صورة' });
         return;
       }
-      Array.from(input.files).forEach((file, ix) => {
-        const randomKey = Date.now() * Math.random();
-        this.newImages.update((images) => [
-          ...images,
-          { file, fullPath: URL.createObjectURL(file), id: 'new-image-' + randomKey, ix },
-        ]);
-      });
-      this.productFg.patchValue({
+      const files = Array.from(input.files);
+      // .forEach((file, ix) => {
+      //   const randomKey = Date.now() * Math.random();
+
+      // });
+      this.newImages.update((prevImages) => [
+        ...prevImages,
+        ...files.map((file, ix) => ({
+          file,
+          fullPath: URL.createObjectURL(file),
+          id: 'new-image-' + Date.now() * Math.random(),
+          ix,
+        })),
+      ]);
+      this.mealFg.patchValue({
         allImages: [...this.allImages()],
       });
       this.currentImage.set(this.allImages()[0]);
@@ -217,6 +228,9 @@ export class MealForm extends BaseComponent implements OnInit {
       this.newImages.update((images) => images.filter((i) => i.id !== this.currentImage()?.id));
     } else {
       this.existingImages.update((images) => images.filter((i) => i.id !== this.currentImage()?.id));
+      this.mealFg.patchValue({
+        listIdsOfDeleteImages: [...this.mealFg.value.listIdsOfDeleteImages!, this.currentImage()?.id],
+      });
     }
     this.currentImage.set(this.allImages()[0]);
   }
@@ -314,11 +328,15 @@ export class MealForm extends BaseComponent implements OnInit {
   products = signal<IProductSearchRow[]>([]);
   productService = inject(ProductService);
   previousProductsSearchValue = '';
+  selectedProducts: IMealProduct[] = [];
+  log(any: any) {
+    console.log(any);
+  }
   displayedProducts = computed(() => {
     const current = this.currentProducts();
     const products = this.products();
 
-    if (!current.length) return products;
+    if (!current.length) return products.map((p) => ({ ...p, quantity: 1 }));
 
     const currentMap = new Map(current.map((a) => [a.id, a]));
 
@@ -329,7 +347,7 @@ export class MealForm extends BaseComponent implements OnInit {
     const missing = current.filter((c) => !products.some((p) => p.id === c.id));
 
     // Usually best UX: current selections first
-    return [...missing, ...merged];
+    return [...missing, ...merged].map((p) => ({ ...p, quantity: 1 }));
   });
   productsPaginationInfo: {
     pageIndex: number;
@@ -372,6 +390,14 @@ export class MealForm extends BaseComponent implements OnInit {
           }
         },
       });
+  }
+  updateQuantity(item: IMealProduct, quantity: number) {
+    if (item.quantity + quantity <= 0) {
+      this.selectedProducts = this.selectedProducts.filter((p) => p.id !== item.id);
+      return;
+    }
+    if (item.quantity + quantity > 1000) return;
+    item.quantity += quantity;
   }
   debouncedProductsSearch(event: any) {
     const searchValue = event?.term ?? '';

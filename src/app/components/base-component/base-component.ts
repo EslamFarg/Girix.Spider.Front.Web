@@ -37,7 +37,7 @@ export interface IDebounceMapValue<T = any> {
 export class BaseComponent {
   localSpaceTypeEnum = SpaceTypeEnum;
   FormMode = FormMode;
-  AmountType=AmountType;
+  AmountType = AmountType;
   //
   nullableFb = inject(FormBuilder);
   fb = this.nullableFb.nonNullable;
@@ -82,6 +82,17 @@ export class BaseComponent {
     const date = new Date();
     date.setDate(date.getDate() - days);
     return date;
+  }
+
+  get localDateIso() {
+    const localDate = new Date();
+    localDate.setMinutes(localDate.getMinutes() - new Date().getTimezoneOffset());
+    return localDate.toISOString();
+  }
+  UtcToLocalIso(utcDateString: string) {
+    const localDate = new Date(utcDateString);
+    localDate.setMinutes(localDate.getMinutes() - new Date().getTimezoneOffset());
+    return localDate.toISOString();
   }
 
   translate = (key: string) => this.translateService.instant(key);

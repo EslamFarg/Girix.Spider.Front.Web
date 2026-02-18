@@ -7,10 +7,10 @@ import { CarouselModule } from 'primeng/carousel';
 import { InputText } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
-import { GroupService } from '../../services/group-service';
+import { GroupService, IGroupReadResponse } from '../../services/group-service';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { IGroupFgControls } from './types';
-import { Validators } from '@angular/forms';
+import { ReactiveFormsModule, Validators, ɵInternalFormsSharedModule } from '@angular/forms';
 import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
@@ -18,6 +18,7 @@ import { IPrinterSearchRow, PrinterSearchEnum, PrinterService } from '@/features
 import { Debounce } from '@/directives/debounce';
 import { ImgFallback } from '@/directives/img-fallback';
 import { TranslatePipe } from '@ngx-translate/core';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-group-form',
@@ -32,13 +33,17 @@ import { TranslatePipe } from '@ngx-translate/core';
     Debounce,
     ButtonDirective,
     ImgFallback,
-    TranslatePipe
-  ],
+    TranslatePipe,
+    ɵInternalFormsSharedModule,
+    ReactiveFormsModule,
+    RouterLink
+],
   templateUrl: './group-form.html',
   styleUrl: './group-form.css',
 })
 export class GroupForm extends BaseComponent implements OnInit {
   formMode = input.required<FormMode>();
+  id = input.required<number>();
 
   initialGroupFgValue: IGroupFgControls = {
     nameEn: this.fb.control<string>('', [Validators.required]),
@@ -50,13 +55,14 @@ export class GroupForm extends BaseComponent implements OnInit {
     ]),
     isOnCasher: this.fb.control(false, []),
     printerId: this.fb.control(null, [Validators.required]),
-    images: this.fb.control([], []),
+    description: this.fb.control<string>('', [Validators.required]),
+    images: this.fb.control<File[]>([], []),
     //
     //
     //update only props
     id: this.fb.control(null, []),
-    // imagesAdd: this.fb.control<File[]>([], []),
-    // listIdsOfDeleteImages: this.fb.control<number[]>([], []),
+    imagesAdd: this.fb.control([], []),
+    listIdsOfDeleteImages: this.fb.control<number[]>([], []),
     //
     //
     //for validation message only
@@ -68,6 +74,7 @@ export class GroupForm extends BaseComponent implements OnInit {
 
   groupService = inject(GroupService);
   groupFg = this.fb.group(this.initialGroupFgValue);
+  existingGroup = signal<IGroupReadResponse | null>(null);
   /**
    *
    */
@@ -80,15 +87,21 @@ export class GroupForm extends BaseComponent implements OnInit {
 
     switch (this.formMode()) {
       case FormMode.Update:
-        this.groupService.getById(this.routeId).subscribe((group) => {
-          this.groupFg.patchValue({
-            ...group,
-          });
-          this.currentImage.set(group.attachment[0]);
-          this.currentPrinter.set({
-            id: group.printerId,
-            name: group.printerName,
-          });
+        this.groupService.getById(this.id()).subscribe({
+          next: (group) => {
+            this.existingGroup.set(group);
+            this.groupFg.patchValue({
+              ...group,
+              nameAr: group.name,
+              nameEn: group.name,
+            });
+            console.log(this.groupFg.value);
+            this.currentImage.set({ ...group.attachment[0], fullPath: this.baseUrl + group.attachment[0].fullPath });
+            this.currentPrinter.set({
+              id: group.printerId,
+              name: group.printerName,
+            });
+          },
         });
         break;
       default:
@@ -103,8 +116,6 @@ export class GroupForm extends BaseComponent implements OnInit {
   onSubmitForm() {
     this.groupFg.patchValue({
       nameEn: this.groupFg.value.nameAr?.trim(),
-      // images: this.newImages().map((image) => image.file!),
-      // allImages: [...this.allImages()],
     });
     if (this.groupFg.invalid) {
       console.log('invalid');
@@ -113,17 +124,19 @@ export class GroupForm extends BaseComponent implements OnInit {
       return;
     }
 
-    let formValues: { [key: string]: string | Blob } = {};
+    let formValues: { [key: string]: any } = {};
 
     switch (this.formMode()) {
       case FormMode.Create:
-        formValues = omitKeys(this.groupFg.value, ['id', 'imagesAdd', 'listIdsOfDeleteImages', 'allImages']);
+        formValues = omitKeys(this.groupFg.value, ['id', 'imagesAdd', 'listIdsOfDeleteImages']);
         break;
       case FormMode.Update:
-        formValues = omitKeys(this.groupFg.value, ['images', 'allImages']);
+        formValues = omitKeys(this.groupFg.value, ['images']);
         break;
     }
     const formData = new FormData();
+
+    console.log(formValues);
 
     Array.from(Object.entries(formValues)).forEach(([key, value]) => {
       if (Array.isArray(value)) {
@@ -170,14 +183,25 @@ export class GroupForm extends BaseComponent implements OnInit {
         this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن اختيار اكثر من صورة' });
         return;
       }
+      this.onDeleteImage();
       const file = input.files[0];
 
       this.currentImage.set({ file, fullPath: URL.createObjectURL(file), id: 'new-image', ix: 0 });
     }
 
+    if (this.formMode() === FormMode.Update) {
+      this.groupFg.patchValue({ imagesAdd: [input.files![0]] });
+    } else {
+      this.groupFg.patchValue({ images: [input.files![0]] });
+    }
+
     input.value = '';
   }
   onDeleteImage() {
+    if (!this.currentImage()?.file) {
+      console.log(this.currentImage()?.id);
+      this.groupFg.patchValue({ listIdsOfDeleteImages: [this.currentImage()?.id] });
+    }
     this.currentImage.set(null);
   }
 

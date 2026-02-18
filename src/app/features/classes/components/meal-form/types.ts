@@ -16,5 +16,12 @@ export interface IMealFgControls {
   images: FormControl<File[] | null>;
   imagesAdd: FormControl<File[] | null>;
   allImages: FormControl<IFormImage[] | null>;
-  ListIdsOfDeleteImages: FormControl<number[] | null>;
+  listIdsOfDeleteImages: FormControl<number[] | null>;
+}
+
+
+export interface IMealProduct {
+  id: number;
+  quantity: number;
+  name?: string;
 }

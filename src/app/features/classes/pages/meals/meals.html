@@ -28,14 +28,14 @@
       </app-input-error-message-handler>
     </div>
 
-    <p-select
+    <!-- <p-select
       [options]="periodOptions"
       formControlName="fromDate"
       optionLabel="label"
       optionValue="value"
       placeholder="الكل"
       class="h-fit hidden! sm:flex! w-40"
-    />
+    /> -->
   </form>
 
   <table class="my-2 sm:my-4 w-full main-table">
@@ -53,21 +53,25 @@
     </thead>
     <tbody>
       @for (item of meals(); track $index) {
-        <tr class="">
-          <td>{{ getRowNumber($index, mealsPaginationInfo.pageIndex) }}</td>
+        <tr class="" [style]="`--ix:${$index}`">
           <td>
-            <img
-              class="w-10 aspect-square mx-auto object-fit-cover"
-              appImgFallback
-              [src]="baseUrl + (item.images?.[0]?.fullPath ?? '')"
-              alt=""
-            />
+            <div>{{ getRowNumber($index, mealsPaginationInfo.pageIndex) }}</div>
           </td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.categoryName }}</td>
-          <td>{{ item.description }}</td>
-          <td class="font-bold">{{ item.tax }}</td>
-          <td class="font-bold">${{ item.price }}</td>
+          <td>
+            <div>
+              <img
+                class="w-10 aspect-square mx-auto object-fit-cover"
+                appImgFallback
+                [src]="baseUrl + (item.images?.[0]?.fullPath ?? '')"
+                alt=""
+              />
+            </div>
+          </td>
+          <td><div>{{ item.name }}</div></td>
+          <td><div>{{ item.categoryName }}</div></td>
+          <td><div>{{ item.description }}</div></td>
+          <td class="font-bold"><div>{{ item.tax }}</div></td>
+          <td class="font-bold"><div>${{ item.price }}</div></td>
           <td>
             <div class="actions">
               <button type="button" class="edit">

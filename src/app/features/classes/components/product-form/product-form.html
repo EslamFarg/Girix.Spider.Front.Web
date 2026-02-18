@@ -10,18 +10,26 @@
     type="submit"
   >
     @if (formMode() === FormMode.Create) {
-    {{ 'actions.save' | translate }}
+      {{ 'actions.save' | translate }}
     } @else {
-    {{ 'actions.edit' | translate }}
+      {{ 'actions.edit' | translate }}
     }
   </button>
-  <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
-    {{'actions.new' | translate }}
-  </button>
+  @if (formMode() === FormMode.Update) {
+    <a
+      routerLink="/classes/products/add"
+      pButton
+      class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
+      variant="outlined"
+    >
+      {{ 'actions.new' | translate }}
+    </a>
+  }
 </div>
 
 <form id="productForm" class="mt-6" [formGroup]="productFg" (ngSubmit)="onSubmitForm()">
   <div class="flex flex-col md:flex-row gap-4">
+    <!-- images -->
     <div class="md:flex-1 md:max-w-50 lg:max-w-60 relative">
       <input
         multiple
@@ -98,9 +106,10 @@
       >
       </app-slider>
     </div>
+    <!-- product info -->
     <div class="grid lg:grid-cols-3 gap-4 flex-1">
       <div>
-        <label for="productName">{{'classes.products.productName' | translate}}</label>
+        <label for="productName">{{ 'classes.products.productName' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('nameAr')">
           <input
             pInputText
@@ -112,7 +121,7 @@
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productPrice">{{'classes.products.productPrice' | translate}}</label>
+        <label for="productPrice">{{ 'classes.products.productPrice' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('price')">
           <input
             pInputText
@@ -126,7 +135,7 @@
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="costPrice">{{'classes.products.costPrice' | translate}}</label>
+        <label for="costPrice">{{ 'classes.products.costPrice' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('costPrice')">
           <input
             pInputText
@@ -140,9 +149,25 @@
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productName">{{'classes.products.group' | translate}}</label>
+        <label for="productName">{{ 'classes.products.group' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('categoryId')">
-          <p-select
+          <ng-select
+            class="app-select w-full"
+            style="--height: 40px !important"
+            [items]="displayedGroups()"
+            formControlName="categoryId"
+            bindLabel="name"
+            bindValue="id"
+            placeholder="الكل"
+            #customerSelect
+            appDebounce
+            [customEvents]="[
+              { key: 'searchEvent', value: customerSelect.searchEvent },
+              { key: 'scrollToEnd', value: customerSelect.scrollToEnd },
+            ]"
+            (debounced)="onGroupsNameSearch($event, customerSelect.searchTerm ?? '')"
+          />
+          <!-- <p-select
             [options]="displayedGroups()"
             optionLabel="name"
             optionValue="id"
@@ -155,7 +180,7 @@
             (onFilter)="onGroupsFilter($event)"
             [placeholder]="'classes.products.group' | translate"
             class="w-full!"
-          />
+          /> -->
           <p-inputgroup-addon class="p-0! overflow-hidden">
             <div
               (click)="openGroupsDialog()"
@@ -172,19 +197,32 @@
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productName">{{'classes.products.tax' | translate}}</label>
+        <label for="productName">{{ 'classes.products.tax' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('tax')">
-          <p-select [options]="[0, 1, 5, 14, 15]" formControlName="tax" [placeholder]="'classes.products.tax' | translate" class="w-full!" />
+          <ng-select
+            class="app-select w-full"
+            style="--height: 40px !important"
+            [items]="[0, 1, 5, 14, 15]"
+            formControlName="tax"
+            placeholder="الكل"
+            [clearable]="false"
+            #customerSelect
+            [placeholder]="'classes.products.tax' | translate"
+          />
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productName">{{'classes.products.excisetax' | translate}}</label>
+        <label for="productName">{{ 'classes.products.excisetax' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('selectiveTax')">
-          <p-select
-            [options]="[0, 25, 50, 75, 100]"
+          <ng-select
+            class="app-select w-full"
+            style="--height: 40px !important"
+            [items]="[0, 25, 50, 75, 100]"
             formControlName="selectiveTax"
+            [clearable]="false"
+            placeholder="الكل"
+            #customerSelect
             [placeholder]="'classes.products.excisetax' | translate"
-            class="w-full!"
           />
         </app-input-error-message-handler>
       </div>
@@ -193,13 +231,77 @@
           <app-input-error-message-handler [fc]="productFg.get('isAddition')">
             <input formControlName="isAddition" type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
           </app-input-error-message-handler>
-          <label for="productName" class="text-dark-line text-sm font-semibold">{{'classes.products.addproduct' | translate}}</label>
+          <label for="productName" class="text-dark-line text-sm font-semibold">{{
+            'classes.products.addproduct' | translate
+          }}</label>
         </div>
       </div>
       <div class="lg:col-span-2 self-end">
-        <label for="productName">{{'classes.products.productadditives' | translate}}</label>
+        <label for="productName">{{ 'classes.products.productadditives' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('idsAdditionMenuItem')">
-          <p-multiselect
+          <ng-select
+            class="app-select w-full"
+            style="--height: 40px !important"
+            [items]="displayedAdditions()"
+            formControlName="idsAdditionMenuItem"
+            bindLabel="name"
+            bindValue="id"
+            placeholder="الكل"
+            #additionsSelect
+            appDebounce
+            [closeOnSelect]="false"
+            [multiple]="true"
+            [customEvents]="[
+              { key: 'searchEvent', value: additionsSelect.searchEvent },
+              { key: 'scrollToEnd', value: additionsSelect.scrollToEnd },
+            ]"
+            [placeholder]="'classes.products.productadditives' | translate"
+            (debounced)="onAdditionProductsSearch($event, additionsSelect.searchTerm ?? '')"
+          >
+            <ng-template ng-label-tmp let-item="item" let-clear="clear" let-item$="item$" let-index="index">
+              <div class="flex items-center gap-2">
+                <span class="ng-value-icon left" (click)="clear(item)" aria-hidden="true">×</span>
+
+                <span class="ng-value-label flex! items-center gap-2">
+                  <div class="rounded-full w-fit shadow shadow-black/30">
+                    <img
+                      appImgFallback
+                      [src]="baseUrl + item.images?.[0]?.fullPath"
+                      class="object-cover rounded-full aspect-square"
+                      width="20px"
+                      height="20px"
+                    />
+                  </div>
+                  {{ item.name }}
+                </span>
+              </div>
+            </ng-template>
+
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              <div class="flex items-center gap-2">
+                <input
+                  id="item-{{ index }}"
+                  type="checkbox"
+                  [ngModel]="item$.selected"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+                {{ item.name }}
+
+                <div class="rounded-full w-fit shadow shadow-black/30">
+                  <img
+                    class="object-cover rounded-full aspect-square"
+                    [src]="baseUrl + item.images?.[0]?.fullPath"
+                    appImgFallback
+                    width="20px"
+                    height="20px"
+                  />
+                </div>
+
+                <!-- {{ item.name }} -->
+              </div>
+            </ng-template>
+          </ng-select>
+          <!-- <p-multiselect
             optionValue="id"
             [options]="displayedAdditions()"
             optionLabel="name"
@@ -210,15 +312,14 @@
             [lazy]="true"
             [filter]="true"
             (onFilter)="onAdditionProductsFilter($event)"
-            [placeholder]="'classes.products.productadditives' | translate"
             class="w-full! [&_.p-virtualscroller]:min-h-25"
-          />
+          /> -->
         </app-input-error-message-handler>
       </div>
     </div>
   </div>
   <div class="mt-4">
-    <label for="productName">{{'classes.products.description' | translate}}</label>
+    <label for="productName">{{ 'classes.products.description' | translate }}</label>
     <app-input-error-message-handler [fc]="productFg.get('descriptionAr')">
       <textarea
         rows="5"

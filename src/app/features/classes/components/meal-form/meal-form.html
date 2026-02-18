@@ -6,7 +6,7 @@
     pButton
     style="--p-button-primary-background: var(--color-dark-line)"
     class="border-dark-line! text-white! py-1! md:px-8! md:flex-none"
-    form="productForm"
+    form="mealForm"
     type="submit"
   >
     @if (formMode() === FormMode.Create) {
@@ -20,8 +20,9 @@
   </button>
 </div>
 
-<div class="mt-6">
+<form [formGroup]="mealFg" id="mealForm" class="mt-6">
   <div class="flex flex-col md:flex-row gap-4">
+    <!-- images -->
     <div class="md:flex-1 md:max-w-50 lg:max-w-60 relative">
       <input
         multiple
@@ -88,7 +89,7 @@
         </div>
       </ng-template>
       <span></span>
-      <app-input-error-message-handler [fc]="productFg.get('allImages')" class="inline" />
+      <app-input-error-message-handler [fc]="mealFg.get('allImages')" class="inline" />
 
       <app-slider
         class="block w-full h-fit mt-2"
@@ -98,27 +99,30 @@
       >
       </app-slider>
     </div>
+    <!-- details -->
     <div class="grid md:grid-cols-3 gap-4 flex-1">
       <div>
-        <label for="productName">اسم الوجبه</label>
+        <label for="mealName">اسم الوجبه</label>
         <app-input-error-message-handler>
           <input
             pInputText
-            id="productName"
+            id="mealName"
+            formControlName="nameAr"
             class="app-input"
-            aria-describedby="productName-help"
+            aria-describedby="mealName-help"
             placeholder="الاسم"
           />
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productPrice">سعر الوجبه</label>
+        <label for="mealPrice">سعر الوجبه</label>
         <app-input-error-message-handler>
           <input
             pInputText
-            id="productPrice"
+            id="mealPrice"
+            formControlName="price"
             class="app-input"
-            aria-describedby="productPrice-help"
+            aria-describedby="mealPrice-help"
             placeholder="السعر"
           />
         </app-input-error-message-handler>
@@ -126,11 +130,11 @@
       <div>
         <label for="costPrice">سعر التكلفه</label>
         <app-input-error-message-handler>
-          <input pInputText id="costPrice" class="app-input" aria-describedby="costPrice-help" placeholder="السعر" />
+          <input pInputText id="costPrice" formControlName="costPrice" class="app-input" aria-describedby="costPrice-help" placeholder="السعر" />
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productName">المجموعة</label>
+        <label for="mealName">المجموعة</label>
         <app-input-error-message-handler [grouped]="false">
           <ng-select
             class="app-select"
@@ -150,40 +154,59 @@
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productName">الضريبه</label>
+        <label for="mealName">الضريبه</label>
         <app-input-error-message-handler>
-          <p-select [options]="[]" optionLabel="name" placeholder="إختر الضريبه" class="w-full! app-input" />
+          <ng-select
+            class="app-select w-full"
+            [items]="[0, 1, 5, 14, 15]"
+            formControlName="tax"
+            placeholder="الكل"
+            [clearable]="false"
+            #customerSelect
+            [placeholder]="'classes.products.tax' | translate"
+          />
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productName">الضريبه الانتقائيه</label>
+        <label for="mealName">الضريبه الانتقائيه</label>
         <app-input-error-message-handler>
-          <p-select [options]="[]" optionLabel="name" placeholder="إختر الضريبه" class="w-full! app-input" />
+          <ng-select
+            class="app-select w-full"
+            [items]="[0, 25, 50, 75, 100]"
+            formControlName="selectiveTax"
+            [clearable]="false"
+            placeholder="الكل"
+            #customerSelect
+            [placeholder]="'classes.products.excisetax' | translate"
+          />
         </app-input-error-message-handler>
       </div>
       <div class="md:col-span-3">
-        <label for="productName">المنتجات</label>
+        <label for="mealName">المنتجات</label>
         <app-input-error-message-handler [grouped]="false">
           <ng-select
             class="app-select"
+            style="--height: fit-content"
             [items]="displayedProducts()"
-            bindLabel="name"
-            bindValue="id"
             [multiple]="true"
+            [(ngModel)]="selectedProducts"
+            [ngModelOptions]="{ standalone: true }"
             [closeOnSelect]="false"
             placeholder="الكل"
-            #productSelect
+            #mealSelect
             appDebounce
             [customEvents]="[
-              { key: 'searchEvent', value: productSelect.searchEvent },
-              { key: 'scrollToEnd', value: productSelect.scrollToEnd },
+              { key: 'searchEvent', value: mealSelect.searchEvent },
+              { key: 'scrollToEnd', value: mealSelect.scrollToEnd },
             ]"
-            (debounced)="debouncedProductsSearch($event)"
+            (debounced)="debouncedGroupsSearch($event)"
           >
             <ng-template ng-label-tmp let-item="item" let-clear="clear" let-item$="item$" let-index="index">
               <div class="flex items-center gap-2">
+                <span class="ng-value-icon left" (click)="clear(item)" aria-hidden="true">×</span>
+
                 <span class="ng-value-label flex! items-center gap-2">
-                  <div class="rounded-full w-fit shadow shadow-black/30">
+                  <!-- <div class="rounded-full w-fit shadow shadow-black/30">
                     <img
                       appImgFallback
                       [src]="baseUrl + item.images?.[0]?.fullPath"
@@ -191,16 +214,27 @@
                       width="20px"
                       height="20px"
                     />
-                  </div>
+                  </div> -->
                   {{ item.name }}
-                  <input id="item-{{ index }}" type="checkbox" [ngModel]="item$.selected" /> {{ item.name }}
                 </span>
-                <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true">×</span>
+                <div class="border border-black/10">
+                  <span class="ng-value-icon left" (click)="updateQuantity(item, 1)">+</span>
+                  <span class="px-1">{{ item.quantity }}</span>
+                  <span class="ng-value-icon right" (click)="updateQuantity(item, -1)">-</span>
+                </div>
               </div>
             </ng-template>
 
-            <ng-template ng-option-tmp let-item="item">
-              <div class="flex items-center gap-2">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              <div class="flex items-center gap-2" (click)="log(item)">
+                <input
+                  id="item-{{ index }}"
+                  type="checkbox"
+                  [ngModel]="item$.selected"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+                {{ item.name }}
+
                 <div class="rounded-full w-fit shadow shadow-black/30">
                   <img
                     class="object-cover rounded-full aspect-square"
@@ -211,7 +245,7 @@
                   />
                 </div>
 
-                {{ item.name }}
+                <!-- {{ item.name }} -->
               </div>
             </ng-template>
           </ng-select>
@@ -220,17 +254,18 @@
     </div>
   </div>
   <div class="mt-4">
-    <label for="productName">البيان</label>
+    <label for="mealName">البيان</label>
     <app-input-error-message-handler>
       <textarea
         rows="5"
         cols="30"
         pTextarea
-        id="productName"
+        id="mealName"
         class="app-input h-auto!"
-        aria-describedby="productName-help"
+        formControlName="descriptionAr"
+        aria-describedby="mealName-help"
         placeholder="البيان"
       ></textarea>
     </app-input-error-message-handler>
   </div>
-</div>
+</form>

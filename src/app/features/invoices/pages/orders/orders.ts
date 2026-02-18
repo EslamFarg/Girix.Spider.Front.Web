@@ -40,7 +40,7 @@ export class Orders extends BaseComponent {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<OrderSearchEnum>(OrderSearchEnum.CustomerName, [Validators.required]),
     fromDate: this.fb.control<string | null>(null, []),
-    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
+    toDate: this.fb.control<string>(this.localDateIso, [Validators.required]),
   };
 
   fg = this.fb.group(this.initialSearchFormValue);

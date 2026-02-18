@@ -29,14 +29,14 @@
       </app-input-error-message-handler>
     </div>
 
-    <p-select
+    <!-- <p-select
       [options]="periodOptions"
       formControlName="fromDate"
       optionLabel="label"
       optionValue="value"
       [placeholder]="'classes.groups.all' | translate"
       class="h-fit hidden! sm:flex! w-40"
-    />
+    /> -->
   </form>
 
   <table class="my-2 sm:my-4 w-full main-table">
@@ -71,7 +71,7 @@
           </td>
           <td>
             <div class="actions">
-              <button type="button" class="edit">
+              <a type="button" class="edit" [routerLink]="`/classes/groups/${item.id}/edit`">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"
@@ -88,7 +88,7 @@
                     fill="#1F1D2B"
                   />
                 </svg>
-              </button>
+              </a>
               <button (click)="deleteGroup(item.id, $event)" type="button" class="delete">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path

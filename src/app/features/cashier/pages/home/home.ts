@@ -83,11 +83,6 @@ interface IOrderCreateFgValue {
   placeName: FormControl<string | null>;
 }
 
-enum DiscountType {
-  Amount = 1,
-  Percentage = 2,
-}
-
 @Component({
   selector: 'app-home',
   imports: [
@@ -434,20 +429,35 @@ export class Home extends BaseComponent implements OnInit {
   deliveryFee = computed(() => {
     if (this.orderLocationType() !== OrderLocationType.Delivery) return 0;
 
-    const feeValue = this.financialSettings()?.deliveryFee;
+    const baseFeeValue = this.financialSettings()?.deliveryFee;
+    let fee = 0;
+
+    //tax
 
     if (this.financialSettings()?.deliveryFeeType == AmountType.Fixed) {
-      return feeValue * (1 + this.financialSettings()?.vat / 100);
+      fee = baseFeeValue * (1 + this.financialSettings()?.vat / 100);
     } else {
       const itemsWithSelectiveTaxSum = this.orderMenuItems().reduce(
         (total, item) => total + this.getMenuItemPriceWithAdditionsWithSelectiveTax(item),
         0,
       );
 
-      const feeAmount = itemsWithSelectiveTaxSum * (feeValue / 100);
-      const feeAfterTax = feeAmount * (1 + this.financialSettings()?.vat / 100);
-      return feeAfterTax;
+      const feeAmount = itemsWithSelectiveTaxSum * (baseFeeValue / 100);
+      console.log('delivery fee before tax:', feeAmount);
+      fee = feeAmount * (1 + this.financialSettings()?.vat / 100);
+      console.log('delivery fee after tax:', fee);
     }
+
+    //discount
+    const baseDiscountValue = this.financialSettings()?.discount;
+
+    if (this.financialSettings()?.discountType == AmountType.Fixed) {
+      fee -= baseDiscountValue * (1 + this.financialSettings()?.vat / 100);
+    } else {
+      fee *= 1 - baseDiscountValue / 100;
+    }
+
+    return fee;
   });
 
   totalMenuItemsTax = computed(() => {
@@ -472,11 +482,11 @@ export class Home extends BaseComponent implements OnInit {
     return serviceFeeAfterTax;
   });
 
-  discountAmount = computed(() => {
+  itemsDiscountAmount = computed(() => {
     const discountValue = this.financialSettings().discount;
-    if (this.financialSettings().discountType == DiscountType.Amount) {
+    if (this.financialSettings().discountType == AmountType.Fixed) {
       return discountValue;
-    } else if (this.financialSettings().discountType == DiscountType.Percentage) {
+    } else if (this.financialSettings().discountType == AmountType.Percentage) {
       return this.orderItemsNet() * (discountValue / 100);
     } else {
       return 0;
@@ -488,7 +498,7 @@ export class Home extends BaseComponent implements OnInit {
   });
 
   net = computed(() => {
-    const net = this.orderItemsNet() + this.hutNet() + this.serviceFee() + this.deliveryFee() - this.discountAmount();
+    const net = this.orderItemsNet() + this.hutNet() + this.serviceFee() + this.deliveryFee() - this.itemsDiscountAmount();
 
     return net;
   });

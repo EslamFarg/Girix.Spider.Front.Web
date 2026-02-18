@@ -172,8 +172,7 @@ label:has(+ app-input-error-message-handler) {
 /* label + app-input-error-message-handler select,
 label + app-input-error-message-handler textarea,
 label + app-input-error-message-handler .p-select,
-label + app-input-error-message-handler input  */
-{
+label + app-input-error-message-handler input  */ {
   --p-select-padding-x: 4px !important;
   --p-select-padding-y: 4px !important;
   background-color: white !important;
@@ -201,8 +200,7 @@ label + app-input-error-message-handler input  */
 /* .app-input input,
 label + app-input-error-message-handler select,
 label + app-input-error-message-handler .p-select,
-label + app-input-error-message-handler input  */
-{
+label + app-input-error-message-handler input  */ {
   height: 32px;
 }
 
@@ -214,8 +212,7 @@ label + app-input-error-message-handler input  */
 /* label + app-input-error-message-handler textarea,
 label + app-input-error-message-handler select,
 label + app-input-error-message-handler .p-select,
-label + app-input-error-message-handler input */
- {
+label + app-input-error-message-handler input */ {
   padding: 2px 8px !important;
 }
 
@@ -248,7 +245,7 @@ label + app-input-error-message-handler input */
 /* ng-select */
 .ng-select.app-select {
   /* background: var(--p-select-background); */
-
+  --height: 32px;
   & .ng-select-container {
     border: 1px solid var(--p-form-field-border-color);
     background-color: var(--p-form-field-background);
@@ -256,8 +253,8 @@ label + app-input-error-message-handler input */
     color: var(--p-form-field-color);
     border-radius: var(--p-form-field-border-radius) !important;
     height: auto;
-    min-height: 32px;
-    height: 32px;
+    min-height: var(--height);
+    height: var(--height);
     transition:
       background var(--p-form-field-transition-duration),
       color var(--p-form-field-transition-duration),
@@ -297,7 +294,7 @@ label + app-input-error-message-handler input */
       top: calc(100% + 2px);
     }
     &.ng-select-top {
-    bottom: calc(100% + 2px);
+      bottom: calc(100% + 2px);
     }
   }
   /* & .ng-value {

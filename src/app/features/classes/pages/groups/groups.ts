@@ -12,6 +12,7 @@ import { IGroupSearchRow, GroupSearchEnum, GroupService } from '../../services/g
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
+import { RouterLink } from "@angular/router";
 @Component({
   selector: 'app-groups',
   imports: [
@@ -24,8 +25,9 @@ import { TranslatePipe } from '@ngx-translate/core';
     SectionWrapper,
     Debounce,
     Menu,
-    TranslatePipe
-  ],
+    TranslatePipe,
+    RouterLink
+],
   templateUrl: './groups.html',
   styleUrl: './groups.css',
 })

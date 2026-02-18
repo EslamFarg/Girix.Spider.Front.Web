@@ -13,7 +13,7 @@ import {
   ProductSearchEnum,
   ProductService,
 } from '../../services/product-service';
-import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GroupSearchEnum, GroupService, IGroupSearchRow } from '../../services/group-service';
 import { ImgOnly } from '@/directives/img-only';
 import { omitKeys } from '@/yn-ng/utils/helpers';
@@ -26,6 +26,9 @@ import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { ProductFgControls } from './types';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { TranslatePipe } from '@ngx-translate/core';
+import { NgSelectComponent, NgOptionTemplateDirective, NgLabelTemplateDirective } from '@ng-select/ng-select';
+import { Debounce } from '@/directives/debounce';
+import { ImgFallback } from '@/directives/img-fallback';
 
 @Component({
   selector: 'app-product-form',
@@ -44,7 +47,13 @@ import { TranslatePipe } from '@ngx-translate/core';
     Dialog,
     MultiSelectModule,
     AllowNumbers,
-    TranslatePipe
+    TranslatePipe,
+    NgSelectComponent,
+    Debounce,
+    FormsModule,
+    ImgFallback,
+    NgOptionTemplateDirective,
+    NgLabelTemplateDirective,
   ],
   templateUrl: './product-form.html',
   styleUrl: './product-form.css',
@@ -106,8 +115,8 @@ export class ProductForm extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.searchGroups(1);
-    this.searchAdditions(1);
+    this.searchGroups({ pageIndex: 1 });
+    this.searchAdditions({ pageIndex: 1 });
 
     this.productFg.get('isAddition')?.valueChanges.subscribe((isAddition) => {
       if (isAddition) {
@@ -139,12 +148,12 @@ export class ProductForm extends BaseComponent implements OnInit {
         break;
     }
 
-    this.setDebounceItem<{ searchValue: string; pageIndex: number }>('searchGroups', (e) =>
-      this.searchGroups(e.pageIndex, e.searchValue),
-    );
-    this.setDebounceItem<{ searchValue: string; pageIndex: number }>('searchAdditionProducts', (e) =>
-      this.searchAdditions(e.pageIndex, e.searchValue),
-    );
+    // this.setDebounceItem<{ searchValue: string; pageIndex: number }>('searchGroups', (e) =>
+    //   this.searchGroups(e.pageIndex, e.searchValue),
+    // );
+    // this.setDebounceItem<{ searchValue: string; pageIndex: number }>('searchAdditionProducts', (e) =>
+    //   this.searchAdditions(e.pageIndex, e.searchValue),
+    // );
   }
 
   onSubmitForm() {
@@ -153,6 +162,7 @@ export class ProductForm extends BaseComponent implements OnInit {
       descriptionEn: this.productFg.value.descriptionAr?.trim(),
       images: this.newImages().map((image) => image.file!),
       allImages: [...this.allImages()],
+      imagesAdd: this.newImages().map((image) => image.file!),
     });
     if (this.productFg.invalid) {
       console.log('invalid');
@@ -224,13 +234,20 @@ export class ProductForm extends BaseComponent implements OnInit {
         this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن اختيار اكثر من 6 صورة' });
         return;
       }
-      Array.from(input.files).forEach((file, ix) => {
-        const randomKey = Date.now() * Math.random();
-        this.newImages.update((images) => [
-          ...images,
-          { file, fullPath: URL.createObjectURL(file), id: 'new-image-' + randomKey, ix },
-        ]);
-      });
+      const files = Array.from(input.files);
+      // .forEach((file, ix) => {
+      //   const randomKey = Date.now() * Math.random();
+
+      // });
+      this.newImages.update((prevImages) => [
+        ...prevImages,
+        ...files.map((file, ix) => ({
+          file,
+          fullPath: URL.createObjectURL(file),
+          id: 'new-image-' + Date.now() * Math.random(),
+          ix,
+        })),
+      ]);
       this.productFg.patchValue({
         allImages: [...this.allImages()],
       });
@@ -245,6 +262,9 @@ export class ProductForm extends BaseComponent implements OnInit {
       this.newImages.update((images) => images.filter((i) => i.id !== this.currentImage()?.id));
     } else {
       this.existingImages.update((images) => images.filter((i) => i.id !== this.currentImage()?.id));
+      this.productFg.patchValue({
+        listIdsOfDeleteImages: [...this.productFg.value.listIdsOfDeleteImages!, this.currentImage()?.id],
+      });
     }
     this.currentImage.set(this.allImages()[0]);
   }
@@ -286,18 +306,18 @@ export class ProductForm extends BaseComponent implements OnInit {
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
-
-  searchGroups(pageIndex: number, searchValue: string = '') {
+  previousGroupsSearchTerm = '';
+  searchGroups(opts: { pageIndex: number; searchTerm?: string }) {
     this.groupService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
+          pageIndex: opts.pageIndex,
           pageSize: 10,
         },
         searchFilters: [
           {
             column: GroupSearchEnum.Name,
-            values: [searchValue],
+            values: [opts.searchTerm ?? ''],
           },
         ],
         fromDate: this.dateNowIso,
@@ -306,13 +326,14 @@ export class ProductForm extends BaseComponent implements OnInit {
         next: (res) => {
           console.log(res.value.rows);
           if (res.value.rows.length === 0) return;
-          if (pageIndex === 1) {
+          this.previousGroupsSearchTerm = opts.searchTerm ?? '';
+          if (opts.pageIndex === 1) {
             this.groups.set(res.value.rows);
           } else {
             this.groups.update((pre) => [...pre, ...res.value.rows]);
           }
           this.groupsPaginationInfo = {
-            pageIndex,
+            pageIndex: opts.pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,
           };
@@ -329,6 +350,18 @@ export class ProductForm extends BaseComponent implements OnInit {
   }
   onGroupsFilter(event: SelectFilterEvent) {
     this.debounceMap.get('searchGroups')?.subject.next({ pageIndex: 1, searchValue: event.filter });
+  }
+
+  onGroupsNameSearch(event: any, searchTerm: string = '') {
+    const isNewSearchTerm = searchTerm != this.previousGroupsSearchTerm;
+
+    if (searchTerm?.length > 100) return;
+
+    if (isNewSearchTerm) {
+      this.searchGroups({ pageIndex: 1, searchTerm });
+    } else {
+      this.searchGroups({ pageIndex: this.groupsPaginationInfo.pageIndex + 1, searchTerm });
+    }
   }
   //
   //
@@ -368,11 +401,12 @@ export class ProductForm extends BaseComponent implements OnInit {
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
-  searchAdditions(pageIndex: number, searchValue: string = '') {
+  previousAdditionsSearchTerm = '';
+  searchAdditions(opts: { pageIndex: number; searchTerm?: string }) {
     this.productService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
+          pageIndex: opts.pageIndex,
           pageSize: 20,
         },
         searchFilters: [
@@ -382,7 +416,7 @@ export class ProductForm extends BaseComponent implements OnInit {
           },
           {
             column: ProductSearchEnum.Name,
-            values: [searchValue],
+            values: [opts.searchTerm ?? ''],
           },
         ],
         fromDate: null,
@@ -391,13 +425,14 @@ export class ProductForm extends BaseComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.value.menuItems.rows.length > 0) {
-            if (pageIndex === 1) {
+            this.previousAdditionsSearchTerm = opts.searchTerm ?? '';
+            if (opts.pageIndex === 1) {
               this.additionProducts.set(res.value.menuItems.rows);
             } else {
               this.additionProducts.update((prev) => prev.concat(res.value.menuItems.rows));
             }
             this.additionPaginationInfo = {
-              pageIndex,
+              pageIndex: opts.pageIndex,
               totalPagesCount: res.value.menuItems.paginationInfo.totalPagesCount,
               totalRowsCount: res.value.menuItems.paginationInfo.totalRowsCount,
             };
@@ -416,7 +451,18 @@ export class ProductForm extends BaseComponent implements OnInit {
       });
     }
   }
-  onAdditionProductsFilter(event: SelectFilterEvent) {
+  onAdditionProductsFilter(event: any) {
     this.debounceMap.get('searchAdditionProducts')?.subject.next({ pageIndex: 1, searchValue: event.filter });
+  }
+  onAdditionProductsSearch(event: any, searchTerm: string = '') {
+    const isNewSearchTerm = searchTerm != this.previousAdditionsSearchTerm;
+
+    if (searchTerm?.length > 100) return;
+
+    if (isNewSearchTerm) {
+      this.searchAdditions({ pageIndex: 1, searchTerm });
+    } else {
+      this.searchAdditions({ pageIndex: this.groupsPaginationInfo.pageIndex + 1, searchTerm });
+    }
   }
 }

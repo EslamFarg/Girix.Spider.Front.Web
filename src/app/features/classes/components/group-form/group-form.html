@@ -6,7 +6,7 @@
     pButton
     style="--p-button-primary-background: var(--color-dark-line)"
     class="border-dark-line! text-white! py-1! md:px-8! md:flex-none"
-    form="productForm"
+    form="groupForm"
     type="submit"
   >
     @if (formMode() === FormMode.Create) {
@@ -15,19 +15,26 @@
       {{ 'actions.edit' | translate }}
     }
   </button>
-  <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
-    {{'actions.new' | translate }}
-  </button>
+  @if (formMode() === FormMode.Update) {
+    <a
+      routerLink="/classes/groups/add"
+      pButton
+      class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
+      variant="outlined"
+    >
+      {{ 'actions.new' | translate }}
+    </a>
+  }
 </div>
 
-<div class="mt-6 flex flex-col md:flex-row gap-4">
+<form [formGroup]="groupFg" id="groupForm" class="mt-6 flex flex-col md:flex-row gap-4" (ngSubmit)="onSubmitForm()">
   <div class="md:flex-1 md:max-w-50 lg:max-w-60 relative">
     <input multiple appImgOnly id="fileInput" type="file" hidden #fileInput (change)="onImagesFilesSelected($event)" />
     @if (currentImage()) {
       <button
         (click)="onDeleteImage()"
         type="button"
-        class="absolute animate-shake cursor-pointer backdrop-blur-[10px] transition-all top-2 z-10 left-2 p-1.5 rounded border border-transparent hover:bg-red-500/10 hover:border-red-500/50 group"
+        class="absolute animate-shake cursor-pointer backdrop-blur-[10px] transition-all top-2 z-10 left-2 p-1.5 rounded border border-transparent hover:bg-rose-500/10 hover:border-red-500/50 group"
       >
         <svg
           class="group-hover:scale-125 transition-all"
@@ -68,28 +75,35 @@
       }
     </label>
 
- 
     <span></span>
     <app-input-error-message-handler [fc]="groupFg.get('allImages')" class="inline" />
   </div>
   <div class="grid md:grid-cols-2 gap-4 flex-1">
     <div>
-      <label for="productName">{{'classes.groups.groupName' | translate}}</label>
-      <app-input-error-message-handler>
-        <input pInputText id="productName" aria-describedby="productName-help" [placeholder]="'classes.groups.groupName' | translate" />
+      <label for="nameAr">{{ 'classes.groups.groupName' | translate }}</label>
+      <app-input-error-message-handler [fc]="groupFg.get('nameAr')">
+        <input
+          pInputText
+          id="nameAr"
+          class="app-input"
+          formControlName="nameAr"
+          aria-describedby="nameAr-help"
+          [placeholder]="'classes.groups.groupName' | translate"
+        />
       </app-input-error-message-handler>
     </div>
 
     <div>
-      <label for="productName">{{'classes.groups.printer' | translate}}</label>
-      <app-input-error-message-handler [grouped]="false">
+      <label for="printerId">{{ 'classes.groups.printer' | translate }}</label>
+      <app-input-error-message-handler [grouped]="false" [fc]="groupFg.get('printerId')">
         <ng-select
           class="app-select"
           [items]="displayedPrinters()"
-          formControlName="fromDate"
+          formControlName="printerId"
           bindLabel="name"
           bindValue="id"
           placeholder="الكل"
+          [clearable]="false"
           #printerSelect
           appDebounce
           [customEvents]="[
@@ -103,24 +117,27 @@
 
     <div class="flex items-center h-fit gap-2 pb-1">
       <app-input-error-message-handler>
-        <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
+        <input formControlName="isOnCasher" type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
       </app-input-error-message-handler>
-      <label for="productName" class="text-dark-line text-sm font-semibold">{{'classes.groups.showgroup' | translate}}</label>
+      <label for="productName" class="text-dark-line text-sm font-semibold">{{
+        'classes.groups.showgroup' | translate
+      }}</label>
     </div>
 
     <div class="md:col-span-2">
-      <label for="productName">{{'classes.groups.description' | translate}}</label>
-      <app-input-error-message-handler>
+      <label for="description">{{ 'classes.groups.description' | translate }}</label>
+      <app-input-error-message-handler [fc]="groupFg.get('description')">
         <textarea
           rows="5"
           cols="30"
           class="w-full"
           pTextarea
-          id="productName"
-          aria-describedby="productName-help"
+          id="description"
+          formControlName="description"
+          aria-describedby="description-help"
           [placeholder]="'classes.groups.description' | translate"
         ></textarea>
       </app-input-error-message-handler>
     </div>
   </div>
-</div>
+</form>

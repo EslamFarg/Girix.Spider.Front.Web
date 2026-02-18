@@ -7,4 +7,7 @@ export interface IGroupFgControls {
   printerId: FormControl<number | null>;
   isOnCasher: FormControl<boolean>;
   images: FormControl<File[] | null>;
+  listIdsOfDeleteImages: FormControl<number[] | null>;
+  imagesAdd: FormControl<File[] | null>;
+  description: FormControl<string | null>;
 }

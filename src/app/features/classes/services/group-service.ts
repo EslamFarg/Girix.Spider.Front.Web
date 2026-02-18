@@ -27,6 +27,7 @@ export interface IGroupReadResponse {
   printerId: number;
   printerName: string;
   isOnCasher: boolean;
+  description: string;
   attachment: IGroupAttachment[];
 }
 
