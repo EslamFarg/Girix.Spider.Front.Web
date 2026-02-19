@@ -14,7 +14,7 @@ import { BaseComponent, IPaginationInfo } from '@/components/base-component/base
 import { HutCard } from '@/components/hut-card/hut-card';
 import { RoomCard } from '@/components/room-card/room-card';
 import { TableCard } from '@/components/table-card/table-card';
-import { OrderService } from '@/features/invoices/services/order-service';
+import { OrderService } from '@/features/orders';
 import { ReactiveFormsModule, Validators, ɵInternalFormsSharedModule } from '@angular/forms';
 
 type allowedDurationMinute = 30 | 60 | 90 | 120 | 150 | 180;

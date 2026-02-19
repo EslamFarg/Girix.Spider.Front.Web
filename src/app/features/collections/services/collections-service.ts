@@ -1,5 +1,5 @@
 import BaseService from '@/core/services/BaseService';
-import { IOrderReadResponse, OrderService } from '@/features/invoices/services/order-service';
+import { IOrderReadResponse, OrderService } from '@/features/orders';
 import { computed, inject, Injectable, signal } from '@angular/core';
 
 export interface ICollectionRequest {
@@ -16,7 +16,7 @@ export class CollectionsService extends BaseService {
   override apiRoute = 'OrderCollections';
   isCollectionInvoiceDialogVisible = computed(() => this.currentItem() !== null);
   currentItem = signal<IOrderReadResponse | null>(null);
-  orderService=inject(OrderService);
+  orderService = inject(OrderService);
 
   openCollectionDialog = (orderId: number, isCollected: boolean) => {
     if (isCollected) {
@@ -29,9 +29,7 @@ export class CollectionsService extends BaseService {
         this.currentItem.set(order);
       },
     });
-
-
-   };
+  };
 
   closeCollectionInvoiceDialog() {
     this.currentItem.set(null);

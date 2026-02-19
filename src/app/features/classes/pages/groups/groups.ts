@@ -12,7 +12,7 @@ import { IGroupSearchRow, GroupSearchEnum, GroupService } from '../../services/g
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
-import { RouterLink } from "@angular/router";
+import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-groups',
   imports: [
@@ -26,8 +26,8 @@ import { RouterLink } from "@angular/router";
     Debounce,
     Menu,
     TranslatePipe,
-    RouterLink
-],
+    RouterLink,
+  ],
   templateUrl: './groups.html',
   styleUrl: './groups.css',
 })
@@ -56,10 +56,10 @@ export class Groups extends BaseComponent {
 
   periodOptions = [
     { label: 'الكل', value: null },
-    { label: 'اخر يوم', value: this.getPreviousUTCDate(1) },
-    { label: 'اخر اسبوع', value: this.getPreviousUTCDate(7) },
-    { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
-    { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
+    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
+    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
+    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
+    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
   ];
   groups = signal<IGroupSearchRow[]>([]);
   groupsPaginationInfo: IPaginationInfo = {

@@ -37,6 +37,11 @@ export default abstract class BaseService {
     search: 'Search',
   };
 
+  get localDateIso() {
+    const localDate = new Date();
+    localDate.setMinutes(localDate.getMinutes() - new Date().getTimezoneOffset());
+    return localDate.toISOString();
+  }
   protected patchEndpoints(endpoints: Partial<IEndpoints>) {
      this.endpoints = { ...this.endpoints, ...endpoints };
   }

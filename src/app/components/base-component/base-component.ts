@@ -78,9 +78,10 @@ export class BaseComponent {
   getRowNumber = (index: number, pageNumber: number) => index + 1 + (pageNumber - 1) * 10;
   getCurrentRowsIx = (pageIndex: number) => (pageIndex - 1) * 10;
 
-  getPreviousUTCDate(days: number) {
+  getPreviousLocalDateIso(days: number) {
     const date = new Date();
     date.setDate(date.getDate() - days);
+    date.setMinutes(date.getMinutes() - new Date().getTimezoneOffset());
     return date;
   }
 

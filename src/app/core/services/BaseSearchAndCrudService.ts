@@ -72,7 +72,7 @@ export class BaseSearchAndCrudService<
         values: x.values.map((y) => y.trim()),
       })),
       fromDate: criteriaDto?.fromDate ?? null,
-      toDate: criteriaDto?.toDate ?? new Date().toISOString(),
+      toDate: criteriaDto?.toDate ?? this.localDateIso,
     };
 
     // if (criteriaDto.removeDateFilter) {

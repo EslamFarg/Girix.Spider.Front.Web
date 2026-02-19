@@ -1,40 +1,48 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, inject, signal } from '@angular/core';
-import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { Select } from 'primeng/select';
-import { Paginator, PaginatorState } from 'primeng/paginator';
-import { InputText } from 'primeng/inputtext';
-import { Dialog } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { IOrderBillReadResponse, IOrderRowResponse, OrderSearchEnum, OrderService } from '@/features/orders';
+import { DatePipe } from '@angular/common';
+import { Menu } from 'primeng/menu';
 import { Button } from 'primeng/button';
-import { CollectionsService } from '../../services/collections-service';
-import { OrderSearchEnum, OrderService, IOrderRowResponse } from '@/features/orders';
 import { MenuItem } from 'primeng/api';
+import { Debounce } from '@/directives/debounce';
+import { PrintService } from '@/features/print/services/print-service';
+import { RouterLink } from '@angular/router';
+import { Dialog } from 'primeng/dialog';
 
 @Component({
-  selector: 'app-all',
+  selector: 'app-orders',
   imports: [
-    SectionWrapper,
+    ReactiveFormsModule,
     InputErrorMessageHandler,
     InputGroupAddon,
-    Select,
-    Paginator,
-    ReactiveFormsModule,
-    InputText,
-    Dialog,
+    InputTextModule,
+    SelectModule,
+    PaginatorModule,
+    SectionWrapper,
+    DatePipe,
+    Menu,
     Button,
+    Debounce,
+    RouterLink,
+    Dialog,
   ],
-  templateUrl: './all.html',
-  styleUrl: './all.css',
+  templateUrl: './orders.html',
+  styleUrl: './orders.css',
 })
-export class All extends BaseComponent {
+export class Orders extends BaseComponent {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<OrderSearchEnum>(OrderSearchEnum.CustomerName, [Validators.required]),
     fromDate: this.fb.control<string | null>(null, []),
-    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
+    toDate: this.fb.control<string>(this.localDateIso, [Validators.required]),
   };
 
   fg = this.fb.group(this.initialSearchFormValue);
@@ -134,18 +142,36 @@ export class All extends BaseComponent {
     });
   }
 
-  ///
-  collectionsService = inject(CollectionsService);
-
-  openCollectionDialog = this.collectionsService.openCollectionDialog;
-
-  isInvoiceTypeChangeDialogVisible = false;
-
-  openInvoiceTypeChangeDialog() {
-    this.isInvoiceTypeChangeDialogVisible = true;
+  printService = inject(PrintService);
+  currentOrderBill = signal<IOrderBillReadResponse | null>(null);
+  printOrder(id: number) {
+    this.orderService.getBill(id).subscribe({
+      next: (order) => {
+        this.currentOrderBill.set(order);
+        // this.printService.printOrder(order);
+        this.orderDialogVisible = true;
+      },
+    });
   }
 
-  closeInvoiceTypeChangeDialog() {
-    this.isInvoiceTypeChangeDialogVisible = false;
+  orderDialogVisible = false;
+
+  showPaymentDialog() {
+    this.orderDialogVisible = true;
+  }
+  getOrderItem(item: IOrderBillReadResponse['items'][0]) {
+    if (item.mealId) {
+      return {
+        name: item.name,
+        quantity: item.qty,
+        net: item.netUnitPriceWithTax,
+      };
+    } else {
+      return {
+        name: item.name,
+        quantity: item.qty,
+        net: item.netUnitPriceWithTax,
+      };
+    }
   }
 }

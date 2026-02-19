@@ -12,79 +12,66 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadChildren: () =>
-          import('@/features/cashier/pages/general-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/cashier').then((m) => m.default),
       },
       {
         path: 'invoices',
-        loadChildren: () =>
-          import('@/features/invoices/pages/invoices-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/invoices').then((m) => m.default),
       },
       {
         path: 'classes',
-        loadChildren: () =>
-          import('@/features/classes/pages/classes-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/classes').then((m) => m.default),
       },
       {
         path: 'restaurant',
-        loadChildren: () =>
-          import('@/features/restaurant/pages/restaurant-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/restaurant').then((m) => m.default),
       },
       {
         path: 'storage',
-        loadChildren: () =>
-          import('@/features/storage/pages/storage-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/storage').then((m) => m.default),
       },
       {
         path: 'replacements',
-        loadChildren: () =>
-          import('@/features/replacements/pages/replacements-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/replacements').then((m) => m.default),
       },
       {
         path: 'customers',
-        loadChildren: () =>
-          import('@/features/customers/pages/customers-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/customers').then((m) => m.default),
       },
       {
         path: 'collections',
-        loadChildren: () =>
-          import('@/features/collections/pages/collections-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/collections').then((m) => m.default),
       },
       {
         path: 'accounts',
-        loadChildren: () =>
-          import('@/features/accounts/pages/accounts-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/accounts').then((m) => m.default),
       },
       {
         path: 'deliveries',
-        loadChildren: () =>
-          import('@/features/deliveries/pages/deliveries-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/deliveries').then((m) => m.default),
       },
       {
         path: 'users',
-        loadChildren: () =>
-          import('@/features/users/pages/users-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/users').then((m) => m.default),
       },
       {
         path: 'settings',
-        loadChildren: () =>
-          import('@/features/settings/pages/settings-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/settings').then((m) => m.default),
       },
       {
         path: 'app-info',
-        loadChildren: () =>
-          import('@/features/app-info/pages/app-info-routes').then((m) => m.default),
+        loadChildren: () => import('@/routes/app-info').then((m) => m.default),
       },
     ],
   },
   {
     path: 'auth',
-    component:AuthLayout,
+    component: AuthLayout,
     children: authRoutes,
     canActivate: [isAuthenticatedGuard],
   },
   {
     path: '**',
-    redirectTo: '',    
-  }
+    redirectTo: '',
+  },
 ];

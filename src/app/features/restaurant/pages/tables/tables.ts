@@ -50,7 +50,7 @@ export class Tables extends BaseComponent {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<TableSearchEnum>(TableSearchEnum.Name, [Validators.required]),
     fromDate: this.fb.control<string | null>(null, []),
-    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
+    toDate: this.fb.control<string>(this.localDateIso, [Validators.required]),
   };
 
   searchFg = this.fb.group(this.initialSearchFormValue);
@@ -81,10 +81,10 @@ export class Tables extends BaseComponent {
 
   periodOptions = [
     { label: 'الكل', value: null },
-    { label: 'اخر يوم', value: this.getPreviousUTCDate(1) },
-    { label: 'اخر اسبوع', value: this.getPreviousUTCDate(7) },
-    { label: 'اخر شهر', value: this.getPreviousUTCDate(30) },
-    { label: 'اخر سنة', value: this.getPreviousUTCDate(365) },
+    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
+    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
+    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
+    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
   ];
 
   fetchAndBindTableData(tableId: number) {

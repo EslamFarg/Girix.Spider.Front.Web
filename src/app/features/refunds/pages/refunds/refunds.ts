@@ -7,14 +7,12 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { IMealSearchRow, MealSearchEnum, MealService } from '../../services/meal-service';
+import { RefundSearchEnum, RefundService } from '../../services/refund-service';
 import { MenuItem } from 'primeng/api';
-import { Menu } from 'primeng/menu';
-import { ImgFallback } from '@/directives/img-fallback';
-import { Debounce } from '@/directives/debounce';
+// import { OrderSearchEnum } from '../../../orders/pages/services/order-service';
 
 @Component({
-  selector: 'app-meals',
+  selector: 'app-refunds',
   imports: [
     ReactiveFormsModule,
     InputErrorMessageHandler,
@@ -23,38 +21,43 @@ import { Debounce } from '@/directives/debounce';
     SelectModule,
     PaginatorModule,
     SectionWrapper,
-    Menu,
-    ImgFallback,
-    Debounce,
   ],
-  templateUrl: './meals.html',
-  styleUrl: './meals.css',
+  templateUrl: './refunds.html',
+  styleUrl: './refunds.css',
 })
-export class Meals extends BaseComponent {
+export class Refunds extends BaseComponent {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
-    searchEnum: this.fb.control<MealSearchEnum>(MealSearchEnum.Name, [Validators.required]),
+    searchEnum: this.fb.control<RefundSearchEnum>(RefundSearchEnum.CustomerName, [Validators.required]),
     fromDate: this.fb.control<string | null>(null, []),
     toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
   };
   fg = this.fb.group(this.initialSearchFormValue);
 
-  orderService = inject(MealService);
+  orderService = inject(RefundService);
   filterMenuItems = signal<MenuItem[]>([
     {
-      label: 'الاسم',
-      command: (event) => this.fg.patchValue({ searchEnum: MealSearchEnum.Name }),
+      label: 'اسم العميل',
+      command: (event) => this.fg.patchValue({ searchEnum: RefundSearchEnum.CustomerName }),
     },
     {
-      label: 'اسم الفئة',
-      command: (event) => this.fg.patchValue({ searchEnum: MealSearchEnum.CategoryName }),
+      label: 'رقم الطلب',
+      command: (event) => this.fg.patchValue({ searchEnum: RefundSearchEnum.OrderNumber }),
+    },
+    {
+      label: 'موقع الطلب',
+      command: (event) => this.fg.patchValue({ searchEnum: RefundSearchEnum.OrderPlace }),
+    },
+    {
+      label: 'نوع الطلب',
+      command: (event) => this.fg.patchValue({ searchEnum: RefundSearchEnum.OrderType }),
     },
   ]);
 
   constructor() {
     super();
 
-    this.searchMeals(1);
+    this.searchOrders(1);
   }
 
   periodOptions = [
@@ -65,14 +68,14 @@ export class Meals extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
   ];
 
-  meals = signal<IMealSearchRow[]>([]);
-  mealsPaginationInfo: IPaginationInfo = {
+  refunds = signal<any[]>([]);
+  refundsPaginationInfo = signal<IPaginationInfo>({
     pageIndex: 1,
     totalPagesCount: 0,
     totalRowsCount: 0,
-  };
+  });
 
-  searchMeals(pageIndex: number) {
+  searchOrders(pageIndex: number) {
     this.orderService
       .search({
         paginationInfo: {
@@ -89,28 +92,19 @@ export class Meals extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
-          this.meals.set(res.value.rows);
-          this.mealsPaginationInfo = {
-            pageIndex, // this.isIdenticalSearch() ? pageIndex : 1,
+          this.refunds.set(res.value.rows);
+          this.refundsPaginationInfo.set({
+            pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,
-            // searchEnum: this.fg.getRawValue().searchEnum,
-            // searchTerm: this.fg.getRawValue().searchTerm,
-            // fromDate: this.fg.getRawValue().fromDate,
-            // toDate: this.fg.getRawValue().toDate,
-          };
+          });
         },
       });
   }
-  // isIdenticalSearch() {
-  //   return (
-  //     this.fg.getRawValue().searchTerm === this.paginationInfo.searchTerm &&
-  //     this.fg.getRawValue().searchEnum === this.paginationInfo.searchEnum &&
-  //     this.fg.getRawValue().fromDate === this.paginationInfo.fromDate &&
-  //     this.fg.getRawValue().toDate === this.paginationInfo.toDate
-  //   );
-  // }
-  onSubmit = () => this.fg.valid && this.searchMeals(1);
 
-  onPageChange = (event: PaginatorState) => this.searchMeals(event.page! + 1);
+  onSubmit = () => this.fg.valid && this.searchOrders(1);
+
+  first = 0;
+  rows = 10;
+  onPageChange = (event: PaginatorState) => this.searchOrders(event.page! + 1);
 }
