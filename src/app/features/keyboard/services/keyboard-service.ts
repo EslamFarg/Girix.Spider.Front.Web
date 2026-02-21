@@ -114,6 +114,7 @@ export class KeyboardService extends BaseService {
     }
     
     this.currentNumbersKeyboardInput.value = newValue;
+    console.log('click input.value before dispatch', this.currentNumbersKeyboardInput.value);
     this.currentNumbersKeyboardInput.dispatchEvent(new Event('input', { bubbles: true }));
   };
 

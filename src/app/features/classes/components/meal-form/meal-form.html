@@ -15,12 +15,19 @@
       تعديل
     }
   </button>
-  <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
-    جديد
-  </button>
+  @if (formMode() === FormMode.Update) {
+    <a
+      routerLink="/classes/meals/add"
+      pButton
+      class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
+      variant="outlined"
+    >
+      جديد
+    </a>
+  }
 </div>
 
-<form [formGroup]="mealFg" id="mealForm" class="mt-6">
+<form [formGroup]="mealFg" id="mealForm" class="mt-6" (ngSubmit)="onSubmitForm()">
   <div class="flex flex-col md:flex-row gap-4">
     <!-- images -->
     <div class="md:flex-1 md:max-w-50 lg:max-w-60 relative">
@@ -30,6 +37,7 @@
         id="fileInput"
         type="file"
         hidden
+        accept=".jpg, .jpeg, .png"
         #fileInput
         (change)="onImagesFilesSelected($event)"
       />
@@ -103,7 +111,7 @@
     <div class="grid md:grid-cols-3 gap-4 flex-1">
       <div>
         <label for="mealName">اسم الوجبه</label>
-        <app-input-error-message-handler>
+        <app-input-error-message-handler [fc]="mealFg.get('nameAr')">
           <input
             pInputText
             id="mealName"
@@ -116,7 +124,7 @@
       </div>
       <div>
         <label for="mealPrice">سعر الوجبه</label>
-        <app-input-error-message-handler>
+        <app-input-error-message-handler [fc]="mealFg.get('price')">
           <input
             pInputText
             id="mealPrice"
@@ -129,13 +137,20 @@
       </div>
       <div>
         <label for="costPrice">سعر التكلفه</label>
-        <app-input-error-message-handler>
-          <input pInputText id="costPrice" formControlName="costPrice" class="app-input" aria-describedby="costPrice-help" placeholder="السعر" />
+        <app-input-error-message-handler [fc]="mealFg.get('costPrice')">
+          <input
+            pInputText
+            id="costPrice"
+            formControlName="costPrice"
+            class="app-input"
+            aria-describedby="costPrice-help"
+            placeholder="السعر"
+          />
         </app-input-error-message-handler>
       </div>
       <div>
         <label for="mealName">المجموعة</label>
-        <app-input-error-message-handler [grouped]="false">
+        <app-input-error-message-handler [grouped]="false" [fc]="mealFg.get('categoryId')">
           <ng-select
             class="app-select"
             [items]="displayedGroups()"
@@ -155,7 +170,7 @@
       </div>
       <div>
         <label for="mealName">الضريبه</label>
-        <app-input-error-message-handler>
+        <app-input-error-message-handler [fc]="mealFg.get('tax')">
           <ng-select
             class="app-select w-full"
             [items]="[0, 1, 5, 14, 15]"
@@ -169,7 +184,7 @@
       </div>
       <div>
         <label for="mealName">الضريبه الانتقائيه</label>
-        <app-input-error-message-handler>
+        <app-input-error-message-handler [fc]="mealFg.get('selectiveTax')">
           <ng-select
             class="app-select w-full"
             [items]="[0, 25, 50, 75, 100]"
@@ -181,9 +196,10 @@
           />
         </app-input-error-message-handler>
       </div>
+      <!-- products -->
       <div class="md:col-span-3">
         <label for="mealName">المنتجات</label>
-        <app-input-error-message-handler [grouped]="false">
+        <app-input-error-message-handler [grouped]="false" [fc]="mealFg.get('menuItems')">
           <ng-select
             class="app-select"
             style="--height: fit-content"
@@ -194,6 +210,7 @@
             [closeOnSelect]="false"
             placeholder="الكل"
             #mealSelect
+            [compareWith]="compareById"
             appDebounce
             [customEvents]="[
               { key: 'searchEvent', value: mealSelect.searchEvent },
@@ -202,7 +219,7 @@
             (debounced)="debouncedGroupsSearch($event)"
           >
             <ng-template ng-label-tmp let-item="item" let-clear="clear" let-item$="item$" let-index="index">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2" >
                 <span class="ng-value-icon left" (click)="clear(item)" aria-hidden="true">×</span>
 
                 <span class="ng-value-label flex! items-center gap-2">
@@ -218,17 +235,17 @@
                   {{ item.name }}
                 </span>
                 <div class="border border-black/10">
-                  <span class="ng-value-icon left" (click)="updateQuantity(item, 1)">+</span>
-                  <span class="px-1">{{ item.quantity }}</span>
-                  <span class="ng-value-icon right" (click)="updateQuantity(item, -1)">-</span>
+                  <span class="ng-value-icon left" (click)="updateQuantity(item.id, 1)">+</span>
+                  <span class="px-1">{{ getSelectedProductById(item.id)?.quantity }}</span>
+                  <span class="ng-value-icon right" (click)="updateQuantity(item.id, -1)">-</span>
                 </div>
               </div>
             </ng-template>
 
             <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
-              <div class="flex items-center gap-2" (click)="log(item)">
+              <div class="flex items-center gap-2">
                 <input
-                  id="item-{{ index }}"
+                  id="product-option-{{ index }}"
                   type="checkbox"
                   [ngModel]="item$.selected"
                   [ngModelOptions]="{ standalone: true }"
@@ -255,7 +272,7 @@
   </div>
   <div class="mt-4">
     <label for="mealName">البيان</label>
-    <app-input-error-message-handler>
+    <app-input-error-message-handler [fc]="mealFg.get('descriptionAr')">
       <textarea
         rows="5"
         cols="30"

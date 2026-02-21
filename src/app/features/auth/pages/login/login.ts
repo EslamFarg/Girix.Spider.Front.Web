@@ -18,7 +18,7 @@ export class Login extends BaseComponent {
   isRememberMe = true;
   initialFormValue = {
     emailOrPhone: this.fb.control<string>('batman@gmail.com', [Validators.required]),
-    password: this.fb.control<string>('Aa1235@@', [Validators.required]),
+    password: this.fb.control<string>('123456Aa#', [Validators.required]),
   };
 
   fg = this.fb.group(this.initialFormValue);

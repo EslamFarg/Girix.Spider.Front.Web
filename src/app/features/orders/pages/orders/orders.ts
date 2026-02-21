@@ -16,6 +16,7 @@ import { Debounce } from '@/directives/debounce';
 import { PrintService } from '@/features/print/services/print-service';
 import { RouterLink } from '@angular/router';
 import { Dialog } from 'primeng/dialog';
+import { FormControlNotifier } from "@/directives/form-control-notifier";
 
 @Component({
   selector: 'app-orders',
@@ -33,7 +34,8 @@ import { Dialog } from 'primeng/dialog';
     Debounce,
     RouterLink,
     Dialog,
-  ],
+    FormControlNotifier
+],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })

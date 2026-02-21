@@ -12,6 +12,7 @@ import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { ImgFallback } from '@/directives/img-fallback';
 import { Debounce } from '@/directives/debounce';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-meals',
@@ -26,7 +27,8 @@ import { Debounce } from '@/directives/debounce';
     Menu,
     ImgFallback,
     Debounce,
-  ],
+    RouterLink
+],
   templateUrl: './meals.html',
   styleUrl: './meals.css',
 })

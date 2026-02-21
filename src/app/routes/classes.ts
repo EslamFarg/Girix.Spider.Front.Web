@@ -10,6 +10,7 @@ import { EditGroup } from '@/features/classes/pages/edit-group/edit-group';
 import { ProductsLayout } from '@/features/classes/layouts/products-layout/products-layout';
 import { MealsLayout } from '@/features/classes/layouts/meals-layout/meals-layout';
 import { GroupsLayout } from '@/features/classes/layouts/groups-layout/groups-layout';
+import { EditMeal } from '@/features/classes/pages/edit-meal/edit-meal';
 
 export default [
   //products
@@ -50,7 +51,7 @@ export default [
 
       {
         path: ':id/edit',
-        component: EditProduct,
+        component: EditMeal,
       },
     ],
   },

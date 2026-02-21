@@ -171,102 +171,178 @@
 >
   <ng-template #headless>
     <div class="flex flex-col p-4 gap-4">
-      <button class="cursor-pointer p-1 w-fit ms-auto" (click)="orderDialogVisible = false">
-        <i class="pi pi-times"></i>
-      </button>
-      <style>
-        table {
-          border-collapse: collapse;
-        }
-        th,
-        td {
-          text-align: start;
-          padding: 4px;
-        }
-        .border-b {
-          border-bottom: 1px solid black;
-        }
-      </style>
-      <div style="border: 1px solid black; width: calc(80mm - 8px); margin: 0 auto;border-radius: 8px;">
+      <!-- header -->
+      <div class="flex items-center gap-2">
+        <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">التحصيل</p>
+        <button class="cursor-pointer p-1 w-fit" (click)="orderDialogVisible = false">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- body -->
+      <div class="outer-invoice-wrap">
         <style>
+          .inner-invoice-wrap {
+            --print-text-gray: #889898;
+            border: 1px solid var(--print-text-gray);
+          }
+          .upper-tables-wrapper {
+            line-height: 1;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+          }
+          table {
+            border-collapse: collapse;
+          }
+          td,
+          th {
+            padding: 4px;
+          }
+          .border-b {
+            border-bottom: 1px solid var(--print-text-gray);
+          }
 
-        </style>
-        <div >
+          .font-bold {
+            font-weight: bold;
+          }
+          .items-table-wrapper {
+            padding: 6px;
+          }
+          .items-table {
+            width: 100%;
 
-        </div>
-        <table dir="rtl">
-          <thead>
-            <tr>
-              <th>الصنف</th>
-              <th>الكمية</th>
-              <th>السعر</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (item of currentOrderBill()?.items; track $index) {
-              <tr class="border-b">
-                <td>{{ item.name }}</td>
-                <td>{{ item.qty }}</td>
-                <td>${{ item.netUnitPriceWithTax }}</td>
-              </tr>
+            & th:nth-child(1),
+            & td:nth-child(1) {
+              text-align: right;
             }
-            <tr class="border-b">
-              <td>المجموع</td>
-              <td></td>
-              <td>${{ currentOrderBill()?.summary?.totalSelectiveTax }}</td>
-            </tr>
-            <tr class="border-b">
-              <td>الخصم</td>
-              <td></td>
-              <td>${{ currentOrderBill()?.summary?.discountAmount }}</td>
-            </tr>
-            <tr class="border-b">
-              <td>المحموع بعد الخصم</td>
-              <td></td>
-              <td>
-                ${{
-                  (currentOrderBill()?.summary?.totalSelectiveTax ?? 0) *
-                    (1 - (currentOrderBill()?.summary?.discountPercentage ?? 0) / 100)
-                }}
-              </td>
-            </tr>
-            <tr class="border-b">
-              <td>الضريبة الانتقائية</td>
-              <td></td>
-              <td>
-                ${{
-                  (currentOrderBill()?.summary?.totalSelectiveTax ?? 0) -
-                    (currentOrderBill()?.summary?.totalUnitPrice ?? 0)
-                }}
-              </td>
-            </tr>
-            <tr class="border-b">
-              <td>الخدمة</td>
-              <td></td>
-              <td>${{ currentOrderBill()?.summary?.serviceFee }}</td>
-            </tr>
-            <tr class="border-b">
-              <td>الضريبة</td>
-              <td></td>
-              <td>${{ currentOrderBill()?.summary?.vatAmount }}</td>
-            </tr>
-            <tr class="border-b">
-              <td>الاجمالي بالضريبة (الصافي)</td>
-              <td></td>
-              <td>${{ currentOrderBill()?.toBePaid }}</td>
-            </tr>
-            <tr class="border-b">
-              <td>مدفوع كاش</td>
-              <td></td>
-              <td>${{ currentOrderBill()?.payments?.payingCash ?? 0 }}</td>
-            </tr>
-            <tr class="border-b">
-              <td>مدفوع شبكة</td>
-              <td></td>
-              <td>${{ currentOrderBill()?.payments?.payingNetwork ?? 0 }}</td>
-            </tr>
-          </tbody>
-        </table>
+            & th:nth-child(2),
+            & td:nth-child(2) {
+              text-align: center;
+            }
+            & th:nth-child(3),
+            & td:nth-child(3) {
+              text-align: left;
+            }
+          }
+        </style>
+        <div class="inner-invoice-wrap" style="margin: 0 auto; border-radius: 8px">
+          <!-- upper info -->
+          <div class="upper-tables-wrapper">
+            <!-- right -->
+            <table>
+              <tbody>
+                <tr class="font-bold">
+                  <td>رقم الفاتوره</td>
+                  <td>#12345</td>
+                </tr>
+                <tr class="font-bold">
+                  <td>رقم الطلب</td>
+                  <td>102</td>
+                </tr>
+                <tr>
+                  <td class="font-bold">اسم العميل:</td>
+                  <td>محمد احمد</td>
+                </tr>
+                <tr>
+                  <td class="font-bold">عنوان العميل</td>
+                  <td>السعوديه - حي البساتين - شارع السعدني</td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- left -->
+            <table style="height: fit-content">
+              <tbody>
+                <tr>
+                  <td colspan="2">20 يناير 2026 04:25 م</td>
+                </tr>
+                <tr class="font-bold">
+                  <td>نوع الدفع:</td>
+                  <td>معلق</td>
+                </tr>
+                <tr>
+                  <td class="font-bold">رقم الجوال</td>
+                  <td>0123456789</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- items -->
+          <div class="items-table-wrapper" style="margin-top: 2rem">
+            <table dir="rtl" class="items-table">
+              <thead>
+                <tr class="border-b">
+                  <th>الصنف</th>
+                  <th>الكمية</th>
+                  <th>الاجمالي</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of currentOrderBill()?.items; track $index) {
+                  <tr >
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.qty }}</td>
+                    <td>${{ item.netUnitPriceWithTax }}</td>
+                  </tr>
+                }
+                <tr class="border-b">
+                  <td>المجموع</td>
+                  <td></td>
+                  <td>${{ currentOrderBill()?.summary?.totalUnitPrice }}</td>
+                </tr>
+                <tr class="border-b">
+                  <td>الخصم</td>
+                  <td></td>
+                  <td>${{ currentOrderBill()?.summary?.discountAmount }}</td>
+                </tr>
+                <tr class="border-b">
+                  <td>المحموع بعد الخصم</td>
+                  <td></td>
+                  <td>
+                    ${{
+                      (currentOrderBill()?.summary?.totalUnitPrice ?? 0) *
+                        (1 - (currentOrderBill()?.summary?.discountPercentage ?? 0) / 100)
+                    }}
+                  </td>
+                </tr>
+                <!-- <tr class="border-b">
+                  <td>الضريبة الانتقائية</td>
+                  <td></td>
+                  <td>
+                    ${{
+                      (currentOrderBill()?.summary?.totalSelectiveTax ?? 0) - (currentOrderBill()?.summary?.totalUnitPrice ?? 0)
+                    }}
+                  </td>
+                </tr> -->
+                <tr class="border-b">
+                  <td>الخدمة</td>
+                  <td></td>
+                  <td>${{ currentOrderBill()?.summary?.serviceFee }}</td>
+                </tr>
+                <tr class="border-b">
+                  <td>الضريبة</td>
+                  <td></td>
+                  <td>${{ currentOrderBill()?.summary?.vatAmount }}</td>
+                </tr>
+                <tr class="border-b">
+                  <td>الاجمالي بالضريبة (الصافي)</td>
+                  <td></td>
+                  <td>${{ currentOrderBill()?.summary?.totalNet }}</td>
+                </tr>
+                <tr class="border-b">
+                  <td>مدفوع كاش</td>
+                  <td></td>
+                  <td>${{ currentOrderBill()?.payments?.payingCash ?? 0 }}</td>
+                </tr>
+                <tr >
+                  <td>مدفوع شبكة</td>
+                  <td></td>
+                  <td>${{ currentOrderBill()?.payments?.payingNetwork ?? 0 }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </ng-template>

@@ -19,6 +19,8 @@ import { NgSelectComponent, NgOptionTemplateDirective, NgLabelTemplateDirective 
 import { Debounce } from '@/directives/debounce';
 import { ImgFallback } from '@/directives/img-fallback';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ImgOnly } from '@/directives/img-only';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-meal-form',
@@ -39,6 +41,8 @@ import { TranslatePipe } from '@ngx-translate/core';
     FormsModule,
     ReactiveFormsModule,
     TranslatePipe,
+    ImgOnly,
+    RouterLink,
   ],
   templateUrl: './meal-form.html',
   styleUrl: './meal-form.css',
@@ -70,7 +74,7 @@ export class MealForm extends BaseComponent implements OnInit {
     //@ts-ignore
     //ts ignore to allow null for now
     categoryId: this.fb.control(null, [Validators.required]),
-    menuItems: this.fb.control([], []),
+    menuItems: this.fb.control([], [Validators.required, Validators.minLength(1)]),
     //
     //
     //update only props
@@ -101,8 +105,13 @@ export class MealForm extends BaseComponent implements OnInit {
         this.mealService.getById(this.routeId).subscribe((meal) => {
           this.mealFg.patchValue({
             ...meal,
+            nameAr: meal.name,
+            nameEn: meal.name,
+            descriptionAr: meal.description,
+            descriptionEn: meal.description,
             images: [],
           });
+          this.selectedProducts = meal.menuItems;
           this.existingImages.set(meal.images);
           this.currentImage.set(meal.images[0]);
           this.currentProducts.set(meal.menuItems);
@@ -127,6 +136,8 @@ export class MealForm extends BaseComponent implements OnInit {
       descriptionEn: this.mealFg.value.descriptionAr?.trim(),
       images: this.newImages().map((image) => image.file!),
       allImages: [...this.allImages()],
+      imagesAdd: this.newImages().map((image) => image.file!),
+      menuItems: this.selectedProducts.map((p) => ({ id: p.id, quantity: p.quantity })),
     });
     if (this.mealFg.invalid) {
       console.log('invalid');
@@ -150,7 +161,11 @@ export class MealForm extends BaseComponent implements OnInit {
 
     Array.from(Object.entries(formValues)).forEach(([key, value]) => {
       if (Array.isArray(value)) {
-        value.forEach((val) => formData.append(key, val));
+        if (key === 'menuItems') {
+          value.forEach((val) => formData.append(key, JSON.stringify(val)));
+        } else {
+          value.forEach((val) => formData.append(key, val.toString()));
+        }
       } else {
         formData.append(key, value);
       }
@@ -158,14 +173,14 @@ export class MealForm extends BaseComponent implements OnInit {
 
     switch (this.formMode()) {
       case FormMode.Create:
-        this.productService.create(formData).subscribe({
+        this.mealService.create(formData).subscribe({
           next: (res) => {
             console.log(res);
           },
         });
         break;
       case FormMode.Update:
-        this.productService.patch(formData).subscribe({
+        this.mealService.patch(formData).subscribe({
           next: (res) => {
             console.log(res);
           },
@@ -320,7 +335,7 @@ export class MealForm extends BaseComponent implements OnInit {
   //
   //
   //
-  //additions
+  //products
   //
   //
   //
@@ -329,7 +344,10 @@ export class MealForm extends BaseComponent implements OnInit {
   productService = inject(ProductService);
   previousProductsSearchValue = '';
   selectedProducts: IMealProduct[] = [];
-  log(any: any) {
+  log() {
+    console.log(this.selectedProducts);
+  }
+  log2(any: any) {
     console.log(any);
   }
   displayedProducts = computed(() => {
@@ -391,7 +409,9 @@ export class MealForm extends BaseComponent implements OnInit {
         },
       });
   }
-  updateQuantity(item: IMealProduct, quantity: number) {
+  updateQuantity(itemId: number, quantity: number) {
+    const item = this.selectedProducts.find((p) => p.id === itemId);
+    if (!item) return;
     if (item.quantity + quantity <= 0) {
       this.selectedProducts = this.selectedProducts.filter((p) => p.id !== item.id);
       return;
@@ -406,5 +426,11 @@ export class MealForm extends BaseComponent implements OnInit {
     } else {
       this.searchProducts(1, searchValue);
     }
+  }
+  compareById = (a: any, b: any) => {
+    return a && b ? a.id === b.id : a === b;
+  };
+  getSelectedProductById(id: number) {
+    return this.selectedProducts.find((p) => p.id === id);
   }
 }

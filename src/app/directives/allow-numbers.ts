@@ -61,6 +61,7 @@ export class AllowNumbers {
 
     if (+input.value > this.max) {
       input.value = this.max.toString();
+      console.log('allow numbers input.value before dispatch', input.value);
       input.dispatchEvent(new Event('input', { bubbles: true }));
       // let message = this.localize(`الحد الاقصى هو ${this.max}`, `Max value is ${this.max}`);
       // this.toaster.warning(message);

@@ -13,7 +13,7 @@
         pButton
         type="button"
         (click)="isMenuVisible = true"
-        class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8! xl:hidden! me-auto"
+        class="border-dark-line! text-dark-line! py-1!   md:flex-none md:px-8! xl:hidden! me-auto"
         variant="outlined"
         type="button"
       >
@@ -36,7 +36,7 @@
         type="button"
         routerLink="/"
         pButton
-        class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
+        class="border-dark-line! text-dark-line! py-1! md:flex-none md:px-8!"
         variant="outlined"
         (click)="resetOrderForm()"
       >
@@ -47,7 +47,7 @@
           (click)="onPrint()"
           type="button"
           pButton
-          class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
+          class="border-dark-line! text-dark-line! py-1! md:flex-none md:px-8!"
           variant="outlined"
         >
           {{ 'actions.print' | translate }}
@@ -520,7 +520,7 @@
     </div>
   </form>
 
-  <p-drawer [(visible)]="isMenuVisible" header="" class="xl:hidden" position="right" styleClass="w-full! bg-white!">
+  <p-drawer [(visible)]="isMenuVisible" header=""   position="right" [maskStyle]="{'z-index': 1}"  styleClass="w-full! bg-white!" [style]="{zIndex: 1111}">
     <app-menu (menuItemChange)="onMenuItemChange($event)" [groups]="groups()" />
   </p-drawer>
 </div>
@@ -962,8 +962,8 @@
               [placeholder]="'form.cash' | translate"
               [formControl]="getFormControl(orderFg, 'payingCash')"
               appAllowNumbers
-              noKeyboard
               [max]="net()"
+              [min]="0"
               [allowDecimal]="true"
               #payingCash
               id="payingCash"
@@ -983,10 +983,10 @@
               appAllowNumbers
               [allowDecimal]="true"
               [max]="net()"
+              [min]="0"
               id="payingNetwork"
               aria-describedby="network-help"
               #payingNetwork
-              noKeyboard
               (click)="triggerNumbersKeyboard(payingNetwork)"
               [formControl]="getFormControl(orderFg, 'payingNetwork')"
               [placeholder]="'form.network' | translate"
@@ -995,28 +995,6 @@
           </app-input-error-message-handler>
         </div>
       </div>
-      <!-- actions -->
-      <!-- <div
-        class="flex gap-2 location-btns *:flex-1 w-full justify-end pt-4"
-        style="--p-button-primary-background: transparent"
-      >
-        <button
-          pButton
-          class="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full border-text-light! text-xs!"
-          variant="outlined"
-          (click)="onSubmitPayment()"
-        >
-          حفظ
-        </button>
-        <button
-          (click)="paymentDialogVisible = false"
-          class="text-red-500! py-2! rounded-[14px]! *:font-bold! w-full border-red-500! text-xs!"
-          pButton
-          variant="outlined"
-        >
-          إلغاء
-        </button>
-      </div> -->
       <app-numbers-keyboard />
     </div>
   </ng-template>

@@ -79,7 +79,7 @@ interface IOrderCreateFgValue {
   createAt: FormControl<string>;
   idempotencyKey: FormControl<string>;
   items: FormControl<IOrderCreateItem[]>;
-  customerRequest: FormControl<IOrderCreateCustomer  | null>;
+  customerRequest: FormControl<IOrderCreateCustomer | null>;
   placeName: FormControl<string | null>;
 }
 
@@ -527,7 +527,7 @@ export class Cashier extends BaseComponent implements OnInit {
   //
   //menu
   //
-  isMenuVisible: boolean = false;
+  isMenuVisible: boolean = true;
   groupsService = inject(GroupService);
   groups = signal<IGroupSearchRow[]>([]);
 
@@ -1364,10 +1364,16 @@ export class Cashier extends BaseComponent implements OnInit {
 
   cashInputSubscription = this.orderFg.get('payingCash')?.valueChanges.subscribe((value) => {
     const net = this.net();
+    let futureValue = value ?? 0;
+    if (futureValue > net) {
+      futureValue = net;
+    } else if (futureValue < 0) {
+      futureValue = 0;
+    }
     this.orderFg.patchValue(
       {
-        payingNetwork: net - +(value ?? 0),
-        payingCash: (value ?? 0) > net ? net : value,
+        payingNetwork: net - futureValue,
+        payingCash: futureValue,
       },
       { emitEvent: false },
     );
@@ -1375,10 +1381,16 @@ export class Cashier extends BaseComponent implements OnInit {
 
   networkInputSubscription = this.orderFg.get('payingNetwork')?.valueChanges.subscribe((value) => {
     const net = this.net();
+    let futureValue = value ?? 0;
+    if (futureValue > net) {
+      futureValue = net;
+    } else if (futureValue < 0) {
+      futureValue = 0;
+    }
     this.orderFg.patchValue(
       {
-        payingCash: net - +(value ?? 0),
-        payingNetwork: (value ?? 0) > net ? net : value,
+        payingCash: net - futureValue,
+        payingNetwork: futureValue,
       },
       { emitEvent: false },
     );
