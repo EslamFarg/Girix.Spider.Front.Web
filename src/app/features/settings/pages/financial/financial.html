@@ -1,139 +1,153 @@
 <div class="custom-scroll overflow-auto h-full">
-  <app-section-wrapper class="p-4 sm:px-6 min-h-full h-full"  >
-    <form action="" class="flex flex-col gap-4 md:gap-6"  >
+  <app-section-wrapper class="p-4 sm:px-6 min-h-full h-full">
+    <form action="" id="financialForm" (ngSubmit)="onSubmit()"  class="flex flex-col gap-4 md:gap-6" [formGroup]="fg">
       <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 md:mt-4">
-        <p-button
-          class="flex-1 md:flex-none"
-          styleClass="border-dark-line! bg-dark-line! text-white! py-1! w-full  md:px-8!"
-          label="حفظ"
-        />
-        <p-button
-          class="flex-1 md:flex-none"
-          styleClass="border-dark-line! text-dark-line! py-1!  w-full md:px-8!"
-          label="حذف"
-          variant="outlined"
-        />
-        <p-button
-          class="flex-1 md:flex-none"
-          styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
-          label="جديد"
-          variant="outlined"
-        />
+        <button
+          pButton
+          form="financialForm"
+          type="submit"
+          style="
+            --p-button-primary-background: var(--color-dark-line);
+            --p-button-primary-color: var(--color-white);
+            --p-button-primary-border-color: var(--color-dark-line);
+            --p-button-primary-hover-color: #000000;
+          "
+          class="py-1! md:px-8!"
+        >
+          حفظ
+        </button>
       </div>
-
+      <!-- service fee -->
       <div>
         <label for="productName" class="text-dark-bg-2 mb-2 block font-medium">سعر الخدمه</label>
-        <div class="grid grid-cols-2 md:grid-cols-[auto_auto_1fr] gap-2">
-          <app-input-error-message-handler>
-            <label
-              for="servicePricePercentage"
-              class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
-              [class.financial-input-active]="servicePricePercentage.checked"
-            >
-              <input
-                #servicePricePercentage
-                [defaultChecked]="true"
-                type="radio"
-                name="servicePriceType"
-                id="servicePricePercentage"
-                aria-describedby="productName-help"
-                (change)="(null)"
-              />
-              <span class="text-dark-line text-xs">نسبه الخدمه</span>
-            </label>
-          </app-input-error-message-handler>
-          <app-input-error-message-handler>
-            <label
-              for="servicePriceValue"
-              class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
-              [class.financial-input-active]="servicePriceValue.checked"
-            >
-              <input
-                #servicePriceValue
-                (change)="(null)"
-                type="radio"
-                name="servicePriceType"
-                id="servicePriceValue"
-                aria-describedby="productName-help"
-              />
-              <span class="text-dark-line text-xs">قيمه الخدمه</span>
-            </label>
-          </app-input-error-message-handler>
-          <app-input-error-message-handler class="h-11 *:h-full flex-1 col-span-2 md:col-span-1">
+        <div class="grid grid-cols-2 md:grid-cols-[130px_130px_1fr] gap-2">
+          <!-- percentage -->
+          <label
+            for="serviceFeePercentage"
+            class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
+            [class.financial-input-active]="serviceFeePercentage.checked"
+          >
             <input
-              type="text"
+              #serviceFeePercentage
+              [value]="AmountType.Percentage"
+              type="radio"
+              name="serviceFeeType"
+              id="serviceFeePercentage"
+              formControlName="serviceFeeType"
+              aria-describedby="productName-help"
+              (change)="(null)"
+            />
+            <span class="text-dark-line text-xs">نسبه الخدمه</span>
+          </label>
+          <!-- fixed -->
+          <label
+            for="serviceFeeValue"
+            class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
+            [class.financial-input-active]="serviceFeeValue.checked"
+          >
+            <input
+              #serviceFeeValue
+              (change)="(null)"
+              [value]="AmountType.Fixed"
+              type="radio"
+              formControlName="serviceFeeType"
+              name="serviceFeeType"
+              id="serviceFeeValue"
+              aria-describedby="productName-help"
+            />
+            <span class="text-dark-line text-xs">قيمه الخدمه</span>
+          </label>
+          <app-input-error-message-handler
+            [fc]="fg.get('serviceFee')"
+            class="h-11 *:h-full flex-1 col-span-2 md:col-span-1"
+          >
+            <input
+              type="number"
               class="app-input h-full!"
+              appAllowNumbers
+              [allowDecimal]="true"
               pInputText
-              id="productPrice"
-              aria-describedby="productPrice-help"
+              id="productFee"
+              formControlName="serviceFee"
+              aria-describedby="productFee-help"
               placeholder="العدد"
             />
           </app-input-error-message-handler>
         </div>
       </div>
 
+      <!-- delivery fee -->
       <div>
         <label for="productName" class="text-dark-bg-2 mb-2 block font-medium">سعر التوصيل</label>
-        <div class="grid grid-cols-2 md:grid-cols-[auto_auto_1fr] gap-2">
-          <app-input-error-message-handler>
-            <label
-              for="deliveryPricePercentage"
-              class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
-              [class.financial-input-active]="deliveryPricePercentage.checked"
-            >
-              <input
-                #deliveryPricePercentage
-                [defaultChecked]="true"
-                type="radio"
-                name="deliveryPriceType"
-                id="deliveryPricePercentage"
-                aria-describedby="productName-help"
-                (change)="(null)"
-              />
-              <span class="text-dark-line text-xs">نسبه التوصيل</span>
-            </label>
-          </app-input-error-message-handler>
-          <app-input-error-message-handler>
-            <label
-              for="deliveryPriceValue"
-              class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
-              [class.financial-input-active]="deliveryPriceValue.checked"
-            >
-              <input
-                #deliveryPriceValue
-                (change)="(null)"
-                type="radio"
-                name="deliveryPriceType"
-                id="deliveryPriceValue"
-                aria-describedby="productName-help"
-              />
-              <span class="text-dark-line text-xs">قيمه التوصيل</span>
-            </label>
-          </app-input-error-message-handler>
-          <app-input-error-message-handler class="h-11 *:h-full flex-1  col-span-2 md:col-span-1">
+        <div class="grid grid-cols-2 md:grid-cols-[130px_130px_1fr] gap-2">
+          <label
+            for="deliveryPricePercentage"
+            class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
+            [class.financial-input-active]="deliveryPricePercentage.checked"
+          >
             <input
-              type="text"
+              #deliveryPricePercentage
+              [value]="AmountType.Percentage"
+              formControlName="deliveryFeeType"
+              type="radio"
+              name="deliveryFeeType"
+              id="deliveryPricePercentage"
+              aria-describedby="productName-help"
+              (change)="(null)"
+            />
+            <span class="text-dark-line text-xs">نسبه التوصيل</span>
+          </label>
+          <label
+            for="deliveryPriceValue"
+            class="flex items-center gap-2 w-full max-w-35 h-11 justify-center p-4 rounded-lg cursor-pointer"
+            [class.financial-input-active]="deliveryPriceValue.checked"
+          >
+            <input
+              #deliveryPriceValue
+              [value]="AmountType.Fixed"
+              formControlName="deliveryFeeType"
+              (change)="(null)"
+              type="radio"
+              name="deliveryFeeType"
+              id="deliveryPriceValue"
+              aria-describedby="productName-help"
+            />
+            <span class="text-dark-line text-xs">قيمه التوصيل</span>
+          </label>
+          <app-input-error-message-handler
+            [fc]="fg.get('deliveryFee')"
+            class="h-11 *:h-full flex-1 col-span-2 md:col-span-1"
+          >
+            <input
+              type="number"
               class="app-input h-full!"
               pInputText
               id="productPrice"
+              formControlName="deliveryFee"
               aria-describedby="productPrice-help"
               placeholder="العدد"
+              appAllowNumbers
+              [allowDecimal]="true"
             />
           </app-input-error-message-handler>
         </div>
       </div>
 
+      <!-- discount -->
       <div>
         <label for="productName" class="text-dark-bg-2 mb-2 block font-medium">الخصم</label>
         <div class="flex gap-2">
-          <app-input-error-message-handler class="h-11 *:h-full flex-1">
+          <app-input-error-message-handler [fc]="fg.get('discount')" class="h-11 *:h-full flex-1">
             <input
-              type="text"
+              type="number"
               class="app-input h-full!"
               pInputText
               id="productPrice"
               aria-describedby="productPrice-help"
+              formControlName="discount"
               placeholder="العدد"
+              appAllowNumbers
+              [allowDecimal]="true"
             />
           </app-input-error-message-handler>
         </div>

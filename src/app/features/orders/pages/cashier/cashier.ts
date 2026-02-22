@@ -136,7 +136,7 @@ export class Cashier extends BaseComponent implements OnInit {
   //
   formMode = signal<FormMode>(FormMode.Create);
   isCreateMode = computed(() => this.formMode() == FormMode.Create);
-  userDetails=this.authService.userDetails;
+  userDetails = this.authService.userDetails;
   //
   //
   //
@@ -220,13 +220,13 @@ export class Cashier extends BaseComponent implements OnInit {
 
   financialSettings = signal<IFinancialSettingsResponse>({
     deliveryFee: 0,
-    deliveryFeeType: 0,
-    minimumSelectiveTax: 0,
+    deliveryFeeType: 1,
     discount: 0,
-    discountType: 0,
+    discountType: 1,
     serviceFee: 0,
-    serviceFeeType: 0,
+    serviceFeeType: 1,
     vat: 0,
+    minimumSelectiveTax: 0,
   });
 
   /**
@@ -1301,9 +1301,10 @@ export class Cashier extends BaseComponent implements OnInit {
     }
   }
   onCustomersNameSearch(event: any, searchTerm: string = '') {
+    searchTerm = searchTerm ?? '';
     const isNewSearchTerm = searchTerm != this.previousCustomersSearchTerm;
-
-    if (!searchTerm || searchTerm.length > 100) return;
+    console.log('onCustomersNameSearch', searchTerm, isNewSearchTerm);
+    if (searchTerm && searchTerm.length > 100) return;
     if (isNewSearchTerm) {
       this.searchCustomers({ pageIndex: 1, searchTerm });
     } else {
