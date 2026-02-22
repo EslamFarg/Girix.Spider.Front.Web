@@ -15,8 +15,8 @@ import { InputText } from 'primeng/inputtext';
 export class ResetPassword extends BaseComponent {
   isRememberMe = false;
   initialFormValue = {
-    newPassword: this.fb.control<string>('P@ssw0rd', [Validators.required]),
-    confirmPassword: this.fb.control<string>('P@ssw0rd', [Validators.required]),
+    newPassword: this.fb.control<string>('', [Validators.required]),
+    confirmPassword: this.fb.control<string>('', [Validators.required]),
   };
 
   fg = this.fb.group(this.initialFormValue);

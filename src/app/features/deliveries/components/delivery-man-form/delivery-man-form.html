@@ -26,6 +26,7 @@
   (ngSubmit)="onSubmitForm()"
   [formGroup]="deliveryFg"
 >
+  <!-- images -->
   <div class="md:flex-1 md:max-w-50 lg:max-w-60 relative">
     <input multiple appImgOnly id="fileInput" type="file" hidden #fileInput (change)="onImagesFilesSelected($event)" />
     @if (currentImage()) {
@@ -59,7 +60,7 @@
       class="flex cursor-pointer items-center justify-center border-2 border-dark-line aspect-square rounded-lg h-fit mb-2 overflow-hidden"
     >
       @if (currentImage()) {
-        <img [src]="currentImage()!.fullPath" appImgFallback alt="" class="w-full object-cover aspect-square" />
+        <img [src]="currentImage()?.fullPath" appImgFallback alt="" class="w-full object-cover aspect-square" />
       } @else {
         <svg width="92" height="96" viewBox="0 0 92 96" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -78,8 +79,9 @@
   </div>
   <!--  -->
   <div class="grid md:grid-cols-2 gap-4 flex-1">
+    <!-- deliveryName -->
     <div class="col-span-2 md:col-span-1">
-      <label for="productName">{{'form.deliveryName' | translate}}</label>
+      <label for="productName">{{ 'form.deliveryName' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('nameAr')">
         <input
           pInputText
@@ -91,40 +93,66 @@
         />
       </app-input-error-message-handler>
     </div>
-    <!--  -->
+    <!-- phoneNumber -->
     <div class="col-span-2 md:col-span-1">
-      <label for="productPrice">{{'form.phoneNumber' | translate}}</label>
+      <label for="productPrice">{{ 'form.phoneNumber' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('phoneNumber')">
-        <input pInputText id="productPrice" formControlName="phoneNumber" aria-describedby="productPrice-help" [placeholder]="'form.phoneNumber' | translate" />
+        <input
+          pInputText
+          id="productPrice"
+          formControlName="phoneNumber"
+          aria-describedby="productPrice-help"
+          [placeholder]="'form.phoneNumber' | translate"
+        />
       </app-input-error-message-handler>
     </div>
-    <!--  -->
+    <!-- email -->
     <div class="col-span-2 md:col-span-1">
-      <label for="costPrice">{{'form.email' | translate}}</label>
+      <label for="costPrice">{{ 'form.email' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('email')">
-        <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="email" [placeholder]="'form.email' | translate" />
+        <input
+          pInputText
+          id="costPrice"
+          aria-describedby="costPrice-help"
+          formControlName="email"
+          [placeholder]="'form.email' | translate"
+        />
       </app-input-error-message-handler>
     </div>
-    <!--  -->
+    <!-- address -->
     <div class="col-span-2 md:col-span-1">
-      <label for="productAddress">{{'form.address' | translate}}</label>
+      <label for="productAddress">{{ 'form.address' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('address')">
-        <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="address" id="productAddress" [placeholder]="'form.address' | translate" />
+        <input
+          pInputText
+          id="costPrice"
+          aria-describedby="costPrice-help"
+          formControlName="address"
+          id="productAddress"
+          [placeholder]="'form.address' | translate"
+        />
       </app-input-error-message-handler>
     </div>
-    <!--  -->
+    <!-- identityNumber -->
     <div class="col-span-2 md:col-span-1">
-      <label for="identityNumber">{{'form.identityNumber' | translate}}</label>
+      <label for="identityNumber">{{ 'form.identityNumber' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('identityNumber')">
-        <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="identityNumber" id="identityNumber" [placeholder]="'form.identityNumber' | translate"/>
+        <input
+          pInputText
+          id="costPrice"
+          aria-describedby="costPrice-help"
+          formControlName="identityNumber"
+          id="identityNumber"
+          [placeholder]="'form.identityNumber' | translate"
+        />
       </app-input-error-message-handler>
     </div>
-    <!--  -->
+    <!-- description -->
     <div class="col-span-2">
-      <label for="notes">{{'form.description' | translate}}</label>
+      <label for="notes">{{ 'form.description' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('description')">
         <textarea
-        id="notes"
+          id="notes"
           rows="7"
           cols="30"
           pTextarea

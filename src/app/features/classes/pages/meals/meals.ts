@@ -41,7 +41,7 @@ export class Meals extends BaseComponent {
   };
   fg = this.fb.group(this.initialSearchFormValue);
 
-  orderService = inject(MealService);
+  mealService = inject(MealService);
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'الاسم',
@@ -75,7 +75,7 @@ export class Meals extends BaseComponent {
   };
 
   searchMeals(pageIndex: number) {
-    this.orderService
+    this.mealService
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
@@ -115,4 +115,34 @@ export class Meals extends BaseComponent {
   onSubmit = () => this.fg.valid && this.searchMeals(1);
 
   onPageChange = (event: PaginatorState) => this.searchMeals(event.page! + 1);
+
+  deleteMeal(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف المنتج',
+      header: 'حذف المنتج',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.mealService.delete(id).subscribe({
+          next: () => {
+            this.searchMeals(1);
+          },
+        });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
+      },
+    });
+  }
 }

@@ -162,9 +162,13 @@ export class MealForm extends BaseComponent implements OnInit {
     Array.from(Object.entries(formValues)).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         if (key === 'menuItems') {
-          value.forEach((val) => formData.append(key, JSON.stringify(val)));
+          value.forEach((val, ix) => {
+            Object.entries(val).forEach(([k, v]) => {
+              formData.append(`menuItems[${ix}][${k}]`, v as string);
+            });
+          });
         } else {
-          value.forEach((val) => formData.append(key, val.toString()));
+          value.forEach((val) => formData.append(key, val));
         }
       } else {
         formData.append(key, value);

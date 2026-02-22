@@ -13,7 +13,7 @@
         pButton
         type="button"
         (click)="isMenuVisible = true"
-        class="border-dark-line! text-dark-line! py-1!   md:flex-none md:px-8! xl:hidden! me-auto"
+        class="border-dark-line! text-dark-line! py-1! md:flex-none md:px-8! xl:hidden! me-auto"
         variant="outlined"
         type="button"
       >
@@ -81,11 +81,11 @@
         </li>
         <li>
           <span class="font-bold">اسم البائع:</span>
-          <span>محمد احمد</span>
+          <span>{{ userDetails()?.fullName }}</span>
         </li>
         <li>
           <span class="font-bold">رقم الجوال:</span>
-          <span>{{ existingOrderBill()?.customer?.phone }}</span>
+          <span>{{ userDetails()?.phoneNumber }}</span>
         </li>
       </ul>
     </div>
@@ -520,7 +520,14 @@
     </div>
   </form>
 
-  <p-drawer [(visible)]="isMenuVisible" header=""   position="right" [maskStyle]="{'z-index': 1}"  styleClass="w-full! bg-white!" [style]="{zIndex: 1111}">
+  <p-drawer
+    [(visible)]="isMenuVisible"
+    header=""
+    position="right"
+    [maskStyle]="{ 'z-index': 1 }"
+    styleClass="w-full! bg-white!"
+    [style]="{ zIndex: 1111 }"
+  >
     <app-menu (menuItemChange)="onMenuItemChange($event)" [groups]="groups()" />
   </p-drawer>
 </div>

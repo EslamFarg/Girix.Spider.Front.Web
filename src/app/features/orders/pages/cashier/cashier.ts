@@ -136,6 +136,7 @@ export class Cashier extends BaseComponent implements OnInit {
   //
   formMode = signal<FormMode>(FormMode.Create);
   isCreateMode = computed(() => this.formMode() == FormMode.Create);
+  userDetails=this.authService.userDetails;
   //
   //
   //
@@ -527,7 +528,7 @@ export class Cashier extends BaseComponent implements OnInit {
   //
   //menu
   //
-  isMenuVisible: boolean = true;
+  isMenuVisible: boolean = false;
   groupsService = inject(GroupService);
   groups = signal<IGroupSearchRow[]>([]);
 

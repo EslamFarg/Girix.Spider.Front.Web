@@ -8,7 +8,7 @@ export default [
     component: Cashier,
   },
   {
-    path: ':id',
+    path: ':id/edit',
     component: Cashier,
   },
 ] satisfies Route[];

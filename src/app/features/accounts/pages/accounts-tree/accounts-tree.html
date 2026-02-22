@@ -64,7 +64,7 @@
     </div>
 
     <app-section-wrapper class="h-fit w-full" styleClass="keep-border p-0!">
-      <p-tree [value]="financialAccounts()" class="w-full" style="--p-tree-background: transparent; --p-tree-node-color: black">
+      <p-tree [value]="financialAccountsNodes()" class="w-full" style="--p-tree-background: transparent; --p-tree-node-color: black">
         <ng-template let-node pTemplate="url">
           <a
             [href]="node.data"

@@ -30,16 +30,7 @@ export interface IUserDetails {
   providedIn: 'root',
 })
 export class AuthService extends BaseService {
-  // userDetails = signal<IUserDetails | null>(this.get('userDetails'));
-  userDetails = signal<IUserDetails | null>({
-    email: '',
-    fullName: '',
-    phoneNumber: '',
-    token: '',
-    userId: '123',
-    groups: [{ id: 0, name: '' }],
-    setting: { name: '', phoneNumber: '' },
-  });
+  userDetails = signal<IUserDetails | null>(this.get('userDetails'));
   isAuthenticated = computed(() => this.userDetails() !== null);
   override apiRoute = 'Auth';
 

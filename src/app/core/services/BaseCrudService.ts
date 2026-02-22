@@ -34,7 +34,7 @@ export class BaseCrudService<ICreateDto = any, IUpdateDto = any, IGetByIdDto = a
   }
 
   delete(id: number) {
-    return this.http.delete<boolean>(`${this.apiUrl}/${id}`).pipe(
+    return this.http.delete<boolean>(`${this.apiUrl}/${this.endpoints.delete}${id}`).pipe(
       tap({
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'تم الحذف', detail: 'لقد قمت بالحذف بنجاح' });

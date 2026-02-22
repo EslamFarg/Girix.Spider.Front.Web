@@ -1,5 +1,5 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -16,7 +16,8 @@ import { Debounce } from '@/directives/debounce';
 import { PrintService } from '@/features/print/services/print-service';
 import { RouterLink } from '@angular/router';
 import { Dialog } from 'primeng/dialog';
-import { FormControlNotifier } from "@/directives/form-control-notifier";
+import { FormControlNotifier } from '@/directives/form-control-notifier';
+import { PrintableOrderInvoice } from '@/components/printable-order-invoice/printable-order-invoice';
 
 @Component({
   selector: 'app-orders',
@@ -34,8 +35,9 @@ import { FormControlNotifier } from "@/directives/form-control-notifier";
     Debounce,
     RouterLink,
     Dialog,
-    FormControlNotifier
-],
+    FormControlNotifier,
+    PrintableOrderInvoice,
+  ],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })
@@ -146,14 +148,21 @@ export class Orders extends BaseComponent {
 
   printService = inject(PrintService);
   currentOrderBill = signal<IOrderBillReadResponse | null>(null);
-  printOrder(id: number) {
+  printableOrderInvoice = viewChild<PrintableOrderInvoice>('printableOrderInvoice');
+  openPrintDialog(id: number) {
     this.orderService.getBill(id).subscribe({
       next: (order) => {
         this.currentOrderBill.set(order);
-        // this.printService.printOrder(order);
+        console.log(this.printableOrderInvoice());
         this.orderDialogVisible = true;
       },
     });
+  }
+  printOrder() {
+    this.printService.printOrder(
+      this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
+      this.printableOrderInvoice()?.styles ?? '',
+    );
   }
 
   orderDialogVisible = false;

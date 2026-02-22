@@ -31,6 +31,9 @@ export interface ISubNavItem {
 export class Header extends BaseComponent {
   header = viewChild<ElementRef<HTMLElement>>('header');
   nav = viewChild<ElementRef<HTMLElement>>('nav');
+
+  userDetails=this.authService.userDetails;
+
   menuItems: MenuItem[] = [
     {
       label: 'الاجاراءات',

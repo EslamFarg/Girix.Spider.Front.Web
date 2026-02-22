@@ -12,7 +12,7 @@ declare global {
     electronAPI: {
       getPrinters: () => Promise<any[]>;
       ping: (msg: string) => Promise<string>;
-      print: (html: string) => Promise<string>;
+      print: (obj:{html: string, css: string}) => Promise<string>;
     };
   }
 }

@@ -11,13 +11,13 @@ export const ValidationErrors = {
       en: labels.messageEn,
     };
   },
-  minLength({ requiredLength, actualLength }: { requiredLength: number; actualLength: number }) {
+  minlength({ requiredLength, actualLength }: { requiredLength: number; actualLength: number }) {
     return {
       ar: `يجب تعبئة هذا الحقل بحد اقل ${requiredLength}`,
       en: `You must fill this field with a minimum of ${requiredLength}`,
     };
   },
-  maxLength({ requiredLength, actualLength }: { requiredLength: number; actualLength: number }) {
+  maxlength({ requiredLength, actualLength }: { requiredLength: number; actualLength: number }) {
     return {
       ar: `يجب تعبئة هذا الحقل بحد اقصي ${requiredLength}`,
       en: `You must fill this field with a maximum of ${requiredLength}`,

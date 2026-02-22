@@ -26,8 +26,8 @@
           type="checkbox"
           class="cursor-pointer"
           id="rememberMe"
-          [checked]="isRememberMe"
-          (change)="isRememberMe = $event.target.checked"
+          [checked]="isRememberLogin"
+          (change)="isRememberLogin = $event.target.checked"
         />
         <label for="rememberMe" class="cursor-pointer  text-white">تذكرني</label>
         <a routerLink="/auth/forgot-password" class="text-app-blue ms-auto text-sm">هل نسيت كلمة المرور ؟ </a>

@@ -6,23 +6,15 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class PrintService extends BaseService {
-  printOrder(order: IOrderBillReadResponse) {
+  printOrder(html: string, css: string) {
     this.loadingService.addLoading();
 
-    const orderItems = 
-
     window.electronAPI
-      .print(
-        `
-        
-        `,
-      )
+      .print({ html, css })
       .then((e) => {
         console.log(e);
       })
       .catch((e) => console.log(e))
       .finally(() => this.loadingService.removeLoading());
   }
-
-  
 }

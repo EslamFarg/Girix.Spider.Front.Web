@@ -13,7 +13,7 @@
 
       <div class="flex items-center gap-2 text-light-bg ms-auto cursor-pointer" (click)="menu.toggle($event)">
         <img class="w-6 h-6 rounded-full object-cover" src="" appImgFallback alt="" />
-        <p class="font-semibold text-xs">يوسف نبيل</p>
+        <p class="font-semibold text-xs max-w-25 text-ellipsis overflow-hidden">{{ userDetails()?.fullName }}</p>
         <i class="pi pi-angle-down text-sm! transition-all" [class.rotate-180]="menu.visible"></i>
       </div>
       <p-menu dir="rtl" #menu [model]="menuItems" [popup]="true" [style]="{ insetInlineEnd: '100%' }" />

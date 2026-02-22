@@ -116,6 +116,6 @@ export class MealService extends BaseSearchAndCrudService<
    */
   constructor() {
     super();
-    this.patchEndpoints({ getById: 'GetById?id=' });
+    this.patchEndpoints({ getById: 'GetById?id=', delete: 'Delete?id=' });
   }
 }

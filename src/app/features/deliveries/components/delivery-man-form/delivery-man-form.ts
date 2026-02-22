@@ -13,7 +13,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-delivery-man-form',
-  imports: [Button, InputErrorMessageHandler, InputText, Textarea, ReactiveFormsModule, ButtonDirective,TranslatePipe],
+  imports: [Button, InputErrorMessageHandler, InputText, Textarea, ReactiveFormsModule, ButtonDirective, TranslatePipe],
   templateUrl: './delivery-man-form.html',
   styleUrl: './delivery-man-form.css',
 })
@@ -23,7 +23,7 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
   id = input.required<number | null>();
   //
   //
-currentDelivery = signal<IDeliveryReadResponse|null>(null)
+  currentDelivery = signal<IDeliveryReadResponse | null>(null);
   //
   //
 
@@ -42,11 +42,21 @@ currentDelivery = signal<IDeliveryReadResponse|null>(null)
       Validators.maxLength(100),
     ]),
 
-    phoneNumber:this.fb.control(null, [Validators.required, Validators.minLength(8), onlyNumbersAllowed,Validators.maxLength(13)]),
-    email:this.fb.control(null,[Validators.required,emailValidator]),
-    address:this.fb.control(null,[Validators.required]),
-    description:this.fb.control(null,[Validators.required]),
-    identityNumber:this.fb.control(null,[Validators.required,onlyNumbersAllowed,Validators.minLength(14),Validators.maxLength(14)]),
+    phoneNumber: this.fb.control(null, [
+      Validators.required,
+      Validators.minLength(8),
+      onlyNumbersAllowed,
+      Validators.maxLength(13),
+    ]),
+    email: this.fb.control(null, [Validators.required, emailValidator]),
+    address: this.fb.control(null, [Validators.required]),
+    description: this.fb.control(null, [Validators.required]),
+    identityNumber: this.fb.control(null, [
+      Validators.required,
+      onlyNumbersAllowed,
+      Validators.minLength(14),
+      Validators.maxLength(14),
+    ]),
     images: this.fb.control([], [Validators.required]),
     //update only props
     id: this.fb.control(null, []),
@@ -66,28 +76,26 @@ currentDelivery = signal<IDeliveryReadResponse|null>(null)
       case FormMode.Create:
         break;
       case FormMode.Update:
-        //fetch 
+        //fetch
         this.deliveryService.getById(this.id()!).subscribe((delivery) => {
           //-> bind data
 
-          this.currentDelivery.set(delivery)
-            
+          this.currentDelivery.set(delivery);
+
           this.deliveryFg.patchValue({
             nameAr: delivery.name,
             ...delivery,
             // ImagesAdd: [],
           });
 
-          console.log(this.deliveryFg.value);
-     
-          console.log(delivery.attachment[0].fullPath);
+ 
+          if (delivery.attachment.length === 0) return;
           this.currentImage.set({
-            
-            fullPath: this.baseUrl+delivery.attachment[0].fullPath,
-            id: delivery.attachment[0].id,
+            fullPath: this.baseUrl + delivery.attachment[0]?.fullPath,
+            id: delivery.attachment[0]?.id,
           });
           this.deliveryFg.patchValue({
-            images: [delivery.attachment[0].fullPath],
+            images: [delivery.attachment[0]?.fullPath],
           });
         });
         break;
@@ -97,35 +105,31 @@ currentDelivery = signal<IDeliveryReadResponse|null>(null)
   onSubmitForm() {
     this.deliveryFg.patchValue({
       nameEn: this.deliveryFg.value.nameAr?.trim(),
-    })
-    
+    });
 
     console.log(this.deliveryFg.value);
-    if(!this.currentImage() || this.deliveryFg.get('images')?.value.length === 0){
-          this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن ان يكون الصورة فارغة' });
-          return;
+    if (!this.currentImage() || this.deliveryFg.get('images')?.value.length === 0) {
+      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن ان يكون الصورة فارغة' });
+      return;
     }
     // debugger;
     if (this.deliveryFg.invalid) {
+      console.log('invalid form', this.deliveryFg.value);
       this.deliveryFg.markAllAsTouched();
       return;
     }
 
-
     const formData = new FormData();
 
-
-    Object.entries(this.deliveryFg.value).forEach(([key, value]:[string, any]) => {
-
-      if(Array.isArray(value)){
-        value.forEach((val)=>{
+    Object.entries(this.deliveryFg.value).forEach(([key, value]: [string, any]) => {
+      if (Array.isArray(value)) {
+        value.forEach((val) => {
           formData.append(key, val);
-        })
-      }else{
+        });
+      } else {
         formData.append(key, value);
       }
-    })
-
+    });
 
     // console.log(formData);
 
@@ -135,14 +139,13 @@ currentDelivery = signal<IDeliveryReadResponse|null>(null)
         break;
       case FormMode.Update:
         // formData.append('images','');
-        
-        if(this.currentImage()?.file){
 
+        if (this.currentImage()?.file) {
           formData.delete('images');
           formData.append('imagesAdd', this.currentImage()!.file!);
           this.currentDelivery()!.attachment.forEach((image) => {
-            formData.append('listIdsOfDeleteImages', (image.id).toString());
-          })
+            formData.append('listIdsOfDeleteImages', image.id.toString());
+          });
         }
         console.log(formData);
         this.deliveryService.put(formData).subscribe();
@@ -164,11 +167,9 @@ currentDelivery = signal<IDeliveryReadResponse|null>(null)
     const input = event.target as HTMLInputElement;
 
     if (input.files && input.files.length > 0) {
-
       this.deliveryFg.patchValue({
         images: [],
-      })
-      
+      });
 
       if (input.files.length > 1) {
         this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن اختيار اكثر من صورة' });
@@ -179,8 +180,6 @@ currentDelivery = signal<IDeliveryReadResponse|null>(null)
       this.currentImage.set({ file, fullPath: URL.createObjectURL(file), id: 'new-image', ix: 0 });
 
       //bind to form
-
-
 
       this.deliveryFg.patchValue({
         images: [file],
