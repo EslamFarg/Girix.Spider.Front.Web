@@ -66,4 +66,28 @@ export class PrintableOrderInvoice extends BaseComponent {
     }
   `;
   sanitizedStyles = this.sanitizer.bypassSecurityTrustHtml(this.styles);
+
+  getDiscountAmount() {
+    return this.data()?.summary?.discountAmount ?? 0;
+  }
+
+  getTotalSelectiveTax() {
+    return this.data()?.summary?.totalSelectiveTax ?? 0;
+  }
+
+  
+
+  getTotalAfterDiscount() {
+    const totalUnitPrice = this.data()?.summary?.totalUnitPrice ?? 0;
+    const discountAmount = this.data()?.summary?.discountAmount ?? 0;
+
+    return totalUnitPrice - discountAmount;
+  }
+
+  getTotalBeforeTax() {
+    const getTotalAfterDiscount = this.getTotalAfterDiscount();
+    const feeAmount = this.data()?.summary?.serviceFee ?? 0;
+
+    return getTotalAfterDiscount + feeAmount;
+  }
 }

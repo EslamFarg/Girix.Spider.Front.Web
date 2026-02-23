@@ -72,9 +72,8 @@ export class ProductForm extends BaseComponent implements OnInit {
     descriptionEn: this.fb.control<string>('', [Validators.required]),
     descriptionAr: this.fb.control<string>('', [
       Validators.required,
-      noSymbolsAllowed,
       Validators.minLength(3),
-      Validators.maxLength(200),
+      Validators.maxLength(1000),
     ]),
     price: this.fb.control<number>(0, [Validators.required, Validators.min(0)]),
     costPrice: this.fb.control<number>(0, [Validators.required, Validators.min(0)]),

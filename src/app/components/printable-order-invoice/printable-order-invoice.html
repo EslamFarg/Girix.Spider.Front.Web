@@ -1,118 +1,134 @@
-<div class="outer-invoice-wrap" style="min-width: 100%" #printableOrderInvoice>
-  <style [innerHTML]="sanitizedStyles"></style>
-  <div class="inner-invoice-wrap" style="margin: 0 auto; border-radius: 8px;">
-    <!-- upper info -->
-    <div class="upper-tables-wrapper">
-      <!-- right -->
-      <table>
-        <tbody>
-          <tr class="font-bold">
-            <td>رقم الفاتوره</td>
-            <td>{{ data()?.invoiceNo }}</td>
-          </tr>
-          <tr class="font-bold">
-            <td>رقم الطلب</td>
-            <td>{{ data()?.orderNo }}</td>
-          </tr>
-          <tr>
-            <td class="font-bold">اسم العميل:</td>
-            <td>{{ data()?.customer?.name }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- left -->
-      <table style="height: fit-content">
-        <tbody>
-          <tr>
-            <td colspan="2">{{ data()?.dateTime | date: 'dd/MM/yyyy h:mm a' }}</td>
-          </tr>
-          <tr class="font-bold">
-            <td>نوع الدفع:</td>
-            <td>{{ data()?.paymentType }}</td>
-          </tr>
-          <tr>
-            <td class="font-bold">رقم الجوال</td>
-            <td>{{ data()?.customer?.phone }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div style="display: flex; gap: 4px; padding: 4px">
-      <div class="font-bold">عنوان العميل</div>
-      <div>{{ data()?.customer?.address }}</div>
-    </div>
-
-    <!-- items -->
-    <div class="items-table-wrapper" style="margin-top: 2rem">
-      <table dir="rtl" class="items-table">
-        <thead>
-          <tr class="border-b">
-            <th>الصنف</th>
-            <th>الكمية</th>
-            <th>الاجمالي</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of data()?.items; track $index) {
-            <tr>
-              <td>{{ item.name }}</td>
-              <td>{{ item.qty }}</td>
-              <td>{{ item.netUnitPriceWithTax }}</td>
+<div
+  class="outer-invoice-wrap"
+  style="width: 100%; margin: 0 auto; padding: 2mm; margin-right: 8px"
+  #printableOrderInvoice
+>
+  <div class="mid-invoice-wrapper" style="padding-bottom: 20px; border-bottom: 1px solid #000">
+    <style [innerHTML]="sanitizedStyles"></style>
+    <div class="inner-invoice-wrap" style="margin: 0 auto; border-radius: 8px">
+      <!-- upper info -->
+      <div class="upper-tables-wrapper">
+        <!-- right -->
+        <table>
+          <tbody>
+            <tr class="font-bold">
+              <td>رقم الفاتوره</td>
+              <td>{{ data()?.invoiceNo }}</td>
             </tr>
-          }
-          <tr class="border-b">
-            <td>المجموع</td>
-            <td></td>
-            <td>{{ data()?.summary?.totalUnitPrice }}</td>
-          </tr>
-          <tr class="border-b">
-            <td>الخصم</td>
-            <td></td>
-            <td>{{ data()?.summary?.discountAmount }}</td>
-          </tr>
-          <tr class="border-b">
-            <td>المحموع بعد الخصم</td>
-            <td></td>
-            <td>
-              {{ (data()?.summary?.totalUnitPrice ?? 0) * (1 - (data()?.summary?.discountPercentage ?? 0) / 100) }}
-            </td>
-          </tr>
-          <!-- <tr class="border-b">
-                  <td>الضريبة الانتقائية</td>
-                  <td></td>
-                  <td>
-                    {{
-                      (data()?.summary?.totalSelectiveTax ?? 0) - (data()?.summary?.totalUnitPrice ?? 0)
-                    }}
-                  </td>
-                </tr> -->
-          <tr class="border-b">
-            <td>الخدمة</td>
-            <td></td>
-            <td>{{ data()?.summary?.serviceFee }}</td>
-          </tr>
-          <tr class="border-b">
-            <td>الضريبة</td>
-            <td></td>
-            <td>{{ data()?.summary?.vatAmount }}</td>
-          </tr>
-          <tr class="border-b">
-            <td>الاجمالي بالضريبة (الصافي)</td>
-            <td></td>
-            <td>{{ data()?.summary?.totalNet }}</td>
-          </tr>
-          <tr class="border-b">
-            <td>مدفوع كاش</td>
-            <td></td>
-            <td>{{ data()?.payments?.payingCash ?? 0 }}</td>
-          </tr>
-          <tr>
-            <td>مدفوع شبكة</td>
-            <td></td>
-            <td>{{ data()?.payments?.payingNetwork ?? 0 }}</td>
-          </tr>
-        </tbody>
-      </table>
+            <tr class="font-bold">
+              <td>رقم الطلب</td>
+              <td>{{ data()?.orderNo }}</td>
+            </tr>
+            <tr>
+              <td class="font-bold">اسم العميل:</td>
+              <td>{{ data()?.customer?.name }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- left -->
+        <table style="height: fit-content">
+          <tbody>
+            <tr>
+              <td colspan="2">{{ data()?.dateTime | date: 'dd/MM/yyyy h:mm a' }}</td>
+            </tr>
+            <tr class="font-bold">
+              <td>نوع الدفع:</td>
+              <td>{{ data()?.paymentType ? 'مدفوع' : 'غير مدفوع' }}</td>
+            </tr>
+            <tr>
+              <td class="font-bold">رقم الجوال</td>
+              <td>{{ data()?.customer?.phone }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display: flex; gap: 4px; padding: 4px">
+        <div class="font-bold">عنوان العميل</div>
+        <div>{{ data()?.customer?.address }}</div>
+      </div>
+
+      <!-- items -->
+      <div class="items-table-wrapper" style="margin-top: 2rem">
+        <table dir="rtl" class="items-table">
+          <thead>
+            <tr class="border-b">
+              <th>الصنف</th>
+              <th>الكمية</th>
+              <th>الاجمالي</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of data()?.items; track $index) {
+              <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.qty }}</td>
+                <td>{{ item.unitPrice }}</td>
+              </tr>
+              @for (item of item.modifiers; track $index) {
+                <tr >
+                  <td > + {{ item.name }}</td>
+                  <td>{{ item.qty }}</td>
+                  <td>{{ item.unitPrice }}</td>
+                </tr>
+              }
+            }
+            <tr class="border-b">
+              <td>المجموع</td>
+              <td></td>
+              <td>{{ data()?.summary?.totalUnitPrice }}</td>
+            </tr>
+            <tr class="border-b">
+              <td>الخصم</td>
+              <td></td>
+              <td>{{ data()?.summary?.discountAmount }}</td>
+            </tr>
+            <tr class="border-b">
+              <td>المحموع بعد الخصم</td>
+              <td></td>
+              <td>
+                {{ getTotalAfterDiscount() }}
+              </td>
+            </tr>
+            <tr class="border-b">
+              <td>الضريبة الانتقائية</td>
+              <td></td>
+              <td>
+                {{ this.data()?.summary?.totalSelectiveTax ?? 0 }}
+              </td>
+            </tr>
+            <tr class="border-b">
+              <td>الخدمة</td>
+              <td></td>
+              <td>{{ data()?.summary?.serviceFee }}</td>
+            </tr>
+            <tr class="border-b">
+              <td>الاجمالي</td>
+              <td></td>
+              <td>{{ getTotalBeforeTax() }}</td>
+            </tr>
+            <tr class="border-b">
+              <td>الضريبة</td>
+              <td></td>
+              <td>{{ data()?.summary?.vatAmount }}</td>
+            </tr>
+            <tr class="border-b" style="border-bottom-width: 2px">
+              <td>الاجمالي بالضريبة (الصافي)</td>
+              <td></td>
+              <td>{{ data()?.summary?.totalNet }}</td>
+            </tr>
+            <tr class="border-b">
+              <td>مدفوع كاش</td>
+              <td></td>
+              <td>{{ data()?.payments?.payingCash ?? 0 }}</td>
+            </tr>
+            <tr>
+              <td>مدفوع شبكة</td>
+              <td></td>
+              <td>{{ data()?.payments?.payingNetwork ?? 0 }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
