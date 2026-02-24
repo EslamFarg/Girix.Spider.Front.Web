@@ -96,6 +96,11 @@
       </table>
     </div>
 
-    <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" />
+    <p-paginator
+      (onPageChange)="onPageChange($event)"
+      [first]="(ordersPaginationInfo().pageIndex - 1) * 10"
+      [rows]="10"
+      [totalRecords]="ordersPaginationInfo().totalRowsCount"
+    />
   </app-section-wrapper>
 </div>

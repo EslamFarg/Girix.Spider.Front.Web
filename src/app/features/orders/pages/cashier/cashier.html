@@ -946,6 +946,7 @@
             <input
               type="radio"
               name="isPaid"
+              [disabled]="orderLocationType() == OrderLocationType.Takeaway"
               id="paymentInfoPaid"
               [defaultChecked]="true"
               (input)="isPaid.set(true)"
@@ -954,7 +955,14 @@
             <label for="paymentInfoPaid">{{ 'form.paid' | translate }}</label>
           </div>
           <div class="flex items-center gap-1">
-            <input type="radio" name="isPaid" id="paymentInfoPostponed" (input)="isPaid.set(false)" [value]="false" />
+            <input
+              [disabled]="orderLocationType() == OrderLocationType.Takeaway"
+              type="radio"
+              name="isPaid"
+              id="paymentInfoPostponed"
+              (input)="isPaid.set(false)"
+              [value]="false"
+            />
             <label for="paymentInfoPostponed">{{ 'form.postponed' | translate }}</label>
           </div>
         </div>
@@ -970,6 +978,7 @@
               [formControl]="getFormControl(orderFg, 'payingCash')"
               appAllowNumbers
               [max]="net()"
+              [disabled]="!isPaid()"
               [min]="0"
               [allowDecimal]="true"
               #payingCash
@@ -991,6 +1000,7 @@
               [allowDecimal]="true"
               [max]="net()"
               [min]="0"
+              [disabled]="!isPaid()  "
               id="payingNetwork"
               aria-describedby="network-help"
               #payingNetwork

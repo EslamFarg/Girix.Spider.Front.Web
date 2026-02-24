@@ -2,10 +2,11 @@ import { IOrderBillReadResponse } from '@/features/orders';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, input, viewChild, ViewEncapsulation } from '@angular/core';
 import { BaseComponent } from '../base-component/base-component';
 import { DatePipe } from '@angular/common';
+import { ImgFallback } from '@/directives/img-fallback';
 
 @Component({
   selector: 'app-printable-order-invoice',
-  imports: [DatePipe],
+  imports: [DatePipe, ImgFallback],
   templateUrl: './printable-order-invoice.html',
   styleUrl: './printable-order-invoice.css',
   encapsulation: ViewEncapsulation.None,
@@ -16,13 +17,14 @@ export class PrintableOrderInvoice extends BaseComponent {
   html = viewChild<ElementRef<HTMLElement>>('printableOrderInvoice');
   styles = `
   .inner-invoice-wrap {
+  background-color: #fff;
       --print-text-gray: #889898;
       border: 1px solid var(--print-text-gray);
       padding: 6px;
       direction: rtl;
       min-width: 100%;
       & *{
-        font-size: 10px;
+        font-size: 14px;
       }
       & .upper-tables-wrapper {
         line-height: 1;
@@ -75,8 +77,6 @@ export class PrintableOrderInvoice extends BaseComponent {
     return this.data()?.summary?.totalSelectiveTax ?? 0;
   }
 
-  
-
   getTotalAfterDiscount() {
     const totalUnitPrice = this.data()?.summary?.totalUnitPrice ?? 0;
     const discountAmount = this.data()?.summary?.discountAmount ?? 0;
@@ -89,5 +89,19 @@ export class PrintableOrderInvoice extends BaseComponent {
     const feeAmount = this.data()?.summary?.serviceFee ?? 0;
 
     return getTotalAfterDiscount + feeAmount;
+  }
+
+  onLogoLoad(img: HTMLImageElement) {
+    //convert src to base64
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+
+    const ctx = canvas.getContext('2d');
+    ctx!.drawImage(img, 0, 0);
+
+    const base64 = canvas.toDataURL('image/png');
+    img.src = base64;
+    console.log(base64);
   }
 }

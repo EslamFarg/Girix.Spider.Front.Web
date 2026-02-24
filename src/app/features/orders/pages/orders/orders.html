@@ -177,7 +177,7 @@
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-white!"
   class="addition-dialog"
-  [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
+  [contentStyleClass]="`flex flex-col    ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
   <ng-template #header>
     <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">التحصيل</p>
@@ -187,12 +187,14 @@
   <app-printable-order-invoice [data]="currentOrderBill()" #printableOrderInvoice />
 
   <ng-template #footer>
-    <p-button
-      label="Print"
-      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
-      styleClass=" bg-[#EA7C69]! text-white! px-6!"
-      [text]="true"
-      (click)="printOrder()"
-    ></p-button>
+    <div class="w-full p-4 pb-0 flex items-center justify-center gap-2">
+      <p-button
+        label="Print"
+        [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
+        styleClass=" bg-[#EA7C69]! text-white! px-6!"
+        [text]="true"
+        (click)="printOrder()"
+      ></p-button>
+    </div>
   </ng-template>
 </p-dialog>

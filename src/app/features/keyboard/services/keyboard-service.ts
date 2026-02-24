@@ -104,15 +104,21 @@ export class KeyboardService extends BaseService {
     }
     let newValue = this.currentNumbersKeyboardInput.value.toString();
 
-    if (this.currentNumbersKeyboardInput && incomingValue != '-') {
-      newValue += incomingValue;
-    } else {
+    if (!this.currentNumbersKeyboardInput) return;
+
+    // more than 1 ( . )
+    if (newValue.includes('.') && incomingValue === '.') return;
+
+    // ( - )
+    if (incomingValue === '-') {
       const upcomingValue = newValue.slice(0, -1);
       if (upcomingValue.length >= 0) {
         newValue = upcomingValue;
       }
+    } else {
+      newValue += incomingValue;
     }
-    
+
     this.currentNumbersKeyboardInput.value = newValue;
     console.log('click input.value before dispatch', this.currentNumbersKeyboardInput.value);
     this.currentNumbersKeyboardInput.dispatchEvent(new Event('input', { bubbles: true }));

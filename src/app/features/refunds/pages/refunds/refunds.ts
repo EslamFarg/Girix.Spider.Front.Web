@@ -7,9 +7,10 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { RefundSearchEnum, RefundService } from '../../services/refund-service';
+import { RefundSearchEnum, RefundService } from '@/features/refunds';
 import { MenuItem } from 'primeng/api';
-// import { OrderSearchEnum } from '../../../orders/pages/services/order-service';
+import { IRefundRowResponse } from '@/features/refunds';
+// import { RefundSearchEnum } from '../../../orders/pages/services/order-service';
 
 @Component({
   selector: 'app-refunds',
@@ -30,11 +31,13 @@ export class Refunds extends BaseComponent {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<RefundSearchEnum>(RefundSearchEnum.CustomerName, [Validators.required]),
     fromDate: this.fb.control<string | null>(null, []),
-    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
+    toDate: this.fb.control<string>(this.localDateIso, [Validators.required]),
   };
+
   fg = this.fb.group(this.initialSearchFormValue);
 
   orderService = inject(RefundService);
+
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'اسم العميل',
@@ -57,7 +60,7 @@ export class Refunds extends BaseComponent {
   constructor() {
     super();
 
-    this.searchOrders(1);
+    this.searchRefunds(1);
   }
 
   periodOptions = [
@@ -68,14 +71,14 @@ export class Refunds extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
   ];
 
-  refunds = signal<any[]>([]);
-  refundsPaginationInfo = signal<IPaginationInfo>({
+  orders = signal<IRefundRowResponse[]>([]);
+  ordersPaginationInfo = signal<IPaginationInfo>({
     pageIndex: 1,
     totalPagesCount: 0,
     totalRowsCount: 0,
   });
 
-  searchOrders(pageIndex: number) {
+  searchRefunds(pageIndex: number) {
     this.orderService
       .search({
         paginationInfo: {
@@ -92,8 +95,8 @@ export class Refunds extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
-          this.refunds.set(res.value.rows);
-          this.refundsPaginationInfo.set({
+          this.orders.set(res.value.rows);
+          this.ordersPaginationInfo.set({
             pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
             totalRowsCount: res.value.paginationInfo.totalRowsCount,
@@ -102,9 +105,29 @@ export class Refunds extends BaseComponent {
       });
   }
 
-  onSubmit = () => this.fg.valid && this.searchOrders(1);
+  onSubmit = () => this.fg.valid && this.searchRefunds(1);
 
-  first = 0;
-  rows = 10;
-  onPageChange = (event: PaginatorState) => this.searchOrders(event.page! + 1);
+  onPageChange = (event: PaginatorState) => this.searchRefunds(event.page! + 1);
+
+  deleteRefund(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف الطلب؟',
+      header: 'حذف الطلب',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => this.orderService.delete(id).subscribe({ next: () => this.searchRefunds(1) }),
+      reject: () => this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' }),
+    });
+  }
 }

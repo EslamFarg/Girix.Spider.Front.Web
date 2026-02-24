@@ -261,6 +261,7 @@ export class Cashier extends BaseComponent implements OnInit {
       });
       switch (orderType) {
         case OrderLocationType.Takeaway:
+          this.isPaid.set(true);
           break;
         case OrderLocationType.Delivery:
           deliveryId?.setValidators([labeledRequiredValidator('يرجى اختيار الدليفري', 'you must select a delivery')]);
@@ -428,7 +429,7 @@ export class Cashier extends BaseComponent implements OnInit {
   //general calculations
   //
 
-  orderLocationType = signal<OrderLocationType | null>(null);
+  orderLocationType = signal<OrderLocationType | null>(OrderLocationType.Takeaway);
 
   deliveryFee = computed(() => {
     if (this.orderLocationType() !== OrderLocationType.Delivery) return 0;
@@ -1345,7 +1346,7 @@ export class Cashier extends BaseComponent implements OnInit {
     return null;
   }
 
-  isPaid = signal<boolean>(false);
+  isPaid = signal<boolean>(true);
 
   isPaidListener = effect(() => {
     let validators: ValidatorFn[] = [];
@@ -1357,6 +1358,9 @@ export class Cashier extends BaseComponent implements OnInit {
     });
     if (this.isPaid()) {
       validators = [Validators.required];
+      cashControl?.enable();
+      networkControl?.enable();
+    }else{
       cashControl?.disable();
       networkControl?.disable();
     }

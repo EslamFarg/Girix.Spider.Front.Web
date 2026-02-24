@@ -1,11 +1,12 @@
-<div
-  class="outer-invoice-wrap"
-  style="width: 100%; margin: 0 auto; padding: 2mm; margin-right: 8px"
-  #printableOrderInvoice
->
-  <div class="mid-invoice-wrapper" style="padding-bottom: 20px; border-bottom: 1px solid #000">
+<div class="outer-invoice-wrap" style="width: 100%; margin: 0 auto" #printableOrderInvoice>
+  <div class="mid-invoice-wrapper">
     <style [innerHTML]="sanitizedStyles"></style>
     <div class="inner-invoice-wrap" style="margin: 0 auto; border-radius: 8px">
+      <!-- logo -->
+      <div style="display: flex; align-items: center; justify-content: center; gap: 6px;width: 100%;margin-bottom: 1rem">
+        <img width="50" height="50" #img (load)="onLogoLoad(img)" src="/images/logo.png"  alt="" />
+        <span>فاتورة كاشير</span>
+      </div>
       <!-- upper info -->
       <div class="upper-tables-wrapper">
         <!-- right -->
@@ -65,8 +66,8 @@
                 <td>{{ item.unitPrice }}</td>
               </tr>
               @for (item of item.modifiers; track $index) {
-                <tr >
-                  <td > + {{ item.name }}</td>
+                <tr>
+                  <td>+ {{ item.name }}</td>
                   <td>{{ item.qty }}</td>
                   <td>{{ item.unitPrice }}</td>
                 </tr>
