@@ -1,7 +1,7 @@
 import { Component, inject, input, signal } from '@angular/core';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { Select } from 'primeng/select';
-import { Button } from 'primeng/button';
+import { Button, ButtonDirective } from 'primeng/button';
 import { Textarea } from 'primeng/textarea';
 import { InputText } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
@@ -9,19 +9,25 @@ import { BaseComponent, FormMode } from '@/components';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { IRestaurantFgControls } from './types';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
+import { labeledRequiredValidator, noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
 import { RestaurantInfoService } from '../../services/restaurant-info-service';
 
 @Component({
   selector: 'app-restaurant',
-  imports: [InputErrorMessageHandler, Select, Button, Textarea, InputText, SectionWrapper,ReactiveFormsModule],
+  imports: [
+    InputErrorMessageHandler,
+    Select,
+    Button,
+    Textarea,
+    InputText,
+    SectionWrapper,
+    ReactiveFormsModule,
+    ButtonDirective,
+  ],
   templateUrl: './restaurant.html',
   styleUrl: './restaurant.css',
 })
 export class Restaurant extends BaseComponent {
-  formMode = input.required<FormMode>();
-  id = input.required<number>();
-
   initialGroupFgValue: IRestaurantFgControls = {
     nameAr: this.fb.control<string>('', [
       Validators.required,
@@ -62,7 +68,7 @@ export class Restaurant extends BaseComponent {
       Validators.minLength(3),
       Validators.maxLength(16),
     ]),
-    logoUrl: this.fb.control(null, [Validators.required]),
+    logoUrl: this.fb.control(null, [labeledRequiredValidator('يجب اختيار صورة', 'you must select an image')]),
   };
 
   restaurantInfoService = inject(RestaurantInfoService);
@@ -78,47 +84,40 @@ export class Restaurant extends BaseComponent {
     this.restaurantInfoService.getSettings().subscribe({
       next: (settings) => {
         this.fg.patchValue(settings);
+        this.currentImage.set({
+          id: 'old-image-id',
+          ix: 0,
+          fullPath: this.baseUrl + settings.logoUrl,
+          file: undefined,
+        });
       },
     });
   }
 
   onSubmitForm() {
-    this.fg.patchValue({
-      nameEn: this.fg.value.nameAr?.trim(),
-    });
     if (this.fg.invalid) {
       console.log('invalid');
       console.log(this.fg.value);
       this.fg.markAllAsTouched();
       return;
     }
-
+    console.log(this.fg.value);
     const formData = new FormData();
 
     Array.from(Object.entries(this.fg.value)).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        value.forEach((val) => formData.append(key, val));
-      } else {
-        formData.append(key, value?.toString() ?? '');
+      if (key === 'logoUrl') {
+        if (!this.currentImage()?.file) {
+          return;
+        }
       }
+      formData.append(key, value ?? '');
     });
 
-    switch (this.formMode()) {
-      case FormMode.Create:
-        this.restaurantInfoService.create(formData).subscribe({
-          next: (res) => {
-            console.log(res);
-          },
-        });
-        break;
-      case FormMode.Update:
-        this.restaurantInfoService.patch(formData).subscribe({
-          next: (res) => {
-            console.log(res);
-          },
-        });
-        break;
-    }
+    this.restaurantInfoService.patch(formData).subscribe({
+      next: (res) => {
+        console.log(res);
+      },
+    });
   }
 
   //
@@ -151,10 +150,7 @@ export class Restaurant extends BaseComponent {
     input.value = '';
   }
   onDeleteImage() {
-    if (!this.currentImage()?.file) {
-      console.log(this.currentImage()?.id);
-      this.fg.patchValue({ logoUrl: null });
-    }
+    this.fg.patchValue({ logoUrl: null });
     this.currentImage.set(null);
   }
 }

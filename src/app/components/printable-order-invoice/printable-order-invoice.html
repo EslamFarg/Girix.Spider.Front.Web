@@ -3,8 +3,18 @@
     <style [innerHTML]="sanitizedStyles"></style>
     <div class="inner-invoice-wrap" style="margin: 0 auto; border-radius: 8px">
       <!-- logo -->
-      <div style="display: flex; align-items: center; justify-content: center; gap: 6px;width: 100%;margin-bottom: 1rem">
-        <img width="50" height="50" #img (load)="onLogoLoad(img)" src="/images/logo.png"  alt="" />
+      <div
+        style="display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin-bottom: 1rem"
+      >
+        <img
+          width="50"
+          height="50"
+          style="border-radius: 50%; object-fit: cover; aspect-ratio: 1"
+          #img
+          (load)="onLogoLoad(img)"
+          src="/images/logo.png"
+          alt=""
+        />
         <span>فاتورة كاشير</span>
       </div>
       <!-- upper info -->
@@ -63,69 +73,74 @@
               <tr>
                 <td>{{ item.name }}</td>
                 <td>{{ item.qty }}</td>
-                <td>{{ item.unitPrice }}</td>
+                <td>{{ item.unitPrice?.toFixed(2) }}</td>
               </tr>
               @for (item of item.modifiers; track $index) {
                 <tr>
                   <td>+ {{ item.name }}</td>
                   <td>{{ item.qty }}</td>
-                  <td>{{ item.unitPrice }}</td>
+                  <td>{{ item.unitPrice?.toFixed(2) }}</td>
                 </tr>
               }
             }
             <tr class="border-b">
               <td>المجموع</td>
               <td></td>
-              <td>{{ data()?.summary?.totalUnitPrice }}</td>
+              <td>{{ data()?.summary?.totalUnitPrice?.toFixed(2) }}</td>
             </tr>
             <tr class="border-b">
               <td>الخصم</td>
               <td></td>
-              <td>{{ data()?.summary?.discountAmount }}</td>
+              <td>{{ data()?.summary?.discountAmount?.toFixed(2) }}</td>
             </tr>
             <tr class="border-b">
               <td>المحموع بعد الخصم</td>
               <td></td>
               <td>
-                {{ getTotalAfterDiscount() }}
+                {{ getTotalAfterDiscount()?.toFixed(2) }}
               </td>
             </tr>
             <tr class="border-b">
               <td>الضريبة الانتقائية</td>
               <td></td>
               <td>
-                {{ this.data()?.summary?.totalSelectiveTax ?? 0 }}
+                {{ this.data()?.summary?.totalSelectiveTax?.toFixed(2) ?? 0 }}
               </td>
             </tr>
             <tr class="border-b">
               <td>الخدمة</td>
               <td></td>
-              <td>{{ data()?.summary?.serviceFee }}</td>
+              <td>{{ data()?.summary?.serviceFee?.toFixed(2) }}</td>
+            </tr>
+            <tr class="border-b">
+              <td>حجز الكوخ</td>
+              <td></td>
+              <td>{{ data()?.summary?.priceForPlace?.toFixed(2) }}</td>
             </tr>
             <tr class="border-b">
               <td>الاجمالي</td>
               <td></td>
-              <td>{{ getTotalBeforeTax() }}</td>
+              <td>{{ getTotalBeforeTax()?.toFixed(2) }}</td>
             </tr>
             <tr class="border-b">
               <td>الضريبة</td>
               <td></td>
-              <td>{{ data()?.summary?.vatAmount }}</td>
+              <td>{{ data()?.summary?.vatAmount?.toFixed(2) }}</td>
             </tr>
             <tr class="border-b" style="border-bottom-width: 2px">
               <td>الاجمالي بالضريبة (الصافي)</td>
               <td></td>
-              <td>{{ data()?.summary?.totalNet }}</td>
+              <td>{{ data()?.summary?.totalNet?.toFixed(2) }}</td>
             </tr>
             <tr class="border-b">
               <td>مدفوع كاش</td>
               <td></td>
-              <td>{{ data()?.payments?.payingCash ?? 0 }}</td>
+              <td>{{ data()?.payments?.payingCash?.toFixed(2) ?? 0 }}</td>
             </tr>
             <tr>
               <td>مدفوع شبكة</td>
               <td></td>
-              <td>{{ data()?.payments?.payingNetwork ?? 0 }}</td>
+              <td>{{ data()?.payments?.payingNetwork?.toFixed(2) ?? 0 }}</td>
             </tr>
           </tbody>
         </table>

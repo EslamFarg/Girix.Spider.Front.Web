@@ -30,7 +30,7 @@ export class RestaurantInfoService extends BaseCrudService<any, IRestaurantInfoU
    */
   constructor() {
     super();
-    this.patchEndpoints({ create: '' });
+    this.patchEndpoints({ patch: '' });
   }
 
   getSettings() {

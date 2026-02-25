@@ -300,37 +300,39 @@ export class Cashier extends BaseComponent implements OnInit {
   //
 
   onMenuItemChange(changedItem: IOrderMenuItem) {
-    const existingItem = this.orderMenuItems().find((item) => item.menuItem.id == changedItem.menuItem.id);
-    if (existingItem) {
-      const futureQuantity = existingItem.menuItem.quantity + changedItem.menuItem.quantity;
+    if (changedItem.menuItem.quantity <= 0) return;
+    
+    this.orderMenuItems.update((items) => items.concat(changedItem));
+    // return;
+    // const existingItem = this.orderMenuItems().find((item) => item.menuItem.id == changedItem.menuItem.id);
+    // if (existingItem) {
+    //   const futureQuantity = existingItem.menuItem.quantity + changedItem.menuItem.quantity;
 
-      if (futureQuantity >= 1000) {
-        this.orderMenuItems.update((items) =>
-          items.map((item) =>
-            item.menuItem.id == existingItem.menuItem.id
-              ? { ...item, menuItem: { ...item.menuItem, quantity: 1000 } }
-              : item,
-          ),
-        );
-        return;
-      }
+    //   if (futureQuantity >= 1000) {
+    //     this.orderMenuItems.update((items) =>
+    //       items.map((item) =>
+    //         item.menuItem.id == existingItem.menuItem.id
+    //           ? { ...item, menuItem: { ...item.menuItem, quantity: 1000 } }
+    //           : item,
+    //       ),
+    //     );
+    //     return;
+    //   }
 
-      if (futureQuantity <= 0) {
-        this.orderMenuItems.update((items) => items.filter((item) => item.menuItem.id != changedItem.menuItem.id));
-        return;
-      }
+    //   if (futureQuantity <= 0) {
+    //     this.orderMenuItems.update((items) => items.filter((item) => item.menuItem.id != changedItem.menuItem.id));
+    //     return;
+    //   }
 
-      this.orderMenuItems.update((items) =>
-        items.map((item) =>
-          item.menuItem.id == existingItem.menuItem.id
-            ? { ...item, menuItem: { ...item.menuItem, quantity: futureQuantity } }
-            : item,
-        ),
-      );
-    } else {
-      if (changedItem.menuItem.quantity <= 0) return;
-      this.orderMenuItems.update((items) => items.concat(changedItem));
-    }
+    //   this.orderMenuItems.update((items) =>
+    //     items.map((item) =>
+    //       item.menuItem.id == existingItem.menuItem.id
+    //         ? { ...item, menuItem: { ...item.menuItem, quantity: futureQuantity } }
+    //         : item,
+    //     ),
+    //   );
+    // } else {
+    // }
   }
 
   onOrderMenuItemQuantityChange(index: number, newQuantity: number) {
@@ -1360,7 +1362,7 @@ export class Cashier extends BaseComponent implements OnInit {
       validators = [Validators.required];
       cashControl?.enable();
       networkControl?.enable();
-    }else{
+    } else {
       cashControl?.disable();
       networkControl?.disable();
     }
