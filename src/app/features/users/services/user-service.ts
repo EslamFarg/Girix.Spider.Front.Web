@@ -36,7 +36,7 @@ export class UserService extends BaseSearchAndCrudService<
     super();
     this.patchEndpoints({
       create: '',
-      update: '',
+      put: '',
     });
   }
 }

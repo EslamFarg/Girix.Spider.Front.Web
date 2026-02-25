@@ -35,7 +35,7 @@ export class CustomerService extends BaseSearchAndCrudService<
   constructor() {
     super();
     this.patchEndpoints({
-      update: 'Update',
+      put: 'Update',
     });
   }
 }

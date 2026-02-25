@@ -9,11 +9,11 @@ import { LoadingService } from '@/yn-ng/services/loading-service';
 type localStorageKey = 'userDetails' | 'token' | 'forgotPasswordEmail' | 'forgotPasswordToken';
 export interface IEndpoints {
   create: string;
-  update: string;
   getById: string;
   delete: string;
-  put: string;
   search: string;
+  patch: string;
+  put: string;
 }
 export default abstract class BaseService {
   static apiBaseUrl = environment.apiUrl;
@@ -30,11 +30,11 @@ export default abstract class BaseService {
 
   endpoints: IEndpoints = {
     create: 'Create',
-    update: '',
-    put: '',
+     put: '',
     getById: '/',
     delete: '',
     search: 'Search',
+    patch: '',
   };
 
   get localDateIso() {
@@ -43,7 +43,7 @@ export default abstract class BaseService {
     return localDate.toISOString();
   }
   protected patchEndpoints(endpoints: Partial<IEndpoints>) {
-     this.endpoints = { ...this.endpoints, ...endpoints };
+    this.endpoints = { ...this.endpoints, ...endpoints };
   }
   //
   //local storage

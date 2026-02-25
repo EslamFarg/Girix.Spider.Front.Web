@@ -14,7 +14,7 @@ export class BaseCrudService<ICreateDto = any, IUpdateDto = any, IGetByIdDto = a
   }
 
   put<IDefaultUpdateDto = IUpdateDto>(createDto: IDefaultUpdateDto | FormData) {
-    return this.http.put<number>(`${this.apiUrl}/${this.endpoints.update}`, createDto).pipe(
+    return this.http.put<number>(`${this.apiUrl}/${this.endpoints.put}`, createDto).pipe(
       tap({
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'تم الحفظ', detail: 'لقد قمت بالحفظ بنجاح' });
