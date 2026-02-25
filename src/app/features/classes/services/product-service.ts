@@ -141,7 +141,7 @@ export class ProductService extends BaseSearchAndCrudService<
    */
   constructor() {
     super();
-    this.patchEndpoints({ getById: 'GetById?MenuItemId=' });
+    this.patchEndpoints({ getById: 'GetById?MenuItemId=',patch: 'Update' });
   }
 
   getAllAdditions(params: { dto: { paginationInfo: { pageIndex: number; pageSize: number } }; isAddition?: boolean }) {

@@ -60,7 +60,7 @@ export class GroupService extends BaseSearchAndCrudService<
    */
   constructor() {
     super();
-    this.patchEndpoints({ getById: 'GetById?id=' });
+    this.patchEndpoints({ getById: 'GetById?id=' ,patch:'Update',delete:'Delete?id='});
   }
 
   getList(IsOnCasher: boolean = false, paginationInfo: { pageIndex: number; pageSize: number }) {
