@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { CustomersForm } from '../../components/customers-form/customers-form';
+import { CustomerForm } from '../../components/customer-form/customer-form';
 import { DeliveriesNav } from '@/features/deliveries/components/deliveries-nav/deliveries-nav';
 import { DeliveryManForm } from '@/features/deliveries/components/delivery-man-form/delivery-man-form';
 import { BaseComponent } from '@/components/base-component/base-component';
@@ -9,7 +9,7 @@ import { noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validat
 
 @Component({
   selector: 'app-add-customer',
-  imports: [SectionWrapper, CustomersForm, DeliveriesNav, DeliveryManForm],
+  imports: [SectionWrapper, CustomerForm, DeliveriesNav, DeliveryManForm],
   templateUrl: './add-customer.html',
   styleUrl: './add-customer.css',
 })

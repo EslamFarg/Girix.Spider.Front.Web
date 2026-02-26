@@ -215,8 +215,8 @@ export class MealForm extends BaseComponent implements OnInit {
 
     if (input.files && input.files.length > 0) {
       const futureLength = this.newImages().length + input.files.length;
-      if (futureLength > 6) {
-        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن اختيار اكثر من 6 صورة' });
+      if (futureLength > 1) {
+        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن اختيار اكثر من 1 صورة' });
         return;
       }
       const files = Array.from(input.files);

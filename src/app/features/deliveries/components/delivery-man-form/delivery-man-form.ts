@@ -5,7 +5,13 @@ import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { BaseComponent, FormMode } from '@/components/base-component/base-component';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { emailValidator, noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
+import {
+  emailValidator,
+  noSymbolsAllowed,
+  onlyArLettersAllowed,
+  onlyEngLettersAllowed,
+  onlyNumbersAllowed,
+} from '@/yn-ng/utils/text-validators';
 import { IDeliveryFgControls } from './types';
 import { DeliveryService, IDeliveryReadResponse } from '../../services/delivery-service';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
@@ -31,6 +37,7 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
     nameAr: this.fb.control(null, [
       Validators.required,
       noSymbolsAllowed,
+      onlyArLettersAllowed,
       Validators.minLength(3),
       Validators.maxLength(100),
     ]),
@@ -38,6 +45,7 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
     nameEn: this.fb.control(null, [
       Validators.required,
       noSymbolsAllowed,
+      onlyEngLettersAllowed,
       Validators.minLength(3),
       Validators.maxLength(100),
     ]),
@@ -84,11 +92,10 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
 
           this.deliveryFg.patchValue({
             nameAr: delivery.name,
+            nameEn: delivery.name,
             ...delivery,
-            // ImagesAdd: [],
           });
 
- 
           if (delivery.attachment.length === 0) return;
           this.currentImage.set({
             fullPath: this.baseUrl + delivery.attachment[0]?.fullPath,
@@ -103,10 +110,6 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
   }
 
   onSubmitForm() {
-    this.deliveryFg.patchValue({
-      nameEn: this.deliveryFg.value.nameAr?.trim(),
-    });
-
     console.log(this.deliveryFg.value);
     if (!this.currentImage() || this.deliveryFg.get('images')?.value.length === 0) {
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن ان يكون الصورة فارغة' });

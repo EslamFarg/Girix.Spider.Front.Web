@@ -56,4 +56,12 @@ export class TableService extends BaseSearchAndCrudService<
   ITableReadResponse
 > {
   override apiRoute = 'Table';
+
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.patchEndpoints({put: 'Update'})
+  }
 }

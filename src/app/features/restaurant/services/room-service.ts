@@ -58,4 +58,10 @@ export class RoomService extends BaseSearchAndCrudService<
   IRoomReadResponse
 > {
   override apiRoute = 'Room';
+
+
+  constructor() {
+    super();
+    this.patchEndpoints({put: 'update'})
+  }
 }

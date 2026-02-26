@@ -66,4 +66,12 @@ export class DeliveryService extends BaseSearchAndCrudService<
   IDeliveryReadResponse
 > {
   override apiRoute = 'Delivery';
+
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.patchEndpoints({ put: 'update' });
+  }
 }

@@ -13,7 +13,13 @@
     >
       <div class="flex-1">
         <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
-          <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" [placeholder]="'actions.search' | translate" />
+          <input
+            class="w-full bg-transparent!"
+            pInputText
+            type="text"
+            formControlName="searchTerm"
+            [placeholder]="'actions.search' | translate"
+          />
           <p-inputgroup-addon class="relative">
             <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
             <p-menu
@@ -45,19 +51,19 @@
       <thead>
         <tr class="">
           <th>#</th>
-          <th>{{'form.deliveryName' | translate}}</th>
-          <th>{{'form.phoneNumber' | translate}}</th>
-          <th>{{'form.address' | translate }}</th>
-          <th>{{'actions.tools' | translate}}</th>
+          <th>{{ 'form.deliveryName' | translate }}</th>
+          <th>{{ 'form.phoneNumber' | translate }}</th>
+          <th>{{ 'form.address' | translate }}</th>
+          <th>{{ 'actions.tools' | translate }}</th>
         </tr>
       </thead>
       <tbody>
         @for (item of deliveryMen(); track $index) {
-          <tr class="">
-            <td>{{ getRowNumber($index, deliveryMenPaginationInfo.pageIndex) }}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.phoneNumber }}</td>
-            <td>{{ item.address }}</td>
+          <tr class="" [style]="`--ix:${$index}`">
+            <td><div>{{ getRowNumber($index, deliveryMenPaginationInfo.pageIndex) }}</div></td>
+            <td><div>{{ item.name }}</div></td>
+            <td><div>{{ item.phoneNumber }}</div></td>
+            <td><div>{{ item.address }}</div></td>
             <td>
               <div class="actions">
                 <a [routerLink]="`/deliveries/delivery-men/${item.id}/edit`" class="edit">

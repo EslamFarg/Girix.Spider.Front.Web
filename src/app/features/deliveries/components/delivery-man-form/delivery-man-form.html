@@ -79,14 +79,28 @@
   </div>
   <!--  -->
   <div class="grid md:grid-cols-2 gap-4 flex-1">
-    <!-- deliveryName -->
+    <!-- deliveryName Ar -->
     <div class="col-span-2 md:col-span-1">
-      <label for="productName">{{ 'form.deliveryName' | translate }}</label>
+      <label for="productName">{{ 'form.deliveryName' | translate }} (Ar)</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('nameAr')">
         <input
           pInputText
           id="nameAr"
           formControlName="nameAr"
+          aria-describedby="productName-help"
+          [placeholder]="'form.deliveryName' | translate"
+          id="productName"
+        />
+      </app-input-error-message-handler>
+    </div>
+    <!-- deliveryName En-->
+    <div class="col-span-2 md:col-span-1">
+      <label for="productName">{{ 'form.deliveryName' | translate }} (En)</label>
+      <app-input-error-message-handler [fc]="deliveryFg.get('nameEn')">
+        <input
+          pInputText
+          id="nameAr"
+          formControlName="nameEn"
           aria-describedby="productName-help"
           [placeholder]="'form.deliveryName' | translate"
           id="productName"

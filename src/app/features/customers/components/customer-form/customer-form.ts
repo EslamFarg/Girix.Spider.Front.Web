@@ -15,7 +15,7 @@ import { ICustomerReadResponse } from '../../services/customer-types';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-customers-form',
+  selector: 'app-customer-form',
   imports: [
     Button,
     Carousel,
@@ -26,12 +26,12 @@ import { RouterLink } from '@angular/router';
     TranslatePipe,
     ButtonDirective,
     ReactiveFormsModule,
-    RouterLink
+    RouterLink,
   ],
-  templateUrl: './customers-form.html',
-  styleUrl: './customers-form.css',
+  templateUrl: './customer-form.html',
+  styleUrl: './customer-form.css',
 })
-export class CustomersForm extends BaseComponent implements OnInit {
+export class CustomerForm extends BaseComponent implements OnInit {
   //
   //
   //inputs
@@ -46,22 +46,22 @@ export class CustomersForm extends BaseComponent implements OnInit {
   //
 
   initialCustomerFgValue: ICustomerFgControls = {
-  id: this.fb.control(null,[]),
-  nameAr: this.fb.control(null,[Validators.required,noSymbolsAllowed]),
-  nameEn: this.fb.control(null,[Validators.required,noSymbolsAllowed]),
-  phoneNumber: this.fb.control(null,[Validators.required,onlyNumbersAllowed]),
-  secondaryMobileNumber: this.fb.control(null,[Validators.required,onlyNumbersAllowed]),
-  city: this.fb.control(null,[Validators.required]),
-  district: this.fb.control(null,[Validators.required]),
-  street: this.fb.control(null,[Validators.required]),
-  buildingNumber: this.fb.control(null,[Validators.required]),
-  apartment: this.fb.control(null,[Validators.required]),
-  landmark: this.fb.control(null,[Validators.required]),
-  postalCode: this.fb.control(null,[Validators.required]),
-  commercialRegister: this.fb.control(null,[Validators.required]),
-  taxNumber: this.fb.control(null,[Validators.required,onlyNumbersAllowed]),
-  numberOfFloor: this.fb.control(null,[Validators.required]),
-  isCompany: this.fb.control(true,[Validators.required]),
+    id: this.fb.control(null, []),
+    nameAr: this.fb.control(null, [Validators.required, noSymbolsAllowed]),
+    nameEn: this.fb.control(null, [Validators.required, noSymbolsAllowed]),
+    phoneNumber: this.fb.control(null, [Validators.required, onlyNumbersAllowed, Validators.minLength(6), Validators.maxLength(16)]),
+    secondaryMobileNumber: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
+    city: this.fb.control(null, [Validators.required]),
+    district: this.fb.control(null, [Validators.required]),
+    street: this.fb.control(null, [Validators.required]),
+    buildingNumber: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
+    apartment: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
+    landmark: this.fb.control(null, [Validators.required]),
+    postalCode: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
+    commercialRegister: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
+    taxNumber: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
+    numberOfFloor: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
+    isCompany: this.fb.control(true, [Validators.required]),
   };
 
   customerFg = this.fb.group(this.initialCustomerFgValue);
@@ -70,11 +70,9 @@ export class CustomersForm extends BaseComponent implements OnInit {
   customerService = inject(CustomerService);
   currentCustomer = signal<ICustomerReadResponse | null>(null);
 
-
   /**
    *
    */
-
 
   //
   //
@@ -90,10 +88,7 @@ export class CustomersForm extends BaseComponent implements OnInit {
           this.currentCustomer.set(Customer);
           //-> bind data
           console.log('customer', Customer);
-          this.customerFg.patchValue({...Customer,
-            nameAr: Customer.name,
-            nameEn: Customer.name
-          });
+          this.customerFg.patchValue({ ...Customer, nameAr: Customer.name, nameEn: Customer.name });
         });
         break;
     }
@@ -102,10 +97,9 @@ export class CustomersForm extends BaseComponent implements OnInit {
   onSubmitForm() {
     this.customerFg.patchValue({
       nameEn: this.customerFg.value.nameAr?.trim(),
-      landmark:this.customerFg.value.numberOfFloor
+      landmark: this.customerFg.value.numberOfFloor,
     });
 
-    debugger;
     console.log(this.customerFg.value);
     if (this.customerFg.invalid) {
       this.customerFg.markAllAsTouched();
@@ -119,8 +113,7 @@ export class CustomersForm extends BaseComponent implements OnInit {
         this.customerService.create(this.customerFg.value).subscribe();
         break;
       case FormMode.Update:
-
-        this.customerService.put({...this.customerFg.value,id: Number(this.id())}).subscribe();
+        this.customerService.put({ ...this.customerFg.value, id: Number(this.id()) }).subscribe();
         break;
     }
   }

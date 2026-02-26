@@ -59,4 +59,9 @@ export class HutService extends BaseSearchAndCrudService<
   IHutReadResponse
 > {
   override apiRoute = 'Hut';
+
+  constructor() {
+    super();
+    this.patchEndpoints({put: 'update'})
+  }
 }

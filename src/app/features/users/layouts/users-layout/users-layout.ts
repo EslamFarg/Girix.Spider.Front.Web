@@ -12,11 +12,11 @@ import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
 export class UsersLayout {
   links:ISectionLink[] = [
     {
-      labelKey: 'Users',
+      labelKey: 'Users.explorer',
       url: '/users'
     },
     {
-      labelKey: 'add',
+      labelKey: 'Users.add',
       url: '/users/add'
     }
   ]
