@@ -1,6 +1,6 @@
 import { FormControl } from "@angular/forms"
 
-export interface IusersFgControls{
+export interface IUserFgControls{
   userId?:FormControl<number | null>
   nameAr: FormControl<string | null>
   nameEn: FormControl<string | null>

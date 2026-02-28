@@ -1,4 +1,4 @@
-import { ValidationErrorKey, ValidationErrors } from '@/yn-ng/constants/validation-errors';
+import { ValidationErrorKey, ValidationErrors } from '../..';
 import { Component, input } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { Message } from 'primeng/message';

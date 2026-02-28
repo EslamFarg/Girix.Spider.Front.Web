@@ -1,7 +1,6 @@
-
-<div class="overflow-auto h-full no-scrollbar">
+<form class="overflow-auto h-full no-scrollbar" [formGroup]="userFg" (ngSubmit)="onSubmitForm()">
   <app-section-wrapper class="p-4">
-    <div
+    <!-- <div
       class="flex items-center justify-center bg-dark-line w-10 h-10 rounded-lg ms-auto cursor-pointer"
       style="box-shadow: 0px 4px 4px 0px #71717199"
     >
@@ -21,10 +20,10 @@
           fill="white"
         />
       </svg>
-    </div>
+    </div> -->
 
     <div class="mt-6 flex flex-col md:flex-row gap-4 md:col-span-2 flex-1 [&_label]:text-dark-bg-1!">
-      <div
+      <!-- <div
         class="p-4 w-full md:w-[165px] min-h-[150px] flex flex-col gap-2 items-center justify-center bg-base-bg border-2 border-dark-line border-dashed rounded-lg h-fit"
       >
         <svg width="33" height="40" viewBox="0 0 33 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -66,34 +65,50 @@
           />
         </svg>
         <span class="text-dark-line text-sm font-bold">صوره المستخدم</span>
-      </div>
+      </div> -->
 
       <div class="grid md:grid-cols-2 gap-4 flex-1">
         <div>
-          <label for="productName">اسم المستخدم</label>
-          <app-input-error-message-handler>
-            <input pInputText id="productName" aria-describedby="productName-help" placeholder="الاسم" />
+          <label for="name">اسم المستخدم</label>
+          <app-input-error-message-handler [fc]="userFg.get(localize('nameAr', 'nameEn'))">
+            <input
+              pInputText
+              id="name"
+              [formControlName]="localize('nameAr', 'nameEn')"
+              aria-describedby="name-help"
+              placeholder="الاسم"
+            />
           </app-input-error-message-handler>
         </div>
         <div class="flex flex-col justify-end">
-          <label for="productName">رقم الجوال</label>
-          <app-input-error-message-handler>
-            <input pInputText id="productName" aria-describedby="productName-help" placeholder="الرقم" />
+          <label for="phoneNumber">رقم الجوال</label>
+          <app-input-error-message-handler [fc]="userFg.get('phoneNumber')">
+            <input
+              pInputText
+              id="phoneNumber"
+              formControlName="phoneNumber"
+              aria-describedby="phoneNumber-help"
+              placeholder="الرقم"
+            />
           </app-input-error-message-handler>
         </div>
         <div>
-          <label for="productName">البريد الالكتروني</label>
-          <app-input-error-message-handler>
-            <input pInputText id="productName" aria-describedby="productName-help" placeholder="البريد الالكتروني" />
+          <label for="email">البريد الالكتروني</label>
+          <app-input-error-message-handler [fc]="userFg.get('email')">
+            <input
+              pInputText
+              formControlName="email"
+              id="email"
+              aria-describedby="email-help"
+              placeholder="البريد الالكتروني"
+            />
           </app-input-error-message-handler>
         </div>
-
-        
 
         <div class="flex flex-col justify-end">
           <label for="productName">نوع المستخدم</label>
           <app-input-error-message-handler>
-            <p-select [options]="[]" optionLabel="name" placeholder="النوع" class="w-full!" />
+            <p-select [options]="userTypes()" formControlName="groupId" optionValue="id" optionLabel="name" placeholder="النوع" class="w-full!" />
           </app-input-error-message-handler>
         </div>
       </div>
@@ -107,4 +122,4 @@
       />
     </div>
   </app-section-wrapper>
-</div>
+</form>

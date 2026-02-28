@@ -9,7 +9,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { emailValidator, noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
-import { IusersFgControls } from './types';
+import { IUserFgControls } from '../../types/users/form';
 import { UserService } from '../../services/user-service';
 import { FinancialAccountService } from '@/features/accounts/services/financial-account-service';
 import {
@@ -17,7 +17,8 @@ import {
   ICashFinancialAccount,
   ICustodyFinancialAccount,
 } from '@/features/accounts/services/financial-account-types';
-import { IUserReadResponse } from '../../services/user-types';
+import { IUserReadResponse } from '../../types/users/api';
+import { UserType } from '../../types';
 // import { IusersFgControls } from '@/features/deliveries/components/users-man-form/types';
 // import { usersService } from '@/features/deliveries/services/users-service';
 
@@ -40,7 +41,7 @@ export class UserForm extends BaseComponent {
   formMode = input.required<FormMode>();
   id = input.required<number | null>();
 
-  initialusersFgValue: IusersFgControls = {
+  initialusersFgValue: IUserFgControls = {
     nameAr: this.fb.control(null, [
       Validators.required,
       noSymbolsAllowed,
@@ -61,14 +62,14 @@ export class UserForm extends BaseComponent {
       onlyNumbersAllowed,
       Validators.maxLength(13),
     ]),
-    isActive:this.fb.control(true, [Validators.required]),
+    isActive: this.fb.control(true, [Validators.required]),
     email: this.fb.control(null, [Validators.required, emailValidator]),
     //ids
     groupId: this.fb.control(null, [Validators.required]),
-    cashierCollectionAccountId:this.fb.control(null, [Validators.required]),
-    custodyAccountId:this.fb.control(null, [Validators.required]),
-    cashPaymentAccountId:this.fb.control(null, [Validators.required]),
-    bankPaymentAccountId:this.fb.control(null, [Validators.required]),
+    cashierCollectionAccountId: this.fb.control(null, [Validators.required]),
+    custodyAccountId: this.fb.control(null, [Validators.required]),
+    cashPaymentAccountId: this.fb.control(null, [Validators.required]),
+    bankPaymentAccountId: this.fb.control(null, [Validators.required]),
     //update only
     userId: this.fb.control(null, []),
   };
@@ -87,9 +88,9 @@ export class UserForm extends BaseComponent {
   custodyAccounts = signal<ICustodyFinancialAccount[]>([]);
 
   userTypes = signal([
-    { id: 1, nameAr: 'Admin', nameEn: 'Admin' },
-    { id: 2, nameAr: 'Casher', nameEn: 'Casher' },
-    { id: 3, nameAr: 'Waiter', nameEn: 'Waiter' },
+    { id: UserType.Admin, nameAr: 'Admin', nameEn: 'Admin' },
+    { id: UserType.Cashier, nameAr: 'Cashier', nameEn: 'Cashier' },
+    { id: UserType.Waiter, nameAr: 'Waiter', nameEn: 'Waiter' },
   ]);
   /**
    *
@@ -113,11 +114,8 @@ export class UserForm extends BaseComponent {
         break;
       case FormMode.Update:
         //fetch
-        this.usersService.getById(this.id()!).subscribe((users:IUserReadResponse | any) => {
-          this.userFg.patchValue({...users,
-            nameAr: users.name,
-            nameEn: users.name,
-          });
+        this.usersService.getById(this.id()!).subscribe((users: IUserReadResponse | any) => {
+          this.userFg.patchValue({ ...users, nameAr: users.name, nameEn: users.name });
         });
         break;
     }
@@ -134,9 +132,7 @@ export class UserForm extends BaseComponent {
       return;
     }
 
-
     // let dto:{[key:string] : string | number}={};
-
 
     // Object.entries(this.userFg.value).forEach(([key, value]:[string,any]) => {
     //   if (Array.isArray(value)) {
@@ -148,11 +144,7 @@ export class UserForm extends BaseComponent {
     //   }
     // })
 
-
     // console.log(dto);
-
-
-
 
     switch (this.formMode()) {
       case FormMode.Create:

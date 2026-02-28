@@ -97,6 +97,10 @@ export class BaseComponent {
   }
 
   translate = (key: string) => this.translateService.instant(key);
+  currentLang = this.translateService.getCurrentLang();
+  localize = (valueAr: any, valueEn: any) => {
+    return this.currentLang === 'ar' ? valueAr : valueEn;
+  };
 
   formatMinutesToHHMMSS(totalMinutes: number): string {
     const totalSeconds = Math.floor(totalMinutes * 60);
@@ -119,6 +123,4 @@ export class BaseComponent {
   getFormControl(form: FormGroup, controlName: string) {
     return form.controls[controlName] as FormControl;
   }
-
- 
 }

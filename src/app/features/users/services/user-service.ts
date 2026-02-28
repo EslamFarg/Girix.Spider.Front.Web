@@ -5,7 +5,7 @@ import {
   IUserCreateUpdateRequest,
   IUserReadResponse,
   IUserSearchResponseValue,
-} from './user-types';
+} from '../types/users/api';
 import { BaseCrudService } from '@/core/services/BaseCrudService';
 import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 

@@ -8,12 +8,12 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Select } from 'primeng/select';
 import { InputText } from 'primeng/inputtext';
-import {   UserSearchEnum, UserService } from '../../services/user-service';
+import { UserSearchEnum, UserService } from '../../services/user-service';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
 import { RouterLink } from '@angular/router';
-import { IUserRowResponse } from '../../services/user-types';
+import { IUserRowResponse } from '../../types/users/api';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -30,7 +30,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     Debounce,
     Menu,
     RouterLink,
-    TranslatePipe
+    TranslatePipe,
   ],
   templateUrl: './users.html',
   styleUrl: './users.css',
