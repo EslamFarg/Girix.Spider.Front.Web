@@ -17,8 +17,8 @@ import { pipe } from 'rxjs';
 export class Login extends BaseComponent {
   isRememberLogin = true;
   initialFormValue = {
-    emailOrPhone: this.fb.control<string>('batman@gmail.com', [Validators.required]),
-    password: this.fb.control<string>('123456Aa#', [Validators.required]),
+    emailOrPhone: this.fb.control<string>('admin@admin.com', [Validators.required]),
+    password: this.fb.control<string>('12345678', [Validators.required]),
   };
 
   fg = this.fb.group(this.initialFormValue);
