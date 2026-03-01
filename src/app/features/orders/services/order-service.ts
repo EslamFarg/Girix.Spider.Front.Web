@@ -1,8 +1,9 @@
 import { BaseSearchAndCrudService } from '@/core/services/BaseSearchAndCrudService';
 import { Injectable } from '@angular/core';
-import { IOrderBillReadResponse, IOrderReadResponse, IOrderSearchResponseValue } from './order-types/read';
-import { ILocalPlaceChangeRequest, IOrderAddItemsRequest, IOrderCreateRequest } from './order-types/write';
-import { OrderSearchEnum } from './order-types/enums';
+import { IOrderBillReadResponse, IOrderReadResponse, IOrderSearchResponseValue } from '../types/api/read';
+import { ILocalPlaceChangeRequest, IOrderAddItemsRequest, IOrderCreateRequest } from '../types/api/write';
+import { OrderSearchEnum } from '../types/api/enums';
+import { Subject, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -15,9 +16,14 @@ export class OrderService extends BaseSearchAndCrudService<
   IOrderReadResponse
 > {
   override apiRoute = 'Order';
+  localPlaceChange = new Subject();
 
   changeLocalPlace(dto: ILocalPlaceChangeRequest) {
-    return this.http.put<any>(`${this.apiUrl}/change-place`, dto);
+    return this.http.put<any>(`${this.apiUrl}/change-place`, dto).pipe(
+      tap({
+        next: () => this.localPlaceChange.next(undefined),
+      }),
+    );
   }
 
   ///v1/Order/add-items

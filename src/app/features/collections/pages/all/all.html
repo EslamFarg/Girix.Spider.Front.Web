@@ -34,12 +34,14 @@
         </thead>
         <tbody>
           @for (order of orders(); track $index) {
-            <tr class="">
-              <td>{{ getRowNumber($index, ordersPaginationInfo().pageIndex) }}</td>
-              <td>123456</td>
-              <td>July 1, 2024</td>
-              <td>محمد احمد محمود</td>
-              <td>0123456789</td>
+            <tr class="" [style]="`--ix:${$index}`">
+              <td>
+                <div>{{ getRowNumber($index, ordersPaginationInfo().pageIndex) }}</div>
+              </td>
+              <td><div>123456</div></td>
+              <td><div>July 1, 2024</div></td>
+              <td><div>محمد احمد محمود</div></td>
+              <td><div>0123456789</div></td>
               <td>
                 @if ($even) {
                   <div class="status active">
@@ -53,8 +55,8 @@
                   </div>
                 }
               </td>
-              <td>محلي</td>
-              <td>$120.00</td>
+              <td><div>محلي</div></td>
+              <td><div>$120.00</div></td>
               <td>
                 <div class="actions">
                   <!-- collect -->

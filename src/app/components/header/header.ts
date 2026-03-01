@@ -31,8 +31,9 @@ export interface ISubNavItem {
 export class Header extends BaseComponent {
   header = viewChild<ElementRef<HTMLElement>>('header');
   nav = viewChild<ElementRef<HTMLElement>>('nav');
+  navItemsContainer = viewChild<ElementRef<HTMLElement>>('navItemsContainer');
 
-  userDetails=this.authService.userDetails;
+  userDetails = this.authService.userDetails;
 
   menuItems: MenuItem[] = [
     {
@@ -172,12 +173,7 @@ export class Header extends BaseComponent {
           labelKey: 'tables',
           imgUrl: headerIcons.replacements.children.tables,
           routerLink: '/replacements/tables',
-        },
-        {
-          labelKey: 'deliveries',
-          imgUrl: headerIcons.replacements.children.deliveries,
-          routerLink: '/replacements/deliveries',
-        },
+        }
       ],
     },
     {
@@ -312,12 +308,12 @@ export class Header extends BaseComponent {
       routerLink: '/app-info',
       children: [
         {
-          labelKey: "profile",
+          labelKey: 'profile',
           imgUrl: headerIcons.appInfo.children.profile,
           routerLink: '/app-info/profile',
         },
         {
-          labelKey: "restaurant",
+          labelKey: 'restaurant',
           imgUrl: headerIcons.appInfo.children.restaurant,
           routerLink: '/app-info/restaurant',
         },
@@ -335,35 +331,52 @@ export class Header extends BaseComponent {
     return this.navItems.some((i) => i.routerLink === route);
   }
 
-  toggleActiveLink(link: string) {
+  toggleActiveLink(link: string, el: HTMLElement) {
     //toggle overflow hidden for exact 1 second to avoid unwanted scroll
-    this.nav()!.nativeElement.style.overflow = 'hidden';
-    this.nav()!.nativeElement.scrollLeft = 0;
-    setTimeout(() => {
-      this.nav()!.nativeElement.style.overflow = 'auto';
-    }, 500);
+    const navItemsContainer = this.navItemsContainer()!.nativeElement;
+    const nav = this.nav()!.nativeElement;
+    const containerRight = navItemsContainer.getBoundingClientRect().right;
+    const rect = el.getBoundingClientRect();
+    const offsetFromRight = containerRight - rect.right;
+    nav.style.overflow = 'hidden';
+
+    // this.nav()!.nativeElement.scrollLeft = 0;
+    // setTimeout(() => {
+    //   this.nav()!.nativeElement.style.overflow = 'auto';
+    // }, 500);
+
+    const moveNav = () => (navItemsContainer.style.translate = `${offsetFromRight - 10}px 0`);
+    const resetNav = () => (navItemsContainer.style.translate = `0 0`);
 
     const isParent = this.isParent(link);
     const isPreviousParent = this.isParent(this.prevActiveLink);
+    const isSameParentLink = link === this.prevActiveLink && isParent;
 
     if (link === '/') {
+      this.isShowingMenu = true;
       if (this.prevActiveLink === '/' || isPreviousParent) {
         this.activeLink = '/';
+        resetNav();
       } else {
         this.prevActiveLink = link;
       }
-      this.isShowingMenu = true;
     } else if (isParent) {
-      this.prevActiveLink = link;
+      if (isSameParentLink) {
+        resetNav();
+        console.log('reset translate');
+        this.isShowingMenu = true;
+        this.prevActiveLink = '';
+      } else {
+        moveNav();
+        console.log('move translate');
+        this.isShowingMenu = false;
+        this.prevActiveLink = link;
+      }
       this.activeLink = link;
-      this.isShowingMenu = !this.isShowingMenu;
     } else if (!isParent) {
       this.prevActiveLink = link;
       this.activeLink = link;
       this.isShowingMenu = false;
-    } else if (link === this.prevActiveLink) {
-      this.prevActiveLink = '/';
-      this.isShowingMenu = true;
     }
   }
 

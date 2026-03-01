@@ -15,20 +15,12 @@ export enum RoomStatus {
 })
 export class RoomCard {
   RoomStatus = RoomStatus;
-  hutStatus = signal<RoomStatus>(RoomStatus.Available);
+  roomStatus = computed<RoomStatus>(() => (this.data().isAvailable ? RoomStatus.Available : RoomStatus.Reserved));
 
   data = input.required<IRoomSearchRow>();
 
-  ngOnInit() {
-    if (this.data().isAvailable) {
-      this.hutStatus.set(RoomStatus.Available);
-    } else {
-      this.hutStatus.set(RoomStatus.Reserved);
-    }
-  }
-
-    roomStatusClass= computed(() => {
-    switch (this.hutStatus()) {
+  roomStatusClass = computed(() => {
+    switch (this.roomStatus()) {
       case RoomStatus.Available:
         return 'room-available';
       case RoomStatus.Reserved:
@@ -38,6 +30,5 @@ export class RoomCard {
       default:
         return '';
     }
-    
-  })
+  });
 }

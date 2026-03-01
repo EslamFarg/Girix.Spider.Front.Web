@@ -27,8 +27,6 @@ export class HutCard {
   // reservedFrom: any;
   // orderId: number;
 
-  hutStatus = signal<HutStatus>(HutStatus.Available);
-
   //countdown
   countdownConfig: CountdownConfig = {
     leftTime: 0,
@@ -48,20 +46,20 @@ export class HutCard {
           const minutes = Math.floor((timeDiff % (60 * 60)) / 60)
             .toString()
             .padStart(2, '0');
-          const seconds = Math.floor((timeDiff % 60) )
+          const seconds = Math.floor(timeDiff % 60)
             .toString()
             .padStart(2, '0');
           return `${hours}:${minutes}:${seconds}`;
         } else {
           //count up from reservedToTime to currentDateTime
-          const timeDiff = (currentDateTime - reservedToTime)/1000;
-          const hours = Math.floor(timeDiff / ( 60 * 60))
+          const timeDiff = (currentDateTime - reservedToTime) / 1000;
+          const hours = Math.floor(timeDiff / (60 * 60))
             .toString()
             .padStart(2, '0');
-          const minutes = Math.floor((timeDiff % ( 60 * 60)) / ( 60))
+          const minutes = Math.floor((timeDiff % (60 * 60)) / 60)
             .toString()
             .padStart(2, '0');
-          const seconds = Math.floor((timeDiff % ( 60)) )
+          const seconds = Math.floor(timeDiff % 60)
             .toString()
             .padStart(2, '0');
           return `-${hours}:${minutes}:${seconds}`;
@@ -74,36 +72,33 @@ export class HutCard {
   countDownEl = viewChild<CountdownComponent>('countdown');
   handleCountdownEvent = (event: CountdownEvent) => {
     if (event.action === 'done' || event.action === 'stop') {
- 
       // this.hutStatus.set(HutStatus.Available);
     }
   };
 
-  ngOnInit() {
-     if (this.data().isAvailable) {
-      this.hutStatus.set(HutStatus.Available);
-     } else {
+  hutStatus = computed<HutStatus>(() => {
+    if (this.data().isAvailable) {
+      return HutStatus.Available;
+    } else {
       const currentDateTime = new Date().getTime();
       // const reservedFromTime = new Date(this.data().reservedFrom).getTime();
       const reservedToTime = new Date(this.data().reservedTo).getTime();
       const isPastReservation = currentDateTime > reservedToTime;
- 
 
       if (isPastReservation) {
-        this.hutStatus.set(HutStatus.OnHold);
         this.countdownConfig = {
           ...this.countdownConfig,
           leftTime: -(reservedToTime - currentDateTime) / 1000,
         };
+        return HutStatus.OnHold;
       } else {
-        this.hutStatus.set(HutStatus.Reserved);
         this.countdownConfig = {
           ...this.countdownConfig,
           leftTime: (reservedToTime - currentDateTime) / 1000,
         };
+        return HutStatus.Reserved;
       }
 
- 
       // this.handleCountdownEvent = (event: CountdownEvent) => {
       //   if (event.action === 'done' || event.action === 'stop') {
       //     console.log(event.action);
@@ -111,7 +106,9 @@ export class HutCard {
       //   }
       // };
     }
-  }
+  });
+
+  ngOnInit() {}
 
   hutStatusClass = computed(() => {
     switch (this.hutStatus()) {

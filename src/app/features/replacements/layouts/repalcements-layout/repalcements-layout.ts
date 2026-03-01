@@ -133,7 +133,7 @@ export class RepalcementsLayout extends BaseComponent {
       return;
     }
 
-    console.log(changeToItem);
+
 
     this.orderService
       .changeLocalPlace({
@@ -141,6 +141,8 @@ export class RepalcementsLayout extends BaseComponent {
         id: orderId!,
         placeType: changeToItem!.localSpaceType,
         placeRefId: changeToItem!.data.id,
+        placeName: changeToItem!.data.name,
+        reservedAt: this.localDateIso,
       })
       .subscribe({
         next: () => {
@@ -148,9 +150,6 @@ export class RepalcementsLayout extends BaseComponent {
           this.currentItem.set(null);
           this.closeDialog();
           this.messageService.add({ severity: 'success', summary: 'تم الحفظ', detail: 'لقد قمت بالحفظ بنجاح' });
-        },
-        error: (err) => {
-          this.messageService.add({ severity: 'error', summary: err.title, detail: err.detail });
         },
       });
   }

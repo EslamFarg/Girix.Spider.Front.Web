@@ -27,6 +27,8 @@
   tbody tr {
     background-color: var(--color-text-lighter);
     --ix: 0;
+    opacity: 0;
+    animation: showTableRow 0.5s calc(var(--ix) * 0.05s) linear forwards;
 
     td {
       animation: showTableRowCell 0.5s calc(var(--ix) * 0.05s) linear forwards;
@@ -129,6 +131,15 @@
         animation: clickBorderColorAnimation 0.2s ease-in-out;
       } */
     }
+  }
+}
+
+@keyframes showTableRow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 

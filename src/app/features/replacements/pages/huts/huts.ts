@@ -14,6 +14,7 @@ import { HutSearchEnum, HutService, IHutReadResponse, IHutSearchRow } from '@/fe
 import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { MenuItem } from 'primeng/api';
 import { omitKeys } from '@/yn-ng/utils/helpers';
+import { OrderService } from '@/features/orders';
 @Component({
   selector: 'app-huts',
   imports: [
@@ -89,9 +90,11 @@ export class Huts extends BaseComponent {
     },
   ]);
 
+  orderService = inject(OrderService);
+
   constructor() {
     super();
-
+    this.orderService.localPlaceChange.subscribe(() => this.searchHuts(1));
     this.searchHuts(1);
   }
 

@@ -2,7 +2,6 @@ import { Route } from '@angular/router';
 import { Rooms } from '@/features/replacements/pages/rooms/rooms';
 import { Huts } from '@/features/replacements/pages/huts/huts';
 import { Tables } from '@/features/replacements/pages/tables/tables';
-import { Deliveries } from '@/features/replacements/pages/deliveries/deliveries';
 import { RepalcementsLayout } from '@/features/replacements/layouts/repalcements-layout/repalcements-layout';
 
 export default [
@@ -22,10 +21,7 @@ export default [
         path: 'tables',
         component: Tables,
       },
-      {
-        path: 'deliveries',
-        component: Deliveries,
-      },
+       
     ],
   },
 ] satisfies Route[];

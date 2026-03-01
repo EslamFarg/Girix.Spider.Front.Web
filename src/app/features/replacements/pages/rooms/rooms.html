@@ -34,7 +34,7 @@
   <div
     class="grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-7 md:grid-cols-4 md:gap-9 xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8"
   >
-    @for (item of rooms(); track $index) {
+    @for (item of rooms(); track `${item.id}-${item.isAvailable}`) {
       <app-room-card
         (click)="
           openDialog({
@@ -43,7 +43,7 @@
           })
         "
         [data]="item"
-      /> 
+       />
     }
   </div>
 

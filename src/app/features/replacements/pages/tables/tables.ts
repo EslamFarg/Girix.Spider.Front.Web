@@ -16,6 +16,7 @@ import {
   TableService,
 } from '@/features/restaurant/services/table-service';
 import { MenuItem } from 'primeng/api';
+import { OrderService } from '@/features/orders';
 
 @Component({
   selector: 'app-tables',
@@ -91,9 +92,12 @@ export class Tables extends BaseComponent {
     },
   ]);
 
+  orderService = inject(OrderService);
+
   constructor() {
     super();
 
+    this.orderService.localPlaceChange.subscribe(() => this.searchTables(1));
     this.searchTables(1);
   }
 

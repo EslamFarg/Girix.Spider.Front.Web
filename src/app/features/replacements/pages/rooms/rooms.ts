@@ -16,6 +16,7 @@ import {
   RoomService,
 } from '@/features/restaurant/services/room-service';
 import { MenuItem } from 'primeng/api';
+import { OrderService } from '@/features/orders';
 
 @Component({
   selector: 'app-rooms',
@@ -91,9 +92,11 @@ export class Rooms extends BaseComponent {
     },
   ]);
 
+  orderService = inject(OrderService);
+
   constructor() {
     super();
-
+    this.orderService.localPlaceChange.subscribe(() => this.searchRooms(1));
     this.searchRooms(1);
   }
 
@@ -128,7 +131,9 @@ export class Rooms extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
+          this.rooms.set([]);
           this.rooms.set(res.value.rows);
+
           this.roomsPaginationInfo = {
             pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,

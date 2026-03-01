@@ -1,4 +1,4 @@
-import { OrderLocalType, OrderLocationType, OrderPaymentType } from "./enums";
+import { OrderLocalType, OrderLocationType, OrderPaymentType } from './enums';
 
 //add items
 export interface IOrderAddItemsRequest {
@@ -15,12 +15,13 @@ export interface IOrderAddItemsRequest {
   dateTime: string;
 }
 
-
 // local place replacement
 export interface ILocalPlaceChangeRequest {
   id: number;
   placeType: number;
   placeRefId: number;
+  placeName: string;
+  reservedAt: string;
   durationMinutes: number | null;
 }
 

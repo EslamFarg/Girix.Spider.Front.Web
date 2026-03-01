@@ -14,13 +14,13 @@
     @switch (currentItem()?.localSpaceType) {
       <!--  -->
       @case (SpaceTypeEnum.Room) {
-        <app-room-card [data]="currentItem()?.data!" />
+        <app-room-card  class="w-25" [data]="currentItem()?.data!" />
       }
       @case (SpaceTypeEnum.Hut) {
-        <app-hut-card class="mt-12 w-25" [data]="currentItem()?.data!" />
+        <app-hut-card  class="mt-12 w-25" [data]="currentItem()?.data!" />
       }
       @case (SpaceTypeEnum.Table) {
-        <app-table-card [data]="currentItem()?.data!" />
+        <app-table-card  class="w-25" [data]="currentItem()?.data!" />
       }
     }
 
@@ -50,7 +50,7 @@
       />
     </div>
 
-    <!-- cards -->
+    <!-- (Hut | Room | Table) cards -->
     <div class="w-full overflow-auto custom-scroll" (scroll)="onScroll($event)">
       @switch (changeToSpace()) {
         <!--  -->
@@ -58,14 +58,16 @@
           <div class="flex my-4 gap-8 w-fit pb-2 *:w-25 *:min-w-25 relative z-1">
             @for (table of tables(); track $index) {
               <app-table-card
-                [class.active]="table.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Table"
+                [class.active]="
+                  table.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Table
+                "
                 (click)="
                   chooseItem({
                     data: table,
                     localSpaceType: SpaceTypeEnum.Table,
                   })
                 "
-                [data]="table"
+                 [data]="table"
               />
             }
           </div>
@@ -75,14 +77,16 @@
           <div class="flex my-4 gap-8 w-fit pb-2 *:w-25 *:min-w-25 relative z-1">
             @for (room of rooms(); track $index) {
               <app-room-card
-                [class.active]="room.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Room"
+                [class.active]="
+                  room.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Room
+                "
                 (click)="
                   chooseItem({
                     data: room,
                     localSpaceType: SpaceTypeEnum.Room,
                   })
                 "
-                [data]="room"
+                 [data]="room"
               />
             }
           </div>
@@ -92,14 +96,16 @@
           <div class="flex my-4 gap-8 w-fit pt-11 pb-2 *:w-25 *:min-w-25 relative z-1">
             @for (hut of huts(); track $index) {
               <app-hut-card
-                [class.active]="hut.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Hut"
+                [class.active]="
+                  hut.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Hut
+                "
                 (click)="
                   chooseItem({
                     data: hut,
                     localSpaceType: SpaceTypeEnum.Hut,
                   })
                 "
-                [data]="hut"
+                 [data]="hut"
               />
             }
           </div>
@@ -107,7 +113,7 @@
       }
     </div>
 
-    <!--  -->
+    <!-- Hut only form -->
     @if (changeToSpace() == localSpaceTypeEnum.Hut) {
       <form
         [formGroup]="hutChangeFg"
