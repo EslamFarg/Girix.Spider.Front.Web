@@ -7,7 +7,10 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const token = authService.get<IUserDetails>('userDetails')?.token;
   const forgetPasswordToken = authService.get('forgotPasswordToken');
 
-  const isPassJwt = req.headers.get('passJwt') === 'true';
+  const isPassJwt = !!req.headers.get('passJwt');
+
+  if (isPassJwt) return next(req);
+
   if (token || forgetPasswordToken) {
     req = req.clone({
       setHeaders: {
