@@ -59,7 +59,11 @@ export class AuthService extends BaseService {
         observer.complete();
       });
     } else {
-      loginResultObs = this.http.post<IUserDetails>(`${this.apiUrl}/login`, dto);
+      loginResultObs = this.http.post<IUserDetails>(`${this.apiUrl}/login`, dto,{
+        headers: {
+          'passJwt': 'true'
+        }
+      });
     }
 
     return loginResultObs.pipe(
@@ -89,7 +93,11 @@ export class AuthService extends BaseService {
       });
     }
 
-    return this.http.post<boolean>(`${this.apiUrl}/forgetPassword`, { email });
+    return this.http.post<boolean>(`${this.apiUrl}/forgetPassword`, { email },{
+        headers: {
+          'passJwt': 'true'
+        }
+      });
   }
 
   validateOtp(otp: string) {
@@ -119,6 +127,10 @@ export class AuthService extends BaseService {
       }>(`${this.apiUrl}/validOtp`, {
         email: this.forgotPasswordEmail,
         otp,
+      },{
+        headers: {
+          'passJwt': 'true'
+        }
       })
       .pipe(
         tap({
