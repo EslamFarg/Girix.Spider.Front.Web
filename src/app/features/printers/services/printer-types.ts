@@ -1,12 +1,3 @@
-import { BaseCrudService } from '@/core/services/BaseCrudService';
-import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
-import BaseService from '@/core/services/BaseService';
- import { Injectable } from '@angular/core';
-
-export enum PrinterSearchEnum {
-  Name = SearchColumEnum.Name,
-}
-
 export interface IPrinterCreateRequest {
   name: string;
   ipAddressOrMacAddress: string;
@@ -22,13 +13,20 @@ export interface IPrinterUpdateRequest {
   type: number;
 }
 
+export enum PrinterType{
+  Network = 1,
+  Bluetooth = 2
+}
+
 export interface IPrinterReadResponse {
   id: number;
   name: string;
   ipAddressOrMacAddress: string;
   port: number;
-  type: number;
+  type: PrinterType;
 }
+
+
 
 export interface IPrinterSearchRow {
   id: number;
@@ -45,11 +43,4 @@ export interface IPrinterSearchResponseValue {
     totalPagesCount: number;
     currentPageIndex: number;
   };
-}
-
-@Injectable({
-  providedIn: 'root',
-})
-export class PrinterService extends BaseSearchAndCrudService<IPrinterSearchResponseValue, PrinterSearchEnum,IPrinterCreateRequest, IPrinterUpdateRequest, IPrinterReadResponse> {
-  override apiRoute = 'Printer';
 }

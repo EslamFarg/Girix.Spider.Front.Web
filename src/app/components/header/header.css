@@ -4,9 +4,14 @@
   box-shadow: 0px 0px 5px 0px #80808066;
 }
 
+.nav-item {
+  pointer-events: none;
+}
+
 .nav-item-visible {
   opacity: 1;
   display: flex;
+  pointer-events: all;
   /* margin: 0 5px; */
   /* translate: 0 0 !important; */
   /* max-width: 200px; */
@@ -41,7 +46,8 @@
     gap: 8px;
     & .child {
       --ix: 0;
-      animation: expandChild 0.5s calc(var(--ix) * 0.1s  ) ease-in-out forwards;
+      pointer-events: all;
+      animation: expandChild 0.5s calc(var(--ix) * 0.1s) ease-in-out forwards;
     }
   }
 }

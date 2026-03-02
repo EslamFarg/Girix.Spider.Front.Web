@@ -1,0 +1,63 @@
+<!-- Table -->
+<p-dialog
+  [(visible)]="printerService.isPrinterDialogVisible"
+  [modal]="true"
+  [style]="{ width: '80%', maxWidth: '50rem' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-text-lighter!"
+  class="addition-dialog"
+  [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+>
+  <p class="font-bold text-center text-dark-bg-2 text-lg mb-4">إختر الطابعة</p>
+  <div class="flex-1 overflow-auto no-scrollbar"   >
+    <div class="h-fit flex flex-col items-center justify-center gap-3">
+      @for (printer of printerItems(); track $index) {
+        <label
+          class="flex items-center w-full justify-center max-w-[250px] gap-2 border border-text-gray rounded px-4 py-2 cursor-pointer"
+          [for]="`printer-${printer.id}-${printer.ipAddressOrMacAddress}-${$index}`"
+        >
+          <input
+            [id]="`printer-${printer.id}-${printer.ipAddressOrMacAddress}-${$index}`"
+            type="checkbox"
+            name="printers"
+            [value]="printer"
+            (change)="onPrinterSelect(printer)"
+          />
+          <p class="overflow-hidden text-ellipsis whitespace-nowrap w-full">
+            @switch (printer.appPrinterType) {
+              @case (appPrinterType.captionOrderPrinter) {
+                <span>طابعة كابتن اوردر</span>
+              }
+              @case (appPrinterType.cashierPrinter) {
+                <span>طابعة كاشير</span>
+              }
+              @case (appPrinterType.programPrinter) {
+                <span>طابعة برنامج</span>
+              }
+            }
+          </p>
+          <div class="text-xs border border-gray-400 px-1 shadow rounded">
+            @switch (printer.type) {
+              @case (PrinterType.Bluetooth) {
+                <span class="text-cyan-600">Bluetooth</span>
+              }
+              @case (PrinterType.Network) {
+                <span class="text-green-600">Network</span>
+              }
+            }
+          </div>
+        </label>
+      }
+    </div>
+  </div>
+
+
+  <ng-template #footer>
+    <button pButton form="pickPrinterForm" class="mx-auto" severity="secondary" type="button" (click)="print()">
+      {{ 'form.submit' | translate }}
+    </button>
+    <button pButton class="mx-auto" severity="secondary" type="button" (click)="closePrinterDialog()">
+      {{ 'form.cancel' | translate }}
+    </button>
+  </ng-template>
+</p-dialog>

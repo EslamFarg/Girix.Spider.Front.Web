@@ -47,7 +47,7 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { ICustomerSearchRow } from '@/features/customers/services/customer-types';
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { PrintService } from '@/features/print/services/print-service';
+import { PrinterService } from '@/features/printers';
 import {
   FinancialSettingsService,
   IFinancialSettingsResponse,
@@ -301,7 +301,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
   onMenuItemChange(changedItem: IOrderMenuItem) {
     if (changedItem.menuItem.quantity <= 0) return;
-    
+
     this.orderMenuItems.update((items) => items.concat(changedItem));
     // return;
     // const existingItem = this.orderMenuItems().find((item) => item.menuItem.id == changedItem.menuItem.id);
@@ -333,6 +333,9 @@ export class Cashier extends BaseComponent implements OnInit {
     //   );
     // } else {
     // }
+  }
+  test() {
+    window.electronAPI.getPrinters().then((e) => console.log(e));
   }
 
   onOrderMenuItemQuantityChange(index: number, newQuantity: number) {
@@ -548,7 +551,7 @@ export class Cashier extends BaseComponent implements OnInit {
   //print
   //
 
-  printService = inject(PrintService);
+  printService = inject(PrinterService);
 
   onPrint() {
     // this.printService.printOrder();

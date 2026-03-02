@@ -13,11 +13,12 @@ import { Menu } from 'primeng/menu';
 import { Button } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
-import { PrintService } from '@/features/print/services/print-service';
+import { PrinterService } from '@/features/printers';
 import { RouterLink } from '@angular/router';
 import { Dialog } from 'primeng/dialog';
 import { FormControlNotifier } from '@/directives/form-control-notifier';
 import { PrintableOrderInvoice } from '@/components/printable-order-invoice/printable-order-invoice';
+import { IElectronPrinter } from '@/app';
 
 @Component({
   selector: 'app-orders',
@@ -146,23 +147,22 @@ export class Orders extends BaseComponent {
     });
   }
 
-  printService = inject(PrintService);
+  printService = inject(PrinterService);
   currentOrderBill = signal<IOrderBillReadResponse | null>(null);
   printableOrderInvoice = viewChild<PrintableOrderInvoice>('printableOrderInvoice');
-  openPrintDialog(id: number) {
+  openOrderDialog(id: number) {
     this.orderService.getBill(id).subscribe({
       next: (order) => {
         this.currentOrderBill.set(order);
-        console.log(this.printableOrderInvoice());
         this.orderDialogVisible = true;
       },
     });
   }
   printOrder() {
-    this.printService.printOrder(
-      this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
-      this.printableOrderInvoice()?.styles ?? '',
-    );
+    this.printService.openPrinterDialog({
+      css: this.printableOrderInvoice()?.styles ?? '',
+      html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
+    });
   }
 
   orderDialogVisible = false;

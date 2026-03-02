@@ -43,5 +43,5 @@ export class BaseCrudService<ICreateDto = any, IUpdateDto = any, IGetByIdDto = a
     );
   }
 
-  getById = (id: number) => this.http.get<IGetByIdDto>(`${this.apiUrl}/${this.endpoints.getById}${id}`);
+  getById = (id: number|'') => this.http.get<IGetByIdDto>(`${this.apiUrl}/${this.endpoints.getById}${id}`);
 }

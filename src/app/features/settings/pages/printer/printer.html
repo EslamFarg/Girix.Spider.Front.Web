@@ -1,41 +1,50 @@
-<div class="h-full overflow-auto no-scrollbar">
-  <app-section-wrapper class="p-4 h-full" styleClass="flex flex-col gap-4 md:gap-10 [&_label]:w-full [&_label]:sm:w-auto [&_app-input-error-message-handler]:w-full [&_app-input-error-message-handler]:sm:w-auto">
+<form [formGroup]="fg" (ngSubmit)="onSubmit()" class="h-full overflow-auto no-scrollbar">
+  <app-section-wrapper
+    class="p-4 h-full"
+    styleClass="flex flex-col gap-4 md:gap-10 [&_label]:w-full [&_label]:sm:w-auto [&_app-input-error-message-handler]:w-full [&_app-input-error-message-handler]:sm:w-auto"
+  >
     <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 md:gap-6">
       <label for="" class="mb-0! text-dark-line text-xl font-bold">طابعـــه الكاشيـــر</label>
       <app-input-error-message-handler class="overflow-visible flex-1">
         <p-select
-          [options]="[]"
+          [options]="printers()"
           optionLabel="name"
+          formControlName="cashierPrinterId"
+          optionValue="id"
           placeholder="الحساب المقابل..."
           class="w-full! h-12! *:text-dark-line! border-text-gray! bg-base-bg!"
         />
       </app-input-error-message-handler>
     </div>
     <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 md:gap-6">
-      <label for="" class="mb-0! text-dark-line text-xl font-bold">طابعـــه الكاشيـــر</label>
+      <label for="" class="mb-0! text-dark-line text-xl font-bold">طابعـه كابتن اوردر</label>
       <app-input-error-message-handler class="overflow-visible flex-1">
         <p-select
-          [options]="[]"
+          [options]="printers()"
           optionLabel="name"
+          optionValue="id"
+          formControlName="captionOrderPrinterId"
           placeholder="الحساب المقابل..."
           class="w-full! h-12! *:text-dark-line! border-text-gray! bg-base-bg!"
         />
       </app-input-error-message-handler>
     </div>
     <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 md:gap-6">
-      <label for="" class="mb-0! text-dark-line text-xl font-bold">طابعـــه الكاشيـــر</label>
+      <label for="" class="mb-0! text-dark-line text-xl font-bold">الطابعه الافتراضيه</label>
       <app-input-error-message-handler class="overflow-visible flex-1">
         <p-select
-          [options]="[]"
+          [options]="printers()"
           optionLabel="name"
+          optionValue="id"
+          formControlName="programPrinterId"
           placeholder="الحساب المقابل..."
           class="w-full! h-12! *:text-dark-line! border-text-gray! bg-base-bg!"
         />
       </app-input-error-message-handler>
     </div>
 
-    <div class="ms-auto w-fit ">
-      <p-button styleClass="border-dark-line! bg-dark-line! text-white! py-1!    md:px-8!" label="حفظ" />
+    <div class="ms-auto w-fit">
+      <button pButton type="submit" class="border-dark-line! bg-dark-line! text-white! py-1! md:px-8!">حفظ</button>
     </div>
   </app-section-wrapper>
-</div>
+</form>

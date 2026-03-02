@@ -91,7 +91,13 @@ export class PrintableOrderInvoice extends BaseComponent {
     return getTotalAfterDiscount + feeAmount;
   }
 
+  loaded=false;
+
   onLogoLoad(img: HTMLImageElement) {
+    console.log("onLogoLoad");
+    if (this.loaded) {
+      return;
+    }
     //convert src to base64
     const canvas = document.createElement('canvas');
     canvas.width = img.naturalWidth;
@@ -102,6 +108,7 @@ export class PrintableOrderInvoice extends BaseComponent {
 
     const base64 = canvas.toDataURL('image/png');
     img.src = base64;
-    console.log(base64);
+
+    this.loaded = true;
   }
 }

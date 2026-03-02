@@ -14,11 +14,12 @@ import { ReactiveFormsModule, Validators, ɵInternalFormsSharedModule } from '@a
 import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
-import { IPrinterSearchRow, PrinterSearchEnum, PrinterService } from '@/features/settings/services/printer-service';
+import {  PrinterSearchEnum, PrinterService } from '@/features/printers';
 import { Debounce } from '@/directives/debounce';
 import { ImgFallback } from '@/directives/img-fallback';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from "@angular/router";
+import { IPrinterSearchRow } from '@/features/printers/services/printer-types';
 
 @Component({
   selector: 'app-group-form',

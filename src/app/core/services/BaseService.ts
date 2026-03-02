@@ -6,7 +6,7 @@ import { MessageService } from 'primeng/api';
 import { Observable, tap } from 'rxjs';
 import { LoadingService } from '@/yn-ng/services/loading-service';
 
-type localStorageKey = 'userDetails' | 'token' | 'forgotPasswordEmail' | 'forgotPasswordToken';
+type localStorageKey = 'userDetails' | 'token' | 'forgotPasswordEmail' | 'forgotPasswordToken' | 'printers';
 export interface IEndpoints {
   create: string;
   getById: string;
