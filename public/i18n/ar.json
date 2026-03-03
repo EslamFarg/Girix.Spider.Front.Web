@@ -190,17 +190,16 @@
     "amount": "المبلغ",
     "paid": "مدفوع",
     "postponed": "معلق",
-    "save": "حفظ",
-    "cancel": "الغاء",
     "network": "شبكة",
-    "cash": "كاش",
-    "submit": "حفظ"
+    "cash": "كاش"
   },
-
+  
   "actions": {
     "save": "حفظ",
     "cancel": "الغاء",
     "new": "جديد",
+    "submit": "حفظ",
+    
     "add": "اضافة",
     "edit": "تعديل",
     "delete": "حذف",

@@ -4,8 +4,7 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { Select } from 'primeng/select';
 import { Button, ButtonDirective } from 'primeng/button';
 import { BaseComponent } from '@/components';
-import { IPrinterSearchRow, PrinterType } from '@/features/printers/services/printer-types';
-import { PrinterSearchEnum, PrinterService } from '@/features/printers';
+import { IPrinterSearchRow, PrinterType, PrinterSearchEnum, PrinterService } from '@/features/printers';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { PrinterSettingsService } from '@/features/printers/services/printer-settings-service';
 

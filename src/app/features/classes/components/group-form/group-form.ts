@@ -19,7 +19,7 @@ import { Debounce } from '@/directives/debounce';
 import { ImgFallback } from '@/directives/img-fallback';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from "@angular/router";
-import { IPrinterSearchRow } from '@/features/printers/services/printer-types';
+import { IPrinterSearchRow } from '@/features/printers';
 
 @Component({
   selector: 'app-group-form',

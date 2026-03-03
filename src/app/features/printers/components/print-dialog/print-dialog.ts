@@ -1,21 +1,16 @@
 import { BaseComponent } from '@/components';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Dialog } from 'primeng/dialog';
-import { PrinterSearchEnum, PrinterService } from '../../services/printer-service';
-import { IPrinterSearchRow, PrinterType } from '../../services/printer-types';
+ import { IPrinterSearchRow, PrinterType,PrinterSearchEnum, PrinterService, AppPrinterType } from '../..';
 import { ButtonDirective } from 'primeng/button';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IPrinterSettingsReadResponse, PrinterSettingsService } from '../../services/printer-settings-service';
 
-enum appPrinterType {
-  cashierPrinter = 'cashierPrinter',
-  captionOrderPrinter = 'captionOrderPrinter',
-  programPrinter = 'programPrinter',
-}
+ 
 
 export interface IAppPrinter extends IPrinterSearchRow {
-  appPrinterType: appPrinterType;
+  appPrinterType: AppPrinterType;
 }
 
 @Component({
@@ -29,7 +24,7 @@ export class PrintDialog extends BaseComponent {
   printerService = inject(PrinterService);
   printerSettingsService = inject(PrinterSettingsService);
   printerSettings = signal<IPrinterSettingsReadResponse | null>(null);
-  appPrinterType = appPrinterType;
+  appPrinterType = AppPrinterType;
   closePrinterDialog = this.printerService.closePrinterDialog;
 
   printerItems = computed<IAppPrinter[]>(() => {
@@ -63,11 +58,13 @@ export class PrintDialog extends BaseComponent {
   }
 
   print() {
-    console.log(this.selectedPrinters());
+    
     if (this.selectedPrinters().length === 0) {
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب تحديد طابعة' });
       return;
     }
+
+    this.printerService.printOrder(this.selectedPrinters());
     // if (printer.isAvailable) {
     //   this.orderFg.patchValue({ placeRefId: printer.id, placeType: OrderLocalType.Printer });
     //   this.printerDialogVisible = false;
@@ -75,5 +72,10 @@ export class PrintDialog extends BaseComponent {
     // } else {
     //   this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
     // }
+  }
+
+
+  visibleChange(isVisible:boolean) {
+    this.printerSettingsService.getSettings().subscribe((res) => this.printerSettings.set(res));
   }
 }

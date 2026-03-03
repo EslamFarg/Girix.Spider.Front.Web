@@ -9,8 +9,9 @@ import {
   IPrinterSearchResponseValue,
   IPrinterSearchRow,
   IPrinterUpdateRequest,
-} from './printer-types';
- 
+} from '../types/printer-api';
+import { AppPrinterType, IAppPrinter } from '../types/printer-app';
+
 export enum PrinterSearchEnum {
   Name = SearchColumEnum.Name,
 }
@@ -19,8 +20,6 @@ export interface IAppPrintOptions {
   html: string;
   css: string;
 }
-
- 
 
 @Injectable({
   providedIn: 'root',
@@ -46,25 +45,36 @@ export class PrinterService extends BaseSearchAndCrudService<
     this.printOptions = null;
   }
 
-  printOrder(opts: IAppPrintOptions) {
+  printOrder(printers: IAppPrinter[]) {
+    if (this.printOptions === null) return;
+
     this.loadingService.addLoading();
+    const electronPrintOpts: IElectonPrintOptions = {
+      printers: printers.map((p) => ({
+        id: p.id,
+        type: p.type,
+        ipAddressOrMacAddress: p.ipAddressOrMacAddress,
+        port: p.port,
+        name: p.name,
+      })),
+      html: this.printOptions.html,
+      css: this.printOptions.css,
+    };
 
-    // const electronPrintOpts: IElectonPrintOptions = {
-    //   printer: {
-    //     type: appPrinterType,
-    //   },
-    //   html: opts.html,
-    //   css: opts.css,
-    // };
-
-    // window.electronAPI
-    //   .print(opts)
-    //   .then((e) => {
-    //     console.log(e);
-    //   })
-    //   .catch((e) => console.log(e))
-    //   .finally(() => this.loadingService.removeLoading());
+    window.electronAPI
+      .print(electronPrintOpts)
+      .then((e) => {
+        console.log(e);
+        
+        e.forEach((failMsg) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'خطأ',
+            detail: failMsg,
+          });
+        });
+      })
+      .catch((e) => console.log(e))
+      .finally(() => this.loadingService.removeLoading());
   }
-
-  
 }

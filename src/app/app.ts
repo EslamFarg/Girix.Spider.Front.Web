@@ -6,16 +6,19 @@ import { ToastModule } from 'primeng/toast';
 import { CollectionDialog } from './features/collections/components/collection-dialog/collection-dialog';
 import { TranslateService, TranslatePipe, TranslateDirective } from '@ngx-translate/core';
 import { KeyboardService } from './features/keyboard/services/keyboard-service';
-import { PrintDialog } from "./features/printers/components/print-dialog/print-dialog";
+import { PrintDialog } from './features/printers/components/print-dialog/print-dialog';
+import { PrinterType } from './features/printers';
+
 export interface IElectronPrinter {
-  id: string;
+  id: number;
   name: string;
-  com: string;
-  type: 'bluetooth' | 'usb' | 'network';
+  ipAddressOrMacAddress: string;
+  port: number;
+  type: PrinterType;
 }
 
 export interface IElectonPrintOptions {
-  printer: IElectronPrinter;
+  printers: IElectronPrinter[];
   html: string;
   css: string;
 }
@@ -25,7 +28,7 @@ declare global {
     electronAPI: {
       getPrinters: () => Promise<any[]>;
       ping: (msg: string) => Promise<string>;
-      print: (opts: IElectonPrintOptions) => Promise<string>;
+      print: (opts: IElectonPrintOptions) => Promise<string[]>;
     };
   }
 }

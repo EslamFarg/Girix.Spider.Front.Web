@@ -1,6 +1,6 @@
 import { BaseCrudService } from '@/core';
 import { Injectable } from '@angular/core';
-import { IPrinterSearchRow } from './printer-types';
+import { IPrinterSearchRow } from '../types/printer-api';
 
 export interface IPrinterSettingsCreateRequest {
   cashierPrinterId: number;

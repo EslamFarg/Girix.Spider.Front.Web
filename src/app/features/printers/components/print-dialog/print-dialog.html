@@ -2,13 +2,16 @@
 <p-dialog
   [(visible)]="printerService.isPrinterDialogVisible"
   [modal]="true"
-  [style]="{ width: '80%', maxWidth: '50rem' }"
+  [style]="{ width: '80%', maxWidth: '300px' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-text-lighter!"
   class="addition-dialog"
   [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+  (visibleChange)="visibleChange($event)"
 >
-  <p class="font-bold text-center text-dark-bg-2 text-lg mb-4">إختر الطابعة</p>
+<ng-template #header>
+  <p class="font-bold text-center text-dark-bg-2 text-lg ">إختر الطابعة</p>
+</ng-template>
   <div class="flex-1 overflow-auto no-scrollbar"   >
     <div class="h-fit flex flex-col items-center justify-center gap-3">
       @for (printer of printerItems(); track $index) {
@@ -53,11 +56,13 @@
 
 
   <ng-template #footer>
-    <button pButton form="pickPrinterForm" class="mx-auto" severity="secondary" type="button" (click)="print()">
-      {{ 'form.submit' | translate }}
+    <div class="flex justify-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
+      <button pButton form="pickPrinterForm"  severity="secondary" type="button" (click)="print()">
+      {{ 'actions.print' | translate }}
     </button>
-    <button pButton class="mx-auto" severity="secondary" type="button" (click)="closePrinterDialog()">
-      {{ 'form.cancel' | translate }}
+    <button pButton  severity="secondary" type="button" (click)="closePrinterDialog()">
+      {{ 'actions.cancel' | translate }}
     </button>
+    </div>
   </ng-template>
 </p-dialog>
