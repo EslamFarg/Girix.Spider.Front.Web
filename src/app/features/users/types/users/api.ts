@@ -8,11 +8,13 @@ export interface IUserCreateRequest {
   custodyAccountId: number
   cashPaymentAccountId: number
   bankPaymentAccountId: number
+  image?: File | null
 }
 export interface IUserCreateUpdateRequest {
   nameAr: string
   nameEn: string
   email: string
+  image?: File | null
   phoneNumber: string
   groupId: number
   cashierCollectionAccountId: number
@@ -45,6 +47,7 @@ export interface IUserReadResponse {
   name: string
   email: string
   phoneNumber: string
+  imageUrl: string | null
   cashierCollectionAccountId: number | null
   custodyAccountId: number | null
   cashPaymentAccountId: number | null

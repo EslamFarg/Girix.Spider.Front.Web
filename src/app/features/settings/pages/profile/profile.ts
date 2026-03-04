@@ -10,10 +10,21 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { IUserReadResponse, UserService, IUserFgControls, UserType } from '@/features/users';
 import { FinancialAccountService } from '@/features/accounts/services/financial-account-service';
 import { TranslatePipe } from '@ngx-translate/core';
+import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
+import { ImgFallback } from '@/directives/img-fallback';
 
 @Component({
   selector: 'app-profile',
-  imports: [Button, InputErrorMessageHandler, Select, InputText, Textarea, SectionWrapper, ReactiveFormsModule],
+  imports: [
+    Button,
+    InputErrorMessageHandler,
+    Select,
+    InputText,
+    Textarea,
+    SectionWrapper,
+    ReactiveFormsModule,
+    ImgFallback,
+  ],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -47,6 +58,7 @@ export class Profile extends BaseComponent {
     custodyAccountId: this.fb.control(null, []),
     cashPaymentAccountId: this.fb.control(null, []),
     bankPaymentAccountId: this.fb.control(null, []),
+    image: this.fb.control(null, []),
     //update only
     userId: this.fb.control(null, []),
   };
@@ -67,8 +79,13 @@ export class Profile extends BaseComponent {
    */
   constructor() {
     super();
-    this.usersService.getById(+this.authService.userDetails()!.userId).subscribe((users: IUserReadResponse | any) => {
-      this.userFg.patchValue({ ...users, nameAr: users.name, nameEn: users.name });
+    this.usersService.getById(+this.authService.userDetails()!.userId).subscribe((user: IUserReadResponse) => {
+      this.userFg.patchValue({ ...user, nameAr: user.name!, nameEn: user.name! });
+      if (user.imageUrl) {
+        this.currentImage.set({
+          fullPath: this.baseUrl + user.imageUrl,
+        });
+      }
     });
   }
 
@@ -80,6 +97,7 @@ export class Profile extends BaseComponent {
     // debugger;
     if (this.userFg.invalid) {
       this.userFg.markAllAsTouched();
+      console.log(this.userFg.value);
       return;
     }
 
@@ -96,7 +114,50 @@ export class Profile extends BaseComponent {
     // })
 
     // console.log(dto);
+    const formData = new FormData();
 
-    this.usersService.put(this.userFg.value).subscribe();
+    Object.entries(this.userFg.value).forEach(([key, value]: [string, any]) => {
+      formData.append(key, value);
+    });
+
+    if(!this.currentImage()?.file){
+      formData.delete('image');
+    }
+
+    this.usersService.put(formData).subscribe();
+  }
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //images
+  //
+  //
+  currentImage = signal<IFormImage | null>(null);
+  onImagesFilesSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+
+    if (input.files && input.files.length > 0) {
+      if (input.files.length > 1) {
+        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن اختيار اكثر من صورة' });
+        return;
+      }
+      this.onDeleteImage();
+      const file = input.files[0];
+
+      this.currentImage.set({ file, fullPath: URL.createObjectURL(file), id: 'new-image', ix: 0 });
+    }
+
+    this.userFg.patchValue({ image: input.files![0] });
+
+    input.value = '';
+  }
+  onDeleteImage() {
+    this.userFg.patchValue({ image: null });
+    this.currentImage.set(null);
   }
 }

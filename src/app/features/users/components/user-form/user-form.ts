@@ -70,6 +70,7 @@ export class UserForm extends BaseComponent {
     custodyAccountId: this.fb.control(null, [Validators.required]),
     cashPaymentAccountId: this.fb.control(null, [Validators.required]),
     bankPaymentAccountId: this.fb.control(null, [Validators.required]),
+    image: this.fb.control(null, []),
     //update only
     userId: this.fb.control(null, []),
   };
@@ -145,6 +146,12 @@ export class UserForm extends BaseComponent {
     // })
 
     // console.log(dto);
+
+    const formDate = new FormData();
+
+    Array.from(Object.entries(this.userFg.value)).forEach(([key, value]) => {
+      formDate.append(key, value?.toString() ?? '');
+    });
 
     switch (this.formMode()) {
       case FormMode.Create:
