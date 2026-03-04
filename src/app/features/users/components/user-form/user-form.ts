@@ -19,6 +19,7 @@ import {
 } from '@/features/accounts/services/financial-account-types';
 import { IUserReadResponse } from '../../types/users/api';
 import { UserType } from '../../types';
+import { RouterLink } from "@angular/router";
 // import { IusersFgControls } from '@/features/deliveries/components/users-man-form/types';
 // import { usersService } from '@/features/deliveries/services/users-service';
 
@@ -33,7 +34,8 @@ import { UserType } from '../../types';
     Select,
     TranslatePipe,
     ReactiveFormsModule,
-  ],
+    RouterLink
+],
   templateUrl: './user-form.html',
   styleUrl: './user-form.css',
 })
@@ -147,18 +149,20 @@ export class UserForm extends BaseComponent {
 
     // console.log(dto);
 
-    const formDate = new FormData();
+    const formData = new FormData();
 
     Array.from(Object.entries(this.userFg.value)).forEach(([key, value]) => {
-      formDate.append(key, value?.toString() ?? '');
+      formData.append(key, value?.toString() ?? '');
     });
+
+    formData.delete("image");
 
     switch (this.formMode()) {
       case FormMode.Create:
-        this.usersService.create(this.userFg.value).subscribe();
+        this.usersService.create(formData).subscribe();
         break;
       case FormMode.Update:
-        this.usersService.put(this.userFg.value).subscribe();
+        this.usersService.put(formData).subscribe();
         break;
     }
   }

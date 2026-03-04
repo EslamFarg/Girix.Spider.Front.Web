@@ -17,7 +17,7 @@
         <p class="font-semibold text-xs max-w-25 text-ellipsis overflow-hidden">{{ userDetails()?.fullName }}</p>
         <i class="pi pi-angle-down text-sm! transition-all" [class.rotate-180]="menu.visible"></i>
       </div>
-      <p-menu dir="rtl" #menu [model]="menuItems" [popup]="true" [style]="{ insetInlineEnd: '100%' }" />
+      <p-menu dir="rtl" #menu [model]="popUpMenuItems" [popup]="true" [style]="{ insetInlineEnd: '100%' }" />
     </div>
   </div>
 
@@ -32,23 +32,24 @@
   <nav class="bg-text-lighter overflow-auto custom-scroll w-full flex-1 shadow" #nav>
     <div class="container flex items-center h-full px-4 gap-2 py-1 min-w-max w-full transition-all" #navItemsContainer>
       @for (parent of navItems; track $index) {
-        <div class="relative flex items-center h-full" #parentElWrapper>
+        <div class="relative flex items-center h-full" #parentElWrapper [id]="`header-link-wrapper-${parent.routerLink}`">
           <!-- parent -->
           <a
+          [id]="`header-link-${parent.routerLink}`"
             class="nav-item max-w-50 opacity-0 z-20 h-full flex duration-500 ease-in-out transition-all flex-col gap-1 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg"
             [class.nav-item-active]="
-              isShowingMenu &&
-              (parent.routerLink === activeLink ||
+              isShowingMenu() &&
+              (parent.routerLink === activeLink() ||
                 isParentActive(parent.routerLink) ||
                 isAnyChildSubLinksActive(parent.routerLink))
             "
             [class.ms-0!]="$first || isParentActive(parent.routerLink)"
             [class.nav-item-visible]="
-              activeLink == '/' ||
-              isChildActive(parent.routerLink) ||
+              activeLink() == '/' ||
+              isAnyChildActive(parent.routerLink) ||
               isAnyChildSubLinksActive(parent.routerLink) ||
-              parent.routerLink === activeLink ||
-              isShowingMenu
+              parent.routerLink === activeLink() ||
+              isShowingMenu()
             "
             [routerLink]="parent.routerLink === '/' ? ['/'] : []"
             (click)="toggleActiveLink(parent.routerLink, parentElWrapper)"
@@ -95,8 +96,8 @@
 
           <!-- children -->
           @if (
-            !isShowingMenu &&
-            (parent.routerLink === activeLink ||
+            !isShowingMenu() &&
+            (parent.routerLink === activeLink() ||
               isParentActive(parent.routerLink) ||
               isAnyChildSubLinksActive(parent.routerLink))
           ) {
@@ -123,21 +124,22 @@
           <div
             class="flex custom-scroll children h-full z-10"
             [class.max-w-fit!]="
-              !isShowingMenu &&
-              (parent.routerLink === activeLink ||
+              !isShowingMenu() &&
+              (parent.routerLink === activeLink() ||
                 isParentActive(parent.routerLink) ||
                 isAnyChildSubLinksActive(parent.routerLink))
             "
             [class.children-visible]="
-              !isShowingMenu && (isParentActive(parent.routerLink) || isAnyChildSubLinksActive(parent.routerLink))
+              !isShowingMenu() && (isParentActive(parent.routerLink) || isAnyChildSubLinksActive(parent.routerLink))
             "
           >
             @for (child of parent.children; track $index) {
               <a
+              [id]="`header-link-${child.routerLink}`"
                 class="child nav-item h-full mx-0! transition-all duration-500 flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg"
                 [style]="`--ix:${$index}`"
                 [class.nav-item-active]="
-                  child.routerLink === activeLink || isAnySubLinksActive(parent.routerLink, child.routerLink)
+                  child.routerLink === activeLink() || isAnySubLinksActive(parent.routerLink, child.routerLink)
                 "
                 (click)="toggleActiveLink(child?.subLinks ? child.subLinks![0] : child.routerLink!, parentElWrapper)"
                 [routerLink]="child?.subLinks ? child.subLinks![0] : child.routerLink!"

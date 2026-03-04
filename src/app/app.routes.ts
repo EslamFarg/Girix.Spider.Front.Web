@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { MainLayout } from '@/layouts/main-layout/main-layout';
-import authRoutes from '@/features/auth/pages/auth-routes';
+import authRoutes from '@/routes/auth';
 import { isAuthenticatedGuard } from '@/features/auth/guards/is-authenticated-guard';
 import { AuthLayout } from './layouts/auth-layout/auth-layout';
 

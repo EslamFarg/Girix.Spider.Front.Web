@@ -1,5 +1,5 @@
 <div
-  class="w-full overflow-auto  flex items-center justify-end gap-2"
+  class="w-full overflow-visible flex items-center justify-end gap-2"
   style="--p-button-primary-background: transparent"
 >
   <button
@@ -15,15 +15,22 @@
       {{ 'actions.edit' | translate }}
     }
   </button>
-  <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
-    {{ 'actions.new' | translate }}
-  </button>
+  @if (formMode() === FormMode.Update) {
+    <a
+      routerLink="/users/add"
+      pButton
+      class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
+      variant="outlined"
+    >
+      {{ 'actions.new' | translate }}
+    </a>
+  }
 </div>
 
 <form id="usersForm" class="mt-6 flex flex-col md:flex-row gap-4" (ngSubmit)="onSubmitForm()" [formGroup]="userFg">
   <!--  -->
   <div class="grid md:grid-cols-2 gap-4 flex-1">
-    <div class=" md:col-span-1">
+    <div class="md:col-span-1">
       <label for="productName">{{ 'form.userName' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('nameAr')">
         <input
@@ -37,7 +44,7 @@
       </app-input-error-message-handler>
     </div>
     <!--  -->
-    <div class=" md:col-span-1">
+    <div class="md:col-span-1">
       <label for="productPrice">{{ 'form.phoneNumber' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('phoneNumber')">
         <input
@@ -50,7 +57,7 @@
       </app-input-error-message-handler>
     </div>
     <!--  -->
-    <div class=" md:col-span-1">
+    <div class="md:col-span-1">
       <label for="costPrice">{{ 'form.email' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('email')">
         <input
@@ -70,7 +77,7 @@
       </app-input-error-message-handler>
     </div> -->
 
-    <div class=" md:col-span-1">
+    <div class="md:col-span-1">
       <label for="productName">{{ 'form.userType' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('groupId')">
         <p-select
@@ -88,11 +95,11 @@
       <app-input-error-message-handler [fc]="userFg.get('isActive')" class="w-fit">
         <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" formControlName="isActive" />
       </app-input-error-message-handler>
-      <label for="productName" class="text-dark-line text-sm font-semibold">{{'actions.active' | translate}}</label>
+      <label for="productName" class="text-dark-line text-sm font-semibold">{{ 'actions.active' | translate }}</label>
     </div>
 
     <div class=" ">
-      <label for="productName">{{'form.cashierCollectionAccount' | translate}}</label>
+      <label for="productName">{{ 'form.cashierCollectionAccount' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('cashierCollectionAccountId')">
         <p-select
           [options]="cashierFinancialAccounts()"
@@ -105,7 +112,7 @@
       </app-input-error-message-handler>
     </div>
     <div class=" ">
-      <label for="productName">{{'form.custodyAccount' | translate}}</label>
+      <label for="productName">{{ 'form.custodyAccount' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('custodyAccountId')">
         <p-select
           [options]="custodyAccounts()"
@@ -117,9 +124,9 @@
         />
       </app-input-error-message-handler>
     </div>
-   
+
     <div class=" ">
-      <label for="productName">{{'form.cashPaymentAccount' | translate}}</label>
+      <label for="productName">{{ 'form.cashPaymentAccount' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('cashPaymentAccountId')">
         <p-select
           [options]="cashFinancialAccounts()"
@@ -132,7 +139,7 @@
       </app-input-error-message-handler>
     </div>
     <div>
-      <label for="productName">{{'form.bankPaymentAccount' | translate}}</label>
+      <label for="productName">{{ 'form.bankPaymentAccount' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('bankPaymentAccountId')">
         <p-select
           [options]="bankFinancialAccounts()"

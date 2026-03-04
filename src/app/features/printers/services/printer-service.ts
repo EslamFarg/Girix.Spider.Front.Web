@@ -77,4 +77,6 @@ export class PrinterService extends BaseSearchAndCrudService<
       .catch((e) => console.log(e))
       .finally(() => this.loadingService.removeLoading());
   }
+
+  
 }

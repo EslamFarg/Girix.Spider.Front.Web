@@ -1,10 +1,10 @@
 <div class="flex items-center justify-center h-screen">
   <section class="flex flex-col gap-6 p-10 w-120">
     <div>
-      <h1 class="text-xl font-bold text-center select-none text-white">الرجاء تسجيل الدخول</h1>
+      <h1 class="text-xl font-bold text-center select-none text-white">تفعيل التطبيق</h1>
       <div class="flex items-center justify-center gap-2">
         <span class="text-sm text-text-gray">أو</span>
-        <a routerLink="/auth/crm-login" class=" text-app-blue  text-sm ">تفعيل التطبيق</a>
+        <a routerLink="/auth/login" class=" text-app-blue  text-sm ">تسجيل الدخول</a>
       </div>
     </div>
 
@@ -19,16 +19,7 @@
           placeholder="البريد الالكتروني / رقم الجوال"
         />
       </app-input-error-message-handler>
-      <app-input-error-message-handler [fc]="fg.get('password')">
-        <p-password
-          class="app-input h-12! [&>input]:h-12!"
-          formControlName="password"
-          placeholder="كلمة المرور"
-          [toggleMask]="true"
-          [feedback]="false"
-        />
-      </app-input-error-message-handler>
-      <div class="flex items-center gap-2">
+      <!-- <div class="flex items-center gap-2">
         <input
           type="checkbox"
           class="cursor-pointer"
@@ -38,7 +29,7 @@
         />
         <label for="rememberMe" class="cursor-pointer text-white">تذكرني</label>
         <a routerLink="/auth/forgot-password" class="text-app-blue ms-auto text-sm">هل نسيت كلمة المرور ؟ </a>
-      </div>
+      </div> -->
       <p-button
         type="submit"
         label="دخول"

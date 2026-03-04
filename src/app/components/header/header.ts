@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, viewChild } from '@angular/core';
+import { AfterViewInit, Component, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ImgFallback } from '@/directives/img-fallback';
 import { RouterLink } from '@angular/router';
 import { BaseComponent } from '@/components/base-component/base-component';
@@ -28,14 +28,14 @@ export interface ISubNavItem {
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
-export class Header extends BaseComponent {
+export class Header extends BaseComponent implements AfterViewInit {
   header = viewChild<ElementRef<HTMLElement>>('header');
   nav = viewChild<ElementRef<HTMLElement>>('nav');
   navItemsContainer = viewChild<ElementRef<HTMLElement>>('navItemsContainer');
 
   userDetails = this.authService.userDetails;
 
-  menuItems: MenuItem[] = [
+  popUpMenuItems: MenuItem[] = [
     {
       label: 'الاجاراءات',
       items: [
@@ -173,7 +173,7 @@ export class Header extends BaseComponent {
           labelKey: 'tables',
           imgUrl: headerIcons.replacements.children.tables,
           routerLink: '/replacements/tables',
-        }
+        },
       ],
     },
     {
@@ -320,11 +320,37 @@ export class Header extends BaseComponent {
       ],
     },
   ];
-  activeLink: string = '/';
-  prevActiveLink: string = '/';
-  isShowingMenu = true;
-  ngOnInit() {
-    this.activeLink = this.router.url;
+  activeLink = signal<string>('/');
+  prevActiveLink = signal<string>('/');
+  isShowingMenu = signal(true);
+
+  ngAfterViewInit(): void {
+    // setTimeout(() => {
+      // this.activeLink = this.router.url;
+      // this.prevActiveLink = this.router.url;
+      const parentRoute = this.getParent(this.router.url) ?? this.router.url;
+      const el = document.getElementById(`header-link-wrapper-${parentRoute}`);
+      console.log( parentRoute,this.router.url, el);
+      this.toggleActiveLink(parentRoute, el!);
+      // this.changeDetectionRef.markForCheck();
+      this.toggleActiveLink(this.router.url, el!);
+      // this.changeDetectionRef.markForCheck();
+    // }, 1000);
+    
+  }
+
+  /**
+   *
+   */
+  constructor() {
+    super();
+    effect(() => {
+      console.log('activeLink (s): ',this.activeLink());
+    })
+  }
+
+  getParent(childRoute: string) {
+    return this.navItems.find((p) => p.children?.some((c) => c.routerLink === childRoute))?.routerLink;
   }
 
   isParent(route: string) {
@@ -349,51 +375,56 @@ export class Header extends BaseComponent {
     const resetNav = () => (navItemsContainer.style.translate = `0 0`);
 
     const isParent = this.isParent(link);
-    const isPreviousParent = this.isParent(this.prevActiveLink);
-    const isSameParentLink = link === this.prevActiveLink && isParent;
+    const isPreviousParent = this.isParent(this.prevActiveLink());
+    const isSameParentLink = link === this.prevActiveLink() && isParent;
+
+    console.log(link, isParent, isPreviousParent, isSameParentLink);
 
     if (link === '/') {
-      this.isShowingMenu = true;
-      if (this.prevActiveLink === '/' || isPreviousParent) {
-        this.activeLink = '/';
+      this.isShowingMenu.set(true);
+      if (this.prevActiveLink() === '/' || isPreviousParent) {
+        this.activeLink.set('/');
         resetNav();
       } else {
-        this.prevActiveLink = link;
+        this.prevActiveLink.set(link);
       }
     } else if (isParent) {
-      if (isSameParentLink) {
+      console.log('is parent');
+      if (isSameParentLink || this.isAnyChildActive(link)) {
         resetNav();
         console.log('reset translate');
-        this.isShowingMenu = true;
-        this.prevActiveLink = '';
+        this.isShowingMenu.set(true);
+        this.prevActiveLink.set('');
       } else {
         moveNav();
         console.log('move translate');
-        this.isShowingMenu = false;
-        this.prevActiveLink = link;
+        this.isShowingMenu.set(false) ;
+        this.prevActiveLink.set(link);
       }
-      this.activeLink = link;
+      this.activeLink.set(link);
     } else if (!isParent) {
-      this.prevActiveLink = link;
-      this.activeLink = link;
-      this.isShowingMenu = false;
+      this.prevActiveLink.set(link);
+      this.activeLink.set(link);
+      this.isShowingMenu.set(false);
     }
+
+    // this.changeDetectionRef.markForCheck();
   }
 
-  isChildActive(parentLink: string) {
+  isAnyChildActive(parentLink: string) {
     const parent = this.navItems.find((item) => item.routerLink === parentLink);
-    const isChildActive = parent?.children?.some((child) => child.routerLink === this.activeLink);
+    const isChildActive = parent?.children?.some((child) => child.routerLink === this.activeLink());
     return isChildActive;
   }
 
   isParentActive(parentLink: string) {
-    return parentLink === this.activeLink || this.isChildActive(parentLink);
+    return parentLink === this.activeLink() || this.isAnyChildActive(parentLink);
     // return this.navItems.some((item) => item.routerLink === parentLink);
   }
 
   isAnyChildSubLinksActive(parentLink: string) {
     const parent = this.navItems.find((item) => item.routerLink === parentLink);
-    return parent?.children?.some((child) => child.subLinks?.some((subLink) => subLink === this.activeLink));
+    return parent?.children?.some((child) => child.subLinks?.some((subLink) => subLink === this.activeLink()));
   }
 
   isAnySubLinksActive(parentLink: string, childLink: string) {
@@ -401,7 +432,7 @@ export class Header extends BaseComponent {
     const child = parent?.children?.find((item) => item.routerLink === childLink);
     if (!child) return false;
     if (!child.subLinks) return false;
-    return child.subLinks.some((subLink) => subLink === this.activeLink);
+    return child.subLinks.some((subLink) => subLink === this.activeLink());
   }
 
   onLogoutClick(event: Event) {

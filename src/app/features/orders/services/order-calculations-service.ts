@@ -44,7 +44,8 @@ export class OrderCalculationsService {
       itemNet = +(item.menuItem.product?.priceWithTax ?? 0);
     }
 
-    return (itemNet + additionsNet) * item.menuItem.quantity;
+    return itemNet * item.menuItem.quantity + additionsNet;
+    // return (itemNet + additionsNet) * item.menuItem.quantity;
   };
 
   getProductTaxValue(item: IProductSearchRow, quantity: number): number {
@@ -82,7 +83,8 @@ export class OrderCalculationsService {
       unitPriceWithSelectiveTax = item.menuItem.product?.priceWithSelectiveTax ?? 0;
     }
 
-    return (unitPriceWithSelectiveTax + addidtionsPriceWithSelectiveTax) * item.menuItem.quantity;
+    return unitPriceWithSelectiveTax * item.menuItem.quantity + addidtionsPriceWithSelectiveTax;
+    //    return (unitPriceWithSelectiveTax + addidtionsPriceWithSelectiveTax) * item.menuItem.quantity;
   };
   getMenuItemWithTaxWithoutAdditions = (item: IOrderMenuItem) => {
     if (item.menuItem.meal) {
