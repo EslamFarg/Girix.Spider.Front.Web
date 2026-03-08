@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputText } from 'primeng/inputtext';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
@@ -7,6 +7,7 @@ import { Button } from 'primeng/button';
 import { Paginator } from 'primeng/paginator';
 import { BaseComponent } from '@/components/base-component/base-component';
 import { Validators } from '@angular/forms';
+import { IPrinterSearchRow, PrinterService, PrinterType } from '@/features/printers';
 
 @Component({
   selector: 'app-add-printer',
@@ -15,32 +16,36 @@ import { Validators } from '@angular/forms';
   styleUrl: './add-printer.css',
 })
 export class AddPrinter extends BaseComponent {
-  initialSearchFormValue = {
-    text: this.fb.control<string>('', [Validators.required]),
-    categoryId: this.fb.control<number>(0, [Validators.required]),
+  PrinterType = PrinterType;
+  printerFg = {
+    name: this.fb.control<string | null>(null, [Validators.required]),
+    ipAddressOrMacAddress: this.fb.control<string | null>(null, [Validators.required]),
+    port: this.fb.control<number | null>(null, [Validators.required]),
+    type: this.fb.control<PrinterType>(PrinterType.Bluetooth, [Validators.required]),
   };
-  fg = this.fb.group(this.initialSearchFormValue);
+  printers = signal<IPrinterSearchRow[]>([]);
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.getPrinters().subscribe((e) => this.printers.set(e.value.rows));
+  }
 
-  periodOptions = [
-    { label: 'اليوم', value: 1 },
-    { label: 'الاسبوع', value: 2 },
-    { label: 'الشهر', value: 3 },
-    { label: 'السنة', value: 4 },
-  ];
+  fg = this.fb.group(this.printerFg);
+  printerService = inject(PrinterService);
 
   onSubmit() {}
 
-  first = 0;
-  rows = 10;
-  onPageChange(event: any) {}
-
   getPrinters() {
-    window.electronAPI
-      .getPrinters()
-      .then((e) => {
-        console.log(e);
-      })
-      .catch((e) => console.log(e));
+    return this.printerService.search({
+      paginationInfo: {
+        pageIndex: 0,
+        pageSize: 0,
+      },
+      searchFilters: [],
+      fromDate: null,
+    });
   }
 
   ping(msg: string) {
