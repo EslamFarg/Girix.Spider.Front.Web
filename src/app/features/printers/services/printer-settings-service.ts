@@ -5,6 +5,7 @@ import { IPrinterSearchRow } from '../types/printer-api';
 export interface IPrinterSettingsCreateRequest {
   cashierPrinterId: number;
   captionOrderPrinterId: number;
+  
   programPrinterId: number;
 }
 

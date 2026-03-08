@@ -32,9 +32,9 @@
           {{ 'actions.edit' | translate }}
         }
       </button>
-      <button pButton type="button" (click)="test()">
+      <!-- <button pButton type="button" (click)="test()">
         test
-      </button>
+      </button> -->
       <a
         type="button"
         routerLink="/"
@@ -741,9 +741,11 @@
   <ng-template #footer>
     <div class="flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
       <button pButton severity="secondary" class="bg-dark-bg-2" (click)="submitHut()">
-        {{ 'form.save' | translate }}
+        {{ 'actions.save' | translate }}
       </button>
-      <button pButton severity="secondary" (click)="HutDialogVisible = false">{{ 'form.cancel' | translate }}</button>
+      <button pButton severity="secondary" (click)="HutDialogVisible = false">
+        {{ 'actions.cancel' | translate }}
+      </button>
     </div>
   </ng-template>
 </p-dialog>
@@ -1003,7 +1005,7 @@
               [allowDecimal]="true"
               [max]="net()"
               [min]="0"
-              [disabled]="!isPaid()  "
+              [disabled]="!isPaid()"
               id="payingNetwork"
               aria-describedby="network-help"
               #payingNetwork

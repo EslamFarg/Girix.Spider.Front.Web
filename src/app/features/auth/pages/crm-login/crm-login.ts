@@ -17,7 +17,6 @@ export class CrmLogin extends BaseComponent {
   isRememberLogin = true;
   initialFormValue = {
     emailOrPhone: this.fb.control<string>('admin@admin.com', [Validators.required]),
-    password: this.fb.control<string>('12345678', [Validators.required]),
   };
 
   fg = this.fb.group(this.initialFormValue);
@@ -28,7 +27,7 @@ export class CrmLogin extends BaseComponent {
       return;
     }
 
-    this.authService.login(this.fg.getRawValue()).subscribe({
+    this.authService.sendCrmOtpToEmail(this.fg.getRawValue()).subscribe({
       next: (data) => {
         if (this.isRememberLogin) {
           this.authService.save('userDetails', data);

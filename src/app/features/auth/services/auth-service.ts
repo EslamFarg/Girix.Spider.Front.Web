@@ -158,7 +158,7 @@ export class AuthService extends BaseService {
     return this.http.post<boolean>(`${this.apiUrl}/changePassword`, dto);
   }
 
-  sendCrmOtp() {
+  sendCrmOtpToEmail(obj:{emailOrPhone: string}) {
     return this.http.post<any>(`${this.apiUrl}/sendCrmOtp`, {});
   }
 

@@ -29,7 +29,14 @@ export class OrderCalculationsService {
       priceWithSelectiveTax = item.menuItem.product!.priceWithSelectiveTax;
     }
 
-    return (priceWithTax - priceWithSelectiveTax) * item.menuItem.quantity;
+    const mainItemsTaxValue = (priceWithTax - priceWithSelectiveTax) * item.menuItem.quantity;
+    const additionsTaxValue = item.additions.reduce(
+      (total, addition) =>
+        total + (addition.product.priceWithTax - addition.product.priceWithSelectiveTax) * addition.quantity,
+      0,
+    );
+    console.log(mainItemsTaxValue, additionsTaxValue);
+    return mainItemsTaxValue + additionsTaxValue;
   };
 
   getMenuItemNetValue = (item: IOrderMenuItem) => {

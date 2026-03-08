@@ -1303,6 +1303,7 @@ export class Cashier extends BaseComponent implements OnInit {
         phoneNumber: event.phoneNumber,
         addressDescription: 'عميل نقدي',
       });
+      
       this.currentCustomer.set(null);
     }
   }

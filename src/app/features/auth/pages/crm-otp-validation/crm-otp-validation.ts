@@ -24,7 +24,7 @@ export class CrmOtpValidation  extends BaseComponent {
       return;
     }
 
-    this.authService.validateOtp(this.fg.getRawValue().otp).subscribe({
+    this.authService.validateCrmOtp(this.fg.getRawValue().otp).subscribe({
       next: (result) => {
         if (result.token) {
           //strictly check for boolean response
