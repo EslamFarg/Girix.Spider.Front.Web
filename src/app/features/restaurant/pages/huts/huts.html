@@ -73,10 +73,10 @@
       </thead>
       <tbody>
         @for (item of huts(); track $index) {
-        <tr class="" [class.*:border-y-green-500!]="item.id === currentItem?.id">
-          <td>{{ getRowNumber($index, hutsPaginationInfo.pageIndex) }}</td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.pricePerHour }}</td>
+        <tr [style]="`--ix:${$index}`" [class.*:border-y-green-500!]="item.id === currentItem?.id">
+          <td><div>{{ getRowNumber($index, hutsPaginationInfo.pageIndex) }}</div></td>
+          <td><div>{{ item.name }}</div></td>
+          <td><div>{{ item.pricePerHour }}</div></td>
           <td>
             <div class="actions">
               <button type="button" class="edit" (click)="fetchAndBindTableData(item.id)">

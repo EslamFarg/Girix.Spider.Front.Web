@@ -64,15 +64,19 @@ export class PrinterService extends BaseSearchAndCrudService<
     window.electronAPI
       .print(electronPrintOpts)
       .then((e) => {
+        console.log('------------printer finished printing-----------')
         console.log(e);
         
-        e.forEach((failMsg) => {
+        e?.forEach((failMsg) => {
+          console.log(failMsg);
           this.messageService.add({
             severity: 'error',
             summary: 'خطأ',
             detail: failMsg,
           });
         });
+        console.log('-----------------------')
+
       })
       .catch((e) => console.log(e))
       .finally(() => this.loadingService.removeLoading());

@@ -57,9 +57,9 @@
       </thead>
       <tbody>
         @for (table of tables(); track $index) {
-        <tr class="">
-          <td>{{ getRowNumber($index, tablesPaginationInfo.pageIndex) }}</td>
-          <td>{{ table.name }}</td>
+        <tr class="" [style]="`--ix:${$index}`">
+          <td><div>{{ getRowNumber($index, tablesPaginationInfo.pageIndex) }}</div></td>
+          <td><div>{{ table.name }}</div></td>
           <td>
             <div class="actions">
               <!-- edit -->

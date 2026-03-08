@@ -17,7 +17,7 @@ import { PrinterService } from '@/features/printers';
 import { RouterLink } from '@angular/router';
 import { Dialog } from 'primeng/dialog';
 import { FormControlNotifier } from '@/directives/form-control-notifier';
-import { PrintableOrderInvoice } from '@/components/printable-order-invoice/printable-order-invoice';
+import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
 import { IElectronPrinter } from '@/app';
 
 @Component({

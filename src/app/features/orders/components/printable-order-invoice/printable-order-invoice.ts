@@ -1,6 +1,6 @@
 import { IOrderBillReadResponse } from '@/features/orders';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, input, viewChild, ViewEncapsulation } from '@angular/core';
-import { BaseComponent } from '../base-component/base-component';
+import { BaseComponent } from '../../../../components/base-component/base-component';
 import { DatePipe } from '@angular/common';
 import { ImgFallback } from '@/directives/img-fallback';
 
@@ -91,10 +91,10 @@ export class PrintableOrderInvoice extends BaseComponent {
     return getTotalAfterDiscount + feeAmount;
   }
 
-  loaded=false;
+  loaded = false;
 
   onLogoLoad(img: HTMLImageElement) {
-    console.log("onLogoLoad");
+    console.log('onLogoLoad');
     if (this.loaded) {
       return;
     }

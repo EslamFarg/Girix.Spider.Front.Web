@@ -57,9 +57,9 @@
       </thead>
       <tbody>
         @for (item of rooms(); track $index) {
-        <tr class="">
-          <td>{{ getRowNumber($index, roomsPaginationInfo().pageIndex) }}</td>
-          <td>{{ item.name }}</td>
+        <tr class="" [style]="`--ix:${$index}`">
+          <td><div>{{ getRowNumber($index, roomsPaginationInfo().pageIndex) }}</div></td>
+          <td><div>{{ item.name }}</div></td>
           <td>
             <div class="actions">
               <button type="button" class="edit" (click)="fetchAndBindTableData(item.id)">
