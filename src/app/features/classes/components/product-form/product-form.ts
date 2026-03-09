@@ -103,6 +103,7 @@ export class ProductForm extends BaseComponent implements OnInit {
 
   productService = inject(ProductService);
   productFg = this.fb.group(this.initialProductFgValue);
+
   /**
    *
    */
@@ -206,7 +207,34 @@ export class ProductForm extends BaseComponent implements OnInit {
         break;
     }
   }
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
 
+  calculatePrice(reverse: boolean = false) {
+    const taxPercentage = (this.productFg.value.tax ?? 0) / 100;
+    const selectedTaxPercentage = (this.productFg.value.selectiveTax ?? 0) / 100;
+    const price = this.productFg.value.price??0;
+    if(reverse){
+      this.productFg.patchValue({
+        price: (price / (1 + taxPercentage + selectedTaxPercentage)),
+      });
+    }else{
+      this.productFg.patchValue({
+        price: (price * (1 + taxPercentage + selectedTaxPercentage)),
+      });
+    }
+  }
+
+  //
+  //
   //
   //
   //

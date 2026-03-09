@@ -376,7 +376,6 @@ export class Cashier extends BaseComponent implements OnInit {
   onSubmitOrder() {
     this.orderFg.patchValue({
       items: this.orderCreateItems(),
-      customerRequest: this.currentCustomer(),
     });
     console.log(this.orderFg.value);
     if (this.orderFg.invalid) {
@@ -419,6 +418,10 @@ export class Cashier extends BaseComponent implements OnInit {
 
   resetOrderForm() {
     this.orderMenuItems.set([]);
+    this.currentCustomer.set(null);
+    this.orderFg.patchValue({
+      idempotencyKey: Date.now() + Math.random().toString(),
+    });
   }
 
   //
@@ -1198,6 +1201,24 @@ export class Cashier extends BaseComponent implements OnInit {
     secondaryMobileNumber: string;
     addressDescription: string;
   } | null>(null);
+  currentCustomerChangeEffect = effect(() => {
+    if (this.currentCustomer()) {
+      this.customerFg.patchValue({
+        id: this.currentCustomer()?.id,
+        phoneNumber: this.currentCustomer()?.phoneNumber,
+        addressDescription: this.currentCustomer()?.addressDescription,
+      });
+    } else {
+      this.customerFg.patchValue({
+        id: this.cashCustomer.id,
+        phoneNumber: this.cashCustomer.phoneNumber + '',
+        addressDescription: 'عميل نقدي',
+      });
+    }
+    this.orderFg.patchValue({
+      customerRequest: this.currentCustomer(),
+    });
+  });
   showCustomerDialog() {
     this.customerDialogVisible = true;
   }
@@ -1214,34 +1235,15 @@ export class Cashier extends BaseComponent implements OnInit {
 
   customerFg = this.fb.group(this.customerFgInitialValue);
 
-  // onSubmitCustomer() {
-  //   if (this.customerFg.invalid) {
-  //     this.customerFg.markAllAsTouched();
-  //     return;
-  //   }
-  //   this.currentCustomer.set({
-  //     id: this.customerFg.value.id!,
-  //     nameAr: this.customerFg.value.nameAr!,
-  //     nameEn: this.customerFg.value.nameEn!,
-  //     phoneNumber: this.customerFg.value.phoneNumber!,
-  //     secondaryMobileNumber: this.customerFg.value.secondaryMobileNumber!,
-  //     addressDescription: this.customerFg.value.addressDescription!,
-  //   });
-
-  //   this.customerDialogVisible = false;
-  // }
-
   customersService = inject(CustomerService);
 
   customers = signal<ICustomerSearchRow[]>([]);
-  displayedCustomers = computed(() => [
-    {
-      id: 0,
-      name: 'عميل نقدي',
-      phoneNumber: 0,
-    },
-    ...this.customers(),
-  ]);
+  cashCustomer = {
+    id: 0,
+    name: 'عميل نقدي',
+    phoneNumber: 0,
+  };
+  displayedCustomers = computed(() => [this.cashCustomer, ...this.customers()]);
   customersSearchPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalRowsCount: 0,
@@ -1284,11 +1286,6 @@ export class Cashier extends BaseComponent implements OnInit {
   }
   onCustomerSelected(event: ICustomerSearchRow) {
     if (event.id) {
-      this.customerFg.patchValue({
-        id: event.id,
-        phoneNumber: event.phoneNumber,
-        addressDescription: event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
-      });
       this.currentCustomer.set({
         id: event.id,
         nameAr: event.name,
@@ -1298,12 +1295,6 @@ export class Cashier extends BaseComponent implements OnInit {
         addressDescription: event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
       });
     } else {
-      this.customerFg.patchValue({
-        id: event.id,
-        phoneNumber: event.phoneNumber,
-        addressDescription: 'عميل نقدي',
-      });
-      
       this.currentCustomer.set(null);
     }
   }
