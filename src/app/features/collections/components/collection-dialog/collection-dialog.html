@@ -14,9 +14,8 @@
     </div>
   </ng-template>
 
-  <div class="text-dark-bg-2 flex flex-col gap-4">
+  <!-- <div class="text-dark-bg-2 flex flex-col gap-4">
     <section class="border border-text-gray p-2 rounded-lg">
-      <!-- info -->
       <section class="flex justify-between text-sm">
         <ul class="flex flex-col gap-2 [&>li>span:nth-child(1)]:font-bold *:flex *:items-center *:gap-2">
           <li>
@@ -48,7 +47,6 @@
           </li>
         </ul>
       </section>
-      <!-- table -->
       <section class="mt-4">
         <table class="w-full text-center" style="border-collapse: separate; border-spacing: 0 8px">
           <thead class="text-sm font-bold">
@@ -85,7 +83,6 @@
           </tfoot>
         </table>
       </section>
-      <!-- summary -->
       <section class="text-xs font-semibold pe-2">
         <ul class="flex flex-col gap-2 *:flex *:justify-between">
           <li>
@@ -168,8 +165,57 @@
         (click)="closeCollectionInvoiceDialog()"
       />
     </section>
-  </div>
+  </div> -->
+  <app-printable-order-invoice [data]="currentBill()" />
+  <form [formGroup]="paymentFg" class="flex flex-col gap-4 py-4">
+    <div class="grid grid-cols-2 gap-4">
+      <!-- cash -->
+      <div>
+        <label for="cash">{{ 'form.cash' | translate }}</label>
+        <app-input-error-message-handler [fc]="paymentFg.get('cashPaymentAmount')">
+          <input
+            pInputText
+            aria-describedby="cash-help"
+            [placeholder]="'form.cash' | translate"
+            [formControl]="getFormControl(paymentFg, 'cashPaymentAmount')"
+            appAllowNumbers
+            [max]="net()"
+            [min]="0"
+            [allowDecimal]="true"
+            #cashPaymentAmount
+            id="cashPaymentAmount"
+            appDebounce
+            class="app-input"
+            (click)="triggerNumbersKeyboard(cashPaymentAmount)"
+          />
+        </app-input-error-message-handler>
+      </div>
 
+      <!-- network -->
+      <div>
+        <label for="network">{{ 'form.network' | translate }}</label>
+        <app-input-error-message-handler [fc]="paymentFg.get('networkPaymentAmount')">
+          <input
+            pInputText
+            appAllowNumbers
+            [allowDecimal]="true"
+            [max]="net()"
+            [min]="0"
+            id="networkPaymentAmount"
+            aria-describedby="network-help"
+            #networkPaymentAmount
+            (click)="triggerNumbersKeyboard(networkPaymentAmount)"
+            [formControl]="getFormControl(paymentFg, 'networkPaymentAmount')"
+            [placeholder]="'form.network' | translate"
+            class="app-input"
+          />
+        </app-input-error-message-handler>
+      </div>
+    </div>
+
+    <!-- number keyboard -->
+    <app-numbers-keyboard />
+  </form>
   <!-- <ng-template #footer>
     
   </ng-template> -->

@@ -81,53 +81,39 @@
   <div class="grid md:grid-cols-2 gap-4 flex-1">
     <!-- deliveryName Ar -->
     <div class="col-span-2 md:col-span-1">
-      <label for="productName">{{ 'form.deliveryName' | translate }} (Ar)</label>
-      <app-input-error-message-handler [fc]="deliveryFg.get('nameAr')">
+      <label for="deliveryName">{{ 'form.deliveryName' | translate }} (Ar)</label>
+      <app-input-error-message-handler [fc]="localize(deliveryFg.get('nameAr'), deliveryFg.get('nameEn'))">
         <input
           pInputText
-          id="nameAr"
-          formControlName="nameAr"
-          aria-describedby="productName-help"
+          [id]="localize('nameAr', 'nameEn')"
+          [formControlName]="localize('nameAr', 'nameEn')"
+          aria-describedby="deliveryName-help"
           [placeholder]="'form.deliveryName' | translate"
-          id="productName"
-        />
-      </app-input-error-message-handler>
-    </div>
-    <!-- deliveryName En-->
-    <div class="col-span-2 md:col-span-1">
-      <label for="productName">{{ 'form.deliveryName' | translate }} (En)</label>
-      <app-input-error-message-handler [fc]="deliveryFg.get('nameEn')">
-        <input
-          pInputText
-          id="nameAr"
-          formControlName="nameEn"
-          aria-describedby="productName-help"
-          [placeholder]="'form.deliveryName' | translate"
-          id="productName"
+          id="deliveryName"
         />
       </app-input-error-message-handler>
     </div>
     <!-- phoneNumber -->
     <div class="col-span-2 md:col-span-1">
-      <label for="productPrice">{{ 'form.phoneNumber' | translate }}</label>
+      <label for="phoneNumber">{{ 'form.phoneNumber' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('phoneNumber')">
         <input
           pInputText
-          id="productPrice"
+          id="phoneNumber"
           formControlName="phoneNumber"
-          aria-describedby="productPrice-help"
+          aria-describedby="phoneNumber-help"
           [placeholder]="'form.phoneNumber' | translate"
         />
       </app-input-error-message-handler>
     </div>
     <!-- email -->
     <div class="col-span-2 md:col-span-1">
-      <label for="costPrice">{{ 'form.email' | translate }}</label>
+      <label for="email">{{ 'form.email' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('email')">
         <input
           pInputText
-          id="costPrice"
-          aria-describedby="costPrice-help"
+          id="email"
+          aria-describedby="email-help"
           formControlName="email"
           [placeholder]="'form.email' | translate"
         />
@@ -135,14 +121,14 @@
     </div>
     <!-- address -->
     <div class="col-span-2 md:col-span-1">
-      <label for="productAddress">{{ 'form.address' | translate }}</label>
+      <label for="address">{{ 'form.address' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('address')">
         <input
           pInputText
-          id="costPrice"
-          aria-describedby="costPrice-help"
+          id="address"
+          aria-describedby="address-help"
           formControlName="address"
-          id="productAddress"
+          id="address"
           [placeholder]="'form.address' | translate"
         />
       </app-input-error-message-handler>
@@ -153,8 +139,8 @@
       <app-input-error-message-handler [fc]="deliveryFg.get('identityNumber')">
         <input
           pInputText
-          id="costPrice"
-          aria-describedby="costPrice-help"
+          id="identityNumber"
+          aria-describedby="identityNumber-help"
           formControlName="identityNumber"
           id="identityNumber"
           [placeholder]="'form.identityNumber' | translate"
@@ -170,7 +156,7 @@
           rows="7"
           cols="30"
           pTextarea
-          aria-describedby="productName-help"
+          aria-describedby="description-help"
           [placeholder]="'form.description' | translate"
           class="w-full"
           formControlName="description"

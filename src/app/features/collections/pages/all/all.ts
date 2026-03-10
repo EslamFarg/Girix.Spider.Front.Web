@@ -10,8 +10,9 @@ import { InputText } from 'primeng/inputtext';
 import { Dialog } from 'primeng/dialog';
 import { Button } from 'primeng/button';
 import { CollectionsService } from '../../services/collections-service';
-import { OrderSearchEnum, OrderService, IOrderRowResponse } from '@/features/orders';
+import { OrderSearchEnum, OrderService, IOrderRowResponse, OrderLocationType } from '@/features/orders';
 import { MenuItem } from 'primeng/api';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-all',
@@ -25,11 +26,13 @@ import { MenuItem } from 'primeng/api';
     InputText,
     Dialog,
     Button,
+    DatePipe,
   ],
   templateUrl: './all.html',
   styleUrl: './all.css',
 })
 export class All extends BaseComponent {
+  OrderLocationType = OrderLocationType;
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<OrderSearchEnum>(OrderSearchEnum.CustomerName, [Validators.required]),
@@ -137,7 +140,13 @@ export class All extends BaseComponent {
   ///
   collectionsService = inject(CollectionsService);
 
-  openCollectionDialog = this.collectionsService.openCollectionDialog;
+  openCollectionDialog = (id: number) => {
+    this.orderService.getBill(id).subscribe({
+      next: (bill) => {
+        this.collectionsService.openCollectionDialog(bill);
+      },
+    });
+  };
 
   isInvoiceTypeChangeDialogVisible = false;
 

@@ -38,31 +38,56 @@
               <td>
                 <div>{{ getRowNumber($index, ordersPaginationInfo().pageIndex) }}</div>
               </td>
-              <td><div>123456</div></td>
-              <td><div>July 1, 2024</div></td>
-              <td><div>محمد احمد محمود</div></td>
-              <td><div>0123456789</div></td>
               <td>
-                @if ($even) {
+                <div>{{ order.orderNumber }}</div>
+              </td>
+              <td>
+                <div>{{ order.createdAt | date: 'dd/MM/yyyy' }}</div>
+              </td>
+              <td>
+                <div>{{ order.customerName }}</div>
+              </td>
+              <td>
+                <div>{{ order.customerPhone }}</div>
+              </td>
+              <td>
+                @if (order.isCollected) {
                   <div class="status active">
                     <span></span>
                     <span>مدفوع</span>
                   </div>
                 } @else {
-                  <div class="status inactive">
+                  <div class="status in-active">
                     <span></span>
                     <span>معلق</span>
                   </div>
                 }
               </td>
-              <td><div>محلي</div></td>
-              <td><div>$120.00</div></td>
+              <td>
+                <div>
+                  @switch (order.orderType) {
+                    @case (OrderLocationType.DineIn) {
+                      محلي
+                    }
+                    @case (OrderLocationType.Delivery) {
+                      توصيل
+                    }
+                    @case (OrderLocationType.Takeaway) {
+                      سفري
+                    }
+                  }
+                </div>
+              </td>
+              <td>
+                <div>${{ order.netOrder.toFixed(2) }}</div>
+              </td>
               <td>
                 <div class="actions">
                   <!-- collect -->
                   <button
                     type="button"
-                    (click)="openCollectionDialog(order.id, order.isCollected)"
+                    [disabled]=" order.isCollected"
+                    (click)="openCollectionDialog(order.id)"
                     class="collect bg-[#EA7C694D]!"
                   >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

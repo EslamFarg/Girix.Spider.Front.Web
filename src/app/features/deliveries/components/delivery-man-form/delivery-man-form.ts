@@ -111,6 +111,10 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
 
   onSubmitForm() {
     console.log(this.deliveryFg.value);
+    this.deliveryFg.patchValue({
+      nameAr: this.deliveryFg.get('nameAr')?.value ?? this.deliveryFg.get('nameEn')?.value,
+      nameEn: this.deliveryFg.get('nameEn')?.value ?? this.deliveryFg.get('nameAr')?.value,
+    });
     if (!this.currentImage() || this.deliveryFg.get('images')?.value.length === 0) {
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن ان يكون الصورة فارغة' });
       return;

@@ -45,6 +45,7 @@ export class Products extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
 
   productService = inject(ProductService);
+  calculatePrice = this.productService.calculatePrice;
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'الاسم',

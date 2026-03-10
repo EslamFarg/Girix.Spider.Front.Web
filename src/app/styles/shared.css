@@ -81,7 +81,7 @@
         background-color: #259800;
       }
     }
-    &.inActive {
+    &.in-active {
       background-color: #ffe0e0;
       color: #ff383c;
       & > span:first-child {

@@ -102,7 +102,19 @@ export class ProductForm extends BaseComponent implements OnInit {
   };
 
   productService = inject(ProductService);
+  calculatePrice = this.productService.calculatePrice;
   productFg = this.fb.group(this.initialProductFgValue);
+  // productFgListener = this.productFg.valueChanges.subscribe((value) => {
+  //   const finalPriceWithTax = this.calculatePrice(
+  //     {
+  //       price: value.price ?? 0,
+  //       taxPercentage: value.tax ?? 0 / 100,
+  //       selectedTaxPercentage: value.selectiveTax ?? 0 / 100,
+  //     },
+  //     false,
+  //   );
+  //   this.productFg.patchValue({ price: finalPriceWithTax }, { emitEvent: false });
+  // });
 
   /**
    *
@@ -136,6 +148,7 @@ export class ProductForm extends BaseComponent implements OnInit {
             nameEn: product.name,
             descriptionAr: product.description,
             descriptionEn: product.description,
+            price: this.calculatePrice(product, true),
             idsAdditionMenuItem: product.additionMenuItem.map((item) => item.id),
           });
           this.existingImages.set(product.images);
@@ -157,28 +170,31 @@ export class ProductForm extends BaseComponent implements OnInit {
   }
 
   onSubmitForm() {
-    this.productFg.patchValue({
-      nameEn: this.productFg.value.nameAr?.trim(),
-      descriptionEn: this.productFg.value.descriptionAr?.trim(),
+    const productFg = this.productFg;
+    productFg.patchValue({
+      nameEn: productFg.value.nameAr?.trim(),
+      descriptionEn: productFg.value.descriptionAr?.trim(),
       images: this.newImages().map((image) => image.file!),
       allImages: [...this.allImages()],
       imagesAdd: this.newImages().map((image) => image.file!),
     });
+    const product = productFg.value;
     if (this.productFg.invalid) {
       console.log('invalid');
-      console.log(this.productFg.value);
+      console.log(product);
       this.productFg.markAllAsTouched();
       return;
     }
+    console.log(product);
 
     let formValues: { [key: string]: string | Blob } = {};
 
     switch (this.formMode()) {
       case FormMode.Create:
-        formValues = omitKeys(this.productFg.value, ['id', 'imagesAdd', 'listIdsOfDeleteImages', 'allImages']);
+        formValues = omitKeys(product, ['id', 'imagesAdd', 'listIdsOfDeleteImages', 'allImages']);
         break;
       case FormMode.Update:
-        formValues = omitKeys(this.productFg.value, ['images', 'allImages']);
+        formValues = omitKeys(product, ['images', 'allImages']);
         break;
     }
     const formData = new FormData();
@@ -190,6 +206,8 @@ export class ProductForm extends BaseComponent implements OnInit {
         formData.append(key, value);
       }
     });
+
+    formData.set('price', this.calculatePrice(product as any, false).toString());
     switch (this.formMode()) {
       case FormMode.Create:
         this.productService.create(formData).subscribe({
@@ -217,21 +235,6 @@ export class ProductForm extends BaseComponent implements OnInit {
   //
   //
   //
-
-  calculatePrice(reverse: boolean = false) {
-    const taxPercentage = (this.productFg.value.tax ?? 0) / 100;
-    const selectedTaxPercentage = (this.productFg.value.selectiveTax ?? 0) / 100;
-    const price = this.productFg.value.price??0;
-    if(reverse){
-      this.productFg.patchValue({
-        price: (price / (1 + taxPercentage + selectedTaxPercentage)),
-      });
-    }else{
-      this.productFg.patchValue({
-        price: (price * (1 + taxPercentage + selectedTaxPercentage)),
-      });
-    }
-  }
 
   //
   //

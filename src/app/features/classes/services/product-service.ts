@@ -141,7 +141,7 @@ export class ProductService extends BaseSearchAndCrudService<
    */
   constructor() {
     super();
-    this.patchEndpoints({ getById: 'GetById?MenuItemId=',patch: 'Update',delete:'delete?menuItemId=' });
+    this.patchEndpoints({ getById: 'GetById?MenuItemId=', patch: 'Update', delete: 'delete?menuItemId=' });
   }
 
   getAllAdditions(params: { dto: { paginationInfo: { pageIndex: number; pageSize: number } }; isAddition?: boolean }) {
@@ -156,5 +156,15 @@ export class ProductService extends BaseSearchAndCrudService<
 
   getAdditions(productId: number) {
     return this.http.get<IProductSearchRow[]>(`${this.apiUrl}/MenuItemAdditionByMenuItemId?MenuItemId=${productId}`);
+  }
+
+  calculatePrice(opts: Pick<any, 'price' | 'tax' | 'selectiveTax'>, calculateOriginal: boolean) {
+    const taxPercentage = (opts.tax ?? 0) / 100;
+    const selectiveTaxPercentage = (opts.selectiveTax ?? 0) / 100;
+    if (calculateOriginal) {
+      return opts.price * ((1 + taxPercentage) * (1 + selectiveTaxPercentage));
+    } else {
+      return opts.price / ((1 + taxPercentage) * (1 + selectiveTaxPercentage));
+    }
   }
 }
