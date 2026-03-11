@@ -37,6 +37,8 @@ export interface IOrderCreateRequest {
   createAt: string;
   idempotencyKey: string;
   items: IOrderCreateItem[];
+  cashAccountId: number;
+  networkAccountId: number;
   customerRequest: IOrderCreateCustomer;
 }
 export interface IOrderCreateItem {

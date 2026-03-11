@@ -1016,6 +1016,30 @@
             />
           </app-input-error-message-handler>
         </div>
+
+        <!-- cash account -->
+        <div>
+          <label  >{{ 'form.cashAccount' | translate }}</label>
+          <app-input-error-message-handler [fc]="orderFg.get('cashAccountId')">
+            <ng-select
+              class="app-select w-full"
+              [items]="displayedCustomers()"
+              formControlName="id"
+              bindLabel="name"
+              bindValue="id"
+              [clearable]="false"
+              placeholder="الكل"
+              #customerSelect
+              appDebounce
+              [customEvents]="[
+                { key: 'searchEvent', value: customerSelect.searchEvent },
+                { key: 'scrollToEnd', value: customerSelect.scrollToEnd },
+              ]"
+              (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
+              (change)="onCustomerSelected($event)"
+            />
+          </app-input-error-message-handler>
+        </div>
       </div>
       <app-numbers-keyboard />
     </div>

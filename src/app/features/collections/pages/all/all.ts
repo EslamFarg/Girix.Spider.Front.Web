@@ -140,13 +140,7 @@ export class All extends BaseComponent {
   ///
   collectionsService = inject(CollectionsService);
 
-  openCollectionDialog = (id: number) => {
-    this.orderService.getBill(id).subscribe({
-      next: (bill) => {
-        this.collectionsService.openCollectionDialog(bill);
-      },
-    });
-  };
+  openCollectionDialog = this.collectionsService.openCollectionDialog;
 
   isInvoiceTypeChangeDialogVisible = false;
 

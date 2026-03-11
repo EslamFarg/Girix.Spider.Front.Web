@@ -11,9 +11,9 @@ export interface ICashFinancialAccount {
   parentName: any;
   finNumber: string;
   balanceNature: number;
-  finalAccountType: number;
-  accountGroup: number;
-  accountStatus: number;
+  finalAccountType: FinancailAccountType;
+  accountGroup: AccountGroup;
+  accountStatus: AccountStatus;
 }
 
 export interface IBankFinancialAccount {
@@ -23,9 +23,9 @@ export interface IBankFinancialAccount {
   parentName: any;
   finNumber: string;
   balanceNature: number;
-  finalAccountType: number;
-  accountGroup: number;
-  accountStatus: number;
+  finalAccountType: FinancailAccountType;
+  accountGroup: AccountGroup;
+  accountStatus: AccountStatus;
 }
 
 export interface ICustodyFinancialAccount {
@@ -35,11 +35,33 @@ export interface ICustodyFinancialAccount {
   parentName: any;
   finNumber: string;
   balanceNature: number;
-  finalAccountType: number;
-  accountGroup: number;
-  accountStatus: number;
+  finalAccountType: FinancailAccountType;
+  accountGroup: AccountGroup;
+  accountStatus: AccountStatus;
 }
 
+enum FinancailAccountType {
+  Normal = 1,
+  Room = 2,
+  Table = 3,
+  Hut = 4,
+  Delivery = 5,
+  User = 6,
+  Customer = 7,
+}
+enum AccountGroup {
+  Assets = 1, // الأصول
+  Liabilities = 2, // الخصوم
+  Equity = 3, // حقوق الملكية
+  Revenues = 4, // الإيرادات
+  Expenses = 5, // المصروفات
+}
+enum AccountStatus
+{
+    Active = 1,    // نشط
+    Inactive = 2,  // غير نشط
+    Closed = 3     // مغلق
+}
 
 export interface ITreeFinancialAccountSearchRow {
   id: number;
@@ -48,7 +70,9 @@ export interface ITreeFinancialAccountSearchRow {
   stage: number;
   finNumber: string;
   balanceNature: number;
-  finalAccountBalance: any;
+  finalAccountType: FinancailAccountType;
+  accountGroup: AccountGroup;
+  accountStatus: AccountStatus;
   children: ITreeFinancialAccountSearchRow[];
 }
 

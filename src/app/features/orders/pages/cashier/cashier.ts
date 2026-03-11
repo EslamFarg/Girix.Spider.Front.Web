@@ -52,7 +52,7 @@ import {
   FinancialSettingsService,
   IFinancialSettingsResponse,
 } from '@/features/settings/services/financial-settings-service';
-import { labeledRequiredValidator } from '@/yn-ng/utils/text-validators';
+import { labeledRequiredValidator, noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { Select, SelectChangeEvent } from 'primeng/select';
 import { KeyboardService } from '@/features/keyboard/services/keyboard-service';
 import { FullKeyboard } from '@/features/keyboard/components/full-keyboard/full-keyboard';
@@ -65,6 +65,11 @@ import {
   IDeliverySearchRow,
 } from '@/features/deliveries/services/delivery-service';
 import { RouterLink } from '@angular/router';
+import {
+  FinancialAccountSearchEnum,
+  FinancialAccountService,
+} from '@/features/accounts/services/financial-account-service';
+import { ITreeFinancialAccountSearchRow } from '@/features/accounts/services/financial-account-types';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -81,6 +86,8 @@ interface IOrderCreateFgValue {
   items: FormControl<IOrderCreateItem[]>;
   customerRequest: FormControl<IOrderCreateCustomer | null>;
   placeName: FormControl<string | null>;
+  cashAccountId: FormControl<number | null>;
+  networkAccountId: FormControl<number | null>;
 }
 
 @Component({
@@ -176,6 +183,8 @@ export class Cashier extends BaseComponent implements OnInit {
     payingNetwork: this.fb.control<number | null>(null, [Validators.required]),
     createAt: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
     idempotencyKey: this.fb.control<string>(Date.now() + Math.random().toString(), [Validators.required]),
+    cashAccountId: this.fb.control<number | null>(null, []),
+    networkAccountId: this.fb.control<number | null>(null, []),
     items: this.fb.control<IOrderCreateItem[]>(
       [],
       [Validators.minLength(1), labeledRequiredValidator('يجب اختيار صنف', 'you must select an item')],
@@ -588,6 +597,182 @@ export class Cashier extends BaseComponent implements OnInit {
     this.keyboardService.triggerNumbersKeyboard(input);
   }
 
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //Accounts
+  //
+
+  currentCashAccount = signal<{
+    id: number;
+    name: string;
+  } | null>(null);
+  currentNetworkAccount = signal<{
+    id: number;
+    name: string;
+  } | null>(null);
+
+  cashAccountSearchFg = this.fb.group({
+    searchTerm: this.fb.control('', [Validators.maxLength(100), noSymbolsAllowed, Validators.minLength(1)]),
+  });
+  networkAccountSearchFg = this.fb.group({
+    searchTerm: this.fb.control('', [Validators.maxLength(100), noSymbolsAllowed, Validators.minLength(1)]),
+  });
+
+  financialAccountService = inject(FinancialAccountService);
+
+  cashAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
+  networkAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
+
+  displayedCashAccounts = computed(() => [this.currentCashAccount(), ...this.customers()]);
+  displayedNetworkAccounts = computed(() => [this.currentNetworkAccount(), ...this.customers()]);
+  
+
+
+  searchAccounts(data: { pageIndex: number; searchTerm?: string }) {
+    return this.financialAccountService.search({
+      paginationInfo: {
+        pageIndex: data.pageIndex,
+        pageSize: 10,
+      },
+      searchFilters: [
+        {
+          column: FinancialAccountSearchEnum.Name,
+          values: [data.searchTerm ?? ''],
+        },
+      ],
+      fromDate: null,
+    });
+    // .subscribe({
+    //   next: (res) => {
+    //     if (res.value.rows.length > 0) {
+    //       this.previousAccountsSearchTerm = data.searchTerm ?? '';
+    //       if (data.pageIndex == 1) {
+    //         this.customers.set(res.value.rows);
+    //       } else {
+    //         this.customers.update((prev) => prev.concat(res.value.rows));
+    //       }
+    //       this.customersSearchPaginationInfo = {
+    //         pageIndex: data.pageIndex,
+    //         totalPagesCount: res.value.paginationInfo.totalPagesCount,
+    //         totalRowsCount: res.value.paginationInfo.totalRowsCount,
+    //       };
+    //     }
+    //   },
+    // });
+  }
+  // onAccountSelected(event: ITreeFinancialAccountSearchRow, isCash: boolean) {
+  //   if (!event.id) return;
+
+  //   if (isCash) {
+  //     this.currentCashAccount.set({
+  //       id: event.id,
+  //       name: event.name,
+  //     });
+  //   } else {
+  //     this.currentNetworkAccount.set({
+  //       id: event.id,
+  //       name: event.name,
+  //     });
+  //   }
+  // }
+  cashAccountsSearchPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0,
+  };
+  networkAccountsSearchPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0,
+  };
+
+  previousCashAccountsSearchTerm: string = '';
+  previousNetworkAccountsSearchTerm: string = '';
+
+  onFinancialAccountsSearch(event: any, searchTerm: string = '', isCash: boolean) {
+    searchTerm = searchTerm ?? '';
+    if (searchTerm && searchTerm.length > 100) return;
+    if (isCash) {
+      const isNewSearchTerm = searchTerm != this.previousCashAccountsSearchTerm;
+      if (isNewSearchTerm) {
+        //refetch page 1
+        this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
+          next: (res) => {
+            if (res.value.rows.length > 0) {
+              this.previousCustomersSearchTerm = searchTerm;
+              this.cashAccounts.set(res.value.rows);
+              this.cashAccountsSearchPaginationInfo = {
+                pageIndex: 1,
+                totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                totalRowsCount: res.value.paginationInfo.totalRowsCount,
+              };
+            }
+          },
+        });
+      } else {
+        //refetch next page
+        this.searchAccounts({ pageIndex: this.customersSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
+          next: (res) => {
+            if (res.value.rows.length > 0) {
+              this.previousCustomersSearchTerm = searchTerm;
+              this.cashAccounts.set(res.value.rows);
+              this.cashAccountsSearchPaginationInfo = {
+                pageIndex: this.customersSearchPaginationInfo.pageIndex + 1,
+                totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                totalRowsCount: res.value.paginationInfo.totalRowsCount,
+              };
+            }
+          },
+        });
+      }
+    } else {
+      const isNewSearchTerm = searchTerm != this.previousNetworkAccountsSearchTerm;
+      if (isNewSearchTerm) {
+        //refetch page 1
+        this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
+          next: (res) => {
+            if (res.value.rows.length > 0) {
+              this.previousCustomersSearchTerm = searchTerm;
+              this.cashAccounts.set(res.value.rows);
+              this.cashAccountsSearchPaginationInfo = {
+                pageIndex: 1,
+                totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                totalRowsCount: res.value.paginationInfo.totalRowsCount,
+              };
+            }
+          },
+        });
+      } else {
+        //refetch next page
+        this.searchAccounts({ pageIndex: this.customersSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
+          next: (res) => {
+            if (res.value.rows.length > 0) {
+              this.previousCustomersSearchTerm = searchTerm;
+              this.cashAccounts.set(res.value.rows);
+              this.cashAccountsSearchPaginationInfo = {
+                pageIndex: this.customersSearchPaginationInfo.pageIndex + 1,
+                totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                totalRowsCount: res.value.paginationInfo.totalRowsCount,
+              };
+            }
+          },
+        });
+      }
+    }
+  }
+
+  //
+  //
+  //
+  //
   //
   //
   //

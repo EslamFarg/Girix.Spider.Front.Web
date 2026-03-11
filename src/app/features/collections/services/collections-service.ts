@@ -8,7 +8,7 @@ export interface ICollectionRequest {
   networkPaymentAmount: number;
   collectionDate: string;
 }
- 
+
 @Injectable({
   providedIn: 'root',
 })
@@ -18,8 +18,15 @@ export class CollectionsService extends BaseService {
   currentBill = signal<IOrderBillReadResponse | null>(null);
   orderService = inject(OrderService);
 
-  openCollectionDialog = (orderBill: IOrderBillReadResponse) => {
-    this.currentBill.set(orderBill);
+  openCollectionDialog = (orderId: number, isCollected: boolean = false) => {
+    if (isCollected)
+      return this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'هذا الطلب محصل بالفعل' });
+    //
+    this.orderService.getBill(orderId).subscribe({
+      next: (bill) => {
+        this.currentBill.set(bill);
+      },
+    });
   };
 
   closeCollectionInvoiceDialog() {
