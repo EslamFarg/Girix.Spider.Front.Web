@@ -183,8 +183,8 @@ export class Cashier extends BaseComponent implements OnInit {
     payingNetwork: this.fb.control<number | null>(null, [Validators.required]),
     createAt: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
     idempotencyKey: this.fb.control<string>(Date.now() + Math.random().toString(), [Validators.required]),
-    cashAccountId: this.fb.control<number | null>(null, []),
-    networkAccountId: this.fb.control<number | null>(null, []),
+    cashAccountId: this.fb.control<number | null>(null, [Validators.required]),
+    networkAccountId: this.fb.control<number | null>(null, [Validators.required]),
     items: this.fb.control<IOrderCreateItem[]>(
       [],
       [Validators.minLength(1), labeledRequiredValidator('يجب اختيار صنف', 'you must select an item')],
@@ -255,6 +255,15 @@ export class Cashier extends BaseComponent implements OnInit {
     this.searchRooms(1);
     this.searchTables(1);
     this.searchDeliveries(1);
+    this.searchAccounts({
+      pageIndex: 1,
+      searchTerm: '',
+    }).subscribe({
+      next: (res) => {
+        this.cashAccounts.set(res.value.rows);
+        this.networkAccounts.set(res.value.rows);
+      }
+    })
     // this.searchAdditions(1);
     this.searchCustomers({ pageIndex: 1, searchTerm: '' });
 
@@ -707,7 +716,7 @@ export class Cashier extends BaseComponent implements OnInit {
         this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
           next: (res) => {
             if (res.value.rows.length > 0) {
-              this.previousCustomersSearchTerm = searchTerm;
+              this.previousCashAccountsSearchTerm = searchTerm;
               this.cashAccounts.set(res.value.rows);
               this.cashAccountsSearchPaginationInfo = {
                 pageIndex: 1,
@@ -722,7 +731,7 @@ export class Cashier extends BaseComponent implements OnInit {
         this.searchAccounts({ pageIndex: this.customersSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
           next: (res) => {
             if (res.value.rows.length > 0) {
-              this.previousCustomersSearchTerm = searchTerm;
+              this.previousCashAccountsSearchTerm = searchTerm;
               this.cashAccounts.set(res.value.rows);
               this.cashAccountsSearchPaginationInfo = {
                 pageIndex: this.customersSearchPaginationInfo.pageIndex + 1,
@@ -740,9 +749,9 @@ export class Cashier extends BaseComponent implements OnInit {
         this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
           next: (res) => {
             if (res.value.rows.length > 0) {
-              this.previousCustomersSearchTerm = searchTerm;
-              this.cashAccounts.set(res.value.rows);
-              this.cashAccountsSearchPaginationInfo = {
+              this.previousNetworkAccountsSearchTerm = searchTerm;
+              this.networkAccounts.set(res.value.rows);
+              this.networkAccountsSearchPaginationInfo = {
                 pageIndex: 1,
                 totalPagesCount: res.value.paginationInfo.totalPagesCount,
                 totalRowsCount: res.value.paginationInfo.totalRowsCount,
@@ -752,12 +761,12 @@ export class Cashier extends BaseComponent implements OnInit {
         });
       } else {
         //refetch next page
-        this.searchAccounts({ pageIndex: this.customersSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
+        this.searchAccounts({ pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
           next: (res) => {
             if (res.value.rows.length > 0) {
-              this.previousCustomersSearchTerm = searchTerm;
-              this.cashAccounts.set(res.value.rows);
-              this.cashAccountsSearchPaginationInfo = {
+              this.previousNetworkAccountsSearchTerm = searchTerm;
+              this.networkAccounts.set(res.value.rows);
+              this.networkAccountsSearchPaginationInfo = {
                 pageIndex: this.customersSearchPaginationInfo.pageIndex + 1,
                 totalPagesCount: res.value.paginationInfo.totalPagesCount,
                 totalRowsCount: res.value.paginationInfo.totalRowsCount,
