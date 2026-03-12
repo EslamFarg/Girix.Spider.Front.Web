@@ -127,7 +127,7 @@
         "financial": {
           "label": "إعدادات الماليه"
         },
-        "dailyOpeningClosing": {
+        "dailyJournal": {
           "label": "إداره فتح/ غلق اليوميه"
         },
         "qr": {
@@ -191,7 +191,12 @@
     "paid": "مدفوع",
     "postponed": "معلق",
     "network": "شبكة",
-    "cash": "كاش"
+    "cash": "كاش",
+    "cashPaid": "المدفوعات كاش",
+    "networkPaid": "المدفوعات شبكة",
+    "accountName": "اسم الحساب",
+    "cashAccount": "حساب كاش",
+    "networkAccount": "حساب شبكة"
   },
   
   "actions": {

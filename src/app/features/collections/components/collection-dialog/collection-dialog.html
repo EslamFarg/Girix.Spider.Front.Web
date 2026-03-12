@@ -169,54 +169,108 @@
   <app-printable-order-invoice [data]="currentBill()" />
   <form [formGroup]="paymentFg" class="flex flex-col gap-4 py-4">
     <div class="grid grid-cols-2 gap-4">
-      <!-- cash -->
-      <div>
-        <label for="cash">{{ 'form.cash' | translate }}</label>
-        <app-input-error-message-handler [fc]="paymentFg.get('cashPaymentAmount')">
-          <input
-            pInputText
-            aria-describedby="cash-help"
-            [placeholder]="'form.cash' | translate"
-            [formControl]="getFormControl(paymentFg, 'cashPaymentAmount')"
-            appAllowNumbers
-            [max]="net()"
-            [min]="0"
-            [allowDecimal]="true"
-            #cashPaymentAmount
-            id="cashPaymentAmount"
-            appDebounce
-            class="app-input"
-            (click)="triggerNumbersKeyboard(cashPaymentAmount)"
-          />
-        </app-input-error-message-handler>
-      </div>
 
-      <!-- network -->
-      <div>
-        <label for="network">{{ 'form.network' | translate }}</label>
-        <app-input-error-message-handler [fc]="paymentFg.get('networkPaymentAmount')">
-          <input
-            pInputText
-            appAllowNumbers
-            [allowDecimal]="true"
-            [max]="net()"
-            [min]="0"
-            id="networkPaymentAmount"
-            aria-describedby="network-help"
-            #networkPaymentAmount
-            (click)="triggerNumbersKeyboard(networkPaymentAmount)"
-            [formControl]="getFormControl(paymentFg, 'networkPaymentAmount')"
-            [placeholder]="'form.network' | translate"
-            class="app-input"
-          />
-        </app-input-error-message-handler>
-      </div>
+       <!-- cash -->
+        <div>
+          <label for="cashPaymentAmount">{{ 'form.cashPaid' | translate }}</label>
+          <app-input-error-message-handler [fc]="paymentFg.get('cashPaymentAmount')">
+            <input
+              pInputText
+              aria-describedby="cash-help"
+              [placeholder]="'form.cash' | translate"
+              [formControl]="getFormControl(paymentFg, 'cashPaymentAmount')"
+              appAllowNumbers
+              [max]="net()"
+               [min]="0"
+              [allowDecimal]="true"
+              #cashPaymentAmount
+              id="cashPaymentAmount"
+              appDebounce
+              class="app-input"
+              (click)="triggerNumbersKeyboard(cashPaymentAmount)"
+            />
+          </app-input-error-message-handler>
+        </div>
+
+        <!-- cash account -->
+        <div>
+          <label>{{ 'form.accountName' | translate }}</label>
+          <app-input-error-message-handler [fc]="paymentFg.get('cashAccountId')">
+            <ng-select
+              class="app-select w-full"
+              [items]="cashAccounts()"
+              [formControl]="getFormControl(paymentFg, 'cashAccountId')"
+              bindLabel="name"
+              bindValue="id"
+              [clearable]="false"
+              placeholder="الكل"
+              #cashAccountSelect
+              appDebounce
+              [customEvents]="[
+                { key: 'searchEvent', value: cashAccountSelect.searchEvent },
+                { key: 'scrollToEnd', value: cashAccountSelect.scrollToEnd },
+              ]"
+              (debounced)="onCashFinancialAccountsSearch($event)"
+            />
+          </app-input-error-message-handler>
+        </div>
+
+        <!-- network -->
+        <div>
+          <label for="networkPaymentAmount">{{ 'form.networkPaid' | translate }}</label>
+          <app-input-error-message-handler [fc]="paymentFg.get('networkPaymentAmount')">
+            <input
+              pInputText
+              appAllowNumbers
+              [allowDecimal]="true"
+              [max]="net()"
+              [min]="0"
+               id="networkPaymentAmount"
+              aria-describedby="network-help"
+              #networkPaymentAmount
+              (click)="triggerNumbersKeyboard(networkPaymentAmount)"
+              [formControl]="getFormControl(paymentFg, 'networkPaymentAmount')"
+              [placeholder]="'form.network' | translate"
+              class="app-input"
+            />
+          </app-input-error-message-handler>
+        </div>
+
+        <!-- network account -->
+        <div>
+          <label>{{ 'form.accountName' | translate }}</label>
+          <app-input-error-message-handler [fc]="paymentFg.get('networkAccountId')">
+            <ng-select
+              class="app-select w-full"
+              [items]="networkAccounts()"
+              [formControl]="getFormControl(paymentFg, 'networkAccountId')"
+              bindLabel="name"
+              bindValue="id"
+              [clearable]="false"
+              placeholder="الكل"
+              #networkAccountSelect
+              appDebounce
+              [customEvents]="[
+                { key: 'searchEvent', value: networkAccountSelect.searchEvent },
+                { key: 'scrollToEnd', value: networkAccountSelect.scrollToEnd },
+              ]"
+              (debounced)="onNetworkFinancialAccountsSearch($event)"
+            />
+          </app-input-error-message-handler>
+        </div>
     </div>
 
     <!-- number keyboard -->
     <app-numbers-keyboard />
   </form>
-  <!-- <ng-template #footer>
-    
-  </ng-template> -->
+  <ng-template #footer>
+    <div class="flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
+      <button pButton severity="secondary" class="bg-dark-bg-2" (click)="onSubmitCollection()">
+        {{ 'actions.save' | translate }}
+      </button>
+      <button pButton severity="secondary" (click)="closeCollectionInvoiceDialog()">
+        {{ 'actions.cancel' | translate }}
+      </button>
+    </div>
+  </ng-template>
 </p-dialog>

@@ -1,0 +1,33 @@
+<div class="flex flex-col gap-4">
+  <!-- الرصيد السابق -->
+  <div class="doc-input">
+    <label for="productPrice" class="mb-0!">الرصيد السابق</label>
+    <app-input-error-message-handler>
+      <input pInputText id="productPrice" aria-describedby="productPrice-help" placeholder="3000" />
+    </app-input-error-message-handler>
+  </div>
+  <!-- العهده -->
+  <div class="doc-input">
+    <label for="" class="mb-0!">الرصيد السابق</label>
+    <app-input-error-message-handler>
+      <input pInputText id="productName" aria-describedby="productName-help" placeholder="3000" />
+    </app-input-error-message-handler>
+  </div>
+  <!-- ملاحظات -->
+  <div>
+    <label for="" class="text-dark-bg-1 font-medium text-sm">ملاحظات</label>
+    <div class="doc-input my-1">
+      <app-input-error-message-handler class="w-full">
+        <textarea
+          rows="5"
+          cols="30"
+          pTextarea
+          class="w-full"
+          id="productName"
+          aria-describedby="productName-help"
+          placeholder="ملاحظات"
+        ></textarea>
+      </app-input-error-message-handler>
+    </div>
+  </div>
+</div>

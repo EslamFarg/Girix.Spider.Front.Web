@@ -42,7 +42,5 @@ export class CollectionsService extends BaseService {
   //
   //
 
-  collect(dto: ICollectionRequest) {
-    this.http.post<any>(`${this.apiUrl}/collect`, dto);
-  }
+  collect = (dto: ICollectionRequest) => this.http.post<any>(`${this.apiUrl}/collect`, dto);
 }

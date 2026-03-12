@@ -91,7 +91,7 @@ export class AccountsTree extends BaseComponent {
 
   searchFinancialAccounts(pageIndex: number) {
     this.financialAccountService
-      .search({
+      .getFinancialAccountTree({
         paginationInfo: {
           pageIndex: pageIndex,
           pageSize: 10,

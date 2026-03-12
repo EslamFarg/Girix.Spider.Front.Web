@@ -13,6 +13,12 @@ import {
 import { toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, fromEvent, map, merge, Observable, Subject, Subscription } from 'rxjs';
 import { outputToObservable } from '@angular/core/rxjs-interop';
+
+export interface IDebounceEvent<T = any> {
+  key: any;
+  value: T;
+}
+
 @Directive({
   selector: '[appDebounce]',
 })

@@ -35,7 +35,12 @@
     "save": "save",
     "cancel": "cancel",
     "network": "اnetworkه",
-    "cash": "cash"
+    "cash": "cash",
+    "cashPaid": "Paid Cash",
+    "networkPaid": "Paid Network",
+    "accountName": "Account Name",
+    "cashAccount": "Cash Account",
+    "networkAccount": "Network Account"
   },
   "actions": {
     "save": "save",

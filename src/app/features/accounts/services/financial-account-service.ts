@@ -2,7 +2,7 @@ import BaseService from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
 import { ICashBankCustodyAccounts, IFinancialAccountSearchResponseValue } from './financial-account-types';
 import { BaseCrudService } from '@/core/services/BaseCrudService';
-import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
+import { BaseSearchAndCrudService, ISearchCriteria, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 
 export enum FinancialAccountSearchEnum {
   Id = SearchColumEnum.Id,
@@ -23,7 +23,10 @@ export class FinancialAccountService extends BaseSearchAndCrudService<
    */
   constructor() {
     super();
-    this.patchEndpoints({ search: 'GetFinancialAccountTree' });
+  }
+
+  getFinancialAccountTree(dto: ISearchCriteria<FinancialAccountSearchEnum>) {
+    return this.search({ ...dto, searchEndpoint: 'GetFinancialAccountTree' });
   }
 
   getCashAndBankAccountsAndCustodyAccounts() {

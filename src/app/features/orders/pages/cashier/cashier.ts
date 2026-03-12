@@ -37,7 +37,7 @@ import {
 } from '@/features/orders/index';
 import { DatePipe } from '@angular/common';
 import { HutSearchEnum, HutService, IHutSearchRow } from '@/features/restaurant/services/hut-service';
-import { Debounce } from '@/directives/debounce';
+import { Debounce, IDebounceEvent } from '@/directives/debounce';
 import { ITableSearchRow, TableSearchEnum, TableService } from '@/features/restaurant/services/table-service';
 import { IRoomSearchRow, RoomSearchEnum, RoomService } from '@/features/restaurant/services/room-service';
 import { Carousel } from 'primeng/carousel';
@@ -262,8 +262,8 @@ export class Cashier extends BaseComponent implements OnInit {
       next: (res) => {
         this.cashAccounts.set(res.value.rows);
         this.networkAccounts.set(res.value.rows);
-      }
-    })
+      },
+    });
     // this.searchAdditions(1);
     this.searchCustomers({ pageIndex: 1, searchTerm: '' });
 
@@ -640,10 +640,8 @@ export class Cashier extends BaseComponent implements OnInit {
   cashAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
   networkAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
 
-  displayedCashAccounts = computed(() => [this.currentCashAccount(), ...this.customers()]);
-  displayedNetworkAccounts = computed(() => [this.currentNetworkAccount(), ...this.customers()]);
-  
-
+  displayedCashAccounts = computed(() => [  ...this.cashAccounts()]);
+  displayedNetworkAccounts = computed(() => [  ...this.networkAccounts()]);
 
   searchAccounts(data: { pageIndex: number; searchTerm?: string }) {
     return this.financialAccountService.search({
@@ -706,75 +704,98 @@ export class Cashier extends BaseComponent implements OnInit {
   previousCashAccountsSearchTerm: string = '';
   previousNetworkAccountsSearchTerm: string = '';
 
-  onFinancialAccountsSearch(event: any, searchTerm: string = '', isCash: boolean) {
-    searchTerm = searchTerm ?? '';
+  onCashFinancialAccountsSearch(
+    event: IDebounceEvent<{
+      term: string;
+    }>,
+  ) {
+    let searchTerm = event?.value?.term ?? '';
+    let isNewSearchTerm = searchTerm != this.previousCashAccountsSearchTerm;
+    if (event.key === 'scrollToEnd') {
+      searchTerm = this.previousCashAccountsSearchTerm;
+    }
     if (searchTerm && searchTerm.length > 100) return;
-    if (isCash) {
-      const isNewSearchTerm = searchTerm != this.previousCashAccountsSearchTerm;
-      if (isNewSearchTerm) {
-        //refetch page 1
-        this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
-          next: (res) => {
-            if (res.value.rows.length > 0) {
-              this.previousCashAccountsSearchTerm = searchTerm;
-              this.cashAccounts.set(res.value.rows);
-              this.cashAccountsSearchPaginationInfo = {
-                pageIndex: 1,
-                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-              };
-            }
-          },
-        });
-      } else {
-        //refetch next page
-        this.searchAccounts({ pageIndex: this.customersSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
-          next: (res) => {
-            if (res.value.rows.length > 0) {
-              this.previousCashAccountsSearchTerm = searchTerm;
-              this.cashAccounts.set(res.value.rows);
-              this.cashAccountsSearchPaginationInfo = {
-                pageIndex: this.customersSearchPaginationInfo.pageIndex + 1,
-                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-              };
-            }
-          },
-        });
-      }
+    //
+    //
+    if (isNewSearchTerm) {
+      //refetch page 1
+      this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
+        next: (res) => {
+          if (res.value.rows.length > 0) {
+            this.previousCashAccountsSearchTerm = searchTerm;
+            this.cashAccounts.set(res.value.rows);
+            this.cashAccountsSearchPaginationInfo = {
+              pageIndex: 1,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
+        },
+      });
     } else {
-      const isNewSearchTerm = searchTerm != this.previousNetworkAccountsSearchTerm;
-      if (isNewSearchTerm) {
-        //refetch page 1
-        this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
-          next: (res) => {
-            if (res.value.rows.length > 0) {
-              this.previousNetworkAccountsSearchTerm = searchTerm;
-              this.networkAccounts.set(res.value.rows);
-              this.networkAccountsSearchPaginationInfo = {
-                pageIndex: 1,
-                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-              };
-            }
-          },
-        });
-      } else {
-        //refetch next page
-        this.searchAccounts({ pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
-          next: (res) => {
-            if (res.value.rows.length > 0) {
-              this.previousNetworkAccountsSearchTerm = searchTerm;
-              this.networkAccounts.set(res.value.rows);
-              this.networkAccountsSearchPaginationInfo = {
-                pageIndex: this.customersSearchPaginationInfo.pageIndex + 1,
-                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-              };
-            }
-          },
-        });
-      }
+      //refetch next page
+      this.searchAccounts({ pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
+        next: (res) => {
+          if (res.value.rows.length > 0) {
+            this.previousCashAccountsSearchTerm = searchTerm;
+            this.cashAccounts.update((prev) => prev.concat(res.value.rows));
+            this.cashAccountsSearchPaginationInfo = {
+              pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
+        },
+      });
+    }
+  }
+
+  onNetworkFinancialAccountsSearch(
+    event: IDebounceEvent<{
+      term: string;
+    }>,
+  ) {
+    let searchTerm = event?.value?.term ?? '';
+    let isNewSearchTerm = searchTerm != this.previousNetworkAccountsSearchTerm;
+    if (event.key === 'scrollToEnd') {
+      searchTerm = this.previousNetworkAccountsSearchTerm;
+    }
+    if (searchTerm && searchTerm.length > 100) return;
+    //
+    //
+    if (isNewSearchTerm) {
+      //refetch page 1
+      this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
+        next: (res) => {
+          if (res.value.rows.length > 0) {
+            this.previousNetworkAccountsSearchTerm = searchTerm;
+            this.networkAccounts.set(res.value.rows);
+            this.networkAccountsSearchPaginationInfo = {
+              pageIndex: 1,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
+        },
+      });
+    } else {
+      //refetch next page
+      this.searchAccounts({
+        pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
+        searchTerm,
+      }).subscribe({
+        next: (res) => {
+          if (res.value.rows.length > 0) {
+            this.previousNetworkAccountsSearchTerm = searchTerm;
+            this.networkAccounts.update((prev) => prev.concat(res.value.rows));
+            this.networkAccountsSearchPaginationInfo = {
+              pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
+        },
+      });
     }
   }
 

@@ -127,7 +127,7 @@
             >
             @let price = item.meal ? item.meal.priceWithTax : item.product?.priceWithTax;
 
-            <span class="text-xs font-bold">{{ price }}</span>
+            <span class="text-xs font-bold">{{ price?.toFixed(2) }}</span>
           </div>
           <!-- quantity editor -->
           <div class="flex items-center gap-2 w-full justify-between">

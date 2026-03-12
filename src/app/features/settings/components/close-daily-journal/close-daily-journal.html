@@ -1,0 +1,97 @@
+<form class="close-daily-journal" [formGroup]="fg">
+  <!-- الرصيد السابق -->
+  <div class="journal-row">
+     <div class="journal-field">
+      <label class="journal-label">الرصيد السابق</label>
+      <div class="doc-input">
+        <input pInputText placeholder="3000" />
+      </div>
+    </div>
+    <div class="journal-field">
+      <label class="journal-label">الحساب</label>
+      <div class="doc-input">
+        <input pInputText placeholder="حساب صندوق الكاشير" />
+      </div>
+    </div>
+  </div>
+
+  <!-- العهده -->
+  <div class="journal-row">
+     <div class="journal-field">
+      <label class="journal-label">العهدة</label>
+      <div class="doc-input">
+        <input pInputText placeholder="3000" />
+      </div>
+    </div>
+    <div class="journal-field">
+      <label class="journal-label">الحساب</label>
+      <div class="doc-input">
+        <input pInputText placeholder="حساب صندوق العهد" />
+      </div>
+    </div>
+  </div>
+
+  <!-- مبلغ غلق كاش -->
+  <div class="journal-row">
+     <div class="journal-field">
+      <label class="journal-label">مبلغ غلق كاش</label>
+      <div class="doc-input">
+        <app-input-error-message-handler [fc]="fg.get('cashClosingAmount')">
+          <input
+            pInputText
+            id="cashClosingAmount"
+            formControlName="cashClosingAmount"
+            aria-describedby="cashClosingAmount-help"
+            placeholder="ادخل الرصيد"
+          />
+        </app-input-error-message-handler>
+      </div>
+    </div>
+    <div class="journal-field">
+      <label class="journal-label">الحساب</label>
+      <div class="doc-input">
+        <input pInputText placeholder="حساب الصندوق النقدي" />
+      </div>
+    </div>
+  </div>
+
+  <!-- مبلغ غلق شيكه -->
+  <div class="journal-row">
+     <div class="journal-field">
+      <label class="journal-label">مبلغ غلق شيكه</label>
+      <div class="doc-input">
+        <app-input-error-message-handler [fc]="fg.get('networkClosingAmount')">
+          <input
+            pInputText
+            id="networkClosingAmount"
+            formControlName="networkClosingAmount"
+            aria-describedby="networkClosingAmount-help"
+            placeholder="ادخل الرصيد"
+          />
+        </app-input-error-message-handler>
+      </div>
+    </div>
+    <div class="journal-field">
+      <label class="journal-label">الحساب</label>
+      <div class="doc-input">
+        <input pInputText placeholder="حساب البنك الأهلي" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ملاحظات -->
+  <div class="journal-notes">
+    <label for="closingNotes" class="journal-label">ملاحظات</label>
+    <div class="doc-input my-1">
+      <textarea
+        rows="5"
+        cols="30"
+        pTextarea
+        class="w-full"
+        id="closingNotes"
+        aria-describedby="closingNotes-help"
+        placeholder="ملاحظات"
+      ></textarea>
+    </div>
+  </div>
+</form>

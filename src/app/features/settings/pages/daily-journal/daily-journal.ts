@@ -5,7 +5,7 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { BaseComponent } from '@/components/base-component/base-component';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
-import { RouterLinkActive, RouterLinkWithHref } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterLinkWithHref, RouterOutlet } from '@angular/router';
 import { Button } from 'primeng/button';
 import { CarouselModule, Carousel } from 'primeng/carousel';
 import { Textarea } from 'primeng/textarea';
@@ -17,23 +17,25 @@ enum DocFormSections {
 }
 
 @Component({
-  selector: 'app-daily-opening-closing',
+  selector: 'app-daily-journal',
   imports: [
     SectionWrapper,
     InputErrorMessageHandler,
     InputGroupAddon,
     ReactiveFormsModule,
     InputText,
+    RouterLink,
     RouterLinkActive,
     RouterLinkWithHref,
     Button,
     Carousel,
     Textarea,
-  ],
-  templateUrl: './daily-opening-closing.html',
-  styleUrl: './daily-opening-closing.css',
+    RouterOutlet
+],
+  templateUrl: './daily-journal.html',
+  styleUrl: './daily-journal.css',
 })
-export class DailyOpeningClosing extends BaseComponent {
+export class DailyJournal extends BaseComponent {
   DocFormSections = DocFormSections;
   initialSearchFormValue = {
     text: this.fb.control<string>('', [Validators.required]),

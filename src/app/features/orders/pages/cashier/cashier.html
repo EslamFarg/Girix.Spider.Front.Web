@@ -974,7 +974,7 @@
 
         <!-- cash -->
         <div>
-          <label for="cash">{{ 'form.cash' | translate }}</label>
+          <label for="cash">{{ 'form.cashPaid' | translate }}</label>
           <app-input-error-message-handler [fc]="orderFg.get('payingCash')">
             <input
               pInputText
@@ -995,9 +995,32 @@
           </app-input-error-message-handler>
         </div>
 
+        <!-- cash account -->
+        <div>
+          <label>{{ 'form.accountName' | translate }}</label>
+          <app-input-error-message-handler [fc]="orderFg.get('cashAccountId')">
+            <ng-select
+              class="app-select w-full"
+              [items]="displayedCashAccounts()"
+              [formControl]="getFormControl(orderFg, 'cashAccountId')"
+              bindLabel="name"
+              bindValue="id"
+              [clearable]="false"
+              placeholder="الكل"
+              #cashAccountSelect
+              appDebounce
+              [customEvents]="[
+                { key: 'searchEvent', value: cashAccountSelect.searchEvent },
+                { key: 'scrollToEnd', value: cashAccountSelect.scrollToEnd },
+              ]"
+              (debounced)="onCashFinancialAccountsSearch($event)"
+            />
+          </app-input-error-message-handler>
+        </div>
+
         <!-- network -->
         <div>
-          <label for="network">{{ 'form.network' | translate }}</label>
+          <label for="network">{{ 'form.networkPaid' | translate }}</label>
           <app-input-error-message-handler [fc]="orderFg.get('payingNetwork')">
             <input
               pInputText
@@ -1017,50 +1040,25 @@
           </app-input-error-message-handler>
         </div>
 
-        <!-- cash account -->
-        <div>
-          <label  >{{ 'form.cashAccount' | translate }}</label>
-          <app-input-error-message-handler [fc]="orderFg.get('cashAccountId')">
-            <ng-select
-              class="app-select w-full"
-              [items]="cashAccounts()"
-              [formControl]="getFormControl(orderFg, 'cashAccountId')"
-              bindLabel="name"
-              bindValue="id"
-              [clearable]="false"
-              placeholder="الكل"
-              #customerSelect
-              appDebounce
-              [customEvents]="[
-                { key: 'searchEvent', value: customerSelect.searchEvent },
-                { key: 'scrollToEnd', value: customerSelect.scrollToEnd },
-              ]"
-              (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
-              (change)="onCustomerSelected($event)"
-            />
-          </app-input-error-message-handler>
-        </div>
-
         <!-- network account -->
         <div>
-          <label  >{{ 'form.cashAccount' | translate }}</label>
-          <app-input-error-message-handler [fc]="orderFg.get('cashAccountId')">
+          <label>{{ 'form.accountName' | translate }}</label>
+          <app-input-error-message-handler [fc]="orderFg.get('networkAccountId')">
             <ng-select
               class="app-select w-full"
-              [items]="networkAccounts()"
+              [items]="displayedNetworkAccounts()"
               [formControl]="getFormControl(orderFg, 'networkAccountId')"
               bindLabel="name"
               bindValue="id"
               [clearable]="false"
               placeholder="الكل"
-              #customerSelect
+              #networkAccountSelect
               appDebounce
               [customEvents]="[
-                { key: 'searchEvent', value: customerSelect.searchEvent },
-                { key: 'scrollToEnd', value: customerSelect.scrollToEnd },
+                { key: 'searchEvent', value: networkAccountSelect.searchEvent },
+                { key: 'scrollToEnd', value: networkAccountSelect.scrollToEnd },
               ]"
-              (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
-              (change)="onCustomerSelected($event)"
+              (debounced)="onNetworkFinancialAccountsSearch($event)"
             />
           </app-input-error-message-handler>
         </div>

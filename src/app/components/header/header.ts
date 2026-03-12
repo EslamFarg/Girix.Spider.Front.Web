@@ -276,9 +276,9 @@ export class Header extends BaseComponent implements AfterViewInit {
           routerLink: '/settings/financial',
         },
         {
-          labelKey: 'dailyOpeningClosing',
-          imgUrl: headerIcons.settings.children.dailyOpeningClosing,
-          routerLink: '/settings/daily-opening-closing',
+          labelKey: 'dailyJournal',
+          imgUrl: headerIcons.settings.children.dailyJournal,
+          routerLink: '/settings/daily-journal',
         },
         {
           labelKey: 'qr',

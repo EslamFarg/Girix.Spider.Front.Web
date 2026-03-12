@@ -30,6 +30,15 @@ export interface IBaseSearchResponse<T> {
   };
 }
 
+export interface ISearchCriteria<SearchEnum> {
+  paginationInfo: Partial<{ pageIndex: number; pageSize: number }>;
+  searchFilters: { column: SearchEnum; values: string[] }[];
+  fromDate: string | null; //start | past
+  toDate?: string; //end;
+  removeDateFilter?: boolean;
+  searchEndpoint?: string;
+}
+
 export class BaseSearchAndCrudService<
   ISearchResponseValue,
   SearchEnum,
@@ -37,13 +46,8 @@ export class BaseSearchAndCrudService<
   IUpdateDto = any,
   IGetByIdDto = any,
 > extends BaseCrudService<ICreateDto, IUpdateDto, IGetByIdDto> {
-  search(criteriaDto: {
-    paginationInfo: Partial<{ pageIndex: number; pageSize: number }>;
-    searchFilters: { column: SearchEnum; values: string[] }[];
-    fromDate: string | null; //start | past
-    toDate?: string; //end;
-    removeDateFilter?: boolean;
-  }) {
+  search(criteriaDto: ISearchCriteria<SearchEnum>) {
+    const searchEndpoint = criteriaDto.searchEndpoint ?? this.endpoints.search;
     if (this.isMock) {
       return new Observable<IBaseSearchResponse<ISearchResponseValue>>((observer) => {
         observer.next({
@@ -87,6 +91,6 @@ export class BaseSearchAndCrudService<
     //   };
     // }
 
-    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(`${this.apiUrl}/${this.endpoints.search}`, body);
+    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(`${this.apiUrl}/${searchEndpoint}`, body);
   }
 }
