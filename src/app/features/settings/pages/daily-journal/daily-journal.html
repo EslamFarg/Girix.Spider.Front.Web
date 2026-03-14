@@ -1,5 +1,5 @@
 <div class="min-h-full h-full overflow-auto custom-scroll">
-  <app-section-wrapper class="p-4" styleClass="flex flex-col gap-4">
+  <app-section-wrapper class="p-4" styleClass="flex flex-col gap-8">
     <!-- search -->
     <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="h-fit items-start gap-2 w-full">
       <app-input-error-message-handler [fc]="fg.get('text')">
@@ -33,34 +33,44 @@
     </section>
 
     <section
-      class="flex items-center gap-2 sm:gap-4 w-full max-w-125 mx-auto"
-      style="--p-button-primary-background: var(--color-text-lighter); --p-button-primary-border-color: transparent"
+      class="flex nav-items items-center gap-2 sm:gap-4 w-full max-w-125 mx-auto"
+      style="
+        --p-button-primary-background: var(--color-text-lighter);
+        --p-button-primary-border-color: transparent;
+        --p-button-primary-color: var(--color-dark-line);
+        --p-button-primary-hover-color: #000000;
+      "
     >
-      <p-button
-        styleClass="w-full"
-        class="text-dark-bg-1 h-12.5 flex-1 text-center px-1 rounded-lg font-semibold flex items-center justify-center"
+      <a
+        routerLinkActive="active"
+        pButton
+        class="h-12.5 flex-1 text-center px-1 rounded-lg font-semibold flex items-center justify-center"
         routerLink="open-daily-journal"
-        ><span>فتح اليوميه</span>
-      </p-button>
+      >
+        <span>فتح اليوميه</span>
+      </a>
 
-      <p-button
-        styleClass="w-full"
-        class="text-dark-bg-1 h-12.5 flex-1 text-center px-1 rounded-lg font-semibold flex items-center justify-center"
+      <a
+        routerLinkActive="active"
+        pButton
+        class="h-12.5 flex-1 text-center px-1 rounded-lg font-semibold flex items-center justify-center"
         routerLink="close-daily-journal"
-        ><span>غلق اليوميه</span>
-      </p-button>
+      >
+        <span>غلق اليوميه</span>
+      </a>
 
-      <p-button
-        styleClass="w-full"
-        class="text-dark-bg-1 h-12.5 flex-1 text-center px-1 rounded-lg font-semibold flex items-center justify-center"
+      <a
+        routerLinkActive="active"
+        pButton
+        class="h-12.5 flex-1 text-center px-1 rounded-lg font-semibold flex items-center justify-center"
         routerLink="reset-shortage"
-        ><span>تصغير العجز</span>
-      </p-button>
+      >
+        <span>تصغير العجز</span>
+      </a>
     </section>
 
-    <router-outlet />
-
-   
+    <div>
+      <router-outlet />
+    </div>
   </app-section-wrapper>
 </div>
-

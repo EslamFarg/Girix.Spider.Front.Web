@@ -1,7 +1,7 @@
 <form class="close-daily-journal" [formGroup]="fg">
   <!-- الرصيد السابق -->
   <div class="journal-row">
-     <div class="journal-field">
+    <div class="journal-field">
       <label class="journal-label">الرصيد السابق</label>
       <div class="doc-input">
         <input pInputText placeholder="3000" />
@@ -17,7 +17,7 @@
 
   <!-- العهده -->
   <div class="journal-row">
-     <div class="journal-field">
+    <div class="journal-field">
       <label class="journal-label">العهدة</label>
       <div class="doc-input">
         <input pInputText placeholder="3000" />
@@ -33,7 +33,7 @@
 
   <!-- مبلغ غلق كاش -->
   <div class="journal-row">
-     <div class="journal-field">
+    <div class="journal-field">
       <label class="journal-label">مبلغ غلق كاش</label>
       <div class="doc-input">
         <app-input-error-message-handler [fc]="fg.get('cashClosingAmount')">
@@ -57,7 +57,7 @@
 
   <!-- مبلغ غلق شيكه -->
   <div class="journal-row">
-     <div class="journal-field">
+    <div class="journal-field">
       <label class="journal-label">مبلغ غلق شيكه</label>
       <div class="doc-input">
         <app-input-error-message-handler [fc]="fg.get('networkClosingAmount')">
@@ -94,4 +94,13 @@
       ></textarea>
     </div>
   </div>
+
+  <button
+    pButton
+    style="--p-button-primary-background: var(--color-dark-line)"
+    class="border-dark-line! text-white! py-1! md:px-8! w-fit ms-auto mt-4"
+    type="submit"
+  >
+    {{ 'actions.save' | translate }}
+  </button>
 </form>

@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-4">
+<form class="flex flex-col gap-4">
   <!-- الرصيد السابق -->
   <div class="doc-input">
     <label for="productPrice" class="mb-0!">الرصيد السابق</label>
@@ -30,4 +30,13 @@
       </app-input-error-message-handler>
     </div>
   </div>
-</div>
+
+  <button
+    pButton
+    style="--p-button-primary-background: var(--color-dark-line)"
+    class="border-dark-line! text-white! py-1! md:px-8!  w-fit ms-auto mt-4"
+    type="submit"
+  >
+   {{'actions.save' | translate }}
+  </button>
+</form>

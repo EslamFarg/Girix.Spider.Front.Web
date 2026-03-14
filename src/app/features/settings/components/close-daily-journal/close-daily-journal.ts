@@ -5,12 +5,14 @@ import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { DailyJournalService } from '../../services/daily-journal-service';
+import { TranslatePipe } from '@ngx-translate/core';
+import { ButtonDirective } from "primeng/button";
 
 @Component({
   selector: 'app-close-daily-journal',
   templateUrl: './close-daily-journal.html',
   styleUrl: './close-daily-journal.css',
-  imports: [InputErrorMessageHandler, InputText, Textarea,ReactiveFormsModule],
+  imports: [InputErrorMessageHandler, InputText, Textarea, ReactiveFormsModule, TranslatePipe, ButtonDirective],
 })
 export class CloseDailyJournal extends BaseComponent {
   initialFgValue = {

@@ -6,7 +6,7 @@ import { BaseComponent } from '@/components/base-component/base-component';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { RouterLink, RouterLinkActive, RouterLinkWithHref, RouterOutlet } from '@angular/router';
-import { Button } from 'primeng/button';
+import { Button, ButtonDirective } from 'primeng/button';
 import { CarouselModule, Carousel } from 'primeng/carousel';
 import { Textarea } from 'primeng/textarea';
 
@@ -30,7 +30,8 @@ enum DocFormSections {
     Button,
     Carousel,
     Textarea,
-    RouterOutlet
+    RouterOutlet,
+    ButtonDirective
 ],
   templateUrl: './daily-journal.html',
   styleUrl: './daily-journal.css',

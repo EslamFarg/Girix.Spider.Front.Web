@@ -5,12 +5,14 @@ import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { Validators } from '@angular/forms';
 import { DailyJournalService } from '../../services/daily-journal-service';
+import { TranslatePipe } from '@ngx-translate/core';
+import { ButtonDirective } from "primeng/button";
 
 @Component({
   selector: 'app-open-daily-journal',
   templateUrl: './open-daily-journal.html',
   styleUrl: './open-daily-journal.css',
-  imports: [InputErrorMessageHandler, InputText, Textarea],
+  imports: [InputErrorMessageHandler, InputText, Textarea, TranslatePipe, ButtonDirective],
 })
 export class OpenDailyJournal extends BaseComponent {
   initialFgValue = {
