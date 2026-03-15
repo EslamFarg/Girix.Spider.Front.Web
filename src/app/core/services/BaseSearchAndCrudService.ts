@@ -46,23 +46,23 @@ export class BaseSearchAndCrudService<
   IUpdateDto = any,
   IGetByIdDto = any,
 > extends BaseCrudService<ICreateDto, IUpdateDto, IGetByIdDto> {
-  search(criteriaDto: ISearchCriteria<SearchEnum>) {
+  search<T = IBaseSearchResponse<ISearchResponseValue>>(criteriaDto: ISearchCriteria<SearchEnum>) {
     const searchEndpoint = criteriaDto.searchEndpoint ?? this.endpoints.search;
-    if (this.isMock) {
-      return new Observable<IBaseSearchResponse<ISearchResponseValue>>((observer) => {
-        observer.next({
-          value: {} as ISearchResponseValue,
-          isSuccess: true,
-          isFailure: false,
-          error: {
-            code: '',
-            args: [],
-            errorType: 0,
-          },
-        });
-        observer.complete();
-      });
-    }
+    // if (this.isMock) {
+    //   return new Observable<T>((observer) => {
+    //     observer.next({
+    //       value: {} as ISearchResponseValue,
+    //       isSuccess: true,
+    //       isFailure: false,
+    //       error: {
+    //         code: '',
+    //         args: [],
+    //         errorType: 0,
+    //       },
+    //     });
+    //     observer.complete();
+    //   });
+    // }
 
     let body: any = {
       criteriaDto: {
@@ -91,6 +91,6 @@ export class BaseSearchAndCrudService<
     //   };
     // }
 
-    return this.http.post<IBaseSearchResponse<ISearchResponseValue>>(`${this.apiUrl}/${searchEndpoint}`, body);
+    return this.http.post<T>(`${this.apiUrl}/${searchEndpoint}`, body);
   }
 }

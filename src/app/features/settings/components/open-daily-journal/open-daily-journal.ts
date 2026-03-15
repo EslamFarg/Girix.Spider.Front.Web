@@ -3,16 +3,16 @@ import { Component, inject } from '@angular/core';
 import { InputErrorMessageHandler } from '@/yn-ng';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
-import { Validators } from '@angular/forms';
+import { Validators, ɵInternalFormsSharedModule, ReactiveFormsModule } from '@angular/forms';
 import { DailyJournalService } from '../../services/daily-journal-service';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ButtonDirective } from "primeng/button";
+import { ButtonDirective } from 'primeng/button';
 
 @Component({
   selector: 'app-open-daily-journal',
   templateUrl: './open-daily-journal.html',
   styleUrl: './open-daily-journal.css',
-  imports: [InputErrorMessageHandler, InputText, Textarea, TranslatePipe, ButtonDirective],
+  imports: [InputErrorMessageHandler, InputText, Textarea, TranslatePipe, ButtonDirective, ɵInternalFormsSharedModule, ReactiveFormsModule],
 })
 export class OpenDailyJournal extends BaseComponent {
   initialFgValue = {
@@ -25,14 +25,14 @@ export class OpenDailyJournal extends BaseComponent {
     super();
   }
 
-  dailyJournalService = inject(DailyJournalService);
+  // dailyJournalService = inject(DailyJournalService);
 
-  onSubmitOrder() {
+  onSubmitOpenDaily() {
     if (this.fg.invalid) {
       this.fg.markAllAsTouched();
       return;
     }
 
-    this.dailyJournalService.openDailySession(this.fg.value as any).subscribe();
+    // this.dailyJournalService.openUserDailySession(this.fg.value as any).subscribe();
   }
 }

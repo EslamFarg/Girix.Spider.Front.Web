@@ -32,10 +32,14 @@
   <nav class="bg-text-lighter overflow-auto custom-scroll w-full flex-1 shadow" #nav>
     <div class="container flex items-center h-full px-4 gap-2 py-1 min-w-max w-full transition-all" #navItemsContainer>
       @for (parent of navItems; track $index) {
-        <div class="relative flex items-center h-full" #parentElWrapper [id]="`header-link-wrapper-${parent.routerLink}`">
+        <div
+          class="relative flex items-center h-full"
+          #parentElWrapper
+          [id]="`header-link-wrapper-${parent.routerLink}`"
+        >
           <!-- parent -->
           <a
-          [id]="`header-link-${parent.routerLink}`"
+            [id]="`header-link-${parent.routerLink}`"
             class="nav-item max-w-50 opacity-0 z-20 h-full flex duration-500 ease-in-out transition-all flex-col gap-1 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg"
             [class.nav-item-active]="
               isShowingMenu() &&
@@ -51,51 +55,18 @@
               parent.routerLink === activeLink() ||
               isShowingMenu()
             "
-            [routerLink]="parent.routerLink === '/' ? ['/'] : []"
-            (click)="toggleActiveLink(parent.routerLink, parentElWrapper)"
+            [routerLink]="parent.isLink ? parent.routerLink : []"
+            (click)="toggleActiveLink({ routerLink: parent.routerLink, isLink: parent.isLink }, parentElWrapper)"
           >
             <img class="h-10 object-center" [src]="'/images/icons/header/' + parent.imgUrl + '.png'" alt="" />
             <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{
               translate('header.nav.' + parent.labelKey + '.label')
             }}</span>
           </a>
-          <!-- <a
-          class="nav-item z-20 h-full opacity-0 max-w-0 duration-500 ease-in-out transition-all flex-col gap-1 items-center justify-between py-1 order-100 px-2 cursor-pointer group border-2 border-transparent rounded-lg"
-          [class.nav-item-active]="
-            isShowingMenu &&
-            (parent.routerLink === activeLink ||
-              isParentActive(parent.routerLink) ||
-              isAnyChildSubLinksActive(parent.routerLink))
-          "
-          [class.slide-out]="
-            !(
-              activeLink == '/' ||
-              isAnyChildSubLinksActive(parent.routerLink) ||
-              isChildActive(parent.routerLink) ||
-              parent.routerLink === activeLink ||
-              isShowingMenu
-            )
-          "
-          [class.ms-0!]="$first || isParentActive(parent.routerLink)"
-          [class.nav-item-visible]="
-            activeLink == '/' ||
-            isChildActive(parent.routerLink) ||
-            isAnyChildSubLinksActive(parent.routerLink) ||
-            parent.routerLink === activeLink ||
-            isShowingMenu
-          "
-          #parentEl
-          [routerLink]="parent.routerLink === '/' ? ['/'] : []"
-          (click)="toggleActiveLink(parent.routerLink,parentEl)"
-        >
-          <img class="h-10 object-center" [src]="'/images/icons/header/' + parent.imgUrl + '.png'" alt="" />
-          <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{
-            translate('header.nav.' + parent.labelKey + '.label')
-          }}</span>
-        </a> -->
 
           <!-- children -->
           @if (
+            !parent?.isLink &&
             !isShowingMenu() &&
             (parent.routerLink === activeLink() ||
               isParentActive(parent.routerLink) ||
@@ -135,13 +106,18 @@
           >
             @for (child of parent.children; track $index) {
               <a
-              [id]="`header-link-${child.routerLink}`"
+                [id]="`header-link-${child.routerLink}`"
                 class="child nav-item h-full mx-0! transition-all duration-500 flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg"
                 [style]="`--ix:${$index}`"
                 [class.nav-item-active]="
                   child.routerLink === activeLink() || isAnySubLinksActive(parent.routerLink, child.routerLink)
                 "
-                (click)="toggleActiveLink(child?.subLinks ? child.subLinks![0] : child.routerLink!, parentElWrapper)"
+                (click)="
+                  toggleActiveLink(
+                    { routerLink: child?.subLinks ? child.subLinks![0] : child.routerLink!, isLink: true },
+                    parentElWrapper
+                  )
+                "
                 [routerLink]="child?.subLinks ? child.subLinks![0] : child.routerLink!"
               >
                 <img

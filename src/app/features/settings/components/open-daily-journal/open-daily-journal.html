@@ -1,31 +1,46 @@
-<form class="flex flex-col gap-4">
+<form class="flex flex-col gap-4" [formGroup]="fg" (ngSubmit)="onSubmitOpenDaily()">
   <!-- الرصيد السابق -->
   <div class="doc-input">
-    <label for="productPrice" class="mb-0!">الرصيد السابق</label>
-    <app-input-error-message-handler>
-      <input pInputText id="productPrice" aria-describedby="productPrice-help" placeholder="3000" />
+    <label for="previousBalance" class="mb-0!">الرصيد السابق</label>
+    <app-input-error-message-handler >
+      <input
+        pInputText
+        id="previousBalance"
+        disabled
+        class="w-full"
+        aria-describedby="previousBalance-help"
+        placeholder="0"
+      />
     </app-input-error-message-handler>
   </div>
   <!-- العهده -->
   <div class="doc-input">
-    <label for="" class="mb-0!">الرصيد السابق</label>
-    <app-input-error-message-handler>
-      <input pInputText id="productName" aria-describedby="productName-help" placeholder="3000" />
+    <label for="" class="mb-0!">العهده</label>
+    <app-input-error-message-handler [fc]="fg.get('custodyBalance')">
+      <input
+        pInputText
+        id="custodyBalance"
+        formControlName="custodyBalance"
+        class="w-full"
+        aria-describedby="custodyBalance-help"
+        placeholder=""
+      />
     </app-input-error-message-handler>
   </div>
   <!-- ملاحظات -->
   <div>
     <label for="" class="text-dark-bg-1 font-medium text-sm">ملاحظات</label>
     <div class="doc-input my-1">
-      <app-input-error-message-handler class="w-full">
+      <app-input-error-message-handler class="w-full" [fc]="fg.get('openingNotes')">
         <textarea
           rows="5"
           cols="30"
           pTextarea
           class="w-full"
-          id="productName"
-          aria-describedby="productName-help"
-          placeholder="ملاحظات"
+          formControlName="openingNotes"
+          id="openingNotes"
+          aria-describedby="openingNotes-help"
+          placeholder=""
         ></textarea>
       </app-input-error-message-handler>
     </div>
@@ -34,9 +49,9 @@
   <button
     pButton
     style="--p-button-primary-background: var(--color-dark-line)"
-    class="border-dark-line! text-white! py-1! md:px-8!  w-fit ms-auto mt-4"
+    class="border-dark-line! text-white! py-1! md:px-8! w-fit ms-auto mt-4"
     type="submit"
   >
-   {{'actions.save' | translate }}
+    {{ 'actions.save' | translate }}
   </button>
 </form>

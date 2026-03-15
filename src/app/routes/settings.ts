@@ -6,7 +6,7 @@ import { Language } from '@/features/settings/pages/language/language';
 import { Support } from '@/features/settings/pages/support/support';
 import { DefaultAccounts } from '@/features/settings/pages/default-accounts/default-accounts';
 import { AddPrinter } from '@/features/settings/pages/add-printer/add-printer';
-import { DailyJournal } from '@/features/settings/pages/daily-journal/daily-journal';
+import { ManageDailyJournal } from '@/features/settings/pages/manage-daily-journal/manage-daily-journal';
 import { Financial } from '@/features/settings/pages/financial/financial';
 import { OpenDailyJournal } from '@/features/settings/components/open-daily-journal/open-daily-journal';
 import { CloseDailyJournal } from '@/features/settings/components/close-daily-journal/close-daily-journal';
@@ -49,8 +49,8 @@ export default [
     component: AddPrinter,
   },
   {
-    path: 'daily-journal',
-    component: DailyJournal,
+    path: 'manage-daily-journal',
+    component: ManageDailyJournal,
     children: [
       {
         path: '',
@@ -71,4 +71,5 @@ export default [
       },
     ],
   },
+  
 ] satisfies Route[];

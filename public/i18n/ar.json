@@ -5,6 +5,9 @@
       "home": {
         "label": "الرئيسية"
       },
+      "dailyJournal": {
+        "label": "اليوميه"
+      },
       "invoices": {
         "label": "الفواتير",
         "orders": {

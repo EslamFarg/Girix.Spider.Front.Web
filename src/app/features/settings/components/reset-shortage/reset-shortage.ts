@@ -31,9 +31,9 @@ export class ResetShortage extends BaseComponent {
   private loadShortages() {
     if (!this.dailyJournalService.userId) return;
 
-    this.dailyJournalService.currentUserDaily().subscribe({
+    this.dailyJournalService.getCurrentUserDaily().subscribe({
       next: (res) => {
-        this.shortages.set(res.value?.shortage ?? []);
+        // this.shortages.set(res);
       },
     });
   }

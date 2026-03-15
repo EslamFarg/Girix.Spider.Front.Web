@@ -13,6 +13,7 @@ export interface IMainNavItem {
   action?: string;
   routerLink: string;
   children?: ISubNavItem[];
+  isLink?: boolean;
 }
 
 export interface ISubNavItem {
@@ -53,6 +54,13 @@ export class Header extends BaseComponent implements AfterViewInit {
       labelKey: 'home',
       imgUrl: headerIcons.home.imgUrl,
       routerLink: '/',
+      isLink: true,
+    },
+    {
+      labelKey: 'dailyJournal',
+      imgUrl: headerIcons.dailyJournal.imgUrl,
+      routerLink: '/daily-journal',
+      isLink: true,
     },
     {
       labelKey: 'invoices',
@@ -326,17 +334,16 @@ export class Header extends BaseComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     // setTimeout(() => {
-      // this.activeLink = this.router.url;
-      // this.prevActiveLink = this.router.url;
-      const parentRoute = this.getParent(this.router.url) ?? this.router.url;
-      const el = document.getElementById(`header-link-wrapper-${parentRoute}`);
-      console.log( parentRoute,this.router.url, el);
-      this.toggleActiveLink(parentRoute, el!);
-      // this.changeDetectionRef.markForCheck();
-      this.toggleActiveLink(this.router.url, el!);
-      // this.changeDetectionRef.markForCheck();
+    // this.activeLink = this.router.url;
+    // this.prevActiveLink = this.router.url;
+    const parentRoute = this.getParent(this.router.url) ?? this.router.url;
+    const el = document.getElementById(`header-link-wrapper-${parentRoute}`);
+    console.log(parentRoute, this.router.url, el);
+    this.toggleActiveLink({ routerLink: parentRoute, isLink: true }, el!);
+    // this.changeDetectionRef.markForCheck();
+    this.toggleActiveLink({ routerLink: this.router.url }, el!);
+    // this.changeDetectionRef.markForCheck();
     // }, 1000);
-    
   }
 
   /**
@@ -344,9 +351,9 @@ export class Header extends BaseComponent implements AfterViewInit {
    */
   constructor() {
     super();
-    effect(() => {
-      console.log('activeLink (s): ',this.activeLink());
-    })
+    // effect(() => {
+    //   console.log('activeLink (s): ', this.activeLink());
+    // });
   }
 
   getParent(childRoute: string) {
@@ -357,9 +364,11 @@ export class Header extends BaseComponent implements AfterViewInit {
     return this.navItems.some((i) => i.routerLink === route);
   }
 
-  toggleActiveLink(link: string, el: HTMLElement) {
+  toggleActiveLink(opts: { routerLink: string; isLink?: boolean }, el: HTMLElement) {
     //toggle overflow hidden for exact 1 second to avoid unwanted scroll
-    const navItemsContainer = this.navItemsContainer()!.nativeElement;
+    const link = opts.routerLink;
+    const navItemsContainer = this.navItemsContainer()?.nativeElement;
+    if (!navItemsContainer || !el) return;
     const nav = this.nav()!.nativeElement;
     const containerRight = navItemsContainer.getBoundingClientRect().right;
     const rect = el.getBoundingClientRect();
@@ -380,10 +389,10 @@ export class Header extends BaseComponent implements AfterViewInit {
 
     console.log(link, isParent, isPreviousParent, isSameParentLink);
 
-    if (link === '/') {
+    if (isParent && opts.isLink) {
       this.isShowingMenu.set(true);
       if (this.prevActiveLink() === '/' || isPreviousParent) {
-        this.activeLink.set('/');
+        this.activeLink.set(link);
         resetNav();
       } else {
         this.prevActiveLink.set(link);
@@ -398,7 +407,7 @@ export class Header extends BaseComponent implements AfterViewInit {
       } else {
         moveNav();
         console.log('move translate');
-        this.isShowingMenu.set(false) ;
+        this.isShowingMenu.set(false);
         this.prevActiveLink.set(link);
       }
       this.activeLink.set(link);

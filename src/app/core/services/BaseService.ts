@@ -40,7 +40,7 @@ export default abstract class BaseService {
   get localDateIso() {
     const localDate = new Date();
     localDate.setMinutes(localDate.getMinutes() - new Date().getTimezoneOffset());
-    return localDate.toISOString();
+    return localDate.toISOString().replace('Z', '');
   }
   protected patchEndpoints(endpoints: Partial<IEndpoints>) {
     this.endpoints = { ...this.endpoints, ...endpoints };
