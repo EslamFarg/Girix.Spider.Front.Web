@@ -154,6 +154,7 @@ export class DailyJournalService extends BaseService {
           if (res?.isOpening) {
             this.handleOpenedDailyJournalState();
             if (this.router.url.includes('open-daily-journal')) {
+              console.log(this.router.url);
               this.router.navigateByUrl('/daily-journal/close-daily-journal');
             }
           } else {
