@@ -33,7 +33,7 @@ export class ResetShortage extends BaseComponent {
 
     this.dailyJournalService.getCurrentUserDaily().subscribe({
       next: (res) => {
-        // this.shortages.set(res);
+        // this.shortages.set(res+);
       },
     });
   }

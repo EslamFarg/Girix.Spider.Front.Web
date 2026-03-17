@@ -56,6 +56,9 @@
 .journal-row .doc-input {
   width: 100%;
 }
+ .doc-input input {
+  width: 100%;
+}
 
 .journal-row input[pInputText],
 .journal-row textarea[pTextarea] {

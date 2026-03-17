@@ -5,7 +5,7 @@ import { first, firstValueFrom } from 'rxjs';
 
 export const canOpenCurrentUserDailyGuard: CanActivateFn =async (route, state) => {
   const dailyJournalService = inject(DailyJournalService);
-  dailyJournalService.currentUserId = dailyJournalService.userId;
+  dailyJournalService.currentUserId = dailyJournalService.loggedInId;
   let router = inject(Router);
   const result = await firstValueFrom(dailyJournalService.getCurrentUserDaily());
   if(result.isOpening){

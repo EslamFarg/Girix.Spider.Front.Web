@@ -17,7 +17,10 @@ export class DailyJournal extends BaseComponent {
    */
   constructor() {
     super();
-    this.dailyJournalService.currentUserId = this.dailyJournalService.userId;
-    this.dailyJournalService.getCurrentUserDaily().subscribe();
+    this.dailyJournalService.getUserDaily(this.dailyJournalService.loggedInId).subscribe({
+      next: (res) => {
+        this.dailyJournalService.currentUserDaily.set(res);
+      },
+    });
   }
 }

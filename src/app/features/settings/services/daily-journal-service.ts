@@ -88,8 +88,8 @@ export interface ICurrentUserDailyJournalResponse {
 export class DailyJournalService extends BaseService {
   override apiRoute = 'DailyJournalPeriod';
   authService = inject(AuthService);
-  get userId() {
-    return this.authService.userDetails()?.userId;
+  get loggedInId() {
+    return +(this.authService.userDetails()?.userId ?? 0);
   }
   currentUserId: any = null;
   //
@@ -147,59 +147,62 @@ export class DailyJournalService extends BaseService {
     this.http.post<any>(`${this.apiUrl}/CloseDailySession/ByUser/${this.currentUserId}`, dto);
 
   ///v1/DailyJournalPeriod/OpenDailySession
+  currentUserDaily=signal<null | IUserDailyJournalResponse>(null);
   getCurrentUserDaily = () => {
-    return this.http.get<ICurrentUserDailyJournalResponse>(`${this.apiUrl}/OpenDailySession`).pipe(
-      tap({
-        next: (res) => {
-          if (res?.isOpening) {
-            this.handleOpenedDailyJournalState();
-            if (this.router.url.includes('open-daily-journal')) {
-              console.log(this.router.url);
-              this.router.navigateByUrl('/daily-journal/close-daily-journal');
-            }
-          } else {
-            this.handleClosedDailyJournalState();
-            if (this.router.url.includes('open-daily-journal')) return;
-            this.router.navigate(['/daily-journal/open-daily-journal']);
-          }
-        },
-        error: (err) => {
-          this.handleClosedDailyJournalState();
-          if (this.router.url.includes('open-daily-journal')) return;
-          this.router.navigate(['/daily-journal/open-daily-journal']);
-        },
-        complete: () => {
-          console.log(this.links().length);
-        },
-      }),
-    );
+    return this.http
+      .get<ICurrentUserDailyJournalResponse>(`${this.apiUrl}/OpenDailySession`)
+      .pipe
+      // tap({
+      //   next: (res) => {
+      //     if (res?.isOpening) {
+      //       this.handleOpenedDailyJournalState();
+      //       if (this.router.url.includes('open-daily-journal')) {
+      //         console.log(this.router.url);
+      //         this.router.navigateByUrl('/daily-journal/close-daily-journal');
+      //       }
+      //     } else {
+      //       this.handleClosedDailyJournalState();
+      //       if (this.router.url.includes('open-daily-journal')) return;
+      //       this.router.navigate(['/daily-journal/open-daily-journal']);
+      //     }
+      //   },
+      //   error: (err) => {
+      //     this.handleClosedDailyJournalState();
+      //     if (this.router.url.includes('open-daily-journal')) return;
+      //     this.router.navigate(['/daily-journal/open-daily-journal']);
+      //   },
+      //   complete: () => {
+      //     console.log(this.links().length);
+      //   },
+      // }),
+      ();
   };
 
   getUserDaily = (userId: number) =>
     this.http
       .get<IUserDailyJournalResponse>(`${this.apiUrl}/OpenDailySession/UserDaily/ByUser/${this.currentUserId}`)
-      .pipe(
-        tap({
-          next: (res) => {
-            if (res.value?.dailyJournalPeriods?.isOpening) {
-              this.handleOpenedDailyJournalState();
-              if (this.router.url.includes('open-daily-journal')) {
-                this.router.navigate(['/settings/daily-journal/close-daily-journal']);
-              }
-            } else {
-              this.handleClosedDailyJournalState();
-              if (this.router.url.includes('open-daily-journal')) return;
-              this.router.navigate(['/settings/daily-journal/open-daily-journal']);
-            }
-          },
-          error: (err) => {
-            this.handleClosedDailyJournalState();
-            if (this.router.url.includes('open-daily-journal')) return;
-            this.router.navigate(['/settings/daily-journal/open-daily-journal']);
-          },
-          complete: () => {
-            console.log(this.links().length);
-          },
-        }),
-      );
+      .pipe
+      // tap({
+      //   next: (res) => {
+      //     if (res.value?.dailyJournalPeriods?.isOpening) {
+      //       this.handleOpenedDailyJournalState();
+      //       if (this.router.url.includes('open-daily-journal')) {
+      //         this.router.navigate(['/settings/daily-journal/close-daily-journal']);
+      //       }
+      //     } else {
+      //       this.handleClosedDailyJournalState();
+      //       if (this.router.url.includes('open-daily-journal')) return;
+      //       this.router.navigate(['/settings/daily-journal/open-daily-journal']);
+      //     }
+      //   },
+      //   error: (err) => {
+      //     this.handleClosedDailyJournalState();
+      //     if (this.router.url.includes('open-daily-journal')) return;
+      //     this.router.navigate(['/settings/daily-journal/open-daily-journal']);
+      //   },
+      //   complete: () => {
+      //     console.log(this.links().length);
+      //   },
+      // }),
+      ();
 }

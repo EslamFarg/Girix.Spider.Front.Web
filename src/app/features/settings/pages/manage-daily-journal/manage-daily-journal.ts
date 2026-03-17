@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -41,12 +41,13 @@ enum DocFormSections {
     TranslatePipe,
     OpenDailyJournal,
     NgSelectComponent,
-    Debounce,MessageModule
+    Debounce,
+    MessageModule,
   ],
   templateUrl: './manage-daily-journal.html',
   styleUrl: './manage-daily-journal.css',
 })
-export class ManageDailyJournal extends BaseComponent {
+export class ManageDailyJournal extends BaseComponent implements OnInit {
   DocFormSections = DocFormSections;
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', []),
@@ -57,11 +58,20 @@ export class ManageDailyJournal extends BaseComponent {
   links = this.dailyJournalService.links;
   currentUser = signal<IUserDailyJournalResponse | null>(null);
 
+  id = input.required<number>();
   /**
    *
    */
   constructor() {
     super();
+  }
+
+  ngOnInit(): void {
+    this.dailyJournalService.getUserDaily(this.id()).subscribe({
+      next: (res) => {
+        this.dailyJournalService.currentUserDaily.set(res);
+      },
+    });
   }
 
   displayedUsers = signal<IUserRowResponse[]>([]);
@@ -127,7 +137,7 @@ export class ManageDailyJournal extends BaseComponent {
         this.dailyJournalService.currentUserId = event.userId;
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: err?.error?.message??'غير موجود' });
+        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: err?.error?.message ?? 'غير موجود' });
       },
     });
   }

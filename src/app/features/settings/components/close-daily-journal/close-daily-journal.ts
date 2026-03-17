@@ -6,7 +6,7 @@ import { Textarea } from 'primeng/textarea';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { DailyJournalService } from '../../services/daily-journal-service';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ButtonDirective } from "primeng/button";
+import { ButtonDirective } from 'primeng/button';
 
 @Component({
   selector: 'app-close-daily-journal',
@@ -18,6 +18,8 @@ export class CloseDailyJournal extends BaseComponent {
   initialFgValue = {
     cashClosingAmount: this.fb.control<number>(0, [Validators.required]),
     networkClosingAmount: this.fb.control<number>(0, [Validators.required]),
+    closingNotes: this.fb.control<string | null>(null, [Validators.required]),
+    closingDate: this.fb.control(this.dateNowIso, []),
   };
   fg = this.fb.group(this.initialFgValue);
   constructor() {
@@ -25,13 +27,14 @@ export class CloseDailyJournal extends BaseComponent {
   }
 
   dailyJournalService = inject(DailyJournalService);
+  currentUserDaily = this.dailyJournalService.currentUserDaily;
 
-  onSubmitOrder() {
+  onCloseDaily() {
     if (this.fg.invalid) {
       this.fg.markAllAsTouched();
       return;
     }
 
-    this.dailyJournalService.closeDailySession(this.fg.value as any).subscribe();
+    this.dailyJournalService.closeUserDailySession(this.fg.value as any).subscribe();
   }
 }
