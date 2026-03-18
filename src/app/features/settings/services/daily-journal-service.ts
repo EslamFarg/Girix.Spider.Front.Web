@@ -88,7 +88,7 @@ export interface ICurrentUserDailyJournalResponse {
 export class DailyJournalService extends BaseService {
   override apiRoute = 'DailyJournalPeriod';
   authService = inject(AuthService);
-  get loggedInId() {
+  get loggedInUserId() {
     return +(this.authService.userDetails()?.userId ?? 0);
   }
   currentUserId: any = null;
@@ -180,7 +180,7 @@ export class DailyJournalService extends BaseService {
 
   getUserDaily = (userId: number) =>
     this.http
-      .get<IUserDailyJournalResponse>(`${this.apiUrl}/OpenDailySession/UserDaily/ByUser/${this.currentUserId}`)
+      .get<IUserDailyJournalResponse>(`${this.apiUrl}/UserDaily/ByUser/${this.currentUserId}`)
       .pipe
       // tap({
       //   next: (res) => {

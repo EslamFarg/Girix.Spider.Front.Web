@@ -17,6 +17,7 @@ export class CollectionsService extends BaseService {
   isCollectionInvoiceDialogVisible = computed(() => this.currentBill() !== null);
   currentBill = signal<IOrderBillReadResponse | null>(null);
   orderService = inject(OrderService);
+  lastCollectedId = signal<number | null>(null);
 
   openCollectionDialog = (orderId: number, isCollected: boolean = false) => {
     if (isCollected)

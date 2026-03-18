@@ -19,7 +19,7 @@ export class CloseDailyJournal extends BaseComponent {
     cashClosingAmount: this.fb.control<number>(0, [Validators.required]),
     networkClosingAmount: this.fb.control<number>(0, [Validators.required]),
     closingNotes: this.fb.control<string | null>(null, [Validators.required]),
-    closingDate: this.fb.control(this.dateNowIso, []),
+    closingDate: this.fb.control(this.localDateIso, []),
   };
   fg = this.fb.group(this.initialFgValue);
   constructor() {
@@ -35,6 +35,14 @@ export class CloseDailyJournal extends BaseComponent {
       return;
     }
 
-    this.dailyJournalService.closeUserDailySession(this.fg.value as any).subscribe();
+    this.dailyJournalService.closeUserDailySession(this.fg.value as any).subscribe({
+      next: () => {
+        this.dailyJournalService.getUserDaily(this.dailyJournalService.currentUserId).subscribe({
+          next: (res) => {
+            this.dailyJournalService.currentUserDaily.set(res);
+          },
+        });
+      },
+    });
   }
 }

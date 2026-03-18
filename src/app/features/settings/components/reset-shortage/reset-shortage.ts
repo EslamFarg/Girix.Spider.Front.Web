@@ -29,7 +29,7 @@ export class ResetShortage extends BaseComponent {
   }
 
   private loadShortages() {
-    if (!this.dailyJournalService.userId) return;
+    if (!this.dailyJournalService.loggedInUserId) return;
 
     this.dailyJournalService.getCurrentUserDaily().subscribe({
       next: (res) => {

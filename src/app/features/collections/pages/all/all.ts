@@ -1,5 +1,5 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
@@ -65,8 +65,10 @@ export class All extends BaseComponent {
 
   constructor() {
     super();
-
-    this.searchOrders(1);
+    effect(() => {
+      this.collectionsService.lastCollectedId();
+      this.searchOrders(1);
+    });
   }
 
   periodOptions = [

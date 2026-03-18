@@ -1,6 +1,6 @@
 <form class="close-daily-journal" [formGroup]="fg" (ngSubmit)="onCloseDaily()">
   <!-- الرصيد السابق -->
-  <div class="journal-row">
+  <div class="journal-row  opacity-70 **:cursor-not-allowed!">
     <div class="journal-field">
       <label class="journal-label">الرصيد السابق</label>
       <div class="doc-input">
@@ -16,7 +16,7 @@
   </div>
 
   <!-- العهده -->
-  <div class="journal-row">
+  <div class="journal-row opacity-70 **:cursor-not-allowed!">
     <div class="journal-field">
       <label class="journal-label">العهدة</label>
       <div class="doc-input">
@@ -28,7 +28,7 @@
         />
       </div>
     </div>
-    <div class="journal-field">
+    <div class="journal-field ">
       <label class="journal-label">الحساب</label>
       <div class="doc-input">
         <input disabled pInputText placeholder="" [value]="currentUserDaily()?.value?.dailyJournalPeriods?.custodyAccountName" />
@@ -52,7 +52,7 @@
         </app-input-error-message-handler>
       </div>
     </div>
-    <div class="journal-field">
+    <div class="journal-field opacity-70 **:cursor-not-allowed!">
       <label class="journal-label">الحساب</label>
       <div class="doc-input">
         <input pInputText disabled  [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
@@ -76,7 +76,7 @@
         </app-input-error-message-handler>
       </div>
     </div>
-    <div class="journal-field">
+    <div class="journal-field opacity-70 **:cursor-not-allowed!">
       <label class="journal-label">الحساب</label>
       <div class="doc-input">
         <input pInputText disabled  [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
@@ -107,6 +107,6 @@
     class="border-dark-line! text-white! py-1! md:px-8! w-fit ms-auto mt-4"
     type="submit"
   >
-    {{ 'actions.save' | translate }}
+    {{ 'actions.close' | translate }}
   </button>
 </form>

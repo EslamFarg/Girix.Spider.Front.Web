@@ -95,9 +95,14 @@ export class CollectionDialog extends BaseComponent {
       this.paymentFg.markAllAsTouched();
       return;
     }
+
+    this.paymentFg.patchValue({
+      collectionDate: this.localDateIso,
+    })
     this.collect(this.paymentFg.value as any).subscribe({
       next: (value) => {
         this.closeCollectionInvoiceDialog();
+        this.collectionsService.lastCollectedId.set(value.id);
       },
     });
   }

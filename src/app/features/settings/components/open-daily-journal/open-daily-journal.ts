@@ -18,14 +18,14 @@ export class OpenDailyJournal extends BaseComponent {
   initialFgValue = {
     custodyBalance: this.fb.control<number>(0, [Validators.required]),
     openingNotes: this.fb.control<string | null>(null, [Validators.required]),
-    dateTime: this.fb.control(this.dateNowIso, [Validators.required]),
+    dateTime: this.fb.control(this.localDateIso, [Validators.required]),
   };
   fg = this.fb.group(this.initialFgValue);
   constructor() {
     super();
   }
 
-  // dailyJournalService = inject(DailyJournalService);
+  dailyJournalService = inject(DailyJournalService);
 
   onSubmitOpenDaily() {
     if (this.fg.invalid) {
@@ -33,6 +33,14 @@ export class OpenDailyJournal extends BaseComponent {
       return;
     }
 
-    // this.dailyJournalService.openUserDailySession(this.fg.value as any).subscribe();
+    this.dailyJournalService.openUserDailySession(this.fg.value as any).subscribe({
+      next: () => {
+        this.dailyJournalService.getUserDaily(this.dailyJournalService.currentUserId).subscribe({
+          next: (res) => {
+            this.dailyJournalService.currentUserDaily.set(res);
+          },
+        });
+      },
+    });
   }
 }

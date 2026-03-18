@@ -105,6 +105,11 @@ export class Restaurant extends BaseComponent {
     const formData = new FormData();
 
     Array.from(Object.entries(this.fg.value)).forEach(([key, value]) => {
+      if (key == 'city' || key == 'district') {
+        formData.append(key + 'Ar', value?.toString() ?? '');
+        formData.append(key + 'En', value?.toString() ?? '');
+        return;
+      }
       if (key === 'logoUrl') {
         if (!this.currentImage()?.file) {
           return;

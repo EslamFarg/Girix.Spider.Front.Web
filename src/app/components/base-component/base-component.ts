@@ -88,7 +88,7 @@ export class BaseComponent {
   get localDateIso() {
     const localDate = new Date();
     localDate.setMinutes(localDate.getMinutes() - new Date().getTimezoneOffset());
-    return localDate.toISOString();
+    return localDate.toISOString().replace('Z', '');
   }
   UtcToLocalIso(utcDateString: string) {
     const localDate = new Date(utcDateString);
