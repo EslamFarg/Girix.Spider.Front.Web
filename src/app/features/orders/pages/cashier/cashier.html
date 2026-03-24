@@ -132,7 +132,7 @@
         name="orderType"
         id="delivery"
         formControlName="orderType"
-        [value]="OrderLocationType.Delivery"
+        [value]="OrderLocationType.PersonDelivery"
       />
       <label
         class="py-1! w-full text-sm!"
@@ -163,7 +163,7 @@
               hidden
               name="placeType"
               id="tableRadio"
-              [value]="OrderLocationType.Takeaway"
+              [value]="OrderLocalType.Table"
               #tableRadio
               formControlName="placeType"
             />
@@ -183,7 +183,7 @@
               name="placeType"
               id="roomRadio"
               formControlName="placeType"
-              [value]="OrderLocationType.DineIn"
+              [value]="OrderLocalType.Room"
             />
             <label
               (click)="RoomDialogVisible = true"
@@ -201,7 +201,7 @@
               name="placeType"
               id="hutRadio"
               formControlName="placeType"
-              [value]="OrderLocationType.Delivery"
+              [value]="OrderLocalType.Hut"
             />
             <label
               (click)="HutDialogVisible = true"

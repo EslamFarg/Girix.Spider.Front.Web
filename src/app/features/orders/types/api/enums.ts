@@ -10,7 +10,8 @@ export enum OrderSearchEnum {
 export enum OrderLocationType {
   DineIn = 1,
   Takeaway = 2,
-  Delivery = 3,
+  PersonDelivery = 3,
+  CompanyDelivery = 4
 }
 export enum OrderPaymentType {
   Pending = 0,

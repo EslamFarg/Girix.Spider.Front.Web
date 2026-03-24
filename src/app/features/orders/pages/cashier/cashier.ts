@@ -281,7 +281,9 @@ export class Cashier extends BaseComponent implements OnInit {
         case OrderLocationType.Takeaway:
           this.isPaid.set(true);
           break;
-        case OrderLocationType.Delivery:
+        case OrderLocationType.PersonDelivery:
+        case OrderLocationType.CompanyDelivery:
+          //todo: fix delivery Id
           deliveryId?.setValidators([labeledRequiredValidator('يرجى اختيار الدليفري', 'you must select a delivery')]);
           break;
         case OrderLocationType.DineIn:
@@ -458,7 +460,11 @@ export class Cashier extends BaseComponent implements OnInit {
   orderLocationType = signal<OrderLocationType | null>(OrderLocationType.Takeaway);
 
   deliveryFee = computed(() => {
-    if (this.orderLocationType() !== OrderLocationType.Delivery) return 0;
+    if (
+      this.orderLocationType() !== OrderLocationType.PersonDelivery &&
+      this.orderLocationType() !== OrderLocationType.CompanyDelivery
+    )
+      return 0;
 
     const baseFeeValue = this.financialSettings()?.deliveryFee;
     let fee = 0;
@@ -640,8 +646,8 @@ export class Cashier extends BaseComponent implements OnInit {
   cashAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
   networkAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
 
-  displayedCashAccounts = computed(() => [  ...this.cashAccounts()]);
-  displayedNetworkAccounts = computed(() => [  ...this.networkAccounts()]);
+  displayedCashAccounts = computed(() => [...this.cashAccounts()]);
+  displayedNetworkAccounts = computed(() => [...this.networkAccounts()]);
 
   searchAccounts(data: { pageIndex: number; searchTerm?: string }) {
     return this.financialAccountService.search({
@@ -1086,7 +1092,7 @@ export class Cashier extends BaseComponent implements OnInit {
   changeDeliveryType(isCompany: boolean) {
     this.isCompanyDelivery = isCompany;
     this.orderFg.patchValue({
-      orderType: OrderLocationType.Delivery,
+      orderType: isCompany ? OrderLocationType.CompanyDelivery : OrderLocationType.PersonDelivery,
       deliveryId: null,
     });
     this.searchDeliveries(1, isCompany);

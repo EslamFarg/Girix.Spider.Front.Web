@@ -4,7 +4,7 @@ import { Button, ButtonDirective } from 'primeng/button';
 import { Select } from 'primeng/select';
 import { InputText } from 'primeng/inputtext';
 import { Dialog } from 'primeng/dialog';
-import { CollectionsService } from '../../services/collections-service';
+import { CollectionsService, OpenCollectionDialogOptsDeliveryType } from '../../services/collections-service';
 import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
 import { OrderService } from '@/features/orders';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -37,19 +37,41 @@ import { noSymbolsAllowed } from '@/yn-ng';
     NumbersKeyboard,
     NgSelectComponent,
     Debounce,
-    ButtonDirective
-],
+    ButtonDirective,
+  ],
   templateUrl: './collection-dialog.html',
   styleUrl: './collection-dialog.css',
 })
 export class CollectionDialog extends BaseComponent {
+  OpenCollectionDialogOptsDeliveryType = OpenCollectionDialogOptsDeliveryType;
   collectionsService = inject(CollectionsService);
-  collect = this.collectionsService.collect;
+  collectNonDelivery = this.collectionsService.collectNonDelivery;
+  collectPersonDelivery = this.collectionsService.collectPersonDelivery;
+  collectCompanyDelivery = this.collectionsService.collectCompanyDelivery;
   orderService = inject(OrderService);
   currentBill = this.collectionsService.currentBill;
   isCollectionInvoiceDialogVisible = this.collectionsService.isCollectionInvoiceDialogVisible;
-  net = computed(() => this.currentBill()?.summary.totalNet ?? 0);
 
+  net = computed(() => {
+    console.log('net change:');
+    if (this.isDeliveryDialog()) {
+      console.log(`current delivery orders: ${JSON.stringify(this.currentDeliveryOrders())}`);
+      return +this.currentDeliveryOrders()
+        .reduce((acc, item) => {
+          if (this.checkedOrderIds().includes(item.orderId)) {
+            console.log(`item: ${item.netOrder}`);
+            return acc + item.netOrder;
+          } else {
+            return acc;
+          }
+        }, 0)
+        .toFixed(2);
+    } else {
+      return +(this.currentBill()?.summary.totalNet ?? 0).toFixed(2);
+    }
+  });
+  isDeliveryDialog = this.collectionsService.isDeliveryDialog;
+  currentDeliveryOrders = this.collectionsService.currentDeliveryOrders;
   /**
    *
    */
@@ -71,12 +93,11 @@ export class CollectionDialog extends BaseComponent {
   }
 
   initialPaymentFgValue = {
-    orderId: this.fb.control<number | null>(0, [Validators.required]),
     cashPaymentAmount: this.fb.control<number>(0, []),
     networkPaymentAmount: this.fb.control<number>(0, []),
     cashAccountId: this.fb.control<number | null>(null, [Validators.required]),
     networkAccountId: this.fb.control<number | null>(null, [Validators.required]),
-    collectionDate: this.fb.control<string | null>(null, [Validators.required]),
+    collectionDate: this.fb.control(this.localDateIso, [Validators.required]),
   };
   paymentFg = this.fb.group(this.initialPaymentFgValue);
   //
@@ -88,7 +109,8 @@ export class CollectionDialog extends BaseComponent {
   //
   //
   //
-
+  currentDeliveryType = this.collectionsService.currentDeliveryType;
+  currentDeliveryId = this.collectionsService.currentDeliveryId;
   onSubmitCollection() {
     if (this.paymentFg.invalid) {
       console.log('invalid paymentFg');
@@ -96,15 +118,46 @@ export class CollectionDialog extends BaseComponent {
       return;
     }
 
-    this.paymentFg.patchValue({
-      collectionDate: this.localDateIso,
-    })
-    this.collect(this.paymentFg.value as any).subscribe({
-      next: (value) => {
-        this.closeCollectionInvoiceDialog();
-        this.collectionsService.lastCollectedId.set(value.id);
-      },
-    });
+    if (this.isDeliveryDialog() && this.checkedOrderIds().length === 0) {
+      this.paymentFg.markAllAsTouched();
+      return;
+    }
+
+    const cashPaymentAmount = (+(this.paymentFg.get('cashPaymentAmount')?.value ?? 0)).toFixed(2);
+    const networkPaymentAmount = (+(this.paymentFg.get('networkPaymentAmount')?.value ?? 0)).toFixed(2);
+    let formValue: any = { ...this.paymentFg.value, cashPaymentAmount, networkPaymentAmount };
+    //        orderId: ,
+
+    switch (this.currentDeliveryType()) {
+      case OpenCollectionDialogOptsDeliveryType.Person:
+        formValue = { ...formValue, deliveryId: this.currentDeliveryId(), orderIds: this.checkedOrderIds() };
+        this.collectPersonDelivery(formValue).subscribe({
+          next: (value) => {
+            this.closeCollectionInvoiceDialog();
+            this.collectionsService.lastCollectedId.set(value.id);
+          },
+        });
+        break;
+      case OpenCollectionDialogOptsDeliveryType.Company:
+        formValue = { ...formValue, companyId: this.currentDeliveryId(), orderIds: this.checkedOrderIds() };
+        this.collectCompanyDelivery(formValue).subscribe({
+          next: (value) => {
+            this.closeCollectionInvoiceDialog();
+            this.collectionsService.lastCollectedId.set(value.id);
+          },
+        });
+        break;
+      case null:
+      default:
+        formValue = { ...formValue, orderId: this.currentBill()!.id };
+        this.collectNonDelivery(formValue).subscribe({
+          next: (value) => {
+            this.closeCollectionInvoiceDialog();
+            this.collectionsService.lastCollectedId.set(value.id);
+          },
+        });
+        break;
+    }
   }
   //
   //
@@ -312,12 +365,11 @@ export class CollectionDialog extends BaseComponent {
     const cashControl = this.paymentFg.get('cashPaymentAmount');
     const networkControl = this.paymentFg.get('networkPaymentAmount');
     console.log(this.currentBill());
-    if (this.currentBill()) {
+    if (this.currentBill() || this.checkedOrderIds().length > 0) {
       validators = [];
       this.paymentFg.patchValue({
         cashPaymentAmount: this.net(),
         networkPaymentAmount: 0,
-        orderId: this.currentBill()!.id,
         collectionDate: this.dateNowIso,
       });
       cashControl?.enable();
@@ -363,4 +415,25 @@ export class CollectionDialog extends BaseComponent {
       { emitEvent: false },
     );
   });
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  checkedOrderIds = signal<number[]>([]);
+  checkOrder(event: Event, orderId: number) {
+    const target = event.target as HTMLInputElement;
+    if (target.checked) {
+      this.checkedOrderIds.update((prev) => [...prev, orderId]);
+    } else {
+      this.checkedOrderIds.update((prev) => prev.filter((id) => id !== orderId));
+    }
+    console.log(this.checkedOrderIds());
+  }
 }

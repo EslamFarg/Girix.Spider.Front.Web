@@ -69,7 +69,10 @@
                     @case (OrderLocationType.DineIn) {
                       محلي
                     }
-                    @case (OrderLocationType.Delivery) {
+                    @case (OrderLocationType.PersonDelivery) {
+                      توصيل
+                    }
+                    @case (OrderLocationType.CompanyDelivery) {
                       توصيل
                     }
                     @case (OrderLocationType.Takeaway) {
@@ -86,8 +89,15 @@
                   <!-- collect -->
                   <button
                     type="button"
-                    [disabled]=" order.isCollected"
-                    (click)="openCollectionDialog(order.id,order.isCollected)"
+                    [disabled]="order.isCollected"
+                    (click)="
+                      openCollectionDialog({
+                        orderId: order.id,
+                        isCollected: order.isCollected,
+                        deliveryType: order.orderType ,
+                        deliveryId: order.deliveryId
+                      })
+                    "
                     class="collect bg-[#EA7C694D]!"
                   >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

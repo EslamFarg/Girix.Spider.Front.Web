@@ -1,15 +1,24 @@
-import { BaseComponent } from '@/components/base-component/base-component';
-import { Component, inject } from '@angular/core';
+import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
+import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { CollectionsService } from '../../services/collections-service';
+import { CollectionsService, OpenCollectionDialogOptsDeliveryType } from '../../services/collections-service';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { Paginator } from 'primeng/paginator';
+import { Paginator, PaginatorState } from 'primeng/paginator';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Dialog } from 'primeng/dialog';
 import { Button } from 'primeng/button';
+import {
+  DeliverySearchEnum,
+  DeliveryService,
+  IDeliverySearchRow,
+} from '@/features/deliveries/services/delivery-service';
+import { MenuItem } from 'primeng/api';
+import { Debounce } from '@/directives/debounce';
+import { Menu } from 'primeng/menu';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-deliveries',
@@ -23,27 +32,135 @@ import { Button } from 'primeng/button';
     Select,
     Dialog,
     Button,
+    ReactiveFormsModule,
+    Debounce,
+    Menu,
+    TranslatePipe,
   ],
   templateUrl: './deliveries.html',
   styleUrl: './deliveries.css',
 })
 export class Deliveries extends BaseComponent {
+  OpenCollectionDialogOptsDeliveryType = OpenCollectionDialogOptsDeliveryType;
   initialSearchFormValue = {
-    text: this.fb.control<string>('', [Validators.required]),
-    categoryId: this.fb.control<number>(0, [Validators.required]),
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+    searchEnum: this.fb.control<DeliverySearchEnum>(DeliverySearchEnum.Name, [Validators.required]),
+    fromDate: this.fb.control<string | null>(null, []),
+    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
   };
-  fg = this.fb.group(this.initialSearchFormValue);
-  onSubmit() {}
+  searchFg = this.fb.group(this.initialSearchFormValue);
 
-  first = 0;
-  rows = 10;
-  onPageChange(event: any) {}
+  deliveryService = inject(DeliveryService);
+  filterMenuItems = signal<MenuItem[]>([
+    {
+      label: 'الاسم',
+      command: (event) => this.searchFg.patchValue({ searchEnum: DeliverySearchEnum.Name }),
+    },
+    {
+      label: 'رقم الهاتف',
+      command: (event) => this.searchFg.patchValue({ searchEnum: DeliverySearchEnum.PhoneNumber }),
+    },
+  ]);
 
-  isCollectionDialogVisible = false;
-  openCollectionDialog() {
-    this.isCollectionDialogVisible = true;
+  constructor() {
+    super();
+
+    this.searchDeliverys(1);
   }
-  closeCollectionDialog() {
-    this.isCollectionDialogVisible = false;
+
+  companyFilter = [
+    { label: 'افراد', value: false },
+    { label: 'شركات', value: true },
+  ];
+
+  
+
+  deliveryMen = signal<IDeliverySearchRow[]>([]);
+
+  deliveryMenPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0,
+  };
+
+  searchDeliverys(pageIndex: number) {
+    this.deliveryService
+      .search({
+        paginationInfo: {
+          pageIndex: pageIndex,
+          pageSize: 10,
+        },
+        searchFilters: [
+          {
+            column: this.searchFg.getRawValue().searchEnum,
+            values: [this.searchFg.getRawValue().searchTerm],
+          },
+        ],
+        fromDate: this.searchFg.getRawValue().fromDate,
+      })
+      .subscribe({
+        next: (res) => {
+          this.deliveryMen.set(res.value.rows);
+          this.deliveryMenPaginationInfo = {
+            pageIndex,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          };
+        },
+      });
+  }
+
+  onSubmit = () => this.searchFg.valid && this.searchDeliverys(1);
+
+  onPageChange = (event: PaginatorState) => this.searchDeliverys(event.page! + 1);
+
+  deleteDelivery(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف المنتج',
+      header: 'حذف المنتج',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.deliveryService.delete(id).subscribe({
+          next: () => {
+            this.searchDeliverys(1);
+          },
+        });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
+      },
+    });
+  }
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  collectionsService = inject(CollectionsService);
+  isCollectionDialogVisible = this.collectionsService.isCollectionInvoiceDialogVisible;
+  openCollectionDialog = this.collectionsService.openCollectionDialog;
+
+  isInvoiceTypeChangeDialogVisible = false;
+
+  openInvoiceTypeChangeDialog() {
+    this.isInvoiceTypeChangeDialogVisible = true;
+  }
+
+  closeInvoiceTypeChangeDialog() {
+    this.isInvoiceTypeChangeDialogVisible = false;
   }
 }
