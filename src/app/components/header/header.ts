@@ -214,6 +214,11 @@ export class Header extends BaseComponent implements AfterViewInit {
           imgUrl: headerIcons.collections.children.deliveries,
           routerLink: '/collections/deliveries',
         },
+        {
+          labelKey: 'companies',
+          imgUrl: headerIcons.collections.children.deliveries,
+          routerLink: '/collections/company-deliveries',
+        },
       ],
     },
     {

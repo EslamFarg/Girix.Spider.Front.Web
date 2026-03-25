@@ -10,7 +10,7 @@ import { InputText } from 'primeng/inputtext';
 import { Dialog } from 'primeng/dialog';
 import { Button } from 'primeng/button';
 import { CollectionsService } from '../../services/collections-service';
-import { OrderSearchEnum, OrderService, IOrderRowResponse, OrderLocationType } from '@/features/orders';
+import { OrderSearchEnum, OrderService, IOrderSearchRow, OrderLocationType } from '@/features/orders';
 import { MenuItem } from 'primeng/api';
 import { DatePipe } from '@angular/common';
 
@@ -79,7 +79,7 @@ export class All extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
   ];
 
-  orders = signal<IOrderRowResponse[]>([]);
+  orders = signal<IOrderSearchRow[]>([]);
   ordersPaginationInfo = signal<IPaginationInfo>({
     pageIndex: 1,
     totalPagesCount: 0,
@@ -117,7 +117,13 @@ export class All extends BaseComponent {
 
   onPageChange = (event: PaginatorState) => this.searchOrders(event.page! + 1);
 
-  deleteOrder(id: number, event: Event) {
+  deleteOrder(order: IOrderSearchRow, event: Event) {
+
+    if(order.isCollected) {
+      this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لا يمكن حذف الطلب المحصل' });
+      return;
+    }
+
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'هل انت متاكد من حذف الطلب؟',
@@ -134,7 +140,7 @@ export class All extends BaseComponent {
         severity: 'danger',
       },
 
-      accept: () => this.orderService.delete(id).subscribe({ next: () => this.searchOrders(1) }),
+      accept: () => this.orderService.delete(order.id).subscribe({ next: () => this.searchOrders(1) }),
       reject: () => this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' }),
     });
   }

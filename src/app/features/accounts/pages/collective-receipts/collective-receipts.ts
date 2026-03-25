@@ -35,9 +35,11 @@ import { TranslatePipe } from '@ngx-translate/core';
   styleUrl: './collective-receipts.css',
 })
 export class CollectiveReceipts extends BaseComponent {
+  
   initialSearchFormValue = {
     receiptVoucherId: this.fb.control<number | null>(null, [Validators.maxLength(100)]),
   };
+
   fg = this.fb.group(this.initialSearchFormValue);
 
   receiptVoucerService = inject(ReceiptVoucherService);
@@ -47,12 +49,14 @@ export class CollectiveReceipts extends BaseComponent {
     this.getList(1);
   }
 
+
   collectiveReceipts = signal<IReceiptVoucherCollectiveReceiptGetListRow[]>([]);
   receiptVouchersPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
+
 
   getList(pageIndex: number) {
     this.receiptVoucerService
@@ -72,7 +76,6 @@ export class CollectiveReceipts extends BaseComponent {
         },
       });
   }
-
 
 
   onSubmit = () => this.fg.valid && this.getList(1);

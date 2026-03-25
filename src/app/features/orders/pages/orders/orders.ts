@@ -7,7 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { IOrderBillReadResponse, IOrderRowResponse, OrderSearchEnum, OrderService } from '@/features/orders';
+import { IOrderBillReadResponse, IOrderSearchRow, OrderSearchEnum, OrderService } from '@/features/orders';
 import { DatePipe } from '@angular/common';
 import { Menu } from 'primeng/menu';
 import { Button } from 'primeng/button';
@@ -87,7 +87,7 @@ export class Orders extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
   ];
 
-  orders = signal<IOrderRowResponse[]>([]);
+  orders = signal<IOrderSearchRow[]>([]);
   ordersPaginationInfo = signal<IPaginationInfo>({
     pageIndex: 1,
     totalPagesCount: 0,

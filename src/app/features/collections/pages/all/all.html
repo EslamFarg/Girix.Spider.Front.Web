@@ -94,8 +94,8 @@
                       openCollectionDialog({
                         orderId: order.id,
                         isCollected: order.isCollected,
-                        deliveryType: order.orderType ,
-                        deliveryId: order.deliveryId
+                        deliveryType: order.orderType,
+                        deliveryId: order.deliveryId,
                       })
                     "
                     class="collect bg-[#EA7C694D]!"
@@ -180,7 +180,7 @@
                       />
                     </svg>
                   </button>
-                  <button type="button" class="delete">
+                  <button type="button" class="delete" (click)="deleteOrder(order , $event)">
                     <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
                         opacity="0.4"

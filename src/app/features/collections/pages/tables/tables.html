@@ -29,7 +29,10 @@
     class="grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-7 md:grid-cols-4 md:gap-9 xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8"
   >
     @for (table of tables(); track $index) {
-      <app-table-card (click)="openCollectionDialog(table.orderId, table.isAvailable)" [data]="table" />
+      <app-table-card (click)="openCollectionDialog({
+        orderId:table.orderId,
+        isCollected:table.isAvailable
+      })" [data]="table" />
     }
   </div>
 

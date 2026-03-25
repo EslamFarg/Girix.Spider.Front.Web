@@ -93,6 +93,9 @@
         },
         "deliveries": {
           "label": "ديليفري"
+        },
+        "companies": {
+          "label": "الشركات"
         }
       },
       "accounts": {

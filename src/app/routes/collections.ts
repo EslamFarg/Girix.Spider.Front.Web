@@ -5,6 +5,7 @@ import { Tables } from '@/features/collections/pages/tables/tables';
 import { Rooms } from '@/features/collections/pages/rooms/rooms';
 import { Huts } from '@/features/collections/pages/huts/huts';
 import { Deliveries } from '@/features/collections/pages/deliveries/deliveries';
+import { CompanyDeliveries } from '@/features/collections/pages/company-deliveries/company-deliveries';
 
 export default [
   {
@@ -26,5 +27,9 @@ export default [
   {
     path: 'deliveries',
     component: Deliveries,
+  },
+  {
+    path: 'company-deliveries',
+    component: CompanyDeliveries,
   },
 ] satisfies Route[];

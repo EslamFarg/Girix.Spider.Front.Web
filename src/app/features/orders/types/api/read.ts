@@ -137,7 +137,7 @@ export interface IOrderBillReadResponse {
 }
 
 
-export interface IOrderRowResponse {
+export interface IOrderSearchRow {
   id: number;
   orderNumber: string;
   orderType: number;
@@ -161,7 +161,7 @@ export interface IOrderRowResponse {
 //search response
 
 export interface IOrderSearchResponseValue {
-  rows: IOrderRowResponse[];
+  rows: IOrderSearchRow[];
   paginationInfo: {
     totalRowsCount: number;
     totalPagesCount: number;

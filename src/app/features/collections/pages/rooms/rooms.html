@@ -36,7 +36,15 @@
     style="row-gap: 4rem; column-gap: 7rem"
   >
     @for (room of rooms(); track $index) {
-      <app-room-card (click)="openCollectionDialog(room.orderId, room.isAvailable)" [data]="room" />
+      <app-room-card
+        (click)="
+          openCollectionDialog({
+            orderId: room.orderId,
+            isCollected: room.isAvailable,
+          })
+        "
+        [data]="room"
+      />
     }
   </div>
 
