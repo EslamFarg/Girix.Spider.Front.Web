@@ -8,7 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { BaseComponent, IPaginationInfo } from '@/components';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { JournalEntryService } from '../../services/journal-entry-service';
+import { IJournalEntryReadResponse, JournalEntryService } from '../../services/journal-entry-service';
 import { Debounce } from '@/directives/debounce';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import {
@@ -35,13 +35,15 @@ import { FinancialAccountService } from '../../services/financial-account-servic
   styleUrl: './journals.css',
 })
 export class Journals extends BaseComponent {
+  currentJournalEntry = signal<IJournalEntryReadResponse | null>(null);
   journalEntryService = inject(JournalEntryService);
   initialFormValue = {
+    refNumber: this.fb.control<string | null>(null, [Validators.required]),
     voucherNo: this.fb.control<string | null>(null, [Validators.required]),
     voucherDate: this.fb.control<string | null>(null, [Validators.required]),
     paymentMethod: this.fb.control<string | null>(null, [Validators.required]),
     notes: this.fb.control<string | null>(null, [Validators.required]),
-    isHasTax: this.fb.control<string | null>(null, [Validators.required]),
+    isHasTax: this.fb.control<boolean>(false, [Validators.required]),
     totalAmount: this.fb.control<number | null>(null, [Validators.required]),
   };
   fg = this.fb.group(this.initialFormValue);
@@ -81,13 +83,26 @@ export class Journals extends BaseComponent {
   };
   previousSearchValue = '';
   searchVoucher(voucherNo: string) {
-    this.journalEntryService.getById(voucherNo as any).subscribe();
+    return this.journalEntryService.getById(voucherNo as any);
   }
 
-  debouncedVoucherSearch(event: any) {
+  debouncedVoucherSearch(event: any, voucherNo: string) {
     console.log(event);
-    const searchValue = event?.term ?? '';
-    this.searchVoucher(searchValue);
+    if (!voucherNo) return;
+    this.searchVoucher(voucherNo).subscribe({
+      next: (data) => {
+        this.currentJournalEntry.set(data);
+        this.fg.patchValue({
+          refNumber: data.refNumber,
+          voucherNo: data.voucherNo,
+          voucherDate: data.voucherDate,
+          paymentMethod: data.paymentMethod,
+          notes: data.notes,
+          isHasTax: data.isHasTax,
+          totalAmount: data.totalAmount,
+        });
+      },
+    });
   }
   //
   //

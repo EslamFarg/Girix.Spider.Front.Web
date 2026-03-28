@@ -25,13 +25,15 @@
           <input
             type="text"
             pInputText
+            #searchInput
             appDebounce
-            [domEvents]="['']"
+            [domEvents]="['change']"
+            (debounced)="debouncedVoucherSearch($event, searchInput.value)"
             id="productPrice"
             aria-describedby="productPrice-help"
             placeholder="بحث برقم القيد"
           />
-          <p-inputgroup-addon class="p-0!">
+          <p-inputgroup-addon class="p-0! cursor-pointer" (click)="debouncedVoucherSearch($event, searchInput.value)">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <ellipse cx="10.5992" cy="10.6532" rx="8.59922" ry="8.65324" fill="#E0E6E9" />
               <path
@@ -154,18 +156,18 @@
                   <ng-select
                     class="app-select"
                     [items]="displayedAccounts()"
-                    formControlName="printerId"
                     bindLabel="name"
                     bindValue="id"
                     placeholder="الكل"
                     [clearable]="false"
-                    #printerSelect
+
+                    #printerSelect1
                     appDebounce
                     [customEvents]="[
-                      { key: 'searchEvent', value: printerSelect.searchEvent },
-                      { key: 'scrollToEnd', value: printerSelect.scrollToEnd },
+                      { key: 'searchEvent', value: printerSelect1.searchEvent },
+                      { key: 'scrollToEnd', value: printerSelect1.scrollToEnd },
                     ]"
-                    (debounced)="debouncedVoucherSearch($event)"
+                    (debounced)="debouncedVoucherSearch($event, printerSelect1.searchTerm  )"
                   />
                 </app-input-error-message-handler>
               </div>
@@ -218,9 +220,9 @@
         </tr>
         @for (item of journalDetailRowsArray.controls; track $index) {
           <tr class="">
-            <td colspan="6">
+            <td colspan="6" class="p-0! border-none!">
               <form [formGroup]="item">
-                <table>
+                <table class="  w-full main-table  h-fit">
                   <tbody>
                     <tr>
                       <td class="w-[50px]">م</td>
@@ -234,13 +236,13 @@
                             bindValue="id"
                             placeholder="الكل"
                             [clearable]="false"
-                            #printerSelect
+                            #printerSelect2
                             appDebounce
                             [customEvents]="[
-                              { key: 'searchEvent', value: printerSelect.searchEvent },
-                              { key: 'scrollToEnd', value: printerSelect.scrollToEnd },
+                              { key: 'searchEvent', value: printerSelect2.searchEvent },
+                              { key: 'scrollToEnd', value: printerSelect2.scrollToEnd },
                             ]"
-                            (debounced)="debouncedVoucherSearch($event)"
+                            (debounced)="debouncedVoucherSearch($event, printerSelect2.searchTerm  )"
                           />
                         </app-input-error-message-handler>
                       </td>

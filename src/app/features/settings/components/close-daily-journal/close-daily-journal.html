@@ -1,6 +1,6 @@
 <form class="close-daily-journal" [formGroup]="fg" (ngSubmit)="onCloseDaily()">
   <!-- الرصيد السابق -->
-  <div class="journal-row  opacity-70 **:cursor-not-allowed!">
+  <div class="journal-row opacity-70 **:cursor-not-allowed!">
     <div class="journal-field">
       <label class="journal-label">الرصيد السابق</label>
       <div class="doc-input">
@@ -10,7 +10,12 @@
     <div class="journal-field">
       <label class="journal-label">الحساب</label>
       <div class="doc-input">
-        <input disabled pInputText placeholder="" [value]="currentUserDaily()?.value?.dailyJournalPeriods?.openingBalanceAccountName" />
+        <input
+          disabled
+          pInputText
+          placeholder=""
+          [value]="currentUserDaily()?.value?.dailyJournalPeriods?.openingBalanceAccountName"
+        />
       </div>
     </div>
   </div>
@@ -28,10 +33,15 @@
         />
       </div>
     </div>
-    <div class="journal-field ">
+    <div class="journal-field">
       <label class="journal-label">الحساب</label>
       <div class="doc-input">
-        <input disabled pInputText placeholder="" [value]="currentUserDaily()?.value?.dailyJournalPeriods?.custodyAccountName" />
+        <input
+          disabled
+          pInputText
+          placeholder=""
+          [value]="currentUserDaily()?.value?.dailyJournalPeriods?.custodyAccountName"
+        />
       </div>
     </div>
   </div>
@@ -55,7 +65,7 @@
     <div class="journal-field opacity-70 **:cursor-not-allowed!">
       <label class="journal-label">الحساب</label>
       <div class="doc-input">
-        <input pInputText disabled  [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
+        <input pInputText disabled [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
       </div>
     </div>
   </div>
@@ -79,7 +89,7 @@
     <div class="journal-field opacity-70 **:cursor-not-allowed!">
       <label class="journal-label">الحساب</label>
       <div class="doc-input">
-        <input pInputText disabled  [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
+        <input pInputText disabled [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
       </div>
     </div>
   </div>

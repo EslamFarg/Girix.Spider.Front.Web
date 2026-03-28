@@ -37,8 +37,8 @@ export class Debounce {
   private sub?: Subscription;
 
   ngOnInit() {
-    const domEvents = this.domEvents().map((e) =>
-      fromEvent(this.el.nativeElement, e).pipe(map((value) => ({ key: value, value }))),
+    const domEvents = this.domEvents().map((domEvent) =>
+      fromEvent(this.el.nativeElement, domEvent).pipe(map((value) => ({ key: domEvent, value }))),
     );
 
     const customEvents = this.customEvents().map((e) =>
