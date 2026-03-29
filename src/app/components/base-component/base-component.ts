@@ -41,6 +41,7 @@ export class BaseComponent {
   //
   nullableFb = inject(FormBuilder);
   fb = this.nullableFb.nonNullable;
+  shallowFg= this.fb.group({});
   baseUrl = environment.apiUrl.replace('/v1', '');
   router = inject(Router);
   activatedRoute = inject(ActivatedRoute);

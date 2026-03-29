@@ -163,8 +163,8 @@
             #customerSelect
             appDebounce
             [customEvents]="[
-              { key: 'searchEvent', value: customerSelect.searchEvent },
-              { key: 'scrollToEnd', value: customerSelect.scrollToEnd },
+              { type: 'searchEvent', value: customerSelect.searchEvent },
+              { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
             ]"
             (debounced)="onGroupsNameSearch($event, customerSelect.searchTerm ?? '')"
           />
@@ -253,8 +253,8 @@
             [closeOnSelect]="false"
             [multiple]="true"
             [customEvents]="[
-              { key: 'searchEvent', value: additionsSelect.searchEvent },
-              { key: 'scrollToEnd', value: additionsSelect.scrollToEnd },
+              { type: 'searchEvent', value: additionsSelect.searchEvent },
+              { type: 'scrollToEnd', value: additionsSelect.scrollToEnd },
             ]"
             [placeholder]="'classes.products.productadditives' | translate"
             (debounced)="onAdditionProductsSearch($event, additionsSelect.searchTerm ?? '')"

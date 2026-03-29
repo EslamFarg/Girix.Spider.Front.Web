@@ -161,8 +161,8 @@
             #groupSelect
             appDebounce
             [customEvents]="[
-              { key: 'searchEvent', value: groupSelect.searchEvent },
-              { key: 'scrollToEnd', value: groupSelect.scrollToEnd },
+              { type: 'searchEvent', value: groupSelect.searchEvent },
+              { type: 'scrollToEnd', value: groupSelect.scrollToEnd },
             ]"
             (debounced)="debouncedGroupsSearch($event)"
           />
@@ -213,8 +213,8 @@
             [compareWith]="compareById"
             appDebounce
             [customEvents]="[
-              { key: 'searchEvent', value: mealSelect.searchEvent },
-              { key: 'scrollToEnd', value: mealSelect.scrollToEnd },
+              { type: 'searchEvent', value: mealSelect.searchEvent },
+              { type: 'scrollToEnd', value: mealSelect.scrollToEnd },
             ]"
             (debounced)="debouncedGroupsSearch($event)"
           >

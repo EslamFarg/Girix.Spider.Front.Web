@@ -233,7 +233,7 @@ export class CollectionDialog extends BaseComponent {
   ) {
     let searchTerm = event?.value?.term ?? '';
     let isNewSearchTerm = searchTerm != this.previousCashAccountsSearchTerm;
-    if (event.key === 'scrollToEnd') {
+    if (event.type === 'scrollToEnd') {
       searchTerm = this.previousCashAccountsSearchTerm;
     }
     if (searchTerm && searchTerm.length > 100) return;
@@ -279,7 +279,7 @@ export class CollectionDialog extends BaseComponent {
   ) {
     let searchTerm = event?.value?.term ?? '';
     let isNewSearchTerm = searchTerm != this.previousNetworkAccountsSearchTerm;
-    if (event.key === 'scrollToEnd') {
+    if (event.type === 'scrollToEnd') {
       searchTerm = this.previousNetworkAccountsSearchTerm;
     }
     if (searchTerm && searchTerm.length > 100) return;

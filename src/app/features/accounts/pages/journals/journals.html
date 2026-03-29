@@ -1,13 +1,30 @@
-<form [formGroup]="fg" class="p-4 h-full overflow-auto custom-scroll">
+<form [formGroup]="fg" id="journalForm" (ngSubmit)="onSubmitJournal()" class="p-4 h-full overflow-auto custom-scroll">
   <!-- <app-opening-balances-nav class="mb-4"/> -->
 
   <app-section-wrapper>
     <!-- actions -->
     <div class="flex items-center gap-2 justify-end">
-      <p-button styleClass="border-dark-line! bg-dark-line! text-white! py-1! px-8!" label="حفظ" />
-      <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="حذف" variant="outlined" />
-      <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="جديد" variant="outlined" />
-      <p-button styleClass="border-dark-line! text-dark-line! py-1! px-8!" label="طباعة" variant="outlined" />
+      <button pButton form="journalForm" type="submit" class="border-dark-line! bg-dark-line! text-white! py-1! px-8!">
+        حفظ
+      </button>
+      <p-button
+        type="button"
+        styleClass="border-dark-line! text-dark-line! py-1! px-8!"
+        label="حذف"
+        variant="outlined"
+      />
+      <p-button
+        type="button"
+        styleClass="border-dark-line! text-dark-line! py-1! px-8!"
+        label="جديد"
+        variant="outlined"
+      />
+      <p-button
+        type="button"
+        styleClass="border-dark-line! text-dark-line! py-1! px-8!"
+        label="طباعة"
+        variant="outlined"
+      />
     </div>
 
     <div class="grid grid-cols-4 gap-4 flex-1 my-4">
@@ -19,38 +36,48 @@
         </app-input-error-message-handler>
       </div>
       <!-- بحث برقم القيد -->
-      <div>
+      <form
+        #searchVoucherForm
+        id="searchVoucherForm"
+        [formGroup]="shallowFg"
+        appDebounce
+        [domEvents]="['submit']"
+        (debounced)="debouncedVoucherSearch($event, voucherSearchInput.value)"
+      >
         <label for="productPrice">بحث برقم القيد</label>
+
         <app-input-error-message-handler>
           <input
             type="text"
             pInputText
-            #searchInput
-            appDebounce
-            [domEvents]="['change']"
-            (debounced)="debouncedVoucherSearch($event, searchInput.value)"
+            form="searchVoucherForm"
+            #voucherSearchInput
             id="productPrice"
             aria-describedby="productPrice-help"
             placeholder="بحث برقم القيد"
           />
-          <p-inputgroup-addon class="p-0! cursor-pointer" (click)="debouncedVoucherSearch($event, searchInput.value)">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="10.5992" cy="10.6532" rx="8.59922" ry="8.65324" fill="#E0E6E9" />
-              <path
-                opacity="0.4"
-                d="M20.6765 21.9555C20.3424 21.9447 20.0248 21.8073 19.7872 21.5707L17.7508 19.1904C17.3142 18.7912 17.2785 18.1126 17.6708 17.6692C17.8544 17.4834 18.104 17.3789 18.3644 17.3789C18.6248 17.3789 18.8744 17.4834 19.058 17.6692L21.6191 19.7184C21.988 20.096 22.1019 20.6565 21.9097 21.1495C21.7176 21.6424 21.2555 21.9757 20.7298 22.0003L20.6765 21.9555Z"
-                fill="#393C49"
-              />
-            </svg>
+          <p-inputgroup-addon class="p-0! cursor-pointer">
+            <button type="submit" form="searchVoucherForm" class="flex cursor-pointer">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="10.5992" cy="10.6532" rx="8.59922" ry="8.65324" fill="#E0E6E9" />
+                <path
+                  opacity="0.4"
+                  d="M20.6765 21.9555C20.3424 21.9447 20.0248 21.8073 19.7872 21.5707L17.7508 19.1904C17.3142 18.7912 17.2785 18.1126 17.6708 17.6692C17.8544 17.4834 18.104 17.3789 18.3644 17.3789C18.6248 17.3789 18.8744 17.4834 19.058 17.6692L21.6191 19.7184C21.988 20.096 22.1019 20.6565 21.9097 21.1495C21.7176 21.6424 21.2555 21.9757 20.7298 22.0003L20.6765 21.9555Z"
+                  fill="#393C49"
+                />
+              </svg>
+            </button>
           </p-inputgroup-addon>
         </app-input-error-message-handler>
-      </div>
+      </form>
       <!-- date -->
       <div class="col-span-2">
         <label for="productName">التاريخ</label>
-        <app-input-error-message-handler>
+        <app-input-error-message-handler [fc]="fg.get('voucherDate')">
           <p-datepicker
             formControlName="voucherDate"
+            [showTime]="true"
+            class="z-11!"
             [iconDisplay]="'input'"
             [showIcon]="true"
             inputId="templatedisplay"
@@ -88,7 +115,7 @@
       <!-- رقم القيد -->
       <div class="col-span-2">
         <label for="costPrice">الرقم الدفتري</label>
-        <app-input-error-message-handler>
+        <app-input-error-message-handler [fc]="fg.get('voucherNo')">
           <input
             formControlName="voucherNo"
             pInputText
@@ -101,14 +128,14 @@
       </div>
       <div class="col-span-2">
         <label for="costPrice">المرجع</label>
-        <app-input-error-message-handler>
-          <input pInputText type="text" id="costPrice" aria-describedby="costPrice-help" placeholder="المرجع" />
+        <app-input-error-message-handler [fc]="fg.get('refNumber')">
+          <input pInputText type="text" id="costPrice" formControlName="refNumber" aria-describedby="costPrice-help" placeholder="المرجع" />
         </app-input-error-message-handler>
       </div>
 
       <div class="col-span-4">
         <label for="productName">البيان</label>
-        <app-input-error-message-handler>
+        <app-input-error-message-handler [fc]="fg.get('notes')">
           <textarea
             rows="5"
             class="w-full"
@@ -122,87 +149,94 @@
       </div>
     </div>
 
-    <div class="flex justify-end">
-      <p-button
-        type="submit"
-        styleClass="border-dark-line! bg-dark-line! text-sm! text-white! py-1! px-2!"
-        label="إدراج الحسابات"
-      />
-    </div>
-
     <table class="my-4 w-full main-table table-fixed">
-      <colgroup>
-        <col style="width: 50px" />
-        <col span="5" />
-      </colgroup>
       <thead>
-        <tr class="">
-          <th>#</th>
-          <th>الحساب</th>
-          <th>المدين</th>
-          <th>الدائن</th>
-          <th>البيان</th>
-          <th>الأدوات</th>
+        <tr>
+          <th class="min-w-12.5 w-12.5">#</th>
+          <th class="min-w-45 w-45">الحساب</th>
+          <th class="min-w-45 w-45">المدين</th>
+          <th class="min-w-45 w-45">الدائن</th>
+          <th class="w-auto">البيان</th>
+          <th class="min-w-45 w-45">الأدوات</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td colspan="6" class="p-0!">
-            <form class="grid grid-cols-[50px_repeat(5,1fr)] *:p-2 *:flex *:items-center *:[&>*]:flex-1">
+        <tr
+          [class.last-clicked-table-row]="lastClickedTableRowIndex() === null"
+          (click)="lastClickedTableRowIndex.set(null)"
+        >
+          <td colspan="6" class="p-0! overflow-visible!">
+            <form
+              [formGroup]="newJournalDetailRowFg"
+              (ngSubmit)="addNewJournalDetailRow()"
+              class="grid grid-cols-[50px_repeat(3,11.25rem)_1fr_11.25rem] *:p-2 *:flex *:items-center *:[&>*]:flex-1"
+            >
               <div class="text-start">#</div>
               <!-- الحساب -->
               <div>
-                <app-input-error-message-handler>
+                <app-input-error-message-handler
+                  [grouped]="false"
+                  [fc]="newJournalDetailRowFg.get('finincalAccountId')"
+                >
                   <ng-select
                     class="app-select"
-                    [items]="displayedAccounts()"
+                    [items]="financialAccounts()"
                     bindLabel="name"
+                    formControlName="finincalAccountId"
                     bindValue="id"
                     placeholder="الكل"
                     [clearable]="false"
-
                     #printerSelect1
                     appDebounce
                     [customEvents]="[
-                      { key: 'searchEvent', value: printerSelect1.searchEvent },
-                      { key: 'scrollToEnd', value: printerSelect1.scrollToEnd },
+                      { type: 'searchEvent', value: printerSelect1.searchEvent },
+                      { type: 'scrollToEnd', value: printerSelect1.scrollToEnd },
                     ]"
-                    (debounced)="debouncedVoucherSearch($event, printerSelect1.searchTerm  )"
+                    (debounced)="debouncedFinancialAccountsSearch($event, printerSelect1.searchTerm)"
                   />
                 </app-input-error-message-handler>
               </div>
               <!-- المدين -->
               <div>
-                <app-input-error-message-handler>
+                <app-input-error-message-handler [fc]="newJournalDetailRowFg.get('debtorAmount')">
                   <input
                     pInputText
-                    id="productName"
+                    id="debtorAmount"
+                    appAllowNumbers
+                    [defaultChecked]="true"
+                    [min]="0"
+                    formControlName="debtorAmount"
                     class="app-input text-center"
-                    aria-describedby="productName-help"
+                    aria-describedby="debtorAmount-help"
                     placeholder="المدين"
                   />
                 </app-input-error-message-handler>
               </div>
               <!-- الدائن -->
               <div>
-                <app-input-error-message-handler>
+                <app-input-error-message-handler [fc]="newJournalDetailRowFg.get('creditorAmount')">
                   <input
                     pInputText
-                    id="productPrice"
+                    appAllowNumbers
+                    [defaultChecked]="true"
+                    [min]="0"
+                    id="creditorAmount"
+                    formControlName="creditorAmount"
                     class="app-input text-center"
-                    aria-describedby="productPrice-help"
+                    aria-describedby="creditorAmount-help"
                     placeholder="الدائن"
                   />
                 </app-input-error-message-handler>
               </div>
               <!-- البيان -->
               <div>
-                <app-input-error-message-handler>
+                <app-input-error-message-handler [fc]="newJournalDetailRowFg.get('notes')">
                   <input
                     pInputText
-                    id="costPrice"
+                    id="notes"
+                    formControlName="notes"
                     class="app-input text-center"
-                    aria-describedby="costPrice-help"
+                    aria-describedby="notes-help"
                     placeholder="البيان"
                   />
                 </app-input-error-message-handler>
@@ -219,18 +253,22 @@
           </td>
         </tr>
         @for (item of journalDetailRowsArray.controls; track $index) {
-          <tr class="">
-            <td colspan="6" class="p-0! border-none!">
+          <tr
+            [class.last-clicked-table-row]="lastClickedTableRowIndex() === $index"
+            (click)="lastClickedTableRowIndex.set($index)"
+          >
+            <td colspan="6" class="p-0! border-none! overflow-visible!">
               <form [formGroup]="item">
-                <table class="  w-full main-table  h-fit">
+                <table class="w-full main-table h-fit">
                   <tbody>
-                    <tr>
-                      <td class="w-[50px]">م</td>
-                      <td>
-                        <app-input-error-message-handler>
+                    <tr [class.last-clicked-table-row]="lastClickedTableRowIndex() === $index">
+                      <td class="min-w-12.5 w-12.5" [class.disabled]="!isRowEditable($index)">م</td>
+                      <!-- الحساب -->
+                      <td class="min-w-45 w-45 overflow-visible!" [class.disabled]="!isRowEditable($index)">
+                        <app-input-error-message-handler [grouped]="false" [fc]="item.get('finincalAccountId')">
                           <ng-select
                             class="app-select"
-                            [items]="displayedAccounts()"
+                            [items]="financialAccounts()"
                             formControlName="finincalAccountId"
                             bindLabel="name"
                             bindValue="id"
@@ -239,19 +277,57 @@
                             #printerSelect2
                             appDebounce
                             [customEvents]="[
-                              { key: 'searchEvent', value: printerSelect2.searchEvent },
-                              { key: 'scrollToEnd', value: printerSelect2.scrollToEnd },
+                              { type: 'searchEvent', value: printerSelect2.searchEvent },
+                              { type: 'scrollToEnd', value: printerSelect2.scrollToEnd },
                             ]"
-                            (debounced)="debouncedVoucherSearch($event, printerSelect2.searchTerm  )"
+                            (debounced)="debouncedFinancialAccountsSearch($event, printerSelect2.searchTerm)"
                           />
                         </app-input-error-message-handler>
                       </td>
-                      <td>12000</td>
-                      <td>32000</td>
-                      <td>معلومات عن الحساب اللي هيكتب فيه الديم او الدائن</td>
-                      <td>
+                      <!-- المدين -->
+                      <td class="min-w-45 w-45" [class.disabled]="!isRowEditable($index)">
+                        <app-input-error-message-handler [grouped]="false" [fc]="item.get('debtorAmount')">
+                          <input
+                            pInputText
+                            id="debtorAmount"
+                            formControlName="debtorAmount"
+                            class="app-input text-center"
+                            aria-describedby="debtorAmount-help"
+                            placeholder="المدين"
+                          />
+                        </app-input-error-message-handler>
+                      </td>
+                      <!-- الدائن -->
+                      <td class="min-w-45 w-45" [class.disabled]="!isRowEditable($index)">
+                        <app-input-error-message-handler [grouped]="false" [fc]="item.get('creditorAmount')">
+                          <input
+                            pInputText
+                            id="creditorAmount"
+                            formControlName="creditorAmount"
+                            [disabled]="!isRowEditable($index + 1)"
+                            class="app-input text-center"
+                            aria-describedby="creditorAmount-help"
+                            placeholder="الدائن"
+                          />
+                        </app-input-error-message-handler>
+                      </td>
+                      <!-- البيان -->
+                      <td [title]="item.get('notes')?.value ?? ''" [class.disabled]="!isRowEditable($index)">
+                        <app-input-error-message-handler [grouped]="false" [fc]="item.get('notes')">
+                          <input
+                            pInputText
+                            id="notes"
+                            formControlName="notes"
+                            class="app-input text-center"
+                            [disabled]="!isRowEditable($index)"
+                            aria-describedby="notes-help"
+                            placeholder="معلومات عن الحساب اللي هيكتب فيه الديم او الدائن"
+                          />
+                        </app-input-error-message-handler>
+                      </td>
+                      <td class="min-w-45 w-45">
                         <div class="actions">
-                          <button type="button" class="edit">
+                          <button type="button" class="edit" (click)="editJournalDetailRow($index)">
                             <svg
                               width="16"
                               height="16"
@@ -275,7 +351,7 @@
                               />
                             </svg>
                           </button>
-                          <button type="button" class="delete">
+                          <button type="button" class="delete" (click)="delteJournalDetailRow($index)">
                             <svg
                               width="15"
                               height="16"

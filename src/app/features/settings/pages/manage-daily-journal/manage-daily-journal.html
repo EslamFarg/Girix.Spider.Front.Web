@@ -11,8 +11,8 @@
         #userSelect
         appDebounce
         [customEvents]="[
-          { key: 'searchEvent', value: userSelect.searchEvent },
-          { key: 'scrollToEnd', value: userSelect.scrollToEnd },
+          { type: 'searchEvent', value: userSelect.searchEvent },
+          { type: 'scrollToEnd', value: userSelect.scrollToEnd },
         ]"
         (debounced)="debouncedUsersSearch($event)"
       />

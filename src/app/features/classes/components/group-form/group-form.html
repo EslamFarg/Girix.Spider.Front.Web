@@ -107,8 +107,8 @@
           #printerSelect
           appDebounce
           [customEvents]="[
-            { key: 'searchEvent', value: printerSelect.searchEvent },
-            { key: 'scrollToEnd', value: printerSelect.scrollToEnd },
+            { type: 'searchEvent', value: printerSelect.searchEvent },
+            { type: 'scrollToEnd', value: printerSelect.scrollToEnd },
           ]"
           (debounced)="debouncedPrinterSearch($event)"
         />

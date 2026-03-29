@@ -859,8 +859,8 @@
               #customerSelect
               appDebounce
               [customEvents]="[
-                { key: 'searchEvent', value: customerSelect.searchEvent },
-                { key: 'scrollToEnd', value: customerSelect.scrollToEnd },
+                { type: 'searchEvent', value: customerSelect.searchEvent },
+                { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
               ]"
               (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
               (change)="onCustomerSelected($event)"
@@ -1010,8 +1010,8 @@
               #cashAccountSelect
               appDebounce
               [customEvents]="[
-                { key: 'searchEvent', value: cashAccountSelect.searchEvent },
-                { key: 'scrollToEnd', value: cashAccountSelect.scrollToEnd },
+                { type: 'searchEvent', value: cashAccountSelect.searchEvent },
+                { type: 'scrollToEnd', value: cashAccountSelect.scrollToEnd },
               ]"
               (debounced)="onCashFinancialAccountsSearch($event)"
             />
@@ -1055,8 +1055,8 @@
               #networkAccountSelect
               appDebounce
               [customEvents]="[
-                { key: 'searchEvent', value: networkAccountSelect.searchEvent },
-                { key: 'scrollToEnd', value: networkAccountSelect.scrollToEnd },
+                { type: 'searchEvent', value: networkAccountSelect.searchEvent },
+                { type: 'scrollToEnd', value: networkAccountSelect.scrollToEnd },
               ]"
               (debounced)="onNetworkFinancialAccountsSearch($event)"
             />
