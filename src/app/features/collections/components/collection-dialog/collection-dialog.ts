@@ -53,13 +53,13 @@ export class CollectionDialog extends BaseComponent {
   isCollectionInvoiceDialogVisible = this.collectionsService.isCollectionInvoiceDialogVisible;
 
   net = computed(() => {
-    console.log('net change:');
+    // console.log('net change:');
     if (this.isDeliveryDialog()) {
-      console.log(`current delivery orders: ${JSON.stringify(this.currentDeliveryOrders())}`);
+      // console.log(`current delivery orders: ${JSON.stringify(this.currentDeliveryOrders())}`);
       return +this.currentDeliveryOrders()
         .reduce((acc, item) => {
           if (this.checkedOrderIds().includes(item.orderId)) {
-            console.log(`item: ${item.netOrder}`);
+            // console.log(`item: ${item.netOrder}`);
             return acc + item.netOrder;
           } else {
             return acc;
@@ -113,7 +113,7 @@ export class CollectionDialog extends BaseComponent {
   currentDeliveryId = this.collectionsService.currentDeliveryId;
   onSubmitCollection() {
     if (this.paymentFg.invalid) {
-      console.log('invalid paymentFg');
+      // console.log('invalid paymentFg');
       this.paymentFg.markAllAsTouched();
       return;
     }
@@ -364,7 +364,7 @@ export class CollectionDialog extends BaseComponent {
     let validators: ValidatorFn[] = [];
     const cashControl = this.paymentFg.get('cashPaymentAmount');
     const networkControl = this.paymentFg.get('networkPaymentAmount');
-    console.log(this.currentBill());
+    // console.log(this.currentBill());
     if (this.currentBill() || this.checkedOrderIds().length > 0) {
       validators = [];
       this.paymentFg.patchValue({
@@ -434,6 +434,6 @@ export class CollectionDialog extends BaseComponent {
     } else {
       this.checkedOrderIds.update((prev) => prev.filter((id) => id !== orderId));
     }
-    console.log(this.checkedOrderIds());
+    // console.log(this.checkedOrderIds());
   }
 }

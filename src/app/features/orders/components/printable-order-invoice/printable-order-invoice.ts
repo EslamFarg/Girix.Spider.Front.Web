@@ -94,7 +94,7 @@ export class PrintableOrderInvoice extends BaseComponent {
   loaded = false;
 
   onLogoLoad(img: HTMLImageElement) {
-    console.log('onLogoLoad');
+    // console.log('onLogoLoad');
     if (this.loaded) {
       return;
     }

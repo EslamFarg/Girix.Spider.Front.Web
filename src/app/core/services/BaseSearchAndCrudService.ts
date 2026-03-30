@@ -18,6 +18,9 @@ export enum SearchColumEnum {
   OrderIsCollectes = 14,
   IsAddition = 15,
   ReservedTo = 16,
+  InvoiceNumber = 17,
+  ReferenceNumber = 18,
+  Quantity = 19,
 }
 export interface IBaseSearchResponse<T> {
   value: T;
@@ -73,7 +76,7 @@ export class BaseSearchAndCrudService<
       },
       searchFilters: criteriaDto.searchFilters.map((x) => ({
         column: x.column,
-        values: x.values.map((y) => y?.trim()??''),
+        values: x.values.map((y) => y?.trim() ?? ''),
       })),
       fromDate: criteriaDto?.fromDate ?? null,
       toDate: criteriaDto?.toDate ?? this.localDateIso,

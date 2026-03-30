@@ -343,7 +343,7 @@ export class Header extends BaseComponent implements AfterViewInit {
     // this.prevActiveLink = this.router.url;
     const parentRoute = this.getParent(this.router.url) ?? this.router.url;
     const el = document.getElementById(`header-link-wrapper-${parentRoute}`);
-    console.log(parentRoute, this.router.url, el);
+    // console.log(parentRoute, this.router.url, el);
     this.toggleActiveLink({ routerLink: parentRoute, isLink: true }, el!);
     // this.changeDetectionRef.markForCheck();
     this.toggleActiveLink({ routerLink: this.router.url }, el!);
@@ -392,7 +392,7 @@ export class Header extends BaseComponent implements AfterViewInit {
     const isPreviousParent = this.isParent(this.prevActiveLink());
     const isSameParentLink = link === this.prevActiveLink() && isParent;
 
-    console.log(link, isParent, isPreviousParent, isSameParentLink);
+    // console.log(link, isParent, isPreviousParent, isSameParentLink);
 
     if (isParent && opts.isLink) {
       this.isShowingMenu.set(true);
@@ -403,15 +403,15 @@ export class Header extends BaseComponent implements AfterViewInit {
         this.prevActiveLink.set(link);
       }
     } else if (isParent) {
-      console.log('is parent');
+      // console.log('is parent');
       if (isSameParentLink || this.isAnyChildActive(link)) {
         resetNav();
-        console.log('reset translate');
+        // console.log('reset translate');
         this.isShowingMenu.set(true);
         this.prevActiveLink.set('');
       } else {
         moveNav();
-        console.log('move translate');
+        // console.log('move translate');
         this.isShowingMenu.set(false);
         this.prevActiveLink.set(link);
       }

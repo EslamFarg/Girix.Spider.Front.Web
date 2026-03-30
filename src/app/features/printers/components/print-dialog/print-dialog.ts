@@ -31,7 +31,6 @@ export class PrintDialog extends BaseComponent {
     if (!this.printerSettings()) return [];
 
     return Object.entries(this.printerSettings()!).map(([key, value]) => {
-      console.log(key);
       return { appPrinterType: key, ...value };
     });
   });

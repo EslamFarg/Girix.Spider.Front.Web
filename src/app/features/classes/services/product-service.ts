@@ -2,6 +2,7 @@ import { BaseCrudService } from '@/core/services/BaseCrudService';
 import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
+import { IUnitSearchRow } from './unit-service';
 
 export interface IProductSearchRow {
   id: number;
@@ -124,6 +125,14 @@ export enum ProductSearchEnum {
   IsAddition = SearchColumEnum.IsAddition,
 }
 
+export interface IProductUnit {
+  id: number;
+  unitId: number;
+  unitName: string;
+  quantity: number;
+  isMainUnit: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -166,5 +175,10 @@ export class ProductService extends BaseSearchAndCrudService<
     } else {
       return opts.price / ((1 + taxPercentage) * (1 + selectiveTaxPercentage));
     }
+  }
+
+  //v1/MenuItem/GetUnitsByMenuItemId
+  getUnitsByProductId(productId: number) {
+    return this.http.get<IProductUnit[]>(`${this.apiUrl}/GetUnitsByMenuItemId?MenuItemId=${productId}`);
   }
 }

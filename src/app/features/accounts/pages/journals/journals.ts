@@ -33,8 +33,8 @@ import { AllowNumbers } from '@/directives/allow-numbers';
     Debounce,
     NgSelectComponent,
     AllowNumbers,
-    ButtonDirective
-],
+    ButtonDirective,
+  ],
   templateUrl: './journals.html',
   styleUrl: './journals.css',
 })
@@ -77,7 +77,7 @@ export class Journals extends BaseComponent {
     const debtorEntries = this.journalDetailRowsArray.value.filter((a) => (a.debtorAmount ?? 0) > 0);
 
     //check if debtor or creditor is empty
-    if(creditorEntries.length == 0 || debtorEntries.length == 0) {
+    if (creditorEntries.length == 0 || debtorEntries.length == 0) {
       this.fg.markAllAsTouched();
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب ادخال قيمة المدين و الدائن' });
       return;
@@ -97,22 +97,21 @@ export class Journals extends BaseComponent {
       return;
     }
 
-
     //collect data to send
     let data = {
       ...this.fg.value,
       voucherDate: this.UtcToLocalIso(this.fg.value.voucherDate!.toISOString()),
-      debitJournalEntryDetailsRequestDtos: debtorEntries.map(d=>({
+      debitJournalEntryDetailsRequestDtos: debtorEntries.map((d) => ({
         finincalAccountId: d.finincalAccountId,
         isHasTax: false,
         totalAmount: d.debtorAmount,
-        notes: d.notes
+        notes: d.notes,
       })),
-      creditJournalEntryDetailsRequestDtos: creditorEntries.map(c=>({
+      creditJournalEntryDetailsRequestDtos: creditorEntries.map((c) => ({
         finincalAccountId: c.finincalAccountId,
         isHasTax: false,
         totalAmount: c.creditorAmount,
-        notes: c.notes
+        notes: c.notes,
       })),
     };
 
@@ -299,15 +298,20 @@ export class Journals extends BaseComponent {
   }>;
 
   setUpNewJournalDetailRowFg() {
-    this.newJournalDetailRowFg = this.fb.group({
-      finincalAccountId: this.fb.control<number | null>(null, [Validators.required]),
-      debtorAmount: this.fb.control<number>(0, [Validators.required]),
-      creditorAmount: this.fb.control<number>(0, [Validators.required]),
-      notes: this.fb.control<string | null>(null, [Validators.required]),
-    });
-    const newJournalDetailRowFgValue = this.newJournalDetailRowFg;
-    const creditorAmountControl = newJournalDetailRowFgValue.controls.creditorAmount;
-    const debtorAmountControl = newJournalDetailRowFgValue.controls.debtorAmount;
+    if (this.newJournalDetailRowFg) {
+      this.newJournalDetailRowFg.reset();
+    } else {
+      this.newJournalDetailRowFg = this.fb.group({
+        finincalAccountId: this.fb.control<number | null>(null, [Validators.required]),
+        debtorAmount: this.fb.control<number>(0, [Validators.required]),
+        creditorAmount: this.fb.control<number>(0, [Validators.required]),
+        notes: this.fb.control<string | null>(null, [Validators.required]),
+      });
+    }
+
+    const creditorAmountControl = this.newJournalDetailRowFg.controls.creditorAmount;
+    const debtorAmountControl = this.newJournalDetailRowFg.controls.debtorAmount;
+
     creditorAmountControl.valueChanges.subscribe((creditorAmount) => {
       debtorAmountControl.setValue(0, { emitEvent: false });
     });
