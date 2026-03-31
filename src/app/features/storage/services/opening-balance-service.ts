@@ -27,7 +27,7 @@ export class OpeningBalanceService extends BaseSearchAndCrudService<any,OpeningB
     this.patchEndpoints({
       create: 'create',
       patch: 'update',
-      delete: 'delete',
+      delete: 'delete?id=',
       getById: 'GetById?id=',
     })
   }

@@ -13,11 +13,11 @@ import { BaseComponent, IPaginationInfo } from '@/components/base-component/base
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Debounce } from '@/directives/debounce';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { PurchaseSearchEnum, PurchaseService } from '../../services/purchase-service';
-import { IPurchaseSearchRow } from '../../types/api/purchases/responses';
+import { PurchaseReturnSearchEnum, PurchaseReturnService } from '../../services/purchase-return-service';
+import { IPurchaseReturnSearchRow } from '../../types/api/purchase-return/responses';
 
 @Component({
-  selector: 'app-purchases',
+  selector: 'app-purchases-returns',
   imports: [
     InputErrorMessageHandler,
     InputGroupAddon,
@@ -32,37 +32,41 @@ import { IPurchaseSearchRow } from '../../types/api/purchases/responses';
     TranslatePipe,
     RouterLink,
   ],
-  templateUrl: './purchases.html',
-  styleUrl: './purchases.css',
+  templateUrl: './purchases-returns.html',
+  styleUrl: './purchases-returns.css',
 })
-export class Purchases extends BaseComponent {
+export class PurchasesReturns extends BaseComponent {
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
-    searchEnum: this.fb.control<PurchaseSearchEnum>(PurchaseSearchEnum.InvoiceNumber, [Validators.required]),
+    searchEnum: this.fb.control<PurchaseReturnSearchEnum>(PurchaseReturnSearchEnum.InvoiceNumber, [Validators.required]),
     fromDate: this.fb.control<string | null>(null, []),
     toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
   };
   fg = this.fb.group(this.initialSearchFormValue);
 
-  purchaseService = inject(PurchaseService);
+  purchaseReturnService = inject(PurchaseReturnService);
   filterMenuItems = signal<MenuItem[]>([
     {
+      label: 'رقم المرتجع',
+      command: () => this.fg.patchValue({ searchEnum: PurchaseReturnSearchEnum.Id }),
+    },
+    {
       label: 'رقم الفاتورة',
-      command: () => this.fg.patchValue({ searchEnum: PurchaseSearchEnum.InvoiceNumber }),
+      command: () => this.fg.patchValue({ searchEnum: PurchaseReturnSearchEnum.InvoiceNumber }),
     },
     {
       label: 'الرقم الدفتري',
-      command: () => this.fg.patchValue({ searchEnum: PurchaseSearchEnum.ReferenceNumber }),
+      command: () => this.fg.patchValue({ searchEnum: PurchaseReturnSearchEnum.ReferenceNumber }),
     },
     {
       label: 'اسم المورد',
-      command: () => this.fg.patchValue({ searchEnum: PurchaseSearchEnum.Name }),
+      command: () => this.fg.patchValue({ searchEnum: PurchaseReturnSearchEnum.Name }),
     },
   ]);
 
   constructor() {
     super();
-    this.searchPurchases(1);
+    this.searchPurchaseReturns(1);
   }
 
   periodOptions = [
@@ -73,15 +77,15 @@ export class Purchases extends BaseComponent {
     { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
   ];
 
-  purchases = signal<IPurchaseSearchRow[]>([]);
-  purchasesPaginationInfo: IPaginationInfo = {
+  purchaseReturns = signal<IPurchaseReturnSearchRow[]>([]);
+  purchaseReturnsPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
 
-  searchPurchases(pageIndex: number) {
-    this.purchaseService
+  searchPurchaseReturns(pageIndex: number) {
+    this.purchaseReturnService
       .search({
         paginationInfo: {
           pageIndex,
@@ -97,8 +101,8 @@ export class Purchases extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
-          this.purchases.set(res.rows);
-          this.purchasesPaginationInfo = {
+          this.purchaseReturns.set(res.rows);
+          this.purchaseReturnsPaginationInfo = {
             pageIndex,
             totalPagesCount: res.paginationInfo.totalPagesCount,
             totalRowsCount: res.paginationInfo.totalRowsCount,
@@ -107,15 +111,15 @@ export class Purchases extends BaseComponent {
       });
   }
 
-  onSubmit = () => this.fg.valid && this.searchPurchases(1);
+  onSubmit = () => this.fg.valid && this.searchPurchaseReturns(1);
 
-  onPageChange = (event: PaginatorState) => this.searchPurchases(event.page! + 1);
+  onPageChange = (event: PaginatorState) => this.searchPurchaseReturns(event.page! + 1);
 
-  deletePurchase(id: number, event: Event) {
+  deletePurchaseReturn(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف فاتورة الشراء',
-      header: 'حذف فاتورة الشراء',
+      message: 'هل انت متاكد من حذف مرتجع المشتريات',
+      header: 'حذف مرتجع المشتريات',
       icon: 'pi pi-info-circle',
       rejectLabel: 'الغاء',
       rejectButtonProps: {
@@ -128,9 +132,9 @@ export class Purchases extends BaseComponent {
         severity: 'danger',
       },
       accept: () => {
-        this.purchaseService.delete(id).subscribe({
+        this.purchaseReturnService.delete(id).subscribe({
           next: () => {
-            this.searchPurchases(1);
+            this.searchPurchaseReturns(1);
           },
         });
       },

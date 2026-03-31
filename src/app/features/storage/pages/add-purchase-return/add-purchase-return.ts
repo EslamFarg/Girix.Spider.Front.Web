@@ -3,11 +3,11 @@ import { Component } from '@angular/core';
 import { PurchasesRefundsForm } from "../../components/purchases-refunds-form/purchases-refunds-form";
 
 @Component({
-  selector: 'app-add-purchases-refunds',
+  selector: 'app-add-purchase-return',
   imports: [  SectionWrapper, PurchasesRefundsForm],
-  templateUrl: './add-purchases-refunds.html',
-  styleUrl: './add-purchases-refunds.css',
+  templateUrl: './add-purchase-return.html',
+  styleUrl: './add-purchase-return.css',
 })
-export class AddPurchasesRefunds {
+export class AddPurchaseReturn {
 
 }

@@ -153,7 +153,7 @@ export class Header extends BaseComponent implements AfterViewInit {
         {
           labelKey: 'purchasesRefunds',
           imgUrl: headerIcons.storage.children.purchasesRefunds,
-          routerLink: '/storage/purchases-refunds',
+          routerLink: '/storage/purchases-returns',
         },
         {
           labelKey: 'inventory',

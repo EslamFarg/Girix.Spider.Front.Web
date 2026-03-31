@@ -2,13 +2,16 @@ import { Route } from '@angular/router';
 import { OpeningBalances } from '@/features/storage/pages/opening-balances/opening-balances';
 import { Purchases } from '@/features/storage/pages/purchases/purchases';
 import { Inventory } from '@/features/storage/pages/inventory/inventory';
-import { AddOpeningBalances } from '@/features/storage/pages/add-opening-balances/add-opening-balances';
+import { AddOpeningBalance } from '@/features/storage/pages/add-opening-balance/add-opening-balance';
 import { AddPurchases } from '@/features/storage/pages/add-purchases/add-purchases';
-import { AddPurchasesRefunds } from '@/features/storage/pages/add-purchases-refunds/add-purchases-refunds';
-import { PurchasesRefunds } from '@/features/storage/pages/purchases-refunds/purchases-refunds';
+import { AddPurchaseReturn } from '@/features/storage/pages/add-purchase-return/add-purchase-return';
+import { PurchasesReturns } from '@/features/storage/pages/purchases-returns/purchases-returns';
 import { OpeningBalancesLayout } from '@/features/storage/layouts/opening-balances-layout/opening-balances-layout';
 import { PurchasesLayout } from '@/features/storage/layouts/purchases-layout/purchases-layout';
-import { PurchasesRefundsLayout } from '@/features/storage/layouts/purchases-refunds-layout/purchases-refunds-layout';
+import { PurchasesReturnsLayout } from '@/features/storage/layouts/purchases-returns-layout/purchases-returns-layout';
+import { EditOpeningBalance } from '@/features/storage/pages/edit-opening-balance/edit-opening-balance';
+import { EditPurchases } from '@/features/storage/pages/edit-purchases/edit-purchases';
+import { EditPurchaseReturn } from '@/features/storage/pages/edit-purchase-return/edit-purchase-return';
 
 export default [
   //opening-balances
@@ -22,8 +25,12 @@ export default [
       },
       {
         path: 'add',
-        component: AddOpeningBalances,
+        component: AddOpeningBalance,
       },
+      {
+        path: ':id/edit',
+        component: EditOpeningBalance,
+      }
     ],
   },
 
@@ -40,21 +47,29 @@ export default [
         path: 'add',
         component: AddPurchases,
       },
+      {
+        path: ':id/edit',
+        component: EditPurchases,
+      },
     ],
   },
 
   //purchases-refunds
   {
-    path: 'purchases-refunds',
-    component: PurchasesRefundsLayout,
+    path: 'purchases-returns',
+    component: PurchasesReturnsLayout,
     children: [
       {
         path: '',
-        component: PurchasesRefunds,
+        component: PurchasesReturns,
       },
       {
         path: 'add',
-        component: AddPurchasesRefunds,
+        component: AddPurchaseReturn,
+      },
+      {
+        path: ':id/edit',
+        component: EditPurchaseReturn,
       },
     ],
   },

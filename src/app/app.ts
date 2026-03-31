@@ -61,4 +61,10 @@ export class App {
     //go to replacements
     // this.router.navigate(['replacements/huts']);
   }
+
+
+   
 }
+
+
+ 

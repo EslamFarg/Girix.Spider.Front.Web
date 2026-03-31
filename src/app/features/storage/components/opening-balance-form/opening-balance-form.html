@@ -4,28 +4,11 @@
     type="submit"
     form="openingBalancesForm"
     pButton
-    class="flex-1 md:flex-none border-dark-line! bg-dark-line! text-white! py-1! md:px-8!"
+    class="flex-1 md:flex-none app-p-btn py-1! md:px-8!"
   >
     حفظ
   </button>
-  <p-button
-    class="flex-1 md:flex-none"
-    styleClass="border-dark-line! text-dark-line! py-1!  w-full md:px-8!"
-    label="حذف"
-    variant="outlined"
-  />
-  <p-button
-    class="flex-1 md:flex-none"
-    styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
-    label="جديد"
-    variant="outlined"
-  />
-  <p-button
-    class="flex-1 md:flex-none"
-    styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
-    label="طباعة"
-    variant="outlined"
-  />
+  <a pButton class="app-p-btn py-1! flex-1 md:flex-none md:px-8!" variant="outlined"> جديد </a>
 </div>
 
 <form
@@ -190,7 +173,7 @@
         </form>
       </td> -->
       <td>
-        <div class="text-start">#</div>
+        <div>#</div>
       </td>
       <!-- كود المنتج -->
       <td>
@@ -241,7 +224,7 @@
         <app-input-error-message-handler [grouped]="false" [fc]="newOpeningBalanceItemRowFg.get('unitId')">
           <ng-select
             class="app-select"
-            [items]="getProductUnits(newOpeningBalanceItemRowFg.get('itemId')?.value ?? 0)()"
+            [items]="this.units.get(newOpeningBalanceItemRowFg.get('itemId')?.value ?? 0)?.() ?? []"
             (open)="getProductUnits(newOpeningBalanceItemRowFg.get('itemId')?.value ?? 0)()"
             bindLabel="unitName"
             [formControl]="getFormControl(newOpeningBalanceItemRowFg, 'unitId')"
@@ -304,7 +287,7 @@
       </td>
       <!-- المجموع -->
       <td>
-        <app-input-error-message-handler [fc]="newOpeningBalanceItemRowFg.get('total')">
+        <!-- <app-input-error-message-handler [fc]="newOpeningBalanceItemRowFg.get('total')">
           <input
             pInputText
             type="number"
@@ -317,7 +300,15 @@
             aria-describedby="total-help"
             placeholder="0.00"
           />
-        </app-input-error-message-handler>
+        </app-input-error-message-handler> -->
+        <div class="app-input flex justify-center items-center" pInputText>
+          <span class="disabled">
+            {{
+              +(newOpeningBalanceItemRowFg.get('purchasePrice')?.value ?? 0) *
+                +(newOpeningBalanceItemRowFg.get('quantity')?.value ?? 0)
+            }}
+          </span>
+        </div>
       </td>
       <!-- actions -->
       <td>
@@ -334,7 +325,7 @@
         [class.last-clicked-table-row]="lastClickedTableRowIndex() === $index"
         (click)="lastClickedTableRowIndex.set($index)"
       >
-        <td class="min-w-12.5 w-12.5" [class.disabled]="!isRowEditable($index)">م</td>
+        <td class="min-w-12.5 w-12.5" [class.disabled]="!isRowEditable($index)">{{ $index + 1 }}</td>
         <!-- كود المنتج -->
         <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
           <app-input-error-message-handler [grouped]="false" [fc]="item.get('itemId')">
@@ -382,11 +373,11 @@
           <app-input-error-message-handler [grouped]="false" [fc]="item.get('unitId')">
             <ng-select
               class="app-select"
-              [items]="units.get(item.get('itemId')?.value ?? 0)?.() ?? []"
+              [items]="units.get(item.get('itemId')!.value!)!()"
               (open)="getProductUnits(newOpeningBalanceItemRowFg.get('itemId')?.value ?? 0)()"
               [formControl]="getFormControl(item, 'unitId')"
               bindLabel="unitName"
-              bindValue="id"
+              bindValue="unitId"
               placeholder="الكل"
               [clearable]="false"
             />
@@ -397,6 +388,7 @@
           <app-input-error-message-handler [grouped]="false" [fc]="item.get('quantity')">
             <input
               pInputText
+              appAllowNumbers
               id="debtorAmount"
               [formControl]="getFormControl(item, 'quantity')"
               class="app-input text-center"
@@ -410,6 +402,9 @@
           <app-input-error-message-handler [grouped]="false" [fc]="item.get('salePrice')">
             <input
               pInputText
+              type="number"
+              appAllowNumbers
+              [allowDecimal]="true"
               id="creditorAmount"
               [formControl]="getFormControl(item, 'salePrice')"
               [disabled]="!isRowEditable($index + 1)"
@@ -424,6 +419,9 @@
           <app-input-error-message-handler [grouped]="false" [fc]="item.get('purchasePrice')">
             <input
               pInputText
+              appAllowNumbers
+              [allowDecimal]="true"
+              type="number"
               id="creditorAmount"
               [formControl]="getFormControl(item, 'purchasePrice')"
               [disabled]="!isRowEditable($index + 1)"
@@ -435,17 +433,11 @@
         </td>
         <!-- المجموع -->
         <td class="" [class.disabled]="!isRowEditable($index)">
-          <app-input-error-message-handler [grouped]="false" [fc]="item.get('total')">
-            <input
-              pInputText
-              id="creditorAmount"
-              [formControl]="getFormControl(item, 'total')"
-              [disabled]="!isRowEditable($index + 1)"
-              class="app-input text-center"
-              aria-describedby="creditorAmount-help"
-              placeholder="0.00"
-            />
-          </app-input-error-message-handler>
+          <div class="app-input flex justify-center items-center" pInputText>
+            <span class="disabled">
+              {{ +(item.get('purchasePrice')?.value ?? 0) * +(item.get('quantity')?.value ?? 0) }}
+            </span>
+          </div>
         </td>
         <!-- actions -->
         <td class="min-w-40 w-40">

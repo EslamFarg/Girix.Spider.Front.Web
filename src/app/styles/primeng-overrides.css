@@ -1,4 +1,4 @@
-:root{
+:root {
   --p-button-primary-hover-background: #5b5b5b1b !important;
   --p-button-primary-active-background: #5b5b5b1b !important;
 }
@@ -61,7 +61,7 @@
     border-end-end-radius: 0 !important;
   }
 
-  .p-inputgroupaddon + .p-select ,
+  .p-inputgroupaddon + .p-select,
   .p-inputgroupaddon + .p-inputtext {
     border-inline-start-color: transparent !important;
     border-start-start-radius: 0 !important;
@@ -131,15 +131,15 @@ p-tree .p-tree-node-children > p-treenode > .p-tree-node > .p-tree-node-content 
     z-index: 1;
   }
 }
-p-tree .p-tree-node-children > p-treenode:nth-child(1) > .p-tree-node > .p-tree-node-content{
-  &::after{
+p-tree .p-tree-node-children > p-treenode:nth-child(1) > .p-tree-node > .p-tree-node-content {
+  &::after {
     height: 50%;
     top: 0%;
   }
 }
-.p-tree-node-children{
+.p-tree-node-children {
   position: relative;
-  &::after{
+  &::after {
     content: '';
     position: absolute;
     width: 1px;
@@ -151,4 +151,11 @@ p-tree .p-tree-node-children > p-treenode:nth-child(1) > .p-tree-node > .p-tree-
     background-color: black;
     z-index: 1;
   }
+}
+
+.app-p-btn {
+  --p-button-primary-color: #fff;
+  --p-button-primary-background: var(--color-dark-line);
+  --p-button-primary-border-color: var(--color-dark-line);
+  --p-button-primary-hover-color: var(--color-dark-line);
 }
