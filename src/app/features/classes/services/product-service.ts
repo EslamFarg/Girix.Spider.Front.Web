@@ -119,6 +119,7 @@ export interface IProductReadResponse {
 
 //MenuItems : Name,CategoryName,CategoryId
 export enum ProductSearchEnum {
+  Id = SearchColumEnum.Id,
   Name = SearchColumEnum.Name,
   CategoryName = SearchColumEnum.CategoryName,
   CategoryId = SearchColumEnum.CategoryId,

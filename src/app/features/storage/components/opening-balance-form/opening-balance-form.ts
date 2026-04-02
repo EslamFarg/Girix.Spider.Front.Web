@@ -427,6 +427,7 @@ export class OpeningBalanceForm extends BaseComponent {
 
   onCurrentItemChange(itemId: IProductSearchRow) {
     this.newOpeningBalanceItemRowFg.controls.itemId.setValue(itemId.id);
+    this.newOpeningBalanceItemRowFg.controls.unitId.setValue(null);
     this.getProductUnits(itemId.id);
   }
 }

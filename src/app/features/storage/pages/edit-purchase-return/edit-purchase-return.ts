@@ -1,11 +1,11 @@
 import { Component, input } from '@angular/core';
 import { BaseComponent } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { PurchasesRefundsForm } from '../../components/purchases-refunds-form/purchases-refunds-form';
+import { PurchaseReturnForm } from '../../components/purchase-return-form/purchase-return-form';
 
 @Component({
   selector: 'app-edit-purchase-return',
-  imports: [SectionWrapper, PurchasesRefundsForm],
+  imports: [SectionWrapper, PurchaseReturnForm],
   templateUrl: './edit-purchase-return.html',
   styleUrl: './edit-purchase-return.css',
 })

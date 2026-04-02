@@ -111,6 +111,7 @@ export class CollectionDialog extends BaseComponent {
   //
   currentDeliveryType = this.collectionsService.currentDeliveryType;
   currentDeliveryId = this.collectionsService.currentDeliveryId;
+
   onSubmitCollection() {
     if (this.paymentFg.invalid) {
       // console.log('invalid paymentFg');
@@ -159,6 +160,7 @@ export class CollectionDialog extends BaseComponent {
         break;
     }
   }
+  
   //
   //
   //

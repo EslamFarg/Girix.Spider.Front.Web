@@ -31,7 +31,7 @@ export class PurchaseService extends BaseSearchAndCrudService<
     this.patchEndpoints({
       create: 'create',
       put: 'update',
-      delete: 'delete?id=',
+      delete: 'delete/',
       getById: 'GetById?id=',
     });
   }

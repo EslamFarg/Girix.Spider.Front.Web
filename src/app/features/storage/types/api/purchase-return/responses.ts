@@ -32,7 +32,6 @@ export interface IPurchaseReturnReadResponse {
   supplierName: string
   supplierPhoneNumber: string
   supplierTaxNumber: string
-  statement: string
   reason: string
   paymentType: number
   referenceNumber: string
@@ -49,7 +48,7 @@ export interface IPurchaseReturnReadResponse {
 }
 
 export interface IPurchaseReturnReadItem {
-  id: number
+    id: number
   purchaseInvoiceItemId: number
   menuItemsId: number
   menuItemName: string
@@ -60,5 +59,4 @@ export interface IPurchaseReturnReadItem {
   salePrice: number
   taxAmount: number
   lineTotal: number
-  notes: string
 }
