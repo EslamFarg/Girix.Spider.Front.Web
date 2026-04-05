@@ -1,38 +1,137 @@
-import { Component } from '@angular/core';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { DatePicker } from 'primeng/datepicker';
-import { InputTextModule } from 'primeng/inputtext';
-import { BaseComponent } from '@/components/base-component/base-component';
+import { BaseComponent, IPaginationInfo, SectionWrapper } from '@/components';
+import { Component, inject, signal } from '@angular/core';
+import { InventorySettlementSearchEnum, InventoryService } from '../../services/inventory-service';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { Paginator } from 'primeng/paginator';
-import { Button } from 'primeng/button';
+import { MenuItem } from 'primeng/api';
+import { IInventorySettlementSearchRow } from '../../types/api/inventory/responses';
+import { PaginatorState, Paginator } from 'primeng/paginator';
+import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { Debounce } from '@/directives/debounce';
+import { InputErrorMessageHandler } from '@/yn-ng';
+import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { Menu } from 'primeng/menu';
+import { TranslatePipe } from '@ngx-translate/core';
+import { InputText } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-inventory',
   imports: [
+    Paginator,
+    RouterLink,
+    DatePipe,
+    Debounce,
+    ReactiveFormsModule,
     SectionWrapper,
     InputErrorMessageHandler,
     InputGroupAddon,
-    DatePicker,
-    InputTextModule,
-    ReactiveFormsModule,
-    Paginator,
-    Button,
+    Menu,
+    TranslatePipe,
+    InputText,
   ],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
 })
 export class Inventory extends BaseComponent {
   initialSearchFormValue = {
-    text: this.fb.control<string>('', [Validators.required]),
-    categoryId: this.fb.control<number>(0, [Validators.required]),
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+    searchEnum: this.fb.control<InventorySettlementSearchEnum>(InventorySettlementSearchEnum.InvoiceNumber, [
+      Validators.required,
+    ]),
+    fromDate: this.fb.control<string | null>(null, []),
+    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
   };
   fg = this.fb.group(this.initialSearchFormValue);
-  onSubmit() {}
 
-  first = 0;
-  rows = 10;
-  onPageChange(event: any) {}
+  inventoryService = inject(InventoryService);
+
+  constructor() {
+    super();
+    this.searchInventorySettlements(1);
+  }
+  filterMenuItems: MenuItem[] = [
+    {
+      label: 'رقم التسوية',
+      command: (event) => this.fg.patchValue({ searchEnum: InventorySettlementSearchEnum.InvoiceNumber }),
+    },
+    {
+      label: 'رقم المرجع',
+      command: (event) => this.fg.patchValue({ searchEnum: InventorySettlementSearchEnum.ReferenceNumber }),
+    },
+  ];
+  periodOptions = [
+    { label: 'الكل', value: null },
+    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
+    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
+    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
+    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
+  ];
+
+  inventories = signal<IInventorySettlementSearchRow[]>([]);
+  inventoriesPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
+
+  searchInventorySettlements(pageIndex: number) {
+    this.inventoryService
+      .search({
+        paginationInfo: {
+          pageIndex: pageIndex,
+          pageSize: 10,
+        },
+        searchFilters: [
+          {
+            column: this.fg.getRawValue().searchEnum,
+            values: [this.fg.getRawValue().searchTerm],
+          },
+        ],
+        fromDate: this.fg.getRawValue().fromDate,
+      })
+      .subscribe({
+        next: (res) => {
+          this.inventories.set(res.rows);
+          this.inventoriesPaginationInfo = {
+            pageIndex,
+            totalPagesCount: res.paginationInfo.totalPagesCount,
+            totalRowsCount: res.paginationInfo.totalRowsCount,
+          };
+        },
+      });
+  }
+
+  onSubmit = () => this.fg.valid && this.searchInventorySettlements(1);
+
+  onPageChange = (event: PaginatorState) => this.searchInventorySettlements(event.page! + 1);
+
+  deleteInventory(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف المنتج',
+      header: 'حذف المنتج',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.inventoryService.delete(id).subscribe({
+          next: () => {
+            this.searchInventorySettlements(1);
+          },
+        });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
+      },
+    });
+  }
 }

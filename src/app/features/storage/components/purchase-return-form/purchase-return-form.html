@@ -29,7 +29,7 @@
     <app-input-error-message-handler>
       <input
         type="text"
-        formControlName="invoiceNumber"
+        formControlName="returnNumber"
         pInputText
         id="productName"
         aria-describedby="productName-help"
@@ -63,7 +63,7 @@
     [domEvents]="['submit']"
     (debounced)="debouncedFindPurchaseInvoiceByNumber($event, voucherSearchInput.value)"
   >
-    <label for="productPrice">بحث برقم الفاتوره</label>
+    <label for="productPrice">بحث...</label>
 
     <app-input-error-message-handler>
       <input
@@ -73,7 +73,7 @@
         #voucherSearchInput
         id="productPrice"
         aria-describedby="productPrice-help"
-        placeholder="بحث برقم الفاتوره"
+        placeholder="بحث برقم الفاتوره/المرتجع"
       />
       <p-inputgroup-addon class="p-0! cursor-pointer relative">
         <button type="button" form="searchVoucherForm" class="flex cursor-pointer" (click)="filterMenu.toggle($event)">
@@ -139,10 +139,10 @@
       <p-datepicker
         formControlName="returnDate"
         [showTime]="true"
-        class="z-11!"
         [iconDisplay]="'input'"
         [showIcon]="true"
         inputId="templatedisplay"
+        appendTo="body"
       >
         <ng-template #inputicon let-clickCallBack="clickCallBack">
           <svg
@@ -222,7 +222,7 @@
         type="text"
         [disabled]="true"
         pInputText
-        [value]="fg.value.supplierId"
+        formControlName="supplierId"
         id="supplierId"
         aria-describedby="supplierId-help"
         placeholder="كود المورد"
@@ -238,7 +238,7 @@
         type="text"
         [disabled]="true"
         pInputText
-        [value]="fg.value.supplierName"
+        formControlName="supplierName"
         id="supplierName"
         aria-describedby="supplierName-help"
         placeholder="الاسم"
@@ -249,13 +249,13 @@
   <!-- supplier phone -->
   <div>
     <label for="supplierPhoneNumber">رقم الجوال</label>
-    <app-input-error-message-handler [fc]="fg.get('supplierPhoneNumber')">
+    <app-input-error-message-handler>
       <input
         type="text"
         pInputText
         [disabled]="true"
         appAllowNumbers
-        [value]="fg.value.supplierPhoneNumber"
+        formControlName="supplierPhoneNumber"
         id="supplierPhoneNumber"
         aria-describedby="supplierPhoneNumber-help"
         placeholder="الرقم"
@@ -272,7 +272,7 @@
         pInputText
         [disabled]="true"
         appAllowNumbers
-        [value]="fg.value.supplierTaxNumber"
+        formControlName="supplierTaxNumber"
         id="supplierTaxNumber"
         aria-describedby="supplierTaxNumber-help"
         placeholder="الرقم"
@@ -289,11 +289,11 @@
       <th class="">اسم المنتج</th>
       <th class="">الوحدة</th>
       <th class="">الكميه</th>
+      <th>الكميه المرتجعة</th>
       <th class="">سعر البيع</th>
       <th class="">سعر الشراء</th>
       <th class="">الضريبه</th>
       <th class="">المجموع</th>
-      <th class="min-w-40 w-40">الأدوات</th>
     </tr>
   </thead>
   <tbody>
@@ -323,7 +323,9 @@
           <app-input-error-message-handler [grouped]="false" [fc]="item.get('quantity')">
             <input
               pInputText
+              type="number"
               appAllowNumbers
+              [max]="+(currentItems()[$index]?.quantity ?? 0)"
               id="debtorAmount"
               [formControl]="getFormControl(item, 'quantity')"
               class="app-input text-center"
@@ -346,7 +348,7 @@
         </td>
         <!-- المجموع -->
         <td class="">
-          <div>{{ currentItems()[$index]?.taxAmount }}</div>
+          <div>{{ currentItems()[$index]?.lineTotal }}</div>
         </td>
       </tr>
     }

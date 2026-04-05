@@ -41,7 +41,7 @@
   <div class="col-span-2">
     <label for="productName">التاريخ</label>
     <app-input-error-message-handler>
-      <p-datepicker [iconDisplay]="'input'" [showIcon]="true" inputId="templatedisplay">
+      <p-datepicker appendTo="body" [iconDisplay]="'input'" [showIcon]="true" inputId="templatedisplay">
         <ng-template #inputicon let-clickCallBack="clickCallBack">
           <svg
             (click)="clickCallBack($event)"

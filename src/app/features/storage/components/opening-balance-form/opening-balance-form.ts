@@ -198,6 +198,7 @@ export class OpeningBalanceForm extends BaseComponent {
       },
     });
   }
+
   //
   //
   //
@@ -207,7 +208,99 @@ export class OpeningBalanceForm extends BaseComponent {
   //
   //
   //
-  // products
+  //
+  //
+  //setting up new opening balance item
+  //
+
+  newOpeningBalanceItemRowFg!: FormGroup<IAppOpeningBalanceItemControls>;
+
+  createItemFg(data?: IAppOpeningBalanceItem) {
+    return this.fb.group<IAppOpeningBalanceItemControls>({
+      itemId: this.fb.control<number | null>(data?.itemId ?? null, [Validators.required]),
+      unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
+      quantity: this.fb.control<number | null>(data?.quantity ?? null, [Validators.required]),
+      purchasePrice: this.fb.control<number | null>(data?.purchasePrice ?? null, [Validators.required]),
+      salePrice: this.fb.control<number | null>(data?.salePrice ?? null, [Validators.required]),
+      total: this.fb.control<number | null>(data?.total ?? null, []),
+    });
+  }
+
+  setUpNewJournalDetailRowFg() {
+    if (this.newOpeningBalanceItemRowFg) {
+      this.newOpeningBalanceItemRowFg.reset();
+    } else {
+      this.newOpeningBalanceItemRowFg = this.createItemFg();
+    }
+  }
+
+  addNewOpeningBalanceItem() {
+    if (this.newOpeningBalanceItemRowFg.invalid) {
+      this.newOpeningBalanceItemRowFg.markAllAsTouched();
+      //log errors
+      Object.entries(this.newOpeningBalanceItemRowFg.controls!).forEach(([key, value]) => {
+        if (value.errors) {
+          console.log(key, value.errors);
+        }
+      });
+      return;
+    }
+
+    const fgValue = this.newOpeningBalanceItemRowFg.value;
+
+    this.fg.controls.items!.push(this.createItemFg(fgValue as IAppOpeningBalanceItem));
+
+    const currentProduct = this.products().find((product) => product.id === fgValue.itemId)!;
+
+    this.currentProducts.update((pre) => [...pre.filter((product) => product.id !== fgValue.itemId), currentProduct]);
+
+    this.lastClickedTableRowIndex.set(this.fg.value.items!.length - 1);
+    this.setUpNewJournalDetailRowFg();
+  }
+
+  onCurrentItemChange(itemId: IProductSearchRow) {
+    this.newOpeningBalanceItemRowFg.controls.itemId.setValue(itemId.id);
+    this.newOpeningBalanceItemRowFg.controls.unitId.setValue(null);
+    this.getProductUnits(itemId.id);
+  }
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //current opening balance item changes
+  //
+
+  lastClickedTableRowIndex = signal<number | null>(null);
+
+  currentEditRowIndex = signal<number>(-1);
+
+  editOpeningBalanceRow(rowIndex: number) {
+    this.lastClickedTableRowIndex.set(rowIndex + 1);
+    this.currentEditRowIndex.set(rowIndex);
+  }
+  isRowEditable(rowIndex: number) {
+    return this.currentEditRowIndex() === rowIndex;
+  }
+  deleteOpeningBalanceRow(rowIndex: number) {
+    this.fg.controls.items.removeAt(rowIndex);
+    this.currentEditRowIndex.set(-1);
+  }
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  // item products search
   //
 
   products = signal<IProductSearchRow[]>([]);
@@ -293,18 +386,10 @@ export class OpeningBalanceForm extends BaseComponent {
   //
   //
   //
-  // units
+  // product units
   //
 
   units = new Map<number, Signal<IProductUnit[]>>();
-  unitService = inject(UnitService);
-
-  unitsPaginationInfo: IPaginationInfo = {
-    pageIndex: 0,
-    totalPagesCount: 0,
-    totalRowsCount: 0,
-  };
-  previousUnitSearchValue = '';
 
   getProductUnits(productId: number) {
     if (!this.units.has(productId)) {
@@ -319,115 +404,5 @@ export class OpeningBalanceForm extends BaseComponent {
     } else {
       return this.units.get(productId)!;
     }
-  }
-
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-
-  lastClickedTableRowIndex = signal<number | null>(null);
-
-  currentEditRowIndex = signal<number>(-1);
-
-  editOpeningBalanceRow(rowIndex: number) {
-    this.lastClickedTableRowIndex.set(rowIndex + 1);
-    this.currentEditRowIndex.set(rowIndex);
-  }
-  isRowEditable(rowIndex: number) {
-    return this.currentEditRowIndex() === rowIndex;
-  }
-  delteOpeningBalanceRow(rowIndex: number) {
-    this.fg.controls.items.removeAt(rowIndex);
-    this.currentEditRowIndex.set(-1);
-  }
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  newOpeningBalanceItemRowFg!: FormGroup<IAppOpeningBalanceItemControls>;
-
-  createItemFg(data?: IAppOpeningBalanceItem) {
-    return this.fb.group<IAppOpeningBalanceItemControls>({
-      itemId: this.fb.control<number | null>(data?.itemId ?? null, [Validators.required]),
-      unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
-      quantity: this.fb.control<number | null>(data?.quantity ?? null, [Validators.required]),
-      purchasePrice: this.fb.control<number | null>(data?.purchasePrice ?? null, [Validators.required]),
-      salePrice: this.fb.control<number | null>(data?.salePrice ?? null, [Validators.required]),
-      total: this.fb.control<number | null>(data?.total ?? null, []),
-    });
-  }
-
-  setUpNewJournalDetailRowFg() {
-    if (this.newOpeningBalanceItemRowFg) {
-      this.newOpeningBalanceItemRowFg.reset();
-    } else {
-      this.newOpeningBalanceItemRowFg = this.createItemFg();
-    }
-  }
-
-  addNewOpeningBalanceItem() {
-    if (this.newOpeningBalanceItemRowFg.invalid) {
-      this.newOpeningBalanceItemRowFg.markAllAsTouched();
-      //log errors
-      Object.entries(this.newOpeningBalanceItemRowFg.controls!).forEach(([key, value]) => {
-        if (value.errors) {
-          console.log(key, value.errors);
-        }
-      });
-      return;
-    }
-
-    const fgValue = this.newOpeningBalanceItemRowFg.value;
-
-    this.fg.controls.items!.push(this.createItemFg(fgValue as IAppOpeningBalanceItem));
-
-    const currentProduct = this.products().find((product) => product.id === fgValue.itemId)!;
-
-    this.currentProducts.update((pre) => [...pre.filter((product) => product.id !== fgValue.itemId), currentProduct]);
-
-    this.lastClickedTableRowIndex.set(this.fg.value.items!.length - 1);
-    this.setUpNewJournalDetailRowFg();
-  }
-
-  log(any: any = null) {
-    console.log('log', any);
-
-    console.log(this.fg.value);
-  }
-
-  onCurrentItemChange(itemId: IProductSearchRow) {
-    this.newOpeningBalanceItemRowFg.controls.itemId.setValue(itemId.id);
-    this.newOpeningBalanceItemRowFg.controls.unitId.setValue(null);
-    this.getProductUnits(itemId.id);
   }
 }

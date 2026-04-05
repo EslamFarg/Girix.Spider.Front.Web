@@ -266,6 +266,11 @@
     "add": "إضافة مرتجع جديد"
   },
 
+  "inventory": {
+    "explorer": "مستكشف التسويات",
+    "add": "إضافة تسوية جديدة"
+  },
+
   "classes": {
     "products": {
       "productName": "اسم المنتج",

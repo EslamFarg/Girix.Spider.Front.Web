@@ -95,6 +95,8 @@ export class PurchaseReturnForm extends BaseComponent {
     referenceNumber: this.fb.control<string | null>({ disabled: true, value: null }, []),
     // رقم الفاتورة
     invoiceNumber: this.fb.control<string | null>({ value: null, disabled: true }, []),
+    //returnNumber
+    returnNumber: this.fb.control<string | null>({ disabled: true, value: null }, []),
     //
     purchaseInvoiceId: this.fb.control<number | null>(null, []),
     paymentType: this.fb.control<number | null>({ disabled: true, value: null }, []),
@@ -249,6 +251,7 @@ export class PurchaseReturnForm extends BaseComponent {
             this.fg.patchValue({
               ...data,
               returnDate: new Date(),
+              purchaseInvoiceId: data.id,
             });
             this.fg.setControl(
               'items',
@@ -271,8 +274,12 @@ export class PurchaseReturnForm extends BaseComponent {
           next: (data) => {
             this.currentPurchase.set(null);
             this.currentPurchaseReturn.set(data);
+            console.log(data);
             this.fg.patchValue({
               ...data,
+              purchaseInvoiceId: data.purchaseInvoiceId,
+              invoiceNumber: data.purchaseInvoiceNumber,
+              returnNumber: data.returnNumber,
               returnDate: new Date(data.returnDate),
             });
             this.fg.setControl(
@@ -312,7 +319,11 @@ export class PurchaseReturnForm extends BaseComponent {
     return this.fb.group<IAppPurchaseReturnItemControls>({
       menuItemsId: this.fb.control<number | null>(data?.menuItemsId ?? null, [Validators.required]),
       unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
-      quantity: this.fb.control<number | null>(data?.quantity ?? null, [Validators.required, Validators.min(1)]),
+      quantity: this.fb.control<number | null>(data?.quantity ?? null, [
+        Validators.required,
+        Validators.min(0),
+        Validators.max(data?.quantity ?? 0),
+      ]),
       purchaseInvoiceItemId: this.fb.control<number | null>(data?.purchaseInvoiceItemId ?? null, [Validators.required]),
     });
   }

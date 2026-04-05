@@ -12,6 +12,9 @@ import { PurchasesReturnsLayout } from '@/features/storage/layouts/purchases-ret
 import { EditOpeningBalance } from '@/features/storage/pages/edit-opening-balance/edit-opening-balance';
 import { EditPurchases } from '@/features/storage/pages/edit-purchases/edit-purchases';
 import { EditPurchaseReturn } from '@/features/storage/pages/edit-purchase-return/edit-purchase-return';
+import { InventoryLayout } from '@/features/storage/layouts/inventory-layout/inventory-layout';
+import { AddInventorySettlement } from '@/features/storage/pages/add-inventory-settlement/add-inventory-settlement';
+import { EditInventorySettlement } from '@/features/storage/pages/edit-inventory-settlement/edit-inventory-settlement';
 
 export default [
   //opening-balances
@@ -77,6 +80,20 @@ export default [
   //inventory
   {
     path: 'inventory',
-    component: Inventory,
+    component: InventoryLayout,
+    children: [
+      {
+        path: '',
+        component: Inventory,
+      },
+      {
+        path: 'add',
+        component: AddInventorySettlement,
+      },
+      {
+        path: ':id/edit',
+        component: EditInventorySettlement,
+      },
+    ],
   },
 ] satisfies Route[];
