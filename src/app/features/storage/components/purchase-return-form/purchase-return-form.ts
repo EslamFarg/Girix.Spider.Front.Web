@@ -107,26 +107,10 @@ export class PurchaseReturnForm extends BaseComponent {
     cashAccountId: this.fb.control<number | null>(null, [Validators.required]),
     networkAccountId: this.fb.control<number | null>(null, [Validators.required]),
     //
-    supplierId: this.fb.control<number | null>(null, [Validators.required]),
-    supplierName: this.fb.control<string | null>(null, [
-      Validators.required,
-      Validators.minLength(3),
-      Validators.maxLength(100),
-      noSymbolsAllowed,
-      mustIncludeLetters,
-    ]),
-    supplierPhoneNumber: this.fb.control<string | null>(null, [
-      Validators.required,
-      Validators.minLength(6),
-      Validators.maxLength(16),
-      onlyNumbersAllowed,
-    ]),
-    supplierTaxNumber: this.fb.control<string | null>(null, [
-      Validators.required,
-      onlyNumbersAllowed,
-      Validators.minLength(6),
-      Validators.maxLength(16),
-    ]),
+    supplierId: this.fb.control<number | null>({ disabled: true, value: null }, []),
+    supplierName: this.fb.control<string | null>({ disabled: true, value: null }, []),
+    supplierPhoneNumber: this.fb.control<string | null>({ disabled: true, value: null }, []),
+    supplierTaxNumber: this.fb.control<string | null>({ disabled: true, value: null }, []),
   };
   fg = this.fb.group(this.initialFormValue);
 

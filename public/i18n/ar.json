@@ -204,13 +204,13 @@
     "cashAccount": "حساب كاش",
     "networkAccount": "حساب شبكة"
   },
-  
+
   "actions": {
     "save": "حفظ",
     "cancel": "الغاء",
     "new": "جديد",
     "submit": "حفظ",
-    
+
     "add": "اضافة",
     "edit": "تعديل",
     "delete": "حذف",
@@ -259,6 +259,11 @@
   "groups": {
     "explorer": "مستكشف المجموعات",
     "add": "إضافة مجموعة جديدة"
+  },
+
+  "purchasesReturns": {
+    "explorer": "مستكشف المرتجعات",
+    "add": "إضافة مرتجع جديد"
   },
 
   "classes": {
