@@ -53,10 +53,24 @@ export class InventoryService extends BaseSearchAndCrudService<
   }
 
   searchProducts(criteriaDto: ISearchCriteria<InventoryProductSearchEnum>) {
-    return this.http.post<IInventoryProductSearchResponse>(`${this.apiUrl}/inventory/search`, criteriaDto);
+    let body: any = {
+      criteriaDto: {
+        paginationInfo: {
+          pageIndex: criteriaDto?.paginationInfo.pageIndex ?? 1,
+          pageSize: criteriaDto?.paginationInfo?.pageSize ?? 10,
+        },
+      },
+      searchFilters: criteriaDto.searchFilters.map((x) => ({
+        column: x.column,
+        values: x.values.map((y) => y?.trim() ?? ''),
+      })),
+      fromDate: criteriaDto?.fromDate ?? null,
+      toDate: criteriaDto?.toDate ?? this.localDateIso,
+    };
+    return this.http.post<IInventoryProductSearchResponse>(`${BaseService.apiBaseUrl}/inventory/search`, body);
   }
 
   getByNumber(number: string) {
-    return this.http.get<IInventoryReadResponse>(`${this.apiRoute}/getbynumber?number=${number}`);
+    return this.http.get<IInventoryReadResponse>(`${this.apiUrl}/getbynumber?number=${number}`);
   }
 }

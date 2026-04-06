@@ -1,42 +1,80 @@
 <div class="p-4 h-full overflow-auto custom-scroll">
   <app-section-wrapper styleClass="h-fit!" class="h-fit!">
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 my-4">
-      <!-- invoice number -->
+    <div [formGroup]="inventoryBulkSearchFg" class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 my-4">
       <div>
-        <label for="productName">رقم التسويه</label>
-        <app-input-error-message-handler>
-          <input type="text" pInputText id="productName" aria-describedby="productName-help" placeholder="الاسم" />
+        <label for="settlementNumber">رقم التسوية</label>
+        <app-input-error-message-handler  >
+          <input
+            type="number"
+            [disabled]="true"
+            [value]="currentInventory()?.settlementNumber"
+            pInputText
+            id="settlementNumber"
+            aria-describedby="settlementNumber-help"
+          />
         </app-input-error-message-handler>
       </div>
-      <!-- invoice number search -->
-      <div>
-        <label for="productPrice">بحث برقم التسويه</label>
+
+      <form
+        #searchSettlementForm
+        id="searchSettlementForm"
+        [formGroup]="shallowFg"
+        appDebounce
+        [domEvents]="['submit']"
+        (debounced)="debouncedFindInventorySettlementByNumberByNumber($event, settlementSearchInput.value)"
+      >
+        <label for="inventorySearchTerm">بحث برقم التسوية</label>
         <app-input-error-message-handler>
-          <input type="text" pInputText id="productPrice" aria-describedby="productPrice-help" placeholder="السعر" />
-          <p-inputgroup-addon class="p-0!">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="10.5992" cy="10.6532" rx="8.59922" ry="8.65324" fill="#E0E6E9" />
-              <path
-                opacity="0.4"
-                d="M20.6765 21.9555C20.3424 21.9447 20.0248 21.8073 19.7872 21.5707L17.7508 19.1904C17.3142 18.7912 17.2785 18.1126 17.6708 17.6692C17.8544 17.4834 18.104 17.3789 18.3644 17.3789C18.6248 17.3789 18.8744 17.4834 19.058 17.6692L21.6191 19.7184C21.988 20.096 22.1019 20.6565 21.9097 21.1495C21.7176 21.6424 21.2555 21.9757 20.7298 22.0003L20.6765 21.9555Z"
-                fill="#393C49"
-              />
-            </svg>
+          <input
+            type="number"
+            pInputText
+            form="searchSettlementForm"
+            id="inventorySearchTerm"
+            aria-describedby="inventorySearchTerm-help"
+            placeholder="بحث برقم التسوية"
+            appAllowNumbers
+            #settlementSearchInput
+          />
+          <p-inputgroup-addon class="p-0! cursor-pointer">
+            <button type="submit" form="searchSettlementForm" class="flex cursor-pointer">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="10.5992" cy="10.6532" rx="8.59922" ry="8.65324" fill="#E0E6E9" />
+                <path
+                  opacity="0.4"
+                  d="M20.6765 21.9555C20.3424 21.9447 20.0248 21.8073 19.7872 21.5707L17.7508 19.1904C17.3142 18.7912 17.2785 18.1126 17.6708 17.6692C17.8544 17.4834 18.104 17.3789 18.3644 17.3789C18.6248 17.3789 18.8744 17.4834 19.058 17.6692L21.6191 19.7184C21.988 20.096 22.1019 20.6565 21.9097 21.1495C21.7176 21.6424 21.2555 21.9757 20.7298 22.0003L20.6765 21.9555Z"
+                  fill="#393C49"
+                />
+              </svg>
+            </button>
           </p-inputgroup-addon>
         </app-input-error-message-handler>
-      </div>
-      <!-- invoice number search -->
+      </form>
+
       <div>
-        <label for="productPrice">الرقم الدفتري</label>
-        <app-input-error-message-handler>
-          <input type="text" pInputText id="productPrice" aria-describedby="productPrice-help" placeholder="السعر" />
+        <label for="referenceNumber">الرقم الدفتري</label>
+        <app-input-error-message-handler [fc]="fg.controls.referenceNumber">
+          <input
+            type="text"
+            pInputText
+            id="referenceNumber"
+            aria-describedby="referenceNumber-help"
+            [formControl]="fg.controls.referenceNumber"
+          />
         </app-input-error-message-handler>
       </div>
-      <!-- date -->
+
       <div>
-        <label for="productName">التاريخ</label>
-        <app-input-error-message-handler>
-          <p-datepicker appendTo="body" [iconDisplay]="'input'" [showIcon]="true" inputId="templatedisplay">
+        <label for="settlementDate">التاريخ</label>
+        <app-input-error-message-handler [fc]="fg.controls.settlementDate">
+          <p-datepicker
+            [formControl]="fg.controls.settlementDate"
+            [showTime]="true"
+            class="z-11!"
+            [iconDisplay]="'input'"
+            [showIcon]="true"
+            inputId="settlementDate"
+            appendTo="body"
+          >
             <ng-template #inputicon let-clickCallBack="clickCallBack">
               <svg
                 (click)="clickCallBack($event)"
@@ -67,21 +105,20 @@
           </p-datepicker>
         </app-input-error-message-handler>
       </div>
-      <!--  -->
+
       <div
         class="px-4 text-dark-bg-1 [&>input]:checked:accent-dark-bg-1 text-sm font-semibold flex items-center gap-2 *:cursor-pointer"
       >
         <input
-          [defaultChecked]="true"
           id="allQuantities"
           type="radio"
           name="inventoryFilterRadio"
-          aria-describedby="productPrice-help"
-          placeholder="السعر"
+          [checked]="inventoryBulkSearchFg.controls.quantityOption.value === QuantityOptions.All"
+          (change)="inventoryBulkSearchFg.controls.quantityOption.setValue(QuantityOptions.All)"
         />
         <label for="allQuantities">كل الكميات</label>
       </div>
-      <!--  -->
+
       <div
         class="px-4 text-dark-bg-1 [&>input]:checked:accent-dark-bg-1 text-sm font-semibold flex items-center gap-2 *:cursor-pointer"
       >
@@ -89,12 +126,12 @@
           id="quantityGreaterThanZero"
           type="radio"
           name="inventoryFilterRadio"
-          aria-describedby="productPrice-help"
-          placeholder="السعر"
+          [checked]="inventoryBulkSearchFg.controls.quantityOption.value === QuantityOptions.MoreThanZero"
+          (change)="inventoryBulkSearchFg.controls.quantityOption.setValue(QuantityOptions.MoreThanZero)"
         />
         <label for="quantityGreaterThanZero">اكبر من الصفر</label>
       </div>
-      <!--  -->
+
       <div
         class="px-4 text-dark-bg-1 [&>input]:checked:accent-dark-bg-1 text-sm font-semibold flex items-center gap-2 *:cursor-pointer"
       >
@@ -102,12 +139,12 @@
           id="quantityLessThanZero"
           type="radio"
           name="inventoryFilterRadio"
-          aria-describedby="productPrice-help"
-          placeholder="السعر"
+          [checked]="inventoryBulkSearchFg.controls.quantityOption.value === QuantityOptions.LessThanZero"
+          (change)="inventoryBulkSearchFg.controls.quantityOption.setValue(QuantityOptions.LessThanZero)"
         />
         <label for="quantityLessThanZero">اصغر من الصفر</label>
       </div>
-      <!--  -->
+
       <div
         class="px-4 text-dark-bg-1 [&>input]:checked:accent-dark-bg-1 text-sm font-semibold flex items-center gap-2 *:cursor-pointer"
       >
@@ -115,26 +152,34 @@
           id="quantityEqualsZero"
           type="radio"
           name="inventoryFilterRadio"
-          aria-describedby="productPrice-help"
-          placeholder="السعر"
+          [checked]="inventoryBulkSearchFg.controls.quantityOption.value === QuantityOptions.Zero"
+          (change)="inventoryBulkSearchFg.controls.quantityOption.setValue(QuantityOptions.Zero)"
         />
         <label for="quantityEqualsZero">تساوي الصفر</label>
       </div>
+
+      <button
+        type="button"
+        pButton
+        class="flex-1 md:flex-none app-p-btn py-1! md:px-8!"
+        (click)="searchInventorySettlementProducts()"
+      >
+        بحث
+      </button>
     </div>
   </app-section-wrapper>
 
-  <app-section-wrapper class="block mt-4">
+  <app-section-wrapper class="block mt-4 h-auto!" styleClass="h-fit!">
     <table class="my-4 w-full main-table table-fixed">
       <thead>
         <tr>
           <th class="min-w-12.5 w-12.5">#</th>
-          <th class="">كود المنتج</th>
-          <th class="">اسم المنتج</th>
-          <th class="">الوحدة</th>
-          <th class="">الكميه</th>
-          <th class="">سعر البيع</th>
-          <th class="">سعر الشراء</th>
-          <th class="">المجموع</th>
+          <th>كود المنتج</th>
+          <th>اسم المنتج</th>
+          <th>الوحدة</th>
+          <th>الكمية بالنظام</th>
+          <th>الكمية الفعلية</th>
+          <th>فرق الكميات</th>
           <th class="min-w-40 w-40">الأدوات</th>
         </tr>
       </thead>
@@ -144,27 +189,19 @@
           (click)="lastClickedTableRowIndex.set(null)"
           class="*:overflow-visible!"
         >
-          <!-- <td colspan="9" class="p-0! overflow-visible!">
-        <form
-          [formGroup]="newInventorySettlementItemRowFg"
-          (ngSubmit)="addNewJournalDetailRow()"
-          class="grid grid-cols-[50px_repeat(7,1fr)_10rem] *:p-2 *:flex *:items-center *:*:flex-1"
-        >
-          
-        </form>
-      </td> -->
           <td>
             <div>#</div>
           </td>
-          <!-- كود المنتج -->
+
           <td>
             <app-input-error-message-handler [grouped]="false" [fc]="newInventorySettlementItemRowFg.get('itemId')">
               <ng-select
                 class="app-select"
                 [items]="displayedInventoryProducts()"
-                bindLabel="name"
+                bindLabel="itemId"
                 [formControl]="getFormControl(newInventorySettlementItemRowFg, 'itemId')"
-                bindValue="id"
+                bindValue="itemId"
+                (change)="onCurrentInventoryItemChange($event)"
                 placeholder="الكل"
                 [clearable]="false"
                 #newInventorySettlementItemSearchByCode
@@ -174,20 +211,25 @@
                   { type: 'scrollToEnd', value: newInventorySettlementItemSearchByCode.scrollToEnd },
                 ]"
                 (debounced)="
-                  debouncedInventoryProductsSearch($event, newInventorySettlementItemSearchByCode.searchTerm)
+                  debouncedInventoryProductsSearch(
+                    $event,
+                    newInventorySettlementItemSearchByCode.searchTerm,
+                    InventoryProductSearchEnum.Id
+                  )
                 "
               />
             </app-input-error-message-handler>
           </td>
-          <!-- اسم المنتج -->
+
           <td>
             <app-input-error-message-handler [grouped]="false" [fc]="newInventorySettlementItemRowFg.get('itemId')">
               <ng-select
                 class="app-select"
                 [items]="displayedInventoryProducts()"
-                bindLabel="name"
+                bindLabel="itemName"
                 [formControl]="getFormControl(newInventorySettlementItemRowFg, 'itemId')"
-                bindValue="id"
+                bindValue="itemId"
+                (change)="onCurrentInventoryItemChange($event)"
                 placeholder="الكل"
                 [clearable]="false"
                 #newInventorySettlementItemSearchByName
@@ -197,92 +239,40 @@
                   { type: 'scrollToEnd', value: newInventorySettlementItemSearchByName.scrollToEnd },
                 ]"
                 (debounced)="
-                  debouncedInventoryProductsSearch($event, newInventorySettlementItemSearchByName.searchTerm)
+                  debouncedInventoryProductsSearch(
+                    $event,
+                    newInventorySettlementItemSearchByName.searchTerm,
+                    InventoryProductSearchEnum.Name
+                  )
                 "
               />
             </app-input-error-message-handler>
           </td>
-          <!-- الوحدة -->
+
           <td>
-            <div>kilo</div>
+            <div>{{ getInventoryUnitName(newInventorySettlementItemRowFg.get('itemId')?.value ?? null) }}</div>
           </td>
-          <!-- الكميه -->
+
           <td>
-            <app-input-error-message-handler [fc]="newInventorySettlementItemRowFg.get('quantity')">
+            <div>{{ newInventorySettlementItemRowFg.get('systemQuantity')?.value }}</div>
+          </td>
+
+          <td>
+            <app-input-error-message-handler [grouped]="false" [fc]="newInventorySettlementItemRowFg.get('actualQuantity')">
               <input
                 pInputText
-                id="quantity"
-                appAllowNumbers
                 type="number"
-                [defaultChecked]="true"
-                [min]="0"
-                [formControl]="getFormControl(newInventorySettlementItemRowFg, 'quantity')"
-                class="app-input text-center"
-                aria-describedby="quantity-help"
-                placeholder="العدد"
-              />
-            </app-input-error-message-handler>
-          </td>
-          <!-- سعر البيع -->
-          <td>
-            <app-input-error-message-handler [fc]="newInventorySettlementItemRowFg.get('salePrice')">
-              <input
-                pInputText
                 appAllowNumbers
-                type="number"
-                [defaultChecked]="true"
-                [min]="0"
-                id="salePrice"
-                [formControl]="getFormControl(newInventorySettlementItemRowFg, 'salePrice')"
+                [formControl]="getFormControl(newInventorySettlementItemRowFg, 'actualQuantity')"
                 class="app-input text-center"
-                aria-describedby="salePrice-help"
+                aria-describedby="new-actualQuantity-help"
                 placeholder="0.00"
               />
             </app-input-error-message-handler>
           </td>
-          <!-- سعر الشراء -->
-          <td>
-            <app-input-error-message-handler [fc]="newInventorySettlementItemRowFg.get('purchasePrice')">
-              <input
-                pInputText
-                type="number"
-                id="purchasePrice"
-                appAllowNumbers
-                [defaultChecked]="true"
-                [min]="0"
-                [formControl]="getFormControl(newInventorySettlementItemRowFg, 'purchasePrice')"
-                class="app-input text-center"
-                aria-describedby="purchasePrice-help"
-                placeholder="0.00"
-              />
-            </app-input-error-message-handler>
-          </td>
-          <!-- المجموع -->
-          <td>
-            <!-- <app-input-error-message-handler [fc]="newInventorySettlementItemRowFg.get('total')">
-          <input
-            pInputText
-            type="number"
-            id="total"
-            appAllowNumbers
-            [defaultChecked]="true"
-            [min]="0"
-            [formControl]="getFormControl(newInventorySettlementItemRowFg, 'total')"
-            class="app-input text-center"
-            aria-describedby="total-help"
-            placeholder="0.00"
-          />
-        </app-input-error-message-handler> -->
-            <div class="app-input flex justify-center items-center" pInputText>
-              <span class="disabled">
-                {{
-                  +(newInventorySettlementItemRowFg.get('purchasePrice')?.value ?? 0) *
-                    +(newInventorySettlementItemRowFg.get('quantity')?.value ?? 0)
-                }}
-              </span>
-            </div>
-          </td>
-          <!-- actions -->
+
+          <td></td>
+
           <td>
             <p-button
               type="button"
@@ -292,6 +282,7 @@
             />
           </td>
         </tr>
+
         @for (item of fg.controls.items.controls; track $index) {
           <tr
             [class.last-clicked-table-row]="lastClickedTableRowIndex() === $index"
@@ -300,109 +291,48 @@
             <td class="min-w-12.5 w-12.5" [class.disabled]="!isInventorySettlementRowEditable($index)">
               {{ $index + 1 }}
             </td>
-            <!-- كود المنتج -->
+
             <td class="overflow-visible!" [class.disabled]="!isInventorySettlementRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.get('itemId')">
-                <ng-select
-                  class="app-select"
-                  [items]="displayedInventoryProducts()"
-                  [formControl]="getFormControl(item, 'itemId')"
-                  bindLabel="name"
-                  bindValue="id"
-                  placeholder="الكل"
-                  [clearable]="false"
-                  #printerSelect2
-                  appDebounce
-                  [customEvents]="[
-                    { type: 'searchEvent', value: printerSelect2.searchEvent },
-                    { type: 'scrollToEnd', value: printerSelect2.scrollToEnd },
-                  ]"
-                  (debounced)="debouncedInventoryProductsSearch($event, printerSelect2.searchTerm)"
-                />
-              </app-input-error-message-handler>
+              <div>{{ item.get('itemId')?.value }}</div>
             </td>
-            <!-- اسم المنتج -->
+
             <td class="overflow-visible!" [class.disabled]="!isInventorySettlementRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.get('itemId')">
-                <ng-select
-                  class="app-select"
-                  [items]="displayedInventoryProducts()"
-                  [formControl]="getFormControl(item, 'itemId')"
-                  bindLabel="name"
-                  bindValue="id"
-                  placeholder="الكل"
-                  [clearable]="false"
-                  #printerSelect2
-                  appDebounce
-                  [customEvents]="[
-                    { type: 'searchEvent', value: printerSelect2.searchEvent },
-                    { type: 'scrollToEnd', value: printerSelect2.scrollToEnd },
-                  ]"
-                  (debounced)="debouncedInventoryProductsSearch($event, printerSelect2.searchTerm)"
-                />
-              </app-input-error-message-handler>
+              <div>{{ getInventoryItemName(item.get('itemId')?.value ?? null) }}</div>
             </td>
-            <!-- الوحدة -->
+
             <td class="overflow-visible!" [class.disabled]="!isInventorySettlementRowEditable($index)">
-              <div>kilo</div>
+              <div>{{ getInventoryUnitName(item.get('itemId')?.value ?? null) }}</div>
             </td>
-            <!-- الكميه -->
-            <td class="" [class.disabled]="!isInventorySettlementRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.get('quantity')">
-                <input
-                  pInputText
-                  appAllowNumbers
-                  id="debtorAmount"
-                  [formControl]="getFormControl(item, 'quantity')"
-                  class="app-input text-center"
-                  aria-describedby="debtorAmount-help"
-                  placeholder="0.00"
-                />
-              </app-input-error-message-handler>
+
+            <td [class.disabled]="!isInventorySettlementRowEditable($index)">
+              <div>{{ item.get('systemQuantity')?.value }}</div>
             </td>
-            <!-- سعر البيع -->
-            <td class="" [class.disabled]="!isInventorySettlementRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.get('salePrice')">
+
+            <td [class.disabled]="!isInventorySettlementRowEditable($index)">
+              <app-input-error-message-handler [grouped]="false" [fc]="item.get('actualQuantity')">
                 <input
                   pInputText
                   type="number"
                   appAllowNumbers
-                  [allowDecimal]="true"
-                  id="creditorAmount"
-                  [formControl]="getFormControl(item, 'salePrice')"
-                  [disabled]="!isInventorySettlementRowEditable($index + 1)"
+                  [formControl]="getFormControl(item, 'actualQuantity')"
                   class="app-input text-center"
-                  aria-describedby="creditorAmount-help"
+                  aria-describedby="actualQuantity-help"
                   placeholder="0.00"
                 />
               </app-input-error-message-handler>
             </td>
-            <!-- سعر الشراء -->
-            <td class="" [class.disabled]="!isInventorySettlementRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.get('purchasePrice')">
-                <input
-                  pInputText
-                  appAllowNumbers
-                  [allowDecimal]="true"
-                  type="number"
-                  id="creditorAmount"
-                  [formControl]="getFormControl(item, 'purchasePrice')"
-                  [disabled]="!isInventorySettlementRowEditable($index + 1)"
-                  class="app-input text-center"
-                  aria-describedby="creditorAmount-help"
-                  placeholder="0.00"
-                />
-              </app-input-error-message-handler>
-            </td>
-            <!-- المجموع -->
-            <td class="" [class.disabled]="!isInventorySettlementRowEditable($index)">
-              <div class="app-input flex justify-center items-center" pInputText>
-                <span class="disabled">
-                  {{ +(item.get('purchasePrice')?.value ?? 0) * +(item.get('quantity')?.value ?? 0) }}
-                </span>
+
+            <td>
+              <div>
+                {{
+                  getDifferenceQuantity(
+                    item.get('systemQuantity')?.value ?? null,
+                    item.get('actualQuantity')?.value ?? null
+                  )
+                }}
               </div>
             </td>
-            <!-- actions -->
+
             <td class="min-w-40 w-40">
               <div class="actions">
                 <button type="button" class="edit" (click)="editInventorySettlementRow($index)">
@@ -445,29 +375,19 @@
 
     <div class="flex flex-col md:flex-row justify-between gap-4">
       <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 mb-4">
-        <p-button
-          class="flex-1 md:flex-none"
-          styleClass="border-dark-line! bg-dark-line! text-white! py-1! w-full  md:px-8!"
-          label="حفظ"
-        />
-        <p-button
-          class="flex-1 md:flex-none"
-          styleClass="border-dark-line! text-dark-line! py-1!  w-full md:px-8!"
-          label="حذف"
-          variant="outlined"
-        />
-        <p-button
-          class="flex-1 md:flex-none"
-          styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
-          label="جديد"
-          variant="outlined"
-        />
-        <p-button
-          class="flex-1 md:flex-none"
-          styleClass="border-dark-line! text-dark-line! py-1! w-full flex-1 md:flex-none md:px-8!"
-          label="طباعة"
-          variant="outlined"
-        />
+        <button
+          type="button"
+          pButton
+          class="flex-1 md:flex-none app-p-btn py-1! md:px-8!"
+          (click)="onSubmitInventory()"
+        >
+          حفظ
+        </button>
+        @switch (currentFormMode()) {
+          @case (FormMode.Update) {
+            <a pButton class="app-p-btn py-1! flex-1 md:flex-none md:px-8!" variant="outlined"> جديد </a>
+          }
+        }
       </div>
     </div>
   </app-section-wrapper>
