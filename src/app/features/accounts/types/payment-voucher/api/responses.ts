@@ -24,3 +24,5 @@ export interface IPaymentVoucherGetListRow {
   totalAmount: number;
   payee: string;
 }
+
+

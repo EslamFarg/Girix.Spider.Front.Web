@@ -271,6 +271,21 @@
     "add": "إضافة تسوية جديدة"
   },
 
+  "collectivePayments": {
+    "explorer": "مستكشف المدفوعات",
+    "add": "إضافة مدفوعات جديدة"
+  },
+
+  "collectiveReceipts": {
+    "explorer": "مستكشف المدفوعات",
+    "add": "إضافة مدفوعات جديدة"
+  },
+
+  "journals": {
+    "explorer": "مستكشف القيود",
+    "add": "إضافة قيد جديد"
+  },
+
   "classes": {
     "products": {
       "productName": "اسم المنتج",

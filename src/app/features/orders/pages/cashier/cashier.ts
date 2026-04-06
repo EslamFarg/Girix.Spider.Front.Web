@@ -69,7 +69,7 @@ import {
   FinancialAccountSearchEnum,
   FinancialAccountService,
 } from '@/features/accounts/services/financial-account-service';
-import { ITreeFinancialAccountSearchRow } from '@/features/accounts/services/financial-account-types';
+import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {

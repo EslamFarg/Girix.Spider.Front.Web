@@ -1,6 +1,6 @@
 import BaseService from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
-import { IReceiptVoucherGetListRequest, IReceiptVoucherGetListResponse } from './receipt-voucher-types';
+import { IReceiptVoucherGetListRequest, IReceiptVoucherGetListResponse } from '../types';
 import { BaseCrudService } from '@/core/services/BaseCrudService';
 
 @Injectable({

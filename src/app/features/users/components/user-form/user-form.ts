@@ -16,7 +16,7 @@ import {
   IBankFinancialAccount,
   ICashFinancialAccount,
   ICustodyFinancialAccount,
-} from '@/features/accounts/services/financial-account-types';
+} from '@/features/accounts/types';
 import { IUserReadResponse } from '../../types/users/api';
 import { UserType } from '../../types';
 import { RouterLink } from "@angular/router";

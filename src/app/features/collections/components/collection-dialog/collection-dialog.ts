@@ -19,7 +19,7 @@ import {
   FinancialAccountSearchEnum,
   FinancialAccountService,
 } from '@/features/accounts/services/financial-account-service';
-import { ITreeFinancialAccountSearchRow } from '@/features/accounts/services/financial-account-types';
+import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { noSymbolsAllowed } from '@/yn-ng';
 
 @Component({

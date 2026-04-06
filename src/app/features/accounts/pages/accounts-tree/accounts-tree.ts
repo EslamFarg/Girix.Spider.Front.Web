@@ -10,7 +10,7 @@ import { BaseComponent, IPaginationInfo } from '@/components/base-component/base
 import { FinancialAccountSearchEnum, FinancialAccountService } from '../../services/financial-account-service';
 import { Validators } from '@angular/forms';
 import { PaginatorState } from 'primeng/paginator';
-import { ITreeFinancialAccountSearchRow } from '../../services/financial-account-types';
+import { ITreeFinancialAccountSearchRow } from '../../types';
 
 @Component({
   selector: 'app-accounts-tree',

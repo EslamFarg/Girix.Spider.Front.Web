@@ -26,7 +26,7 @@ import {
   FinancialAccountSearchEnum,
   FinancialAccountService,
 } from '@/features/accounts/services/financial-account-service';
-import { ITreeFinancialAccountSearchRow } from '@/features/accounts/services/financial-account-types';
+import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from "@angular/router";
 

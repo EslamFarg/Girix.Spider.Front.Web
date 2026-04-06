@@ -16,11 +16,11 @@ export class CollectiveReceiptsLayout {
    */
   links: ISectionLink[] = [
     {
-      labelKey: 'TODO: Change',
+      labelKey: 'collectiveReceipts.explorer',
       url: '/accounts/collective-receipts',
     },
     {
-      labelKey: 'TODO: Change',
+      labelKey: 'collectiveReceipts.add',
       url: '/accounts/collective-receipts/add',
     },
   ];

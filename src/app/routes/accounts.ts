@@ -9,11 +9,29 @@ import { AddCollectivePayment } from '@/features/accounts/pages/add-collective-p
 import { EditCollectivePayment } from '@/features/accounts/pages/edit-collective-payment/edit-collective-payment';
 import { CollectivePaymentsLayout } from '@/features/accounts/layouts/collective-payments-layout/collective-payments-layout';
 import { CollectiveReceiptsLayout } from '@/features/accounts/layouts/collective-receipts-layout/collective-receipts-layout';
+import { JournalsLayout } from '@/features/accounts/layouts/journals-layout/journals-layout';
+import { AddJournal } from '@/features/accounts/pages/add-journal/add-journal';
+import { EditJournal } from '@/features/accounts/pages/edit-journal/edit-journal';
 
 export default [
   {
     path: 'journals',
-    component: Journals,
+    component: JournalsLayout,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: Journals,
+      },
+      {
+        path: 'add',
+        component: AddJournal,
+      },
+      {
+        path: ':id/edit',
+        component: EditJournal,
+      },
+    ],
   },
   //collective payments
   {

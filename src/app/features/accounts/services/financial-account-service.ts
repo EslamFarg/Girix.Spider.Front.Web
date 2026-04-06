@@ -1,6 +1,6 @@
 import BaseService from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
-import { ICashBankCustodyAccounts, IFinancialAccountSearchResponseValue } from './financial-account-types';
+import { ICashBankCustodyAccounts, IFinancialAccountSearchResponseValue } from '../types';
 import { BaseCrudService } from '@/core/services/BaseCrudService';
 import { BaseSearchAndCrudService, ISearchCriteria, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 

@@ -1,6 +1,6 @@
 import BaseService from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
-import { IPaymentVoucherGetListRequest, IPaymentVoucherGetListResponse } from './payment-voucher-types';
+import { IPaymentVoucherGetListRequest, IPaymentVoucherGetListResponse } from '../types';
 import { BaseCrudService } from '@/core/services/BaseCrudService';
 
 @Injectable({

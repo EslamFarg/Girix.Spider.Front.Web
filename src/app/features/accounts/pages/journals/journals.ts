@@ -1,339 +1,129 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { Button, ButtonDirective } from 'primeng/button';
-import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { Textarea } from 'primeng/textarea';
-import { DatePickerModule } from 'primeng/datepicker';
+import { BaseComponent, IPaginationInfo, SectionWrapper } from '@/components';
+import { Debounce } from '@/directives/debounce';
+import { Component, inject, signal } from '@angular/core';
+import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { InputErrorMessageHandler } from '@/yn-ng';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { InputTextModule } from 'primeng/inputtext';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { BaseComponent, IPaginationInfo } from '@/components';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IJournalEntryReadResponse, JournalEntryService } from '../../services/journal-entry-service';
-import { Debounce, IDebounceEvent } from '@/directives/debounce';
-import { NgSelectComponent } from '@ng-select/ng-select';
-import {
-  IFinancialAccountSearchResponseValue,
-  ITreeFinancialAccountSearchRow,
-} from '../../services/financial-account-types';
-import { FinancialAccountSearchEnum, FinancialAccountService } from '../../services/financial-account-service';
-import { PaginatorState } from 'primeng/paginator';
-import { AllowNumbers } from '@/directives/allow-numbers';
+import { InputText } from 'primeng/inputtext';
+import { Paginator, PaginatorState } from 'primeng/paginator';
+import { MenuItem } from 'primeng/api';
+import { Menu } from 'primeng/menu';
+import { TranslatePipe } from '@ngx-translate/core';
+import { RouterLink } from '@angular/router';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { JournalEntrySearchEnum, JournalEntryService } from '../../services/journal-entry-service';
+import { IJournalEntrySearchRow } from '../../types';
 
 @Component({
   selector: 'app-journals',
-  imports: [
-    Button,
-    InputErrorMessageHandler,
-    Textarea,
-    InputTextModule,
-    DatePickerModule,
-    InputGroupAddon,
-    SectionWrapper,
-    ReactiveFormsModule,
-    Debounce,
-    NgSelectComponent,
-    AllowNumbers,
-    ButtonDirective,
-  ],
   templateUrl: './journals.html',
   styleUrl: './journals.css',
+  imports: [
+    Paginator,
+    RouterLink,
+    DatePipe,
+    DecimalPipe,
+    Debounce,
+    ReactiveFormsModule,
+    SectionWrapper,
+    InputErrorMessageHandler,
+    InputGroupAddon,
+    Menu,
+    TranslatePipe,
+    InputText,
+  ],
 })
 export class Journals extends BaseComponent {
-  currentJournalEntry = signal<IJournalEntryReadResponse | null>(null);
-  journalEntryService = inject(JournalEntryService);
-  initialFormValue = {
-    // المرجع
-    refNumber: this.fb.control<string | null>(null, [Validators.required]),
-    // الرقم الدفتري
-    voucherNo: this.fb.control<string | null>(null, [Validators.required]),
-    voucherDate: this.fb.control<Date | null>(null, [Validators.required]),
-    paymentMethod: this.fb.control<string | null>(null, [Validators.required]),
-    notes: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(1000)]),
-    isHasTax: this.fb.control<boolean>(false, [Validators.required]),
-    totalAmount: this.fb.control<number | null>(null, [Validators.required]),
+  initialSearchFormValue = {
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+    searchEnum: this.fb.control<JournalEntrySearchEnum>(JournalEntrySearchEnum.InvoiceNumber, [Validators.required]),
+    fromDate: this.fb.control<string | null>(null, []),
+    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
   };
-  fg = this.fb.group(this.initialFormValue);
 
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
+  fg = this.fb.group(this.initialSearchFormValue);
+  journalService = inject(JournalEntryService);
 
-  onSubmitJournal() {
-    if (this.fg.invalid) {
-      this.fg.markAllAsTouched();
-      return;
-    }
+  filterMenuItems: MenuItem[] = [
+    {
+      label: 'رقم القيد',
+      command: () => this.fg.patchValue({ searchEnum: JournalEntrySearchEnum.InvoiceNumber }),
+    },
+    {
+      label: 'رقم المرجع',
+      command: () => this.fg.patchValue({ searchEnum: JournalEntrySearchEnum.ReferenceNumber }),
+    },
+  ];
 
-    const creditorEntries = this.journalDetailRowsArray.value.filter((a) => (a.creditorAmount ?? 0) > 0);
-    const debtorEntries = this.journalDetailRowsArray.value.filter((a) => (a.debtorAmount ?? 0) > 0);
-
-    //check if debtor or creditor is empty
-    if (creditorEntries.length == 0 || debtorEntries.length == 0) {
-      this.fg.markAllAsTouched();
-      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب ادخال قيمة المدين و الدائن' });
-      return;
-    }
-
-    //check if debtor sum == creditor sum
-    const creditorSum = creditorEntries.reduce((a, b) => a + (b.creditorAmount ?? 0), 0);
-    const debtorSum = debtorEntries.reduce((a, b) => a + (b.debtorAmount ?? 0), 0);
-
-    if (creditorSum != debtorSum) {
-      this.fg.markAllAsTouched();
-      this.messageService.add({
-        severity: 'error',
-        summary: 'خطأ',
-        detail: 'القيمتان المدينة والدائنة غير متساويتان',
-      });
-      return;
-    }
-
-    //collect data to send
-    let data = {
-      ...this.fg.value,
-      voucherDate: this.UtcToLocalIso(this.fg.value.voucherDate!.toISOString()),
-      debitJournalEntryDetailsRequestDtos: debtorEntries.map((d) => ({
-        finincalAccountId: d.finincalAccountId,
-        isHasTax: false,
-        totalAmount: d.debtorAmount,
-        notes: d.notes,
-      })),
-      creditJournalEntryDetailsRequestDtos: creditorEntries.map((c) => ({
-        finincalAccountId: c.finincalAccountId,
-        isHasTax: false,
-        totalAmount: c.creditorAmount,
-        notes: c.notes,
-      })),
-    };
-
-    this.journalEntryService.create(data).subscribe();
-  }
-
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  /**
-   *
-   */
-  constructor() {
-    super();
-    this.searchFinancialAccounts(1);
-    this.setUpNewJournalDetailRowFg();
-  }
-
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  // accounts
-  //
-
-  currentAccount = signal<{ id: number; name: string } | null>(null);
-  financialAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
-  financialAccountService = inject(FinancialAccountService);
-  displayedAccounts = computed(() => {
-    const accounts = this.financialAccounts();
-    const current = this.currentAccount();
-
-    if (!current) return accounts;
-
-    const exists = accounts.some((g) => g.id === current.id);
-
-    if (exists) {
-      return accounts.map((g) => (g.id === current.id ? { ...g, ...current } : g));
-    }
-
-    return [current, ...accounts];
-  });
-  financialAccountsPaginationInfo: IPaginationInfo = {
-    pageIndex: 0,
+  journals = signal<IJournalEntrySearchRow[]>([]);
+  journalsPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
-  previousAccountSearchValue = '';
-  searchVoucher(voucherNo: string) {
-    return this.journalEntryService.getById(voucherNo as any);
+
+  constructor() {
+    super();
+    this.searchJournals(1);
   }
 
-  debouncedVoucherSearch(event: any, voucherNo: string) {
-    console.log(event);
-    if (!voucherNo) return;
-
-    this.searchVoucher(voucherNo).subscribe({
-      next: (data) => {
-        this.currentJournalEntry.set(data);
-        this.fg.patchValue({
-          refNumber: data.refNumber,
-          voucherNo: data.voucherNo,
-          voucherDate: new Date(data.voucherDate),
-          paymentMethod: data.paymentMethod,
-          notes: data.notes,
-          isHasTax: data.isHasTax,
-          totalAmount: data.totalAmount,
-        });
-      },
-    });
-  }
-
-  searchFinancialAccounts(pageIndex: number, searchValue: string = '') {
-    this.financialAccountService
+  searchJournals(pageIndex: number) {
+    this.journalService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
+          pageIndex,
           pageSize: 10,
         },
         searchFilters: [
           {
-            column: FinancialAccountSearchEnum.Name,
-            values: [searchValue],
+            column: this.fg.getRawValue().searchEnum!,
+            values: [this.fg.getRawValue().searchTerm],
           },
         ],
-        fromDate: null,
+        fromDate: this.fg.getRawValue().fromDate,
       })
       .subscribe({
         next: (res) => {
-          if (res.value.rows.length === 0) return;
-          if (pageIndex == 1) {
-            this.financialAccounts.set(res.value.rows);
-          } else {
-            this.financialAccounts.update((pre) => [...pre, ...res.value.rows]);
-          }
-          this.financialAccountsPaginationInfo = {
+          this.journals.set(res.rows);
+          this.journalsPaginationInfo = {
             pageIndex,
-            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            totalPagesCount: res.paginationInfo.totalPagesCount,
+            totalRowsCount: res.paginationInfo.totalRowsCount,
           };
         },
       });
   }
 
-  debouncedFinancialAccountsSearch(event: IDebounceEvent, searchValue: string) {
-    console.log(event);
-    if (event.type === 'scrollToEnd') {
-      this.searchFinancialAccounts(this.financialAccountsPaginationInfo.pageIndex + 1);
-    } else {
-      this.searchFinancialAccounts(1, searchValue);
-    }
-  }
+  onSubmit = () => this.fg.valid && this.searchJournals(1);
 
-  onSubmit = () => this.fg.valid && this.searchFinancialAccounts(1);
+  onPageChange = (event: PaginatorState) => this.searchJournals(event.page! + 1);
 
-  onPageChange = (event: PaginatorState) => this.searchFinancialAccounts(event.page! + 1);
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-
-  journalDetailRowsArray = this.fb.array<typeof this.newJournalDetailRowFg>([]);
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-
-  lastClickedTableRowIndex = signal<number | null>(null);
-
-  currentEditRowIndex = signal<number>(-1);
-
-  editJournalDetailRow(rowIndex: number) {
-    this.lastClickedTableRowIndex.set(rowIndex + 1);
-    this.currentEditRowIndex.set(rowIndex);
-  }
-  isRowEditable(rowIndex: number) {
-    return this.currentEditRowIndex() === rowIndex;
-  }
-  delteJournalDetailRow(rowIndex: number) {
-    this.journalDetailRowsArray.removeAt(rowIndex);
-    this.currentEditRowIndex.set(-1);
-  }
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  newJournalDetailRowFg!: FormGroup<{
-    finincalAccountId: FormControl<number | null>;
-    debtorAmount: FormControl<number>;
-    creditorAmount: FormControl<number>;
-    notes: FormControl<string | null>;
-  }>;
-
-  setUpNewJournalDetailRowFg() {
-    if (this.newJournalDetailRowFg) {
-      this.newJournalDetailRowFg.reset();
-    } else {
-      this.newJournalDetailRowFg = this.fb.group({
-        finincalAccountId: this.fb.control<number | null>(null, [Validators.required]),
-        debtorAmount: this.fb.control<number>(0, [Validators.required]),
-        creditorAmount: this.fb.control<number>(0, [Validators.required]),
-        notes: this.fb.control<string | null>(null, [Validators.required]),
-      });
-    }
-
-    const creditorAmountControl = this.newJournalDetailRowFg.controls.creditorAmount;
-    const debtorAmountControl = this.newJournalDetailRowFg.controls.debtorAmount;
-
-    creditorAmountControl.valueChanges.subscribe((creditorAmount) => {
-      debtorAmountControl.setValue(0, { emitEvent: false });
+  deleteJournal(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل أنت متأكد من حذف القيد؟',
+      header: 'حذف القيد',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'إلغاء',
+      rejectButtonProps: {
+        label: 'إلغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+      accept: () => {
+        this.journalService.delete(id).subscribe({
+          next: () => {
+            this.searchJournals(1);
+          },
+        });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'إلغاء', detail: 'تم إلغاء الحذف' });
+      },
     });
-    debtorAmountControl.valueChanges.subscribe((debtorAmount) => {
-      creditorAmountControl.setValue(0, { emitEvent: false });
-    });
-  }
-
-  addNewJournalDetailRow() {
-    if (this.newJournalDetailRowFg.invalid) {
-      this.newJournalDetailRowFg.markAllAsTouched();
-      return;
-    }
-    const debitorAmount = this.newJournalDetailRowFg.value.debtorAmount ?? 0;
-    const creditorAmount = this.newJournalDetailRowFg.value.creditorAmount ?? 0;
-    if (debitorAmount == 0 && creditorAmount == 0) {
-      this.newJournalDetailRowFg.markAllAsTouched();
-      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب ادخال قيمة المدين او الدائن' });
-      return;
-    }
-    this.journalDetailRowsArray.push(this.newJournalDetailRowFg);
-    this.lastClickedTableRowIndex.set(this.journalDetailRowsArray.length - 1);
-    this.setUpNewJournalDetailRowFg();
   }
 }

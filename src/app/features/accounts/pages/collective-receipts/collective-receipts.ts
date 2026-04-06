@@ -9,7 +9,7 @@ import { BaseComponent, IPaginationInfo } from '@/components/base-component/base
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { ReceiptVoucherService } from '../../services/receipt-voucher-service';
-import { IReceiptVoucherCollectiveReceiptGetListRow } from '../../services/receipt-voucher-types';
+import { IReceiptVoucherCollectiveReceiptGetListRow } from '../../types';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { Debounce } from '@/directives/debounce';
 import { CurrencyPipe, DatePipe } from '@angular/common';

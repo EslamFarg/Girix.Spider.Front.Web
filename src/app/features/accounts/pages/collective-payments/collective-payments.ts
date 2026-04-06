@@ -8,7 +8,7 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { InputText } from 'primeng/inputtext';
 import { PaymentVoucherService } from '../../services/payment-voucher-service';
-import { IPaymentVoucherGetListRow } from '../../services/payment-voucher-types';
+import { IPaymentVoucherGetListRow } from '../../types';
 import { Debounce } from '@/directives/debounce';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';

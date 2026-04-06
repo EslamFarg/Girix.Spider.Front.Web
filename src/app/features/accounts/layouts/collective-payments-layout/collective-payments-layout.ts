@@ -16,11 +16,11 @@ export class CollectivePaymentsLayout {
    */
   links: ISectionLink[] = [
     {
-      labelKey: 'TODO: Change',
+      labelKey: 'collectivePayments.explorer',
       url: '/accounts/collective-payments',
     },
     {
-      labelKey: 'TODO: Change',
+      labelKey: 'collectivePayments.add',
       url: '/accounts/collective-payments/add',
     },
   ];

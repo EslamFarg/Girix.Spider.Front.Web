@@ -1,43 +1,25 @@
-import { BaseCrudService } from '@/core';
+import { BaseCrudService, BaseSearchAndCrudService, ISearchCriteria, SearchColumEnum } from '@/core';
 import { Injectable } from '@angular/core';
+import { IJournalEntryReadResponse, IJournalEntrySearchResponse  } from '../types';
 
-export interface IJournalEntryReadResponse {
-  id: number
-  voucherNo: string
-  refNumber: any
-  voucherDate: string
-  paymentMethod: string
-  notes: string
-  isHasTax: boolean
-  totalAmount: number
-  totalDebit: number
-  totalCredit: number
-  debitLines: IDebitLine[]
-  creditLines: ICreditLine[]
+//JournalEntry: Id,InvoiceNumber,ReferenceNumber                                                
+export enum JournalEntrySearchEnum {
+  Id = SearchColumEnum.Id,
+  InvoiceNumber = SearchColumEnum.InvoiceNumber,
+  ReferenceNumber = SearchColumEnum.ReferenceNumber,
 }
-
-export interface IDebitLine {
-  finincalAccountId: number
-  finincalAccountName: string
-  isHasTax: boolean
-  totalAmount: number
-  notes: string
-}
-
-export interface ICreditLine {
-  finincalAccountId: number
-  finincalAccountName: string
-  isHasTax: boolean
-  totalAmount: number
-  notes: string
-}
-
 
 @Injectable({
   providedIn: 'root',
 })
-export class JournalEntryService extends BaseCrudService<any, any, IJournalEntryReadResponse> {
-  ///v1/JournalEntry/Create
+export class JournalEntryService extends BaseSearchAndCrudService<
+  any,
+  JournalEntrySearchEnum,
+  any,
+  any,
+  IJournalEntryReadResponse
+> {
+  //v1/JournalEntry/Create
   override apiRoute = 'JournalEntry';
 
   /*
@@ -48,8 +30,11 @@ export class JournalEntryService extends BaseCrudService<any, any, IJournalEntry
     this.patchEndpoints({
       create: 'create',
       put: 'update',
-      getById:""
-    })
+      getById: '',
+    });
   }
- 
+
+  override search<T = IJournalEntrySearchResponse>(criteriaDto: ISearchCriteria<JournalEntrySearchEnum>) {
+    return super.search<T>(criteriaDto);
+  }
 }
