@@ -88,7 +88,10 @@ export class PurchaseReturnForm extends BaseComponent {
   purchaseService = inject(PurchaseService);
   id = input<number | null>(null);
 
-  formMode = input<FormMode>(FormMode.Create);
+  formMode = computed(() => {
+    if (this.currentPurchaseReturn()) return FormMode.Update;
+    return this.initialFormMode();
+  });
 
   initialFormValue = {
     // المرجع

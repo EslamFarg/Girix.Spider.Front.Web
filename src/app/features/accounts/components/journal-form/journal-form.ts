@@ -14,6 +14,16 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
+import { ControlsOf } from '@/yn-ng/types/helpers';
+import { RouterLink } from '@angular/router';
+
+interface IAppJournalItem {
+  finincalAccountId: number | null;
+  debtorAmount: number;
+  creditorAmount: number;
+  notes: string | null;
+}
+type IAppJournalItemControls = ControlsOf<IAppJournalItem>;
 
 @Component({
   selector: 'app-journal-form',
@@ -30,14 +40,20 @@ import { Textarea } from 'primeng/textarea';
     NgSelectComponent,
     AllowNumbers,
     ButtonDirective,
+    RouterLink,
   ],
   templateUrl: './journal-form.html',
   styleUrl: './journal-form.css',
 })
 export class JournalForm extends BaseComponent {
-  currentJournalEntry = signal<IJournalEntryReadResponse | null>(null);
+  id = input.required<number>();
+
+  currentJournal = signal<IJournalEntryReadResponse | null>(null);
   journalEntryService = inject(JournalEntryService);
-  formMode = input<FormMode>(FormMode.Create);
+  formMode = computed(() => {
+    if (this.currentJournal()) return FormMode.Update;
+    return this.initialFormMode();
+  });
   //
   //
   //
@@ -45,18 +61,60 @@ export class JournalForm extends BaseComponent {
   //
   //
   //
+  //
+  //
+
   initialFormValue = {
+    // رقم القيد
+    id: this.fb.control<number | null>({ value: null, disabled: true }, []),
     // المرجع
     refNumber: this.fb.control<string | null>(null, [Validators.required]),
     // الرقم الدفتري
     voucherNo: this.fb.control<string | null>(null, [Validators.required]),
     voucherDate: this.fb.control<Date | null>(null, [Validators.required]),
-    paymentMethod: this.fb.control<string | null>(null, [Validators.required]),
     notes: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(1000)]),
-    isHasTax: this.fb.control<boolean>(false, [Validators.required]),
-    totalAmount: this.fb.control<number | null>(null, [Validators.required]),
+    items: this.fb.array<FormGroup<IAppJournalItemControls>>([], [Validators.required, Validators.minLength(1)]),
   };
   fg = this.fb.group(this.initialFormValue);
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.searchFinancialAccounts(1);
+    this.setUpNewJournalDetailsRowFg();
+  }
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+
+  ngOnInit() {
+    switch (this.formMode()) {
+      case FormMode.Create:
+        break;
+      case FormMode.Update:
+        this.journalEntryService.getById(this.id()).subscribe({
+          next: (data) => {
+            this.debouncedJournalSearch(data.id.toString());
+          },
+        });
+        break;
+    }
+  }
 
   //
   //
@@ -72,13 +130,16 @@ export class JournalForm extends BaseComponent {
   //
 
   onSubmitJournal() {
+    console.log(this.fg.value);
     if (this.fg.invalid) {
       this.fg.markAllAsTouched();
       return;
     }
 
-    const creditorEntries = this.journalDetailRowsArray.value.filter((a) => (a.creditorAmount ?? 0) > 0);
-    const debtorEntries = this.journalDetailRowsArray.value.filter((a) => (a.debtorAmount ?? 0) > 0);
+    const journalDetailRowsArray = this.fg.controls.items;
+
+    const creditorEntries = journalDetailRowsArray.value.filter((a) => (a.creditorAmount ?? 0) > 0);
+    const debtorEntries = journalDetailRowsArray.value.filter((a) => (a.debtorAmount ?? 0) > 0);
 
     //check if debtor or creditor is empty
     if (creditorEntries.length == 0 || debtorEntries.length == 0) {
@@ -119,23 +180,33 @@ export class JournalForm extends BaseComponent {
       })),
     };
 
-    this.journalEntryService.create(data).subscribe();
+    switch (this.formMode()) {
+      case FormMode.Create:
+        this.journalEntryService.create(data).subscribe({
+          next: (data) => {
+            this.onResetJournal();
+          },
+        });
+        break;
+      case FormMode.Update:
+        this.journalEntryService
+          .put({
+            id: this.currentJournal()?.id,
+            ...data,
+          })
+          .subscribe({
+            next: (data) => {
+              this.onResetJournal();
+            },
+          });
+        break;
+    }
   }
 
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  /**
-   *
-   */
-  constructor() {
-    super();
-    this.searchFinancialAccounts(1);
-    this.setUpNewJournalDetailRowFg();
+  onResetJournal() {
+    this.fg.reset();
+    this.fg.setControl('items', this.fb.array<FormGroup<IAppJournalItemControls>>([]));
+    this.currentJournal.set(null);
   }
 
   //
@@ -172,26 +243,40 @@ export class JournalForm extends BaseComponent {
     totalRowsCount: 0,
   };
   previousAccountSearchValue = '';
-  searchVoucher(voucherNo: string) {
-    return this.journalEntryService.getById(voucherNo as any);
-  }
+  debouncedJournalSearch(id: string) {
+    if (!id) return;
 
-  debouncedVoucherSearch(event: any, voucherNo: string) {
-    console.log(event);
-    if (!voucherNo) return;
-
-    this.searchVoucher(voucherNo).subscribe({
+    this.journalEntryService.getById(+id).subscribe({
       next: (data) => {
-        this.currentJournalEntry.set(data);
+        this.currentJournal.set(data);
         this.fg.patchValue({
+          id: data.id,
           refNumber: data.refNumber,
           voucherNo: data.voucherNo,
           voucherDate: new Date(data.voucherDate),
-          paymentMethod: data.paymentMethod,
           notes: data.notes,
-          isHasTax: data.isHasTax,
-          totalAmount: data.totalAmount,
         });
+        this.fg.setControl(
+          'items',
+          this.fb.array<FormGroup<IAppJournalItemControls>>([
+            ...data.creditLines.map((a) =>
+              this.createNewJournalDetailsItemFg({
+                finincalAccountId: a.finincalAccountId,
+                creditorAmount: a.totalAmount,
+                debtorAmount: 0,
+                notes: a.notes,
+              }),
+            ),
+            ...data.debitLines.map((a) =>
+              this.createNewJournalDetailsItemFg({
+                finincalAccountId: a.finincalAccountId,
+                creditorAmount: 0,
+                debtorAmount: a.totalAmount,
+                notes: a.notes,
+              }),
+            ),
+          ]),
+        );
       },
     });
   }
@@ -240,20 +325,7 @@ export class JournalForm extends BaseComponent {
   onSubmit = () => this.fg.valid && this.searchFinancialAccounts(1);
 
   onPageChange = (event: PaginatorState) => this.searchFinancialAccounts(event.page! + 1);
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
 
-  journalDetailRowsArray = this.fb.array<typeof this.newJournalDetailRowFg>([]);
   //
   //
   //
@@ -278,7 +350,7 @@ export class JournalForm extends BaseComponent {
     return this.currentEditRowIndex() === rowIndex;
   }
   delteJournalDetailRow(rowIndex: number) {
-    this.journalDetailRowsArray.removeAt(rowIndex);
+    this.fg.controls.items.removeAt(rowIndex);
     this.currentEditRowIndex.set(-1);
   }
   //
@@ -294,27 +366,18 @@ export class JournalForm extends BaseComponent {
   //
   //
   //
-  newJournalDetailRowFg!: FormGroup<{
-    finincalAccountId: FormControl<number | null>;
-    debtorAmount: FormControl<number>;
-    creditorAmount: FormControl<number>;
-    notes: FormControl<string | null>;
-  }>;
+  newJournalDetailsItemFg!: FormGroup<IAppJournalItemControls>;
 
-  setUpNewJournalDetailRowFg() {
-    if (this.newJournalDetailRowFg) {
-      this.newJournalDetailRowFg.reset();
-    } else {
-      this.newJournalDetailRowFg = this.fb.group({
-        finincalAccountId: this.fb.control<number | null>(null, [Validators.required]),
-        debtorAmount: this.fb.control<number>(0, [Validators.required]),
-        creditorAmount: this.fb.control<number>(0, [Validators.required]),
-        notes: this.fb.control<string | null>(null, [Validators.required]),
-      });
-    }
+  createNewJournalDetailsItemFg(data?: IAppJournalItem) {
+    const fg = this.fb.group<IAppJournalItemControls>({
+      creditorAmount: this.fb.control<number>(data?.creditorAmount ?? 0, [Validators.required]),
+      debtorAmount: this.fb.control<number>(data?.debtorAmount ?? 0, [Validators.required]),
+      notes: this.fb.control<string | null>(data?.notes ?? null, [Validators.required, Validators.maxLength(1000)]),
+      finincalAccountId: this.fb.control<number | null>(data?.finincalAccountId ?? null, [Validators.required]),
+    });
 
-    const creditorAmountControl = this.newJournalDetailRowFg.controls.creditorAmount;
-    const debtorAmountControl = this.newJournalDetailRowFg.controls.debtorAmount;
+    const creditorAmountControl = fg.controls.creditorAmount;
+    const debtorAmountControl = fg.controls.debtorAmount;
 
     creditorAmountControl.valueChanges.subscribe((creditorAmount) => {
       debtorAmountControl.setValue(0, { emitEvent: false });
@@ -322,22 +385,43 @@ export class JournalForm extends BaseComponent {
     debtorAmountControl.valueChanges.subscribe((debtorAmount) => {
       creditorAmountControl.setValue(0, { emitEvent: false });
     });
+
+    return fg;
   }
 
-  addNewJournalDetailRow() {
-    if (this.newJournalDetailRowFg.invalid) {
-      this.newJournalDetailRowFg.markAllAsTouched();
+  setUpNewJournalDetailsRowFg() {
+    if (this.newJournalDetailsItemFg) {
+      this.newJournalDetailsItemFg.reset();
+    } else {
+      this.newJournalDetailsItemFg = this.createNewJournalDetailsItemFg();
+    }
+  }
+
+  submitNewJournalDetailsItem() {
+    if (this.newJournalDetailsItemFg.invalid) {
+      this.newJournalDetailsItemFg.markAllAsTouched();
+      //log errors
+      Object.entries(this.newJournalDetailsItemFg.controls!).forEach(([key, value]) => {
+        if (value.errors) {
+          console.log(key, value.errors);
+        }
+      });
       return;
     }
-    const debitorAmount = this.newJournalDetailRowFg.value.debtorAmount ?? 0;
-    const creditorAmount = this.newJournalDetailRowFg.value.creditorAmount ?? 0;
+
+    const debitorAmount = this.newJournalDetailsItemFg.value.debtorAmount ?? 0;
+    const creditorAmount = this.newJournalDetailsItemFg.value.creditorAmount ?? 0;
     if (debitorAmount == 0 && creditorAmount == 0) {
-      this.newJournalDetailRowFg.markAllAsTouched();
+      this.newJournalDetailsItemFg.markAllAsTouched();
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب ادخال قيمة المدين او الدائن' });
       return;
     }
-    this.journalDetailRowsArray.push(this.newJournalDetailRowFg);
-    this.lastClickedTableRowIndex.set(this.journalDetailRowsArray.length - 1);
-    this.setUpNewJournalDetailRowFg();
+
+    const fgValue = this.newJournalDetailsItemFg.value;
+
+    this.fg.controls.items!.push(this.createNewJournalDetailsItemFg(fgValue as IAppJournalItem));
+
+    this.lastClickedTableRowIndex.set(this.fg.value.items!.length - 1);
+    this.setUpNewJournalDetailsRowFg();
   }
 }

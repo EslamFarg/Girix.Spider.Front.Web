@@ -58,7 +58,10 @@ export class OpeningBalanceForm extends BaseComponent {
   openingBalanceService = inject(OpeningBalanceService);
   id = input<number | null>(null);
 
-  formMode = input<FormMode>(FormMode.Create);
+  formMode = computed(() => {
+    if (this.currentOpeningBalance()) return FormMode.Update;
+    return this.initialFormMode();
+  });
 
   initialFormValue = {
     // المرجع

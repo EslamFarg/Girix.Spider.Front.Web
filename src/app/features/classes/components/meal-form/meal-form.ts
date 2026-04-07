@@ -11,7 +11,7 @@ import { InputText } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { IMealFgControls, IMealProduct } from './types';
-import { MealService } from '../../services/meal-service';
+import { IMealReadResponse, MealService } from '../../services/meal-service';
 import { GroupSearchEnum, GroupService, IGroupSearchRow } from '../../services/group-service';
 import { IProductSearchRow, ProductSearchEnum, ProductService } from '../../services/product-service';
 import { Slider } from '@/components/slider/slider';
@@ -48,7 +48,10 @@ import { RouterLink } from '@angular/router';
   styleUrl: './meal-form.css',
 })
 export class MealForm extends BaseComponent implements OnInit {
-  formMode = input.required<FormMode>();
+  formMode = computed(() => {
+    if(this.existingMeal()) return FormMode.Update;
+    return this.initialFormMode();
+  });
 
   initialMealFgValue: IMealFgControls = {
     nameEn: this.fb.control(null, [Validators.required]),
@@ -89,6 +92,7 @@ export class MealForm extends BaseComponent implements OnInit {
 
   mealService = inject(MealService);
   mealFg = this.fb.group(this.initialMealFgValue);
+  existingMeal = signal<IMealReadResponse | null>(null);
   /**
    *
    */
@@ -103,6 +107,7 @@ export class MealForm extends BaseComponent implements OnInit {
     switch (this.formMode()) {
       case FormMode.Update:
         this.mealService.getById(this.routeId).subscribe((meal) => {
+          this.existingMeal.set(meal);
           this.mealFg.patchValue({
             ...meal,
             nameAr: meal.name,

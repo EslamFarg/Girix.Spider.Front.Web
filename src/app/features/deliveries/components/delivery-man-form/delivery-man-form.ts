@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputText } from 'primeng/inputtext';
@@ -25,7 +25,10 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class DeliveryManForm extends BaseComponent implements OnInit {
   //inputs FROM PARENT
-  formMode = input.required<FormMode>();
+  formMode = computed(() => {
+    if (this.currentDelivery()) return FormMode.Update;
+    return this.initialFormMode();
+  });
   id = input.required<number | null>();
   //
   //

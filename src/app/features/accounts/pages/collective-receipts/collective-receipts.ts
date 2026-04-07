@@ -8,12 +8,14 @@ import { Paginator, PaginatorState } from 'primeng/paginator';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
-import { ReceiptVoucherService } from '../../services/receipt-voucher-service';
-import { IReceiptVoucherCollectiveReceiptGetListRow } from '../../types';
+import { ReceiptVoucherSearchEnum, ReceiptVoucherService } from '../../services/receipt-voucher-service';
+import {  IReceiptVoucherSearchRow } from '../../types';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { Debounce } from '@/directives/debounce';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MenuItem } from 'primeng/api';
+import { Menu } from "primeng/menu";
 
 @Component({
   selector: 'app-collective-receipts',
@@ -29,45 +31,65 @@ import { TranslatePipe } from '@ngx-translate/core';
     Debounce,
     DatePipe,
     CurrencyPipe,
-    TranslatePipe
-  ],
+    TranslatePipe,
+    Menu
+],
   templateUrl: './collective-receipts.html',
   styleUrl: './collective-receipts.css',
 })
 export class CollectiveReceipts extends BaseComponent {
   
   initialSearchFormValue = {
-    receiptVoucherId: this.fb.control<number | null>(null, [Validators.maxLength(100)]),
+    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+    searchEnum: this.fb.control<ReceiptVoucherSearchEnum>(ReceiptVoucherSearchEnum.Id, [Validators.required]),
+    fromDate: this.fb.control<string | null>(null, []),
+    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
   };
 
   fg = this.fb.group(this.initialSearchFormValue);
+  receiptVoucherService = inject(ReceiptVoucherService);
 
-  receiptVoucerService = inject(ReceiptVoucherService);
+  filterMenuItems: MenuItem[] = [
+    {
+      label: 'رقم القيد',
+      command: () => this.fg.patchValue({ searchEnum: ReceiptVoucherSearchEnum.Id }),
+    },
+    {
+      label: 'الرقم الدفتري',
+      command: () => this.fg.patchValue({ searchEnum: ReceiptVoucherSearchEnum.VoucherNo }),
+    },
+  ];
 
-  constructor() {
-    super();
-    this.getList(1);
-  }
-
-
-  collectiveReceipts = signal<IReceiptVoucherCollectiveReceiptGetListRow[]>([]);
+  receiptVouchers = signal<IReceiptVoucherSearchRow[]>([]);
   receiptVouchersPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
 
+  constructor() {
+    super();
+    this.searchReceiptVouchers(1);
+  }
 
-  getList(pageIndex: number) {
-    this.receiptVoucerService
-      .getList({
-        criteria: { paginationInfo: { pageIndex, pageSize: 10 } },
-        receiptVoucherId: this.fg.getRawValue().receiptVoucherId ?? 0,
+  searchReceiptVouchers(pageIndex: number) {
+    this.receiptVoucherService
+      .search({
+        paginationInfo: {
+          pageIndex,
+          pageSize: 10,
+        },
+        searchFilters: [
+          {
+            column: this.fg.getRawValue().searchEnum!,
+            values: [this.fg.getRawValue().searchTerm],
+          },
+        ],
+        fromDate: this.fg.getRawValue().fromDate,
       })
       .subscribe({
         next: (res) => {
-          this.collectiveReceipts.set(res.rows);
-          console.log(this.collectiveReceipts());
+          this.receiptVouchers.set(res.rows);
           this.receiptVouchersPaginationInfo = {
             pageIndex,
             totalPagesCount: res.paginationInfo.totalPagesCount,
@@ -77,20 +99,19 @@ export class CollectiveReceipts extends BaseComponent {
       });
   }
 
+  onSubmit = () => this.fg.valid && this.searchReceiptVouchers(1);
 
-  onSubmit = () => this.fg.valid && this.getList(1);
+  onPageChange = (event: PaginatorState) => this.searchReceiptVouchers(event.page! + 1);
 
-  onPageChange = (event: PaginatorState) => this.getList(event.page! + 1);
-
-  deleteCollectiveReceipt(id: number, event: Event) {
+  deleteReceiptVoucher(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف السند',
-      header: 'حذف السند',
+      message: 'هل أنت متأكد من حذف القيد؟',
+      header: 'حذف القيد',
       icon: 'pi pi-info-circle',
-      rejectLabel: 'الغاء',
+      rejectLabel: 'إلغاء',
       rejectButtonProps: {
-        label: 'الغاء',
+        label: 'إلغاء',
         severity: 'secondary',
         outlined: true,
       },
@@ -98,16 +119,15 @@ export class CollectiveReceipts extends BaseComponent {
         label: 'حذف',
         severity: 'danger',
       },
-
       accept: () => {
-        this.receiptVoucerService.delete(id).subscribe({
+        this.receiptVoucherService.delete(id).subscribe({
           next: () => {
-            this.getList(1);
+            this.searchReceiptVouchers(1);
           },
         });
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
+        this.messageService.add({ severity: 'error', summary: 'إلغاء', detail: 'تم إلغاء الحذف' });
       },
     });
   }

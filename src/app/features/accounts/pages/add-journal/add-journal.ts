@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { JournalForm } from '../../components/journal-form/journal-form';
+import { BaseComponent } from '@/components';
 
 @Component({
   selector: 'app-add-journal',
@@ -7,6 +8,6 @@ import { JournalForm } from '../../components/journal-form/journal-form';
   templateUrl: './add-journal.html',
   styleUrl: './add-journal.css',
 })
-export class AddJournal {
-
+export class AddJournal extends BaseComponent {
+    id=input.required<number>();
 }

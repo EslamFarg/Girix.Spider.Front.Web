@@ -70,7 +70,10 @@ export class PurchasesForm extends BaseComponent {
   purchaseService = inject(PurchaseService);
   id = input<number | null>(null);
 
-  formMode = input<FormMode>(FormMode.Create);
+  formMode = computed(() => {
+    if (this.currentPurchase()) return FormMode.Update;
+    return this.initialFormMode();
+  });
 
   initialFormValue = {
     // المرجع

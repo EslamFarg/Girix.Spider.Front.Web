@@ -1,22 +1,28 @@
 <!-- search -->
 <div class="flex h-fit items-start gap-2 w-full">
   <form #form [formGroup]="fg" appDebounce [domEvents]="['submit']" (debounced)="onSubmit()" class="flex-1">
-    <app-input-error-message-handler [fc]="fg.get('receiptVoucherId')">
+    <app-input-error-message-handler [fc]="fg.get('searchTerm')">
       <input
         class="w-full bg-transparent! no-input-spinner"
         type="number"
         pInputText
         appAllowNumbers
-        formControlName="receiptVoucherId"
-        placeholder="بحث ب رقم السند"
+        formControlName="searchTerm"
+        placeholder="بحث "
       />
       <!-- <p-inputgroup-addon>
         <i class="pi pi-filter"></i>
       </p-inputgroup-addon> -->
-      <p-inputgroup-addon>
-        <button type="submit" class="flex cursor-pointer">
-          <i class="pi pi-search"></i>
-        </button>
+      <p-inputgroup-addon class="relative">
+        <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+        <p-menu
+          dir="rtl"
+          [class]="`*:top-full! *:left-0! `"
+          #filterMenu
+          [model]="filterMenuItems"
+          [popup]="true"
+          [style]="{ insetInlineEnd: '100%' }"
+        />
       </p-inputgroup-addon>
     </app-input-error-message-handler>
   </form>
@@ -28,23 +34,31 @@
   <thead>
     <tr class="">
       <th>#</th>
-      <th>{{'form.voucherNumber' | translate}}</th>
-      <th>{{'form.date' | translate }}</th>
-      <th>{{'form.ledgerNumber' | translate}}</th>
-      <th>{{'form.amount' | translate }}</th>
-      <th>{{'actions.tools' | translate }}</th>
+      <th>{{ 'form.voucherNumber' | translate }}</th>
+      <th>{{ 'form.date' | translate }}</th>
+      <th>{{ 'form.ledgerNumber' | translate }}</th>
+      <th>{{ 'form.amount' | translate }}</th>
+      <th>{{ 'actions.tools' | translate }}</th>
     </tr>
   </thead>
   <tbody>
-    @for (collectiveReceipt of collectiveReceipts(); track $index) {
+    @for (receiptVoucher of receiptVouchers(); track $index) {
       <tr class="" [style]="`--ix:${$index}`">
-        <td><div>{{getRowNumber($index, receiptVouchersPaginationInfo.pageIndex)}}</div></td>
         <td>
-          <div>{{ collectiveReceipt.id }}</div>
+          <div>{{ getRowNumber($index, receiptVouchersPaginationInfo.pageIndex) }}</div>
         </td>
-        <td><div>{{collectiveReceipt.voucherDate | date: 'dd/MM/yyyy'}}</div></td>
-        <td><div>{{collectiveReceipt.voucherNo}}</div></td>
-        <td><div>{{collectiveReceipt.totalAmount | currency}}</div></td>
+        <td>
+          <div>{{ receiptVoucher.id }}</div>
+        </td>
+        <td>
+          <div>{{ receiptVoucher.voucherDate | date: 'dd/MM/yyyy' }}</div>
+        </td>
+        <td>
+          <div>{{ receiptVoucher.voucherNo }}</div>
+        </td>
+        <td>
+          <div>{{ receiptVoucher.totalAmount | currency }}</div>
+        </td>
         <td>
           <div class="actions">
             <button type="button" class="print">
@@ -73,7 +87,7 @@
                 />
               </svg>
             </button>
-            <button type="button" class="delete" (click)="deleteCollectiveReceipt(collectiveReceipt.id,$event)">
+            <button type="button" class="delete" (click)="deleteReceiptVoucher(receiptVoucher.id, $event)">
               <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   opacity="0.4"

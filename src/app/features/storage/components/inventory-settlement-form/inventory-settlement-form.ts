@@ -65,7 +65,10 @@ export class InventorySettlementForm extends BaseComponent {
   InventoryProductSearchEnum = InventoryProductSearchEnum;
   QuantityOptions = QuantityOptions;
 
-  formMode = input<FormMode>(FormMode.Create);
+  formMode = computed(() => {
+    if (this.currentInventory()) return FormMode.Update;
+    return this.initialFormMode();
+  });
   currentFormMode = signal<FormMode>(FormMode.Create);
 
   initialFormValue = {

@@ -1,30 +1,34 @@
-<form [formGroup]="fg" id="journalForm" (ngSubmit)="onSubmitJournal()" class="p-4 h-full overflow-auto custom-scroll">
- 
+<form
+  [formGroup]="fg"
+  id="journalForm"
+  (reset)="onResetJournal()"
+  (ngSubmit)="onSubmitJournal()"
+  class="p-4 h-full overflow-auto custom-scroll"
+>
   <!-- actions -->
-<div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 mb-4">
-  <button type="submit" form="journalForm" pButton class="flex-1 md:flex-none app-p-btn py-1! md:px-8!">
-    حفظ
-  </button>
-  @switch (formMode()) {
-    @case (FormMode.Update) {
-      <a
-        pButton
-        routerLink="/accounts/journals/add"
-        class="app-p-btn py-1! flex-1 md:flex-none md:px-8!"
-        variant="outlined"
-      >
-        جديد
-      </a>
+  <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 mb-4">
+    <button type="submit" form="journalForm" pButton class="flex-1 md:flex-none app-p-btn py-1! md:px-8!">حفظ</button>
+    @switch (formMode()) {
+      @case (FormMode.Update) {
+        <button
+          pButton
+          type="reset"
+          routerLink="/accounts/journals/add"
+          class="app-p-btn py-1! flex-1 md:flex-none md:px-8!"
+          variant="outlined"
+        >
+          جديد
+        </button>
+      }
     }
-  }
-</div>
+  </div>
 
-  <div class="grid grid-cols-4 gap-4 flex-1 my-4">
+  <div class="grid md:grid-cols-4 gap-4 flex-1 my-4">
     <!-- رقم القيد -->
     <div>
-      <label for="productName">رقم القيد</label>
+      <label for="id">رقم القيد</label>
       <app-input-error-message-handler>
-        <input type="text" pInputText id="productName" aria-describedby="productName-help" placeholder="الاسم" />
+        <input type="text" pInputText id="id" formControlName="id" aria-describedby="id-help" placeholder="الاسم" />
       </app-input-error-message-handler>
     </div>
     <!-- بحث برقم القيد -->
@@ -34,7 +38,7 @@
       [formGroup]="shallowFg"
       appDebounce
       [domEvents]="['submit']"
-      (debounced)="debouncedVoucherSearch($event, voucherSearchInput.value)"
+      (debounced)="debouncedJournalSearch(voucherSearchInput.value)"
     >
       <label for="productPrice">بحث برقم القيد</label>
 
@@ -63,8 +67,8 @@
       </app-input-error-message-handler>
     </form>
     <!-- date -->
-    <div class="col-span-2">
-      <label for="productName">التاريخ</label>
+    <div class="md:col-span-2">
+      <label for="voucherDate">التاريخ</label>
       <app-input-error-message-handler [fc]="fg.get('voucherDate')">
         <p-datepicker
           formControlName="voucherDate"
@@ -105,21 +109,22 @@
         </p-datepicker>
       </app-input-error-message-handler>
     </div>
-    <!-- رقم القيد -->
-    <div class="col-span-2">
-      <label for="costPrice">الرقم الدفتري</label>
-      <app-input-error-message-handler [fc]="fg.get('voucherNo')">
+    <!-- الرقم الدفتري -->
+    <div class="md:col-span-2">
+      <label for="voucherNo">الرقم الدفتري</label>
+      <app-input-error-message-handler>
         <input
-          formControlName="voucherNo"
-          pInputText
           type="text"
-          id="costPrice"
-          aria-describedby="costPrice-help"
-          placeholder="الرقم الدفتري"
+          pInputText
+          id="voucherNo"
+          formControlName="voucherNo"
+          aria-describedby="voucherNo-help"
+          placeholder="الاسم"
         />
       </app-input-error-message-handler>
     </div>
-    <div class="col-span-2">
+    <!-- المرجع -->
+    <div class="md:col-span-2">
       <label for="costPrice">المرجع</label>
       <app-input-error-message-handler [fc]="fg.get('refNumber')">
         <input
@@ -133,7 +138,7 @@
       </app-input-error-message-handler>
     </div>
 
-    <div class="col-span-4">
+    <div class="md:col-span-4">
       <label for="productName">البيان</label>
       <app-input-error-message-handler [fc]="fg.get('notes')">
         <textarea
@@ -149,233 +154,214 @@
     </div>
   </div>
 
-  <table class="my-4 w-full main-table table-fixed">
-    <thead>
-      <tr>
-        <th class="min-w-12.5 w-12.5">#</th>
-        <th class="min-w-45 w-45">الحساب</th>
-        <th class="min-w-45 w-45">المدين</th>
-        <th class="min-w-45 w-45">الدائن</th>
-        <th class="w-auto">البيان</th>
-        <th class="min-w-45 w-45">الأدوات</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        [class.last-clicked-table-row]="lastClickedTableRowIndex() === null"
-        (click)="lastClickedTableRowIndex.set(null)"
-      >
-        <td colspan="6" class="p-0! overflow-visible!">
-          <form
-            [formGroup]="newJournalDetailRowFg"
-            (ngSubmit)="addNewJournalDetailRow()"
-            class="grid grid-cols-[50px_repeat(3,11.25rem)_1fr_11.25rem] *:p-2 *:flex *:items-center *:[&>*]:flex-1"
+  <div class="overflow-x-auto">
+    <table class="my-4 min-w-250 w-full main-table table-fixed">
+      <thead>
+        <tr>
+          <th class="min-w-12.5 w-12.5">#</th>
+          <th class="min-w-12.5">الحساب</th>
+          <th class="min-w-12.5">المدين</th>
+          <th class="min-w-12.5">الدائن</th>
+          <th class="min-w-12.5">البيان</th>
+          <th class="min-w-40 w-40">الأدوات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          [class.last-clicked-table-row]="lastClickedTableRowIndex() === null"
+          (click)="lastClickedTableRowIndex.set(null)"
+          class="*:overflow-visible!"
+        >
+          <td class="text-start">#</td>
+          <!-- الحساب -->
+          <td>
+            <app-input-error-message-handler
+              [grouped]="false"
+              [fc]="newJournalDetailsItemFg.controls.finincalAccountId"
+            >
+              <ng-select
+                class="app-select"
+                [items]="financialAccounts()"
+                bindLabel="name"
+                [formControl]="newJournalDetailsItemFg.controls.finincalAccountId"
+                bindValue="id"
+                placeholder="الكل"
+                appendTo="body"
+                [clearable]="false"
+                #printerSelect1
+                appDebounce
+                [customEvents]="[
+                  { type: 'searchEvent', value: printerSelect1.searchEvent },
+                  { type: 'scrollToEnd', value: printerSelect1.scrollToEnd },
+                ]"
+                (debounced)="debouncedFinancialAccountsSearch($event, printerSelect1.searchTerm)"
+              />
+            </app-input-error-message-handler>
+          </td>
+          <!-- المدين -->
+          <td>
+            <app-input-error-message-handler [fc]="newJournalDetailsItemFg.controls.debtorAmount">
+              <input
+                pInputText
+                id="debtorAmount"
+                appAllowNumbers
+                [defaultChecked]="true"
+                [min]="0"
+                [formControl]="newJournalDetailsItemFg.controls.debtorAmount"
+                class="app-input text-center"
+                aria-describedby="debtorAmount-help"
+                placeholder="المدين"
+              />
+            </app-input-error-message-handler>
+          </td>
+          <!-- الدائن -->
+          <td>
+            <app-input-error-message-handler [fc]="newJournalDetailsItemFg.controls.creditorAmount">
+              <input
+                pInputText
+                appAllowNumbers
+                [defaultChecked]="true"
+                [min]="0"
+                id="creditorAmount"
+                [formControl]="newJournalDetailsItemFg.controls.creditorAmount"
+                class="app-input text-center"
+                aria-describedby="creditorAmount-help"
+                placeholder="الدائن"
+              />
+            </app-input-error-message-handler>
+          </td>
+          <!-- البيان -->
+          <td>
+            <app-input-error-message-handler [fc]="newJournalDetailsItemFg.controls.notes">
+              <input
+                pInputText
+                id="notes"
+                [formControl]="newJournalDetailsItemFg.controls.notes"
+                class="app-input text-center"
+                aria-describedby="notes-help"
+                placeholder="البيان"
+              />
+            </app-input-error-message-handler>
+          </td>
+          <!-- actions -->
+          <td>
+            <button
+              (click)="submitNewJournalDetailsItem()"
+              type="button"
+              pButton
+              class="border-dark-line! bg-dark-line! text-sm! text-white! py-1! px-8!"
+            >
+              إضافه
+            </button>
+          </td>
+        </tr>
+        @for (item of fg.controls.items.controls; track $index) {
+          <tr
+            [class.last-clicked-table-row]="lastClickedTableRowIndex() === $index"
+            (click)="lastClickedTableRowIndex.set($index)"
           >
-            <div class="text-start">#</div>
+            <td class="min-w-12.5 w-12.5" [class.disabled]="!isRowEditable($index)">{{ $index + 1 }}</td>
             <!-- الحساب -->
-            <div>
-              <app-input-error-message-handler [grouped]="false" [fc]="newJournalDetailRowFg.get('finincalAccountId')">
+            <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
+              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.finincalAccountId">
                 <ng-select
                   class="app-select"
                   [items]="financialAccounts()"
+                  [formControl]="item.controls.finincalAccountId"
                   bindLabel="name"
-                  formControlName="finincalAccountId"
                   bindValue="id"
                   placeholder="الكل"
                   [clearable]="false"
-                  #printerSelect1
+                  #printerSelect2
                   appDebounce
                   [customEvents]="[
-                    { type: 'searchEvent', value: printerSelect1.searchEvent },
-                    { type: 'scrollToEnd', value: printerSelect1.scrollToEnd },
+                    { type: 'searchEvent', value: printerSelect2.searchEvent },
+                    { type: 'scrollToEnd', value: printerSelect2.scrollToEnd },
                   ]"
-                  (debounced)="debouncedFinancialAccountsSearch($event, printerSelect1.searchTerm)"
+                  (debounced)="debouncedFinancialAccountsSearch($event, printerSelect2.searchTerm)"
                 />
               </app-input-error-message-handler>
-            </div>
+            </td>
             <!-- المدين -->
-            <div>
-              <app-input-error-message-handler [fc]="newJournalDetailRowFg.get('debtorAmount')">
+            <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
+              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.debtorAmount">
                 <input
                   pInputText
                   id="debtorAmount"
-                  appAllowNumbers
-                  [defaultChecked]="true"
-                  [min]="0"
-                  formControlName="debtorAmount"
+                  [formControl]="item.controls.debtorAmount"
                   class="app-input text-center"
                   aria-describedby="debtorAmount-help"
                   placeholder="المدين"
                 />
               </app-input-error-message-handler>
-            </div>
+            </td>
             <!-- الدائن -->
-            <div>
-              <app-input-error-message-handler [fc]="newJournalDetailRowFg.get('creditorAmount')">
+            <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
+              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.creditorAmount">
                 <input
                   pInputText
-                  appAllowNumbers
-                  [defaultChecked]="true"
-                  [min]="0"
                   id="creditorAmount"
-                  formControlName="creditorAmount"
+                  [formControl]="item.controls.creditorAmount"
+                  [disabled]="!isRowEditable($index + 1)"
                   class="app-input text-center"
                   aria-describedby="creditorAmount-help"
                   placeholder="الدائن"
                 />
               </app-input-error-message-handler>
-            </div>
+            </td>
             <!-- البيان -->
-            <div>
-              <app-input-error-message-handler [fc]="newJournalDetailRowFg.get('notes')">
+            <td [title]="item.get('notes')?.value ?? ''" [class.disabled]="!isRowEditable($index)">
+              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.notes">
                 <input
                   pInputText
                   id="notes"
-                  formControlName="notes"
+                  [formControl]="item.controls.notes"
                   class="app-input text-center"
+                  [disabled]="!isRowEditable($index)"
                   aria-describedby="notes-help"
-                  placeholder="البيان"
+                  placeholder="معلومات عن الحساب اللي هيكتب فيه الديم او الدائن"
                 />
               </app-input-error-message-handler>
-            </div>
+            </td>
             <!-- actions -->
-            <div>
-              <p-button
-                type="submit"
-                styleClass="border-dark-line! bg-dark-line! text-sm! text-white! py-1! px-8!"
-                label="إضافه"
-              />
-            </div>
-          </form>
-        </td>
-      </tr>
-      @for (item of journalDetailRowsArray.controls; track $index) {
-        <tr
-          [class.last-clicked-table-row]="lastClickedTableRowIndex() === $index"
-          (click)="lastClickedTableRowIndex.set($index)"
-        >
-          <td colspan="6" class="p-0! border-none! overflow-visible!">
-            <form [formGroup]="item">
-              <table class="w-full main-table h-fit">
-                <tbody>
-                  <tr [class.last-clicked-table-row]="lastClickedTableRowIndex() === $index">
-                    <td class="min-w-12.5 w-12.5" [class.disabled]="!isRowEditable($index)">م</td>
-                    <!-- الحساب -->
-                    <td class="min-w-45 w-45 overflow-visible!" [class.disabled]="!isRowEditable($index)">
-                      <app-input-error-message-handler [grouped]="false" [fc]="item.get('finincalAccountId')">
-                        <ng-select
-                          class="app-select"
-                          [items]="financialAccounts()"
-                          formControlName="finincalAccountId"
-                          bindLabel="name"
-                          bindValue="id"
-                          placeholder="الكل"
-                          [clearable]="false"
-                          #printerSelect2
-                          appDebounce
-                          [customEvents]="[
-                            { type: 'searchEvent', value: printerSelect2.searchEvent },
-                            { type: 'scrollToEnd', value: printerSelect2.scrollToEnd },
-                          ]"
-                          (debounced)="debouncedFinancialAccountsSearch($event, printerSelect2.searchTerm)"
-                        />
-                      </app-input-error-message-handler>
-                    </td>
-                    <!-- المدين -->
-                    <td class="min-w-45 w-45" [class.disabled]="!isRowEditable($index)">
-                      <app-input-error-message-handler [grouped]="false" [fc]="item.get('debtorAmount')">
-                        <input
-                          pInputText
-                          id="debtorAmount"
-                          formControlName="debtorAmount"
-                          class="app-input text-center"
-                          aria-describedby="debtorAmount-help"
-                          placeholder="المدين"
-                        />
-                      </app-input-error-message-handler>
-                    </td>
-                    <!-- الدائن -->
-                    <td class="min-w-45 w-45" [class.disabled]="!isRowEditable($index)">
-                      <app-input-error-message-handler [grouped]="false" [fc]="item.get('creditorAmount')">
-                        <input
-                          pInputText
-                          id="creditorAmount"
-                          formControlName="creditorAmount"
-                          [disabled]="!isRowEditable($index + 1)"
-                          class="app-input text-center"
-                          aria-describedby="creditorAmount-help"
-                          placeholder="الدائن"
-                        />
-                      </app-input-error-message-handler>
-                    </td>
-                    <!-- البيان -->
-                    <td [title]="item.get('notes')?.value ?? ''" [class.disabled]="!isRowEditable($index)">
-                      <app-input-error-message-handler [grouped]="false" [fc]="item.get('notes')">
-                        <input
-                          pInputText
-                          id="notes"
-                          formControlName="notes"
-                          class="app-input text-center"
-                          [disabled]="!isRowEditable($index)"
-                          aria-describedby="notes-help"
-                          placeholder="معلومات عن الحساب اللي هيكتب فيه الديم او الدائن"
-                        />
-                      </app-input-error-message-handler>
-                    </td>
-                    <td class="min-w-45 w-45">
-                      <div class="actions">
-                        <button type="button" class="edit" (click)="editJournalDetailRow($index)">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 16 16"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              opacity="0.4"
-                              d="M15.1055 14.1807H10.0439C9.55009 14.1807 9.14844 14.5887 9.14844 15.0903C9.14844 15.5929 9.55009 16 10.0439 16H15.1055C15.5993 16 16.001 15.5929 16.001 15.0903C16.001 14.5887 15.5993 14.1807 15.1055 14.1807Z"
-                              fill="#1F1D2B"
-                            />
-                            <path
-                              d="M6.49691 3.46993L11.2932 7.34556C11.4089 7.43825 11.4287 7.60833 11.3384 7.72682L5.65222 15.136C5.29477 15.5937 4.76801 15.8527 4.20363 15.8622L1.09952 15.9004C0.933968 15.9023 0.789109 15.7877 0.751484 15.6233L0.0460042 12.5561C-0.0762789 11.9923 0.0460042 11.4094 0.403447 10.9603L6.11783 3.51579C6.21001 3.39635 6.38027 3.37533 6.49691 3.46993Z"
-                              fill="#1F1D2B"
-                            />
-                            <path
-                              opacity="0.4"
-                              d="M13.4398 5.03595L12.5152 6.19023C12.4221 6.30776 12.2546 6.32687 12.1389 6.23323C11.0149 5.32356 8.1365 2.9892 7.3379 2.3423C7.22126 2.24675 7.20527 2.07666 7.29933 1.95818L8.19106 0.850717C9.00001 -0.190812 10.411 -0.286365 11.5491 0.62139L12.8566 1.66292C13.3928 2.08335 13.7502 2.63756 13.8725 3.22044C14.0136 3.8616 13.8631 4.49129 13.4398 5.03595Z"
-                              fill="#1F1D2B"
-                            />
-                          </svg>
-                        </button>
-                        <button type="button" class="delete" (click)="delteJournalDetailRow($index)">
-                          <svg
-                            width="15"
-                            height="16"
-                            viewBox="0 0 15 16"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              opacity="0.4"
-                              d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z"
-                              fill="#FF383C"
-                            />
-                            <path
-                              d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z"
-                              fill="#FF383C"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </form>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
+            <td class="min-w-45 w-45">
+              <div class="actions">
+                <button type="button" class="edit" (click)="editJournalDetailRow($index)">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      opacity="0.4"
+                      d="M15.1055 14.1807H10.0439C9.55009 14.1807 9.14844 14.5887 9.14844 15.0903C9.14844 15.5929 9.55009 16 10.0439 16H15.1055C15.5993 16 16.001 15.5929 16.001 15.0903C16.001 14.5887 15.5993 14.1807 15.1055 14.1807Z"
+                      fill="#1F1D2B"
+                    />
+                    <path
+                      d="M6.49691 3.46993L11.2932 7.34556C11.4089 7.43825 11.4287 7.60833 11.3384 7.72682L5.65222 15.136C5.29477 15.5937 4.76801 15.8527 4.20363 15.8622L1.09952 15.9004C0.933968 15.9023 0.789109 15.7877 0.751484 15.6233L0.0460042 12.5561C-0.0762789 11.9923 0.0460042 11.4094 0.403447 10.9603L6.11783 3.51579C6.21001 3.39635 6.38027 3.37533 6.49691 3.46993Z"
+                      fill="#1F1D2B"
+                    />
+                    <path
+                      opacity="0.4"
+                      d="M13.4398 5.03595L12.5152 6.19023C12.4221 6.30776 12.2546 6.32687 12.1389 6.23323C11.0149 5.32356 8.1365 2.9892 7.3379 2.3423C7.22126 2.24675 7.20527 2.07666 7.29933 1.95818L8.19106 0.850717C9.00001 -0.190812 10.411 -0.286365 11.5491 0.62139L12.8566 1.66292C13.3928 2.08335 13.7502 2.63756 13.8725 3.22044C14.0136 3.8616 13.8631 4.49129 13.4398 5.03595Z"
+                      fill="#1F1D2B"
+                    />
+                  </svg>
+                </button>
+                <button type="button" class="delete" (click)="delteJournalDetailRow($index)">
+                  <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      opacity="0.4"
+                      d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z"
+                      fill="#FF383C"
+                    />
+                    <path
+                      d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z"
+                      fill="#FF383C"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </form>

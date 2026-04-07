@@ -1,6 +1,6 @@
 import { AuthService } from '@/features/auth/services/auth-service';
 import { LayoutService } from '@/layouts/services/layout-service';
-import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, input, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -41,7 +41,7 @@ export class BaseComponent {
   //
   nullableFb = inject(FormBuilder);
   fb = this.nullableFb.nonNullable;
-  shallowFg= this.fb.group({});
+  shallowFg = this.fb.group({});
   baseUrl = environment.apiUrl.replace('/v1', '');
   router = inject(Router);
   activatedRoute = inject(ActivatedRoute);
@@ -57,6 +57,7 @@ export class BaseComponent {
   dateNowIso = this.dateNow.toISOString();
   debounceMap: Map<string, IDebounceMapValue> = new Map();
   isLoading = this.loadingService.isLoading;
+  initialFormMode = input<FormMode>(FormMode.Create);
 
   setDebounceItem<T>(key: string, callback: (e: T) => void) {
     this.debounceMap.set(key, { subject: new Subject<T>(), callback });

@@ -1,13 +1,13 @@
-import { Component } from '@angular/core';
- import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
-import { CollectiveReceiptForm } from "../../components/collective-receipt-form/collective-receipt-form";
+import { BaseComponent } from '@/components';
+import { Component, input } from '@angular/core';
+import { CollectiveReceiptForm } from '../../components/collective-receipt-form/collective-receipt-form';
 
 @Component({
   selector: 'app-add-collective-receipt',
-  imports: [  SectionWrapper, CollectiveReceiptForm],
+  imports: [CollectiveReceiptForm],
   templateUrl: './add-collective-receipt.html',
   styleUrl: './add-collective-receipt.css',
 })
-export class AddCollectiveReceipt {
-
+export class AddCollectiveReceipt extends BaseComponent {
+  id = input.required<number>();
 }

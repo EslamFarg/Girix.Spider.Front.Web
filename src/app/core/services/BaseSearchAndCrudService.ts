@@ -21,6 +21,7 @@ export enum SearchColumEnum {
   InvoiceNumber = 17,
   ReferenceNumber = 18,
   Quantity = 19,
+  VoucherNo = 20,
 }
 export interface IBaseSearchResponse<T> {
   value: T;

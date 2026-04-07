@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { Button, ButtonDirective } from 'primeng/button';
 import { Carousel } from 'primeng/carousel';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
@@ -37,7 +37,10 @@ export class CustomerForm extends BaseComponent implements OnInit {
   //inputs
   //
 
-  formMode = input.required<FormMode>();
+  formMode = computed(() => {
+    if (this.currentCustomer()) return FormMode.Update;
+    return this.initialFormMode();
+  });
   id = input.required<number | null>();
 
   //

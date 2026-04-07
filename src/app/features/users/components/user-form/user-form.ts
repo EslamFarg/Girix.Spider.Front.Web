@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
@@ -40,7 +40,10 @@ import { RouterLink } from "@angular/router";
   styleUrl: './user-form.css',
 })
 export class UserForm extends BaseComponent {
-  formMode = input.required<FormMode>();
+  formMode = computed(() => {
+    if (this.currentUser()) return FormMode.Update;
+    return this.initialFormMode();
+  });
   id = input.required<number | null>();
 
   initialusersFgValue: IUserFgControls = {
@@ -82,7 +85,7 @@ export class UserForm extends BaseComponent {
   //services
   usersService = inject(UserService);
   financialAccountsService = inject(FinancialAccountService);
-  currentusers: any;
+  currentUser = signal<IUserReadResponse | null>(null);
 
   //
   cashFinancialAccounts = signal<ICashFinancialAccount[]>([]);
@@ -118,6 +121,7 @@ export class UserForm extends BaseComponent {
       case FormMode.Update:
         //fetch
         this.usersService.getById(this.id()!).subscribe((users: IUserReadResponse | any) => {
+          this.currentUser.set(users);
           this.userFg.patchValue({ ...users, nameAr: users.name, nameEn: users.name });
         });
         break;

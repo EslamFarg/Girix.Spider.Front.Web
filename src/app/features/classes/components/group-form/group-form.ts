@@ -43,8 +43,11 @@ import { IPrinterSearchRow } from '@/features/printers';
   styleUrl: './group-form.css',
 })
 export class GroupForm extends BaseComponent implements OnInit {
-  formMode = input.required<FormMode>();
   id = input.required<number>();
+  formMode = computed(() => {
+    if(this.existingGroup()) return FormMode.Update;
+    return this.initialFormMode();
+  });
 
   initialGroupFgValue: IGroupFgControls = {
     nameEn: this.fb.control<string>('', [Validators.required]),

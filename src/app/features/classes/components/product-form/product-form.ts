@@ -9,6 +9,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components/base-component/base-component';
 import {
   IProductCreateRequest,
+  IProductReadResponse,
   IProductSearchRow,
   ProductSearchEnum,
   ProductService,
@@ -59,7 +60,10 @@ import { ImgFallback } from '@/directives/img-fallback';
   styleUrl: './product-form.css',
 })
 export class ProductForm extends BaseComponent implements OnInit {
-  formMode = input.required<FormMode>();
+  formMode = computed(() => {
+    if (this.existingProduct()) return FormMode.Update;
+    return this.initialFormMode();
+  });
 
   initialProductFgValue: ProductFgControls = {
     nameEn: this.fb.control<string>('', [Validators.required]),
@@ -104,6 +108,7 @@ export class ProductForm extends BaseComponent implements OnInit {
   productService = inject(ProductService);
   calculatePrice = this.productService.calculatePrice;
   productFg = this.fb.group(this.initialProductFgValue);
+  existingProduct = signal<IProductReadResponse | null>(null);
   // productFgListener = this.productFg.valueChanges.subscribe((value) => {
   //   const finalPriceWithTax = this.calculatePrice(
   //     {
@@ -142,6 +147,7 @@ export class ProductForm extends BaseComponent implements OnInit {
     switch (this.formMode()) {
       case FormMode.Update:
         this.productService.getById(this.routeId).subscribe((product) => {
+          this.existingProduct.set(product);
           this.productFg.patchValue({
             ...product,
             nameAr: product.name,

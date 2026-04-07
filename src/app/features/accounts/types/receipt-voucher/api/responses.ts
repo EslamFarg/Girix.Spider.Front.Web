@@ -1,26 +1,35 @@
-export interface IReceiptVoucherGetListRequest {
-  receiptVoucherId: number;
-  criteria: {
-    paginationInfo: {
-      pageIndex: number;
-      pageSize: number;
-    };
-  };
+ export interface IReceiptVoucherSearchRow {
+  id: number;
+  voucherNo: string;
+  voucherDate: string;
+  debitAccountId: number;
+  debitAccountName: any;
+  totalAmount: number;
 }
-export interface IReceiptVoucherGetListResponse {
-  rows: IReceiptVoucherCollectiveReceiptGetListRow[];
+
+export interface IReceiptVoucherSearchResponse {
+  rows: IReceiptVoucherSearchRow[];
   paginationInfo: {
+    currentPageIndex: number;
     totalRowsCount: number;
     totalPagesCount: number;
   };
 }
 
-export interface IReceiptVoucherCollectiveReceiptGetListRow {
+export interface IReceiptVoucherReadResponse {
   id: number;
-  voucherNo: string | null;
+  voucherNo: string;
   voucherDate: string;
-  creditAccountId: number;
-  creditAccountName: string;
+  paymentMethod: string;
+  notes: string;
+  debitAccountId: number;
+  debitAccountName: string;
+  isHasTax: boolean;
   totalAmount: number;
-  payee: string;
+  lines: Array<{
+    finincalAccountId: number;
+    finincalAccountName: string;
+    isHasTax: boolean;
+    totalAmount: number;
+  }>;
 }
