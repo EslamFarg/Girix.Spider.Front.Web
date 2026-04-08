@@ -199,10 +199,10 @@
             <ng-select
               class="app-select"
               [items]="financialAccounts()"
-              bindLabel="finNumber"
+              bindLabel="name"
               bindValue="id"
               [formControl]="newPaymentVoucherDetailsItemFg.controls.finincalAccountId"
-              (change)="onReceiptVoucherDetailsItemAccountChange(newPaymentVoucherDetailsItemFg, $event.id)"
+              (change)="onPaymentVoucherDetailsItemAccountChange(newPaymentVoucherDetailsItemFg, $event.id)"
               placeholder="رقم الحساب"
               [clearable]="false"
               #paymentAccountCodeSelect
@@ -218,7 +218,11 @@
                   FinancialAccountSearchEnum.FinNumber
                 )
               "
-            />
+            >
+              <ng-template ng-label-tmp let-item="item">
+                {{ item?.finNumber }}
+              </ng-template>
+            </ng-select>
           </app-input-error-message-handler>
         </td>
         <td>
@@ -232,7 +236,7 @@
               bindLabel="name"
               bindValue="id"
               [formControl]="newPaymentVoucherDetailsItemFg.controls.finincalAccountId"
-              (change)="onReceiptVoucherDetailsItemAccountChange(newPaymentVoucherDetailsItemFg, $event.id)"
+              (change)="onPaymentVoucherDetailsItemAccountChange(newPaymentVoucherDetailsItemFg, $event.id)"
               placeholder="الحساب"
               [clearable]="false"
               #paymentAccountNameSelect
@@ -300,7 +304,7 @@
                 bindLabel="finNumber"
                 bindValue="id"
                 [formControl]="item.controls.finincalAccountId"
-                (change)="onReceiptVoucherDetailsItemAccountChange(item, $event.id)"
+                (change)="onPaymentVoucherDetailsItemAccountChange(item, $event.id)"
                 placeholder="رقم الحساب"
                 [clearable]="false"
                 #editPaymentAccountCodeSelect
@@ -316,14 +320,18 @@
                     FinancialAccountSearchEnum.FinNumber
                   )
                 "
-              />
+              >
+                <ng-template ng-label-tmp let-item="item">
+                  {{ item?.finNumber }}
+                </ng-template>
+              </ng-select>
             </app-input-error-message-handler>
           </td>
           <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
             <app-input-error-message-handler [grouped]="false" [fc]="item.controls.finincalAccountId">
               <ng-select
                 class="app-select"
-                (change)="onReceiptVoucherDetailsItemAccountChange(item, $event.id)"
+                (change)="onPaymentVoucherDetailsItemAccountChange(item, $event.id)"
                 [items]="financialAccounts()"
                 bindLabel="name"
                 bindValue="id"
@@ -356,7 +364,6 @@
               <input
                 pInputText
                 appAllowNumbers
-                type="number"
                 [allowDecimal]="true"
                 [formControl]="item.controls.totalAmount"
                 class="app-input text-center"

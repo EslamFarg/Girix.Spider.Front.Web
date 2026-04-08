@@ -1,20 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
 import { BaseComponent } from '@/components/base-component/base-component';
-import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { PasswordModule } from 'primeng/password';
 import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
-import { pipe } from 'rxjs';
+import { ApiUrlOverrideDialog } from '@/components/api-url-override-dialog/api-url-override-dialog';
+import { ApiUrlOverrideService } from '@/core/services/api-url-override-service';
 
 @Component({
   selector: 'app-login',
-  imports: [InputErrorMessageHandler, InputTextModule, ReactiveFormsModule, PasswordModule, RouterLink, Button],
+  imports: [InputErrorMessageHandler, InputTextModule, ReactiveFormsModule, PasswordModule, RouterLink, Button, ApiUrlOverrideDialog],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login extends BaseComponent {
+  apiUrlOverrideService = inject(ApiUrlOverrideService);
   isRememberLogin = true;
   initialFormValue = {
     emailOrPhone: this.fb.control<string>('admin@admin.com', [Validators.required]),

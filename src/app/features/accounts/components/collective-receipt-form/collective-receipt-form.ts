@@ -6,7 +6,7 @@ import { ControlsOf } from '@/yn-ng/types/helpers';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { NgSelectComponent } from '@ng-select/ng-select';
+import { NgSelectComponent, NgItemLabelDirective, NgLabelTemplateDirective } from '@ng-select/ng-select';
 import { ButtonDirective } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -46,7 +46,9 @@ type ISelectableBankCashAccount = ICashFinancialAccount | IBankFinancialAccount 
     AllowNumbers,
     ButtonDirective,
     RouterLink,
-  ],
+    NgItemLabelDirective,
+    NgLabelTemplateDirective
+],
   templateUrl: './collective-receipt-form.html',
   styleUrl: './collective-receipt-form.css',
 })
@@ -66,6 +68,7 @@ export class CollectiveReceiptForm extends BaseComponent {
     voucherDate: this.fb.control<Date | null>(null, [Validators.required]),
     debitAccountId: this.fb.control<number | null>(null, [Validators.required]),
     isHasTax: this.fb.control<boolean>(false, []),
+    paymentMethod: this.fb.control<string | null>('cash', []),
     notes: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(1000)]),
     items: this.fb.array<FormGroup<IAppReceiptVoucherItemControls>>([], [Validators.required, Validators.minLength(1)]),
   };
@@ -99,7 +102,7 @@ export class CollectiveReceiptForm extends BaseComponent {
     }
 
     const voucherItems = this.fg.controls.items.getRawValue();
-    const totalAmount = voucherItems.reduce((sum, item) => sum + (item.totalAmount ?? 0), 0);
+    const totalAmount = voucherItems.reduce((sum, item) => sum + +(item?.totalAmount ?? 0), 0);
 
     if (voucherItems.length === 0 || totalAmount <= 0) {
       this.fg.markAllAsTouched();
@@ -117,6 +120,7 @@ export class CollectiveReceiptForm extends BaseComponent {
       notes: this.fg.value.notes!,
       debitAccountId: this.fg.value.debitAccountId!,
       isHasTax: this.fg.value.isHasTax ?? false,
+      paymentMethod: this.fg.value.paymentMethod!,
       totalAmount: +totalAmount,
       receiptVoucherDetailsRequestDtos: voucherItems.map((item) => ({
         finincalAccountId: item.finincalAccountId!,
@@ -141,7 +145,6 @@ export class CollectiveReceiptForm extends BaseComponent {
           })
           .subscribe({
             next: () => {
-              this.onResetReceiptVoucher();
             },
           });
         break;
@@ -315,3 +318,4 @@ export class CollectiveReceiptForm extends BaseComponent {
     fg.controls.finincalAccountId.setValue(itemId);
   }
 }
+ 

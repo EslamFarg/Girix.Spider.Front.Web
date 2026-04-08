@@ -16,6 +16,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
 import { Menu } from "primeng/menu";
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-collective-receipts',
@@ -32,7 +33,8 @@ import { Menu } from "primeng/menu";
     DatePipe,
     CurrencyPipe,
     TranslatePipe,
-    Menu
+    Menu,
+    RouterLink
 ],
   templateUrl: './collective-receipts.html',
   styleUrl: './collective-receipts.css',

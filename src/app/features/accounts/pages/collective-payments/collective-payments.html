@@ -64,7 +64,7 @@
                 />
               </svg>
             </button>
-            <button type="button" class="edit" [routerLink]="['/accounts/collective-payments', collectivePayment.id, 'edit']">
+            <a   [routerLink]="['/accounts/collective-payments', collectivePayment.id, 'edit']">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   opacity="0.4"
@@ -81,7 +81,7 @@
                   fill="#1F1D2B"
                 />
               </svg>
-            </button>
+            </a>
             <button type="button" class="delete" (click)="deleteCollectivePayment(collectivePayment.id, $event)">
               <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path

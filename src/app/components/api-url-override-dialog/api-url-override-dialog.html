@@ -1,0 +1,54 @@
+<p-dialog
+  header="API URL"
+  appendTo="body"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(92vw, 40rem)' }"
+  [visible]="apiUrlOverrideService.isDialogVisible()"
+  (onHide)="apiUrlOverrideService.closeDialog()"
+>
+  <form [formGroup]="apiUrlForm" class="flex flex-col gap-4" (ngSubmit)="submit()">
+    <div class="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+      {{ warningText() }}
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-semibold" for="api-url-input">Runtime API URL</label>
+      <input
+        id="api-url-input"
+        type="url"
+        pInputText
+        formControlName="apiUrl"
+        placeholder="https://example.com/v1"
+        class="w-full"
+        dir="ltr"
+      />
+      <small class="text-xs text-text-gray break-all">Default: {{ apiUrlOverrideService.defaultApiUrl }}</small>
+      <small class="text-xs text-text-gray break-all">Current: {{ apiUrlControl.value }}</small>
+      <small class="text-xs text-amber-600">
+        This override is stored in this browser and takes effect after an immediate reload.
+      </small>
+      @if (apiUrlControl.touched && apiUrlControl.hasError('required')) {
+        <small class="text-xs text-red-500">API URL is required.</small>
+      }
+      @if (apiUrlControl.touched && apiUrlControl.hasError('invalidApiUrl')) {
+        <small class="text-xs text-red-500">Enter a valid `http` or `https` URL.</small>
+      }
+    </div>
+
+    <div class="flex flex-wrap justify-end gap-2">
+      @if (apiUrlOverrideService.isOverridden) {
+        <p-button
+          type="button"
+          label="Reset to default"
+          severity="secondary"
+          [outlined]="true"
+          (click)="apiUrlOverrideService.resetApiUrl()"
+        />
+      }
+      <p-button type="button" label="Cancel" severity="secondary" [text]="true" (click)="apiUrlOverrideService.closeDialog()" />
+      <p-button type="submit" label="Apply and reload" />
+    </div>
+  </form>
+</p-dialog>

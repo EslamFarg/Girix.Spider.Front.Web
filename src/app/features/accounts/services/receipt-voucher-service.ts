@@ -22,6 +22,17 @@ export class ReceiptVoucherService extends BaseSearchAndCrudService<
 > {
   override apiRoute = 'ReceiptVoucher';
 
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.patchEndpoints({
+      getById: '',
+      put: 'update',
+    });
+  }
+
   override search<T = IReceiptVoucherSearchResponse>(criteriaDto: ISearchCriteria<ReceiptVoucherSearchEnum>) {
     return super.search<T>(criteriaDto);
   }

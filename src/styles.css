@@ -53,3 +53,23 @@ body {
 .hg-theme-default .hg-row > div:first-child {
   margin-right: 0px !important;
 }
+
+
+.temp-hidden{
+  display: none !important;
+}
+.glow-pulse {
+  box-shadow: 0 0 10px 2px rgba(0, 255, 255, 0.5);
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px 2px rgba(0, 255, 255, 0.271);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 15px 4px rgba(0, 255, 255, 0.7);
+    transform: scale(1.02); /* Optional: adds a slight "breathing" effect */
+  }
+}

@@ -10,7 +10,10 @@
         <div>أبناء المحله</div>
       </div> -->
 
-      <div class="hidden items-center justify-center text-sm sm:flex text-light-bg">20 يناير 2026 / 03:56:22 ص</div>
+      <!-- <div class="hidden items-center justify-center text-sm sm:flex text-light-bg">20 يناير 2026 / 03:56:22 ص</div> -->
+      <div class="hidden items-center justify-center text-sm sm:flex text-light-bg">
+        <p-message class="[&_.p-message-content]:py-0!   glow-pulse">قيد التطوير</p-message>
+      </div>
 
       <div class="flex items-center gap-2 text-light-bg ms-auto cursor-pointer" (click)="menu.toggle($event)">
         <img class="w-6 h-6 rounded-full object-cover" src="" appImgFallback alt="" />
@@ -18,6 +21,8 @@
         <i class="pi pi-angle-down text-sm! transition-all" [class.rotate-180]="menu.visible"></i>
       </div>
       <p-menu dir="rtl" #menu [model]="popUpMenuItems" [popup]="true" [style]="{ insetInlineEnd: '100%' }" />
+
+      <app-api-url-override-dialog />
     </div>
   </div>
 

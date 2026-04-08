@@ -26,7 +26,13 @@ export class PaymentVoucherService extends BaseSearchAndCrudService<
   IPaymentVoucherReadResponse
 > {
   override apiRoute = 'PaymentVoucher';
-
+  constructor() {
+    super();
+    this.patchEndpoints({
+      getById: '',
+      put: 'update',
+    });
+  }
   override search<T = IPaymentVoucherSearchResponse>(criteriaDto: ISearchCriteria<PaymentVoucherSearchEnum>) {
     return super.search<T>(criteriaDto);
   }

@@ -6,7 +6,7 @@ import { ControlsOf } from '@/yn-ng/types/helpers';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { NgSelectComponent } from '@ng-select/ng-select';
+import { NgSelectComponent, NgItemLabelDirective, NgLabelTemplateDirective } from '@ng-select/ng-select';
 import { ButtonDirective } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -46,6 +46,8 @@ type ISelectableBankCashAccount = ICashFinancialAccount | IBankFinancialAccount 
     AllowNumbers,
     ButtonDirective,
     RouterLink,
+    NgItemLabelDirective,
+    NgLabelTemplateDirective,
   ],
   templateUrl: './collective-payment-form.html',
   styleUrl: './collective-payment-form.css',
@@ -144,7 +146,6 @@ export class CollectivePaymentForm extends BaseComponent {
           })
           .subscribe({
             next: () => {
-              this.onResetPaymentVoucher();
             },
           });
         break;
@@ -314,9 +315,7 @@ export class CollectivePaymentForm extends BaseComponent {
     this.lastClickedTableRowIndex.set(this.fg.controls.items.length - 1);
     this.setUpNewPaymentVoucherDetailsRowFg();
   }
-
-
-  onReceiptVoucherDetailsItemAccountChange(fg: FormGroup<IAppPaymentVoucherItemControls>, itemId: number) {
-      fg.controls.finincalAccountId.setValue(itemId);
-    }
+  onPaymentVoucherDetailsItemAccountChange(fg: FormGroup<IAppPaymentVoucherItemControls>, itemId: number) {
+    fg.controls.finincalAccountId.setValue(itemId);
+  }
 }

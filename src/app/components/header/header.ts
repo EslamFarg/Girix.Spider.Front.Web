@@ -7,6 +7,9 @@ import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { ProgressBarModule, ProgressBar } from 'primeng/progressbar';
 import { LayoutService } from '@/layouts/services/layout-service';
+import { MessageModule } from 'primeng/message';
+import { ApiUrlOverrideDialog } from '@/components/api-url-override-dialog/api-url-override-dialog';
+import { ApiUrlOverrideService } from '@/core/services/api-url-override-service';
 export interface IMainNavItem {
   labelKey: string;
   imgUrl: string;
@@ -25,7 +28,14 @@ export interface ISubNavItem {
 
 @Component({
   selector: 'app-header',
-  imports: [ImgFallback, RouterLink, Menu, ProgressBar],
+  imports: [
+    ImgFallback,
+    RouterLink,
+    Menu,
+    ProgressBar,
+    MessageModule,
+    ApiUrlOverrideDialog,
+  ],
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
@@ -35,11 +45,17 @@ export class Header extends BaseComponent implements AfterViewInit {
   navItemsContainer = viewChild<ElementRef<HTMLElement>>('navItemsContainer');
 
   userDetails = this.authService.userDetails;
+  apiUrlOverrideService = inject(ApiUrlOverrideService);
 
   popUpMenuItems: MenuItem[] = [
     {
       label: 'الاجاراءات',
       items: [
+        {
+          label: 'API URL',
+          icon: 'pi pi-link',
+          command: () => this.apiUrlOverrideService.openDialog(),
+        },
         {
           label: 'تسجيل الخروج',
           icon: 'pi pi-sign-out',

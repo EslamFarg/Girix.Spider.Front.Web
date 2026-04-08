@@ -1,5 +1,23 @@
 <div class="flex items-center justify-center h-screen">
   <section class="flex flex-col gap-6 p-10 w-120">
+    <div dir="ltr" class="rounded-xl border border-amber-500/50 bg-amber-100 px-4 py-3 text-amber-950 shadow-sm">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-1">
+          <strong class="text-sm">Developer only</strong>
+          <span class="text-sm">
+            Need to switch this client to a different backend before login? Open the runtime API URL dialog.
+          </span>
+          <span class="text-xs break-all opacity-80">Current API: {{ apiUrlOverrideService.currentApiUrl }}</span>
+        </div>
+        <p-button
+          type="button"
+          label="Change API URL"
+          severity="contrast"
+          styleClass="whitespace-nowrap"
+          (click)="apiUrlOverrideService.openDialog()"
+        />
+      </div>
+    </div>
     <div>
       <h1 class="text-xl font-bold text-center select-none text-white">الرجاء تسجيل الدخول</h1>
       <div class="flex items-center justify-center gap-2">
@@ -46,5 +64,9 @@
         styleClass="w-full border-dark-bg-1! bg-dark-line!  cursor-pointer ! rounded py-2.5 mt-4 text-white!"
       />
     </form>
+
+    <app-api-url-override-dialog
+      [warningText]="'Developer only: use this only when you intentionally need to point the login screen at a different backend.'"
+    />
   </section>
 </div>

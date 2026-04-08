@@ -5,7 +5,7 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { environment } from '../../../environments/environment';
+import BaseService from '@/core/services/BaseService';
 import { TranslateService } from '@ngx-translate/core';
 import { SpaceTypeEnum } from '@/features/replacements/services/replacements-service';
 import { BehaviorSubject, debounceTime, Observable, Subject } from 'rxjs';
@@ -42,7 +42,9 @@ export class BaseComponent {
   nullableFb = inject(FormBuilder);
   fb = this.nullableFb.nonNullable;
   shallowFg = this.fb.group({});
-  baseUrl = environment.apiUrl.replace('/v1', '');
+  get baseUrl() {
+    return BaseService.apiBaseUrl.replace(/\/v1$/, '');
+  }
   router = inject(Router);
   activatedRoute = inject(ActivatedRoute);
   sanitizer = inject(DomSanitizer);
