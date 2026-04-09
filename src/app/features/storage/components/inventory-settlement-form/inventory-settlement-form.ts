@@ -15,7 +15,7 @@ import { NgSelectComponent } from '@ng-select/ng-select';
 import { Debounce, IDebounceEvent } from '@/directives/debounce';
 import { tap } from 'rxjs';
 import { AllowNumbers } from '@/directives/allow-numbers';
-import { onlyNumbersAllowed } from '@/yn-ng';
+import { onlyNumbersAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
 
  
  
@@ -73,7 +73,7 @@ export class InventorySettlementForm extends BaseComponent {
 
   initialFormValue = {
     // المرجع
-    referenceNumber: this.fb.control<string | null>(null, [Validators.required,onlyNumbersAllowed]),
+    referenceNumber: this.fb.control<string | null>(null, [Validators.required,Validators.maxLength(16),onlyNumbersOrEnLettersAllowed]),
     // الرقم الفاتورة
     settlementDate: this.fb.control<Date | null>(null, [Validators.required]),
     items: this.fb.array<FormGroup<IAppInventoryItemControls>>([], [Validators.required, Validators.minLength(1)]),

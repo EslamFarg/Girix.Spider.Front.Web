@@ -16,6 +16,7 @@ import { ConsoleService, NgSelectComponent } from '@ng-select/ng-select';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { IUnitSearchRow, UnitSearchEnum, UnitService } from '@/features/classes/services/unit-service';
 import { FormControlNotifier } from '@/directives/form-control-notifier';
+import { onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
 
 interface IAppOpeningBalanceItem {
   itemId: number | null;
@@ -65,7 +66,11 @@ export class OpeningBalanceForm extends BaseComponent {
 
   initialFormValue = {
     // المرجع
-    referenceNumber: this.fb.control<string | null>(null, [Validators.required]),
+    referenceNumber: this.fb.control<string | null>(null, [
+      Validators.required,
+      Validators.maxLength(16),
+      onlyNumbersOrEnLettersAllowed,
+    ]),
     // الرقم الفاتورة
     invoiceNumber: this.fb.control<string | null>({ value: null, disabled: true }, []),
     date: this.fb.control<Date | null>(null, [Validators.required]),

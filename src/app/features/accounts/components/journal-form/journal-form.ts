@@ -7,7 +7,12 @@ import { FinancialAccountService, FinancialAccountSearchEnum } from '../../servi
 import { JournalEntryService } from '../../services/journal-entry-service';
 import { ITreeFinancialAccountSearchRow, IJournalEntryReadResponse } from '../../types';
 import { AllowNumbers } from '@/directives/allow-numbers';
-import { InputErrorMessageHandler } from '@/yn-ng';
+import {
+  InputErrorMessageHandler,
+  noSymbolsAllowed,
+  onlyArLettersAllowed,
+  onlyNumbersOrEnLettersAllowed,
+} from '@/yn-ng';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { Button, ButtonDirective } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -68,7 +73,11 @@ export class JournalForm extends BaseComponent {
     // رقم القيد
     id: this.fb.control<number | null>({ value: null, disabled: true }, []),
     // المرجع
-    refNumber: this.fb.control<string | null>(null, [Validators.required]),
+    refNumber: this.fb.control<string | null>(null, [
+      Validators.required,
+      Validators.maxLength(16),
+      onlyNumbersOrEnLettersAllowed,
+    ]),
     // الرقم الدفتري
     voucherNo: this.fb.control<string | null>(null, [Validators.required]),
     voucherDate: this.fb.control<Date | null>(null, [Validators.required]),

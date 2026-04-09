@@ -18,6 +18,13 @@
               formControlName="parentId"
               placeholder="اختر المجموعة"
               appendTo="body"
+              #parentAccountSelect
+              appDebounce
+              [customEvents]="[
+                { type: 'searchEvent', value: parentAccountSelect.searchEvent },
+                { type: 'scrollToEnd', value: parentAccountSelect.scrollToEnd },
+              ]"
+              (debounced)="debouncedSelectableAccountsSearch('parent', $event, parentAccountSelect.searchTerm)"
             />
           </app-input-error-message-handler>
         </div>
@@ -27,12 +34,19 @@
           <app-input-error-message-handler [grouped]="false" [fc]="fg.controls.currentAccountId">
             <ng-select
               class="app-select"
-              [items]="flatFinancialAccounts()"
+              [items]="currentAccountOptions()"
               bindLabel="name"
               bindValue="id"
               formControlName="currentAccountId"
               placeholder="اختر الحساب"
               appendTo="body"
+              #currentAccountSelect
+              appDebounce
+              [customEvents]="[
+                { type: 'searchEvent', value: currentAccountSelect.searchEvent },
+                { type: 'scrollToEnd', value: currentAccountSelect.scrollToEnd },
+              ]"
+              (debounced)="debouncedSelectableAccountsSearch('current', $event, currentAccountSelect.searchTerm)"
               (change)="onCurrentAccountChange($event?.id ?? $event)"
             />
           </app-input-error-message-handler>

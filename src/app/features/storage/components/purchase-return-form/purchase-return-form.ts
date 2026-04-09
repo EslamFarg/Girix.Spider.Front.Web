@@ -14,7 +14,7 @@ import { IProductSearchRow, IProductUnit, ProductSearchEnum, ProductService } fr
 import { IDebounceEvent, Debounce } from '@/directives/debounce';
 import { PaginatorState } from 'primeng/paginator';
 import { UnitService } from '@/features/classes/services/unit-service';
-import { mustIncludeLetters, noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng';
+import { mustIncludeLetters, noSymbolsAllowed, onlyNumbersAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { OrderPaymentType } from '@/features/orders';
 import { SupplierService } from '../../services/supplier-service';
@@ -95,7 +95,9 @@ export class PurchaseReturnForm extends BaseComponent {
 
   initialFormValue = {
     // المرجع
-    referenceNumber: this.fb.control<string | null>({ disabled: true, value: null }, []),
+    referenceNumber: this.fb.control<string | null>({ disabled: true, value: null }, [
+      
+    ]),
     // رقم الفاتورة
     invoiceNumber: this.fb.control<string | null>({ value: null, disabled: true }, []),
     //returnNumber
