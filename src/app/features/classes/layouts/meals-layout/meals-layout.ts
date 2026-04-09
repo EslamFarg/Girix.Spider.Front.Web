@@ -11,12 +11,12 @@ import { RouterOutlet } from '@angular/router';
 export class MealsLayout {
   links: ISectionLink[] = [
     {
-      labelKey: 'meals.explorer',
+      labelKey: 'MEALS.EXPLORER',
       url: '/classes/meals',
-     },
+    },
     {
-      labelKey: 'meals.add',
+      labelKey: 'MEALS.ADD',
       url: '/classes/meals/add',
-     },
+    },
   ];
 }

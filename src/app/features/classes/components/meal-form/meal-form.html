@@ -178,7 +178,7 @@
             placeholder="الكل"
             [clearable]="false"
             #customerSelect
-            [placeholder]="'classes.products.tax' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.TAX' | translate"
           />
         </app-input-error-message-handler>
       </div>
@@ -192,7 +192,7 @@
             [clearable]="false"
             placeholder="الكل"
             #customerSelect
-            [placeholder]="'classes.products.excisetax' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.EXCISE_TAX' | translate"
           />
         </app-input-error-message-handler>
       </div>
@@ -219,7 +219,7 @@
             (debounced)="debouncedGroupsSearch($event)"
           >
             <ng-template ng-label-tmp let-item="item" let-clear="clear" let-item$="item$" let-index="index">
-              <div class="flex items-center gap-2" >
+              <div class="flex items-center gap-2">
                 <span class="ng-value-icon left" (click)="clear(item)" aria-hidden="true">×</span>
 
                 <span class="ng-value-label flex! items-center gap-2">

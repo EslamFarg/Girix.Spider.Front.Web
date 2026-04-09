@@ -1,20 +1,19 @@
 <form class="flex flex-col gap-4" [formGroup]="fg" (ngSubmit)="onSubmitOpenDaily()">
-  <!-- الرصيد السابق -->
-  <div class="doc-input flex">
-    <label for="previousBalance" class="mb-0!">الرصيد السابق</label>
+  <div class="doc-input flex opacity-70">
+    <label for="previousBalance" class="mb-0!">Previous balance</label>
     <input
       pInputText
       id="previousBalance"
       disabled
       class="flex-1"
       aria-describedby="previousBalance-help"
+      [value]="currentUserDaily()?.value?.dailyJournalPeriods?.openingBalance ?? 0"
       placeholder="0"
     />
   </div>
-  <app-input-error-message-handler />
-  <!-- العهده -->
+
   <div class="doc-input flex opacity-70">
-    <label for="" class="mb-0!">العهده</label>
+    <label for="custodyBalance" class="mb-0!">Custody balance</label>
     <input
       pInputText
       id="custodyBalance"
@@ -25,9 +24,9 @@
     />
   </div>
   <app-input-error-message-handler [fc]="fg.get('custodyBalance')" />
-  <!-- ملاحظات -->
+
   <div>
-    <label for="" class="text-dark-bg-1 font-medium text-sm">ملاحظات</label>
+    <label for="openingNotes" class="text-dark-bg-1 font-medium text-sm">Notes</label>
     <div class="doc-input flex my-1">
       <textarea
         rows="5"

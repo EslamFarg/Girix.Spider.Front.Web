@@ -9,7 +9,13 @@
 >
   <div class="flex-1">
     <app-input-error-message-handler [fc]="fg.get('searchTerm')">
-      <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" [placeholder]="'actions.search' | translate" />
+      <input
+        class="w-full bg-transparent!"
+        pInputText
+        type="text"
+        formControlName="searchTerm"
+        [placeholder]="'ACTIONS.SEARCH' | translate"
+      />
       <!-- <p-inputgroup-addon>
             <i class="pi pi-filter"></i>
           </p-inputgroup-addon> -->
@@ -34,11 +40,11 @@
     <thead>
       <tr class="">
         <th>#</th>
-        <th>{{'form.customerName' | translate}}</th>
-        <th>{{'form.phoneNumber' | translate}}</th>
-        <th>{{'form.address' | translate}}</th>
-        <th>{{'form.company' | translate}}</th>
-        <th>{{'actions.tools' | translate }}</th>
+        <th>{{ 'form.customerName' | translate }}</th>
+        <th>{{ 'form.phoneNumber' | translate }}</th>
+        <th>{{ 'FORM.ADDRESS' | translate }}</th>
+        <th>{{ 'FORM.COMPANY' | translate }}</th>
+        <th>{{ 'ACTIONS.TOOLS' | translate }}</th>
       </tr>
     </thead>
     <tbody>

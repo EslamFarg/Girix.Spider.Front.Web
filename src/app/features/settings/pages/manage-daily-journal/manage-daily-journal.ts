@@ -1,78 +1,62 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { BaseComponent } from '@/components/base-component/base-component';
-import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputText } from 'primeng/inputtext';
-import { RouterLink, RouterLinkActive, RouterLinkWithHref, RouterOutlet } from '@angular/router';
-import { Button, ButtonDirective } from 'primeng/button';
-import { CarouselModule, Carousel } from 'primeng/carousel';
-import { Textarea } from 'primeng/textarea';
-import { DailyJournalService, IUserDailyJournalResponse } from '../../services/daily-journal-service';
-import { TranslatePipe } from '@ngx-translate/core';
-import { OpenDailyJournal } from '../../components/open-daily-journal/open-daily-journal';
+import { DailyJournalService } from '../../services/daily-journal-service';
 import { IUserRowResponse, IUserSearchResponseValue, UserSearchEnum, UserService } from '@/features/users';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { Debounce, IDebounceEvent } from '@/directives/debounce';
 import { MessageModule } from 'primeng/message';
-enum DocFormSections {
-  opening = 1,
-  closing = 2,
-  deficitReduction = 3,
+import { ButtonDirective } from 'primeng/button';
+import { TranslatePipe } from '@ngx-translate/core';
+import { ManageOpenDailyJournal } from '../../components/manage-open-daily-journal/manage-open-daily-journal';
+import { ManageCloseDailyJournal } from '../../components/manage-close-daily-journal/manage-close-daily-journal';
+import { ResetShortage } from '../../components/reset-shortage/reset-shortage';
+
+enum ManageDailyJournalSections {
+  closing = 'closing',
+  deficitReduction = 'deficitReduction',
 }
 
 @Component({
   selector: 'app-manage-daily-journal',
   imports: [
     SectionWrapper,
-    InputErrorMessageHandler,
-    InputGroupAddon,
-    ReactiveFormsModule,
-    InputText,
-    RouterLink,
-    RouterLinkActive,
-    RouterLinkWithHref,
-    Button,
-    Carousel,
-    Textarea,
-    RouterOutlet,
-    ButtonDirective,
-    TranslatePipe,
-    OpenDailyJournal,
     NgSelectComponent,
     Debounce,
     MessageModule,
+    ButtonDirective,
+    TranslatePipe,
+    ManageOpenDailyJournal,
+    ManageCloseDailyJournal,
+    ResetShortage,
   ],
   templateUrl: './manage-daily-journal.html',
   styleUrl: './manage-daily-journal.css',
 })
-export class ManageDailyJournal extends BaseComponent implements OnInit {
-  DocFormSections = DocFormSections;
-  initialSearchFormValue = {
-    searchTerm: this.fb.control<string>('', []),
-  };
-  searchFg = this.fb.group(this.initialSearchFormValue);
+export class ManageDailyJournal extends BaseComponent {
+  ManageDailyJournalSections = ManageDailyJournalSections;
+
   dailyJournalService = inject(DailyJournalService);
   userService = inject(UserService);
-  links = this.dailyJournalService.links;
-  currentUser = signal<IUserDailyJournalResponse | null>(null);
 
-  id = input.required<number>();
-  /**
-   *
-   */
-  constructor() {
-    super();
-  }
-
-  ngOnInit(): void {
-    this.dailyJournalService.getUserDaily(this.id()).subscribe({
-      next: (res) => {
-        this.dailyJournalService.currentUserDaily.set(res);
-      },
-    });
-  }
+  currentUserDaily = this.dailyJournalService.currentUserDaily;
+  currentUser = computed(() => this.currentUserDaily()?.value ?? null);
+  isOpening = computed(() => Boolean(this.currentUser()?.dailyJournalPeriods?.isOpening));
+  activeSection = signal<ManageDailyJournalSections>(ManageDailyJournalSections.closing);
+  visibleSections = computed(() =>
+    this.isOpening()
+      ? [
+          {
+            key: ManageDailyJournalSections.closing,
+            labelKey: 'settings.daily-journal.closing',
+          },
+          {
+            key: ManageDailyJournalSections.deficitReduction,
+            labelKey: 'settings.daily-journal.reset-shortage',
+          },
+        ]
+      : [],
+  );
 
   displayedUsers = signal<IUserRowResponse[]>([]);
   previousAccountsSearchTerm = '';
@@ -86,12 +70,24 @@ export class ManageDailyJournal extends BaseComponent implements OnInit {
     totalRowsCount: 0,
   };
 
+  constructor() {
+    super();
+    this.searchUsers(1, '');
+
+    effect(() => {
+      const userDaily = this.currentUserDaily();
+      if (!userDaily) return;
+
+      this.activeSection.set(ManageDailyJournalSections.closing);
+    });
+  }
+
   searchUsers(pageIndex: number, searchTerm: string) {
     this.previousAccountsSearchTerm = searchTerm;
     this.userService
       .search<IUserSearchResponseValue>({
         paginationInfo: {
-          pageIndex: 1,
+          pageIndex,
           pageSize: 10,
         },
         searchFilters: [
@@ -104,41 +100,49 @@ export class ManageDailyJournal extends BaseComponent implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          if (res?.rows?.length > 0) {
-            if (pageIndex === 1) {
-              this.displayedUsers.set(res.rows);
-            } else {
-              this.displayedUsers.update((prev) => prev.concat(res.rows));
-            }
-            this.usersPaginationInfo = {
-              pageIndex,
-              totalPagesCount: res.paginationInfo.totalPagesCount,
-              totalRowsCount: res.paginationInfo.totalRowsCount,
-            };
+          if (pageIndex === 1) {
+            this.displayedUsers.set(res?.rows ?? []);
+          } else if (res?.rows?.length) {
+            this.displayedUsers.update((prev) => prev.concat(res.rows));
           }
+
+          this.usersPaginationInfo = {
+            pageIndex,
+            totalPagesCount: res.paginationInfo.totalPagesCount,
+            totalRowsCount: res.paginationInfo.totalRowsCount,
+          };
         },
       });
   }
 
-  debouncedUsersSearch(event: IDebounceEvent<{ term: string }>) {
-    const searchValue = event?.value.term ?? '';
-    console.log(searchValue);
-    if (this.previousAccountsSearchTerm === searchValue) {
+  debouncedUsersSearch(event: IDebounceEvent<{ term: string }>, searchTerm: string) {
+    const searchValue = searchTerm ?? '';
+    const isScrollEvent = event.type === 'scrollToEnd';
+    const canLoadMore = this.usersPaginationInfo.pageIndex < this.usersPaginationInfo.totalPagesCount;
+
+    if (isScrollEvent && this.previousAccountsSearchTerm === searchValue && canLoadMore) {
       this.searchUsers(this.usersPaginationInfo.pageIndex + 1, searchValue);
-    } else {
+      return;
+    }
+
+    if (!isScrollEvent) {
       this.searchUsers(1, searchValue);
     }
   }
 
   onUserSelected(event: IUserRowResponse) {
+    this.dailyJournalService.currentUserId = event.userId;
     this.dailyJournalService.getUserDaily(event.userId).subscribe({
       next: (res) => {
-        this.currentUser.set(res);
-        this.dailyJournalService.currentUserId = event.userId;
+        this.dailyJournalService.currentUserDaily.set(res);
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: err?.error?.message ?? 'غير موجود' });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: err?.error?.message ?? 'Not found' });
       },
     });
+  }
+
+  setActiveSection(section: ManageDailyJournalSections) {
+    this.activeSection.set(section);
   }
 }

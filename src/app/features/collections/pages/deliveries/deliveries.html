@@ -15,7 +15,7 @@
           pInputText
           type="text"
           formControlName="searchTerm"
-          [placeholder]="'actions.search' | translate"
+          [placeholder]="'ACTIONS.SEARCH' | translate"
         />
         <p-inputgroup-addon class="relative">
           <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
@@ -49,20 +49,25 @@
       <div
         style="backdrop-filter: blur(20px); box-shadow: 0px 0px 27.14px 0px #6a6a6acc inset"
         class="flex border-2 relative cursor-pointer border-[#393C49] aspect-[1.84] available items-center justify-center bg-white rounded-[14px]"
-        [class.replacements-reserved]="item.orderNumber>0"
-        (click)="openCollectionDialog({
-          deliveryId: item.id,
-          deliveryType:OpenCollectionDialogOptsDeliveryType.Person
-        })"
+        [class.replacements-reserved]="item.orderNumber > 0"
+        (click)="
+          openCollectionDialog({
+            deliveryId: item.id,
+            deliveryType: OpenCollectionDialogOptsDeliveryType.Person,
+          })
+        "
       >
-        @if (item.orderNumber>0) {
+        @if (item.orderNumber > 0) {
           <div
             class="absolute -top-3.5 -right-0.5 w-[23px] aspect-square flex items-center justify-center text-base font-bold bg-dark-line text-[#FA8D7B] rounded-full"
           >
             <span>{{ item.orderNumber }}</span>
           </div>
         }
-        <span class="text-black font-bold mx-auto min-w-[95%] w-[95%] text-center text-ellipsis overflow-hidden whitespace-nowrap">{{item.name}}</span>
+        <span
+          class="text-black font-bold mx-auto min-w-[95%] w-[95%] text-center text-ellipsis overflow-hidden whitespace-nowrap"
+          >{{ item.name }}</span
+        >
       </div>
     }
   </div>

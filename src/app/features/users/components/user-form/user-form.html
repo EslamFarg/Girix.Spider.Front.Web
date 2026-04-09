@@ -10,9 +10,9 @@
     type="submit"
   >
     @if (formMode() === FormMode.Create) {
-      {{ 'actions.save' | translate }}
+      {{ 'ACTIONS.SAVE' | translate }}
     } @else {
-      {{ 'actions.edit' | translate }}
+      {{ 'ACTIONS.EDIT' | translate }}
     }
   </button>
   @if (formMode() === FormMode.Update) {
@@ -22,7 +22,7 @@
       class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
       variant="outlined"
     >
-      {{ 'actions.new' | translate }}
+      {{ 'ACTIONS.NEW' | translate }}
     </a>
   }
 </div>
@@ -58,22 +58,22 @@
     </div>
     <!--  -->
     <div class="md:col-span-1">
-      <label for="costPrice">{{ 'form.email' | translate }}</label>
+      <label for="costPrice">{{ 'FORM.EMAIL' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('email')">
         <input
           pInputText
           id="costPrice"
           aria-describedby="costPrice-help"
           formControlName="email"
-          [placeholder]="'form.email' | translate"
+          [placeholder]="'FORM.EMAIL' | translate"
         />
       </app-input-error-message-handler>
     </div>
     <!--  -->
     <!-- <div class=" md:col-span-1">
-      <label for="productAddress">{{'form.address' | translate}}</label>
+      <label for="productAddress">{{'FORM.ADDRESS' | translate}}</label>
       <app-input-error-message-handler [fc]="userFg.get('address')">
-        <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="address" id="productAddress" [placeholder]="'form.address' | translate" />
+        <input pInputText id="costPrice" aria-describedby="costPrice-help" formControlName="address" id="productAddress" [placeholder]="'FORM.ADDRESS' | translate" />
       </app-input-error-message-handler>
     </div> -->
 
@@ -95,18 +95,18 @@
       <app-input-error-message-handler [fc]="userFg.get('isActive')" class="w-fit">
         <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" formControlName="isActive" />
       </app-input-error-message-handler>
-      <label for="productName" class="text-dark-line text-sm font-semibold">{{ 'actions.active' | translate }}</label>
+      <label for="productName" class="text-dark-line text-sm font-semibold">{{ 'ACTIONS.ACTIVE' | translate }}</label>
     </div>
 
     <div class=" ">
-      <label for="productName">{{ 'form.cashierCollectionAccount' | translate }}</label>
+      <label for="productName">{{ 'FORM.CASHierCollectionAccount' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('cashierCollectionAccountId')">
         <p-select
           [options]="cashierFinancialAccounts()"
           optionLabel="name"
           optionValue="id"
           formControlName="cashierCollectionAccountId"
-          [placeholder]="'form.cashierCollectionAccount' | translate"
+          [placeholder]="'FORM.CASHierCollectionAccount' | translate"
           class="w-full!"
         />
       </app-input-error-message-handler>
@@ -126,14 +126,14 @@
     </div>
 
     <div class=" ">
-      <label for="productName">{{ 'form.cashPaymentAccount' | translate }}</label>
+      <label for="productName">{{ 'FORM.CASHPaymentAccount' | translate }}</label>
       <app-input-error-message-handler [fc]="userFg.get('cashPaymentAccountId')">
         <p-select
           [options]="cashFinancialAccounts()"
           optionLabel="name"
           optionValue="id"
           formControlName="cashPaymentAccountId"
-          [placeholder]="'form.cashPaymentAccount' | translate"
+          [placeholder]="'FORM.CASHPaymentAccount' | translate"
           class="w-full!"
         />
       </app-input-error-message-handler>

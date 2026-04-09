@@ -18,7 +18,7 @@
             pInputText
             type="text"
             formControlName="searchTerm"
-            [placeholder]="'actions.search' | translate"
+            [placeholder]="'ACTIONS.SEARCH' | translate"
           />
           <p-inputgroup-addon class="relative">
             <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
@@ -53,17 +53,25 @@
           <th>#</th>
           <th>{{ 'form.deliveryName' | translate }}</th>
           <th>{{ 'form.phoneNumber' | translate }}</th>
-          <th>{{ 'form.address' | translate }}</th>
-          <th>{{ 'actions.tools' | translate }}</th>
+          <th>{{ 'FORM.ADDRESS' | translate }}</th>
+          <th>{{ 'ACTIONS.TOOLS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
         @for (item of deliveryMen(); track $index) {
           <tr class="" [style]="`--ix:${$index}`">
-            <td><div>{{ getRowNumber($index, deliveryMenPaginationInfo.pageIndex) }}</div></td>
-            <td><div>{{ item.name }}</div></td>
-            <td><div>{{ item.phoneNumber }}</div></td>
-            <td><div>{{ item.address }}</div></td>
+            <td>
+              <div>{{ getRowNumber($index, deliveryMenPaginationInfo.pageIndex) }}</div>
+            </td>
+            <td>
+              <div>{{ item.name }}</div>
+            </td>
+            <td>
+              <div>{{ item.phoneNumber }}</div>
+            </td>
+            <td>
+              <div>{{ item.address }}</div>
+            </td>
             <td>
               <div class="actions">
                 <a [routerLink]="`/deliveries/delivery-men/${item.id}/edit`" class="edit">

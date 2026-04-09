@@ -10,9 +10,9 @@
     type="submit"
   >
     @if (formMode() === FormMode.Create) {
-      {{ 'actions.save' | translate }}
+      {{ 'ACTIONS.SAVE' | translate }}
     } @else {
-      {{ 'actions.edit' | translate }}
+      {{ 'ACTIONS.EDIT' | translate }}
     }
   </button>
   @if (formMode() === FormMode.Update) {
@@ -22,7 +22,7 @@
       class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
       variant="outlined"
     >
-      {{ 'actions.new' | translate }}
+      {{ 'ACTIONS.NEW' | translate }}
     </a>
   }
 </div>
@@ -80,7 +80,7 @@
   </div>
   <div class="grid md:grid-cols-2 gap-4 flex-1">
     <div>
-      <label for="nameAr">{{ 'classes.groups.groupName' | translate }}</label>
+      <label for="nameAr">{{ 'CLASSES.GROUPS.GROUP_NAME' | translate }}</label>
       <app-input-error-message-handler [fc]="groupFg.get('nameAr')">
         <input
           pInputText
@@ -88,13 +88,13 @@
           class="app-input"
           formControlName="nameAr"
           aria-describedby="nameAr-help"
-          [placeholder]="'classes.groups.groupName' | translate"
+          [placeholder]="'CLASSES.GROUPS.GROUP_NAME' | translate"
         />
       </app-input-error-message-handler>
     </div>
 
     <div>
-      <label for="printerId">{{ 'classes.groups.printer' | translate }}</label>
+      <label for="printerId">{{ 'CLASSES.GROUPS.PRINTER' | translate }}</label>
       <app-input-error-message-handler [grouped]="false" [fc]="groupFg.get('printerId')">
         <ng-select
           class="app-select"
@@ -120,12 +120,12 @@
         <input formControlName="isOnCasher" type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
       </app-input-error-message-handler>
       <label for="productName" class="text-dark-line text-sm font-semibold">{{
-        'classes.groups.showgroup' | translate
+        'CLASSES.GROUPS.SHOW_GROUP' | translate
       }}</label>
     </div>
 
     <div class="md:col-span-2">
-      <label for="description">{{ 'classes.groups.description' | translate }}</label>
+      <label for="description">{{ 'CLASSES.GROUPS.DESCRIPTION' | translate }}</label>
       <app-input-error-message-handler [fc]="groupFg.get('description')">
         <textarea
           rows="5"
@@ -135,7 +135,7 @@
           id="description"
           formControlName="description"
           aria-describedby="description-help"
-          [placeholder]="'classes.groups.description' | translate"
+          [placeholder]="'CLASSES.GROUPS.DESCRIPTION' | translate"
         ></textarea>
       </app-input-error-message-handler>
     </div>

@@ -628,13 +628,13 @@
 <div class="grid grid-cols-2 gap-4 flex-1 my-4">
   <!-- cash -->
   <div>
-    <label for="cash">{{ 'form.cashPaid' | translate }}</label>
+    <label for="cash">{{ 'FORM.CASHPaid' | translate }}</label>
     <app-input-error-message-handler [fc]="fg.get('cashAmount')">
       <input
         pInputText
         type="number"
         aria-describedby="cash-help"
-        [placeholder]="'form.cash' | translate"
+        [placeholder]="'FORM.CASH' | translate"
         [formControl]="getFormControl(fg, 'cashAmount')"
         appAllowNumbers
         [min]="0"
@@ -672,7 +672,7 @@
 
   <!-- network -->
   <div>
-    <label for="network">{{ 'form.networkPaid' | translate }}</label>
+    <label for="network">{{ 'FORM.NETWORKPaid' | translate }}</label>
     <app-input-error-message-handler [fc]="fg.get('networkAmount')">
       <input
         pInputText
@@ -684,7 +684,7 @@
         aria-describedby="network-help"
         #networkAmount
         [formControl]="getFormControl(fg, 'networkAmount')"
-        [placeholder]="'form.network' | translate"
+        [placeholder]="'FORM.NETWORK' | translate"
         class="app-input"
       />
     </app-input-error-message-handler>

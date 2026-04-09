@@ -9,13 +9,13 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './journals-layout.css',
 })
 export class JournalsLayout {
-links: ISectionLink[] = [
+  links: ISectionLink[] = [
     {
-      labelKey: 'journals.explorer',
+      labelKey: 'JOURNALS.EXPLORER',
       url: '/accounts/journals',
     },
     {
-      labelKey: 'journals.add',
+      labelKey: 'JOURNALS.ADD',
       url: '/accounts/journals/add',
     },
   ];

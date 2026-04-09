@@ -10,9 +10,9 @@
     type="submit"
   >
     @if (formMode() === FormMode.Create) {
-      {{ 'actions.save' | translate }}
+      {{ 'ACTIONS.SAVE' | translate }}
     } @else {
-      {{ 'actions.edit' | translate }}
+      {{ 'ACTIONS.EDIT' | translate }}
     }
   </button>
   <button pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
@@ -108,20 +108,20 @@
     </div>
     <!-- email -->
     <div class="col-span-2 md:col-span-1">
-      <label for="email">{{ 'form.email' | translate }}</label>
+      <label for="email">{{ 'FORM.EMAIL' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('email')">
         <input
           pInputText
           id="email"
           aria-describedby="email-help"
           formControlName="email"
-          [placeholder]="'form.email' | translate"
+          [placeholder]="'FORM.EMAIL' | translate"
         />
       </app-input-error-message-handler>
     </div>
     <!-- address -->
     <div class="col-span-2 md:col-span-1">
-      <label for="address">{{ 'form.address' | translate }}</label>
+      <label for="address">{{ 'FORM.ADDRESS' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('address')">
         <input
           pInputText
@@ -129,7 +129,7 @@
           aria-describedby="address-help"
           formControlName="address"
           id="address"
-          [placeholder]="'form.address' | translate"
+          [placeholder]="'FORM.ADDRESS' | translate"
         />
       </app-input-error-message-handler>
     </div>
@@ -149,7 +149,7 @@
     </div>
     <!-- description -->
     <div class="col-span-2">
-      <label for="notes">{{ 'form.description' | translate }}</label>
+      <label for="notes">{{ 'FORM.DESCRIPTION' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('description')">
         <textarea
           id="notes"
@@ -157,7 +157,7 @@
           cols="30"
           pTextarea
           aria-describedby="description-help"
-          [placeholder]="'form.description' | translate"
+          [placeholder]="'FORM.DESCRIPTION' | translate"
           class="w-full"
           formControlName="description"
         ></textarea>

@@ -16,7 +16,7 @@ export class DailyJournal extends BaseComponent {
   links = this.dailyJournalService.links;
 
   isOpenState = computed<boolean>(() =>
-    Boolean(this.dailyJournalService?.currentUserDaily()?.value.dailyJournalPeriods.isOpening),
+    Boolean(this.dailyJournalService?.currentUserDaily()?.value?.dailyJournalPeriods?.isOpening),
   );
 
   /**

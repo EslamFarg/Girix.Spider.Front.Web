@@ -15,7 +15,7 @@
           pInputText
           type="text"
           formControlName="searchTerm"
-          [placeholder]="'actions.search' | translate"
+          [placeholder]="'ACTIONS.SEARCH' | translate"
         />
         <p-inputgroup-addon class="relative">
           <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
@@ -67,7 +67,7 @@
             <div>{{ item.referenceNumber }}</div>
           </td>
           <td>
-            <div>{{ item.settlementDate| date }}</div>
+            <div>{{ item.settlementDate | date }}</div>
           </td>
           <td>
             <div class="actions">

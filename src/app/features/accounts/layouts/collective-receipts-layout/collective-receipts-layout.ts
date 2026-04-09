@@ -1,7 +1,7 @@
 import { ISectionLink, SectionNav } from '@/components/section-nav/section-nav';
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 
 @Component({
   selector: 'app-collective-receipts-layout',
@@ -16,11 +16,11 @@ export class CollectiveReceiptsLayout {
    */
   links: ISectionLink[] = [
     {
-      labelKey: 'collectiveReceipts.explorer',
+      labelKey: 'COLLECTIVE_RECEIPTS.EXPLORER',
       url: '/accounts/collective-receipts',
     },
     {
-      labelKey: 'collectiveReceipts.add',
+      labelKey: 'COLLECTIVE_RECEIPTS.ADD',
       url: '/accounts/collective-receipts/add',
     },
   ];

@@ -27,9 +27,9 @@
         type="submit"
       >
         @if (formMode() === FormMode.Create) {
-          {{ 'actions.save' | translate }}
+          {{ 'ACTIONS.SAVE' | translate }}
         } @else {
-          {{ 'actions.edit' | translate }}
+          {{ 'ACTIONS.EDIT' | translate }}
         }
       </button>
       <!-- <button pButton type="button" (click)="test()">
@@ -43,7 +43,7 @@
         variant="outlined"
         (click)="resetOrderForm()"
       >
-        {{ 'actions.new' | translate }}
+        {{ 'ACTIONS.NEW' | translate }}
       </a>
       @if (existingOrderBill()) {
         <button
@@ -53,7 +53,7 @@
           class="border-dark-line! text-dark-line! py-1! md:flex-none md:px-8!"
           variant="outlined"
         >
-          {{ 'actions.print' | translate }}
+          {{ 'ACTIONS.PRINT' | translate }}
         </button>
       }
     </div>
@@ -741,10 +741,10 @@
   <ng-template #footer>
     <div class="flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
       <button pButton severity="secondary" class="bg-dark-bg-2" (click)="submitHut()">
-        {{ 'actions.save' | translate }}
+        {{ 'ACTIONS.SAVE' | translate }}
       </button>
       <button pButton severity="secondary" (click)="HutDialogVisible = false">
-        {{ 'actions.cancel' | translate }}
+        {{ 'ACTIONS.CANCEL' | translate }}
       </button>
     </div>
   </ng-template>
@@ -957,7 +957,7 @@
               (input)="isPaid.set(true)"
               [value]="true"
             />
-            <label for="paymentInfoPaid">{{ 'form.paid' | translate }}</label>
+            <label for="paymentInfoPaid">{{ 'FORM.PAID' | translate }}</label>
           </div>
           <div class="flex items-center gap-1">
             <input
@@ -968,18 +968,18 @@
               (input)="isPaid.set(false)"
               [value]="false"
             />
-            <label for="paymentInfoPostponed">{{ 'form.postponed' | translate }}</label>
+            <label for="paymentInfoPostponed">{{ 'FORM.POSTPONED' | translate }}</label>
           </div>
         </div>
 
         <!-- cash -->
         <div>
-          <label for="cash">{{ 'form.cashPaid' | translate }}</label>
+          <label for="cash">{{ 'FORM.CASHPaid' | translate }}</label>
           <app-input-error-message-handler [fc]="orderFg.get('payingCash')">
             <input
               pInputText
               aria-describedby="cash-help"
-              [placeholder]="'form.cash' | translate"
+              [placeholder]="'FORM.CASH' | translate"
               [formControl]="getFormControl(orderFg, 'payingCash')"
               appAllowNumbers
               [max]="net()"
@@ -1020,7 +1020,7 @@
 
         <!-- network -->
         <div>
-          <label for="network">{{ 'form.networkPaid' | translate }}</label>
+          <label for="network">{{ 'FORM.NETWORKPaid' | translate }}</label>
           <app-input-error-message-handler [fc]="orderFg.get('payingNetwork')">
             <input
               pInputText
@@ -1034,7 +1034,7 @@
               #payingNetwork
               (click)="triggerNumbersKeyboard(payingNetwork)"
               [formControl]="getFormControl(orderFg, 'payingNetwork')"
-              [placeholder]="'form.network' | translate"
+              [placeholder]="'FORM.NETWORK' | translate"
               class="app-input"
             />
           </app-input-error-message-handler>

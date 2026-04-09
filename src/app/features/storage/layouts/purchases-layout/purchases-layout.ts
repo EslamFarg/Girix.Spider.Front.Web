@@ -9,14 +9,14 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './purchases-layout.css',
 })
 export class PurchasesLayout {
-links: ISectionLink[] = [
+  links: ISectionLink[] = [
     {
-      labelKey: 'purchases.explorer',
+      labelKey: 'PURCHASES.EXPLORER',
       url: '/storage/purchases',
-     },
+    },
     {
-      labelKey: 'purchases.add',
+      labelKey: 'PURCHASES.ADD',
       url: '/storage/purchases/add',
-     },
+    },
   ];
 }

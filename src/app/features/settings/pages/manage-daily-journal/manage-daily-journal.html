@@ -1,74 +1,74 @@
 <div class="min-h-full h-full overflow-auto custom-scroll">
   <app-section-wrapper class="p-4" styleClass="flex flex-col gap-8">
-    <!-- search -->
     <div class="h-fit items-start gap-2 w-full">
       <ng-select
         class="app-select"
         [items]="displayedUsers()"
         (change)="onUserSelected($event)"
         bindLabel="name"
-        placeholder="الكل"
+        placeholder="Select user"
         #userSelect
         appDebounce
         [customEvents]="[
           { type: 'searchEvent', value: userSelect.searchEvent },
           { type: 'scrollToEnd', value: userSelect.scrollToEnd },
         ]"
-        (debounced)="debouncedUsersSearch($event)"
+        (debounced)="debouncedUsersSearch($event, userSelect.searchTerm)"
       />
-      <!-- <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
-        <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
-        <p-inputgroup-addon>
-          <i class="pi pi-filter"></i>
-        </p-inputgroup-addon>
-        <p-inputgroup-addon>
-          <i class="pi pi-search"></i>
-        </p-inputgroup-addon>
-      </app-input-error-message-handler> -->
     </div>
 
     @if (currentUser()) {
       <section class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
         <div class="border border-text-gray flex items-center gap-4 rounded-lg h-8 px-4 text-sm">
-          <span class="text-dark-line">اسم المستخدم</span>
-          <span class="text-text-gray">{{ currentUser()?.value?.name }}</span>
+          <span class="text-dark-line">User name</span>
+          <span class="text-text-gray">{{ currentUser()?.name }}</span>
         </div>
         <div class="border border-text-gray flex items-center gap-4 rounded-lg h-8 px-4 text-sm">
-          <span class="text-dark-line">رقم الجوال</span>
-          <span class="text-text-gray">{{ currentUser()?.value?.phoneNumber }}</span>
+          <span class="text-dark-line">Phone number</span>
+          <span class="text-text-gray">{{ currentUser()?.phoneNumber }}</span>
         </div>
         <div class="border border-text-gray flex items-center gap-4 rounded-lg h-8 px-4 text-sm">
-          <span class="text-dark-line">إجمالي العجز</span>
-          <span class="text-text-gray">{{currentUser()?.value?.totalShortage}}</span>
+          <span class="text-dark-line">Total shortage</span>
+          <span class="text-text-gray">{{ currentUser()?.totalShortage }}</span>
         </div>
         <div class="border border-text-gray flex items-center gap-4 rounded-lg h-8 px-4 text-sm">
-          <span class="text-dark-line">نوع المستخدم</span>
-          <span class="text-[#FF383C]">{{ currentUser()?.value?.groupName }}</span>
+          <span class="text-dark-line">User type</span>
+          <span class="text-[#FF383C]">{{ currentUser()?.groupName }}</span>
         </div>
-      </section>
-      <section
-        class="flex nav-items items-center gap-2 sm:gap-4 w-full max-w-125 mx-auto"
-        style="
-          --p-button-primary-background: var(--color-text-lighter);
-          --p-button-primary-border-color: transparent;
-          --p-button-primary-color: var(--color-dark-line);
-          --p-button-primary-hover-color: #000000;
-        "
-      >
-        @for (link of links(); track $index) {
-          <a
-            routerLinkActive="active"
-            pButton
-            class="h-12.5 flex-1 text-center px-1 rounded-lg font-semibold flex items-center justify-center"
-            [routerLink]="link.routerLink"
-          >
-            <span>{{ link.labelKey | translate }}</span>
-          </a>
-        }
       </section>
 
+      @if (isOpening()) {
+        <section
+          class="flex nav-items items-center gap-2 sm:gap-4 w-full max-w-125 mx-auto"
+          style="
+            --p-button-primary-background: var(--color-text-lighter);
+            --p-button-primary-border-color: transparent;
+            --p-button-primary-color: var(--color-dark-line);
+            --p-button-primary-hover-color: #000000;
+          "
+        >
+          @for (section of visibleSections(); track section.key) {
+            <button
+              pButton
+              type="button"
+              class="h-12.5 flex-1 text-center px-1 rounded-lg font-semibold flex items-center justify-center"
+              [class.active]="activeSection() === section.key"
+              (click)="setActiveSection(section.key)"
+            >
+              <span>{{ section.labelKey | translate }}</span>
+            </button>
+          }
+        </section>
+      }
+
       <div>
-        <router-outlet />
+        @if (!isOpening()) {
+          <app-manage-open-daily-journal />
+        } @else if (activeSection() === ManageDailyJournalSections.deficitReduction) {
+          <app-reset-shortage />
+        } @else {
+          <app-manage-close-daily-journal />
+        }
       </div>
     } @else {
       <p-message

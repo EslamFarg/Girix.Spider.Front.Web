@@ -9,14 +9,14 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './purchases-returns-layout.css',
 })
 export class PurchasesReturnsLayout {
-links: ISectionLink[] = [
+  links: ISectionLink[] = [
     {
-      labelKey: 'purchasesReturns.explorer',
+      labelKey: 'PURCHASES_RETURNS.EXPLORER',
       url: '/storage/purchases-returns',
-     },
+    },
     {
-      labelKey: 'purchasesReturns.add',
+      labelKey: 'PURCHASES_RETURNS.ADD',
       url: '/storage/purchases-returns/add',
-     },
+    },
   ];
 }

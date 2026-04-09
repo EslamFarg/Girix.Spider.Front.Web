@@ -11,11 +11,11 @@ import { RouterOutlet } from '@angular/router';
 export class GroupsLayout {
   links: ISectionLink[] = [
     {
-      labelKey: 'groups.explorer',
+      labelKey: 'GROUPS.EXPLORER',
       url: '/classes/groups',
     },
     {
-      labelKey: 'groups.add',
+      labelKey: 'GROUPS.ADD',
       url: '/classes/groups/add',
     },
   ];

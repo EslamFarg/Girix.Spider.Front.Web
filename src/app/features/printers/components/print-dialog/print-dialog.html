@@ -9,10 +9,10 @@
   [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
   (visibleChange)="visibleChange($event)"
 >
-<ng-template #header>
-  <p class="font-bold text-center text-dark-bg-2 text-lg ">إختر الطابعة</p>
-</ng-template>
-  <div class="flex-1 overflow-auto no-scrollbar"   >
+  <ng-template #header>
+    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الطابعة</p>
+  </ng-template>
+  <div class="flex-1 overflow-auto no-scrollbar">
     <div class="h-fit flex flex-col items-center justify-center gap-3">
       @for (printer of printerItems(); track $index) {
         <label
@@ -54,15 +54,14 @@
     </div>
   </div>
 
-
   <ng-template #footer>
     <div class="flex justify-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
-      <button pButton form="pickPrinterForm"  severity="secondary" type="button" (click)="print()">
-      {{ 'actions.print' | translate }}
-    </button>
-    <button pButton  severity="secondary" type="button" (click)="closePrinterDialog()">
-      {{ 'actions.cancel' | translate }}
-    </button>
+      <button pButton form="pickPrinterForm" severity="secondary" type="button" (click)="print()">
+        {{ 'ACTIONS.PRINT' | translate }}
+      </button>
+      <button pButton severity="secondary" type="button" (click)="closePrinterDialog()">
+        {{ 'ACTIONS.CANCEL' | translate }}
+      </button>
     </div>
   </ng-template>
 </p-dialog>

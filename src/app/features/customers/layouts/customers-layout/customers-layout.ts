@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ISectionLink, SectionNav } from '@/components/section-nav/section-nav';
 import { RouterOutlet } from '@angular/router';
-import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
+import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 
 @Component({
   selector: 'app-customers-layout',
@@ -12,11 +12,11 @@ import { SectionWrapper } from "@/components/section-wrapper/section-wrapper";
 export class CustomersLayout {
   links: ISectionLink[] = [
     {
-      labelKey: 'customers.explorer',
+      labelKey: 'CUSTOMERS.EXPLORER',
       url: '/customers',
     },
     {
-      labelKey: 'customers.add',
+      labelKey: 'CUSTOMERS.ADD',
       url: '/customers/add',
     },
   ];

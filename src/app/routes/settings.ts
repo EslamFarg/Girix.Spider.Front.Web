@@ -8,9 +8,6 @@ import { DefaultAccounts } from '@/features/settings/pages/default-accounts/defa
 import { AddPrinter } from '@/features/settings/pages/add-printer/add-printer';
 import { ManageDailyJournal } from '@/features/settings/pages/manage-daily-journal/manage-daily-journal';
 import { Financial } from '@/features/settings/pages/financial/financial';
-import { OpenDailyJournal } from '@/features/settings/components/open-daily-journal/open-daily-journal';
-import { CloseDailyJournal } from '@/features/settings/components/close-daily-journal/close-daily-journal';
-import { ResetShortage } from '@/features/settings/components/reset-shortage/reset-shortage';
 
 export default [
   {
@@ -18,7 +15,6 @@ export default [
     component: Printer,
   },
 
-  //program
   {
     path: 'program/about',
     component: About,
@@ -31,7 +27,6 @@ export default [
     path: 'program/support',
     component: Support,
   },
-  //
   {
     path: 'qr',
     component: Qr,
@@ -51,25 +46,5 @@ export default [
   {
     path: 'manage-daily-journal',
     component: ManageDailyJournal,
-    children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'open-daily-journal',
-      },
-      {
-        path: 'open-daily-journal',
-        component: OpenDailyJournal,
-      },
-      {
-        path: 'close-daily-journal',
-        component: CloseDailyJournal,
-      },
-      {
-        path: 'reset-shortage',
-        component: ResetShortage,
-      },
-    ],
   },
-  
 ] satisfies Route[];

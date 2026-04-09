@@ -178,9 +178,9 @@ export class DailyJournalService extends BaseService {
       ();
   };
 
-  getUserDaily = (userId: number) =>
+  getUserDaily = (userId: number=this.currentUserId) =>
     this.http
-      .get<IUserDailyJournalResponse>(`${this.apiUrl}/UserDaily/ByUser/${this.currentUserId}`)
+      .get<IUserDailyJournalResponse>(`${this.apiUrl}/UserDaily/ByUser/${userId}`)
       .pipe
       // tap({
       //   next: (res) => {

@@ -11,11 +11,11 @@ import { RouterOutlet } from '@angular/router';
 export class OpeningBalancesLayout {
   links: ISectionLink[] = [
     {
-      labelKey: 'openingBalances.explorer',
+      labelKey: 'OPENING_BALANCES.EXPLORER',
       url: '/storage/opening-balances',
     },
     {
-      labelKey: 'openingBalances.add',
+      labelKey: 'OPENING_BALANCES.ADD',
       url: '/storage/opening-balances/add',
     },
   ];

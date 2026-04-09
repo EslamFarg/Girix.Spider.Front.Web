@@ -11,11 +11,11 @@ import { RouterOutlet } from '@angular/router';
 export class InventoryLayout {
   links: ISectionLink[] = [
     {
-      labelKey: 'inventory.explorer',
+      labelKey: 'INVENTORY.EXPLORER',
       url: '/storage/inventory',
     },
     {
-      labelKey: 'inventory.add',
+      labelKey: 'INVENTORY.ADD',
       url: '/storage/inventory/add',
     },
   ];

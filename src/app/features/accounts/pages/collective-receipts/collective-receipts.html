@@ -34,11 +34,11 @@
   <thead>
     <tr class="">
       <th>#</th>
-      <th>{{ 'form.voucherNumber' | translate }}</th>
-      <th>{{ 'form.date' | translate }}</th>
+      <th>{{ 'FORM.VOUCHER_NUMBER' | translate }}</th>
+      <th>{{ 'FORM.DATE' | translate }}</th>
       <th>{{ 'form.ledgerNumber' | translate }}</th>
-      <th>{{ 'form.amount' | translate }}</th>
-      <th>{{ 'actions.tools' | translate }}</th>
+      <th>{{ 'FORM.AMOUNT' | translate }}</th>
+      <th>{{ 'ACTIONS.TOOLS' | translate }}</th>
     </tr>
   </thead>
   <tbody>
@@ -69,7 +69,7 @@
                 />
               </svg>
             </button>
-            <a  [routerLink]="['/accounts/collective-receipts', receiptVoucher.id, 'edit']" class="edit">
+            <a [routerLink]="['/accounts/collective-receipts', receiptVoucher.id, 'edit']" class="edit">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   opacity="0.4"

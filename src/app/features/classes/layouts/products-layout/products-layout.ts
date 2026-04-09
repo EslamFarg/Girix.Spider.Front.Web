@@ -11,13 +11,12 @@ import { RouterOutlet } from '@angular/router';
 export class ProductsLayout {
   links: ISectionLink[] = [
     {
-      labelKey: 'products.explorer',
+      labelKey: 'PRODUCTS.EXPLORER',
       url: '/classes/products',
-     },
+    },
     {
-      labelKey: 'products.add',
+      labelKey: 'PRODUCTS.ADD',
       url: '/classes/products/add',
-     },
+    },
   ];
 }
- 

@@ -1,316 +1,316 @@
 {
-  "header": {
-    "logout": { "label": "تسجيل الخروج" },
-    "nav": {
-      "home": {
-        "label": "الرئيسية"
+  "HEADER": {
+    "LOGOUT": { "LABEL": "تسجيل الخروج" },
+    "NAV": {
+      "HOME": {
+        "LABEL": "الرئيسية"
       },
-      "dailyJournal": {
-        "label": "اليوميه"
+      "DAILY_JOURNAL": {
+        "LABEL": "اليوميه"
       },
-      "invoices": {
-        "label": "الفواتير",
-        "orders": {
-          "label": "الطلبات"
+      "INVOICES": {
+        "LABEL": "الفواتير",
+        "ORDERS": {
+          "LABEL": "الطلبات"
         },
-        "refunds": {
-          "label": "المرتجعات"
+        "REFUNDS": {
+          "LABEL": "المرتجعات"
         }
       },
-      "classes": {
-        "label": "الأصناف",
-        "products": {
-          "label": "المنتجات"
+      "CLASSES": {
+        "LABEL": "الأصناف",
+        "PRODUCTS": {
+          "LABEL": "المنتجات"
         },
-        "meals": {
-          "label": "الوجبات"
+        "MEALS": {
+          "LABEL": "الوجبات"
         },
-        "groups": {
-          "label": "المجموعات"
+        "GROUPS": {
+          "LABEL": "المجموعات"
         }
       },
-      "restaurant": {
-        "label": "المطعم",
-        "tables": {
-          "label": "الطاولات"
+      "RESTAURANT": {
+        "LABEL": "المطعم",
+        "TABLES": {
+          "LABEL": "الطاولات"
         },
-        "huts": {
-          "label": "الاكواخ"
+        "HUTS": {
+          "LABEL": "الاكواخ"
         },
-        "rooms": {
-          "label": "الغرف"
+        "ROOMS": {
+          "LABEL": "الغرف"
         }
       },
-      "customers": {
-        "label": "العملاء",
-        "addCustomer": {
-          "label": "اضافة عميل"
+      "CUSTOMERS": {
+        "LABEL": "العملاء",
+        "ADD_CUSTOMER": {
+          "LABEL": "اضافة عميل"
         }
       },
-      "storage": {
-        "label": "المخزون",
-        "openingBalances": {
-          "label": "الارصده الافتتاحيه"
+      "STORAGE": {
+        "LABEL": "المخزون",
+        "OPENING_BALANCES": {
+          "LABEL": "الارصده الافتتاحيه"
         },
-        "purchases": {
-          "label": "المشتريات"
+        "PURCHASES": {
+          "LABEL": "المشتريات"
         },
-        "purchasesRefunds": {
-          "label": "مرتجعات المشتريات"
+        "PURCHASES_REFUNDS": {
+          "LABEL": "مرتجعات المشتريات"
         },
-        "inventory": {
-          "label": "تسويه جرديه"
+        "INVENTORY": {
+          "LABEL": "تسويه جرديه"
         }
       },
-      "replacements": {
-        "label": "التبديلات",
-        "rooms": {
-          "label": "الغرف"
+      "REPLACEMENTS": {
+        "LABEL": "التبديلات",
+        "ROOMS": {
+          "LABEL": "الغرف"
         },
-        "huts": {
-          "label": "الاكواخ"
+        "HUTS": {
+          "LABEL": "الاكواخ"
         },
-        "tables": {
-          "label": "الطاولات"
+        "TABLES": {
+          "LABEL": "الطاولات"
         },
-        "deliveries": {
-          "label": "ديليفري"
+        "DELIVERIES": {
+          "LABEL": "ديليفري"
         }
       },
-      "collections": {
-        "label": "التحصيلات",
-        "all": {
-          "label": "الكل"
+      "COLLECTIONS": {
+        "LABEL": "التحصيلات",
+        "ALL": {
+          "LABEL": "الكل"
         },
-        "tables": {
-          "label": "الطاولات"
+        "TABLES": {
+          "LABEL": "الطاولات"
         },
-        "rooms": {
-          "label": "الغرف"
+        "ROOMS": {
+          "LABEL": "الغرف"
         },
-        "huts": {
-          "label": "الاكواخ"
+        "HUTS": {
+          "LABEL": "الاكواخ"
         },
-        "deliveries": {
-          "label": "ديليفري"
+        "DELIVERIES": {
+          "LABEL": "ديليفري"
         },
-        "companies": {
-          "label": "الشركات"
+        "COMPANIES": {
+          "LABEL": "الشركات"
         }
       },
-      "accounts": {
-        "label": "الحسابات",
-        "journals": {
-          "label": "القيود"
+      "ACCOUNTS": {
+        "LABEL": "الحسابات",
+        "JOURNALS": {
+          "LABEL": "القيود"
         },
-        "collectiveReceipts": {
-          "label": "سند قبض مجمع"
+        "COLLECTIVE_RECEIPTS": {
+          "LABEL": "سند قبض مجمع"
         },
-        "collectivePayments": {
-          "label": "سند صرف مجمع"
+        "COLLECTIVE_PAYMENTS": {
+          "LABEL": "سند صرف مجمع"
         },
-        "accountsTree": {
-          "label": "شجره الحسابات"
+        "ACCOUNTS_TREE": {
+          "LABEL": "شجره الحسابات"
         }
       },
-      "delivery": {
-        "label": "الديليفري",
-        "deliveryMen": {
-          "label": "بيانات الديليفري"
+      "DELIVERY": {
+        "LABEL": "الديليفري",
+        "DELIVERY_MEN": {
+          "LABEL": "بيانات الديليفري"
         }
       },
-      "users": {
-        "label": "المستخدمين",
-        "addUser": {
-          "label": "إضافه مستخدم"
+      "USERS": {
+        "LABEL": "المستخدمين",
+        "ADD_USER": {
+          "LABEL": "إضافه مستخدم"
         }
       },
-      "settings": {
-        "label": "الاعدادات",
-        "program": {
-          "label": "إعدادات البرنامج"
+      "SETTINGS": {
+        "LABEL": "الاعدادات",
+        "PROGRAM": {
+          "LABEL": "إعدادات البرنامج"
         },
-        "financial": {
-          "label": "إعدادات الماليه"
+        "FINANCIAL": {
+          "LABEL": "إعدادات الماليه"
         },
-        "dailyJournal": {
-          "label": "إداره فتح/ غلق اليوميه"
+        "DAILY_JOURNAL": {
+          "LABEL": "إداره فتح/ غلق اليوميه"
         },
-        "qr": {
-          "label": "طابعه ال QR"
+        "QR": {
+          "LABEL": "طابعه ال QR"
         },
-        "defaultAccounts": {
-          "label": "إعدادات الحسابات الإفتراضيه"
+        "DEFAULT_ACCOUNTS": {
+          "LABEL": "إعدادات الحسابات الإفتراضيه"
         },
-        "addPrinter": {
-          "label": "إضافه طابعه"
+        "ADD_PRINTER": {
+          "LABEL": "إضافه طابعه"
         },
-        "printer": {
-          "label": "اعدادات الطابعه"
+        "PRINTER": {
+          "LABEL": "اعدادات الطابعه"
         }
       },
-      "appInfo": {
-        "label": "بيانات البرنامج",
-        "profile": {
-          "label": "الملف الشخصي"
+      "APP_INFO": {
+        "LABEL": "بيانات البرنامج",
+        "PROFILE": {
+          "LABEL": "الملف الشخصي"
         },
-        "restaurant": {
-          "label": "بيانات المطعم"
+        "RESTAURANT": {
+          "LABEL": "بيانات المطعم"
         }
       }
     }
   },
 
-  "form": {
-    "phoneNumber": "رقم الجوال",
-    "number": "الرقم",
-    "email": "البريد الالكتروني",
-    "deliveryName": "اسم الديليفري",
-    "address": "العنوان",
-    "identityNumber": "رقم الهويه",
-    "description": "البيان",
-    "userName": "اسم المستخدم",
-    "userType": "نوع المستخدم",
-    "userCondition": "حاله المستخدم",
-    "cashierCollectionAccount": "حساب تحصيل الكاشير",
-    "custodyAccount": "حساب العهده",
-    "cashPaymentAccount": "حساب المدفوعات كاش",
-    "bankPaymentAccount": "حساب المدفوعات شبكه",
-    "customerName": "اسم العميل",
-    "customerAddress": "عنوان العميل",
-    "secondaryPhoneNumber": "رقم جوال إضافي",
-    "commercialRegister": "السجل التجاري",
-    "taxNumber": "الرقم الضريبي",
-    "city": "المدينة",
-    "district": "الحي",
-    "street": "الشارع",
-    "building": "العمارة",
-    "postalCode": "الرقم البريدي",
-    "floor": "الدور",
-    "apartment": "الشقة",
-    "isCompany": "العميل يعتبر شركة",
-    "company": "الشركه",
-    "voucherNumber": "رقم السند",
-    "date": "التاريخ",
-    "ledgerNumber": "الرقم الدفتري",
-    "amount": "المبلغ",
-    "paid": "مدفوع",
-    "postponed": "معلق",
-    "network": "شبكة",
-    "cash": "كاش",
-    "cashPaid": "المدفوعات كاش",
-    "networkPaid": "المدفوعات شبكة",
-    "accountName": "اسم الحساب",
-    "cashAccount": "حساب كاش",
-    "networkAccount": "حساب شبكة"
+  "FORM": {
+    "PHONE_NUMBER": "رقم الجوال",
+    "NUMBER": "الرقم",
+    "EMAIL": "البريد الالكتروني",
+    "DELIVERY_NAME": "اسم الديليفري",
+    "ADDRESS": "العنوان",
+    "IDENTITY_NUMBER": "رقم الهويه",
+    "DESCRIPTION": "البيان",
+    "USER_NAME": "اسم المستخدم",
+    "USER_TYPE": "نوع المستخدم",
+    "USER_CONDITION": "حاله المستخدم",
+    "CASHIER_COLLECTION_ACCOUNT": "حساب تحصيل الكاشير",
+    "CUSTODY_ACCOUNT": "حساب العهده",
+    "CASH_PAYMENT_ACCOUNT": "حساب المدفوعات كاش",
+    "BANK_PAYMENT_ACCOUNT": "حساب المدفوعات شبكه",
+    "CUSTOMER_NAME": "اسم العميل",
+    "CUSTOMER_ADDRESS": "عنوان العميل",
+    "SECONDARY_PHONE_NUMBER": "رقم جوال إضافي",
+    "COMMERCIAL_REGISTER": "السجل التجاري",
+    "TAX_NUMBER": "الرقم الضريبي",
+    "CITY": "المدينة",
+    "DISTRICT": "الحي",
+    "STREET": "الشارع",
+    "BUILDING": "العمارة",
+    "POSTAL_CODE": "الرقم البريدي",
+    "FLOOR": "الدور",
+    "APARTMENT": "الشقة",
+    "IS_COMPANY": "العميل يعتبر شركة",
+    "COMPANY": "الشركه",
+    "VOUCHER_NUMBER": "رقم السند",
+    "DATE": "التاريخ",
+    "LEDGER_NUMBER": "الرقم الدفتري",
+    "AMOUNT": "المبلغ",
+    "PAID": "مدفوع",
+    "POSTPONED": "معلق",
+    "NETWORK": "شبكة",
+    "CASH": "كاش",
+    "CASH_PAID": "المدفوعات كاش",
+    "NETWORK_PAID": "المدفوعات شبكة",
+    "ACCOUNT_NAME": "اسم الحساب",
+    "CASH_ACCOUNT": "حساب كاش",
+    "NETWORK_ACCOUNT": "حساب شبكة"
   },
 
-  "actions": {
-    "save": "حفظ",
-    "cancel": "الغاء",
-    "new": "جديد",
-    "submit": "حفظ",
-
-    "add": "اضافة",
-    "edit": "تعديل",
-    "delete": "حذف",
-    "open": "فتح",
-    "close": "اغلاق",
-    "print": "طباعه",
-    "download": "تحميل",
-    "search": "بحث",
-    "tools": "الادوات",
-    "active": "نشط"
+  "ACTIONS": {
+    "SAVE": "حفظ",
+    "CANCEL": "الغاء",
+    "NEW": "جديد",
+    "SUBMIT": "حفظ",
+    "ADD": "اضافة",
+    "EDIT": "تعديل",
+    "DELETE": "حذف",
+    "OPEN": "فتح",
+    "CLOSE": "اغلاق",
+    "PRINT": "طباعه",
+    "DOWNLOAD": "تحميل",
+    "SEARCH": "بحث",
+    "TOOLS": "الادوات",
+    "ACTIVE": "نشط",
+    "CLEAR_DEBT":"تصفير العجز"
   },
 
-  "deliveries": {
-    "explorer": "مستكشف الديليفري",
-    "add": "إضافة ديليفري جديد"
+  "DELIVERIES": {
+    "EXPLORER": "مستكشف الديليفري",
+    "ADD": "إضافة ديليفري جديد"
   },
 
-  "Users": {
-    "explorer": "مستكشف المستخدمين",
-    "add": "إضافة مستخدم جديد"
+  "USERS": {
+    "EXPLORER": "مستكشف المستخدمين",
+    "ADD": "إضافة مستخدم جديد"
   },
 
-  "purchasesRefunds": {
-    "explorer": "مستكشف المرتجعات",
-    "add": "إضافة مرتجع جديد"
+  "PURCHASES_REFUNDS": {
+    "EXPLORER": "مستكشف المرتجعات",
+    "ADD": "إضافة مرتجع جديد"
   },
-  "purchases": {
-    "explorer": "مستكشف المشتريات",
-    "add": "إضافة مشتريات جديدة"
+  "PURCHASES": {
+    "EXPLORER": "مستكشف المشتريات",
+    "ADD": "إضافة مشتريات جديدة"
   },
-  "openingBalances": {
-    "explorer": "مستكشف الارصدة",
-    "add": "إضافة أرصدة افتتاحية جديدة"
+  "OPENING_BALANCES": {
+    "EXPLORER": "مستكشف الارصدة",
+    "ADD": "إضافة أرصدة افتتاحية جديدة"
   },
-  "customers": {
-    "explorer": "مستكشف العملاء",
-    "add": "إضافة عميل جديد"
+  "CUSTOMERS": {
+    "EXPLORER": "مستكشف العملاء",
+    "ADD": "إضافة عميل جديد"
   },
-  "products": {
-    "explorer": "مستكشف المنتجات",
-    "add": "إضافة منتج جديد"
+  "PRODUCTS": {
+    "EXPLORER": "مستكشف المنتجات",
+    "ADD": "إضافة منتج جديد"
   },
-  "meals": {
-    "explorer": "مستكشف الوجبات",
-    "add": "إضافة وجبة جديدة"
+  "MEALS": {
+    "EXPLORER": "مستكشف الوجبات",
+    "ADD": "إضافة وجبة جديدة"
   },
-  "groups": {
-    "explorer": "مستكشف المجموعات",
-    "add": "إضافة مجموعة جديدة"
-  },
-
-  "purchasesReturns": {
-    "explorer": "مستكشف المرتجعات",
-    "add": "إضافة مرتجع جديد"
+  "GROUPS": {
+    "EXPLORER": "مستكشف المجموعات",
+    "ADD": "إضافة مجموعة جديدة"
   },
 
-  "inventory": {
-    "explorer": "مستكشف التسويات",
-    "add": "إضافة تسوية جديدة"
+  "PURCHASES_RETURNS": {
+    "EXPLORER": "مستكشف المرتجعات",
+    "ADD": "إضافة مرتجع جديد"
   },
 
-  "collectivePayments": {
-    "explorer": "مستكشف المدفوعات",
-    "add": "إضافة مدفوعات جديدة"
+  "INVENTORY": {
+    "EXPLORER": "مستكشف التسويات",
+    "ADD": "إضافة تسوية جديدة"
   },
 
-  "collectiveReceipts": {
-    "explorer": "مستكشف المدفوعات",
-    "add": "إضافة مدفوعات جديدة"
+  "COLLECTIVE_PAYMENTS": {
+    "EXPLORER": "مستكشف المدفوعات",
+    "ADD": "إضافة مدفوعات جديدة"
   },
 
-  "journals": {
-    "explorer": "مستكشف القيود",
-    "add": "إضافة قيد جديد"
+  "COLLECTIVE_RECEIPTS": {
+    "EXPLORER": "مستكشف المدفوعات",
+    "ADD": "إضافة مدفوعات جديدة"
   },
 
-  "classes": {
-    "products": {
-      "productName": "اسم المنتج",
-      "productPrice": "سعر المنتج",
-      "costPrice": "سعر التكلفه",
-      "group": "المجموعه",
-      "tax": "الضريبه",
-      "excisetax": "الضريبه الانتقائيه",
-      "addproduct": "يعتبر المنتج كااضافه",
-      "productadditives": "اضافات المنتج",
-      "description": "البيان",
-      "productImage": "صوره المنتج",
-      "productDetail": "وصف المنتج",
-      "productAddition": "المنتج كاضافه",
-      "productTax": "قيمه الضريبه"
+  "JOURNALS": {
+    "EXPLORER": "مستكشف القيود",
+    "ADD": "إضافة قيد جديد"
+  },
+
+  "CLASSES": {
+    "PRODUCTS": {
+      "PRODUCT_NAME": "اسم المنتج",
+      "PRODUCT_PRICE": "سعر المنتج",
+      "COST_PRICE": "سعر التكلفه",
+      "GROUP": "المجموعه",
+      "TAX": "الضريبه",
+      "EXCISE_TAX": "الضريبه الانتقائيه",
+      "ADD_PRODUCT": "يعتبر المنتج كااضافه",
+      "PRODUCT_ADDITIVES": "اضافات المنتج",
+      "DESCRIPTION": "البيان",
+      "PRODUCT_IMAGE": "صوره المنتج",
+      "PRODUCT_DETAIL": "وصف المنتج",
+      "PRODUCT_ADDITION": "المنتج كاضافه",
+      "PRODUCT_TAX": "قيمه الضريبه"
     },
-    "groups": {
-      "groups": "المجموعات",
-      "show": "الظهور",
-      "groupName": "اسم المجموعه",
-      "printer": "الطابعه",
-      "showgroup": "إظهار المجموعه في شاشة الكاشير",
-      "description": "البيان",
-      "all": "الكل"
+    "GROUPS": {
+      "GROUPS": "المجموعات",
+      "SHOW": "الظهور",
+      "GROUP_NAME": "اسم المجموعه",
+      "PRINTER": "الطابعه",
+      "SHOW_GROUP": "إظهار المجموعه في شاشة الكاشير",
+      "DESCRIPTION": "البيان",
+      "ALL": "الكل"
     }
   }
 }

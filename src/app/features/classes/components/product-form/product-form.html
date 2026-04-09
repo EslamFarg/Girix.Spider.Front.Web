@@ -10,9 +10,9 @@
     type="submit"
   >
     @if (formMode() === FormMode.Create) {
-      {{ 'actions.save' | translate }}
+      {{ 'ACTIONS.SAVE' | translate }}
     } @else {
-      {{ 'actions.edit' | translate }}
+      {{ 'ACTIONS.EDIT' | translate }}
     }
   </button>
   @if (formMode() === FormMode.Update) {
@@ -22,7 +22,7 @@
       class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
       variant="outlined"
     >
-      {{ 'actions.new' | translate }}
+      {{ 'ACTIONS.NEW' | translate }}
     </a>
   }
 </div>
@@ -110,19 +110,19 @@
     <!-- product info -->
     <div class="grid lg:grid-cols-3 gap-4 flex-1">
       <div>
-        <label for="productName">{{ 'classes.products.productName' | translate }}</label>
+        <label for="productName">{{ 'CLASSES.PRODUCTS.PRODUCT_NAME' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('nameAr')">
           <input
             pInputText
             id="productName"
             formControlName="nameAr"
             aria-describedby="productName-help"
-            [placeholder]="'classes.products.productName' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.PRODUCT_NAME' | translate"
           />
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productPrice">{{ 'classes.products.productPrice' | translate }}</label>
+        <label for="productPrice">{{ 'CLASSES.PRODUCTS.PRODUCT_PRICE' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('price')">
           <input
             pInputText
@@ -131,12 +131,12 @@
             id="productPrice"
             formControlName="price"
             aria-describedby="productPrice-help"
-            [placeholder]="'classes.products.productPrice' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.PRODUCT_PRICE' | translate"
           />
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="costPrice">{{ 'classes.products.costPrice' | translate }}</label>
+        <label for="costPrice">{{ 'CLASSES.PRODUCTS.COST_PRICE' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('costPrice')">
           <input
             pInputText
@@ -145,12 +145,12 @@
             id="costPrice"
             formControlName="costPrice"
             aria-describedby="costPrice-help"
-            [placeholder]="'classes.products.costPrice' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.COST_PRICE' | translate"
           />
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productName">{{ 'classes.products.group' | translate }}</label>
+        <label for="productName">{{ 'CLASSES.PRODUCTS.GROUP' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('categoryId')">
           <ng-select
             class="app-select w-full"
@@ -179,7 +179,7 @@
             [lazy]="true"
             [filter]="true"
             (onFilter)="onGroupsFilter($event)"
-            [placeholder]="'classes.products.group' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.GROUP' | translate"
             class="w-full!"
           /> -->
           <!-- <p-inputgroup-addon class="p-0! overflow-hidden">
@@ -198,7 +198,7 @@
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productName">{{ 'classes.products.tax' | translate }}</label>
+        <label for="productName">{{ 'CLASSES.PRODUCTS.TAX' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('tax')">
           <ng-select
             class="app-select w-full"
@@ -208,12 +208,12 @@
             placeholder="الكل"
             [clearable]="false"
             #customerSelect
-            [placeholder]="'classes.products.tax' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.TAX' | translate"
           />
         </app-input-error-message-handler>
       </div>
       <div>
-        <label for="productName">{{ 'classes.products.excisetax' | translate }}</label>
+        <label for="productName">{{ 'CLASSES.PRODUCTS.EXCISE_TAX' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('selectiveTax')">
           <ng-select
             class="app-select w-full"
@@ -223,7 +223,7 @@
             [clearable]="false"
             placeholder="الكل"
             #customerSelect
-            [placeholder]="'classes.products.excisetax' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.EXCISE_TAX' | translate"
           />
         </app-input-error-message-handler>
       </div>
@@ -233,12 +233,12 @@
             <input formControlName="isAddition" type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
           </app-input-error-message-handler>
           <label for="productName" class="text-dark-line text-sm font-semibold">{{
-            'classes.products.addproduct' | translate
+            'CLASSES.PRODUCTS.ADD_PRODUCT' | translate
           }}</label>
         </div>
       </div>
       <div class="lg:col-span-2 self-end">
-        <label for="productName">{{ 'classes.products.productadditives' | translate }}</label>
+        <label for="productName">{{ 'CLASSES.PRODUCTS.PRODUCT_ADDITIVES' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('idsAdditionMenuItem')">
           <ng-select
             class="app-select w-full"
@@ -256,7 +256,7 @@
               { type: 'searchEvent', value: additionsSelect.searchEvent },
               { type: 'scrollToEnd', value: additionsSelect.scrollToEnd },
             ]"
-            [placeholder]="'classes.products.productadditives' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.PRODUCT_ADDITIVES' | translate"
             (debounced)="onAdditionProductsSearch($event, additionsSelect.searchTerm ?? '')"
           >
             <ng-template ng-label-tmp let-item="item" let-clear="clear" let-item$="item$" let-index="index">
@@ -320,7 +320,7 @@
     </div>
   </div>
   <div class="mt-4">
-    <label for="productName">{{ 'classes.products.description' | translate }}</label>
+    <label for="productName">{{ 'CLASSES.PRODUCTS.DESCRIPTION' | translate }}</label>
     <app-input-error-message-handler [fc]="productFg.get('descriptionAr')">
       <textarea
         rows="5"
@@ -330,7 +330,7 @@
         id="productName"
         formControlName="descriptionAr"
         aria-describedby="productName-help"
-        [placeholder]="'classes.products.description' | translate"
+        [placeholder]="'CLASSES.PRODUCTS.DESCRIPTION' | translate"
       ></textarea>
     </app-input-error-message-handler>
   </div>

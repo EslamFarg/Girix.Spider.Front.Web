@@ -1,14 +1,18 @@
 <form class="close-daily-journal" [formGroup]="fg" (ngSubmit)="onCloseDaily()">
-  <!-- الرصيد السابق -->
   <div class="journal-row opacity-70 **:cursor-not-allowed!">
     <div class="journal-field">
-      <label class="journal-label">الرصيد السابق</label>
+      <label class="journal-label">Previous balance</label>
       <div class="doc-input">
-        <input disabled pInputText placeholder="0.0" />
+        <input
+          disabled
+          pInputText
+          placeholder="0.0"
+          [value]="currentUserDaily()?.value?.dailyJournalPeriods?.openingBalance"
+        />
       </div>
     </div>
     <div class="journal-field">
-      <label class="journal-label">الحساب</label>
+      <label class="journal-label">Account</label>
       <div class="doc-input">
         <input
           disabled
@@ -20,10 +24,9 @@
     </div>
   </div>
 
-  <!-- العهده -->
   <div class="journal-row opacity-70 **:cursor-not-allowed!">
     <div class="journal-field">
-      <label class="journal-label">العهدة</label>
+      <label class="journal-label">Custody balance</label>
       <div class="doc-input">
         <input
           disabled
@@ -34,7 +37,7 @@
       </div>
     </div>
     <div class="journal-field">
-      <label class="journal-label">الحساب</label>
+      <label class="journal-label">Account</label>
       <div class="doc-input">
         <input
           disabled
@@ -46,10 +49,9 @@
     </div>
   </div>
 
-  <!-- مبلغ غلق كاش -->
   <div class="journal-row">
     <div class="journal-field">
-      <label class="journal-label">مبلغ غلق كاش</label>
+      <label class="journal-label">Cash closing amount</label>
       <div class="doc-input">
         <app-input-error-message-handler [fc]="fg.get('cashClosingAmount')">
           <input
@@ -57,23 +59,22 @@
             id="cashClosingAmount"
             formControlName="cashClosingAmount"
             aria-describedby="cashClosingAmount-help"
-            placeholder="ادخل الرصيد"
+            placeholder="Enter amount"
           />
         </app-input-error-message-handler>
       </div>
     </div>
     <div class="journal-field opacity-70 **:cursor-not-allowed!">
-      <label class="journal-label">الحساب</label>
+      <label class="journal-label">Account</label>
       <div class="doc-input">
         <input pInputText disabled [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
       </div>
     </div>
   </div>
 
-  <!-- مبلغ غلق شيكه -->
   <div class="journal-row">
     <div class="journal-field">
-      <label class="journal-label">مبلغ غلق شيكه</label>
+      <label class="journal-label">Network closing amount</label>
       <div class="doc-input">
         <app-input-error-message-handler [fc]="fg.get('networkClosingAmount')">
           <input
@@ -81,22 +82,21 @@
             id="networkClosingAmount"
             formControlName="networkClosingAmount"
             aria-describedby="networkClosingAmount-help"
-            placeholder="ادخل الرصيد"
+            placeholder="Enter amount"
           />
         </app-input-error-message-handler>
       </div>
     </div>
     <div class="journal-field opacity-70 **:cursor-not-allowed!">
-      <label class="journal-label">الحساب</label>
+      <label class="journal-label">Account</label>
       <div class="doc-input">
-        <input pInputText disabled [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
+        <input pInputText disabled [value]="currentUserDaily()?.value?.dailyJournalPeriods?.networkAccountName" />
       </div>
     </div>
   </div>
 
-  <!-- ملاحظات -->
   <div class="journal-notes">
-    <label for="closingNotes" class="journal-label">ملاحظات</label>
+    <label for="closingNotes" class="journal-label">Notes</label>
     <div class="doc-input my-1">
       <textarea
         rows="5"
@@ -106,7 +106,7 @@
         id="closingNotes"
         formControlName="closingNotes"
         aria-describedby="closingNotes-help"
-        placeholder="ملاحظات"
+        placeholder="Notes"
       ></textarea>
     </div>
   </div>
