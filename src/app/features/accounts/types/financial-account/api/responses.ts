@@ -1,3 +1,5 @@
+import { BalanceNature, FinalAccountType } from '@/features/accounts/services/financial-account-service';
+
 export interface ICashBankCustodyAccounts {
   cash: ICashFinancialAccount[];
   bank: IBankFinancialAccount[];
@@ -56,11 +58,10 @@ enum AccountGroup {
   Revenues = 4, // الإيرادات
   Expenses = 5, // المصروفات
 }
-enum AccountStatus
-{
-    Active = 1,    // نشط
-    Inactive = 2,  // غير نشط
-    Closed = 3     // مغلق
+enum AccountStatus {
+  Active = 1, // نشط
+  Inactive = 2, // غير نشط
+  Closed = 3, // مغلق
 }
 
 export interface ITreeFinancialAccountSearchRow {
@@ -83,4 +84,17 @@ export interface IFinancialAccountSearchResponseValue {
     totalPagesCount: number;
     currentPageIndex: number;
   };
+}
+
+export interface ITreeFinancialAccountReadResponse {
+  id: number;
+  name: string;
+  stage: number;
+  parentId: number;
+  finNumber: string;
+  balanceNature: BalanceNature;
+  finalAccountBalance: number;
+  finalAccountType: FinalAccountType;
+  accountGroup: AccountGroup;
+  accountStatus: AccountStatus;
 }

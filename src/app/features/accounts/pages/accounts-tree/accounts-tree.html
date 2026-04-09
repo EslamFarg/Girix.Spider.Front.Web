@@ -1,84 +1,185 @@
 <div class="h-full overflow-auto custom-scroll">
-  <app-section-wrapper
-    class="p-4 "
-    styleClass="py-6 grid! grid-cols-1 lg:grid-cols-3 gap-4 "
-  >
-    <div class="flex flex-col gap-6 lg:col-span-2 h-full">
-      <app-section-wrapper styleClass="grid grid-cols-2 gap-4 h-fit!">
-        <div class="h-fit">
-          <label for="costPrice">رقم الحساب</label>
-          <app-input-error-message-handler>
-            <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="110001" />
+  <app-section-wrapper class="p-4" styleClass="py-6 grid! grid-cols-1 lg:grid-cols-3 gap-4 ">
+    <form
+      [formGroup]="fg"
+      (ngSubmit)="onSubmitAccount()"
+      (reset)="onResetAccount()"
+      class="flex flex-col gap-6 lg:col-span-2 h-full"
+    >
+      <app-section-wrapper styleClass="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="parentId">حساب الاب</label>
+          <app-input-error-message-handler [grouped]="false" [fc]="fg.controls.parentId">
+            <ng-select
+              class="app-select"
+              [items]="parentAccounts()"
+              bindLabel="name"
+              bindValue="id"
+              formControlName="parentId"
+              placeholder="اختر المجموعة"
+              appendTo="body"
+            />
           </app-input-error-message-handler>
         </div>
-        <div class="h-fit">
-          <label for="costPrice">إسم حساب الاب</label>
-          <app-input-error-message-handler>
-            <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="الاسم" />
+
+        <div>
+          <label for="currentAccountId">الحساب</label>
+          <app-input-error-message-handler [grouped]="false" [fc]="fg.controls.currentAccountId">
+            <ng-select
+              class="app-select"
+              [items]="flatFinancialAccounts()"
+              bindLabel="name"
+              bindValue="id"
+              formControlName="currentAccountId"
+              placeholder="اختر الحساب"
+              appendTo="body"
+              (change)="onCurrentAccountChange($event?.id ?? $event)"
+            />
+          </app-input-error-message-handler>
+        </div>
+
+        <div>
+          <label for="finNumber">رقم الحساب</label>
+          <app-input-error-message-handler [fc]="fg.controls.finNumber">
+            <input
+              pInputText
+              id="finNumber"
+              formControlName="finNumber"
+              aria-describedby="finNumber-help"
+              placeholder="رقم الحساب"
+            />
+          </app-input-error-message-handler>
+        </div>
+
+        <div>
+          <label for="nameAr">اسم الحساب</label>
+          <app-input-error-message-handler [fc]="fg.controls.nameAr">
+            <input
+              pInputText
+              id="nameAr"
+              formControlName="nameAr"
+              aria-describedby="nameAr-help"
+              placeholder="اسم الحساب"
+            />
+          </app-input-error-message-handler>
+        </div>
+
+        <div>
+          <label for="accountGroup">مجموعة الحساب</label>
+          <app-input-error-message-handler [fc]="fg.controls.accountGroup">
+            <p-select
+              [options]="accountGroupOptions"
+              optionLabel="label"
+              optionValue="value"
+              formControlName="accountGroup"
+              placeholder="اختر المجموعة"
+              class="w-full!"
+            />
+          </app-input-error-message-handler>
+        </div>
+
+        <div>
+          <label for="balanceNature">طبيعة الحساب</label>
+          <app-input-error-message-handler [fc]="fg.controls.balanceNature">
+            <p-select
+              [options]="balanceNatureOptions"
+              optionLabel="label"
+              optionValue="value"
+              formControlName="balanceNature"
+              placeholder="اختر الطبيعة"
+              class="w-full!"
+            />
+          </app-input-error-message-handler>
+        </div>
+
+        <div>
+          <label for="accountStatus">حالة الحساب</label>
+          <app-input-error-message-handler [fc]="fg.controls.accountStatus">
+            <p-select
+              [options]="accountStatusOptions"
+              optionLabel="label"
+              optionValue="value"
+              formControlName="accountStatus"
+              placeholder="اختر الحالة"
+              class="w-full!"
+            />
+          </app-input-error-message-handler>
+        </div>
+
+        <div>
+          <label for="finalAccountType">نوع الحساب الختامي</label>
+          <app-input-error-message-handler [fc]="fg.controls.finalAccountType">
+            <p-select
+              [options]="finalAccountTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              formControlName="finalAccountType"
+              placeholder="اختر النوع"
+              class="w-full!"
+            />
           </app-input-error-message-handler>
         </div>
       </app-section-wrapper>
-      <app-section-wrapper styleClass="grid grid-cols-2 gap-4">
-        <div>
-          <label for="costPrice">رقم الحساب</label>
-          <app-input-error-message-handler>
-            <input pInputText id="costPrice" aria-describedby="costPrice-help" placeholder="الاسم" />
-          </app-input-error-message-handler>
-        </div>
-        <div>
-          <label for="productName">إسم الحساب</label>
-          <app-input-error-message-handler>
-            <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
-          </app-input-error-message-handler>
-        </div>
-        <div>
-          <label for="productName">مجموعه الحساب</label>
-          <app-input-error-message-handler>
-            <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
-          </app-input-error-message-handler>
-        </div>
-        <div>
-          <label for="productName">طبيعه الحساب</label>
-          <app-input-error-message-handler>
-            <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
-          </app-input-error-message-handler>
-        </div>
-        <div>
-          <label for="productName">حاله الحساب</label>
-          <app-input-error-message-handler>
-            <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
-          </app-input-error-message-handler>
-        </div>
-        <div>
-          <label for="productName">الحساب الختامي</label>
-          <app-input-error-message-handler>
-            <p-select [options]="[]" optionLabel="name" placeholder="إختر المجموعه" class="w-full!" />
-          </app-input-error-message-handler>
-        </div>
-      </app-section-wrapper>
+
       <div class="flex items-center gap-2 justify-end">
-        <p-button styleClass="border-dark-line! bg-dark-line! text-white! py-1! sm:px-8!" label="حفظ" />
-        <p-button styleClass="border-dark-line! text-dark-line! py-1! sm:px-8!" label="حذف" variant="outlined" />
-        <p-button styleClass="border-dark-line! text-dark-line! py-1! sm:px-8!" label="جديد" variant="outlined" />
+        <p-button
+          type="submit"
+          styleClass="border-dark-line! bg-dark-line! text-white! py-1! sm:px-8!"
+          [label]="formMode() === FormMode.Create ? 'حفظ' : 'تحديث'"
+        />
+        <p-button
+          type="button"
+          styleClass="border-dark-line! text-dark-line! py-1! sm:px-8!"
+          label="حذف"
+          variant="outlined"
+          [disabled]="formMode() !== FormMode.Update"
+          (onClick)="deleteSelectedFinancialAccount($event)"
+        />
+        <p-button
+          type="reset"
+          styleClass="border-dark-line! text-dark-line! py-1! sm:px-8!"
+          label="جديد"
+          variant="outlined"
+        />
       </div>
-    </div>
+    </form>
 
     <app-section-wrapper class="h-fit w-full" styleClass="keep-border p-0!">
-      <p-tree [value]="financialAccountsNodes()" class="w-full" style="--p-tree-background: transparent; --p-tree-node-color: black">
-        <ng-template let-node pTemplate="url">
-          <a
-            [href]="node.data"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-surface-700 dark:text-surface-100 hover:text-primary"
-          >
-            {{ node.label }}
-          </a>
-        </ng-template>
+      <form [formGroup]="searchFg" (ngSubmit)="onSubmitSearch()" class="p-4 sticky top-0 z-10 bg-white">
+        <app-input-error-message-handler [fc]="searchFg.controls.searchTerm">
+          <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
+          <p-inputgroup-addon class="relative">
+            <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+            <p-menu
+              dir="rtl"
+              [class]="`*:top-full! *:left-0! `"
+              #filterMenu
+              [model]="filterOptions"
+              [popup]="true"
+              [style]="{ insetInlineEnd: '100%' }"
+            />
+          </p-inputgroup-addon>
+          <p-inputgroup-addon>
+            <button pButton type="submit" class="border-0! cursor-pointer">
+              <i class="pi pi-search"></i>
+            </button>
+          </p-inputgroup-addon>
+        </app-input-error-message-handler>
+      </form>
+
+      <p-tree
+        [value]="financialAccountsNodes()"
+        selectionMode="single"
+        [selection]="selectedTreeNode()"
+        (onNodeSelect)="onTreeNodeSelect($event.node)"
+        (onNodeDoubleClick)="onTreeNodeSelect($event.node)"
+        class="w-full"
+        style="--p-tree-background: transparent; --p-tree-node-color: black"
+      >
         <ng-template let-node pTemplate="default">
-          <div class="flex items-center" gap-2>
+          <div class="flex items-center gap-2 cursor-pointer hover:bg-gray-500">
             <i class="pi pi-file"></i>
-            <b class="ms-2">{{ node.label }}</b>
+            <b>{{ node.label }}</b>
           </div>
         </ng-template>
       </p-tree>
