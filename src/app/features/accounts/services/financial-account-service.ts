@@ -3,10 +3,12 @@ import { Injectable } from '@angular/core';
 import {
   ICashBankCustodyAccounts,
   IFinancialAccountSearchResponseValue,
+  IFinancialAccountSearchRow,
+  IFinancialAccountTreeResponseValue,
+  IFinancialAccountTreeRow,
   ITreeFinancialAccountReadResponse,
 } from '../types';
-import { BaseCrudService } from '@/core/services/BaseCrudService';
-import { BaseSearchAndCrudService, ISearchCriteria, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
+import { BaseSearchAndCrudService, IBaseSearchResponse, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import { IFinancialAccountCreateRequest, IFinancialAccountUpdateRequest } from '../types/financial-account/api/request';
 
 export enum FinancialAccountSearchEnum {
@@ -54,8 +56,30 @@ export class FinancialAccountService extends BaseSearchAndCrudService<
     super();
   }
 
-  getFinancialAccountTree(dto: ISearchCriteria<FinancialAccountSearchEnum>) {
-    return this.search({ ...dto, searchEndpoint: 'GetFinancialAccountTree' });
+  getFullTree() {
+    return this.http.post<IBaseSearchResponse<IFinancialAccountTreeResponseValue>>(`${this.apiUrl}/GetFinancialAccountTree`, {
+      criteriaDto: {
+        paginationInfo: {
+          pageIndex: 0,
+          pageSize: 0,
+        },
+      },
+      searchFilters: [
+        {
+          column: 0,
+          values: [''],
+        },
+      ],
+      fromDate: null,
+      toDate: this.localDateIso,
+    });
+  }
+
+  flattenTree(accounts: IFinancialAccountTreeRow[]): IFinancialAccountSearchRow[] {
+    return accounts.flatMap((account) => {
+      const { children, ...flatAccount } = account;
+      return [flatAccount, ...this.flattenTree(children)];
+    });
   }
 
   getCashAndBankAccountsAndCustodyAccounts() {

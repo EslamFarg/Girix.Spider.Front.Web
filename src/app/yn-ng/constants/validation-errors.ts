@@ -11,6 +11,12 @@ export const ValidationErrors = {
       en: labels.messageEn,
     };
   },
+  labeledRegex(labels:{messageAr: string, messageEn: string}) {
+    return {
+      ar: labels.messageAr,
+      en: labels.messageEn,
+    };
+  },
   minlength({ requiredLength, actualLength }: { requiredLength: number; actualLength: number }) {
     return {
       ar: `يجب تعبئة هذا الحقل بحد اقل ${requiredLength}`,
@@ -82,5 +88,8 @@ export const ValidationErrors = {
   },
   mobile() {
     return { ar: 'رقم الجوال غير صالح', en: 'The mobile number is not valid' };
+  },
+  onlyNumbersOrEnLettersAllowed() {
+    return { ar: 'مسموح فقط بالارقام والحروف الانجليزية', en: 'Only numbers and English letters are allowed' };
   },
 };

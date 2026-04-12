@@ -202,7 +202,8 @@
     "NETWORK_PAID": "المدفوعات شبكة",
     "ACCOUNT_NAME": "اسم الحساب",
     "CASH_ACCOUNT": "حساب كاش",
-    "NETWORK_ACCOUNT": "حساب شبكة"
+    "NETWORK_ACCOUNT": "حساب شبكة",
+    "TAX_VALUE": "قيمه الضريبه"
   },
 
   "ACTIONS": {
@@ -220,7 +221,7 @@
     "SEARCH": "بحث",
     "TOOLS": "الادوات",
     "ACTIVE": "نشط",
-    "CLEAR_DEBT":"تصفير العجز"
+    "CLEAR_DEBT": "تصفير العجز"
   },
 
   "DELIVERIES": {
@@ -289,19 +290,18 @@
 
   "CLASSES": {
     "PRODUCTS": {
-      "PRODUCT_NAME": "اسم المنتج",
-      "PRODUCT_PRICE": "سعر المنتج",
+      "NAME": "اسم المنتج",
+      "PRICE": "سعر المنتج",
       "COST_PRICE": "سعر التكلفه",
       "GROUP": "المجموعه",
       "TAX": "الضريبه",
       "EXCISE_TAX": "الضريبه الانتقائيه",
-      "ADD_PRODUCT": "يعتبر المنتج كااضافه",
-      "PRODUCT_ADDITIVES": "اضافات المنتج",
+      "IS_ADDITION": "يعتبر المنتج كااضافه",
+      "ADDITIONS": "اضافات المنتج",
       "DESCRIPTION": "البيان",
-      "PRODUCT_IMAGE": "صوره المنتج",
-      "PRODUCT_DETAIL": "وصف المنتج",
-      "PRODUCT_ADDITION": "المنتج كاضافه",
-      "PRODUCT_TAX": "قيمه الضريبه"
+      "IMAGE": "صوره المنتج",
+      "DETAIL": "وصف المنتج",
+      "PRODUCT_ADDITION": "المنتج كاضافه"
     },
     "GROUPS": {
       "GROUPS": "المجموعات",

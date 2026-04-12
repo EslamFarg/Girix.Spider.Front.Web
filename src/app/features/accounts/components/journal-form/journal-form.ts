@@ -9,6 +9,7 @@ import { ITreeFinancialAccountSearchRow, IJournalEntryReadResponse } from '../..
 import { AllowNumbers } from '@/directives/allow-numbers';
 import {
   InputErrorMessageHandler,
+  labeledRegexValidator,
   noSymbolsAllowed,
   onlyArLettersAllowed,
   onlyNumbersOrEnLettersAllowed,
@@ -75,8 +76,13 @@ export class JournalForm extends BaseComponent {
     // المرجع
     refNumber: this.fb.control<string | null>(null, [
       Validators.required,
+      Validators.minLength(2),
       Validators.maxLength(16),
-      onlyNumbersOrEnLettersAllowed,
+      labeledRegexValidator(
+        /^[a-zA-Z0-9-]*$/,
+        'مسموح فقط بالارقام والحروف الانجليزية و "-"',
+        'only numbers or english letters or "-" allowed',
+      ),
     ]),
     // الرقم الدفتري
     voucherNo: this.fb.control<string | null>(null, [Validators.required]),
@@ -116,11 +122,7 @@ export class JournalForm extends BaseComponent {
       case FormMode.Create:
         break;
       case FormMode.Update:
-        this.journalEntryService.getById(this.id()).subscribe({
-          next: (data) => {
-            this.debouncedJournalSearch(data.id.toString());
-          },
-        });
+        this.debouncedJournalSearch(this.id().toString());
         break;
     }
   }
@@ -139,7 +141,6 @@ export class JournalForm extends BaseComponent {
   //
 
   onSubmitJournal() {
-    console.log(this.fg.value);
     if (this.fg.invalid) {
       this.fg.markAllAsTouched();
       return;

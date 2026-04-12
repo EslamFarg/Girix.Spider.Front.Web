@@ -70,3 +70,10 @@ export function labeledRequiredValidator(messageAr: string, messageEn: string): 
     };
   };
 }
+
+export function labeledRegexValidator(regex: RegExp, messageAr: string, messageEn: string): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
+    return regex.test(control.value) ? null : { labeledRegex: { messageAr, messageEn } };
+  };
+}

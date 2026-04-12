@@ -64,7 +64,7 @@ enum AccountStatus {
   Closed = 3, // مغلق
 }
 
-export interface ITreeFinancialAccountSearchRow {
+export interface IFinancialAccountSearchRow {
   id: number;
   name: string;
   parentId: any;
@@ -74,11 +74,32 @@ export interface ITreeFinancialAccountSearchRow {
   finalAccountType: FinancailAccountType;
   accountGroup: AccountGroup;
   accountStatus: AccountStatus;
-  children: ITreeFinancialAccountSearchRow[];
+}
+export interface IFinancialAccountTreeRow {
+  id: number;
+  name: string;
+  parentId: any;
+  stage: number;
+  finNumber: string;
+  balanceNature: number;
+  finalAccountType: FinancailAccountType;
+  accountGroup: AccountGroup;
+  accountStatus: AccountStatus;
+  children: IFinancialAccountTreeRow[];
 }
 
+export type ITreeFinancialAccountSearchRow = IFinancialAccountSearchRow;
+
+export interface IFinancialAccountTreeResponseValue {
+  rows: IFinancialAccountTreeRow[];
+  paginationInfo: {
+    totalRowsCount: number;
+    totalPagesCount: number;
+    currentPageIndex: number;
+  };
+}
 export interface IFinancialAccountSearchResponseValue {
-  rows: ITreeFinancialAccountSearchRow[];
+  rows: IFinancialAccountSearchRow[];
   paginationInfo: {
     totalRowsCount: number;
     totalPagesCount: number;

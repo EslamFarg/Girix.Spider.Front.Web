@@ -107,22 +107,26 @@
       >
       </app-slider>
     </div>
+
     <!-- product info -->
     <div class="grid lg:grid-cols-3 gap-4 flex-1">
+      <!-- name -->
       <div>
-        <label for="productName">{{ 'CLASSES.PRODUCTS.PRODUCT_NAME' | translate }}</label>
+        <label for="productName">{{ 'CLASSES.PRODUCTS.NAME' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('nameAr')">
           <input
             pInputText
             id="productName"
             formControlName="nameAr"
             aria-describedby="productName-help"
-            [placeholder]="'CLASSES.PRODUCTS.PRODUCT_NAME' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.NAME' | translate"
           />
         </app-input-error-message-handler>
       </div>
+
+      <!-- price -->
       <div>
-        <label for="productPrice">{{ 'CLASSES.PRODUCTS.PRODUCT_PRICE' | translate }}</label>
+        <label for="productPrice">{{ 'CLASSES.PRODUCTS.PRICE' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('price')">
           <input
             pInputText
@@ -131,10 +135,12 @@
             id="productPrice"
             formControlName="price"
             aria-describedby="productPrice-help"
-            [placeholder]="'CLASSES.PRODUCTS.PRODUCT_PRICE' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.PRICE' | translate"
           />
         </app-input-error-message-handler>
       </div>
+
+      <!-- cost -->
       <div>
         <label for="costPrice">{{ 'CLASSES.PRODUCTS.COST_PRICE' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('costPrice')">
@@ -149,6 +155,8 @@
           />
         </app-input-error-message-handler>
       </div>
+
+      <!-- group -->
       <div>
         <label for="productName">{{ 'CLASSES.PRODUCTS.GROUP' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('categoryId')">
@@ -197,6 +205,8 @@
           </p-inputgroup-addon> -->
         </app-input-error-message-handler>
       </div>
+
+      <!-- tax -->
       <div>
         <label for="productName">{{ 'CLASSES.PRODUCTS.TAX' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('tax')">
@@ -212,6 +222,8 @@
           />
         </app-input-error-message-handler>
       </div>
+
+      <!-- excise -->
       <div>
         <label for="productName">{{ 'CLASSES.PRODUCTS.EXCISE_TAX' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('selectiveTax')">
@@ -227,18 +239,22 @@
           />
         </app-input-error-message-handler>
       </div>
+
+      <!-- is addition -->
       <div class="flex flex-col justify-end">
         <div class="flex items-center h-fit gap-2 pb-1">
           <app-input-error-message-handler [fc]="productFg.get('isAddition')">
             <input formControlName="isAddition" type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
           </app-input-error-message-handler>
           <label for="productName" class="text-dark-line text-sm font-semibold">{{
-            'CLASSES.PRODUCTS.ADD_PRODUCT' | translate
+            'CLASSES.PRODUCTS.IS_ADDITION' | translate
           }}</label>
         </div>
       </div>
+
+      <!-- additions -->
       <div class="lg:col-span-2 self-end">
-        <label for="productName">{{ 'CLASSES.PRODUCTS.PRODUCT_ADDITIVES' | translate }}</label>
+        <label for="productName">{{ 'CLASSES.PRODUCTS.ADDITIONS' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('idsAdditionMenuItem')">
           <ng-select
             class="app-select w-full"
@@ -256,7 +272,7 @@
               { type: 'searchEvent', value: additionsSelect.searchEvent },
               { type: 'scrollToEnd', value: additionsSelect.scrollToEnd },
             ]"
-            [placeholder]="'CLASSES.PRODUCTS.PRODUCT_ADDITIVES' | translate"
+            [placeholder]="'CLASSES.PRODUCTS.ADDITIONS' | translate"
             (debounced)="onAdditionProductsSearch($event, additionsSelect.searchTerm ?? '')"
           >
             <ng-template ng-label-tmp let-item="item" let-clear="clear" let-item$="item$" let-index="index">

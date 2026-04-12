@@ -24,6 +24,7 @@
   </div>
 
   <div class="grid md:grid-cols-4 gap-4 flex-1 my-4">
+
     <!-- رقم القيد -->
     <div>
       <label for="id">رقم القيد</label>
@@ -31,6 +32,7 @@
         <input type="text" pInputText id="id" formControlName="id" aria-describedby="id-help" placeholder="الاسم" />
       </app-input-error-message-handler>
     </div>
+
     <!-- بحث برقم القيد -->
     <form
       #searchVoucherForm
@@ -66,6 +68,7 @@
         </p-inputgroup-addon>
       </app-input-error-message-handler>
     </form>
+
     <!-- date -->
     <div class="md:col-span-2">
       <label for="voucherDate">التاريخ</label>
@@ -109,10 +112,11 @@
         </p-datepicker>
       </app-input-error-message-handler>
     </div>
+    
     <!-- الرقم الدفتري -->
     <div class="md:col-span-2">
       <label for="voucherNo">الرقم الدفتري</label>
-      <app-input-error-message-handler>
+      <app-input-error-message-handler [fc]="fg.controls.voucherNo">
         <input
           type="text"
           pInputText
@@ -123,31 +127,33 @@
         />
       </app-input-error-message-handler>
     </div>
+    
     <!-- المرجع -->
     <div class="md:col-span-2">
-      <label for="costPrice">المرجع</label>
-      <app-input-error-message-handler [fc]="fg.get('refNumber')">
+      <label for="refNumber">المرجع</label>
+      <app-input-error-message-handler [fc]="fg.controls.refNumber">
         <input
           pInputText
           type="text"
-          id="costPrice"
+          id="refNumber"
           formControlName="refNumber"
-          aria-describedby="costPrice-help"
+          aria-describedby="refNumber-help"
           placeholder="المرجع"
         />
       </app-input-error-message-handler>
     </div>
 
+    <!-- البيان -->
     <div class="md:col-span-4">
-      <label for="productName">البيان</label>
-      <app-input-error-message-handler [fc]="fg.get('notes')">
+      <label for="notes">البيان</label>
+      <app-input-error-message-handler [fc]="fg.controls.notes">
         <textarea
           rows="5"
           class="w-full"
           pTextarea
           formControlName="notes"
-          id="productName"
-          aria-describedby="productName-help"
+          id="notes"
+          aria-describedby="notes-help"
           placeholder="البيان"
         ></textarea>
       </app-input-error-message-handler>

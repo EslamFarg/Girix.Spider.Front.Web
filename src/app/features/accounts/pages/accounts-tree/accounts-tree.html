@@ -7,6 +7,7 @@
       class="flex flex-col gap-6 lg:col-span-2 h-full"
     >
       <app-section-wrapper styleClass="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- parent account -->
         <div>
           <label for="parentId">حساب الاب</label>
           <app-input-error-message-handler [grouped]="false" [fc]="fg.controls.parentId">
@@ -15,20 +16,15 @@
               [items]="parentAccounts()"
               bindLabel="name"
               bindValue="id"
+              (change)="onParentAccountChange($event?.id ?? null)"
               formControlName="parentId"
               placeholder="اختر المجموعة"
               appendTo="body"
-              #parentAccountSelect
-              appDebounce
-              [customEvents]="[
-                { type: 'searchEvent', value: parentAccountSelect.searchEvent },
-                { type: 'scrollToEnd', value: parentAccountSelect.scrollToEnd },
-              ]"
-              (debounced)="debouncedSelectableAccountsSearch('parent', $event, parentAccountSelect.searchTerm)"
             />
           </app-input-error-message-handler>
         </div>
 
+        <!-- current account -->
         <div>
           <label for="currentAccountId">الحساب</label>
           <app-input-error-message-handler [grouped]="false" [fc]="fg.controls.currentAccountId">
@@ -39,15 +35,8 @@
               bindValue="id"
               formControlName="currentAccountId"
               placeholder="اختر الحساب"
+              (change)="onCurrentAccountChange($event)"
               appendTo="body"
-              #currentAccountSelect
-              appDebounce
-              [customEvents]="[
-                { type: 'searchEvent', value: currentAccountSelect.searchEvent },
-                { type: 'scrollToEnd', value: currentAccountSelect.scrollToEnd },
-              ]"
-              (debounced)="debouncedSelectableAccountsSearch('current', $event, currentAccountSelect.searchTerm)"
-              (change)="onCurrentAccountChange($event?.id ?? $event)"
             />
           </app-input-error-message-handler>
         </div>
@@ -147,7 +136,7 @@
           label="حذف"
           variant="outlined"
           [disabled]="formMode() !== FormMode.Update"
-          (onClick)="deleteSelectedFinancialAccount($event)"
+          (onClick)="deleteFinancialAccount($event)"
         />
         <p-button
           type="reset"

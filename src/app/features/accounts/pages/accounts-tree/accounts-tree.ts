@@ -16,7 +16,7 @@ import {
 } from '../../services/financial-account-service';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { PaginatorState } from 'primeng/paginator';
-import { ITreeFinancialAccountSearchRow } from '../../types';
+import { IFinancialAccountSearchRow, IFinancialAccountTreeRow } from '../../types';
 import { Select } from 'primeng/select';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { Debounce, IDebounceEvent } from '@/directives/debounce';
@@ -27,6 +27,10 @@ interface IOption<T> {
   label: string;
   value: T;
 }
+
+type AccountTreeRow = IFinancialAccountTreeRow;
+type AccountOptionRow = IFinancialAccountSearchRow;
+type AccountRow = AccountTreeRow | AccountOptionRow;
 
 @Component({
   selector: 'app-accounts-tree',
@@ -54,8 +58,9 @@ export class AccountsTree extends BaseComponent {
 
   financialAccountsNodes = signal<TreeNode[]>([]);
   selectedTreeNode = signal<TreeNode | null>(null);
-  selectedFinancialAccount = signal<ITreeFinancialAccountSearchRow | null>(null);
-  allFinancialAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
+  selectedFinancialAccount = signal<AccountOptionRow | null>(null);
+  allFinancialAccounts = signal<AccountTreeRow[]>([]);
+  allFlatFinancialAccounts = signal<AccountOptionRow[]>([]);
 
   formMode = computed(() => (this.selectedFinancialAccount() ? FormMode.Update : FormMode.Create));
 
@@ -93,13 +98,6 @@ export class AccountsTree extends BaseComponent {
     },
   ];
 
-  periodOptions = [
-    { label: 'الكل', value: null },
-    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
-    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
-    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
-    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
-  ];
 
   accountGroupOptions: IOption<AccountGroup>[] = [
     { label: 'الاصول', value: AccountGroup.Assets },
@@ -126,98 +124,43 @@ export class AccountsTree extends BaseComponent {
     { label: 'الميزانية', value: FinalAccountType.BalanceSheet },
   ];
 
-  financialAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
-  parentAccountSearchResults = signal<ITreeFinancialAccountSearchRow[]>([]);
-  currentAccountSearchResults = signal<ITreeFinancialAccountSearchRow[]>([]);
-  flatFinancialAccounts = computed(() => this.flattenAccounts(this.financialAccounts()));
-  currentAccountOptions = computed(() => {
-    const selectedAccount = this.selectedFinancialAccount();
-    const options = this.currentAccountSearchResults();
-
-    if (!selectedAccount) {
-      return options;
-    }
-
-    return this.mergeSelectedAccount(options, selectedAccount);
-  });
+  financialAccounts = signal<AccountTreeRow[]>([]);
+  currentParentAccountId = signal<number | null>(null);
+  currentAccountId = signal<number | null>(null);
+  currentAccountOptions = computed(() =>
+    this.allFlatFinancialAccounts().filter((item) => item.id !== this.currentParentAccountId()),
+  );
+  onParentAccountChange(parentAccountId: number | null) {
+    if (!parentAccountId) return;
+    this.currentParentAccountId.set(parentAccountId);
+  }
   parentAccounts = computed(() => {
-    const currentAccountId = this.fg.controls.currentAccountId.value;
-    const selectedParentAccount = this.getSelectedParentAccount();
-    const options = this.mergeSelectedAccount(this.parentAccountSearchResults(), selectedParentAccount)
-      .filter((item) => item.id !== currentAccountId)
-      .map((item) => ({
-        id: item.id,
-        name: item.name,
-      }));
-
-    if (this.formMode() === FormMode.Update && this.fg.controls.parentId.value === -1) {
-      return [{ id: -1, name: 'بدون' }, ...options];
-    }
-
-    return options;
+    const accountsWithoutCurrent = this.allFlatFinancialAccounts().filter(
+      (item) => item.id !== this.currentAccountId(),
+    );
+    return accountsWithoutCurrent;
   });
-
-  financialAccountsPaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
-    totalRowsCount: 0,
-    totalPagesCount: 0,
-  };
-  parentAccountsPaginationInfo: IPaginationInfo = {
-    pageIndex: 0,
-    totalRowsCount: 0,
-    totalPagesCount: 0,
-  };
-  currentAccountsPaginationInfo: IPaginationInfo = {
-    pageIndex: 0,
-    totalRowsCount: 0,
-    totalPagesCount: 0,
-  };
 
   constructor() {
     super();
-    this.searchFinancialAccounts(1);
-    this.searchSelectableAccounts('parent', 1);
-    this.searchSelectableAccounts('current', 1);
+    this.getFullFinancialAccountsTree();
   }
 
-  searchFinancialAccounts(pageIndex: number, selectedAccountId?: number | null) {
-    this.financialAccountService
-      .getFinancialAccountTree({
-        paginationInfo: {
-          pageIndex,
-          pageSize: 10,
-        },
-        searchFilters: [
-          {
-            column: this.searchFg.getRawValue().searchEnum,
-            values: [this.searchFg.getRawValue().searchTerm],
-          },
-        ],
-        fromDate: this.searchFg.getRawValue().fromDate,
-      })
-      .subscribe({
-        next: (res) => {
-          this.allFinancialAccounts.set(res.value.rows);
-          this.applyTreeFilter();
-          this.financialAccountsPaginationInfo = {
-            pageIndex,
-            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
-
-          if (selectedAccountId) {
-            const selected = this.findAccountById(res.value.rows, selectedAccountId);
-            if (selected) {
-              this.bindFinancialAccount(selected);
-            }
-          }
-        },
-      });
+  getFullFinancialAccountsTree() {
+    this.financialAccountService.getFullTree().subscribe({
+      next: (res) => {
+        this.allFinancialAccounts.set(res.value.rows);
+        const flatAccounts = this.financialAccountService.flattenTree(res.value.rows);
+        console.log(flatAccounts);
+        this.allFlatFinancialAccounts.set(flatAccounts);
+        // this.parentAccountOptionsSource.set(flatAccounts);
+        // this.currentAccountOptionsSource.set(flatAccounts);
+        this.applyTreeFilter();
+      },
+    });
   }
 
   onSubmitSearch = () => this.searchFg.valid && this.applyTreeFilter();
-
-  onPageChange = (event: PaginatorState) => this.searchFinancialAccounts(event.page! + 1);
 
   onSubmitAccount() {
     if (this.fg.invalid) {
@@ -244,7 +187,7 @@ export class AccountsTree extends BaseComponent {
           })
           .subscribe({
             next: (createdId) => {
-              this.searchFinancialAccounts(1, createdId);
+              this.getFullFinancialAccountsTree();
               this.resetFormState();
             },
           });
@@ -259,7 +202,7 @@ export class AccountsTree extends BaseComponent {
           })
           .subscribe({
             next: (updatedId) => {
-              this.searchFinancialAccounts(this.financialAccountsPaginationInfo.pageIndex, updatedId || formValue.id);
+              this.getFullFinancialAccountsTree();
             },
           });
         break;
@@ -270,8 +213,10 @@ export class AccountsTree extends BaseComponent {
     this.resetFormState();
   }
 
-  bindFinancialAccount(account: ITreeFinancialAccountSearchRow) {
-    this.selectedFinancialAccount.set(account);
+  bindFinancialAccount(account: AccountRow) {
+    this.selectedFinancialAccount.set(this.toSelectableAccount(account));
+    this.currentParentAccountId.set(account.parentId);
+    this.currentAccountId.set(account.id);
     this.fg.patchValue({
       id: account.id,
       parentId: account.parentId ?? -1,
@@ -285,16 +230,21 @@ export class AccountsTree extends BaseComponent {
     });
   }
 
-  onCurrentAccountChange(accountId: number | null) {
-    if (!accountId) {
+  onCurrentAccountChange(account: IFinancialAccountSearchRow | null) {
+    if (!account) {
       this.resetFormState();
       return;
     }
 
+    this.currentParentAccountId.set(account.parentId);
+    this.currentAccountId.set(account.id);
+    const accountId = account.id;
+
     const selected =
-      this.currentAccountSearchResults().find((account) => account.id === accountId) ??
-      this.findAccountById(this.allFinancialAccounts(), accountId) ??
-      this.findAccountById(this.financialAccounts(), accountId);
+      //   this.currentAccountOptionsSource().find((account) => account.id === accountId) ??
+      this.allFlatFinancialAccounts().find((account) => account.id === accountId);
+    //   this.findAccountById(this.allFinancialAccounts(), accountId) ??
+    //   this.findAccountById(this.financialAccounts(), accountId);
 
     if (selected) {
       this.bindFinancialAccount(selected);
@@ -302,15 +252,17 @@ export class AccountsTree extends BaseComponent {
   }
 
   onTreeNodeSelect(node: TreeNode) {
-     const account = node.data as ITreeFinancialAccountSearchRow | undefined;
+    const account = node.data as AccountTreeRow | undefined;
     if (!account) return;
 
-    this.selectedTreeNode.set( node);
+    this.selectedTreeNode.set(node);
     this.bindFinancialAccount(account);
   }
 
-  deleteSelectedFinancialAccount(event: Event) {
+
+  deleteFinancialAccount(event: Event) {
     const account = this.selectedFinancialAccount();
+    
     if (!account) {
       this.messageService.add({
         severity: 'warn',
@@ -320,10 +272,6 @@ export class AccountsTree extends BaseComponent {
       return;
     }
 
-    this.deleteFinancialAccount(account.id, event);
-  }
-
-  deleteFinancialAccount(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'هل انت متاكد من حذف الحساب',
@@ -340,10 +288,10 @@ export class AccountsTree extends BaseComponent {
         severity: 'danger',
       },
       accept: () => {
-        this.financialAccountService.delete(id).subscribe({
+        this.financialAccountService.delete(account.id).subscribe({
           next: () => {
             this.resetFormState();
-            this.searchFinancialAccounts(1);
+            this.getFullFinancialAccountsTree();
           },
         });
       },
@@ -369,33 +317,13 @@ export class AccountsTree extends BaseComponent {
     });
   }
 
-  debouncedSelectableAccountsSearch(
-    target: 'parent' | 'current',
-    event: IDebounceEvent,
-    searchValue: string = '',
-  ) {
-    const paginationInfo =
-      target === 'parent' ? this.parentAccountsPaginationInfo : this.currentAccountsPaginationInfo;
-
-    if (event.type === 'scrollToEnd') {
-      if (paginationInfo.pageIndex < paginationInfo.totalPagesCount) {
-        this.searchSelectableAccounts(target, paginationInfo.pageIndex + 1, searchValue);
-      }
-
-      return;
-    }
-
-    this.searchSelectableAccounts(target, 1, searchValue);
-  }
-
   private applyTreeFilter() {
     const { searchTerm, searchEnum } = this.searchFg.getRawValue();
     const filteredAccounts = this.filterAccountsTree(this.allFinancialAccounts(), searchTerm, searchEnum);
-    this.financialAccounts.set(filteredAccounts);
     this.financialAccountsNodes.set(this.mapTreeNodes(filteredAccounts));
   }
 
-  private mapTreeNodes(accounts: ITreeFinancialAccountSearchRow[]): TreeNode[] {
+  private mapTreeNodes(accounts: AccountTreeRow[]): TreeNode[] {
     return accounts.map((account) => ({
       key: account.id.toString(),
       label: account.name,
@@ -405,79 +333,12 @@ export class AccountsTree extends BaseComponent {
     }));
   }
 
-  private flattenAccounts(accounts: ITreeFinancialAccountSearchRow[]): ITreeFinancialAccountSearchRow[] {
-    return accounts.flatMap((account) => [account, ...this.flattenAccounts(account.children)]);
-  }
-
-  private searchSelectableAccounts(target: 'parent' | 'current', pageIndex: number, searchValue: string = '') {
-    this.financialAccountService
-      .search({
-        paginationInfo: {
-          pageIndex,
-          pageSize: 10,
-        },
-        searchFilters: [
-          {
-            column: FinancialAccountSearchEnum.Name,
-            values: [searchValue],
-          },
-        ],
-        fromDate: null,
-      })
-      .subscribe({
-        next: (res) => {
-          const targetSignal = target === 'parent' ? this.parentAccountSearchResults : this.currentAccountSearchResults;
-
-          if (pageIndex === 1) {
-            targetSignal.set(res.value.rows);
-          } else {
-            targetSignal.update((previous) => [...previous, ...res.value.rows]);
-          }
-
-          const paginationInfo = {
-            pageIndex,
-            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
-
-          if (target === 'parent') {
-            this.parentAccountsPaginationInfo = paginationInfo;
-          } else {
-            this.currentAccountsPaginationInfo = paginationInfo;
-          }
-        },
-      });
-  }
-
-  private mergeSelectedAccount(
-    accounts: ITreeFinancialAccountSearchRow[],
-    selectedAccount: ITreeFinancialAccountSearchRow | null,
-  ) {
-    if (!selectedAccount) {
-      return accounts;
-    }
-
-    return accounts.some((account) => account.id === selectedAccount.id) ? accounts : [selectedAccount, ...accounts];
-  }
-
-  private getSelectedParentAccount(): ITreeFinancialAccountSearchRow | null {
-    const parentId = this.fg.controls.parentId.value;
-
-    if (!parentId || parentId === -1) {
-      return null;
-    }
-
-    return (
-      this.parentAccountSearchResults().find((account) => account.id === parentId) ??
-      this.findAccountById(this.allFinancialAccounts(), parentId)
-    );
-  }
 
   private filterAccountsTree(
-    accounts: ITreeFinancialAccountSearchRow[],
+    accounts: AccountTreeRow[],
     searchTerm: string,
     searchEnum: FinancialAccountSearchEnum,
-  ): ITreeFinancialAccountSearchRow[] {
+  ): AccountTreeRow[] {
     const normalizedTerm = searchTerm.trim().toLowerCase();
 
     if (!normalizedTerm) {
@@ -499,13 +360,10 @@ export class AccountsTree extends BaseComponent {
           children: filteredChildren,
         };
       })
-      .filter((account): account is ITreeFinancialAccountSearchRow => !!account);
+      .filter((account): account is AccountTreeRow => !!account);
   }
 
-  private findAccountById(
-    accounts: ITreeFinancialAccountSearchRow[],
-    id: number,
-  ): ITreeFinancialAccountSearchRow | null {
+  private findAccountById(accounts: AccountTreeRow[], id: number): AccountTreeRow | null {
     for (const account of accounts) {
       if (account.id === id) {
         return account;
@@ -518,5 +376,19 @@ export class AccountsTree extends BaseComponent {
     }
 
     return null;
+  }
+
+  private toSelectableAccount(account: AccountRow): AccountOptionRow {
+    return {
+      id: account.id,
+      name: account.name,
+      parentId: account.parentId,
+      stage: account.stage,
+      finNumber: account.finNumber,
+      balanceNature: account.balanceNature,
+      finalAccountType: account.finalAccountType,
+      accountGroup: account.accountGroup,
+      accountStatus: account.accountStatus,
+    };
   }
 }
