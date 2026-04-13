@@ -35,8 +35,7 @@ export class FixedFinancialAccountService extends BaseService {
           pageIndex: 0,
           pageSize: 0,
         },
-      })
-      .subscribe();
+      });
 
   patchAccouts = (items: IFixedFinancialAccountPatchRow[]) => this.http.patch(`${this.apiUrl}`, items).subscribe();
 }
