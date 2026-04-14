@@ -1,26 +1,30 @@
 <div class="overflow-auto custom-scroll h-full">
-  <app-section-wrapper class="p-4 " styleClass="flex flex-col gap-6 py-6!">
-    @for (item of defaultAccounts(); track $index) {
-    <div class="grid md:grid-cols-2 gap-4 border-b md:border-b-0 border-dark-line/20 pb-6 md:pb-0">
-      <app-input-error-message-handler>
-        <p-select
-          [options]="[]"
-          optionLabel="name"
-          placeholder="اسم الحساب.."
-          class="w-full! *:text-dark-line! border-dark-line!"
-        />
-      </app-input-error-message-handler>
-      <app-input-error-message-handler>
-        <p-select
-          [options]="allAccounts()"
-          optionLabel="name"
-          placeholder="الحساب المقابل..."
-          class="w-full! *:text-dark-line! border-dark-line!"
-        />
-      </app-input-error-message-handler>
-    </div>
+  <app-section-wrapper class="p-4" styleClass="flex flex-col gap-6 py-6!">
+    @for (item of formArray.controls; track $index) {
+      <div class="grid md:grid-cols-2 gap-4 border-b md:border-b-0 border-dark-line/20 pb-6 md:pb-0">
+        <app-input-error-message-handler>
+          <input pInputText type="text" [value]="defaultAccounts()[$index].name" [disabled]="true" />
+        </app-input-error-message-handler>
+        <app-input-error-message-handler>
+          <p-select
+            [options]="allAccounts()"
+            [formControl]="item.controls.refFinancalId"
+            optionValue="id"
+            [filter]="true"
+            (onChange)="onFgChange(item)"
+            optionLabel="name"
+            placeholder="الحساب المقابل..."
+            class="w-full! *:text-dark-line! border-dark-line!"
+          />
+        </app-input-error-message-handler>
+      </div>
     }
 
-    <p-button class="ms-auto" styleClass="border-dark-line! bg-dark-line! text-white! py-1! px-8!" label="طباعه" />
+    <p-button
+      class="app-p-btn ms-auto"
+      (onClick)="onSave()"
+      styleClass=" py-1! px-8!"
+      [label]="'ACTIONS.SAVE' | translate"
+    />
   </app-section-wrapper>
 </div>

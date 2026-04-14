@@ -22,13 +22,21 @@ export interface IElectonPrintOptions {
   html: string;
   css: string;
 }
-
+export interface IBluetoothPrinter {
+  id: string;
+  name: any;
+  com: string;
+  type: string;
+}
 declare global {
   interface Window {
     electronAPI: {
-      getPrinters: () => Promise<any[]>;
-      ping: (msg: string) => Promise<string>;
-      print: (opts: IElectonPrintOptions) => Promise<string[]>;
+      getBluetoothPrinters: () => Promise<IBluetoothPrinter[]>;
+      ping: (msg: unknown) => Promise<unknown>;
+      print: (msg: IElectonPrintOptions) => Promise<string[]>;
+      saveLink: (key: string, link: string) => Promise<{ key: string; link: string }>;
+      getLink: (key: string) => Promise<{ key: string; link: string | null }>;
+      getAllLinks: () => Promise<Record<string, string>>;
     };
   }
 }

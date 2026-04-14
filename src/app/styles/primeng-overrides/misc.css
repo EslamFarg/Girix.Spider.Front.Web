@@ -153,12 +153,7 @@ p-tree .p-tree-node-children > p-treenode:nth-child(1) > .p-tree-node > .p-tree-
   }
 }
 
-.app-p-btn {
-  --p-button-primary-color: #fff;
-  --p-button-primary-background: var(--color-dark-line);
-  --p-button-primary-border-color: var(--color-dark-line);
-  --p-button-primary-hover-color: var(--color-dark-line);
-}
+
 .custom-datepicker-position {
   top: 42px !important;
   margin-top: 2px !important;

@@ -6,6 +6,7 @@ import { Button } from 'primeng/button';
 import { BaseComponent } from '@/components';
 import {
   FixedFinancialAccountService,
+  IFixedFinancialAccountPatchRow,
   IFixedFinancialAccountRow,
 } from '../../services/fixed-financial-account-service';
 import {
@@ -13,10 +14,19 @@ import {
   FinancialAccountService,
 } from '@/features/accounts/services/financial-account-service';
 import { IFinancialAccountSearchRow } from '@/features/accounts/types';
+import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ControlsOf } from '@/yn-ng/types/helpers';
+import { InputText } from 'primeng/inputtext';
+import { TranslatePipe } from '@ngx-translate/core';
 
+interface IAppDefaultAccountItem {
+  id: number | null;
+  refFinancalId: number | null;
+}
+type IAppDefaultAccountItemControls = ControlsOf<IFixedFinancialAccountPatchRow>;
 @Component({
   selector: 'app-default-accounts',
-  imports: [SectionWrapper, InputErrorMessageHandler, Select, Button],
+  imports: [SectionWrapper, InputErrorMessageHandler, Select, Button, ReactiveFormsModule, InputText, TranslatePipe],
   templateUrl: './default-accounts.html',
   styleUrl: './default-accounts.css',
 })
@@ -26,6 +36,9 @@ export class DefaultAccounts extends BaseComponent {
 
   defaultAccounts = signal<IFixedFinancialAccountRow[]>([]);
   allAccounts = signal<IFinancialAccountSearchRow[]>([]);
+
+  formArray = this.fb.array<FormGroup<IAppDefaultAccountItemControls>>([]);
+  changedDefaultAccounts: IFixedFinancialAccountPatchRow[] = [];
   /**
    *
    */
@@ -35,6 +48,14 @@ export class DefaultAccounts extends BaseComponent {
     this.fixedFinancialAccountService.getAll().subscribe({
       next: (res) => {
         this.defaultAccounts.set(res.rows);
+        res.rows.forEach((item) => {
+          this.formArray.push(
+            this.fb.group<IAppDefaultAccountItemControls>({
+              id: this.fb.control(item.id, [Validators.required]),
+              refFinancalId: this.fb.control(item.refFinancalId, [Validators.required]),
+            }),
+          );
+        });
       },
     });
 
@@ -57,5 +78,26 @@ export class DefaultAccounts extends BaseComponent {
           this.allAccounts.set(res.value.rows);
         },
       });
+  }
+
+  onFgChange(fg: FormGroup<IAppDefaultAccountItemControls>) {
+    //check if fixed account exists
+    const existingChangedDefaultAccount = this.changedDefaultAccounts.find((item) => item.id === fg.value.id);
+
+    if (fg.invalid) return;
+
+    if (existingChangedDefaultAccount) {
+      existingChangedDefaultAccount.refFinancalId = fg.value.refFinancalId!;
+    } else {
+      this.changedDefaultAccounts.push(fg.value as IFixedFinancialAccountPatchRow);
+    }
+  }
+
+  onSave() {
+    if (this.changedDefaultAccounts.length === 0) {
+      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لم تتم تغييرات للحفظ' });
+      return;
+    }
+    this.fixedFinancialAccountService.patchAccouts(this.changedDefaultAccounts);
   }
 }

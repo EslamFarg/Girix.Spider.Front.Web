@@ -34,14 +34,14 @@
     </app-input-error-message-handler>
   </div>
   <div class="md:col-span-2">
-    <label for="phoneNumber">{{ 'form.phoneNumber' | translate }}</label>
+    <label for="phoneNumber">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
     <app-input-error-message-handler [fc]="customerFg.get('phoneNumber')">
       <input
         pInputText
         id="phoneNumber"
         formControlName="phoneNumber"
         aria-describedby="phoneNumber-help"
-        [placeholder]="'form.phoneNumber' | translate"
+        [placeholder]="'FORM.PHONE_NUMBER' | translate"
       />
     </app-input-error-message-handler>
   </div>

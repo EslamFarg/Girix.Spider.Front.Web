@@ -9,6 +9,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components/base-component/base-component';
 import {
   IProductCreateRequest,
+  IProductCreateUnit,
   IProductReadResponse,
   IProductSearchRow,
   ProductSearchEnum,
@@ -24,12 +25,12 @@ import { Dialog } from 'primeng/dialog';
 import { BehaviorSubject, debounce, debounceTime, Subject, tap } from 'rxjs';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
-import { ProductFgControls } from './types';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { TranslatePipe } from '@ngx-translate/core';
 import { NgSelectComponent, NgOptionTemplateDirective, NgLabelTemplateDirective } from '@ng-select/ng-select';
 import { Debounce } from '@/directives/debounce';
 import { ImgFallback } from '@/directives/img-fallback';
+import { ControlsOf } from '@/yn-ng/types/helpers';
 
 @Component({
   selector: 'app-product-form',
@@ -65,7 +66,7 @@ export class ProductForm extends BaseComponent implements OnInit {
     return this.initialFormMode();
   });
 
-  initialProductFgValue: ProductFgControls = {
+  initialProductFgValue = {
     nameEn: this.fb.control<string>('', [Validators.required]),
     nameAr: this.fb.control<string>('', [
       Validators.required,
@@ -79,15 +80,15 @@ export class ProductForm extends BaseComponent implements OnInit {
       Validators.minLength(3),
       Validators.maxLength(1000),
     ]),
-    price: this.fb.control<number>(0, [Validators.required, Validators.min(0)]),
-    costPrice: this.fb.control<number>(0, [Validators.required, Validators.min(0)]),
-    tax: this.fb.control<number>(0, [Validators.required]),
-    selectiveTax: this.fb.control<number>(0, [Validators.required]),
+    price: this.fb.control<number|null>(0, [Validators.required, Validators.min(0)]),
+    costPrice: this.fb.control<number|null>(0, [Validators.required, Validators.min(0)]),
+    tax: this.fb.control<number|null>(0, [Validators.required]),
+    selectiveTax: this.fb.control<number|null>(0, [Validators.required]),
     //category = group
-    isAddition: this.fb.control<boolean>(false, [Validators.required]),
-    idsAdditionMenuItem: this.fb.control<number[]>([], []),
-    images: this.fb.control<File[] & { id: number; fullPath: string }[]>([], []),
-    //@ts-ignore
+    isAddition: this.fb.control<boolean | null>(false, [Validators.required]),
+    idsAdditionMenuItem: this.fb.control<number[]|null>([], []),
+    images: this.fb.control<File[] | { id: number; fullPath: string }[] |null>([], []),
+    menuItemUnits: this.fb.array<FormGroup<ControlsOf<IProductCreateUnit>> |null>([]),
     //ts ignore to allow null for now
     categoryId: this.fb.control<number | null>(null, [Validators.required]),
     //
@@ -103,6 +104,7 @@ export class ProductForm extends BaseComponent implements OnInit {
       [],
       [Validators.required, Validators.minLength(1), Validators.maxLength(6)],
     ),
+
   };
 
   productService = inject(ProductService);
@@ -501,4 +503,91 @@ export class ProductForm extends BaseComponent implements OnInit {
       this.searchAdditions({ pageIndex: this.groupsPaginationInfo.pageIndex + 1, searchTerm });
     }
   }
+   //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //units dynamic form
+    //
+  
+    lastClickedTableRowIndex = signal<number | null>(null);
+  
+    currentEditRowIndex = signal<number>(-1);
+  
+    editJournalDetailRow(rowIndex: number) {
+      this.lastClickedTableRowIndex.set(rowIndex + 1);
+      this.currentEditRowIndex.set(rowIndex);
+    }
+    isRowEditable(rowIndex: number) {
+      return this.currentEditRowIndex() === rowIndex;
+    }
+    delteJournalDetailRow(rowIndex: number) {
+      this.productFg.controls.menuItemUnits.removeAt(rowIndex);
+      this.currentEditRowIndex.set(-1);
+    }
+
+    newJournalDetailsItemFg!: FormGroup<IAppJournalItemControls>;
+  
+    createNewJournalDetailsItemFg(data?: IAppJournalItem) {
+      const fg = this.fb.group<IAppJournalItemControls>({
+        creditorAmount: this.fb.control<number>(data?.creditorAmount ?? 0, [Validators.required]),
+        debtorAmount: this.fb.control<number>(data?.debtorAmount ?? 0, [Validators.required]),
+        notes: this.fb.control<string | null>(data?.notes ?? null, [Validators.required, Validators.maxLength(1000)]),
+        finincalAccountId: this.fb.control<number | null>(data?.finincalAccountId ?? null, [Validators.required]),
+      });
+  
+      const creditorAmountControl = fg.controls.creditorAmount;
+      const debtorAmountControl = fg.controls.debtorAmount;
+  
+      creditorAmountControl.valueChanges.subscribe((creditorAmount) => {
+        debtorAmountControl.setValue(0, { emitEvent: false });
+      });
+      debtorAmountControl.valueChanges.subscribe((debtorAmount) => {
+        creditorAmountControl.setValue(0, { emitEvent: false });
+      });
+  
+      return fg;
+    }
+  
+    setUpNewJournalDetailsRowFg() {
+      if (this.newJournalDetailsItemFg) {
+        this.newJournalDetailsItemFg.reset();
+      } else {
+        this.newJournalDetailsItemFg = this.createNewJournalDetailsItemFg();
+      }
+    }
+  
+    submitNewJournalDetailsItem() {
+      if (this.newJournalDetailsItemFg.invalid) {
+        this.newJournalDetailsItemFg.markAllAsTouched();
+        //log errors
+        Object.entries(this.newJournalDetailsItemFg.controls!).forEach(([key, value]) => {
+          if (value.errors) {
+            console.log(key, value.errors);
+          }
+        });
+        return;
+      }
+  
+      const debitorAmount = this.newJournalDetailsItemFg.value.debtorAmount ?? 0;
+      const creditorAmount = this.newJournalDetailsItemFg.value.creditorAmount ?? 0;
+      if (debitorAmount == 0 && creditorAmount == 0) {
+        this.newJournalDetailsItemFg.markAllAsTouched();
+        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب ادخال قيمة المدين او الدائن' });
+        return;
+      }
+  
+      const fgValue = this.newJournalDetailsItemFg.value;
+  
+      this.fg.controls.items!.push(this.createNewJournalDetailsItemFg(fgValue as IAppJournalItem));
+  
+      this.lastClickedTableRowIndex.set(this.fg.value.items!.length - 1);
+      this.setUpNewJournalDetailsRowFg();
+    }
 }

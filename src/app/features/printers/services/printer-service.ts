@@ -35,6 +35,16 @@ export class PrinterService extends BaseSearchAndCrudService<
   isPrinterDialogVisible = false;
   printOptions: IAppPrintOptions | null = null;
 
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.patchEndpoints({
+      getById: '',
+    });
+  }
+
   openPrinterDialog(opts: IAppPrintOptions) {
     this.printOptions = opts;
     this.isPrinterDialogVisible = true;
@@ -64,9 +74,9 @@ export class PrinterService extends BaseSearchAndCrudService<
     window.electronAPI
       .print(electronPrintOpts)
       .then((e) => {
-        console.log('------------printer finished printing-----------')
+        console.log('------------printer finished printing-----------');
         console.log(e);
-        
+
         e?.forEach((failMsg) => {
           console.log(failMsg);
           this.messageService.add({
@@ -75,12 +85,20 @@ export class PrinterService extends BaseSearchAndCrudService<
             detail: failMsg,
           });
         });
-        console.log('-----------------------')
-
+        console.log('-----------------------');
       })
       .catch((e) => console.log(e))
       .finally(() => this.loadingService.removeLoading());
   }
 
-  
+  async getLocalBluetoothPrinters() {
+    this.loadingService.addLoading();
+    try {
+      const e = await window.electronAPI
+        .getBluetoothPrinters();
+      return e;
+    } finally {
+      this.loadingService.removeLoading();
+    }
+  }
 }

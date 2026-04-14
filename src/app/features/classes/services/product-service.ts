@@ -69,6 +69,12 @@ export interface IProductCreateRequest {
   idsAdditionMenuItem: number[];
 
   images: File[];
+  menuItemUnits: IProductCreateUnit[]
+}
+export interface IProductCreateUnit{
+  unitId: number
+  quantity: number
+  isMainUnit: boolean
 }
 
 //update

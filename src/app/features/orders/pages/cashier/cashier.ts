@@ -355,7 +355,7 @@ export class Cashier extends BaseComponent implements OnInit {
     // }
   }
   test() {
-    window.electronAPI.getPrinters().then((e) => console.log(e));
+    // window.electronAPI.getPrinters().then((e) => console.log(e));
   }
 
   onOrderMenuItemQuantityChange(index: number, newQuantity: number) {

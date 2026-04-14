@@ -24,7 +24,7 @@
 @import 'primeicons/primeicons.css';
 @import './app/styles/fonts.css';
 @import './app/styles/layout.css';
-@import './app/styles/primeng-overrides.css';
+@import './app/styles/primeng-overrides/primeng-overrides.css';
 @import './app/styles/animations.css';
 @import './app/styles/shared.css';
 
