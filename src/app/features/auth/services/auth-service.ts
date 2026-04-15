@@ -33,6 +33,7 @@ export class AuthService extends BaseService {
   userDetails = signal<IUserDetails | null>(this.get('userDetails'));
   isAuthenticated = computed(() => this.userDetails() !== null);
   override apiRoute = 'Auth';
+  crmApi='http://gtsdev-001-site23.atempurl.com'
 
   login(dto: ILoginDto) {
     let loginResultObs: Observable<IUserDetails>;
@@ -59,10 +60,10 @@ export class AuthService extends BaseService {
         observer.complete();
       });
     } else {
-      loginResultObs = this.http.post<IUserDetails>(`${this.apiUrl}/login`, dto,{
+      loginResultObs = this.http.post<IUserDetails>(`${this.apiUrl}/login`, dto, {
         headers: {
-          'passJwt': 'true'
-        }
+          passJwt: 'true',
+        },
       });
     }
 
@@ -93,11 +94,15 @@ export class AuthService extends BaseService {
       });
     }
 
-    return this.http.post<boolean>(`${this.apiUrl}/forgetPassword`, { email },{
+    return this.http.post<boolean>(
+      `${this.apiUrl}/forgetPassword`,
+      { email },
+      {
         headers: {
-          'passJwt': 'true'
-        }
-      });
+          passJwt: 'true',
+        },
+      },
+    );
   }
 
   validateOtp(otp: string) {
@@ -124,14 +129,18 @@ export class AuthService extends BaseService {
       .post<{
         token: string;
         userId: string;
-      }>(`${this.apiUrl}/validOtp`, {
-        email: this.forgotPasswordEmail,
-        otp,
-      },{
-        headers: {
-          'passJwt': 'true'
-        }
-      })
+      }>(
+        `${this.apiUrl}/validOtp`,
+        {
+          email: this.forgotPasswordEmail,
+          otp,
+        },
+        {
+          headers: {
+            passJwt: 'true',
+          },
+        },
+      )
       .pipe(
         tap({
           next: (result) => {
@@ -158,11 +167,17 @@ export class AuthService extends BaseService {
     return this.http.post<boolean>(`${this.apiUrl}/changePassword`, dto);
   }
 
-  sendCrmOtpToEmail(obj:{emailOrPhone: string}) {
-    return this.http.post<any>(`${this.apiUrl}/sendCrmOtp`, {});
+  sendCrmOtpToEmail(obj: { emailOrPhone: string }) {
+    return this.http.get<boolean>(`${this.crmApi}/AuthUsers/GetAllYourActivations?email=${obj.emailOrPhone}` );
+
+    //then redirect to crm otp validation on success 
   }
 
   validateCrmOtp(otp: string) {
-    return this.http.post<any>(`${this.apiUrl}/validateCrmOtp`, { otp });
+    return this.http.get<{
+      expiryDate: string;
+      apiUrl: string;
+      activationCode: string;
+    }>(`${this.crmApi}/ProgramActivation/MobileProductActiveForClient?cloudIdActivation=${otp}` );
   }
 }

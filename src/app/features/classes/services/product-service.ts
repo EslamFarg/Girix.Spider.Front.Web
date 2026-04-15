@@ -95,6 +95,7 @@ export interface IProductUpdateRequest {
 
   isAddition: boolean;
   idsAdditionMenuItem: number[];
+  menuItemUnits: IProductCreateUnit[];
 
   imagesAdd: File[];
   listIdsOfDeleteImages: number[];

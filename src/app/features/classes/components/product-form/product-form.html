@@ -29,7 +29,6 @@
 
 <form id="productForm" class="mt-6" [formGroup]="productFg" (ngSubmit)="onSubmitForm()">
   <div class="flex flex-col md:flex-row gap-4">
-    <!-- images -->
     <div class="md:flex-1 md:max-w-50 lg:max-w-60 relative">
       <input
         multiple
@@ -85,50 +84,41 @@
           </svg>
         }
       </label>
-
-      <ng-template let-image #imageTemplate>
-        <div class="group" (click)="onSelectImage(image.ix)">
+      <ng-template let-image #imageTemplate
+        ><div class="group" (click)="onSelectImage(image.ix)">
           <img
             [src]="image.fullPath"
             appImgFallback
             class="min-w-full! aspect-square object-cover !mx-auto rounded-full shadow cursor-pointer group-hover:shadow-md group-hover:shadow-green-700/50 group-hover:scale-80 transition-all"
             alt=""
-          />
-        </div>
-      </ng-template>
+          /></div
+      ></ng-template>
       <span></span>
       <app-input-error-message-handler [fc]="productFg.get('allImages')" class="inline" />
-
       <app-slider
         class="block w-full h-fit mt-2"
         [items]="allImages()"
         [config]="{ itemWidth: 48 }"
         [template]="imageTemplate"
-      >
-      </app-slider>
+      ></app-slider>
     </div>
 
-    <!-- product info -->
     <div class="grid lg:grid-cols-3 gap-4 flex-1">
-      <!-- name -->
       <div>
-        <label for="productName">{{ 'CLASSES.PRODUCTS.NAME' | translate }}</label>
-        <app-input-error-message-handler [fc]="productFg.get('nameAr')">
-          <input
+        <label for="productName">{{ 'CLASSES.PRODUCTS.NAME' | translate }}</label
+        ><app-input-error-message-handler [fc]="productFg.get('nameAr')"
+          ><input
             pInputText
             id="productName"
             formControlName="nameAr"
             aria-describedby="productName-help"
             [placeholder]="'CLASSES.PRODUCTS.NAME' | translate"
-          />
-        </app-input-error-message-handler>
+        /></app-input-error-message-handler>
       </div>
-
-      <!-- price -->
       <div>
-        <label for="productPrice">{{ 'CLASSES.PRODUCTS.PRICE' | translate }}</label>
-        <app-input-error-message-handler [fc]="productFg.get('price')">
-          <input
+        <label for="productPrice">{{ 'CLASSES.PRODUCTS.PRICE' | translate }}</label
+        ><app-input-error-message-handler [fc]="productFg.get('price')"
+          ><input
             pInputText
             appAllowNumbers
             [allowDecimal]="true"
@@ -136,15 +126,12 @@
             formControlName="price"
             aria-describedby="productPrice-help"
             [placeholder]="'CLASSES.PRODUCTS.PRICE' | translate"
-          />
-        </app-input-error-message-handler>
+        /></app-input-error-message-handler>
       </div>
-
-      <!-- cost -->
       <div>
-        <label for="costPrice">{{ 'CLASSES.PRODUCTS.COST_PRICE' | translate }}</label>
-        <app-input-error-message-handler [fc]="productFg.get('costPrice')">
-          <input
+        <label for="costPrice">{{ 'CLASSES.PRODUCTS.COST_PRICE' | translate }}</label
+        ><app-input-error-message-handler [fc]="productFg.get('costPrice')"
+          ><input
             pInputText
             appAllowNumbers
             [allowDecimal]="true"
@@ -152,22 +139,19 @@
             formControlName="costPrice"
             aria-describedby="costPrice-help"
             [placeholder]="'CLASSES.PRODUCTS.COST_PRICE' | translate"
-          />
-        </app-input-error-message-handler>
+        /></app-input-error-message-handler>
       </div>
-
-      <!-- group -->
       <div>
-        <label for="productName">{{ 'CLASSES.PRODUCTS.GROUP' | translate }}</label>
-        <app-input-error-message-handler [fc]="productFg.get('categoryId')">
-          <ng-select
+        <label for="productName">{{ 'CLASSES.PRODUCTS.GROUP' | translate }}</label
+        ><app-input-error-message-handler [fc]="productFg.get('categoryId')"
+          ><ng-select
             class="app-select w-full"
             style="--height: 40px !important"
             [items]="displayedGroups()"
             formControlName="categoryId"
             bindLabel="name"
             bindValue="id"
-            placeholder="الكل"
+            placeholder="&#1575;&#1604;&#1603;&#1604;"
             #customerSelect
             appDebounce
             [customEvents]="[
@@ -175,84 +159,45 @@
               { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
             ]"
             (debounced)="onGroupsNameSearch($event, customerSelect.searchTerm ?? '')"
-          />
-          <!-- <p-select
-            [options]="displayedGroups()"
-            optionLabel="name"
-            optionValue="id"
-            [virtualScroll]="true"
-            formControlName="categoryId"
-            (onLazyLoad)="getNextGroupsPage($event)"
-            [virtualScrollItemSize]="36"
-            [lazy]="true"
-            [filter]="true"
-            (onFilter)="onGroupsFilter($event)"
-            [placeholder]="'CLASSES.PRODUCTS.GROUP' | translate"
-            class="w-full!"
-          /> -->
-          <!-- <p-inputgroup-addon class="p-0! overflow-hidden">
-            <div
-              (click)="openGroupsDialog()"
-              class="bg-text-light flex items-center cursor-pointer justify-center flex-1 h-full border-r border-r-(--p-inputtext-border-color)!"
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M10.9807 7.06251H7.12428V10.8855C7.12428 11.501 6.62092 12 6 12C5.37908 12 4.87572 11.501 4.87572 10.8855V7.06251H1.01932C0.440134 7.00305 0 6.51921 0 5.94198C0 5.36475 0.440134 4.88092 1.01932 4.82146H4.86363V1.01048C4.92361 0.436318 5.41167 0 5.99396 0C6.57624 0 7.0643 0.436318 7.12428 1.01048V4.82146H10.9807C11.5599 4.88092 12 5.36475 12 5.94198C12 6.51921 11.5599 7.00305 10.9807 7.06251Z"
-                  fill="#1F1D2B"
-                />
-              </svg>
-            </div>
-          </p-inputgroup-addon> -->
-        </app-input-error-message-handler>
+        /></app-input-error-message-handler>
       </div>
-
-      <!-- tax -->
       <div>
-        <label for="productName">{{ 'CLASSES.PRODUCTS.TAX' | translate }}</label>
-        <app-input-error-message-handler [fc]="productFg.get('tax')">
-          <ng-select
+        <label for="productName">{{ 'CLASSES.PRODUCTS.TAX' | translate }}</label
+        ><app-input-error-message-handler [fc]="productFg.get('tax')"
+          ><ng-select
             class="app-select w-full"
             style="--height: 40px !important"
             [items]="[0, 1, 5, 14, 15]"
             formControlName="tax"
-            placeholder="الكل"
+            placeholder="&#1575;&#1604;&#1603;&#1604;"
             [clearable]="false"
-            #customerSelect
             [placeholder]="'CLASSES.PRODUCTS.TAX' | translate"
-          />
-        </app-input-error-message-handler>
+        /></app-input-error-message-handler>
       </div>
-
-      <!-- excise -->
       <div>
-        <label for="productName">{{ 'CLASSES.PRODUCTS.EXCISE_TAX' | translate }}</label>
-        <app-input-error-message-handler [fc]="productFg.get('selectiveTax')">
-          <ng-select
+        <label for="productName">{{ 'CLASSES.PRODUCTS.EXCISE_TAX' | translate }}</label
+        ><app-input-error-message-handler [fc]="productFg.get('selectiveTax')"
+          ><ng-select
             class="app-select w-full"
             style="--height: 40px !important"
             [items]="[0, 25, 50, 75, 100]"
             formControlName="selectiveTax"
             [clearable]="false"
-            placeholder="الكل"
-            #customerSelect
             [placeholder]="'CLASSES.PRODUCTS.EXCISE_TAX' | translate"
-          />
-        </app-input-error-message-handler>
+        /></app-input-error-message-handler>
       </div>
-
-      <!-- is addition -->
       <div class="flex flex-col justify-end">
         <div class="flex items-center h-fit gap-2 pb-1">
-          <app-input-error-message-handler [fc]="productFg.get('isAddition')">
-            <input formControlName="isAddition" type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
-          </app-input-error-message-handler>
-          <label for="productName" class="text-dark-line text-sm font-semibold">{{
+          <app-input-error-message-handler [fc]="productFg.get('isAddition')"
+            ><input
+              formControlName="isAddition"
+              type="checkbox"
+              class="accent-dark-line w-5 h-5" /></app-input-error-message-handler
+          ><label for="productName" class="text-dark-line text-sm font-semibold">{{
             'CLASSES.PRODUCTS.IS_ADDITION' | translate
           }}</label>
         </div>
       </div>
-
-      <!-- additions -->
       <div class="lg:col-span-2 self-end">
         <label for="productName">{{ 'CLASSES.PRODUCTS.ADDITIONS' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('idsAdditionMenuItem')">
@@ -263,7 +208,7 @@
             formControlName="idsAdditionMenuItem"
             bindLabel="name"
             bindValue="id"
-            placeholder="الكل"
+            placeholder="&#1575;&#1604;&#1603;&#1604;"
             #additionsSelect
             appDebounce
             [closeOnSelect]="false"
@@ -275,12 +220,11 @@
             [placeholder]="'CLASSES.PRODUCTS.ADDITIONS' | translate"
             (debounced)="onAdditionProductsSearch($event, additionsSelect.searchTerm ?? '')"
           >
-            <ng-template ng-label-tmp let-item="item" let-clear="clear" let-item$="item$" let-index="index">
-              <div class="flex items-center gap-2">
-                <span class="ng-value-icon left" (click)="clear(item)" aria-hidden="true">×</span>
-
-                <span class="ng-value-label flex! items-center gap-2">
-                  <div class="rounded-full w-fit shadow shadow-black/30">
+            <ng-template ng-label-tmp let-item="item" let-clear="clear"
+              ><div class="flex items-center gap-2">
+                <span class="ng-value-icon left" (click)="clear(item)" aria-hidden="true">&times;</span
+                ><span class="ng-value-label flex! items-center gap-2"
+                  ><div class="rounded-full w-fit shadow shadow-black/30">
                     <img
                       appImgFallback
                       [src]="baseUrl + item.images?.[0]?.fullPath"
@@ -289,21 +233,18 @@
                       height="20px"
                     />
                   </div>
-                  {{ item.name }}
-                </span>
-              </div>
-            </ng-template>
-
-            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
-              <div class="flex items-center gap-2">
+                  {{ item.name }}</span
+                >
+              </div></ng-template
+            >
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index"
+              ><div class="flex items-center gap-2">
                 <input
                   id="item-{{ index }}"
                   type="checkbox"
                   [ngModel]="item$.selected"
                   [ngModelOptions]="{ standalone: true }"
-                />
-                {{ item.name }}
-
+                />{{ item.name }}
                 <div class="rounded-full w-fit shadow shadow-black/30">
                   <img
                     class="object-cover rounded-full aspect-square"
@@ -312,32 +253,17 @@
                     width="20px"
                     height="20px"
                   />
-                </div>
-
-                <!-- {{ item.name }} -->
-              </div>
-            </ng-template>
+                </div></div
+            ></ng-template>
           </ng-select>
-          <!-- <p-multiselect
-            optionValue="id"
-            [options]="displayedAdditions()"
-            optionLabel="name"
-            [virtualScroll]="true"
-            formControlName="idsAdditionMenuItem"
-            (onLazyLoad)="getNextAdditionProductsPage($event)"
-            [virtualScrollItemSize]="43"
-            [lazy]="true"
-            [filter]="true"
-            (onFilter)="onAdditionProductsFilter($event)"
-            class="w-full! [&_.p-virtualscroller]:min-h-25"
-          /> -->
         </app-input-error-message-handler>
       </div>
     </div>
   </div>
+
   <div class="mt-4">
-    <label for="productName">{{ 'CLASSES.PRODUCTS.DESCRIPTION' | translate }}</label>
-    <app-input-error-message-handler [fc]="productFg.get('descriptionAr')">
+    <label for="productName">{{ 'CLASSES.PRODUCTS.DESCRIPTION' | translate }}</label
+    ><app-input-error-message-handler [fc]="productFg.get('descriptionAr')">
       <textarea
         rows="5"
         cols="30"
@@ -351,17 +277,18 @@
     </app-input-error-message-handler>
   </div>
 
-
   <div class="overflow-x-auto">
     <table class="my-4 min-w-250 w-full main-table table-fixed">
       <thead>
         <tr>
           <th class="min-w-12.5 w-12.5">#</th>
-          <th class="min-w-12.5">كود الوحدة</th>
-          <th class="min-w-12.5">الوحدة</th>
-          <th class="min-w-12.5">الوحدة الرئيسية</th>
-          <th class="min-w-12.5">كمية الوحدة</th>
-          <th class="min-w-40 w-40">الأدوات</th>
+          <th class="min-w-12.5">&#1603;&#1608;&#1583; &#1575;&#1604;&#1608;&#1581;&#1583;&#1577;</th>
+          <th class="min-w-12.5">&#1575;&#1604;&#1608;&#1581;&#1583;&#1577;</th>
+          <th class="min-w-12.5">
+            &#1575;&#1604;&#1608;&#1581;&#1583;&#1577; &#1575;&#1604;&#1585;&#1574;&#1610;&#1587;&#1610;&#1577;
+          </th>
+          <th class="min-w-12.5">&#1603;&#1605;&#1610;&#1577; &#1575;&#1604;&#1608;&#1581;&#1583;&#1577;</th>
+          <th class="min-w-40 w-40">&#1575;&#1604;&#1571;&#1583;&#1608;&#1575;&#1578;</th>
         </tr>
       </thead>
       <tbody>
@@ -371,160 +298,131 @@
           class="*:overflow-visible!"
         >
           <td class="text-start">#</td>
-          <!-- الحساب -->
+          <td>{{ newProductUnitRowFg.controls.unitId.value ?? '-' }}</td>
           <td>
-            <app-input-error-message-handler
-              [grouped]="false"
-              [fc]="newJournalDetailsItemFg.controls.finincalAccountId"
-            >
-              <ng-select
-                class="app-select"
-                [items]="financialAccounts()"
-                bindLabel="name"
-                [formControl]="newJournalDetailsItemFg.controls.finincalAccountId"
-                bindValue="id"
-                placeholder="الكل"
-                appendTo="body"
-                [clearable]="false"
-                #printerSelect1
-                appDebounce
-                [customEvents]="[
-                  { type: 'searchEvent', value: printerSelect1.searchEvent },
-                  { type: 'scrollToEnd', value: printerSelect1.scrollToEnd },
-                ]"
-                (debounced)="debouncedFinancialAccountsSearch($event, printerSelect1.searchTerm)"
-              />
-            </app-input-error-message-handler>
+            <div class="flex items-start gap-2">
+              <app-input-error-message-handler
+                class="flex-1"
+                [grouped]="false"
+                [fc]="newProductUnitRowFg.controls.unitId"
+              >
+                <ng-select
+                  class="app-select"
+                  [items]="displayedUnits()"
+                  bindLabel="nameAr"
+                  [formControl]="newProductUnitRowFg.controls.unitId"
+                  bindValue="id"
+                  placeholder="&#1575;&#1604;&#1608;&#1581;&#1583;&#1577;"
+                  appendTo="body"
+                  [clearable]="false"
+                  #unitsSelect1
+                  appDebounce
+                  [customEvents]="[
+                    { type: 'searchEvent', value: unitsSelect1.searchEvent },
+                    { type: 'scrollToEnd', value: unitsSelect1.scrollToEnd },
+                  ]"
+                  (change)="onCurrentProductUnitChange($event)"
+                  (debounced)="onUnitsSearch($event, unitsSelect1.searchTerm)"
+                />
+              </app-input-error-message-handler>
+              <button
+                type="button"
+                pButton
+                class="border-dark-line! text-dark-line! px-4! py-1! shrink-0"
+                variant="outlined"
+                (click)="openUnitsDialog()"
+              >
+                &#1593;&#1585;&#1590;
+              </button>
+            </div>
           </td>
-          <!-- المدين -->
           <td>
-            <app-input-error-message-handler [fc]="newJournalDetailsItemFg.controls.debtorAmount">
-              <input
+            <app-input-error-message-handler [fc]="newProductUnitRowFg.controls.isMainUnit"
+              ><input
+                type="checkbox"
+                class="accent-dark-line w-5 h-5"
+                [formControl]="newProductUnitRowFg.controls.isMainUnit"
+            /></app-input-error-message-handler>
+          </td>
+          <td>
+            <app-input-error-message-handler [fc]="newProductUnitRowFg.controls.quantity"
+              ><input
                 pInputText
-                id="debtorAmount"
                 appAllowNumbers
-                [defaultChecked]="true"
-                [min]="0"
-                [formControl]="newJournalDetailsItemFg.controls.debtorAmount"
+                [allowDecimal]="true"
+                [min]="1"
+                [formControl]="newProductUnitRowFg.controls.quantity"
                 class="app-input text-center"
-                aria-describedby="debtorAmount-help"
-                placeholder="المدين"
-              />
-            </app-input-error-message-handler>
+                aria-describedby="unitQuantity-help"
+                placeholder="&#1603;&#1605;&#1610;&#1577; &#1575;&#1604;&#1608;&#1581;&#1583;&#1577;"
+            /></app-input-error-message-handler>
           </td>
-          <!-- الدائن -->
-          <td>
-            <app-input-error-message-handler [fc]="newJournalDetailsItemFg.controls.creditorAmount">
-              <input
-                pInputText
-                appAllowNumbers
-                [defaultChecked]="true"
-                [min]="0"
-                id="creditorAmount"
-                [formControl]="newJournalDetailsItemFg.controls.creditorAmount"
-                class="app-input text-center"
-                aria-describedby="creditorAmount-help"
-                placeholder="الدائن"
-              />
-            </app-input-error-message-handler>
-          </td>
-          <!-- البيان -->
-          <td>
-            <app-input-error-message-handler [fc]="newJournalDetailsItemFg.controls.notes">
-              <input
-                pInputText
-                id="notes"
-                [formControl]="newJournalDetailsItemFg.controls.notes"
-                class="app-input text-center"
-                aria-describedby="notes-help"
-                placeholder="البيان"
-              />
-            </app-input-error-message-handler>
-          </td>
-          <!-- actions -->
           <td>
             <button
-              (click)="submitNewJournalDetailsItem()"
+              (click)="addProductUnitRow()"
               type="button"
               pButton
               class="border-dark-line! bg-dark-line! text-sm! text-white! py-1! px-8!"
             >
-              إضافه
+              &#1573;&#1590;&#1575;&#1601;&#1577;
             </button>
           </td>
         </tr>
-        @for (item of fg.controls.items.controls; track $index) {
+        @for (item of productUnitRows.controls; track $index) {
           <tr
             [class.last-clicked-table-row]="lastClickedTableRowIndex() === $index"
             (click)="lastClickedTableRowIndex.set($index)"
           >
             <td class="min-w-12.5 w-12.5" [class.disabled]="!isRowEditable($index)">{{ $index + 1 }}</td>
-            <!-- الحساب -->
             <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.finincalAccountId">
-                <ng-select
+              {{ item.controls.unitId.value ?? '-' }}
+            </td>
+            <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
+              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.unitId"
+                ><ng-select
                   class="app-select"
-                  [items]="financialAccounts()"
-                  [formControl]="item.controls.finincalAccountId"
-                  bindLabel="name"
+                  [items]="displayedUnits()"
+                  [formControl]="item.controls.unitId"
+                  bindLabel="nameAr"
                   bindValue="id"
-                  placeholder="الكل"
+                  placeholder="&#1575;&#1604;&#1608;&#1581;&#1583;&#1577;"
                   [clearable]="false"
-                  #printerSelect2
+                  #unitsSelect2
                   appDebounce
                   [customEvents]="[
-                    { type: 'searchEvent', value: printerSelect2.searchEvent },
-                    { type: 'scrollToEnd', value: printerSelect2.scrollToEnd },
+                    { type: 'searchEvent', value: unitsSelect2.searchEvent },
+                    { type: 'scrollToEnd', value: unitsSelect2.scrollToEnd },
                   ]"
-                  (debounced)="debouncedFinancialAccountsSearch($event, printerSelect2.searchTerm)"
-                />
-              </app-input-error-message-handler>
+                  (change)="onExistingProductUnitChange($event)"
+                  (debounced)="onUnitsSearch($event, unitsSelect2.searchTerm)"
+              /></app-input-error-message-handler>
             </td>
-            <!-- المدين -->
             <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.debtorAmount">
-                <input
-                  pInputText
-                  id="debtorAmount"
-                  [formControl]="item.controls.debtorAmount"
-                  class="app-input text-center"
-                  aria-describedby="debtorAmount-help"
-                  placeholder="المدين"
-                />
-              </app-input-error-message-handler>
+              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.isMainUnit"
+                ><input
+                  type="checkbox"
+                  class="accent-dark-line w-5 h-5"
+                  [formControl]="item.controls.isMainUnit"
+                  [disabled]="!isRowEditable($index)"
+                  (change)="onProductUnitMainChange($index)"
+              /></app-input-error-message-handler>
             </td>
-            <!-- الدائن -->
-            <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.creditorAmount">
-                <input
+            <td [title]="getUnitDisplayName(item.controls.unitId.value)" [class.disabled]="!isRowEditable($index)">
+              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.quantity"
+                ><input
                   pInputText
-                  id="creditorAmount"
-                  [formControl]="item.controls.creditorAmount"
-                  [disabled]="!isRowEditable($index + 1)"
-                  class="app-input text-center"
-                  aria-describedby="creditorAmount-help"
-                  placeholder="الدائن"
-                />
-              </app-input-error-message-handler>
-            </td>
-            <!-- البيان -->
-            <td [title]="item.get('notes')?.value ?? ''" [class.disabled]="!isRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.notes">
-                <input
-                  pInputText
-                  id="notes"
-                  [formControl]="item.controls.notes"
+                  appAllowNumbers
+                  [allowDecimal]="true"
+                  [formControl]="item.controls.quantity"
                   class="app-input text-center"
                   [disabled]="!isRowEditable($index)"
-                  aria-describedby="notes-help"
-                  placeholder="معلومات عن الحساب اللي هيكتب فيه الديم او الدائن"
-                />
-              </app-input-error-message-handler>
+                  aria-describedby="unitQuantity-help"
+                  placeholder="&#1603;&#1605;&#1610;&#1577; &#1575;&#1604;&#1608;&#1581;&#1583;&#1577;"
+              /></app-input-error-message-handler>
             </td>
-            <!-- actions -->
             <td class="min-w-45 w-45">
               <div class="actions">
-                <button type="button" class="edit" (click)="editJournalDetailRow($index)">
+                <button type="button" class="edit" (click)="editProductUnitRow($index)">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       opacity="0.4"
@@ -540,9 +438,8 @@
                       d="M13.4398 5.03595L12.5152 6.19023C12.4221 6.30776 12.2546 6.32687 12.1389 6.23323C11.0149 5.32356 8.1365 2.9892 7.3379 2.3423C7.22126 2.24675 7.20527 2.07666 7.29933 1.95818L8.19106 0.850717C9.00001 -0.190812 10.411 -0.286365 11.5491 0.62139L12.8566 1.66292C13.3928 2.08335 13.7502 2.63756 13.8725 3.22044C14.0136 3.8616 13.8631 4.49129 13.4398 5.03595Z"
                       fill="#1F1D2B"
                     />
-                  </svg>
-                </button>
-                <button type="button" class="delete" (click)="delteJournalDetailRow($index)">
+                  </svg></button
+                ><button type="button" class="delete" (click)="deleteProductUnitRow($index)">
                   <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       opacity="0.4"
@@ -565,6 +462,78 @@
 </form>
 
 <p-dialog
+  header="&#1575;&#1604;&#1608;&#1581;&#1583;&#1575;&#1578;"
+  [modal]="true"
+  [visible]="isUnitsDialogVisible()"
+  [style]="{ width: '100%', maxWidth: '900px' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-base-bg!"
+  (onHide)="closeUnitsDialog()"
+  contentStyleClass="no-scrollbar"
+>
+  <div class="flex flex-col gap-4">
+    <div class="flex items-center justify-between gap-2">
+      <p class="text-sm text-dark-line/70 m-0">معاينة الوحدات وتعديلها أو حذفها.</p>
+      <p-button label="اغلاق" severity="secondary" (click)="closeUnitsDialog()" />
+    </div>
+
+    @if (productUnitRows.length === 0) {
+      <div class="rounded-lg border border-dark-line/10 px-4 py-6 text-center text-dark-line/70">
+        لا يوجد وحدات مضافة حاليا.
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full main-table table-fixed">
+          <thead>
+            <tr>
+              <th class="min-w-12.5 w-12.5">#</th>
+              <th>&#1575;&#1604;&#1608;&#1581;&#1583;&#1577;</th>
+              <th class="min-w-25 w-25">
+                &#1575;&#1604;&#1608;&#1581;&#1583;&#1577; &#1575;&#1604;&#1585;&#1574;&#1610;&#1587;&#1610;&#1577;
+              </th>
+              <th class="min-w-25 w-25">&#1575;&#1604;&#1603;&#1605;&#1610;&#1577;</th>
+              <th class="min-w-40 w-40">&#1575;&#1604;&#1571;&#1583;&#1608;&#1575;&#1578;</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of productUnitRows.controls; track $index) {
+              <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ getUnitDisplayName(item.controls.unitId.value) }}</td>
+                <td>{{ item.controls.isMainUnit.value ? '&#1606;&#1593;&#1605;' : '&#1604;&#1575;' }}</td>
+                <td>{{ item.controls.quantity.value ?? '-' }}</td>
+                <td class="min-w-45 w-45">
+                  <div class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      pButton
+                      class="border-dark-line! text-dark-line! px-4! py-1! text-sm!"
+                      variant="outlined"
+                      (click)="editProductUnitFromDialog($index)"
+                    >
+                      &#1578;&#1593;&#1583;&#1610;&#1604;
+                    </button>
+                    <button
+                      type="button"
+                      pButton
+                      class="border-red-500! text-red-500! px-4! py-1! text-sm!"
+                      variant="outlined"
+                      (click)="deleteProductUnitFromDialog($index)"
+                    >
+                      &#1581;&#1584;&#1601;
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</p-dialog>
+
+<p-dialog
   header=" "
   [modal]="true"
   [visible]="isGroupsDialogVisible()"
@@ -575,10 +544,8 @@
   contentStyleClass="no-scrollbar"
 >
   <div [class]="`flex flex-col gap-6 items-center justify-center ${isLoading() ? 'opacity-70 cursor-wait' : ''}`">
-    <!--  -->
     <div class="flex justify-end gap-2">
       <p-button label="Cancel" severity="secondary" (click)="closeGroupsDialog()" />
-      <!-- <p-button label="Save" (click)="submitItemChange()" /> -->
     </div>
   </div>
 </p-dialog>

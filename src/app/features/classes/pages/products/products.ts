@@ -17,21 +17,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-products',
-  imports: [
-    ReactiveFormsModule,
-    InputErrorMessageHandler,
-    InputGroupAddon,
-    InputTextModule,
-    SelectModule,
-    PaginatorModule,
-    ImgFallback,
-    RouterLink,
-    RouterLinkActive,
-    SectionWrapper,
-    Debounce,
-    Menu,
-    TranslatePipe,
-  ],
+  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputGroupAddon, InputTextModule, SelectModule, PaginatorModule, ImgFallback, RouterLink, RouterLinkActive, SectionWrapper, Debounce, Menu, TranslatePipe],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
@@ -43,18 +29,11 @@ export class Products extends BaseComponent {
     toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
   };
   fg = this.fb.group(this.initialSearchFormValue);
-
   productService = inject(ProductService);
   calculatePrice = this.productService.calculatePrice;
   filterMenuItems = signal<MenuItem[]>([
-    {
-      label: 'الاسم',
-      command: (event) => this.fg.patchValue({ searchEnum: ProductSearchEnum.Name }),
-    },
-    {
-      label: 'اسم الفئة',
-      command: (event) => this.fg.patchValue({ searchEnum: ProductSearchEnum.CategoryName }),
-    },
+    { label: '\u0627\u0644\u0627\u0633\u0645', command: () => this.fg.patchValue({ searchEnum: ProductSearchEnum.Name }) },
+    { label: '\u0627\u0633\u0645 \u0627\u0644\u0641\u064a\u0654\u0629', command: () => this.fg.patchValue({ searchEnum: ProductSearchEnum.CategoryName }) },
   ]);
 
   constructor() {
@@ -63,77 +42,50 @@ export class Products extends BaseComponent {
   }
 
   periodOptions = [
-    { label: 'الكل', value: null },
-    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
-    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
-    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
-    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
+    { label: '\u0627\u0644\u0643\u0644', value: null },
+    { label: '\u0627\u062e\u0631 \u064a\u0648\u0645', value: this.getPreviousLocalDateIso(1) },
+    { label: '\u0627\u062e\u0631 \u0627\u0633\u0628\u0648\u0639', value: this.getPreviousLocalDateIso(7) },
+    { label: '\u0627\u062e\u0631 \u0634\u0647\u0631', value: this.getPreviousLocalDateIso(30) },
+    { label: '\u0627\u062e\u0631 \u0633\u0646\u0629', value: this.getPreviousLocalDateIso(365) },
   ];
 
   products = signal<IProductSearchRow[]>([]);
-  productsPaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
-    totalPagesCount: 0,
-    totalRowsCount: 0,
-  };
+  productsPaginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
   searchProducts(pageIndex: number) {
-    this.productService
-      .search({
-        paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 10,
-        },
-        searchFilters: [
-          {
-            column: this.fg.getRawValue().searchEnum,
-            values: [this.fg.getRawValue().searchTerm],
-          },
-        ],
-        fromDate: this.fg.getRawValue().fromDate,
-      })
-      .subscribe({
-        next: (res) => {
-          this.products.set(res.value.menuItems.rows);
-          this.productsPaginationInfo = {
-            pageIndex,
-            totalPagesCount: res.value.menuItems.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.menuItems.paginationInfo.totalRowsCount,
-          };
-        },
-      });
+    this.productService.search({
+      paginationInfo: { pageIndex, pageSize: 10 },
+      searchFilters: [{ column: this.fg.getRawValue().searchEnum, values: [this.fg.getRawValue().searchTerm] }],
+      fromDate: this.fg.getRawValue().fromDate,
+    }).subscribe({
+      next: (res) => {
+        this.products.set(res.value.menuItems.rows);
+        this.productsPaginationInfo = {
+          pageIndex,
+          totalPagesCount: res.value.menuItems.paginationInfo.totalPagesCount,
+          totalRowsCount: res.value.menuItems.paginationInfo.totalRowsCount,
+        };
+      },
+    });
   }
 
   onSubmit = () => this.fg.valid && this.searchProducts(1);
-
   onPageChange = (event: PaginatorState) => this.searchProducts(event.page! + 1);
 
   deleteProduct(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف المنتج',
-      header: 'حذف المنتج',
+      message: '\u0647\u0644 \u0627\u0646\u062a \u0645\u062a\u0627\u0654\u0643\u062f \u0645\u0646 \u062d\u0630\u0641 \u0627\u0644\u0645\u0646\u062a\u062c',
+      header: '\u062d\u0630\u0641 \u0627\u0644\u0645\u0646\u062a\u062c',
       icon: 'pi pi-info-circle',
-      rejectLabel: 'الغاء',
-      rejectButtonProps: {
-        label: 'الغاء',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'حذف',
-        severity: 'danger',
-      },
-
+      rejectLabel: '\u0627\u0644\u063a\u0627\u0621',
+      rejectButtonProps: { label: '\u0627\u0644\u063a\u0627\u0621', severity: 'secondary', outlined: true },
+      acceptButtonProps: { label: '\u062d\u0630\u0641', severity: 'danger' },
       accept: () => {
-        this.productService.delete(id).subscribe({
-          next: () => {
-            this.searchProducts(1);
-          },
-        });
+        this.productService.delete(id).subscribe({ next: () => this.searchProducts(1) });
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
+        this.messageService.add({ severity: 'error', summary: '\u0627\u0644\u063a\u0627\u0621', detail: '\u0644\u0642\u062f \u0642\u0645\u062a \u0628\u0627\u0644\u063a\u0627\u0621 \u0627\u0644\u062d\u0630\u0641' });
       },
     });
   }

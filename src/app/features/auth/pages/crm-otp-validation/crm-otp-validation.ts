@@ -26,7 +26,7 @@ export class CrmOtpValidation  extends BaseComponent {
 
     this.authService.validateCrmOtp(this.fg.getRawValue().otp).subscribe({
       next: (result) => {
-        if (result.token) {
+        if (result) {
           //strictly check for boolean response
           this.router.navigate(['/auth/reset-password']);
         }
