@@ -28,7 +28,7 @@ export class CrmOtpValidation  extends BaseComponent {
       next: (result) => {
         if (result) {
           //strictly check for boolean response
-          this.router.navigate(['/auth/reset-password']);
+          this.router.navigate(['/auth/login']);
         }
       },
     });

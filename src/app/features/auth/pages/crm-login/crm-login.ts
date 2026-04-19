@@ -29,14 +29,8 @@ export class CrmLogin extends BaseComponent {
 
     this.authService.sendCrmOtpToEmail(this.fg.getRawValue()).subscribe({
       next: (data) => {
-        if (this.isRememberLogin) {
-          this.authService.save('userDetails', data);
-        }
-        this.messageService.add({
-          severity: 'success',
-          summary: 'تم تسجيل الدخول',
-          detail: 'لقد قمت بتسجيل الدخول بنجاح',
-        });
+        console.log(data);
+        this.router.navigate(['/auth/crm-otp-validation']);
       },
     });
   }
