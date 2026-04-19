@@ -2,10 +2,10 @@
   <section class="flex flex-col gap-4 p-10 w-120">
     <div class="text-center">
       <a routerLink="/auth/login" class="text-app-blue text-sm underline cursor-pointer">تسجيل الدخول</a>
-      <h1 class="text-xl font-bold select-none mt-2">ادخل OTP code</h1>
+      <h1 class="text-xl font-bold select-none mt-2 text-white">ادخل OTP code</h1>
     </div>
     <p class="text-text-light text-sm text-center max-w-80 mx-auto leading-relaxed">
-      ادخل رمز التحقق الذي ارسلناه للتو علي البريد الالكتروني الخاص بك gt******.com
+      ادخل رمز التحقق الذي ارسلناه للتو علي البريد الالكتروني الخاص بك {{formattedEmail}}
     </p>
     <form class="flex w-full flex-col mt-4 gap-3" [formGroup]="fg" (ngSubmit)="onSubmit()">
       <app-input-error-message-handler>
@@ -13,20 +13,28 @@
           styleClass="aspect-square"
           dir="ltr"
           formControlName="otp"
-          style="--p-inputtext-border-color: var(--color-dark-bg-1); --p-inputtext-background: var(--color-text-dark)"
+          style="
+            --p-inputtext-border-color: var(--color-dark-bg-1);
+            --p-inputtext-background: var(--color-text-dark);
+            --p-inputtext-color: #fff;
+          "
           [integerOnly]="true"
           [length]="6"
         />
       </app-input-error-message-handler>
       <p
-        class="text-text-light text-sm text-center max-w-80 mx-auto leading-relaxed"
+        class="text-text-light text-sm text-center max-w-80 mx-auto leading-relaxed flex gap-1"
         [class.hidden]="isResendCountdownOver"
       >
-        يمكنك اعاده ارسال الرمز بعد
-        <countdown #countdown class="mx-auto w-fit" [config]="countdownConfig" (event)="handleCountdownEvent($event)" />
-        ثانيه
+        <span>يمكنك اعاده ارسال الرمز بعد</span>
+        <countdown #countdown class="mx-auto w-fit text-red-500" [config]="countdownConfig" (event)="handleCountdownEvent($event)" />
       </p>
-      <button class="text-app-blue text-sm cursor-pointer" [class.hidden]="!isResendCountdownOver" type="button">
+      <button
+        class="text-app-blue text-sm cursor-pointer"
+        (click)="resendOtp()"
+        [class.hidden]="!isResendCountdownOver"
+        type="button"
+      >
         اعاده ارسال الرمز ؟
       </button>
       <p-button
@@ -35,7 +43,7 @@
         class="w-full max-w-44 mx-auto"
         [style]="{
           '--p-button-primary-background': 'var(--color-dark-bg-1)',
-          '--p-button-primary-border-color': 'var(--color-dark-bg-2)'
+          '--p-button-primary-border-color': 'var(--color-dark-bg-2)',
         }"
         styleClass="w-full     cursor-pointer ! rounded py-2.5 mt-4 text-white!"
       />

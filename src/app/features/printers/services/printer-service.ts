@@ -42,6 +42,7 @@ export class PrinterService extends BaseSearchAndCrudService<
     super();
     this.patchEndpoints({
       getById: '',
+      put: 'update',
     });
   }
 

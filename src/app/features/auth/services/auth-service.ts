@@ -1,3 +1,4 @@
+import { ApiUrlOverrideService } from '@/core/services/api-url-override-service';
 import BaseService from '@/core/services/BaseService';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -32,8 +33,9 @@ export interface IUserDetails {
 export class AuthService extends BaseService {
   userDetails = signal<IUserDetails | null>(this.get('userDetails'));
   isAuthenticated = computed(() => this.userDetails() !== null);
+  apiUrlOverrideService = inject(ApiUrlOverrideService);
   override apiRoute = 'Auth';
-  crmApi='http://gtsdev-001-site23.atempurl.com'
+  crmApi = 'http://gtsdev-001-site23.atempurl.com';
 
   login(dto: ILoginDto) {
     let loginResultObs: Observable<IUserDetails>;
@@ -80,6 +82,7 @@ export class AuthService extends BaseService {
   get forgotPasswordEmail() {
     return this.get('forgotPasswordEmail');
   }
+  
   get forgotPasswordToken() {
     return this.get('forgotPasswordToken');
   }
@@ -167,17 +170,47 @@ export class AuthService extends BaseService {
     return this.http.post<boolean>(`${this.apiUrl}/changePassword`, dto);
   }
 
-  sendCrmOtpToEmail(obj: { emailOrPhone: string }) {
-    return this.http.get<boolean>(`${this.crmApi}/AuthUsers/GetAllYourActivations?email=${obj.emailOrPhone}` );
+  //
+  //
+  //
+  //
+  //
+  //
+  //crm
+  //
 
-    //then redirect to crm otp validation on success 
+  currentCrmEmail='';
+
+  sendCrmOtpToEmail(currentCrmEmail: string) {
+    this.currentCrmEmail = currentCrmEmail;
+    return this.http.get<boolean>(`${this.crmApi}/AuthUsers/GetAllYourActivations?email=${currentCrmEmail}`);
+
+    //then redirect to crm otp validation on success
+  }
+
+  resendCrmOtpToEmail() {
+    return this.sendCrmOtpToEmail(this.currentCrmEmail);
   }
 
   validateCrmOtp(otp: string) {
-    return this.http.get<{
-      expiryDate: string;
-      apiUrl: string;
-      activationCode: string;
-    }>(`${this.crmApi}/ProgramActivation/MobileProductActiveForClient?cloudIdActivation=${otp}` );
+    return this.http
+      .get<{
+        expireDate: string;
+        link: string;
+      }>(`${this.crmApi}/ProgramActivation/MobileProductActiveForClient?cloudIdActivation=${otp}`)
+      .pipe(
+        tap({
+          next: (result) => {
+            let link = result.link;
+            if (link[link.length - 1] !== '/') {
+              link += '/';
+            }
+            link += 'v1';
+            this.apiUrlOverrideService.applyApiUrl(link);
+            this.save('activationToken', otp);
+            this.save('crmEmail', this.currentCrmEmail);
+          },
+        }),
+      );
   }
 }

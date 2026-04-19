@@ -1,11 +1,11 @@
 import { BaseComponent } from '@/components';
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputErrorMessageHandler } from "@/yn-ng";
-import { InputText } from "primeng/inputtext";
-import { Password } from "primeng/password";
-import { Button } from "primeng/button";
-import { RouterLink } from "@angular/router";
+import { emailValidator, InputErrorMessageHandler } from '@/yn-ng';
+import { InputText } from 'primeng/inputtext';
+import { Password } from 'primeng/password';
+import { Button } from 'primeng/button';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-crm-login',
@@ -16,7 +16,7 @@ import { RouterLink } from "@angular/router";
 export class CrmLogin extends BaseComponent {
   isRememberLogin = true;
   initialFormValue = {
-    emailOrPhone: this.fb.control<string>('admin@admin.com', [Validators.required]),
+    emailOrPhone: this.fb.control<string | null>(null, [Validators.required, Validators.email, emailValidator]),
   };
 
   fg = this.fb.group(this.initialFormValue);
@@ -27,7 +27,7 @@ export class CrmLogin extends BaseComponent {
       return;
     }
 
-    this.authService.sendCrmOtpToEmail(this.fg.getRawValue()).subscribe({
+    this.authService.sendCrmOtpToEmail(this.fg.getRawValue().emailOrPhone!).subscribe({
       next: (data) => {
         console.log(data);
         this.router.navigate(['/auth/crm-otp-validation']);

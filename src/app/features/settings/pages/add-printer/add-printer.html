@@ -30,19 +30,35 @@
         </app-input-error-message-handler>
       </div>
 
-      <!-- Port -->
-      <div>
-        <label for="productName">Port</label>
-        <app-input-error-message-handler>
-          <input
+      @if (fg.value.type === PrinterType.Network) {
+        <!-- Port -->
+        <div>
+          <label for="port">Port</label>
+          <app-input-error-message-handler [fc]="fg.controls.port">
+            <input
             pInputText
-            id="productName"
+            id="port"
             formControlName="port"
-            aria-describedby="productName-help"
-            placeholder="port"
-          />
-        </app-input-error-message-handler>
-      </div>
+            aria-describedby="port-help"
+              placeholder="port"
+            />
+          </app-input-error-message-handler>
+        </div>
+      } @else {
+        <!-- com Port -->
+        <div>
+          <label for="comPort">Port</label>
+          <app-input-error-message-handler [fc]="fg.controls.comPort">
+            <input
+              pInputText
+              id="comPort"
+              formControlName="comPort"
+              aria-describedby="comPort-help"
+              placeholder="comPort"
+            />
+          </app-input-error-message-handler>
+        </div>
+      }
 
       <!-- Printer Type -->
       <div>
@@ -213,7 +229,9 @@
                 </td>
                 <td>
                   <div class="actions">
-                    <button type="button" pButton class="app-p-btn w-fit! px-3!" (click)="pickBluetoothPrinter(item)">اختر</button>
+                    <button type="button" pButton class="app-p-btn w-fit! px-3!" (click)="pickBluetoothPrinter(item)">
+                      اختر
+                    </button>
                   </div>
                 </td>
               </tr>

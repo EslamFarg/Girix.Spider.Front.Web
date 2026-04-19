@@ -32,18 +32,18 @@ export class ApiUrlOverrideService {
   applyApiUrl(apiUrl: string) {
     const normalizedApiUrl = this.normalizeApiUrl(apiUrl);
 
-    if (normalizedApiUrl === this.normalizedDefaultApiUrl) {
-      BaseService.clearApiBaseUrlOverride();
-    } else {
+    // if (normalizedApiUrl === this.normalizedDefaultApiUrl) {
+    //   BaseService.clearApiBaseUrlOverride();
+    // } else {
       BaseService.setApiBaseUrlOverride(normalizedApiUrl);
-    }
+    // }
 
     this.closeDialog();
-    this.messageService.add({
-      severity: 'success',
-      summary: 'API URL updated',
-      detail: 'The application will reload and use the selected API URL.',
-    });
+    // this.messageService.add({
+    //   severity: 'success',
+    //   summary: 'API URL updated',
+    //   detail: 'The application will reload and use the selected API URL.',
+    // });
 
     this.reloadApplication();
   }
@@ -65,6 +65,6 @@ export class ApiUrlOverrideService {
   }
 
   private reloadApplication() {
-    setTimeout(() => window.location.reload(), 300);
+    // setTimeout(() => window.location.reload(), 300);
   }
 }

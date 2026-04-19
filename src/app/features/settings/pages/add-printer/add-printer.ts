@@ -10,6 +10,7 @@ import { ReactiveFormsModule, Validators, ɵInternalFormsSharedModule } from '@a
 import { IPrinterSearchRow, PrinterService, PrinterType } from '@/features/printers';
 import { Dialog } from 'primeng/dialog';
 import { IBluetoothPrinter } from '@/app';
+import { onlyNumbersAllowed } from '@/yn-ng';
 
 @Component({
   selector: 'app-add-printer',
@@ -32,9 +33,25 @@ export class AddPrinter extends BaseComponent {
   printerFg = {
     name: this.fb.control<string | null>(null, [Validators.required]),
     ipAddressOrMacAddress: this.fb.control<string | null>(null, [Validators.required]),
-    port: this.fb.control<any>(null, [Validators.required]),
+    port: this.fb.control<any>(null, []),
+    comPort: this.fb.control<any>(null, [Validators.required]),
     type: this.fb.control<PrinterType>(PrinterType.Bluetooth, [Validators.required]),
   };
+  fg = this.fb.group(this.printerFg);
+  fgListener = this.fg.valueChanges.subscribe((values) => {
+    const portControl= this.fg.controls.port;
+    const comPortControl= this.fg.controls.comPort;
+
+    if(values.type === PrinterType.Network){
+      portControl.setValidators([Validators.required,onlyNumbersAllowed]);
+      comPortControl.clearValidators();
+      comPortControl.setValue(null);
+    }else{
+      portControl.clearValidators();
+      portControl.setValue(0);
+      comPortControl.setValidators([Validators.required]);
+    }
+  })
   printers = signal<IPrinterSearchRow[]>([]);
   currentPrinter = signal<IPrinterSearchRow | null>(null);
   /**
@@ -45,13 +62,14 @@ export class AddPrinter extends BaseComponent {
     this.updatePrintersList();
   }
 
-  fg = this.fb.group(this.printerFg);
   printerService = inject(PrinterService);
 
   onSubmit() {
     if (this.fg.invalid) {
-      return;
+      console.log(this.fg.value);
+      console.log('invalid');
       this.fg.markAllAsTouched();
+      return;
     }
 
     switch (!!this.currentPrinter()) {
@@ -172,8 +190,9 @@ export class AddPrinter extends BaseComponent {
     this.fg.patchValue({
       name: item.name,
       ipAddressOrMacAddress: item.id,
-      port: item.com,
+      comPort: item.com,
       type: PrinterType.Bluetooth,
+      port: 0,
     });
     this.bluetoothPrintersDialogVisible = false;
   }

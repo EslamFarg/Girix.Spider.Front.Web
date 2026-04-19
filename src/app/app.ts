@@ -8,6 +8,7 @@ import { TranslateService, TranslatePipe, TranslateDirective } from '@ngx-transl
 import { KeyboardService } from './features/keyboard/services/keyboard-service';
 import { PrintDialog } from './features/printers/components/print-dialog/print-dialog';
 import { PrinterType } from './features/printers';
+import { AuthService } from './features/auth/services/auth-service';
 
 export interface IElectronPrinter {
   id: number;
@@ -53,7 +54,8 @@ export class App {
   private translate = inject(TranslateService);
   keyboardService = inject(KeyboardService);
   router = inject(Router);
-
+  authService = inject(AuthService);
+  isAuthenticated = this.authService.isAuthenticated;
   constructor() {
     this.translate.addLangs(['ar', 'en']);
     this.translate.setFallbackLang('ar');
@@ -69,10 +71,4 @@ export class App {
     //go to replacements
     // this.router.navigate(['replacements/huts']);
   }
-
-
-   
 }
-
-
- 

@@ -1,22 +1,35 @@
 import { BaseComponent } from '@/components';
-import { Component } from '@angular/core';
+import { Component, viewChild } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdown';
-import { InputOtp } from "primeng/inputotp";
-import { InputErrorMessageHandler } from "@/yn-ng";
-import { Button } from "primeng/button";
+import { InputOtp } from 'primeng/inputotp';
+import { InputErrorMessageHandler } from '@/yn-ng';
+import { Button } from 'primeng/button';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-crm-otp-validation',
-  imports: [InputOtp, InputErrorMessageHandler, CountdownComponent, Button,ReactiveFormsModule],
+  imports: [InputOtp, InputErrorMessageHandler, CountdownComponent, Button, ReactiveFormsModule, RouterLink],
   templateUrl: './crm-otp-validation.html',
   styleUrl: './crm-otp-validation.css',
 })
-export class CrmOtpValidation  extends BaseComponent {
+export class CrmOtpValidation extends BaseComponent {
   initialFormValue = {
     otp: this.fb.control<string>('', [Validators.required, Validators.minLength(6)]),
   };
   fg = this.fb.group(this.initialFormValue);
+  currentEmail = this.authService.currentCrmEmail;
+  formattedEmail = this.currentEmail.substring(0, 3) + '***' + this.currentEmail.substring(6);
+
+  /**
+   *
+   */
+  constructor() {
+    super();
+    if (!this.authService.currentCrmEmail) {
+      this.router.navigate(['/auth/crm-login']);
+    }
+  }
 
   onSubmit() {
     if (this.fg.invalid) {
@@ -27,9 +40,48 @@ export class CrmOtpValidation  extends BaseComponent {
     this.authService.validateCrmOtp(this.fg.getRawValue().otp).subscribe({
       next: (result) => {
         if (result) {
-          //strictly check for boolean response
-          this.router.navigate(['/auth/login']);
+          const expiryDate = new Date(result.expireDate);
+          if (expiryDate <= new Date()) {
+            //if expired
+            this.messageService.add({
+              severity: 'error',
+              summary: 'تم التحقق',
+              detail: `تم انتهاء صلاحية التطبيق`,
+              life: 1000 * 60 * 60,
+            });
+          } else {
+            //if not expired
+            this.authService.save('expireDate', expiryDate.toISOString());
+            this.router.navigate(['/auth/login']).finally(() => {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'تم التحقق',
+                detail: `تم تفعيل التطبيق حتي ${expiryDate.toLocaleString()}`,
+                life: 1000 * 60 * 60,
+              });
+            });
+          }
         }
+      },
+    });
+  }
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  // resend otp
+  //
+  countDown = viewChild<CountdownComponent>('countdown');
+  resendOtp() {
+    this.authService.resendCrmOtpToEmail().subscribe({
+      next: (result) => {
+        this.isResendCountdownOver = false;
+        this.countDown()?.restart();
       },
     });
   }
@@ -37,7 +89,7 @@ export class CrmOtpValidation  extends BaseComponent {
   isResendCountdownOver = false;
 
   //countdown
-  countdownConfig: CountdownConfig = { format: 'ss', leftTime: 35 };
+  countdownConfig: CountdownConfig = { format: 'mm:ss', leftTime: 120 };
   handleCountdownEvent(event: CountdownEvent) {
     if (event.action === 'done' || event.action === 'stop') {
       console.log('done');

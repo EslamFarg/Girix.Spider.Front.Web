@@ -55,7 +55,7 @@
           <th>{{ 'CLASSES.PRODUCTS.GROUP' | translate }}</th>
           <th>{{ 'CLASSES.PRODUCTS.DETAIL' | translate }}</th>
           <th>{{ 'CLASSES.PRODUCTS.PRODUCT_ADDITION' | translate }}</th>
-          <th>{{ 'CLASSES.PRODUCTS.TAX_VALUE' | translate }}</th>
+          <th>{{ 'FORM.TAX_VALUE' | translate }}</th>
           <th>{{ 'CLASSES.PRODUCTS.PRICE' | translate }}</th>
           <th>{{ 'ACTIONS.TOOLS' | translate }}</th>
         </tr>
@@ -99,10 +99,10 @@
               </div>
             </td>
             <td class="font-bold">
-              <div>{{ item.tax }}</div>
+              <div>{{ item?.tax?.toFixed(2) }}</div>
             </td>
             <td class="font-bold">
-              <div>${{ calculatePrice(item, true) }}</div>
+              <div>${{ calculatePrice(item, true)?.toFixed(2) }}</div>
             </td>
             <td>
               <div class="actions">

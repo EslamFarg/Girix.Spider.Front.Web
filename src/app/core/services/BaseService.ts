@@ -13,6 +13,9 @@ type localStorageKey =
   | 'forgotPasswordEmail'
   | 'forgotPasswordToken'
   | 'printers'
+  | 'expireDate'
+  | 'activationToken'
+  | 'crmEmail'
   | typeof API_URL_OVERRIDE_STORAGE_KEY;
 export interface IEndpoints {
   create: string;
@@ -37,7 +40,7 @@ export default abstract class BaseService {
   }
 
   static getResolvedApiBaseUrl() {
-    return BaseService.getStoredApiBaseUrlOverride() ?? environment.apiUrl;
+    return BaseService.getStoredApiBaseUrlOverride()??'' ;//?? environment.apiUrl;
   }
 
   static apiBaseUrl = BaseService.getResolvedApiBaseUrl();
