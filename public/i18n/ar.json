@@ -203,7 +203,9 @@
     "ACCOUNT_NAME": "اسم الحساب",
     "CASH_ACCOUNT": "حساب كاش",
     "NETWORK_ACCOUNT": "حساب شبكة",
-    "TAX_VALUE": "قيمه الضريبه"
+    "TAX_VALUE": "قيمه الضريبه",
+    "NAME_AR": "الاسم بالعربي",
+    "NAME_EN": "الاسم بالانجليزي"
   },
 
   "ACTIONS": {
@@ -301,6 +303,8 @@
       "DESCRIPTION": "البيان",
       "IMAGE": "صوره المنتج",
       "DETAIL": "وصف المنتج",
+      "UNITS": "وحدات المنتج",
+      "COMPONENTS": "مكونات المنتج",
       "PRODUCT_ADDITION": "المنتج كاضافه"
     },
     "GROUPS": {

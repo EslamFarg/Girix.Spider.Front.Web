@@ -7,7 +7,14 @@ import { SelectFilterEvent, SelectLazyLoadEvent, SelectModule } from 'primeng/se
 import { CarouselModule } from 'primeng/carousel';
 import { TextareaModule } from 'primeng/textarea';
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components/base-component/base-component';
-import { IProductCreateUnit, IProductReadResponse, IProductSearchRow, IProductUnit, ProductSearchEnum, ProductService } from '../../services/product-service';
+import {
+  IProductCreateUnit,
+  IProductReadResponse,
+  IProductSearchRow,
+  IProductUnit,
+  ProductSearchEnum,
+  ProductService,
+} from '../../services/product-service';
 import { FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GroupSearchEnum, GroupService, IGroupSearchRow } from '../../services/group-service';
 import { ImgOnly } from '@/directives/img-only';
@@ -25,6 +32,8 @@ import { ImgFallback } from '@/directives/img-fallback';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { IUnitSearchRow, UnitSearchEnum, UnitService } from '../../services/unit-service';
 import { RouterLink } from '@angular/router';
+import { IProductComponentReadResponse } from '../../types/product-components/responses';
+import { ProductComponentsService } from '../../services/product-components-service';
 
 interface IProductUnitFormRow {
   unitId: number | null;
@@ -68,9 +77,18 @@ export class ProductForm extends BaseComponent implements OnInit {
 
   initialProductFgValue = {
     nameEn: this.fb.control<string>('', [Validators.required]),
-    nameAr: this.fb.control<string>('', [Validators.required, noSymbolsAllowed, Validators.minLength(3), Validators.maxLength(200)]),
+    nameAr: this.fb.control<string>('', [
+      Validators.required,
+      noSymbolsAllowed,
+      Validators.minLength(3),
+      Validators.maxLength(200),
+    ]),
     descriptionEn: this.fb.control<string>('', [Validators.required]),
-    descriptionAr: this.fb.control<string>('', [Validators.required, Validators.minLength(3), Validators.maxLength(1000)]),
+    descriptionAr: this.fb.control<string>('', [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(1000),
+    ]),
     price: this.fb.control<number | null>(0, [Validators.required, Validators.min(0)]),
     costPrice: this.fb.control<number | null>(0, [Validators.required, Validators.min(0)]),
     tax: this.fb.control<number | null>(0, [Validators.required]),
@@ -78,12 +96,18 @@ export class ProductForm extends BaseComponent implements OnInit {
     isAddition: this.fb.control<boolean | null>(false, [Validators.required]),
     idsAdditionMenuItem: this.fb.control<number[] | null>([], []),
     images: this.fb.control<File[] | { id: number; fullPath: string }[] | null>([], []),
-    menuItemUnits: this.fb.array<FormGroup<IProductUnitFormRowControls>>([], [Validators.required, Validators.minLength(1)]),
+    menuItemUnits: this.fb.array<FormGroup<IProductUnitFormRowControls>>(
+      [],
+      [Validators.required, Validators.minLength(1)],
+    ),
     categoryId: this.fb.control<number | null>(null, [Validators.required]),
     id: this.fb.control<number>(0, []),
     imagesAdd: this.fb.control<File[]>([], []),
     listIdsOfDeleteImages: this.fb.control<number[]>([], []),
-    allImages: this.fb.control<IFormImage[]>([], [Validators.required, Validators.minLength(1), Validators.maxLength(6)]),
+    allImages: this.fb.control<IFormImage[]>(
+      [],
+      [Validators.required, Validators.minLength(1), Validators.maxLength(6)],
+    ),
   };
 
   productService = inject(ProductService);
@@ -111,7 +135,9 @@ export class ProductForm extends BaseComponent implements OnInit {
     const current = this.currentGroup();
     const groups = this.groups();
     if (!current) return groups;
-    return groups.some((g) => g.id === current.id) ? groups.map((g) => (g.id === current.id ? { ...g, ...current } : g)) : [current, ...groups];
+    return groups.some((g) => g.id === current.id)
+      ? groups.map((g) => (g.id === current.id ? { ...g, ...current } : g))
+      : [current, ...groups];
   });
   groupsPaginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
   previousGroupsSearchTerm = '';
@@ -130,39 +156,26 @@ export class ProductForm extends BaseComponent implements OnInit {
   additionPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
   previousAdditionsSearchTerm = '';
 
-  units = signal<IUnitSearchRow[]>([]);
-  currentUnits = signal<Partial<IUnitSearchRow>[]>([]);
-  displayedUnits = computed(() => {
-    const current = this.currentUnits();
-    const units = this.units();
-    if (!current.length) return units;
-    const currentMap = new Map(current.map((unit) => [unit.id, unit]));
-    const merged = units.map((unit) => (currentMap.has(unit.id) ? { ...unit, ...currentMap.get(unit.id)! } : unit));
-    const missing = current.filter((unit) => !units.some((existing) => existing.id === unit.id));
-    return [...missing, ...merged] as IUnitSearchRow[];
-  });
-  unitsPaginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
   previousUnitsSearchTerm = '';
   isUnitsDialogVisible = signal(false);
 
   lastClickedTableRowIndex = signal<number | null>(null);
   currentEditRowIndex = signal<number>(-1);
-  newProductUnitRowFg!: FormGroup<IProductUnitFormRowControls>;
+  newProductUnitRowFg = this.fb.group<IProductUnitFormRowControls>({
+    unitId: this.fb.control<number | null>(null, [Validators.required]),
+    quantity: this.fb.control<number | null>(null, [Validators.required, Validators.min(1)]),
+    isMainUnit: this.fb.control<boolean | null>(false, [Validators.required]),
+  });
 
   constructor() {
     super();
     effect(() => console.log(this.allImages()));
   }
 
-  get productUnitRows() {
-    return this.productFg.controls.menuItemUnits;
-  }
-
   ngOnInit() {
     this.searchGroups({ pageIndex: 1 });
     this.searchAdditions({ pageIndex: 1 });
     this.searchUnits({ pageIndex: 1 });
-    this.setUpNewProductUnitRowFg();
 
     this.productFg.get('isAddition')?.valueChanges.subscribe((isAddition) => {
       if (isAddition) {
@@ -195,7 +208,10 @@ export class ProductForm extends BaseComponent implements OnInit {
         this.currentUnits.set(units.map((unit) => ({ id: unit.unitId, nameAr: unit.unitName, nameEn: unit.unitName })));
         this.productFg.setControl(
           'menuItemUnits',
-          this.fb.array(units.map((unit) => this.createProductUnitRowFg(this.mapProductUnitToFormRow(unit))), [Validators.required, Validators.minLength(1)]),
+          this.fb.array(
+            units.map((unit) => this.createProductUnitRowFg(this.mapProductUnitToFormRow(unit))),
+            [Validators.required, Validators.minLength(1)],
+          ),
         );
       });
     }
@@ -246,7 +262,10 @@ export class ProductForm extends BaseComponent implements OnInit {
 
     formData.set('price', this.calculatePrice(product as any, false).toString());
 
-    (this.formMode() === FormMode.Create ? this.productService.create(formData) : this.productService.patch(formData)).subscribe({
+    (this.formMode() === FormMode.Create
+      ? this.productService.create(formData)
+      : this.productService.patch(formData)
+    ).subscribe({
       next: (res) => console.log(res),
     });
   }
@@ -259,14 +278,20 @@ export class ProductForm extends BaseComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: '\u062e\u0637\u0627\u0654',
-          detail: '\u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0643\u062b\u0631 \u0645\u0646 6 \u0635\u0648\u0631\u0629',
+          detail:
+            '\u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0643\u062b\u0631 \u0645\u0646 6 \u0635\u0648\u0631\u0629',
         });
         return;
       }
       const files = Array.from(input.files);
       this.newImages.update((prev) => [
         ...prev,
-        ...files.map((file, ix) => ({ file, fullPath: URL.createObjectURL(file), id: 'new-image-' + Date.now() * Math.random(), ix })),
+        ...files.map((file, ix) => ({
+          file,
+          fullPath: URL.createObjectURL(file),
+          id: 'new-image-' + Date.now() * Math.random(),
+          ix,
+        })),
       ]);
       this.productFg.patchValue({ allImages: [...this.allImages()] });
       this.currentImage.set(this.allImages()[0] ?? null);
@@ -279,7 +304,9 @@ export class ProductForm extends BaseComponent implements OnInit {
     if (isImageNew) this.newImages.update((images) => images.filter((i) => i.id !== this.currentImage()?.id));
     else {
       this.existingImages.update((images) => images.filter((i) => i.id !== this.currentImage()?.id));
-      this.productFg.patchValue({ listIdsOfDeleteImages: [...this.productFg.value.listIdsOfDeleteImages!, this.currentImage()?.id as number] });
+      this.productFg.patchValue({
+        listIdsOfDeleteImages: [...this.productFg.value.listIdsOfDeleteImages!, this.currentImage()?.id as number],
+      });
     }
     this.currentImage.set(this.allImages()[0] ?? null);
   }
@@ -287,28 +314,31 @@ export class ProductForm extends BaseComponent implements OnInit {
   onSelectImage = (ix: number) => this.currentImage.set(this.allImages()[ix]);
 
   searchGroups(opts: { pageIndex: number; searchTerm?: string }) {
-    this.groupService.search({
-      paginationInfo: { pageIndex: opts.pageIndex, pageSize: 10 },
-      searchFilters: [{ column: GroupSearchEnum.Name, values: [opts.searchTerm ?? ''] }],
-      fromDate: this.dateNowIso,
-    }).subscribe({
-      next: (res) => {
-        if (res.value.rows.length === 0) return;
-        this.previousGroupsSearchTerm = opts.searchTerm ?? '';
-        if (opts.pageIndex === 1) this.groups.set(res.value.rows);
-        else this.groups.update((pre) => [...pre, ...res.value.rows]);
-        this.groupsPaginationInfo = {
-          pageIndex: opts.pageIndex,
-          totalPagesCount: res.value.paginationInfo.totalPagesCount,
-          totalRowsCount: res.value.paginationInfo.totalRowsCount,
-        };
-      },
-    });
+    this.groupService
+      .search({
+        paginationInfo: { pageIndex: opts.pageIndex, pageSize: 10 },
+        searchFilters: [{ column: GroupSearchEnum.Name, values: [opts.searchTerm ?? ''] }],
+        fromDate: this.dateNowIso,
+      })
+      .subscribe({
+        next: (res) => {
+          if (res.value.rows.length === 0) return;
+          this.previousGroupsSearchTerm = opts.searchTerm ?? '';
+          if (opts.pageIndex === 1) this.groups.set(res.value.rows);
+          else this.groups.update((pre) => [...pre, ...res.value.rows]);
+          this.groupsPaginationInfo = {
+            pageIndex: opts.pageIndex,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          };
+        },
+      });
   }
 
   getNextGroupsPage(event: SelectLazyLoadEvent) {
     if (event.first === 0) return;
-    if (event.last === this.groups().length) this.emitDebounceItem('searchGroups', { pageIndex: this.groupsPaginationInfo.pageIndex + 1, searchValue: '' });
+    if (event.last === this.groups().length)
+      this.emitDebounceItem('searchGroups', { pageIndex: this.groupsPaginationInfo.pageIndex + 1, searchValue: '' });
   }
 
   onGroupsFilter(event: SelectFilterEvent) {
@@ -317,36 +347,45 @@ export class ProductForm extends BaseComponent implements OnInit {
 
   onGroupsNameSearch(event: any, searchTerm: string = '') {
     if (searchTerm?.length > 100) return;
-    this.searchGroups({ pageIndex: searchTerm !== this.previousGroupsSearchTerm ? 1 : this.groupsPaginationInfo.pageIndex + 1, searchTerm });
+    this.searchGroups({
+      pageIndex: searchTerm !== this.previousGroupsSearchTerm ? 1 : this.groupsPaginationInfo.pageIndex + 1,
+      searchTerm,
+    });
   }
 
   searchAdditions(opts: { pageIndex: number; searchTerm?: string }) {
-    this.productService.search({
-      paginationInfo: { pageIndex: opts.pageIndex, pageSize: 20 },
-      searchFilters: [
-        { column: ProductSearchEnum.IsAddition, values: ['true'] },
-        { column: ProductSearchEnum.Name, values: [opts.searchTerm ?? ''] },
-      ],
-      fromDate: null,
-      removeDateFilter: true,
-    }).subscribe({
-      next: (res) => {
-        if (res.value.menuItems.rows.length === 0) return;
-        this.previousAdditionsSearchTerm = opts.searchTerm ?? '';
-        if (opts.pageIndex === 1) this.additionProducts.set(res.value.menuItems.rows);
-        else this.additionProducts.update((prev) => prev.concat(res.value.menuItems.rows));
-        this.additionPaginationInfo = {
-          pageIndex: opts.pageIndex,
-          totalPagesCount: res.value.menuItems.paginationInfo.totalPagesCount,
-          totalRowsCount: res.value.menuItems.paginationInfo.totalRowsCount,
-        };
-      },
-    });
+    this.productService
+      .search({
+        paginationInfo: { pageIndex: opts.pageIndex, pageSize: 20 },
+        searchFilters: [
+          { column: ProductSearchEnum.IsAddition, values: ['true'] },
+          { column: ProductSearchEnum.Name, values: [opts.searchTerm ?? ''] },
+        ],
+        fromDate: null,
+        removeDateFilter: true,
+      })
+      .subscribe({
+        next: (res) => {
+          if (res.value.menuItems.rows.length === 0) return;
+          this.previousAdditionsSearchTerm = opts.searchTerm ?? '';
+          if (opts.pageIndex === 1) this.additionProducts.set(res.value.menuItems.rows);
+          else this.additionProducts.update((prev) => prev.concat(res.value.menuItems.rows));
+          this.additionPaginationInfo = {
+            pageIndex: opts.pageIndex,
+            totalPagesCount: res.value.menuItems.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.menuItems.paginationInfo.totalRowsCount,
+          };
+        },
+      });
   }
 
   getNextAdditionProductsPage(event: SelectLazyLoadEvent) {
     if (event.first === 0) return;
-    if (event.last === this.additionProducts().length) this.emitDebounceItem('searchAdditionProducts', { pageIndex: this.additionPaginationInfo.pageIndex + 1, searchValue: '' });
+    if (event.last === this.additionProducts().length)
+      this.emitDebounceItem('searchAdditionProducts', {
+        pageIndex: this.additionPaginationInfo.pageIndex + 1,
+        searchValue: '',
+      });
   }
 
   onAdditionProductsFilter(event: any) {
@@ -355,51 +394,167 @@ export class ProductForm extends BaseComponent implements OnInit {
 
   onAdditionProductsSearch(event: any, searchTerm: string = '') {
     if (searchTerm?.length > 100) return;
-    this.searchAdditions({ pageIndex: searchTerm !== this.previousAdditionsSearchTerm ? 1 : this.additionPaginationInfo.pageIndex + 1, searchTerm });
-  }
-
-  searchUnits(opts: { pageIndex: number; searchTerm?: string }) {
-    this.unitService.search({
-      paginationInfo: { pageIndex: opts.pageIndex, pageSize: 20 },
-      searchFilters: [{ column: UnitSearchEnum.Name, values: [opts.searchTerm ?? ''] }],
-      fromDate: null,
-    }).subscribe({
-      next: (res) => {
-        if (res.value.rows.length === 0) return;
-        this.previousUnitsSearchTerm = opts.searchTerm ?? '';
-        if (opts.pageIndex === 1) this.units.set(res.value.rows);
-        else this.units.update((prev) => prev.concat(res.value.rows));
-        this.unitsPaginationInfo = {
-          pageIndex: opts.pageIndex,
-          totalPagesCount: res.value.paginationInfo.totalPagesCount,
-          totalRowsCount: res.value.paginationInfo.totalRowsCount,
-        };
-      },
+    this.searchAdditions({
+      pageIndex: searchTerm !== this.previousAdditionsSearchTerm ? 1 : this.additionPaginationInfo.pageIndex + 1,
+      searchTerm,
     });
   }
 
+  //
+  //
+  //
+  //#region units
+  //
+
+  units = signal<IUnitSearchRow[]>([]);
+  currentUnits = signal<Partial<IUnitSearchRow>[]>([]);
+  displayedUnits = computed(() => {
+    const current = this.currentUnits();
+    const units = this.units();
+    if (!current.length) return units;
+    const currentMap = new Map(current.map((unit) => [unit.id, unit]));
+    const merged = units.map((unit) => (currentMap.has(unit.id) ? { ...unit, ...currentMap.get(unit.id)! } : unit));
+    const missing = current.filter((unit) => !units.some((existing) => existing.id === unit.id));
+    return [...missing, ...merged] as IUnitSearchRow[];
+  });
+  unitsPaginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
+
+  searchUnits(opts: { pageIndex: number; searchTerm?: string }) {
+    this.unitService
+      .search({
+        paginationInfo: { pageIndex: opts.pageIndex, pageSize: 30 },
+        searchFilters: [{ column: UnitSearchEnum.Name, values: [opts.searchTerm ?? ''] }],
+        fromDate: null,
+      })
+      .subscribe({
+        next: (res) => {
+          if (res.value.rows.length === 0) return;
+          this.previousUnitsSearchTerm = opts.searchTerm ?? '';
+          if (opts.pageIndex === 1) this.units.set(res.value.rows);
+          else this.units.update((prev) => prev.concat(res.value.rows));
+          this.unitsPaginationInfo = {
+            pageIndex: opts.pageIndex,
+            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          };
+        },
+      });
+  }
+
   onUnitsSearch(event: any, searchTerm: string = '') {
+    console.log('onUnitsSearch', event);
     if (searchTerm?.length > 100) return;
-    if (event?.type === 'scrollToEnd' && searchTerm === this.previousUnitsSearchTerm) this.searchUnits({ pageIndex: this.unitsPaginationInfo.pageIndex + 1, searchTerm });
+    console.log(searchTerm, this.previousUnitsSearchTerm);
+    if (event?.type === 'scrollToEnd' && searchTerm === this.previousUnitsSearchTerm)
+      this.searchUnits({ pageIndex: this.unitsPaginationInfo.pageIndex + 1, searchTerm });
     else this.searchUnits({ pageIndex: 1, searchTerm });
+  }
+
+  onUnitsTableScroll($event: Event) {
+    //call onUnitsTableScrollToBottom if scrolled to the bottom
+    console.log('onUnitsTableScroll');
+
+    const target = $event.target as HTMLDivElement;
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) this.onUnitsTableScrollToBottom();
+  }
+
+  onUnitsTableScrollToBottom() {
+    console.log('onUnitsTableScrollToBottom');
+    if (this.unitsPaginationInfo.pageIndex < this.unitsPaginationInfo.totalPagesCount)
+      this.searchUnits({ pageIndex: this.unitsPaginationInfo.pageIndex + 1 });
   }
 
   openUnitsDialog = () => this.isUnitsDialogVisible.set(true);
   closeUnitsDialog = () => this.isUnitsDialogVisible.set(false);
 
-  editProductUnitRow(rowIndex: number) {
-    this.lastClickedTableRowIndex.set(rowIndex + 1);
-    this.currentEditRowIndex.set(rowIndex);
+  initialUnitFgValue = {
+    id: this.fb.control<number | null>(null, []),
+    nameAr: this.fb.control<string | null>(null, [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(100),
+    ]),
+    nameEn: this.fb.control<string | null>(null, [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(100),
+    ]),
+  };
+  unitFg = this.fb.group(this.initialUnitFgValue);
+
+  deleteUnit(unitId: number, event: Event) {
+    this.unitService.delete(unitId).subscribe({
+      next: () => this.searchUnits({ pageIndex: 1 }),
+    });
   }
 
-  isRowEditable(rowIndex: number) {
-    return this.currentEditRowIndex() === rowIndex;
+  editUnit(unit: IUnitSearchRow) {
+    this.unitFg.patchValue({
+      id: unit.id,
+      nameAr: unit.nameAr,
+      nameEn: unit.nameEn,
+    });
   }
 
-  deleteProductUnitRow(rowIndex: number) {
-    this.productUnitRows.removeAt(rowIndex);
-    this.currentEditRowIndex.set(-1);
-    this.syncCurrentUnitsFromRows();
+  onSubmitUnitForm() {
+    if (this.unitFg.invalid) return;
+
+    const formValue = this.unitFg.value;
+
+    if (formValue.id) {
+      this.unitService.put(formValue).subscribe({
+        next: () => this.searchUnits({ pageIndex: 1 }),
+      });
+    } else {
+      this.unitService.create(formValue).subscribe({
+        next: () => {
+          this.searchUnits({ pageIndex: 1 });
+          this.unitFg.reset();
+        },
+      });
+    }
+  }
+
+  //#endregion
+
+  //
+  //
+  //
+  //#region product unit
+  //
+
+  get productUnitRows() {
+    return this.productFg.controls.menuItemUnits;
+  }
+
+  addProductUnitRow() {
+    if (this.newProductUnitRowFg.invalid) {
+      this.newProductUnitRowFg.markAllAsTouched();
+      return;
+    }
+
+    const rowValue = this.newProductUnitRowFg.getRawValue();
+    const isUnitAlreadyAdded = this.productUnitRows.value.find((unit) => unit.unitId === rowValue.unitId);
+
+    if (isUnitAlreadyAdded) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'خطأ',
+        detail: 'الوحدة موجودة مسبقا',
+      });
+      return;
+    }
+
+    if (rowValue.isMainUnit) {
+      this.productUnitRows.controls.forEach((row) => {
+        row.controls.isMainUnit.setValue(false);
+      });
+    }
+
+    this.productUnitRows.push(this.createProductUnitRowFg(rowValue));
+    this.lastClickedTableRowIndex.set(this.productUnitRows.length - 1);
+
+    this.newProductUnitRowFg.reset();
   }
 
   createProductUnitRowFg(data?: IProductUnitFormRow) {
@@ -410,58 +565,8 @@ export class ProductForm extends BaseComponent implements OnInit {
     });
   }
 
-  setUpNewProductUnitRowFg() {
-    this.currentEditRowIndex.set(-1);
-    if (this.newProductUnitRowFg) this.newProductUnitRowFg.reset({ unitId: null, quantity: null, isMainUnit: false });
-    else this.newProductUnitRowFg = this.createProductUnitRowFg();
-  }
-
-  addProductUnitRow() {
-    if (this.newProductUnitRowFg.invalid) {
-      this.newProductUnitRowFg.markAllAsTouched();
-      return;
-    }
-
-    const rowValue = this.newProductUnitRowFg.getRawValue();
-    const editingRowIndex = this.currentEditRowIndex();
-
-    if (this.productUnitRows.controls.some((row, index) => index !== editingRowIndex && row.controls.unitId.value === rowValue.unitId)) {
-      this.messageService.add({
-        severity: 'error',
-        summary: '\u062e\u0637\u0627\u0654',
-        detail: '\u0627\u0644\u0648\u062d\u062f\u0629 \u0627\u0644\u0645\u062d\u062f\u062f\u0629 \u0645\u0648\u062c\u0648\u062f\u0629 \u0628\u0627\u0644\u0641\u0639\u0644',
-      });
-      return;
-    }
-
-    if (rowValue.isMainUnit) {
-      this.productUnitRows.controls.forEach((row, index) => {
-        if (index !== editingRowIndex) row.controls.isMainUnit.setValue(false);
-      });
-    }
-
-    if (editingRowIndex !== -1) {
-      this.productUnitRows.at(editingRowIndex).patchValue(rowValue);
-      this.lastClickedTableRowIndex.set(editingRowIndex);
-    } else {
-      this.productUnitRows.push(this.createProductUnitRowFg(rowValue));
-      this.lastClickedTableRowIndex.set(this.productUnitRows.length - 1);
-    }
-
-    this.syncCurrentUnitsFromRows();
-    this.setUpNewProductUnitRowFg();
-  }
-
-  editProductUnitFromDialog(rowIndex: number) {
-    const row = this.productUnitRows.at(rowIndex);
-    if (!row) return;
-    this.newProductUnitRowFg.patchValue(row.getRawValue());
-    this.editProductUnitRow(rowIndex);
-    this.closeUnitsDialog();
-  }
-
-  deleteProductUnitFromDialog(rowIndex: number) {
-    this.deleteProductUnitRow(rowIndex);
+  mapProductUnitToFormRow(unit: IProductUnit): IProductUnitFormRow {
+    return { unitId: unit.unitId, quantity: unit.quantity, isMainUnit: unit.isMainUnit };
   }
 
   onProductUnitMainChange(changedRowIndex: number) {
@@ -471,32 +576,196 @@ export class ProductForm extends BaseComponent implements OnInit {
     });
   }
 
-  onCurrentProductUnitChange(unit: IUnitSearchRow | null) {
-    if (!unit) return;
-    this.newProductUnitRowFg.controls.unitId.setValue(unit.id);
-    this.syncCurrentUnitsFromRows(unit);
+  editProductUnitRow(rowIndex: number) {
+    this.lastClickedTableRowIndex.set(rowIndex + 1);
+    this.currentEditRowIndex.set(rowIndex);
   }
 
-  onExistingProductUnitChange(unit: IUnitSearchRow | null) {
-    if (unit) this.syncCurrentUnitsFromRows(unit);
+  deleteProductUnitRow(rowIndex: number) {
+    this.productUnitRows.removeAt(rowIndex);
   }
 
-  getUnitDisplayName(unitId: number | null) {
-    return this.displayedUnits().find((unit) => unit.id === unitId)?.nameAr ?? '';
+  isProductUnitRowEditable(rowIndex: number) {
+    return this.currentEditRowIndex() === rowIndex;
+  }
+
+  //
+  //
+  //
+  //#endregion
+  //
+  //
+  //
+  //
+  //#region product components
+  //
+
+  productComponentsService = inject(ProductComponentsService);
+  components = signal<IProductComponentReadResponse[]>([]);
+  currentComponents = signal<Partial<IProductComponentReadResponse>[]>([]);
+  isComponentsDialogVisible = signal(false);
+  
+  displayedComponents = computed(() => {
+    const current = this.currentUnits();
+    const components = this.components();
+    if (!current.length) return components;
+    const currentMap = new Map(current.map((unit) => [unit.id, unit]));
+    const merged = components.map((unit) => (currentMap.has(unit.id) ? { ...unit, ...currentMap.get(unit.id)! } : unit));
+    const missing = current.filter((unit) => !components.some((existing) => existing.id === unit.id));
+    return [...missing, ...merged] as IProductComponentReadResponse[];
+  });
+  componentsPaginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
+
+  getComponentsList(opts: { pageIndex: number; pageSize: number } = { pageIndex: 0, pageSize: 0 }) {
+    this.productComponentsService.getList(opts).subscribe({
+      next: (res) => {
+        this.components.set(res.rows);
+      },
+    });
+  }
+
+
+
+  openComponentsDialog = () => this.isComponentsDialogVisible.set(true);
+  closeComponentsDialog = () => this.isComponentsDialogVisible.set(false);
+  /*
+    id: number;
+  menuItemId: number;
+  menuItemName: string;
+  componentId: number;
+  componentName: string;
+  unitId: number;
+  unitName: string;
+  quantity: number;
+  price: number;
+  */
+
+  initialComponentFgValue = {
+    id: this.fb.control<number | null>(null, []),
+    nameAr: this.fb.control<string | null>(null, [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(100),
+    ]),
+    nameEn: this.fb.control<string | null>(null, [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(100),
+    ]),
+
+  };
+  componentFg = this.fb.group(this.initialUnitFgValue);
+
+  deleteComponent(unitId: number, event: Event) {
+    this.productComponentsService.delete(unitId).subscribe({
+      next: () => this.getComponentsList(),
+    });
+  }
+
+  editComponent(component: IProductComponentReadResponse) {
+    this.componentFg.patchValue({
+      id: component.id,
+      nameAr: component.nameAr,
+      nameEn: component.nameEn,
+    });
+  }
+
+  onSubmitComponentForm() {
+    if (this.unitFg.invalid) return;
+
+    const formValue = this.unitFg.value;
+
+    if (formValue.id) {
+      this.unitService.put(formValue).subscribe({
+        next: () => this.searchComponents({ pageIndex: 1 }),
+      });
+    } else {
+      this.unitService.create(formValue).subscribe({
+        next: () => {
+          this.searchComponents({ pageIndex: 1 });
+          this.unitFg.reset();
+        },
+      });
+    }
+  }
+
+  //#endregion
+
+  //
+  //
+  //
+  //#region product unit
+  //
+
+  get productUnitRows() {
+    return this.productFg.controls.menuItemUnits;
+  }
+
+  addProductUnitRow() {
+    if (this.newProductUnitRowFg.invalid) {
+      this.newProductUnitRowFg.markAllAsTouched();
+      return;
+    }
+
+    const rowValue = this.newProductUnitRowFg.getRawValue();
+    const isUnitAlreadyAdded = this.productUnitRows.value.find((unit) => unit.unitId === rowValue.unitId);
+
+    if (isUnitAlreadyAdded) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'خطأ',
+        detail: 'الوحدة موجودة مسبقا',
+      });
+      return;
+    }
+
+    if (rowValue.isMainUnit) {
+      this.productUnitRows.controls.forEach((row) => {
+        row.controls.isMainUnit.setValue(false);
+      });
+    }
+
+    this.productUnitRows.push(this.createProductUnitRowFg(rowValue));
+    this.lastClickedTableRowIndex.set(this.productUnitRows.length - 1);
+
+    this.newProductUnitRowFg.reset();
+  }
+
+  createProductUnitRowFg(data?: IProductUnitFormRow) {
+    return this.fb.group<IProductUnitFormRowControls>({
+      unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
+      quantity: this.fb.control<number | null>(data?.quantity ?? null, [Validators.required, Validators.min(1)]),
+      isMainUnit: this.fb.control<boolean | null>(data?.isMainUnit ?? false, [Validators.required]),
+    });
   }
 
   mapProductUnitToFormRow(unit: IProductUnit): IProductUnitFormRow {
     return { unitId: unit.unitId, quantity: unit.quantity, isMainUnit: unit.isMainUnit };
   }
 
-  syncCurrentUnitsFromRows(extraUnit?: Partial<IUnitSearchRow>) {
-    const selected = this.productUnitRows.controls
-      .map((row) => row.controls.unitId.value)
-      .filter((unitId): unitId is number => unitId !== null)
-      .map((unitId) => {
-        const matched = this.displayedUnits().find((unit) => unit.id === unitId);
-        return matched ? { id: matched.id, nameAr: matched.nameAr, nameEn: matched.nameEn } : { id: unitId, nameAr: '', nameEn: '' };
-      });
-    this.currentUnits.set(extraUnit?.id ? [...selected, extraUnit] : selected);
+  onProductUnitMainChange(changedRowIndex: number) {
+    if (!this.productUnitRows.at(changedRowIndex)?.controls.isMainUnit.value) return;
+    this.productUnitRows.controls.forEach((row, index) => {
+      if (index !== changedRowIndex) row.controls.isMainUnit.setValue(false, { emitEvent: false });
+    });
   }
+
+  editProductUnitRow(rowIndex: number) {
+    this.lastClickedTableRowIndex.set(rowIndex + 1);
+    this.currentEditRowIndex.set(rowIndex);
+  }
+
+  deleteProductUnitRow(rowIndex: number) {
+    this.productUnitRows.removeAt(rowIndex);
+  }
+
+  isProductUnitRowEditable(rowIndex: number) {
+    return this.currentEditRowIndex() === rowIndex;
+  }
+
+  //
+  //
+  //
+  //#endregion
+  //
 }
