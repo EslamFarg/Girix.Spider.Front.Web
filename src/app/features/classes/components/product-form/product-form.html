@@ -105,6 +105,7 @@
     </div>
 
     <div class="grid lg:grid-cols-3 gap-4 flex-1">
+      <!-- name -->
       <div>
         <label for="productName">{{ 'CLASSES.PRODUCTS.NAME' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('nameAr')">
@@ -117,6 +118,8 @@
           />
         </app-input-error-message-handler>
       </div>
+
+      <!-- price -->
       <div>
         <label for="productPrice">{{ 'CLASSES.PRODUCTS.PRICE' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('price')">
@@ -131,6 +134,8 @@
           />
         </app-input-error-message-handler>
       </div>
+
+      <!-- cost price -->
       <div>
         <label for="costPrice">{{ 'CLASSES.PRODUCTS.COST_PRICE' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('costPrice')">
@@ -145,6 +150,8 @@
           />
         </app-input-error-message-handler>
       </div>
+
+      <!-- group -->
       <div>
         <label for="productName">{{ 'CLASSES.PRODUCTS.GROUP' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('categoryId')">
@@ -166,6 +173,8 @@
           />
         </app-input-error-message-handler>
       </div>
+
+      <!-- tax -->
       <div>
         <label for="productName">{{ 'CLASSES.PRODUCTS.TAX' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('tax')">
@@ -180,6 +189,8 @@
           />
         </app-input-error-message-handler>
       </div>
+
+      <!-- excise tax -->
       <div>
         <label for="productName">{{ 'CLASSES.PRODUCTS.EXCISE_TAX' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('selectiveTax')">
@@ -193,16 +204,20 @@
           />
         </app-input-error-message-handler>
       </div>
+
+      <!-- is addition -->
       <div class="flex flex-col justify-end">
         <div class="flex items-center h-fit gap-2 pb-1">
           <app-input-error-message-handler [fc]="productFg.get('isAddition')">
-            <input formControlName="isAddition" type="checkbox" class="accent-dark-line w-5 h-5"
-          /></app-input-error-message-handler>
+            <input formControlName="isAddition" type="checkbox" class="accent-dark-line w-5 h-5" />
+          </app-input-error-message-handler>
           <label for="productName" class="text-dark-line text-sm font-semibold">
             {{ 'CLASSES.PRODUCTS.IS_ADDITION' | translate }}
           </label>
         </div>
       </div>
+
+      <!-- additions -->
       <div class="lg:col-span-2 self-end">
         <label for="productName">{{ 'CLASSES.PRODUCTS.ADDITIONS' | translate }}</label>
         <app-input-error-message-handler [fc]="productFg.get('idsAdditionMenuItem')">
@@ -267,6 +282,7 @@
     </div>
   </div>
 
+  <!-- description -->
   <div class="mt-4">
     <label for="productName">{{ 'CLASSES.PRODUCTS.DESCRIPTION' | translate }}</label>
     <app-input-error-message-handler [fc]="productFg.get('descriptionAr')">
@@ -302,6 +318,7 @@
           [class.last-clicked-table-row]="lastClickedTableRowIndex() === null"
           (click)="lastClickedTableRowIndex.set(null)"
           class="*:overflow-visible!"
+          
         >
           <td class="text-start">#</td>
           <!-- Unit -->
@@ -391,9 +408,12 @@
           <tr
             [class.last-clicked-table-row]="lastClickedTableRowIndex() === $index"
             (click)="lastClickedTableRowIndex.set($index)"
+            [style]="`--ix:${$index}`"
           >
             <!-- index -->
-            <td class="min-w-12.5 w-12.5" [class.disabled]="!isProductUnitRowEditable($index)">{{ $index + 1 }}</td>
+            <td class="min-w-12.5 w-12.5" [class.disabled]="!isProductUnitRowEditable($index)">
+              <div>{{ $index + 1 }}</div>
+            </td>
             <!-- unit -->
             <td class="overflow-visible!" [class.disabled]="!isProductUnitRowEditable($index)">
               <app-input-error-message-handler [grouped]="false" [fc]="item.controls.unitId">
@@ -403,7 +423,7 @@
                   [formControl]="item.controls.unitId"
                   bindLabel="nameAr"
                   bindValue="id"
-                  placeholder="&#1575;&#1604;&#1608;&#1581;&#1583;&#1577;"
+                  placeholder="الوحدة"
                   [clearable]="false"
                   #unitsSelect2
                   appDebounce
@@ -484,206 +504,7 @@
     </table>
   </div>
 
-  <!-- Components | المكونات -->
-  <div class="overflow-x-auto mt-4">
-    <p>{{ 'CLASSES.PRODUCTS.COMPONENTS' | translate }}</p>
-
-    <table class="my-4 min-w-250 w-full main-table table-fixed">
-      <thead>
-        <tr>
-          <th class="min-w-12.5 w-12.5">#</th>
-          <th class="min-w-12.5">الوحدة</th>
-          <th class="min-w-12.5">الوحدة الرئيسية</th>
-          <th class="min-w-12.5">كمية الوحدة</th>
-          <th class="min-w-40 w-40">الأدوات</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          [class.last-clicked-table-row]="lastClickedTableRowIndex() === null"
-          (click)="lastClickedTableRowIndex.set(null)"
-          class="*:overflow-visible!"
-        >
-          <td class="text-start">#</td>
-          <!-- Unit -->
-          <td>
-            <div class="flex items-start gap-1">
-              <app-input-error-message-handler
-                class="flex-1"
-                [grouped]="false"
-                [fc]="newProductUnitRowFg.controls.unitId"
-              >
-                <ng-select
-                  class="app-select"
-                  [items]="displayedUnits()"
-                  bindLabel="nameAr"
-                  [formControl]="newProductUnitRowFg.controls.unitId"
-                  bindValue="id"
-                  placeholder="&#1575;&#1604;&#1608;&#1581;&#1583;&#1577;"
-                  appendTo="body"
-                  [clearable]="false"
-                  #unitsSelect1
-                  appDebounce
-                  [customEvents]="[
-                    { type: 'searchEvent', value: unitsSelect1.searchEvent },
-                    { type: 'scrollToEnd', value: unitsSelect1.scrollToEnd },
-                  ]"
-                  (debounced)="onUnitsSearch($event, unitsSelect1?.searchTerm ?? '')"
-                />
-              </app-input-error-message-handler>
-              <button
-                type="button"
-                pButton
-                class="h-7.5 p-0.5! app-p-btn *:text-white!"
-                variant="outlined"
-                (click)="openUnitsDialog()"
-              >
-                <svg class="w-full h-full" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                  <g id="SVGRepo_iconCarrier">
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M20.8477 1.87868C19.6761 0.707109 17.7766 0.707105 16.605 1.87868L2.44744 16.0363C2.02864 16.4551 1.74317 16.9885 1.62702 17.5692L1.03995 20.5046C0.760062 21.904 1.9939 23.1379 3.39334 22.858L6.32868 22.2709C6.90945 22.1548 7.44285 21.8693 7.86165 21.4505L22.0192 7.29289C23.1908 6.12132 23.1908 4.22183 22.0192 3.05025L20.8477 1.87868ZM18.0192 3.29289C18.4098 2.90237 19.0429 2.90237 19.4335 3.29289L20.605 4.46447C20.9956 4.85499 20.9956 5.48815 20.605 5.87868L17.9334 8.55027L15.3477 5.96448L18.0192 3.29289ZM13.9334 7.3787L3.86165 17.4505C3.72205 17.5901 3.6269 17.7679 3.58818 17.9615L3.00111 20.8968L5.93645 20.3097C6.13004 20.271 6.30784 20.1759 6.44744 20.0363L16.5192 9.96448L13.9334 7.3787Z"
-                      fill="currentColor"
-                    ></path>
-                  </g>
-                </svg>
-              </button>
-            </div>
-          </td>
-          <!-- is main -->
-          <td class="text-center">
-            <input
-              type="checkbox"
-              class="accent-dark-line w-5 h-5"
-              [formControl]="newProductUnitRowFg.controls.isMainUnit"
-            />
-          </td>
-          <!-- quantity -->
-          <td>
-            <app-input-error-message-handler [fc]="newProductUnitRowFg.controls.quantity">
-              <input
-                pInputText
-                appAllowNumbers
-                [allowDecimal]="true"
-                [min]="1"
-                [formControl]="newProductUnitRowFg.controls.quantity"
-                class="app-input text-center"
-                aria-describedby="unitQuantity-help"
-                placeholder="&#1603;&#1605;&#1610;&#1577; &#1575;&#1604;&#1608;&#1581;&#1583;&#1577;"
-              />
-            </app-input-error-message-handler>
-          </td>
-          <!-- actions -->
-          <td>
-            <button
-              (click)="addProductUnitRow()"
-              type="button"
-              pButton
-              class="border-dark-line! bg-dark-line! text-sm! text-white! py-1! px-8!"
-            >
-              &#1573;&#1590;&#1575;&#1601;&#1577;
-            </button>
-          </td>
-        </tr>
-        @for (item of productUnitRows.controls; track $index) {
-          <tr
-            [class.last-clicked-table-row]="lastClickedTableRowIndex() === $index"
-            (click)="lastClickedTableRowIndex.set($index)"
-          >
-            <!-- index -->
-            <td class="min-w-12.5 w-12.5" [class.disabled]="!isProductUnitRowEditable($index)">{{ $index + 1 }}</td>
-            <!-- unit -->
-            <td class="overflow-visible!" [class.disabled]="!isProductUnitRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.unitId">
-                <ng-select
-                  class="app-select"
-                  [items]="displayedUnits()"
-                  [formControl]="item.controls.unitId"
-                  bindLabel="nameAr"
-                  bindValue="id"
-                  placeholder="&#1575;&#1604;&#1608;&#1581;&#1583;&#1577;"
-                  [clearable]="false"
-                  #unitsSelect2
-                  appDebounce
-                  [customEvents]="[
-                    { type: 'searchEvent', value: unitsSelect2.searchEvent },
-                    { type: 'scrollToEnd', value: unitsSelect2.scrollToEnd },
-                  ]"
-                  (debounced)="onUnitsSearch($event, unitsSelect2.searchTerm)"
-                />
-              </app-input-error-message-handler>
-            </td>
-            <!-- is main -->
-            <td class="overflow-visible!" [class.disabled]="!isProductUnitRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.isMainUnit">
-                <input
-                  type="checkbox"
-                  class="accent-dark-line w-5 h-5"
-                  [formControl]="item.controls.isMainUnit"
-                  [disabled]="!isProductUnitRowEditable($index)"
-                  (change)="onProductUnitMainChange($index)"
-                />
-              </app-input-error-message-handler>
-            </td>
-            <!-- quantity -->
-            <td [class.disabled]="!isProductUnitRowEditable($index)">
-              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.quantity">
-                <input
-                  pInputText
-                  appAllowNumbers
-                  [allowDecimal]="true"
-                  [formControl]="item.controls.quantity"
-                  class="app-input text-center"
-                  [disabled]="!isProductUnitRowEditable($index)"
-                  aria-describedby="unitQuantity-help"
-                  placeholder="&#1603;&#1605;&#1610;&#1577; &#1575;&#1604;&#1608;&#1581;&#1583;&#1577;"
-                />
-              </app-input-error-message-handler>
-            </td>
-            <!-- actions -->
-            <td class="min-w-45 w-45">
-              <div class="actions">
-                <button type="button" class="edit" (click)="editProductUnitRow($index)">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      opacity="0.4"
-                      d="M15.1055 14.1807H10.0439C9.55009 14.1807 9.14844 14.5887 9.14844 15.0903C9.14844 15.5929 9.55009 16 10.0439 16H15.1055C15.5993 16 16.001 15.5929 16.001 15.0903C16.001 14.5887 15.5993 14.1807 15.1055 14.1807Z"
-                      fill="#1F1D2B"
-                    />
-                    <path
-                      d="M6.49691 3.46993L11.2932 7.34556C11.4089 7.43825 11.4287 7.60833 11.3384 7.72682L5.65222 15.136C5.29477 15.5937 4.76801 15.8527 4.20363 15.8622L1.09952 15.9004C0.933968 15.9023 0.789109 15.7877 0.751484 15.6233L0.0460042 12.5561C-0.0762789 11.9923 0.0460042 11.4094 0.403447 10.9603L6.11783 3.51579C6.21001 3.39635 6.38027 3.37533 6.49691 3.46993Z"
-                      fill="#1F1D2B"
-                    />
-                    <path
-                      opacity="0.4"
-                      d="M13.4398 5.03595L12.5152 6.19023C12.4221 6.30776 12.2546 6.32687 12.1389 6.23323C11.0149 5.32356 8.1365 2.9892 7.3379 2.3423C7.22126 2.24675 7.20527 2.07666 7.29933 1.95818L8.19106 0.850717C9.00001 -0.190812 10.411 -0.286365 11.5491 0.62139L12.8566 1.66292C13.3928 2.08335 13.7502 2.63756 13.8725 3.22044C14.0136 3.8616 13.8631 4.49129 13.4398 5.03595Z"
-                      fill="#1F1D2B"
-                    />
-                  </svg>
-                </button>
-                <button type="button" class="delete" (click)="deleteProductUnitRow($index)">
-                  <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      opacity="0.4"
-                      d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z"
-                      fill="#FF383C"
-                    />
-                    <path
-                      d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z"
-                      fill="#FF383C"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+  
 </form>
 
 <p-dialog
@@ -739,7 +560,7 @@
         </thead>
         <tbody>
           @for (item of displayedUnits(); track $index) {
-            <tr>
+            <tr [style]="`--ix:${$index}`">
               <td>
                 <div>{{ $index + 1 }}</div>
               </td>

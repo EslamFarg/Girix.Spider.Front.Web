@@ -1,11 +1,11 @@
 import { BaseCrudService } from '@/core';
 import { Injectable } from '@angular/core';
-import { IProductComponentReadResponse } from '../types/product-components/responses';
+import { IComponentReadResponse } from '../types/product-components/responses';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ProductComponentsService extends BaseCrudService<any, any, IProductComponentReadResponse> {
+export class ProductComponentsService extends BaseCrudService<any, any, IComponentReadResponse> {
   override apiRoute = 'MenuItemComponent';
 
   /**

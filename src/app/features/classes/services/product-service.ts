@@ -3,6 +3,7 @@ import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseS
 import BaseService from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
 import { IUnitSearchRow } from './unit-service';
+import { IComponentReadResponse } from '../types/product-components/responses';
 
 export interface IProductSearchRow {
   id: number;
@@ -114,6 +115,8 @@ export interface IProductReadResponse {
   selectiveTax: number;
   description: string;
   isAddition: boolean;
+  menuItemUnits: IProductUnit[];
+  components: IComponentReadResponse[];
   additionMenuItem: {
     id: number;
     name: string;

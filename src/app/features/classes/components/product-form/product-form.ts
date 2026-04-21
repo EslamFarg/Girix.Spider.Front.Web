@@ -27,12 +27,11 @@ import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { TranslatePipe } from '@ngx-translate/core';
 import { NgLabelTemplateDirective, NgOptionTemplateDirective, NgSelectComponent } from '@ng-select/ng-select';
-import { Debounce } from '@/directives/debounce';
+import { Debounce, IDebounceEvent } from '@/directives/debounce';
 import { ImgFallback } from '@/directives/img-fallback';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { IUnitSearchRow, UnitSearchEnum, UnitService } from '../../services/unit-service';
 import { RouterLink } from '@angular/router';
-import { IProductComponentReadResponse } from '../../types/product-components/responses';
 import { ProductComponentsService } from '../../services/product-components-service';
 
 interface IProductUnitFormRow {
@@ -41,8 +40,8 @@ interface IProductUnitFormRow {
   isMainUnit: boolean | null;
 }
 
-type IProductUnitFormRowControls = ControlsOf<IProductUnitFormRow>;
 
+type ProductUnitFormRowControls = ControlsOf<IProductUnitFormRow>;
 @Component({
   selector: 'app-product-form',
   imports: [
@@ -73,9 +72,15 @@ type IProductUnitFormRowControls = ControlsOf<IProductUnitFormRow>;
   styleUrl: './product-form.css',
 })
 export class ProductForm extends BaseComponent implements OnInit {
+  productService = inject(ProductService);
+  unitService = inject(UnitService);
+  productComponentsService = inject(ProductComponentsService);
+  groupService = inject(GroupService);
+
   formMode = computed(() => (this.existingProduct() ? FormMode.Update : this.initialFormMode()));
 
   initialProductFgValue = {
+    id: this.fb.control<number | null>(null, []),
     nameEn: this.fb.control<string>('', [Validators.required]),
     nameAr: this.fb.control<string>('', [
       Validators.required,
@@ -96,12 +101,11 @@ export class ProductForm extends BaseComponent implements OnInit {
     isAddition: this.fb.control<boolean | null>(false, [Validators.required]),
     idsAdditionMenuItem: this.fb.control<number[] | null>([], []),
     images: this.fb.control<File[] | { id: number; fullPath: string }[] | null>([], []),
-    menuItemUnits: this.fb.array<FormGroup<IProductUnitFormRowControls>>(
+    menuItemUnits: this.fb.array<FormGroup<ProductUnitFormRowControls>>(
       [],
       [Validators.required, Validators.minLength(1)],
     ),
     categoryId: this.fb.control<number | null>(null, [Validators.required]),
-    id: this.fb.control<number>(0, []),
     imagesAdd: this.fb.control<File[]>([], []),
     listIdsOfDeleteImages: this.fb.control<number[]>([], []),
     allImages: this.fb.control<IFormImage[]>(
@@ -110,8 +114,6 @@ export class ProductForm extends BaseComponent implements OnInit {
     ),
   };
 
-  productService = inject(ProductService);
-  unitService = inject(UnitService);
   calculatePrice = this.productService.calculatePrice;
   productFg = this.fb.group(this.initialProductFgValue);
   existingProduct = signal<IProductReadResponse | null>(null);
@@ -128,7 +130,6 @@ export class ProductForm extends BaseComponent implements OnInit {
   closeGroupsDialog = () => this.isGroupsDialogVisible.set(false);
   openGroupsDialog = () => this.isGroupsDialogVisible.set(true);
 
-  groupService = inject(GroupService);
   currentGroup = signal<{ id: number; name: string } | null>(null);
   groups = signal<IGroupSearchRow[]>([]);
   displayedGroups = computed(() => {
@@ -141,7 +142,6 @@ export class ProductForm extends BaseComponent implements OnInit {
   });
   groupsPaginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
   previousGroupsSearchTerm = '';
-
   currentAdditions = signal<{ id: number; name: string }[]>([]);
   additionProducts = signal<IProductSearchRow[]>([]);
   displayedAdditions = computed(() => {
@@ -160,12 +160,6 @@ export class ProductForm extends BaseComponent implements OnInit {
   isUnitsDialogVisible = signal(false);
 
   lastClickedTableRowIndex = signal<number | null>(null);
-  currentEditRowIndex = signal<number>(-1);
-  newProductUnitRowFg = this.fb.group<IProductUnitFormRowControls>({
-    unitId: this.fb.control<number | null>(null, [Validators.required]),
-    quantity: this.fb.control<number | null>(null, [Validators.required, Validators.min(1)]),
-    isMainUnit: this.fb.control<boolean | null>(false, [Validators.required]),
-  });
 
   constructor() {
     super();
@@ -198,22 +192,33 @@ export class ProductForm extends BaseComponent implements OnInit {
           price: this.calculatePrice(product, true),
           idsAdditionMenuItem: product.additionMenuItem.map((item) => item.id),
         });
+        this.productFg.setControl(
+          'menuItemUnits',
+          this.fb.array(
+            product.menuItemUnits.map((unit) => this.createProductUnitRowFg(unit)),
+            [Validators.required, Validators.minLength(1)],
+          ),
+        );
+        // this.currentComponentProducts.set(product.components.map((c) => ({
+        //   id: c.componentId,
+        //   name: c.componentName,
+        // })));
         this.existingImages.set(product.images);
         this.currentImage.set(product.images[0] ?? null);
         this.currentGroup.set({ id: product.categoryId, name: product.categoryName });
         this.currentAdditions.set(product.additionMenuItem);
       });
 
-      this.productService.getUnitsByProductId(this.routeId).subscribe((units) => {
-        this.currentUnits.set(units.map((unit) => ({ id: unit.unitId, nameAr: unit.unitName, nameEn: unit.unitName })));
-        this.productFg.setControl(
-          'menuItemUnits',
-          this.fb.array(
-            units.map((unit) => this.createProductUnitRowFg(this.mapProductUnitToFormRow(unit))),
-            [Validators.required, Validators.minLength(1)],
-          ),
-        );
-      });
+      // this.productService.getUnitsByProductId(this.routeId).subscribe((units) => {
+      //   this.currentUnits.set(units.map((unit) => ({ id: unit.unitId, nameAr: unit.unitName, nameEn: unit.unitName })));
+      //   this.productFg.setControl(
+      //     'menuItemUnits',
+      //     this.fb.array(
+      //       units.map((unit) => this.createProductUnitRowFg(this.mapProductUnitToFormRow(unit))),
+      //       [Validators.required, Validators.minLength(1)],
+      //     ),
+      //   );
+      // });
     }
   }
 
@@ -228,13 +233,18 @@ export class ProductForm extends BaseComponent implements OnInit {
 
     const product = {
       ...this.productFg.getRawValue(),
-      menuItemUnits: this.productUnitRows.getRawValue() as IProductCreateUnit[],
     };
 
     if (this.productFg.invalid) {
       console.log('invalid');
       console.log(product);
       this.productFg.markAllAsTouched();
+      return;
+    }
+
+    //check if no main unit is selected
+    if (!product.menuItemUnits.some((unit) => unit.isMainUnit)) {
+      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب تعيين وحدة اساسية' });
       return;
     }
 
@@ -522,180 +532,12 @@ export class ProductForm extends BaseComponent implements OnInit {
   //
   //#region product unit
   //
-
-  get productUnitRows() {
-    return this.productFg.controls.menuItemUnits;
-  }
-
-  addProductUnitRow() {
-    if (this.newProductUnitRowFg.invalid) {
-      this.newProductUnitRowFg.markAllAsTouched();
-      return;
-    }
-
-    const rowValue = this.newProductUnitRowFg.getRawValue();
-    const isUnitAlreadyAdded = this.productUnitRows.value.find((unit) => unit.unitId === rowValue.unitId);
-
-    if (isUnitAlreadyAdded) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'خطأ',
-        detail: 'الوحدة موجودة مسبقا',
-      });
-      return;
-    }
-
-    if (rowValue.isMainUnit) {
-      this.productUnitRows.controls.forEach((row) => {
-        row.controls.isMainUnit.setValue(false);
-      });
-    }
-
-    this.productUnitRows.push(this.createProductUnitRowFg(rowValue));
-    this.lastClickedTableRowIndex.set(this.productUnitRows.length - 1);
-
-    this.newProductUnitRowFg.reset();
-  }
-
-  createProductUnitRowFg(data?: IProductUnitFormRow) {
-    return this.fb.group<IProductUnitFormRowControls>({
-      unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
-      quantity: this.fb.control<number | null>(data?.quantity ?? null, [Validators.required, Validators.min(1)]),
-      isMainUnit: this.fb.control<boolean | null>(data?.isMainUnit ?? false, [Validators.required]),
-    });
-  }
-
-  mapProductUnitToFormRow(unit: IProductUnit): IProductUnitFormRow {
-    return { unitId: unit.unitId, quantity: unit.quantity, isMainUnit: unit.isMainUnit };
-  }
-
-  onProductUnitMainChange(changedRowIndex: number) {
-    if (!this.productUnitRows.at(changedRowIndex)?.controls.isMainUnit.value) return;
-    this.productUnitRows.controls.forEach((row, index) => {
-      if (index !== changedRowIndex) row.controls.isMainUnit.setValue(false, { emitEvent: false });
-    });
-  }
-
-  editProductUnitRow(rowIndex: number) {
-    this.lastClickedTableRowIndex.set(rowIndex + 1);
-    this.currentEditRowIndex.set(rowIndex);
-  }
-
-  deleteProductUnitRow(rowIndex: number) {
-    this.productUnitRows.removeAt(rowIndex);
-  }
-
-  isProductUnitRowEditable(rowIndex: number) {
-    return this.currentEditRowIndex() === rowIndex;
-  }
-
-  //
-  //
-  //
-  //#endregion
-  //
-  //
-  //
-  //
-  //#region product components
-  //
-
-  productComponentsService = inject(ProductComponentsService);
-  components = signal<IProductComponentReadResponse[]>([]);
-  currentComponents = signal<Partial<IProductComponentReadResponse>[]>([]);
-  isComponentsDialogVisible = signal(false);
-  
-  displayedComponents = computed(() => {
-    const current = this.currentUnits();
-    const components = this.components();
-    if (!current.length) return components;
-    const currentMap = new Map(current.map((unit) => [unit.id, unit]));
-    const merged = components.map((unit) => (currentMap.has(unit.id) ? { ...unit, ...currentMap.get(unit.id)! } : unit));
-    const missing = current.filter((unit) => !components.some((existing) => existing.id === unit.id));
-    return [...missing, ...merged] as IProductComponentReadResponse[];
+  currentProductUnitEditRowIndex = signal<number>(-1);
+  newProductUnitRowFg = this.fb.group<ProductUnitFormRowControls>({
+    unitId: this.fb.control<number | null>(null, [Validators.required]),
+    quantity: this.fb.control<number | null>(null, [Validators.required, Validators.min(1)]),
+    isMainUnit: this.fb.control<boolean | null>(false, [Validators.required]),
   });
-  componentsPaginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
-
-  getComponentsList(opts: { pageIndex: number; pageSize: number } = { pageIndex: 0, pageSize: 0 }) {
-    this.productComponentsService.getList(opts).subscribe({
-      next: (res) => {
-        this.components.set(res.rows);
-      },
-    });
-  }
-
-
-
-  openComponentsDialog = () => this.isComponentsDialogVisible.set(true);
-  closeComponentsDialog = () => this.isComponentsDialogVisible.set(false);
-  /*
-    id: number;
-  menuItemId: number;
-  menuItemName: string;
-  componentId: number;
-  componentName: string;
-  unitId: number;
-  unitName: string;
-  quantity: number;
-  price: number;
-  */
-
-  initialComponentFgValue = {
-    id: this.fb.control<number | null>(null, []),
-    nameAr: this.fb.control<string | null>(null, [
-      Validators.required,
-      Validators.minLength(3),
-      Validators.maxLength(100),
-    ]),
-    nameEn: this.fb.control<string | null>(null, [
-      Validators.required,
-      Validators.minLength(3),
-      Validators.maxLength(100),
-    ]),
-
-  };
-  componentFg = this.fb.group(this.initialUnitFgValue);
-
-  deleteComponent(unitId: number, event: Event) {
-    this.productComponentsService.delete(unitId).subscribe({
-      next: () => this.getComponentsList(),
-    });
-  }
-
-  editComponent(component: IProductComponentReadResponse) {
-    this.componentFg.patchValue({
-      id: component.id,
-      nameAr: component.nameAr,
-      nameEn: component.nameEn,
-    });
-  }
-
-  onSubmitComponentForm() {
-    if (this.unitFg.invalid) return;
-
-    const formValue = this.unitFg.value;
-
-    if (formValue.id) {
-      this.unitService.put(formValue).subscribe({
-        next: () => this.searchComponents({ pageIndex: 1 }),
-      });
-    } else {
-      this.unitService.create(formValue).subscribe({
-        next: () => {
-          this.searchComponents({ pageIndex: 1 });
-          this.unitFg.reset();
-        },
-      });
-    }
-  }
-
-  //#endregion
-
-  //
-  //
-  //
-  //#region product unit
-  //
 
   get productUnitRows() {
     return this.productFg.controls.menuItemUnits;
@@ -732,7 +574,7 @@ export class ProductForm extends BaseComponent implements OnInit {
   }
 
   createProductUnitRowFg(data?: IProductUnitFormRow) {
-    return this.fb.group<IProductUnitFormRowControls>({
+    return this.fb.group<ProductUnitFormRowControls>({
       unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
       quantity: this.fb.control<number | null>(data?.quantity ?? null, [Validators.required, Validators.min(1)]),
       isMainUnit: this.fb.control<boolean | null>(data?.isMainUnit ?? false, [Validators.required]),
@@ -752,7 +594,7 @@ export class ProductForm extends BaseComponent implements OnInit {
 
   editProductUnitRow(rowIndex: number) {
     this.lastClickedTableRowIndex.set(rowIndex + 1);
-    this.currentEditRowIndex.set(rowIndex);
+    this.currentProductUnitEditRowIndex.set(rowIndex);
   }
 
   deleteProductUnitRow(rowIndex: number) {
@@ -760,7 +602,7 @@ export class ProductForm extends BaseComponent implements OnInit {
   }
 
   isProductUnitRowEditable(rowIndex: number) {
-    return this.currentEditRowIndex() === rowIndex;
+    return this.currentProductUnitEditRowIndex() === rowIndex;
   }
 
   //
@@ -768,4 +610,4 @@ export class ProductForm extends BaseComponent implements OnInit {
   //
   //#endregion
   //
-}
+  }
