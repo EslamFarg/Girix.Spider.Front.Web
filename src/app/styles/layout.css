@@ -15,3 +15,9 @@
     @apply flex-1;
   }
 }
+
+.last-clicked-table-row {
+  position: relative;
+  overflow: visible;
+  z-index: 10;
+}

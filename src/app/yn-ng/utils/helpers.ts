@@ -33,7 +33,7 @@ export function getEnumMap(enumObj: any): { label: string; value: number }[] {
     .map((key) => ({ label: key, value: enumObj[key] }));
 }
 
-export function omitKeys(obj: Object, keysToOmit: string[]):any {
+export function omitKeys(obj: Object, keysToOmit: string[]) {
   return Object.fromEntries(Object.entries(obj).filter(([key]) => !keysToOmit.includes(key)));
 }
 

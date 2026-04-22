@@ -1,11 +1,15 @@
 import { BaseCrudService } from '@/core';
 import { Injectable } from '@angular/core';
-import { IComponentReadResponse } from '../types/product-components/responses';
+import { IComponentReadResponse, IProductComponentsReadResponse } from '../types/product-components/responses';
+import { IProductComponentCreateRequest, IProductComponentUpdateRequest } from '../types/product-components/requests';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ProductComponentsService extends BaseCrudService<any, any, IComponentReadResponse> {
+export class ProductComponentsService extends BaseCrudService<
+  IProductComponentCreateRequest,
+  IProductComponentUpdateRequest
+> {
   override apiRoute = 'MenuItemComponent';
 
   /**
@@ -23,30 +27,8 @@ export class ProductComponentsService extends BaseCrudService<any, any, ICompone
 
   //v1/MenuItemComponent/by-menu-item/{menuItemId}
   getByProductId(id: number) {
-    return this.http.get<{
-      menuItemId: number;
-      components: {
-        id: number;
-        componentId: number;
-        componentName: string;
-        unitId: number;
-        unitName: string;
-        quantity: number;
-        price: number;
-      }[];
-    }>(`${this.apiUrl}/by-menu-item/${id}`);
+    return this.http.get<IProductComponentsReadResponse>(`${this.apiUrl}/by-menu-item/${id}`);
   }
 
-  getList(paginationInfo: { pageIndex: number; pageSize: number } = { pageIndex: 0, pageSize: 0 }) {
-    return this.http.post<{
-      rows: IProductComponentReadResponse[];
-      paginationInfo: {
-        totalRowsCount: number;
-        totalPagesCount: number;
-        currentPageIndex: number;
-      };
-    }>(`${this.apiUrl}`, {
-      paginationInfo,
-    });
-  }
+
 }

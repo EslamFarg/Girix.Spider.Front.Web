@@ -78,6 +78,9 @@ export class CollectionsService extends BaseService {
         this.getOrdersForDelivery(opts.deliveryId!).subscribe({
           next: (orders) => {
             this.currentDeliveryOrders.set(orders);
+            if(orders.length==0){
+              this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يوجد طلبات لهذا الدليفري' });
+            }
           },
         });
         break;

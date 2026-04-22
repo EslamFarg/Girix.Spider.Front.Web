@@ -26,6 +26,15 @@ export interface IProductSearchRow {
     id: number;
     name: string;
   }[];
+  menuItemUnits: IProductSearchRowUnit[];
+}
+export interface IProductSearchRowUnit {
+  id: number;
+  unitId: number;
+  unitName: string;
+  quantity: number;
+  price: number;
+  isMainUnit: boolean;
 }
 
 export interface IProductSearchResponseValue {
@@ -70,12 +79,12 @@ export interface IProductCreateRequest {
   idsAdditionMenuItem: number[];
 
   images: File[];
-  menuItemUnits: IProductCreateUnit[]
+  menuItemUnits: IProductCreateUnit[];
 }
-export interface IProductCreateUnit{
-  unitId: number
-  quantity: number
-  isMainUnit: boolean
+export interface IProductCreateUnit {
+  unitId: number;
+  quantity: number;
+  isMainUnit: boolean;
 }
 
 //update

@@ -54,6 +54,7 @@
           openCollectionDialog({
             deliveryId: item.id,
             deliveryType: OpenCollectionDialogOptsDeliveryType.Person,
+            
           })
         "
       >
@@ -77,6 +78,6 @@
     [first]="getCurrentRowsIx(1)"
     [showFirstLastIcon]="false"
     [rows]="10"
-    [totalRecords]="120"
+    [totalRecords]="deliveryMenPaginationInfo.totalRowsCount"
   />
 </app-section-wrapper>

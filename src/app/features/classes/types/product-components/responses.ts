@@ -23,4 +23,17 @@ export interface IProductComponents {
   unitName: string
   quantity: number
   price: number
+  availableUnits: AvailableUnit[]
+}
+
+ 
+
+ 
+export interface AvailableUnit {
+  id: number
+  unitId: number
+  unitName: string
+  quantity: number
+  price: number
+  isMainUnit: boolean
 }
