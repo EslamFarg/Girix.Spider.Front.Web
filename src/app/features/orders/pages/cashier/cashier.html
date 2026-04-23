@@ -556,17 +556,6 @@
 <!--  -->
 <!--  -->
 <!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
 <!-- dialogs -->
 <!--  -->
 <!--  -->
@@ -861,7 +850,7 @@
       <form id="customerForm" class="overflow-visible grid gap-4 md:grid-cols-2" [formGroup]="customerFg">
         <!-- name (search) -->
         <div>
-          <label for="customerName">{{ 'form.customerName' | translate }}</label>
+          <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
           <app-input-error-message-handler [fc]="customerFg.get('id')">
             <ng-select
               class="app-select w-full"
@@ -901,13 +890,13 @@
 
         <!-- address -->
         <div class="md:col-span-2">
-          <label for="customerAddress">{{ 'form.customerAddress' | translate }}</label>
+          <label for="customerAddress">{{ 'FORM.CUSTOMER_ADDRESS' | translate }}</label>
           <app-input-error-message-handler [fc]="customerFg.get('addressDescription')">
             <input
               pInputText
               formControlName="addressDescription"
               aria-describedby="productAddress-help"
-              [placeholder]="'form.customerAddress' | translate"
+              [placeholder]="'FORM.CUSTOMER_ADDRESS' | translate"
               class="app-input order-customer-address"
               (click)="triggerFullKeyboard('.order-customer-address')"
             />
@@ -916,28 +905,6 @@
 
         <!-- <app-full-keyboard /> -->
       </form>
-      <!-- actions -->
-      <!-- <div
-        class="flex gap-2 location-btns *:flex-1 w-full justify-end pt-4"
-        style="--p-button-primary-background: transparent"
-      >
-        <button
-          pButton
-          class="text-dark-line! py-2! rounded-[14px]! *:font-bold! w-full border-text-light! text-xs!"
-          variant="outlined"
-          (click)="onSubmitCustomer()"
-        >
-          حفظ
-        </button>
-        <button
-          (click)="customerDialogVisible = false"
-          class="text-red-500! py-2! rounded-[14px]! *:font-bold! w-full border-red-500! text-xs!"
-          pButton
-          variant="outlined"
-        >
-          إلغاء
-        </button>
-      </div> -->
     </div>
   </ng-template>
 </p-dialog>

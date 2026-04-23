@@ -211,14 +211,227 @@
   </app-section-wrapper>
 </div>
 
-<app-order-transference-dialog
-  [visible]="true"
+<p-dialog
+  [visible]="isInvoiceTypeChangeDialogVisible"
   [modal]="true"
-  [style]="{ width: '100%', maxWidth: '400px' }"
+  [style]="{ width: '100%', maxWidth: '94vw' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-white!"
   contentStyleClass=" custom-scroll overflow-visible!"
   class="addition-dialog"
   (onHide)="closeInvoiceTypeChangeDialog()"
-/>
- 
+>
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2 flex-1 ps-10 text-xl font-bold text-dark-bg-2">تحويل</div>
+  </ng-template>
+
+  <div class="text-dark-bg-2 flex flex-col gap-4 font-medium text-sm grid grid-cols-2">
+    <!-- current type -->
+    <div>
+      <label for="productName">نوع الفاتوره</label>
+      <app-input-error-message-handler>
+        <input
+          class="h-[46px]!"
+          [disabled]="true"
+          pInputText
+          id="productName"
+          aria-describedby="productName-help"
+          placeholder="محلي"
+        />
+      </app-input-error-message-handler>
+    </div>
+
+    <!-- change to -->
+    <div>
+      <label for="productName">تحويل إلي</label>
+      <app-input-error-message-handler>
+        <p-select [options]="[]" optionLabel="name" placeholder="إختر" class="w-full! h-[46px]!" />
+      </app-input-error-message-handler>
+    </div>
+
+    <!-- name (search) -->
+    <div>
+      <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
+      <app-input-error-message-handler [fc]="transferanceFg.controls.customerRequest.controls.id">
+        <ng-select
+          class="app-select w-full"
+          [items]="displayedCustomers()"
+          [formControl]="transferanceFg.controls.customerRequest.controls.id"
+          bindLabel="name"
+          bindValue="id"
+          [clearable]="false"
+          placeholder="الكل"
+          #customerSelect
+          appDebounce
+          [customEvents]="[
+            { type: 'searchEvent', value: customerSelect.searchEvent },
+            { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
+          ]"
+          (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
+          (change)="onCustomerSelected($event)"
+        />
+      </app-input-error-message-handler>
+    </div>
+
+    <!-- phone -->
+    <div>
+      <label for="phoneNumber">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
+      <app-input-error-message-handler [fc]="transferanceFg.controls.customerRequest.controls.phoneNumber">
+        <input
+          pInputText
+          [formControl]="transferanceFg.controls.customerRequest.controls.phoneNumber"
+          aria-describedby="phoneNumber-help"
+          [placeholder]="'FORM.PHONE_NUMBER' | translate"
+          #customerPhoneSearch
+          appDebounce
+          class="app-input"
+        />
+      </app-input-error-message-handler>
+    </div>
+
+    <!-- address -->
+    <div class="md:col-span-2">
+      <label for="customerAddress">{{ 'FORM.CUSTOMER_ADDRESS' | translate }}</label>
+      <app-input-error-message-handler [fc]="transferanceFg.controls.customerRequest.controls.addressDescription">
+        <input
+          pInputText
+          [formControl]="transferanceFg.controls.customerRequest.controls.addressDescription"
+          aria-describedby="productAddress-help"
+          [placeholder]="'FORM.CUSTOMER_ADDRESS' | translate"
+          class="app-input order-customer-address"
+        />
+      </app-input-error-message-handler>
+    </div>
+
+    <!-- paid / postponed (radio) -->
+    <div
+      class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4 border-b border-b-text-light pb-4 [&_input]:w-5 [&_input]:aspect-square"
+    >
+      <div class="flex items-center gap-1">
+        <input
+          type="radio"
+          name="isPaid"
+          [disabled]="transferanceFg.value.orderType == OrderLocationType.Takeaway"
+          id="paymentInfoPaid"
+          [defaultChecked]="true"
+          (input)="isPaid.set(true)"
+          [value]="true"
+        />
+        <label for="paymentInfoPaid">{{ 'FORM.PAID' | translate }}</label>
+      </div>
+      <div class="flex items-center gap-1">
+        <input
+          [disabled]="transferanceFg.value.orderType == OrderLocationType.Takeaway"
+          type="radio"
+          name="isPaid"
+          id="paymentInfoPostponed"
+          (input)="isPaid.set(false)"
+          [value]="false"
+        />
+        <label for="paymentInfoPostponed">{{ 'FORM.POSTPONED' | translate }}</label>
+      </div>
+    </div>
+
+    <!-- cash -->
+    <div>
+      <label for="cash">{{ 'FORM.CASHPaid' | translate }}</label>
+      <app-input-error-message-handler [fc]="transferanceFg.controls.payingCash">
+        <input
+          pInputText
+          aria-describedby="cash-help"
+          [placeholder]="'FORM.CASH' | translate"
+          [formControl]="transferanceFg.controls.payingCash"
+          appAllowNumbers
+          [max]="net()"
+          [disabled]="!isPaid()"
+          [min]="0"
+          [allowDecimal]="true"
+          #payingCash
+          id="payingCash"
+          appDebounce
+          class="app-input"
+          />
+          <!-- (click)="triggerNumbersKeyboard(payingCash)" -->
+      </app-input-error-message-handler>
+    </div>
+
+    <!-- cash account -->
+    <div>
+      <label>{{ 'form.accountName' | translate }}</label>
+      <app-input-error-message-handler [fc]="transferanceFg.controls.cashAccountId">
+        <ng-select
+          class="app-select w-full"
+          [items]="displayedCashAccounts()"
+          [formControl]="transferanceFg.controls.cashAccountId"
+          bindLabel="name"
+          bindValue="id"
+          [clearable]="false"
+          placeholder="الكل"
+          #cashAccountSelect
+          appDebounce
+          [customEvents]="[
+            { type: 'searchEvent', value: cashAccountSelect.searchEvent },
+            { type: 'scrollToEnd', value: cashAccountSelect.scrollToEnd },
+          ]"
+          (debounced)="onCashFinancialAccountsSearch($event)"
+        />
+      </app-input-error-message-handler>
+    </div>
+
+    <!-- network -->
+    <div>
+      <label for="network">{{ 'FORM.NETWORKPaid' | translate }}</label>
+      <app-input-error-message-handler [fc]="transferanceFg.controls.payingNetwork">
+        <input
+          pInputText
+          appAllowNumbers
+          [allowDecimal]="true"
+          [max]="net()"
+          [min]="0"
+          [disabled]="!isPaid()"
+          id="payingNetwork"
+          aria-describedby="network-help"
+          #payingNetwork
+          [formControl]="transferanceFg.controls.payingNetwork"
+          [placeholder]="'FORM.NETWORK' | translate"
+          class="app-input"
+          />
+          <!-- (click)="triggerNumbersKeyboard(payingNetwork)" -->
+      </app-input-error-message-handler>
+    </div>
+
+    <!-- network account -->
+    <div>
+      <label>{{ 'form.accountName' | translate }}</label>
+      <app-input-error-message-handler [fc]="transferanceFg.controls.networkAccountId">
+        <ng-select
+          class="app-select w-full"
+          [items]="displayedNetworkAccounts()"
+          [formControl]="transferanceFg.controls.networkAccountId"
+          bindLabel="name"
+          bindValue="id"
+          [clearable]="false"
+          placeholder="الكل"
+          #networkAccountSelect
+          appDebounce
+          [customEvents]="[
+            { type: 'searchEvent', value: networkAccountSelect.searchEvent },
+            { type: 'scrollToEnd', value: networkAccountSelect.scrollToEnd },
+          ]"
+          (debounced)="onNetworkFinancialAccountsSearch($event)"
+        />
+      </app-input-error-message-handler>
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <div class="flex justify-center w-full">
+      <p-button
+        label="حفظ"
+        styleClass=" bg-dark-line! text-white! w-25 h-[32px]!"
+        severity="secondary"
+        (click)="closeInvoiceTypeChangeDialog()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

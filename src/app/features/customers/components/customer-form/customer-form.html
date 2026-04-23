@@ -22,13 +22,13 @@
 
 <form id="customerForm" class="grid md:grid-cols-4 gap-4 flex-1" (ngSubmit)="onSubmitForm()" [formGroup]="customerFg">
   <div class="md:col-span-4">
-    <label for="customerName">{{ 'form.customerName' | translate }}</label>
+    <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
     <app-input-error-message-handler [fc]="customerFg.get('nameAr')">
       <input
         pInputText
         id="customerName"
         aria-describedby="customerName-help"
-        [placeholder]="'form.customerName' | translate"
+        [placeholder]="'FORM.CUSTOMER_NAME' | translate"
         formControlName="nameAr"
       />
     </app-input-error-message-handler>
