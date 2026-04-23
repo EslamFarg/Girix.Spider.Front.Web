@@ -13,6 +13,7 @@ import { CollectionsService } from '../../services/collections-service';
 import { OrderSearchEnum, OrderService, IOrderSearchRow, OrderLocationType } from '@/features/orders';
 import { MenuItem } from 'primeng/api';
 import { DatePipe } from '@angular/common';
+import { OrderTransferenceDialog } from "@/features/orders/components/order-transference-dialog/order-transference-dialog";
 
 @Component({
   selector: 'app-all',
@@ -27,7 +28,8 @@ import { DatePipe } from '@angular/common';
     Dialog,
     Button,
     DatePipe,
-  ],
+    OrderTransferenceDialog
+],
   templateUrl: './all.html',
   styleUrl: './all.css',
 })
