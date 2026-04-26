@@ -358,7 +358,7 @@
 <div class="grid grid-cols-2 gap-4 flex-1 my-4">
   <!-- cash -->
   <div>
-    <label for="cash">{{ 'FORM.CASHPaid' | translate }}</label>
+    <label for="cash">{{ 'FORM.CASH_PAID' | translate }}</label>
     <app-input-error-message-handler [fc]="fg.get('cashAmount')">
       <input
         pInputText
@@ -379,7 +379,7 @@
 
   <!-- cash account -->
   <div>
-    <label>{{ 'form.accountName' | translate }}</label>
+    <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
     <app-input-error-message-handler [fc]="fg.get('cashAccountId')">
       <ng-select
         class="app-select w-full"
@@ -402,7 +402,7 @@
 
   <!-- network -->
   <div>
-    <label for="network">{{ 'FORM.NETWORKPaid' | translate }}</label>
+    <label for="network">{{ 'FORM.NETWORK_PAID' | translate }}</label>
     <app-input-error-message-handler [fc]="fg.get('networkAmount')">
       <input
         pInputText
@@ -422,7 +422,7 @@
 
   <!-- network account -->
   <div>
-    <label>{{ 'form.accountName' | translate }}</label>
+    <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
     <app-input-error-message-handler [fc]="fg.get('networkAccountId')">
       <ng-select
         class="app-select w-full"

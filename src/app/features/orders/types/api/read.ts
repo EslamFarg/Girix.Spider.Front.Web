@@ -1,5 +1,7 @@
 //gey by id
 
+import { OrderLocationType } from "./enums";
+
 export interface IOrderReadResponse {
   id: number;
   orderNumber: string;
@@ -140,7 +142,7 @@ export interface IOrderBillReadResponse {
 export interface IOrderSearchRow {
   id: number;
   orderNumber: string;
-  orderType: number;
+  orderType: OrderLocationType;
   paymentType: number;
   customerId: number;
   customerName: string;

@@ -11,7 +11,8 @@ import { InputErrorMessageHandler } from '@/yn-ng';
 import { Select } from 'primeng/select';
 import { Debounce } from '@/directives/debounce';
 import { InputText } from 'primeng/inputtext';
-import { CollectionsService, OpenCollectionDialogOptsDeliveryType } from '../../services/collections-service';
+import { CollectionsService } from '../../services/collections-service';
+import { OrderLocationType } from '@/features/orders';
 
 @Component({
   selector: 'app-company-deliveries',
@@ -31,7 +32,7 @@ import { CollectionsService, OpenCollectionDialogOptsDeliveryType } from '../../
   styleUrl: './company-deliveries.css',
 })
 export class CompanyDeliveries extends BaseComponent {
-    OpenCollectionDialogOptsDeliveryType = OpenCollectionDialogOptsDeliveryType;
+    OrderLocationType = OrderLocationType;
   
   initialFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),

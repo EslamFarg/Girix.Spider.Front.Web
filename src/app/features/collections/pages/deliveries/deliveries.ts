@@ -1,7 +1,7 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { CollectionsService, OpenCollectionDialogOptsDeliveryType } from '../../services/collections-service';
+import { CollectionsService } from '../../services/collections-service';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -19,6 +19,7 @@ import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
+import { OrderLocationType } from '@/features/orders';
 
 @Component({
   selector: 'app-deliveries',
@@ -41,7 +42,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   styleUrl: './deliveries.css',
 })
 export class Deliveries extends BaseComponent {
-  OpenCollectionDialogOptsDeliveryType = OpenCollectionDialogOptsDeliveryType;
+  OrderLocationType = OrderLocationType;
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<DeliverySearchEnum>(DeliverySearchEnum.Name, [Validators.required]),

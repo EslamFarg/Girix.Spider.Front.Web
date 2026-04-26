@@ -1,14 +1,14 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { Select } from 'primeng/select';
+import { Select, SelectChangeEvent } from 'primeng/select';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { InputText } from 'primeng/inputtext';
 import { Dialog } from 'primeng/dialog';
-import { Button } from 'primeng/button';
+import { Button, ButtonDirective } from 'primeng/button';
 import { CollectionsService } from '../../services/collections-service';
 import { OrderSearchEnum, OrderService, IOrderSearchRow, OrderLocationType, OrderLocalType } from '@/features/orders';
 import { MenuItem } from 'primeng/api';
@@ -18,10 +18,27 @@ import { ICustomerSearchRow } from '@/features/customers/services/customer-types
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { Debounce, IDebounceEvent } from '@/directives/debounce';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AllowNumbers } from "@/directives/allow-numbers";
-import { FinancialAccountSearchEnum, FinancialAccountService } from '@/features/accounts/services/financial-account-service';
+import { AllowNumbers } from '@/directives/allow-numbers';
+import {
+  FinancialAccountSearchEnum,
+  FinancialAccountService,
+} from '@/features/accounts/services/financial-account-service';
 import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
-import { noSymbolsAllowed } from '@/yn-ng';
+import { labeledRequiredValidator, noSymbolsAllowed } from '@/yn-ng';
+import { HutSearchEnum, HutService, IHutSearchRow } from '@/features/restaurant/services/hut-service';
+import {
+  FinancialSettingsService,
+  IFinancialSettingsResponse,
+} from '@/features/settings/services/financial-settings-service';
+import { ITableSearchRow, TableSearchEnum, TableService } from '@/features/restaurant/services/table-service';
+import { IRoomSearchRow, RoomSearchEnum, RoomService } from '@/features/restaurant/services/room-service';
+import {
+  DeliverySearchEnum,
+  DeliveryService,
+  IDeliverySearchRow,
+} from '@/features/deliveries/services/delivery-service';
+import { HutCard, RoomCard, TableCard } from '@/components';
+import { Skeleton } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-all',
@@ -39,13 +56,20 @@ import { noSymbolsAllowed } from '@/yn-ng';
     NgSelectComponent,
     Debounce,
     TranslatePipe,
-    AllowNumbers
-],
+    AllowNumbers,
+    HutCard,
+    FormsModule,
+    RoomCard,
+    TableCard,
+    Skeleton,
+    ButtonDirective,
+  ],
   templateUrl: './all.html',
   styleUrl: './all.css',
 })
 export class All extends BaseComponent {
   OrderLocationType = OrderLocationType;
+  OrderLocalType = OrderLocalType;
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<OrderSearchEnum>(OrderSearchEnum.CustomerName, [Validators.required]),
@@ -78,6 +102,50 @@ export class All extends BaseComponent {
 
   constructor() {
     super();
+    this.financialSettingsService.getSettings().subscribe((res) => this.financialSettings.set(res));
+    this.searchHuts(1);
+    this.searchRooms(1);
+    this.searchTables(1);
+    this.searchDeliveries(1);
+    this.searchAccounts({
+      pageIndex: 1,
+      searchTerm: '',
+    }).subscribe({
+      next: (res) => {
+        this.cashAccounts.set(res.value.rows);
+        this.networkAccounts.set(res.value.rows);
+      },
+    });
+    // this.searchAdditions(1);
+    this.searchCustomers({ pageIndex: 1, searchTerm: '' });
+
+    this.transferanceFg.get('orderType')?.valueChanges.subscribe((orderType) => {
+      const placeRefId = this.transferanceFg.get('placeRefId');
+      const deliveryId = this.transferanceFg.get('deliveryId');
+      placeRefId?.setValidators([]);
+      deliveryId?.setValidators([]);
+      this.transferanceFg?.patchValue({
+        placeRefId: null,
+        deliveryId: null,
+      });
+      switch (orderType) {
+        case OrderLocationType.Takeaway:
+          this.isPaid.set(true);
+          break;
+        case OrderLocationType.PersonDelivery:
+        case OrderLocationType.CompanyDelivery:
+          //todo: fix delivery Id
+          deliveryId?.setValidators([labeledRequiredValidator('يرجى اختيار الدليفري', 'you must select a delivery')]);
+          break;
+        case OrderLocationType.DineIn:
+          this.transferanceFg.patchValue({ placeType: OrderLocalType.Table });
+          placeRefId!.setValidators([labeledRequiredValidator('يرجى اختيار المكان', 'you must select a place')]);
+
+          break;
+      }
+      placeRefId?.updateValueAndValidity();
+      deliveryId?.updateValueAndValidity();
+    });
     effect(() => {
       this.collectionsService.lastCollectedId();
       this.searchOrders(1);
@@ -158,42 +226,64 @@ export class All extends BaseComponent {
   }
 
   //
+
   //
-  //
-  //
-  //
-  //
+  // collection
   //
   collectionsService = inject(CollectionsService);
 
   openCollectionDialog = this.collectionsService.openCollectionDialog;
 
+  //
+  //#region transferance
+  //
+  orderLocationType = OrderLocationType;
+  currentOrder = signal<IOrderSearchRow | null>(null);
+  currentOrderType = computed(() => this.currentOrder()?.orderType);
+  orderTypeOptions = computed(() =>
+    [
+      { labelKey: 'محلي', value: OrderLocationType.DineIn },
+      { labelKey: 'توصيل (عامل)', value: OrderLocationType.PersonDelivery },
+      { labelKey: 'توصيل (شركة)', value: OrderLocationType.CompanyDelivery },
+      { labelKey: 'سفري', value: OrderLocationType.Takeaway },
+    ].filter((opt) => opt.value !== this.currentOrderType()),
+  );
+  orderLocalTypeOptions = computed(() =>
+    [
+      { labelKey: 'كوخ', value: OrderLocalType.Hut },
+      { labelKey: 'طاولة', value: OrderLocalType.Table },
+      { labelKey: 'غرفة', value: OrderLocalType.Room },
+    ].filter((opt) => opt.value !== this.currentOrder()?.placeType),
+  );
+
   isInvoiceTypeChangeDialogVisible = false;
 
-  openInvoiceTypeChangeDialog() {
+  openInvoiceTypeChangeDialog(order: IOrderSearchRow) {
+    this.currentOrder.set(order);
     this.isInvoiceTypeChangeDialogVisible = true;
+    this.transferanceFg.patchValue({
+      id: order.id,
+      orderType: order.orderType,
+      placeType: order.placeType,
+      placeRefId: order.placeRefId,
+      placeName: '',
+      reservedAt: this.localDateIso,
+      simulateOnly: false,
+      customerRequest: {
+        id: order.customerId,
+        nameAr: order.customerName,
+        nameEn: order.customerName,
+        phoneNumber: order.customerPhone,
+        secondaryMobileNumber: null,
+        addressDescription: order.customerAdress,
+      },
+    });
   }
 
   closeInvoiceTypeChangeDialog() {
+    this.currentOrder.set(null);
     this.isInvoiceTypeChangeDialogVisible = false;
   }
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  orderLocationType=OrderLocationType;
-
 
   transferanceFg = this.fb.group({
     id: this.fb.control<null | number>(null, [Validators.required]),
@@ -205,8 +295,8 @@ export class All extends BaseComponent {
     // hut/cabin/room id
     placeRefId: this.fb.control<null | number>(null, [Validators.required]),
     placeName: this.fb.control<string | null>(null, [Validators.required]),
-    durationMinutes: this.fb.control<null | number>(null, [Validators.required]),
-    deliveryId: this.fb.control<null | number>(null, [Validators.required]),
+    durationMinutes: this.fb.control<null | number>(null, []),
+    deliveryId: this.fb.control<null | number>(null, []),
     reservedAt: this.fb.control<string | null>(null, [Validators.required]),
     payingCash: this.fb.control<null | number>(null, [Validators.required]),
     cashAccountId: this.fb.control<null | number>(null, [Validators.required]),
@@ -219,27 +309,23 @@ export class All extends BaseComponent {
       nameEn: this.fb.control<string | null>(null, [Validators.required]),
       phoneNumber: this.fb.control<string | null>(null, [Validators.required]),
       secondaryMobileNumber: this.fb.control<string | null>(null, [Validators.required]),
-      addressDescription: this.fb.control<string | null>(null, [Validators.required])
+      addressDescription: this.fb.control<string | null>(null, [Validators.required]),
     }),
   });
 
-  net=signal<number>(0);
-  
+  net = signal<number>(0);
+
+  submitOrderTransference() {
+    console.log(this.transferanceFg.value);
+      if (this.transferanceFg.invalid) return;
+
+      console.log('valid transferance');
+  }
+
+  //#endregion
 
   //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //customer
+  //#region customer
   //
 
   currentCustomer = signal<{
@@ -342,19 +428,10 @@ export class All extends BaseComponent {
     }
   }
 
+  //#endregion
+
   //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //payment info
+  //#region payment info
   //
 
   paymentDialogVisible = false;
@@ -430,165 +507,523 @@ export class All extends BaseComponent {
     );
   });
 
+  //#endregion
+
   //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //Accounts
-    //
-  
-    currentCashAccount = signal<{
-      id: number;
-      name: string;
-    } | null>(null);
-    currentNetworkAccount = signal<{
-      id: number;
-      name: string;
-    } | null>(null);
-  
-    cashAccountSearchFg = this.fb.group({
-      searchTerm: this.fb.control('', [Validators.maxLength(100), noSymbolsAllowed, Validators.minLength(1)]),
+  //#region Accounts
+  //
+
+  currentCashAccount = signal<{
+    id: number;
+    name: string;
+  } | null>(null);
+  currentNetworkAccount = signal<{
+    id: number;
+    name: string;
+  } | null>(null);
+
+  cashAccountSearchFg = this.fb.group({
+    searchTerm: this.fb.control('', [Validators.maxLength(100), noSymbolsAllowed, Validators.minLength(1)]),
+  });
+  networkAccountSearchFg = this.fb.group({
+    searchTerm: this.fb.control('', [Validators.maxLength(100), noSymbolsAllowed, Validators.minLength(1)]),
+  });
+
+  financialAccountService = inject(FinancialAccountService);
+
+  cashAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
+  networkAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
+
+  displayedCashAccounts = computed(() => [...this.cashAccounts()]);
+  displayedNetworkAccounts = computed(() => [...this.networkAccounts()]);
+
+  searchAccounts(data: { pageIndex: number; searchTerm?: string }) {
+    return this.financialAccountService.search({
+      paginationInfo: {
+        pageIndex: data.pageIndex,
+        pageSize: 10,
+      },
+      searchFilters: [
+        {
+          column: FinancialAccountSearchEnum.Name,
+          values: [data.searchTerm ?? ''],
+        },
+      ],
+      fromDate: null,
     });
-    networkAccountSearchFg = this.fb.group({
-      searchTerm: this.fb.control('', [Validators.maxLength(100), noSymbolsAllowed, Validators.minLength(1)]),
-    });
-  
-    financialAccountService = inject(FinancialAccountService);
-  
-    cashAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
-    networkAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
-  
-    displayedCashAccounts = computed(() => [...this.cashAccounts()]);
-    displayedNetworkAccounts = computed(() => [...this.networkAccounts()]);
-  
-    searchAccounts(data: { pageIndex: number; searchTerm?: string }) {
-      return this.financialAccountService.search({
+  }
+
+  cashAccountsSearchPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0,
+  };
+  networkAccountsSearchPaginationInfo: IPaginationInfo = {
+    pageIndex: 1,
+    totalRowsCount: 0,
+    totalPagesCount: 0,
+  };
+
+  previousCashAccountsSearchTerm: string = '';
+  previousNetworkAccountsSearchTerm: string = '';
+
+  onCashFinancialAccountsSearch(
+    event: IDebounceEvent<{
+      term: string;
+    }>,
+  ) {
+    let searchTerm = event?.value?.term ?? '';
+    let isNewSearchTerm = searchTerm != this.previousCashAccountsSearchTerm;
+    if (event.type === 'scrollToEnd') {
+      searchTerm = this.previousCashAccountsSearchTerm;
+    }
+    if (searchTerm && searchTerm.length > 100) return;
+    //
+    //
+    if (isNewSearchTerm) {
+      //refetch page 1
+      this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
+        next: (res) => {
+          if (res.value.rows.length > 0) {
+            this.previousCashAccountsSearchTerm = searchTerm;
+            this.cashAccounts.set(res.value.rows);
+            this.cashAccountsSearchPaginationInfo = {
+              pageIndex: 1,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
+        },
+      });
+    } else {
+      //refetch next page
+      this.searchAccounts({ pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
+        next: (res) => {
+          if (res.value.rows.length > 0) {
+            this.previousCashAccountsSearchTerm = searchTerm;
+            this.cashAccounts.update((prev) => prev.concat(res.value.rows));
+            this.cashAccountsSearchPaginationInfo = {
+              pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
+        },
+      });
+    }
+  }
+
+  onNetworkFinancialAccountsSearch(
+    event: IDebounceEvent<{
+      term: string;
+    }>,
+  ) {
+    let searchTerm = event?.value?.term ?? '';
+    let isNewSearchTerm = searchTerm != this.previousNetworkAccountsSearchTerm;
+    if (event.type === 'scrollToEnd') {
+      searchTerm = this.previousNetworkAccountsSearchTerm;
+    }
+    if (searchTerm && searchTerm.length > 100) return;
+    //
+    //
+    if (isNewSearchTerm) {
+      //refetch page 1
+      this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
+        next: (res) => {
+          if (res.value.rows.length > 0) {
+            this.previousNetworkAccountsSearchTerm = searchTerm;
+            this.networkAccounts.set(res.value.rows);
+            this.networkAccountsSearchPaginationInfo = {
+              pageIndex: 1,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
+        },
+      });
+    } else {
+      //refetch next page
+      this.searchAccounts({
+        pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
+        searchTerm,
+      }).subscribe({
+        next: (res) => {
+          if (res.value.rows.length > 0) {
+            this.previousNetworkAccountsSearchTerm = searchTerm;
+            this.networkAccounts.update((prev) => prev.concat(res.value.rows));
+            this.networkAccountsSearchPaginationInfo = {
+              pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
+        },
+      });
+    }
+  }
+
+  // #endregion
+
+  //
+  //local space
+  //
+
+  financialSettingsService = inject(FinancialSettingsService);
+  financialSettings = signal<IFinancialSettingsResponse>({
+    deliveryFee: 0,
+    deliveryFeeType: 1,
+    discount: 0,
+    discountType: 1,
+    serviceFee: 0,
+    serviceFeeType: 1,
+    vat: 0,
+    minimumSelectiveTax: 0,
+  });
+
+  //
+  //#region huts
+  //
+
+  HutDialogVisible: boolean = false;
+
+  hutService = inject(HutService);
+  huts = signal<IHutSearchRow[]>([]);
+  currentHut = signal<IHutSearchRow | null>(null);
+  currentHutMinutes = signal(30);
+  currentHutPrice = computed(() => {
+    const currentHut = this.currentHut();
+    if (!currentHut) return 0;
+
+    const hutHourPriceAfterVat = currentHut.pricePerHour * (1 + this.financialSettings().vat / 100);
+
+    return hutHourPriceAfterVat;
+  });
+  hutNet = computed(() => {
+    const hutPricePerHour = this.currentHut()?.pricePerHour ?? 0;
+    const vat = this.financialSettings().vat;
+    const minutes = this.currentHutMinutes();
+    const price = hutPricePerHour * (minutes / 60);
+
+    if (this.transferanceFg.value.placeType == OrderLocalType.Hut && this.currentHut()) {
+      return price * (1 + vat / 100);
+    } else {
+      return 0;
+    }
+  });
+  hutPaginationInfo: {
+    pageIndex: number;
+    totalPagesCount: number;
+    totalRowsCount: number;
+  } = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
+
+  searchHuts(pageIndex: number) {
+    this.hutService
+      .search({
         paginationInfo: {
-          pageIndex: data.pageIndex,
-          pageSize: 10,
+          pageIndex: pageIndex,
+          pageSize: 30,
         },
         searchFilters: [
           {
-            column: FinancialAccountSearchEnum.Name,
-            values: [data.searchTerm ?? ''],
+            column: HutSearchEnum.Name,
+            values: [''],
           },
         ],
         fromDate: null,
+      })
+      .subscribe({
+        next: (res) => {
+          if (res.value.rows.length > 0) {
+            this.huts.update((prev) => prev.concat(res.value.rows));
+            this.hutPaginationInfo = {
+              pageIndex,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
+        },
       });
+  }
+
+  onHutsScroll(event: Event, hutsScroller: HTMLElement) {
+    // if at bottom
+    if (hutsScroller.scrollTop + hutsScroller.clientHeight >= hutsScroller.scrollHeight - 1) {
+      this.searchHuts(this.hutPaginationInfo.pageIndex + 1);
     }
-    
-    cashAccountsSearchPaginationInfo: IPaginationInfo = {
-      pageIndex: 1,
-      totalRowsCount: 0,
-      totalPagesCount: 0,
-    };
-    networkAccountsSearchPaginationInfo: IPaginationInfo = {
-      pageIndex: 1,
-      totalRowsCount: 0,
-      totalPagesCount: 0,
-    };
-  
-    previousCashAccountsSearchTerm: string = '';
-    previousNetworkAccountsSearchTerm: string = '';
-  
-    onCashFinancialAccountsSearch(
-      event: IDebounceEvent<{
-        term: string;
-      }>,
-    ) {
-      let searchTerm = event?.value?.term ?? '';
-      let isNewSearchTerm = searchTerm != this.previousCashAccountsSearchTerm;
-      if (event.type === 'scrollToEnd') {
-        searchTerm = this.previousCashAccountsSearchTerm;
-      }
-      if (searchTerm && searchTerm.length > 100) return;
-      //
-      //
-      if (isNewSearchTerm) {
-        //refetch page 1
-        this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
-          next: (res) => {
-            if (res.value.rows.length > 0) {
-              this.previousCashAccountsSearchTerm = searchTerm;
-              this.cashAccounts.set(res.value.rows);
-              this.cashAccountsSearchPaginationInfo = {
-                pageIndex: 1,
-                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-              };
-            }
-          },
-        });
-      } else {
-        //refetch next page
-        this.searchAccounts({ pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
-          next: (res) => {
-            if (res.value.rows.length > 0) {
-              this.previousCashAccountsSearchTerm = searchTerm;
-              this.cashAccounts.update((prev) => prev.concat(res.value.rows));
-              this.cashAccountsSearchPaginationInfo = {
-                pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1,
-                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-              };
-            }
-          },
-        });
-      }
+  }
+
+  onHutSelected(hut: IHutSearchRow) {
+    if (hut.isAvailable) {
+      // this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
+      this.currentHut.set(hut);
+      // this.HutDialogVisible = false;
     }
-  
-    onNetworkFinancialAccountsSearch(
-      event: IDebounceEvent<{
-        term: string;
-      }>,
-    ) {
-      let searchTerm = event?.value?.term ?? '';
-      let isNewSearchTerm = searchTerm != this.previousNetworkAccountsSearchTerm;
-      if (event.type === 'scrollToEnd') {
-        searchTerm = this.previousNetworkAccountsSearchTerm;
-      }
-      if (searchTerm && searchTerm.length > 100) return;
-      //
-      //
-      if (isNewSearchTerm) {
-        //refetch page 1
-        this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
-          next: (res) => {
-            if (res.value.rows.length > 0) {
-              this.previousNetworkAccountsSearchTerm = searchTerm;
-              this.networkAccounts.set(res.value.rows);
-              this.networkAccountsSearchPaginationInfo = {
-                pageIndex: 1,
-                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-              };
-            }
-          },
-        });
-      } else {
-        //refetch next page
-        this.searchAccounts({
-          pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
-          searchTerm,
-        }).subscribe({
-          next: (res) => {
-            if (res.value.rows.length > 0) {
-              this.previousNetworkAccountsSearchTerm = searchTerm;
-              this.networkAccounts.update((prev) => prev.concat(res.value.rows));
-              this.networkAccountsSearchPaginationInfo = {
-                pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
-                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-              };
-            }
-          },
-        });
-      }
+  }
+
+  submitHut() {
+    const hut = this.currentHut();
+    if (!hut) {
+      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لم يتم اختيار كوخ' });
+      return;
     }
+    this.transferanceFg.patchValue({
+      placeRefId: hut.id,
+      placeType: OrderLocalType.Hut,
+      durationMinutes: this.currentHutMinutes(),
+    });
+    this.HutDialogVisible = false;
+    this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع بنجاح' });
+  }
+
+  onHutDurationChange(duration: SelectChangeEvent) {
+    this.currentHutMinutes.set(duration.value);
+  }
+
+  // #endregion
+
+  //
+  //#region tables
+  //
+
+  TableDialogVisible: boolean = false;
+
+  tableService = inject(TableService);
+  tables = signal<ITableSearchRow[]>([]);
+
+  tablePaginationInfo: {
+    pageIndex: number;
+    totalPagesCount: number;
+    totalRowsCount: number;
+  } = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
+  searchTables(pageIndex: number) {
+    this.tableService
+      .search({
+        paginationInfo: {
+          pageIndex: pageIndex,
+          pageSize: 30,
+        },
+        searchFilters: [
+          {
+            column: TableSearchEnum.Name,
+            values: [''],
+          },
+        ],
+        fromDate: null,
+      })
+      .subscribe({
+        next: (res) => {
+          if (res.value.rows.length > 0) {
+            this.tables.update((prev) => prev.concat(res.value.rows));
+            this.tablePaginationInfo = {
+              pageIndex,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
+        },
+      });
+  }
+  onTablesScroll(event: Event, tablesScroller: HTMLElement) {
+    // if at bottom
+    if (tablesScroller.scrollTop + tablesScroller.clientHeight >= tablesScroller.scrollHeight - 1) {
+      this.searchTables(this.tablePaginationInfo.pageIndex + 1);
+    }
+  }
+  onTableSelected(table: ITableSearchRow) {
+    if (table.isAvailable) {
+      this.transferanceFg.patchValue({ placeRefId: table.id, placeType: OrderLocalType.Table });
+      this.TableDialogVisible = false;
+      this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
+    }
+  }
+
+  // #endregion
+
+  //
+  //#region rooms
+  //
+
+  RoomDialogVisible: boolean = false;
+
+  roomService = inject(RoomService);
+  rooms = signal<IRoomSearchRow[]>([]);
+  roomPaginationInfo: {
+    pageIndex: number;
+    totalPagesCount: number;
+    totalRowsCount: number;
+  } = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
+  searchRooms(pageIndex: number) {
+    this.roomService
+      .search({
+        paginationInfo: {
+          pageIndex: pageIndex,
+          pageSize: 20,
+        },
+        searchFilters: [
+          {
+            column: RoomSearchEnum.Name,
+            values: [''],
+          },
+        ],
+        fromDate: null,
+      })
+      .subscribe({
+        next: (res) => {
+          if (res.value.rows.length > 0) {
+            this.rooms.update((prev) => prev.concat(res.value.rows));
+            this.roomPaginationInfo = {
+              pageIndex,
+              totalPagesCount: res.value.paginationInfo.totalPagesCount,
+              totalRowsCount: res.value.paginationInfo.totalRowsCount,
+            };
+          }
+        },
+      });
+  }
+  onRoomsScroll(event: Event, roomsScroller: HTMLElement) {
+    // console.log(roomsScroller);
+    // if at bottom
+    if (roomsScroller.scrollTop + roomsScroller.clientHeight >= roomsScroller.scrollHeight - 1) {
+      this.searchRooms(this.roomPaginationInfo.pageIndex + 1);
+    }
+  }
+  onRoomSelected(room: IRoomSearchRow) {
+    if (room.isAvailable) {
+      this.transferanceFg.patchValue({ placeRefId: room.id, placeType: OrderLocalType.Room });
+      this.RoomDialogVisible = false;
+      this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع بنجاح' });
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
+    }
+  }
+
+  // #endregion
+
+  //
+  //#region deliveries
+  //
+
+  DeliveryDialogVisible: boolean = false;
+
+  deliveryService = inject(DeliveryService);
+  deliveries = signal<IDeliverySearchRow[]>([]);
+  companyDeliveries = signal<ICustomerSearchRow[]>([]);
+
+  isCompanyDelivery: boolean = false;
+
+  changeDeliveryType(isCompany: boolean) {
+    this.isCompanyDelivery = isCompany;
+    this.transferanceFg.patchValue({
+      orderType: isCompany ? OrderLocationType.CompanyDelivery : OrderLocationType.PersonDelivery,
+      deliveryId: null,
+    });
+    this.searchDeliveries(1, isCompany);
+  }
+
+  deliveryPaginationInfo: {
+    pageIndex: number;
+    totalPagesCount: number;
+    totalRowsCount: number;
+  } = {
+    pageIndex: 1,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  };
+  searchDeliveries(pageIndex: number, isCompany: boolean = false) {
+    if (isCompany) {
+      this.customersService
+        .search({
+          paginationInfo: {
+            pageIndex: pageIndex,
+            pageSize: 20,
+          },
+          searchFilters: [
+            {
+              column: CustomerSearchEnum.IsCompany,
+              values: ['true'],
+            },
+          ],
+          fromDate: null,
+        })
+        .subscribe({
+          next: (res) => {
+            if (res.value.rows.length > 0) {
+              if (pageIndex == 1) {
+                this.companyDeliveries.set(res.value.rows);
+              } else {
+                this.companyDeliveries.update((prev) => prev.concat(res.value.rows));
+              }
+
+              this.deliveryPaginationInfo = {
+                pageIndex,
+                totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                totalRowsCount: res.value.paginationInfo.totalRowsCount,
+              };
+            }
+          },
+        });
+    } else {
+      this.deliveryService
+        .search({
+          paginationInfo: {
+            pageIndex: pageIndex,
+            pageSize: 20,
+          },
+          searchFilters: [
+            {
+              column: DeliverySearchEnum.Name,
+              values: [''],
+            },
+          ],
+          fromDate: null,
+        })
+        .subscribe({
+          next: (res) => {
+            if (res.value.rows.length > 0) {
+              if (pageIndex == 1) {
+                this.deliveries.set(res.value.rows);
+              } else {
+                this.deliveries.update((prev) => prev.concat(res.value.rows));
+              }
+              this.deliveryPaginationInfo = {
+                pageIndex,
+                totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                totalRowsCount: res.value.paginationInfo.totalRowsCount,
+              };
+            }
+          },
+        });
+    }
+  }
+  onDeliveriesScroll(event: Event, deliveriesScroller: HTMLElement) {
+    // if at bottom
+    if (deliveriesScroller.scrollTop + deliveriesScroller.clientHeight >= deliveriesScroller.scrollHeight - 1) {
+      this.searchDeliveries(this.deliveryPaginationInfo.pageIndex + 1);
+    }
+  }
+  onDeliverySelected(deliveryId: number) {
+    // if (delivery.isAvailable) {
+    this.transferanceFg.patchValue({ deliveryId });
+    this.DeliveryDialogVisible = false;
+    this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الدليفري بنجاح' });
+    // } else {
+    //   this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
+    // }
+  }
+
+  // #endregion
 }

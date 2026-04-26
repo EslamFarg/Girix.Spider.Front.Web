@@ -4,9 +4,9 @@ import { Button, ButtonDirective } from 'primeng/button';
 import { Select } from 'primeng/select';
 import { InputText } from 'primeng/inputtext';
 import { Dialog } from 'primeng/dialog';
-import { CollectionsService, OpenCollectionDialogOptsDeliveryType } from '../../services/collections-service';
+import { CollectionsService } from '../../services/collections-service';
 import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
-import { OrderService } from '@/features/orders';
+import { OrderLocationType, OrderService } from '@/features/orders';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BaseComponent, IPaginationInfo } from '@/components';
 import { ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
@@ -43,7 +43,7 @@ import { noSymbolsAllowed } from '@/yn-ng';
   styleUrl: './collection-dialog.css',
 })
 export class CollectionDialog extends BaseComponent {
-  OpenCollectionDialogOptsDeliveryType = OpenCollectionDialogOptsDeliveryType;
+  OrderLocationType = OrderLocationType;
   collectionsService = inject(CollectionsService);
   collectNonDelivery = this.collectionsService.collectNonDelivery;
   collectPersonDelivery = this.collectionsService.collectPersonDelivery;
@@ -109,7 +109,7 @@ export class CollectionDialog extends BaseComponent {
   //
   //
   //
-  currentDeliveryType = this.collectionsService.currentDeliveryType;
+  currentDeliveryType = this.collectionsService.currentOrderType;
   currentDeliveryId = this.collectionsService.currentDeliveryId;
 
   onSubmitCollection() {
@@ -130,7 +130,7 @@ export class CollectionDialog extends BaseComponent {
     //        orderId: ,
 
     switch (this.currentDeliveryType()) {
-      case OpenCollectionDialogOptsDeliveryType.Person:
+      case OrderLocationType.PersonDelivery:
         formValue = { ...formValue, deliveryId: this.currentDeliveryId(), orderIds: this.checkedOrderIds() };
         this.collectPersonDelivery(formValue).subscribe({
           next: (value) => {
@@ -139,7 +139,7 @@ export class CollectionDialog extends BaseComponent {
           },
         });
         break;
-      case OpenCollectionDialogOptsDeliveryType.Company:
+      case OrderLocationType.CompanyDelivery:
         formValue = { ...formValue, companyId: this.currentDeliveryId(), orderIds: this.checkedOrderIds() };
         this.collectCompanyDelivery(formValue).subscribe({
           next: (value) => {

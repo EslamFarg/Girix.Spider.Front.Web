@@ -94,7 +94,7 @@
                       openCollectionDialog({
                         orderId: order.id,
                         isCollected: order.isCollected,
-                        deliveryType: order.orderType,
+                        orderType: order.orderType,
                         deliveryId: order.deliveryId,
                       })
                     "
@@ -169,7 +169,7 @@
                     </svg>
                   </button>
                   <!-- change location type -->
-                  <button (click)="openInvoiceTypeChangeDialog()" type="button" class="edit bg-text-light!">
+                  <button (click)="openInvoiceTypeChangeDialog(order)" type="button" class="edit bg-text-light!">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M14.7073 6.37467C14.0026 5.45926 13.0464 4.7691 11.9556 4.38861C10.8649 4.00813 9.68685 3.95382 8.5657 4.23234C7.44455 4.51086 6.42889 5.11012 5.64299 5.95682C4.85708 6.80351 4.335 7.86092 4.14062 8.99967M14.999 3.33301V6.66634H11.6656M5.28896 13.6247C5.99344 14.5404 6.94963 15.2309 8.04049 15.6117C9.13135 15.9924 10.3095 16.0468 11.4309 15.7682C12.5522 15.4897 13.5679 14.8902 14.3538 14.0433C15.1397 13.1963 15.6616 12.1387 15.8556 10.9997M4.99812 16.6663V13.333H8.33146"
@@ -211,13 +211,14 @@
   </app-section-wrapper>
 </div>
 
+<!-- invoice type change dialog -->
 <p-dialog
   [visible]="isInvoiceTypeChangeDialogVisible"
   [modal]="true"
   [style]="{ width: '100%', maxWidth: '94vw' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-white!"
-  contentStyleClass=" custom-scroll overflow-visible!"
+  contentStyleClass=" custom-scroll "
   class="addition-dialog"
   (onHide)="closeInvoiceTypeChangeDialog()"
 >
@@ -225,204 +226,409 @@
     <div class="inline-flex items-center justify-center gap-2 flex-1 ps-10 text-xl font-bold text-dark-bg-2">تحويل</div>
   </ng-template>
 
-  <div class="text-dark-bg-2 flex flex-col gap-4 font-medium text-sm grid grid-cols-2">
-    <!-- current type -->
-    <div>
-      <label for="productName">نوع الفاتوره</label>
-      <app-input-error-message-handler>
-        <input
-          class="h-[46px]!"
-          [disabled]="true"
-          pInputText
-          id="productName"
-          aria-describedby="productName-help"
-          placeholder="محلي"
-        />
-      </app-input-error-message-handler>
-    </div>
-
-    <!-- change to -->
-    <div>
-      <label for="productName">تحويل إلي</label>
-      <app-input-error-message-handler>
-        <p-select [options]="[]" optionLabel="name" placeholder="إختر" class="w-full! h-[46px]!" />
-      </app-input-error-message-handler>
-    </div>
-
-    <!-- name (search) -->
-    <div>
-      <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
-      <app-input-error-message-handler [fc]="transferanceFg.controls.customerRequest.controls.id">
-        <ng-select
-          class="app-select w-full"
-          [items]="displayedCustomers()"
-          [formControl]="transferanceFg.controls.customerRequest.controls.id"
-          bindLabel="name"
-          bindValue="id"
-          [clearable]="false"
-          placeholder="الكل"
-          #customerSelect
-          appDebounce
-          [customEvents]="[
-            { type: 'searchEvent', value: customerSelect.searchEvent },
-            { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
-          ]"
-          (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
-          (change)="onCustomerSelected($event)"
-        />
-      </app-input-error-message-handler>
-    </div>
-
-    <!-- phone -->
-    <div>
-      <label for="phoneNumber">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
-      <app-input-error-message-handler [fc]="transferanceFg.controls.customerRequest.controls.phoneNumber">
-        <input
-          pInputText
-          [formControl]="transferanceFg.controls.customerRequest.controls.phoneNumber"
-          aria-describedby="phoneNumber-help"
-          [placeholder]="'FORM.PHONE_NUMBER' | translate"
-          #customerPhoneSearch
-          appDebounce
-          class="app-input"
-        />
-      </app-input-error-message-handler>
-    </div>
-
-    <!-- address -->
-    <div class="md:col-span-2">
-      <label for="customerAddress">{{ 'FORM.CUSTOMER_ADDRESS' | translate }}</label>
-      <app-input-error-message-handler [fc]="transferanceFg.controls.customerRequest.controls.addressDescription">
-        <input
-          pInputText
-          [formControl]="transferanceFg.controls.customerRequest.controls.addressDescription"
-          aria-describedby="productAddress-help"
-          [placeholder]="'FORM.CUSTOMER_ADDRESS' | translate"
-          class="app-input order-customer-address"
-        />
-      </app-input-error-message-handler>
-    </div>
-
-    <!-- paid / postponed (radio) -->
-    <div
-      class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4 border-b border-b-text-light pb-4 [&_input]:w-5 [&_input]:aspect-square"
-    >
-      <div class="flex items-center gap-1">
-        <input
-          type="radio"
-          name="isPaid"
-          [disabled]="transferanceFg.value.orderType == OrderLocationType.Takeaway"
-          id="paymentInfoPaid"
-          [defaultChecked]="true"
-          (input)="isPaid.set(true)"
-          [value]="true"
-        />
-        <label for="paymentInfoPaid">{{ 'FORM.PAID' | translate }}</label>
+  <form [formGroup]="transferanceFg" class="flex flex-col gap-4 py-4">
+    <div class="text-dark-bg-2 font-medium text-sm grid grid-cols-2 gap-4">
+      <!-- current type -->
+      <div>
+        <label for="productName">نوع الفاتوره</label>
+        <app-input-error-message-handler>
+          <input
+            [disabled]="true"
+            class="app-input"
+            pInputText
+            id="productName"
+            aria-describedby="productName-help"
+            placeholder="محلي"
+          />
+        </app-input-error-message-handler>
       </div>
-      <div class="flex items-center gap-1">
-        <input
-          [disabled]="transferanceFg.value.orderType == OrderLocationType.Takeaway"
-          type="radio"
-          name="isPaid"
-          id="paymentInfoPostponed"
-          (input)="isPaid.set(false)"
-          [value]="false"
-        />
-        <label for="paymentInfoPostponed">{{ 'FORM.POSTPONED' | translate }}</label>
-      </div>
-    </div>
 
-    <!-- cash -->
-    <div>
-      <label for="cash">{{ 'FORM.CASHPaid' | translate }}</label>
-      <app-input-error-message-handler [fc]="transferanceFg.controls.payingCash">
-        <input
-          pInputText
-          aria-describedby="cash-help"
-          [placeholder]="'FORM.CASH' | translate"
-          [formControl]="transferanceFg.controls.payingCash"
-          appAllowNumbers
-          [max]="net()"
-          [disabled]="!isPaid()"
-          [min]="0"
-          [allowDecimal]="true"
-          #payingCash
-          id="payingCash"
-          appDebounce
-          class="app-input"
+      <!-- change to -->
+      <div>
+        <label for="productName">تحويل إلي</label>
+        <app-input-error-message-handler>
+          <ng-select
+            class="app-select w-full"
+            [items]="orderTypeOptions()"
+            formControlName="orderType"
+            bindLabel="labelKey"
+            bindValue="value"
+            [clearable]="false"
+            placeholder="الكل"
+          />
+        </app-input-error-message-handler>
+      </div>
+
+      <!-- local space type -->
+      @if (transferanceFg.value.orderType === OrderLocationType.DineIn) {
+        <div>
+          <label for="productName">نوع المكان</label>
+          <app-input-error-message-handler>
+            <p-select
+              [options]="orderLocalTypeOptions()"
+              formControlName="placeType"
+              optionLabel="labelKey"
+              optionValue="value"
+              placeholder="إختر"
+              class="w-full! h-[46px]!"
+            />
+          </app-input-error-message-handler>
+        </div>
+      }
+
+      <!-- name (search) -->
+      <div>
+        <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
+        <app-input-error-message-handler [fc]="transferanceFg.controls.customerRequest.controls.id">
+          <ng-select
+            class="app-select w-full"
+            [items]="displayedCustomers()"
+            [formControl]="transferanceFg.controls.customerRequest.controls.id"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            placeholder="الكل"
+            #customerSelect
+            appDebounce
+            [customEvents]="[
+              { type: 'searchEvent', value: customerSelect.searchEvent },
+              { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
+            ]"
+            (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
+            (change)="onCustomerSelected($event)"
+          />
+        </app-input-error-message-handler>
+      </div>
+
+      <!-- phone -->
+      <div>
+        <label for="phoneNumber">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
+        <app-input-error-message-handler [fc]="transferanceFg.controls.customerRequest.controls.phoneNumber">
+          <input
+            pInputText
+            [formControl]="transferanceFg.controls.customerRequest.controls.phoneNumber"
+            aria-describedby="phoneNumber-help"
+            [placeholder]="'FORM.PHONE_NUMBER' | translate"
+            #customerPhoneSearch
+            appDebounce
+            class="app-input"
+          />
+        </app-input-error-message-handler>
+      </div>
+
+      <!-- address -->
+      <div class="md:col-span-2">
+        <label for="customerAddress">{{ 'FORM.CUSTOMER_ADDRESS' | translate }}</label>
+        <app-input-error-message-handler [fc]="transferanceFg.controls.customerRequest.controls.addressDescription">
+          <input
+            pInputText
+            [formControl]="transferanceFg.controls.customerRequest.controls.addressDescription"
+            aria-describedby="productAddress-help"
+            [placeholder]="'FORM.CUSTOMER_ADDRESS' | translate"
+            class="app-input order-customer-address"
+          />
+        </app-input-error-message-handler>
+      </div>
+
+      <!-- paid / postponed (radio) -->
+      <div
+        class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4 border-b border-b-text-light pb-4 [&_input]:w-5 [&_input]:aspect-square"
+      >
+        <div class="flex items-center gap-1">
+          <input
+            type="radio"
+            name="isPaid"
+            [disabled]="transferanceFg.value.orderType == OrderLocationType.Takeaway"
+            id="paymentInfoPaid"
+            [defaultChecked]="true"
+            (input)="isPaid.set(true)"
+            [value]="true"
+          />
+          <label for="paymentInfoPaid">{{ 'FORM.PAID' | translate }}</label>
+        </div>
+        <div class="flex items-center gap-1">
+          <input
+            [disabled]="transferanceFg.value.orderType == OrderLocationType.Takeaway"
+            type="radio"
+            name="isPaid"
+            id="paymentInfoPostponed"
+            (input)="isPaid.set(false)"
+            [value]="false"
+          />
+          <label for="paymentInfoPostponed">{{ 'FORM.POSTPONED' | translate }}</label>
+        </div>
+      </div>
+
+      <!-- cash -->
+      <div>
+        <label for="cash">{{ 'FORM.CASH_PAID' | translate }}</label>
+        <app-input-error-message-handler [fc]="transferanceFg.controls.payingCash">
+          <input
+            pInputText
+            aria-describedby="cash-help"
+            [placeholder]="'FORM.CASH' | translate"
+            [formControl]="transferanceFg.controls.payingCash"
+            appAllowNumbers
+            [max]="net()"
+            [disabled]="!isPaid()"
+            [min]="0"
+            [allowDecimal]="true"
+            #payingCash
+            id="payingCash"
+            appDebounce
+            class="app-input"
           />
           <!-- (click)="triggerNumbersKeyboard(payingCash)" -->
-      </app-input-error-message-handler>
-    </div>
+        </app-input-error-message-handler>
+      </div>
 
-    <!-- cash account -->
-    <div>
-      <label>{{ 'form.accountName' | translate }}</label>
-      <app-input-error-message-handler [fc]="transferanceFg.controls.cashAccountId">
-        <ng-select
-          class="app-select w-full"
-          [items]="displayedCashAccounts()"
-          [formControl]="transferanceFg.controls.cashAccountId"
-          bindLabel="name"
-          bindValue="id"
-          [clearable]="false"
-          placeholder="الكل"
-          #cashAccountSelect
-          appDebounce
-          [customEvents]="[
-            { type: 'searchEvent', value: cashAccountSelect.searchEvent },
-            { type: 'scrollToEnd', value: cashAccountSelect.scrollToEnd },
-          ]"
-          (debounced)="onCashFinancialAccountsSearch($event)"
-        />
-      </app-input-error-message-handler>
-    </div>
+      <!-- cash account -->
+      <div>
+        <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
+        <app-input-error-message-handler [fc]="transferanceFg.controls.cashAccountId">
+          <ng-select
+            class="app-select w-full"
+            [items]="displayedCashAccounts()"
+            [formControl]="transferanceFg.controls.cashAccountId"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            placeholder="الكل"
+            #cashAccountSelect
+            appDebounce
+            [customEvents]="[
+              { type: 'searchEvent', value: cashAccountSelect.searchEvent },
+              { type: 'scrollToEnd', value: cashAccountSelect.scrollToEnd },
+            ]"
+            (debounced)="onCashFinancialAccountsSearch($event)"
+          />
+        </app-input-error-message-handler>
+      </div>
 
-    <!-- network -->
-    <div>
-      <label for="network">{{ 'FORM.NETWORKPaid' | translate }}</label>
-      <app-input-error-message-handler [fc]="transferanceFg.controls.payingNetwork">
-        <input
-          pInputText
-          appAllowNumbers
-          [allowDecimal]="true"
-          [max]="net()"
-          [min]="0"
-          [disabled]="!isPaid()"
-          id="payingNetwork"
-          aria-describedby="network-help"
-          #payingNetwork
-          [formControl]="transferanceFg.controls.payingNetwork"
-          [placeholder]="'FORM.NETWORK' | translate"
-          class="app-input"
+      <!-- network -->
+      <div>
+        <label for="network">{{ 'FORM.NETWORK_PAID' | translate }}</label>
+        <app-input-error-message-handler [fc]="transferanceFg.controls.payingNetwork">
+          <input
+            pInputText
+            appAllowNumbers
+            [allowDecimal]="true"
+            [max]="net()"
+            [min]="0"
+            [disabled]="!isPaid()"
+            id="payingNetwork"
+            aria-describedby="network-help"
+            #payingNetwork
+            [formControl]="transferanceFg.controls.payingNetwork"
+            [placeholder]="'FORM.NETWORK' | translate"
+            class="app-input"
           />
           <!-- (click)="triggerNumbersKeyboard(payingNetwork)" -->
-      </app-input-error-message-handler>
+        </app-input-error-message-handler>
+      </div>
+
+      <!-- network account -->
+      <div>
+        <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
+        <app-input-error-message-handler [fc]="transferanceFg.controls.networkAccountId">
+          <ng-select
+            class="app-select w-full"
+            [items]="displayedNetworkAccounts()"
+            [formControl]="transferanceFg.controls.networkAccountId"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            placeholder="الكل"
+            #networkAccountSelect
+            appDebounce
+            [customEvents]="[
+              { type: 'searchEvent', value: networkAccountSelect.searchEvent },
+              { type: 'scrollToEnd', value: networkAccountSelect.scrollToEnd },
+            ]"
+            (debounced)="onNetworkFinancialAccountsSearch($event)"
+          />
+        </app-input-error-message-handler>
+      </div>
     </div>
 
-    <!-- network account -->
-    <div>
-      <label>{{ 'form.accountName' | translate }}</label>
-      <app-input-error-message-handler [fc]="transferanceFg.controls.networkAccountId">
-        <ng-select
-          class="app-select w-full"
-          [items]="displayedNetworkAccounts()"
-          [formControl]="transferanceFg.controls.networkAccountId"
-          bindLabel="name"
-          bindValue="id"
-          [clearable]="false"
-          placeholder="الكل"
-          #networkAccountSelect
+    <!-- locations -->
+    @switch (transferanceFg.value.orderType) {
+      <!-- dine in -->
+      @case (OrderLocationType.DineIn) {
+        <!-- <div> -->
+        @switch (transferanceFg.value.placeType) {
+          <!-- hut -->
+          @case (OrderLocalType.Hut) {
+            <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الكوخ</p>
+
+            <div
+              class="flex-1 overflow-auto no-scrollbar"
+              appDebounce
+              #hutsScroller
+              [domEvents]="['scroll']"
+              (debounced)="onHutsScroll($event, hutsScroller)"
+            >
+              <div class="h-fit grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-[90px_20px]">
+                @for (item of huts(); track $index) {
+                  <app-hut-card [data]="item" (click)="onHutSelected(item)" class="max-w-[250px]" />
+                }
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 border-t border-dark-line pt-4 [&_label]:mb-1 [&_label]:inline-block">
+              <!-- reservation time -->
+              <div>
+                <label for="">مدة الحجز</label>
+                <p-select
+                  style="--p-select-background: #ffffff"
+                  class="w-full border border-dark-line!"
+                  [options]="[30, 60, 90, 120, 150, 180]"
+                  formControlName="durationMinutes"
+                  (onChange)="onHutDurationChange($event)"
+                />
+              </div>
+              <!-- hut name/id -->
+              <div>
+                <label for="">رقم / اسم الكوخ</label>
+                <input
+                  type="text"
+                  name=""
+                  class="w-full border border-dark-line!"
+                  disabled
+                  [value]="currentHut()?.name"
+                  pInputText
+                  id=""
+                />
+              </div>
+              <!-- hut price -->
+              <div>
+                <label for="">سعر الكوخ في الساعه</label>
+                <input
+                  type="text"
+                  name=""
+                  class="w-full border border-dark-line!"
+                  disabled
+                  [value]="currentHutPrice().toFixed(2)"
+                  pInputText
+                  id=""
+                />
+              </div>
+            </div>
+          }
+          <!-- room -->
+          @case (OrderLocalType.Room) {
+            <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الغرفة</p>
+
+            <div
+              class="flex-1 overflow-auto no-scrollbar"
+              appDebounce
+              #roomsScroller
+              [domEvents]="['scroll']"
+              (debounced)="onRoomsScroll($event, roomsScroller)"
+            >
+              <div class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5">
+                @for (item of rooms(); track $index) {
+                  <app-room-card [data]="item" (click)="onRoomSelected(item)" class="max-w-[250px]" />
+                }
+              </div>
+            </div>
+          }
+          <!-- table -->
+          @case (OrderLocalType.Table) {
+            <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الطاولة</p>
+            <div
+              class="flex-1 overflow-auto no-scrollbar"
+              appDebounce
+              #tablesScroller
+              [domEvents]="['scroll']"
+              (debounced)="onTablesScroll($event, tablesScroller)"
+            >
+              <div class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5">
+                @for (item of tables(); track $index) {
+                  <app-table-card [data]="item" (click)="onTableSelected(item)" class="max-w-[250px]" />
+                }
+              </div>
+            </div>
+          }
+        }
+        <!-- </div> -->
+      }
+
+      <!-- company/person delivery -->
+      <!-- @case (OrderLocationType.CompanyDelivery) -->
+      @case (OrderLocationType.PersonDelivery) {
+        <div
+          class="flex gap-2 w-full justify-center pt-4"
+          style="--p-button-primary-background: #fff; --p-button-primary-color: #1f1d2b"
+        >
+          <button pButton [class.text-green-500!]="!isCompanyDelivery" (click)="changeDeliveryType(false)">
+            دليفري
+          </button>
+          <button pButton [class.text-green-500!]="isCompanyDelivery" (click)="changeDeliveryType(true)">شركة</button>
+        </div>
+        <div
+          class="flex-1 overflow-visible no-scrollbar"
           appDebounce
-          [customEvents]="[
-            { type: 'searchEvent', value: networkAccountSelect.searchEvent },
-            { type: 'scrollToEnd', value: networkAccountSelect.scrollToEnd },
-          ]"
-          (debounced)="onNetworkFinancialAccountsSearch($event)"
-        />
-      </app-input-error-message-handler>
-    </div>
-  </div>
+          #tablesScroller
+          [domEvents]="['scroll']"
+          (debounced)="onDeliveriesScroll($event, tablesScroller)"
+        >
+          <div
+            class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5 *:flex *:flex-col *:items-center *:justify-center *:border *:p-4! *:rounded-[14px] *:cursor-pointer"
+            style="--p-button-primary-background: #fff"
+          >
+            @if (isCompanyDelivery) {
+              @for (item of companyDeliveries(); track $index) {
+                <button pButton (click)="onDeliverySelected(item.id)">
+                  <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                      stroke="#000000"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <p class="text-center text-dark-bg-2 text-sm">
+                    {{ item.name }}
+                  </p>
+                </button>
+              } @empty {
+                <p-skeleton class="h-20" />
+                <p-skeleton class="h-20" />
+                <p-skeleton class="h-20" />
+              }
+            } @else {
+              @for (item of deliveries(); track $index) {
+                <button pButton class="relative overflow-visible!" (click)="onDeliverySelected(item.id)">
+                  <span
+                    class="absolute -top-2.5 -left-2.5 text-xs text-white bg-rose-600 rounded-full w-5 h-5 flex items-center justify-center"
+                    >{{ item.orderNumber }}</span
+                  >
+                  <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                      stroke="#000000"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <p class="text-center text-dark-bg-2 text-sm">
+                    {{ item.name }}
+                  </p>
+                </button>
+              } @empty {
+                <p-skeleton class="h-20" />
+                <p-skeleton class="h-20" />
+                <p-skeleton class="h-20" />
+              }
+            }
+          </div>
+        </div>
+      }
+    }
+  </form>
 
   <ng-template #footer>
     <div class="flex justify-center w-full">
@@ -430,7 +636,7 @@
         label="حفظ"
         styleClass=" bg-dark-line! text-white! w-25 h-[32px]!"
         severity="secondary"
-        (click)="closeInvoiceTypeChangeDialog()"
+        (click)="submitOrderTransference()"
       />
     </div>
   </ng-template>

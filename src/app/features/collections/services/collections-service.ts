@@ -16,15 +16,11 @@ interface IDeliveryOrder {
   netOrder: number;
   netReturnOrder: number;
 }
-export enum OpenCollectionDialogOptsDeliveryType {
-  Person = OrderLocationType.PersonDelivery,
-  Company = OrderLocationType.CompanyDelivery,
-}
 
 interface IOpenCollectionDialogOpts {
   orderId: number;
   isCollected: boolean;
-  deliveryType: null | OpenCollectionDialogOptsDeliveryType;
+  orderType:  OrderLocationType;
   deliveryId: number;
 }
 export interface ICollectionPersonDeliveryRequest {
@@ -56,25 +52,25 @@ export class CollectionsService extends BaseService {
   currentDeliveryOrders = signal<IDeliveryOrder[]>([]);
   orderService = inject(OrderService);
   lastCollectedId = signal<number | null>(null);
-  currentDeliveryType = signal<OpenCollectionDialogOptsDeliveryType | null>(null);
+  currentOrderType = signal<OrderLocationType | null>(null);
   currentDeliveryId = signal<number | null>(null);
 
   openCollectionDialog = (
-    opts: Partial<IOpenCollectionDialogOpts & Pick<IOpenCollectionDialogOpts, 'deliveryType'>> = {
+    opts: Partial<IOpenCollectionDialogOpts & Pick<IOpenCollectionDialogOpts, 'orderType'>> = {
       isCollected: false,
     },
   ) => {
     if (opts.isCollected)
       return this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'هذا الطلب محصل بالفعل' });
 
-    this.currentDeliveryType.set(opts?.deliveryType ?? null);
+    this.currentOrderType.set(opts?.orderType ?? null);
     this.currentDeliveryId.set(opts?.deliveryId ?? null);
     //
     //
     //
 
-    switch (opts.deliveryType) {
-      case OpenCollectionDialogOptsDeliveryType.Person:
+    switch (opts.orderType) {
+      case OrderLocationType.PersonDelivery:
         this.getOrdersForDelivery(opts.deliveryId!).subscribe({
           next: (orders) => {
             this.currentDeliveryOrders.set(orders);
@@ -84,7 +80,7 @@ export class CollectionsService extends BaseService {
           },
         });
         break;
-      case OpenCollectionDialogOptsDeliveryType.Company:
+      case OrderLocationType.CompanyDelivery:
         this.getOrdersForCompany(opts.deliveryId!).subscribe({
           next: (orders) => {
             this.currentDeliveryOrders.set(orders);

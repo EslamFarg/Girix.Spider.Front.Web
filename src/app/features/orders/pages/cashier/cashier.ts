@@ -929,10 +929,6 @@ export class Cashier extends BaseComponent implements OnInit {
   //
   //
   //
-  //
-  //
-  //
-  //
   //tables
   //
   TableDialogVisible: boolean = false;
@@ -992,11 +988,7 @@ export class Cashier extends BaseComponent implements OnInit {
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
     }
   }
-  //
-  //
-  //
-  //
-  //
+
   //
   //
   //
@@ -1188,11 +1180,11 @@ export class Cashier extends BaseComponent implements OnInit {
     //   this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
     // }
   }
-  //
-  //
-  //
-  //
 
+  //
+  //
+  //
+  //
   //
   //
   //
