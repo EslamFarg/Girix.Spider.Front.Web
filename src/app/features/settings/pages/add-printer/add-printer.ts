@@ -45,12 +45,15 @@ export class AddPrinter extends BaseComponent {
     if(values.type === PrinterType.Network){
       portControl.setValidators([Validators.required,onlyNumbersAllowed]);
       comPortControl.clearValidators();
-      comPortControl.setValue(null);
+      comPortControl.setValue(null,{emitEvent:false});
     }else{
       portControl.clearValidators();
-      portControl.setValue(0);
+      portControl.setValue(0,{emitEvent:false});
       comPortControl.setValidators([Validators.required]);
     }
+
+    // portControl.updateValueAndValidity();
+    // comPortControl.updateValueAndValidity();
   })
   printers = signal<IPrinterSearchRow[]>([]);
   currentPrinter = signal<IPrinterSearchRow | null>(null);

@@ -367,7 +367,7 @@
             pInputText
             aria-describedby="cash-help"
             [placeholder]="'FORM.CASH' | translate"
-            [formControl]="transferanceFg.controls.payingCash"
+            formControlName="payingCash"
             appAllowNumbers
             [max]="net()"
             [disabled]="!isPaid()"
@@ -419,7 +419,7 @@
             id="payingNetwork"
             aria-describedby="network-help"
             #payingNetwork
-            [formControl]="transferanceFg.controls.payingNetwork"
+            formControlName="payingNetwork"
             [placeholder]="'FORM.NETWORK' | translate"
             class="app-input"
           />
