@@ -338,7 +338,6 @@
           <input
             type="radio"
             name="isPaid"
-            [disabled]="transferanceFg.value.orderType == OrderLocationType.Takeaway"
             id="paymentInfoPaid"
             [defaultChecked]="true"
             (input)="isPaid.set(true)"
@@ -348,7 +347,6 @@
         </div>
         <div class="flex items-center gap-1">
           <input
-            [disabled]="transferanceFg.value.orderType == OrderLocationType.Takeaway"
             type="radio"
             name="isPaid"
             id="paymentInfoPostponed"
@@ -369,7 +367,7 @@
             [placeholder]="'FORM.CASH' | translate"
             formControlName="payingCash"
             appAllowNumbers
-            [max]="net()"
+            [max]="currentOrderNet()"
             [disabled]="!isPaid()"
             [min]="0"
             [allowDecimal]="true"
@@ -413,7 +411,7 @@
             pInputText
             appAllowNumbers
             [allowDecimal]="true"
-            [max]="net()"
+            [max]="currentOrderNet()"
             [min]="0"
             [disabled]="!isPaid()"
             id="payingNetwork"
@@ -555,7 +553,7 @@
       }
 
       <!-- company/person delivery -->
-      <!-- @case (OrderLocationType.CompanyDelivery) -->
+      @case (OrderLocationType.CompanyDelivery)
       @case (OrderLocationType.PersonDelivery) {
         <div
           class="flex gap-2 w-full justify-center pt-4"

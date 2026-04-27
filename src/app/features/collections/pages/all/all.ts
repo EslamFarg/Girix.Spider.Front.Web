@@ -39,6 +39,7 @@ import {
 } from '@/features/deliveries/services/delivery-service';
 import { HutCard, RoomCard, TableCard } from '@/components';
 import { Skeleton } from 'primeng/skeleton';
+import { AmountType } from '@/core';
 
 @Component({
   selector: 'app-all',
@@ -70,6 +71,7 @@ import { Skeleton } from 'primeng/skeleton';
 export class All extends BaseComponent {
   OrderLocationType = OrderLocationType;
   OrderLocalType = OrderLocalType;
+
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<OrderSearchEnum>(OrderSearchEnum.CustomerName, [Validators.required]),
@@ -79,6 +81,7 @@ export class All extends BaseComponent {
 
   fg = this.fb.group(this.initialSearchFormValue);
 
+  financialSettingsService = inject(FinancialSettingsService);
   orderService = inject(OrderService);
 
   filterMenuItems = signal<MenuItem[]>([
@@ -237,8 +240,28 @@ export class All extends BaseComponent {
   //
   //#region transferance
   //
-  orderLocationType = OrderLocationType;
   currentOrder = signal<IOrderSearchRow | null>(null);
+  currentOrderNet = computed(() => this.currentOrder()?.netOrder || 0);
+  currentOrderLocationType = computed(() => this.currentOrder()?.orderType);
+  orderTransferenceType = signal<OrderLocationType | null>(null);
+  transferenceCost = computed(() => {
+    const serviceFee = this.serviceFee();
+    const deliveryFee = this.deliveryFee();
+    const hutNet = this.hutNet();
+    return serviceFee + deliveryFee + hutNet;
+  });
+
+  financialSettings = signal<IFinancialSettingsResponse>({
+    deliveryFee: 0,
+    deliveryFeeType: 1,
+    discount: 0,
+    discountType: 1,
+    serviceFee: 0,
+    serviceFeeType: 1,
+    vat: 0,
+    minimumSelectiveTax: 0,
+  });
+
   currentOrderType = computed(() => this.currentOrder()?.orderType);
   orderTypeOptions = computed(() =>
     [
@@ -263,9 +286,9 @@ export class All extends BaseComponent {
     this.isInvoiceTypeChangeDialogVisible = true;
     this.transferanceFg.patchValue({
       id: order.id,
-      orderType: order.orderType,
-      placeType: order.placeType,
-      placeRefId: order.placeRefId,
+      orderType: null,
+      placeType: null,
+      placeRefId: null,
       placeName: '',
       reservedAt: this.localDateIso,
       simulateOnly: false,
@@ -283,6 +306,7 @@ export class All extends BaseComponent {
   closeInvoiceTypeChangeDialog() {
     this.currentOrder.set(null);
     this.isInvoiceTypeChangeDialogVisible = false;
+    this.orderTransferenceType.set(null);
   }
 
   transferanceFg = this.fb.group({
@@ -313,14 +337,108 @@ export class All extends BaseComponent {
     }),
   });
 
-  net = signal<number>(0);
+  tranferanceFgOrderTypeListener = this.transferanceFg.controls.orderType.valueChanges.subscribe((orderType) => {
+    this.orderTransferenceType.set(orderType);
+    const cashControl= this.transferanceFg.controls.payingCash;
+    const networkControl= this.transferanceFg.controls.payingNetwork;
 
+    if (orderType == OrderLocationType.Takeaway) {
+      cashControl?.disable();
+      networkControl?.disable();
+    }else{
+      cashControl?.enable();
+      networkControl?.enable();
+    }
+  });
   submitOrderTransference() {
     console.log(this.transferanceFg.value);
-      if (this.transferanceFg.invalid) return;
+    if (this.transferanceFg.invalid) return;
 
-      console.log('valid transferance');
+    console.log('valid transferance');
   }
+
+  //#endregion
+
+  //
+  //#region transferance calculations
+  //
+
+  deliveryFee = computed(() => {
+    if (
+      this.orderTransferenceType() !== OrderLocationType.PersonDelivery &&
+      this.orderTransferenceType() !== OrderLocationType.CompanyDelivery
+    )
+      return 0;
+
+    const baseFeeValue = this.financialSettings()?.deliveryFee;
+    let fee = 0;
+
+    //tax
+
+    if (this.financialSettings()?.deliveryFeeType == AmountType.Fixed) {
+      fee = baseFeeValue * (1 + this.financialSettings()?.vat / 100);
+    } else {
+      // const itemsWithSelectiveTaxSum = this.orderMenuItems().reduce(
+      //   (total, item) => total + this.getMenuItemPriceWithAdditionsWithSelectiveTax(item),
+      //   0,
+      // );
+
+      // const feeAmount = itemsWithSelectiveTaxSum * (baseFeeValue / 100);
+      // console.log('delivery fee before tax:', feeAmount);
+      // fee = feeAmount * (1 + this.financialSettings()?.vat / 100);
+      // console.log('delivery fee after tax:', fee);
+
+      const taxedFeePercentage = baseFeeValue * (1 + this.financialSettings()?.vat / 100);
+      fee = this.currentOrderNet() * (taxedFeePercentage / 100);
+    }
+
+    //discount
+    const baseDiscountValue = this.financialSettings()?.discount;
+
+    if (this.financialSettings()?.discountType == AmountType.Fixed) {
+      fee -= baseDiscountValue * (1 + this.financialSettings()?.vat / 100);
+    } else {
+      fee *= 1 - baseDiscountValue / 100;
+    }
+
+    return fee;
+  });
+
+  serviceFee = computed(() => {
+    let serviceFee = 0;
+
+    if (this.orderTransferenceType() == OrderLocationType.DineIn) {
+      const net = this.currentOrderNet();
+      if (this.financialSettings().serviceFeeType == AmountType.Percentage) {
+        let taxedServiceFeePercentage = this.financialSettings().serviceFee * (1 + this.financialSettings().vat / 100);
+        serviceFee = net * (taxedServiceFeePercentage / 100);
+      } else {
+        serviceFee = this.financialSettings().serviceFee * (1 + this.financialSettings().vat / 100);
+      }
+    }
+
+    return serviceFee;
+  });
+
+  // itemsDiscountAmount = computed(() => {
+  //   const discountValue = this.financialSettings().discount;
+  //   if (this.financialSettings().discountType == AmountType.Fixed) {
+  //     return discountValue;
+  //   } else if (this.financialSettings().discountType == AmountType.Percentage) {
+  //     return this.orderItemsNet() * (discountValue / 100);
+  //   } else {
+  //     return 0;
+  //   }
+  // });
+
+  // netListener = effect(() => {
+  //   let net = this.net();
+
+  //   this.orderFg.patchValue({
+  //     payingCash: net,
+  //     payingNetwork: 0,
+  //   });
+  // });
 
   //#endregion
 
@@ -474,7 +592,7 @@ export class All extends BaseComponent {
   });
 
   cashInputSubscription = this.transferanceFg.get('payingCash')?.valueChanges.subscribe((value) => {
-    const net = this.net();
+    const net = this.currentOrderNet();
     let futureValue = value ?? 0;
     if (futureValue > net) {
       futureValue = net;
@@ -491,7 +609,7 @@ export class All extends BaseComponent {
   });
 
   networkInputSubscription = this.transferanceFg.get('payingNetwork')?.valueChanges.subscribe((value) => {
-    const net = this.net();
+    const net = this.currentOrderNet();
     let futureValue = value ?? 0;
     if (futureValue > net) {
       futureValue = net;
@@ -667,18 +785,6 @@ export class All extends BaseComponent {
   //
   //local space
   //
-
-  financialSettingsService = inject(FinancialSettingsService);
-  financialSettings = signal<IFinancialSettingsResponse>({
-    deliveryFee: 0,
-    deliveryFeeType: 1,
-    discount: 0,
-    discountType: 1,
-    serviceFee: 0,
-    serviceFeeType: 1,
-    vat: 0,
-    minimumSelectiveTax: 0,
-  });
 
   //
   //#region huts
