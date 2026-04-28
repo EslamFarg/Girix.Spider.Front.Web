@@ -1,7 +1,7 @@
 import { BaseSearchAndCrudService } from '@/core/services/BaseSearchAndCrudService';
 import { Injectable } from '@angular/core';
 import { IOrderBillReadResponse, IOrderReadResponse, IOrderSearchResponseValue } from '../types/api/read';
-import { ILocalPlaceChangeRequest, IOrderAddItemsRequest, IOrderCreateRequest } from '../types/api/write';
+import { ILocalPlaceChangeRequest, IOrderAddItemsRequest, IOrderChangeTypeRequest, IOrderCreateRequest } from '../types/api/write';
 import { OrderSearchEnum } from '../types/api/enums';
 import { Subject, tap } from 'rxjs';
 
@@ -33,5 +33,10 @@ export class OrderService extends BaseSearchAndCrudService<
 
   getBill(id: number) {
     return this.http.get<IOrderBillReadResponse>(`${this.apiUrl}/${id}/bill`);
+  }
+
+  //v1/Order/change-type
+  changeType(dto: IOrderChangeTypeRequest) {
+    return this.http.put<IOrderBillReadResponse>(`${this.apiUrl}/change-type`, dto);
   }
 }

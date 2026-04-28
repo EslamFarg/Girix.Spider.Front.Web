@@ -61,3 +61,31 @@ export interface IOrderCreateCustomer {
   secondaryMobileNumber: string;
   addressDescription: string;
 }
+
+export interface IOrderChangeTypeRequest {
+  id: number
+  simulateOnly: boolean
+  orderType: number
+  placeType: number
+  placeRefId: number
+  placeName: string
+  durationMinutes: number
+  deliveryId: number
+  reservedAt: string
+  payingCash: number
+  payingNetwork: number
+  refund: number
+  cashAccountId: number
+  networkAccountId: number
+  customerRequest: IOrderChangeTypeCustomerRequest
+}
+
+export interface IOrderChangeTypeCustomerRequest {
+  id: number
+  nameAr: string
+  nameEn: string
+  phoneNumber: string
+  secondaryMobileNumber: string
+  addressDescription: string
+}
+

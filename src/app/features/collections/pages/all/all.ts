@@ -10,7 +10,14 @@ import { InputText } from 'primeng/inputtext';
 import { Dialog } from 'primeng/dialog';
 import { Button, ButtonDirective } from 'primeng/button';
 import { CollectionsService } from '../../services/collections-service';
-import { OrderSearchEnum, OrderService, IOrderSearchRow, OrderLocationType, OrderLocalType } from '@/features/orders';
+import {
+  OrderSearchEnum,
+  OrderService,
+  IOrderSearchRow,
+  OrderLocationType,
+  OrderLocalType,
+  IOrderChangeTypeRequest,
+} from '@/features/orders';
 import { MenuItem } from 'primeng/api';
 import { DatePipe } from '@angular/common';
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
@@ -24,7 +31,7 @@ import {
   FinancialAccountService,
 } from '@/features/accounts/services/financial-account-service';
 import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
-import { labeledRequiredValidator, noSymbolsAllowed } from '@/yn-ng';
+import { labeledRequiredValidator, noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng';
 import { HutSearchEnum, HutService, IHutSearchRow } from '@/features/restaurant/services/hut-service';
 import {
   FinancialSettingsService,
@@ -40,6 +47,7 @@ import {
 import { HutCard, RoomCard, TableCard } from '@/components';
 import { Skeleton } from 'primeng/skeleton';
 import { AmountType } from '@/core';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-all',
@@ -244,11 +252,20 @@ export class All extends BaseComponent {
   currentOrderNet = computed(() => this.currentOrder()?.netOrder || 0);
   currentOrderLocationType = computed(() => this.currentOrder()?.orderType);
   orderTransferenceType = signal<OrderLocationType | null>(null);
+  toBePaidToClient = signal(0);
+
   transferenceCost = computed(() => {
     const serviceFee = this.serviceFee();
     const deliveryFee = this.deliveryFee();
     const hutNet = this.hutNet();
-    return serviceFee + deliveryFee + hutNet;
+    const sum = serviceFee + deliveryFee + hutNet;
+    return sum;
+  });
+
+  transferenceCostEffect = effect(() => {
+    this.transferanceFg.patchValue({
+      payingCash: this.transferenceCost(),
+    });
   });
 
   financialSettings = signal<IFinancialSettingsResponse>({
@@ -280,8 +297,17 @@ export class All extends BaseComponent {
   );
 
   isInvoiceTypeChangeDialogVisible = false;
+  isInvoiceTypeChangeConfirmDialogVisible = false;
 
   openInvoiceTypeChangeDialog(order: IOrderSearchRow) {
+    if (order.netReturnOrder > 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'الغاء',
+        detail: 'لا يمكن تغيير نوع الفاتورة للطلبات المرتجعة',
+      });
+      return;
+    }
     this.currentOrder.set(order);
     this.isInvoiceTypeChangeDialogVisible = true;
     this.transferanceFg.patchValue({
@@ -291,7 +317,7 @@ export class All extends BaseComponent {
       placeRefId: null,
       placeName: '',
       reservedAt: this.localDateIso,
-      simulateOnly: false,
+      simulateOnly: true,
       customerRequest: {
         id: order.customerId,
         nameAr: order.customerName,
@@ -305,56 +331,117 @@ export class All extends BaseComponent {
 
   closeInvoiceTypeChangeDialog() {
     this.currentOrder.set(null);
+    this.toBePaidToClient.set(0);
     this.isInvoiceTypeChangeDialogVisible = false;
     this.orderTransferenceType.set(null);
   }
 
+  openInvoiceTypeChangeConfirmDialog() {
+    this.isInvoiceTypeChangeDialogVisible = true;
+  }
+
+  closeInvoiceTypeChangeConfirmDialog() {
+    this.isInvoiceTypeChangeConfirmDialogVisible = false;
+  }
+
   transferanceFg = this.fb.group({
     id: this.fb.control<null | number>(null, [Validators.required]),
-    simulateOnly: this.fb.control<boolean>(false, [Validators.required]),
+    simulateOnly: this.fb.control<boolean>(true, []),
     // dinein/delivery/takeaway
     orderType: this.fb.control<null | OrderLocationType>(null, [Validators.required]),
     // hut/cabin/room
     placeType: this.fb.control<null | OrderLocalType>(null, [Validators.required]),
     // hut/cabin/room id
     placeRefId: this.fb.control<null | number>(null, [Validators.required]),
-    placeName: this.fb.control<string | null>(null, [Validators.required]),
-    durationMinutes: this.fb.control<null | number>(null, []),
+    placeName: this.fb.control<string | null>(null, []),
+    durationMinutes: this.fb.control<number | null>(null, []),
     deliveryId: this.fb.control<null | number>(null, []),
     reservedAt: this.fb.control<string | null>(null, [Validators.required]),
-    payingCash: this.fb.control<null | number>(null, [Validators.required]),
+    payingCash: this.fb.control<null | number>(null, []),
     cashAccountId: this.fb.control<null | number>(null, [Validators.required]),
-    payingNetwork: this.fb.control<null | number>(null, [Validators.required]),
+    payingNetwork: this.fb.control<null | number>(null, []),
     networkAccountId: this.fb.control<null | number>(null, [Validators.required]),
-    refund: this.fb.control<null | number>(null, [Validators.required]),
+    refund: this.fb.control<null | number>(null, []),
     customerRequest: this.fb.group({
       id: this.fb.control<null | number>(null, [Validators.required]),
       nameAr: this.fb.control<string | null>(null, [Validators.required]),
       nameEn: this.fb.control<string | null>(null, [Validators.required]),
-      phoneNumber: this.fb.control<string | null>(null, [Validators.required]),
-      secondaryMobileNumber: this.fb.control<string | null>(null, [Validators.required]),
+      phoneNumber: this.fb.control<string | null>(null, [
+        Validators.required,
+        onlyNumbersAllowed,
+        Validators.minLength(6),
+        Validators.maxLength(16),
+      ]),
+      secondaryMobileNumber: this.fb.control<string | null>(null, []),
       addressDescription: this.fb.control<string | null>(null, [Validators.required]),
     }),
   });
 
   tranferanceFgOrderTypeListener = this.transferanceFg.controls.orderType.valueChanges.subscribe((orderType) => {
     this.orderTransferenceType.set(orderType);
-    const cashControl= this.transferanceFg.controls.payingCash;
-    const networkControl= this.transferanceFg.controls.payingNetwork;
+    const { payingCash, payingNetwork, deliveryId, placeRefId, durationMinutes, placeType } =
+      this.transferanceFg.controls;
 
-    if (orderType == OrderLocationType.Takeaway) {
-      cashControl?.disable();
-      networkControl?.disable();
-    }else{
-      cashControl?.enable();
-      networkControl?.enable();
+    payingCash?.disable();
+    payingNetwork?.disable();
+
+    [deliveryId, durationMinutes, placeRefId, placeType].forEach((control) => control.clearValidators());
+
+    durationMinutes?.setValue(null);
+
+    switch (orderType) {
+      case OrderLocationType.DineIn:
+        payingCash?.enable();
+        payingNetwork?.enable();
+        durationMinutes?.setValidators([Validators.required]);
+        placeRefId?.setValidators([Validators.required]);
+        placeType?.setValidators([Validators.required]);
+        durationMinutes?.setValue(30);
+        break;
+
+      case OrderLocationType.CompanyDelivery:
+      case OrderLocationType.PersonDelivery:
+        payingCash?.enable();
+        payingNetwork?.enable();
+        deliveryId?.setValidators([Validators.required]);
+        break;
     }
   });
-  submitOrderTransference() {
-    console.log(this.transferanceFg.value);
-    if (this.transferanceFg.invalid) return;
 
-    console.log('valid transferance');
+  submitOrderTransference() {
+    this.transferanceFg.controls.customerRequest.patchValue({
+      nameEn: this.transferanceFg.value?.customerRequest?.nameAr,
+    });
+    if (this.transferanceFg.invalid) {
+      this.transferanceFg.markAllAsTouched();
+      return;
+    }
+
+    return this.orderService.changeType(this.transferanceFg.getRawValue() as IOrderChangeTypeRequest).pipe(
+      tap({
+        next: () => {
+          this.searchOrders(1);
+        },
+      }),
+    );
+  }
+
+  submitOrderTransferenceSimulation() {
+    this.submitOrderTransference()?.subscribe({
+      next: (bill) => {
+        this.toBePaidToClient.set(bill?.toBePaid?.amount || 0);
+      },
+    });
+  }
+
+  confirmOrderTransference() {
+    this.transferanceFg.patchValue({ simulateOnly: false });
+    this.submitOrderTransference()?.subscribe({
+      next: () => {
+        this.closeInvoiceTypeChangeConfirmDialog();
+        this.closeInvoiceTypeChangeDialog();
+      },
+    });
   }
 
   //#endregion
@@ -572,7 +659,7 @@ export class All extends BaseComponent {
   isPaid = signal<boolean>(true);
 
   isPaidListener = effect(() => {
-    let validators: ValidatorFn[] = [];
+    // let validators: ValidatorFn[] = [];
     const cashControl = this.transferanceFg.controls.payingCash;
     const networkControl = this.transferanceFg.controls.payingNetwork;
     this.transferanceFg.patchValue({
@@ -580,45 +667,45 @@ export class All extends BaseComponent {
       payingNetwork: 0,
     });
     if (this.isPaid()) {
-      validators = [Validators.required];
+      // validators = [Validators.required];
       cashControl?.enable();
       networkControl?.enable();
     } else {
       cashControl?.disable();
       networkControl?.disable();
     }
-    cashControl?.setValidators(validators);
-    networkControl?.setValidators(validators);
+    // cashControl?.setValidators(validators);
+    // networkControl?.setValidators(validators);
   });
 
-  cashInputSubscription = this.transferanceFg.get('payingCash')?.valueChanges.subscribe((value) => {
-    const net = this.currentOrderNet();
+  cashInputSubscription = this.transferanceFg.controls.payingCash?.valueChanges.subscribe((value) => {
+    const transferenceCost = this.transferenceCost();
     let futureValue = value ?? 0;
-    if (futureValue > net) {
-      futureValue = net;
+    if (futureValue > transferenceCost) {
+      futureValue = transferenceCost;
     } else if (futureValue < 0) {
       futureValue = 0;
     }
     this.transferanceFg.patchValue(
       {
-        payingNetwork: net - futureValue,
+        payingNetwork: transferenceCost - futureValue,
         payingCash: futureValue,
       },
       { emitEvent: false },
     );
   });
 
-  networkInputSubscription = this.transferanceFg.get('payingNetwork')?.valueChanges.subscribe((value) => {
-    const net = this.currentOrderNet();
+  networkInputSubscription = this.transferanceFg.controls.payingNetwork?.valueChanges.subscribe((value) => {
+    const transferenceCost = this.transferenceCost();
     let futureValue = value ?? 0;
-    if (futureValue > net) {
-      futureValue = net;
+    if (futureValue > transferenceCost) {
+      futureValue = transferenceCost;
     } else if (futureValue < 0) {
       futureValue = 0;
     }
     this.transferanceFg.patchValue(
       {
-        payingCash: net - futureValue,
+        payingCash: transferenceCost - futureValue,
         payingNetwork: futureValue,
       },
       { emitEvent: false },

@@ -367,7 +367,7 @@
             [placeholder]="'FORM.CASH' | translate"
             formControlName="payingCash"
             appAllowNumbers
-            [max]="currentOrderNet()"
+            [max]="transferenceCost()"
             [disabled]="!isPaid()"
             [min]="0"
             [allowDecimal]="true"
@@ -411,7 +411,7 @@
             pInputText
             appAllowNumbers
             [allowDecimal]="true"
-            [max]="currentOrderNet()"
+            [max]="transferenceCost()"
             [min]="0"
             [disabled]="!isPaid()"
             id="payingNetwork"
@@ -631,10 +631,41 @@
   <ng-template #footer>
     <div class="flex justify-center w-full">
       <p-button
+        label="متابعة"
+        styleClass=" bg-dark-line! text-white! w-25 h-[32px]!"
+        severity="secondary"
+        (click)="submitOrderTransferenceSimulation()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- invoice type change dialog -->
+<p-dialog
+  [visible]="isInvoiceTypeChangeConfirmDialogVisible"
+  [modal]="true"
+  [style]="{ width: '100%', maxWidth: '94vw' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-white!"
+  contentStyleClass=" custom-scroll "
+  class="addition-dialog"
+  (onHide)="closeInvoiceTypeChangeConfirmDialog()"
+>
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2 flex-1 ps-10 text-xl font-bold text-dark-bg-2">تأكيد التحويل</div>
+  </ng-template>
+
+  @if (toBePaidToClient() > 0){
+    <p>توجد مستحقات للعميل بقيمة {{ toBePaidToClient() }}</p>
+  }
+
+  <ng-template #footer>
+    <div class="flex justify-center w-full">
+      <p-button
         label="حفظ"
         styleClass=" bg-dark-line! text-white! w-25 h-[32px]!"
         severity="secondary"
-        (click)="submitOrderTransference()"
+        (click)="confirmOrderTransference()"
       />
     </div>
   </ng-template>

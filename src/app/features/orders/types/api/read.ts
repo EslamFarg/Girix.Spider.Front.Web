@@ -155,6 +155,7 @@ export interface IOrderSearchRow {
   priceForPlace: number;
   createdAt: string;
   netOrder: number;
+  netReturnOrder: number;
   isCollected: boolean;
   payingCash: number;
   payingNetwork: number;
