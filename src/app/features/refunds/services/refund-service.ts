@@ -3,13 +3,12 @@ import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseS
 import BaseService from '@/core/services/BaseService';
 import { Injectable } from '@angular/core';
 import { IRefundSearchResponseValue } from './refund-types/response';
-
+//Id,InvoiceNumber,ReferenceNumber,Name
 export enum RefundSearchEnum {
   Id = SearchColumEnum.Id,
-  OrderNumber = SearchColumEnum.OrderNumber,
-  OrderType = SearchColumEnum.OrderType,
-  CustomerName = SearchColumEnum.CustomerName,
-  OrderPlace = SearchColumEnum.OrderPlace,
+  InvoiceNumber = SearchColumEnum.InvoiceNumber,
+  ReferenceNumber = SearchColumEnum.ReferenceNumber,
+  Name = SearchColumEnum.Name,
 }
 
 @Injectable({

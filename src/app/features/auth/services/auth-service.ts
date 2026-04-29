@@ -35,7 +35,7 @@ export class AuthService extends BaseService {
   isAuthenticated = computed(() => this.userDetails() !== null);
   apiUrlOverrideService = inject(ApiUrlOverrideService);
   override apiRoute = 'Auth';
-  crmApi = 'http://gtsdev-001-site23.atempurl.com';
+  crmApi = 'https://majedsoftcompany-001-site17.stempurl.com';
 
   login(dto: ILoginDto) {
     let loginResultObs: Observable<IUserDetails>;

@@ -230,15 +230,14 @@
     <div class="text-dark-bg-2 font-medium text-sm grid grid-cols-2 gap-4">
       <!-- current type -->
       <div>
-        <label for="productName">نوع الفاتوره</label>
+        <label for="orderType">نوع الفاتوره</label>
         <app-input-error-message-handler>
           <input
-            [disabled]="true"
-            class="app-input"
             pInputText
-            id="productName"
-            aria-describedby="productName-help"
-            placeholder="محلي"
+            [disabled]="true"
+            [value]="currentOrderType()?.labelKey"
+            aria-describedby="orderType-help"
+            class="app-input order-customer-address"
           />
         </app-input-error-message-handler>
       </div>

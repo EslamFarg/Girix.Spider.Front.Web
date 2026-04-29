@@ -72,6 +72,7 @@ import { tap } from 'rxjs';
     TableCard,
     Skeleton,
     ButtonDirective,
+    FormsModule,
   ],
   templateUrl: './all.html',
   styleUrl: './all.css',
@@ -253,12 +254,13 @@ export class All extends BaseComponent {
   currentOrderLocationType = computed(() => this.currentOrder()?.orderType);
   orderTransferenceType = signal<OrderLocationType | null>(null);
   toBePaidToClient = signal(0);
+  toBePaidFromClient = signal(0);
 
   transferenceCost = computed(() => {
     const serviceFee = this.serviceFee();
     const deliveryFee = this.deliveryFee();
     const hutNet = this.hutNet();
-    const sum = serviceFee + deliveryFee + hutNet;
+    const sum = serviceFee + deliveryFee + hutNet; //this.toBePaidFromClient();
     return sum;
   });
 
@@ -279,15 +281,16 @@ export class All extends BaseComponent {
     minimumSelectiveTax: 0,
   });
 
-  currentOrderType = computed(() => this.currentOrder()?.orderType);
-  orderTypeOptions = computed(() =>
-    [
-      { labelKey: 'محلي', value: OrderLocationType.DineIn },
-      { labelKey: 'توصيل (عامل)', value: OrderLocationType.PersonDelivery },
-      { labelKey: 'توصيل (شركة)', value: OrderLocationType.CompanyDelivery },
-      { labelKey: 'سفري', value: OrderLocationType.Takeaway },
-    ].filter((opt) => opt.value !== this.currentOrderType()),
+  allOrderTypes = signal([
+    { labelKey: 'محلي', value: OrderLocationType.DineIn },
+    { labelKey: 'توصيل (عامل)', value: OrderLocationType.PersonDelivery },
+    { labelKey: 'توصيل (شركة)', value: OrderLocationType.CompanyDelivery },
+    { labelKey: 'سفري', value: OrderLocationType.Takeaway },
+  ]);
+  currentOrderType = computed(
+    () => this.allOrderTypes().find((opt) => opt.value === this.currentOrderLocationType()),
   );
+  orderTypeOptions = computed(() => this.allOrderTypes().filter((opt) => opt.value !== this.currentOrderType()?.value));
   orderLocalTypeOptions = computed(() =>
     [
       { labelKey: 'كوخ', value: OrderLocalType.Hut },
@@ -609,17 +612,15 @@ export class All extends BaseComponent {
   }
   onCustomerSelected(event: ICustomerSearchRow) {
     if (event.id) {
-      this.currentCustomer.set({
+      this.transferanceFg.controls.customerRequest.patchValue({
         id: event.id,
         nameAr: event.name,
         nameEn: event.name,
         phoneNumber: event.phoneNumber,
         secondaryMobileNumber: event.secondaryMobileNumber,
         addressDescription: event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
-      });
-    } else {
-      this.currentCustomer.set(null);
-    }
+      })
+    }  
   }
   onCustomersNameSearch(event: any, searchTerm: string = '') {
     searchTerm = searchTerm ?? '';

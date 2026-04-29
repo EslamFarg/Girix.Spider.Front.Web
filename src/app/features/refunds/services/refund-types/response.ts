@@ -1,25 +1,18 @@
-export interface IRefundRowResponse {
-  id: number;
-  orderNumber: string;
-  orderType: number;
-  paymentType: number;
-  customerId: number;
-  customerName: string;
-  customerPhone: string;
-  customerSecondaryPhone: string;
-  customerAdress: string;
-  deliveryId: number;
-  placeType: number;
-  placeRefId: number;
-  priceForPlace: number;
-  createdAt: string;
-  netOrder: number;
-  isCollected: boolean;
-  payingCash: number;
-  payingNetwork: number;
+export interface IRefundSearchRow {
+   id: number
+  orderMasterId: number
+  orderReturnDate: string
+  netOrderReturn: number
+  payingCash: number
+  payingNetwork: number
+  createdAt: string
+  paymentType: number
+  customerName: string
+  customerPhone: any
+  customerAdress: any
 }
 export interface IRefundSearchResponseValue {
-  rows: IRefundRowResponse[];
+  rows: IRefundSearchRow[];
   paginationInfo: {
     totalRowsCount: number;
     totalPagesCount: number;
