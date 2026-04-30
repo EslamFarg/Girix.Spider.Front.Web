@@ -1,0 +1,300 @@
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { BaseComponent, FormMode } from '@/components/base-component/base-component';
+import { RefundService } from '../../services/refund-service';
+import {
+  IOrderLatestUpdateItem,
+  IOrderLatestUpdateModifier,
+  IOrderLatestUpdateResponse,
+  IRefundResponse,
+} from '../../services/refund-types/response';
+import {
+  FormArray,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Button } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
+import { AllowNumbers } from '@/directives/allow-numbers';
+import { TranslatePipe } from '@ngx-translate/core';
+import { ControlsOf } from '@/yn-ng/types/helpers';
+import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
+
+interface IRefundItemFormRow {
+  orderDetailId: number;
+  quantity: number;
+  originalQuantity: number;
+  name: string;
+  unitPrice: number;
+  netUnitPrice: number;
+}
+
+interface IRefundAddonFormRow {
+  additionalOrderDetailsId: number;
+  quantity: number;
+  originalQuantity: number;
+  name: string;
+  unitPrice: number;
+  netUnitPrice: number;
+}
+
+type RefundItemFormRowControls = ControlsOf<IRefundItemFormRow>;
+type RefundAddonFormRowControls = ControlsOf<IRefundAddonFormRow>;
+
+@Component({
+  selector: 'app-refund-form',
+  imports: [
+    Button,
+    InputTextModule,
+    InputErrorMessageHandler,
+    AllowNumbers,
+    TranslatePipe,
+    ReactiveFormsModule,
+    FormsModule,
+    RouterLink,
+    DecimalPipe,
+  ],
+  templateUrl: './refund-form.html',
+  styleUrl: './refund-form.css',
+})
+export class RefundForm extends BaseComponent implements OnInit {
+  refundService = inject(RefundService);
+
+  formMode = input<FormMode>(FormMode.Create);
+  refundId = input<number>(0);
+
+  orderData = signal<IOrderLatestUpdateResponse | IRefundResponse | null>(null);
+  isCreateMode = computed(() => this.formMode() === FormMode.Create);
+
+  refundFg = this.fb.group({
+    payingCash: this.fb.control<number>(0, [Validators.required, Validators.min(0)]),
+    payingNetwork: this.fb.control<number>(0, [Validators.required, Validators.min(0)]),
+    items: this.fb.array<FormGroup<RefundItemFormRowControls>>([], [Validators.required]),
+  });
+
+  addonArrays = signal<FormArray<FormGroup<RefundAddonFormRowControls>>[]>([]);
+
+  get itemRows() {
+    return this.refundFg.controls.items;
+  }
+
+  ngOnInit() {
+    if (this.isCreateMode()) {
+      const orderId = Number(this.activatedRoute.snapshot.queryParamMap.get('orderId'));
+      if (orderId) {
+        this.refundService.getOrderLatestUpdate(orderId).subscribe({
+          next: (res) => {
+            this.orderData.set(res);
+            this.patchFormFromOrder(res);
+          },
+        });
+      }
+    } else {
+      const id = this.refundId();
+      if (id) {
+        this.refundService.getById(id).subscribe({
+          next: (res) => {
+            this.orderData.set(res);
+            this.patchFormFromRefund(res);
+          },
+        });
+      }
+    }
+  }
+
+  patchFormFromOrder(order: IOrderLatestUpdateResponse) {
+    this.refundFg.patchValue({
+      payingCash: order.payments.payingCash,
+      payingNetwork: order.payments.payingNetwork,
+    });
+
+    const itemsArray = this.fb.array<FormGroup<RefundItemFormRowControls>>(
+      order.items.map((item) => this.createItemRow(item)),
+      [Validators.required],
+    );
+    this.refundFg.setControl('items', itemsArray);
+
+    this.addonArrays.set(
+      order.items.map((item) =>
+        this.fb.array<FormGroup<RefundAddonFormRowControls>>(
+          item.modifiers.map((mod) => this.createAddonRow(mod)),
+        ),
+      ),
+    );
+  }
+
+  patchFormFromRefund(refund: IRefundResponse) {
+    this.refundFg.patchValue({
+      payingCash: refund.payments.payingCash,
+      payingNetwork: refund.payments.payingNetwork,
+    });
+
+    const itemsArray = this.fb.array<FormGroup<RefundItemFormRowControls>>(
+      refund.items.map((item) => this.createItemRowFromRefund(item)),
+      [Validators.required],
+    );
+    this.refundFg.setControl('items', itemsArray);
+
+    this.addonArrays.set(
+      refund.items.map((item) =>
+        this.fb.array<FormGroup<RefundAddonFormRowControls>>(
+          (item.modifiers ?? []).map((mod: any) => this.createAddonRowFromRefund(mod)),
+        ),
+      ),
+    );
+  }
+
+  createItemRow(item: IOrderLatestUpdateItem): FormGroup<RefundItemFormRowControls> {
+    return this.fb.group<RefundItemFormRowControls>({
+      orderDetailId: this.fb.control(item.masterOrderDetailsId, { validators: [] }),
+      quantity: this.fb.control(item.qty, [Validators.required, Validators.min(0), Validators.max(item.qty)]),
+      originalQuantity: this.fb.control(item.qty, { validators: [] }),
+      name: this.fb.control(item.name, { validators: [] }),
+      unitPrice: this.fb.control(item.unitPrice, { validators: [] }),
+      netUnitPrice: this.fb.control(item.netUnitPrice, { validators: [] }),
+    });
+  }
+
+  createItemRowFromRefund(item: IRefundResponse['items'][number]): FormGroup<RefundItemFormRowControls> {
+    return this.fb.group<RefundItemFormRowControls>({
+      orderDetailId: this.fb.control(item.masterOrderDetailsId, { validators: [] }),
+      quantity: this.fb.control(item.qty, [Validators.required, Validators.min(0)]),
+      originalQuantity: this.fb.control(item.realQtyInMasterOrder, { validators: [] }),
+      name: this.fb.control(item.name, { validators: [] }),
+      unitPrice: this.fb.control(item.unitPrice, { validators: [] }),
+      netUnitPrice: this.fb.control(item.netUnitPrice, { validators: [] }),
+    });
+  }
+
+  createAddonRow(modifier: IOrderLatestUpdateModifier): FormGroup<RefundAddonFormRowControls> {
+    return this.fb.group<RefundAddonFormRowControls>({
+      additionalOrderDetailsId: this.fb.control(modifier.masterOrderDetailsId, { validators: [] }),
+      quantity: this.fb.control(modifier.qty, [Validators.required, Validators.min(0), Validators.max(modifier.qty)]),
+      originalQuantity: this.fb.control(modifier.qty, { validators: [] }),
+      name: this.fb.control(modifier.name, { validators: [] }),
+      unitPrice: this.fb.control(modifier.unitPrice, { validators: [] }),
+      netUnitPrice: this.fb.control(modifier.netUnitPrice, { validators: [] }),
+    });
+  }
+
+  createAddonRowFromRefund(modifier: any): FormGroup<RefundAddonFormRowControls> {
+    return this.fb.group<RefundAddonFormRowControls>({
+      additionalOrderDetailsId: this.fb.control(modifier.masterOrderDetailsId ?? modifier.id, { validators: [] }),
+      quantity: this.fb.control(modifier.qty, [Validators.required, Validators.min(0)]),
+      originalQuantity: this.fb.control(modifier.realQtyInMasterOrder ?? modifier.qty, { validators: [] }),
+      name: this.fb.control(modifier.name, { validators: [] }),
+      unitPrice: this.fb.control(modifier.unitPrice, { validators: [] }),
+      netUnitPrice: this.fb.control(modifier.netUnitPrice, { validators: [] }),
+    });
+  }
+
+  getAddonRows(itemIndex: number): FormArray<FormGroup<RefundAddonFormRowControls>> {
+    return this.addonArrays()[itemIndex];
+  }
+
+  onItemQuantityChange(itemIndex: number, event: Event) {
+    if (!this.isCreateMode()) return;
+    const input = event.target as HTMLInputElement;
+    const row = this.itemRows.at(itemIndex);
+    const original = row.value.originalQuantity ?? 0;
+    let val = Number(input.value);
+
+    if (val > original) {
+      val = original;
+      input.value = String(original);
+    }
+    if (val < 0) {
+      val = 0;
+      input.value = '0';
+    }
+    row.patchValue({ quantity: val });
+  }
+
+  onAddonQuantityChange(itemIndex: number, addonIndex: number, event: Event) {
+    if (!this.isCreateMode()) return;
+    const input = event.target as HTMLInputElement;
+    const row = this.getAddonRows(itemIndex).at(addonIndex);
+    const original = row.value.originalQuantity ?? 0;
+    let val = Number(input.value);
+
+    if (val > original) {
+      val = original;
+      input.value = String(original);
+    }
+    if (val < 0) {
+      val = 0;
+      input.value = '0';
+    }
+    row.patchValue({ quantity: val });
+  }
+
+  calculateItemTotal(itemRow: FormGroup<RefundItemFormRowControls>, itemIndex: number): number {
+    const qty = itemRow.value.quantity ?? 0;
+    const addons = this.addonArrays()[itemIndex]?.controls ?? [];
+    const itemTotal = qty * (itemRow.value.netUnitPrice ?? 0);
+    const addonsTotal = addons.reduce((sum, a) => sum + (a.value.quantity ?? 0) * (a.value.netUnitPrice ?? 0), 0);
+    return itemTotal + addonsTotal;
+  }
+
+  calculateRefundTotal(): number {
+    return this.itemRows.controls.reduce((sum, item, index) => sum + this.calculateItemTotal(item, index), 0);
+  }
+
+  onSubmitForm() {
+    if (this.refundFg.invalid) {
+      this.refundFg.markAllAsTouched();
+      return;
+    }
+
+    const items = this.itemRows.controls
+      .map((item, index) => ({
+        orderDetailId: item.value.orderDetailId!,
+        quantity: item.value.quantity ?? 0,
+        addons: (this.addonArrays()[index]?.controls ?? [])
+          .map((addon) => ({
+            additionalOrderDetailsId: addon.value.additionalOrderDetailsId!,
+            quantity: addon.value.quantity ?? 0,
+          }))
+          .filter((a) => a.quantity > 0),
+      }))
+      .filter((item) => item.quantity > 0 || item.addons.length > 0);
+
+    if (items.length === 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'خطأ',
+        detail: 'يجب اختيار عنصر واحد على الأقل للاسترجاع',
+      });
+      return;
+    }
+
+    if (this.isCreateMode()) {
+      const orderId = Number(this.activatedRoute.snapshot.queryParamMap.get('orderId'));
+      const payload = {
+        orderMasterId: orderId,
+        payingCash: this.refundFg.value.payingCash ?? 0,
+        payingNetwork: this.refundFg.value.payingNetwork ?? 0,
+        createAt: this.localDateIso,
+        idempotencyKey: crypto.randomUUID(),
+        items,
+      };
+      this.refundService.create(payload).subscribe({
+        next: () => this.router.navigate(['/invoices/refunds']),
+      });
+    } else {
+      const payload = {
+        id: this.refundId(),
+        paymentType: (this.orderData() as IRefundResponse)?.paymentType ?? 0,
+        payingCash: this.refundFg.value.payingCash ?? 0,
+        payingNetwork: this.refundFg.value.payingNetwork ?? 0,
+        items,
+      };
+      this.refundService.patch(payload).subscribe({
+        next: () => this.router.navigate(['/invoices/refunds']),
+      });
+    }
+  }
+}

@@ -35,7 +35,7 @@ export class AuthService extends BaseService {
   isAuthenticated = computed(() => this.userDetails() !== null);
   apiUrlOverrideService = inject(ApiUrlOverrideService);
   override apiRoute = 'Auth';
-  crmApi = 'https://majedsoftcompany-001-site17.stempurl.com';
+  integrationApi = 'https://majedsoftcompany-001-site17.stempurl.com';
 
   login(dto: ILoginDto) {
     let loginResultObs: Observable<IUserDetails>;
@@ -183,7 +183,7 @@ export class AuthService extends BaseService {
 
   sendCrmOtpToEmail(currentCrmEmail: string) {
     this.currentCrmEmail = currentCrmEmail;
-    return this.http.get<boolean>(`${this.crmApi}/AuthUsers/GetAllYourActivations?email=${currentCrmEmail}`);
+    return this.http.get<boolean>(`${this.integrationApi}/AuthUsers/GetAllYourActivations?email=${currentCrmEmail}`);
 
     //then redirect to crm otp validation on success
   }
@@ -197,7 +197,7 @@ export class AuthService extends BaseService {
       .get<{
         expireDate: string;
         link: string;
-      }>(`${this.crmApi}/ProgramActivation/MobileProductActiveForClient?cloudIdActivation=${otp}`)
+      }>(`${this.integrationApi}/ProgramActivation/MobileProductActiveForClient?cloudIdActivation=${otp}`)
       .pipe(
         tap({
           next: (result) => {
