@@ -1,90 +1,323 @@
 {
-  "form": {
-    "phoneNumber": "phoneNumber",
-    "email": "email",
-    "deliveryName": "deliveryName",
-    "address": "address",
-    "identityNumber": "identityNumber",
-    "description": "description",
-    "userName": "userName",
-    "userType": "userType",
-    "userCondition": "userCondition",
-    "cashierCollectionAccount": "Cashier Collection Account",
-    "custodyAccount": "Custody Account",
-    "cashPaymentAccount": "Cash Payment Account",
-    "bankPaymentAccount": "Bank Payment Account",
-    "customerName": "Customer Name",
-    "secondaryPhoneNumber": "Additional Mobile Number",
-    "commercialRegister": "Commercial Register",
-    "taxNumber": "Tax Number",
-    "city": "City",
-    "district": "District",
-    "street": "Street",
-    "building": "Building",
-    "postalCode": "Postal Code",
-    "floor": "Floor",
-    "apartment": "Apartment",
-    "isCompany": "Customer Is a Company",
-    "company": "Company",
-    "voucherNumber": "Voucher Number",
-    "date": "Date",
-    "ledgerNumber": "Ledger Number",
-    "amount": "Amount",
-    "paid": "paid",
-    "postponed": "postponed",
-    "save": "save",
-    "cancel": "cancel",
-    "network": "اnetworkه",
-    "cash": "cash",
-    "cashPaid": "Paid Cash",
-    "networkPaid": "Paid Network",
-    "accountName": "Account Name",
-    "cashAccount": "Cash Account",
-    "networkAccount": "Network Account"
-  },
-  "actions": {
-    "save": "save",
-    "cancel": "cancel",
-    "new": "new",
-    "add": "add",
-    "edit": "edit",
-    "delete": "delete",
-    "close": "close",
-    "print": "print",
-    "download": "download",
-    "search": "search",
-    "tools": "tools",
-    "active": "active"
-  },
-  "deliveries": {
-    "explorer": "explorer",
-    "add": "add"
+  "HEADER": {
+    "LOGOUT": { "LABEL": "Logout" },
+    "NAV": {
+      "HOME": {
+        "LABEL": "Home"
+      },
+      "DAILY_JOURNAL": {
+        "LABEL": "Daily Journal"
+      },
+      "INVOICES": {
+        "LABEL": "Invoices",
+        "ORDERS": {
+          "LABEL": "Orders"
+        },
+        "REFUNDS": {
+          "LABEL": "Refunds"
+        }
+      },
+      "CLASSES": {
+        "LABEL": "Classes",
+        "PRODUCTS": {
+          "LABEL": "Products"
+        },
+        "MEALS": {
+          "LABEL": "Meals"
+        },
+        "GROUPS": {
+          "LABEL": "Groups"
+        },
+        "COMPONENTS": {
+          "LABEL": "Product Components"
+        }
+      },
+      "RESTAURANT": {
+        "LABEL": "Restaurant",
+        "TABLES": {
+          "LABEL": "Tables"
+        },
+        "HUTS": {
+          "LABEL": "Huts"
+        },
+        "ROOMS": {
+          "LABEL": "Rooms"
+        }
+      },
+      "CUSTOMERS": {
+        "LABEL": "Customers",
+        "ADD_CUSTOMER": {
+          "LABEL": "Add Customer"
+        }
+      },
+      "STORAGE": {
+        "LABEL": "Storage",
+        "OPENING_BALANCES": {
+          "LABEL": "Opening Balances"
+        },
+        "PURCHASES": {
+          "LABEL": "Purchases"
+        },
+        "PURCHASES_REFUNDS": {
+          "LABEL": "Purchase Refunds"
+        },
+        "INVENTORY": {
+          "LABEL": "Inventory Adjustment"
+        }
+      },
+      "REPLACEMENTS": {
+        "LABEL": "Replacements",
+        "ROOMS": {
+          "LABEL": "Rooms"
+        },
+        "HUTS": {
+          "LABEL": "Huts"
+        },
+        "TABLES": {
+          "LABEL": "Tables"
+        },
+        "DELIVERIES": {
+          "LABEL": "Delivery"
+        }
+      },
+      "COLLECTIONS": {
+        "LABEL": "Collections",
+        "ALL": {
+          "LABEL": "All"
+        },
+        "TABLES": {
+          "LABEL": "Tables"
+        },
+        "ROOMS": {
+          "LABEL": "Rooms"
+        },
+        "HUTS": {
+          "LABEL": "Huts"
+        },
+        "DELIVERIES": {
+          "LABEL": "Delivery"
+        },
+        "COMPANIES": {
+          "LABEL": "Companies"
+        }
+      },
+      "ACCOUNTS": {
+        "LABEL": "Accounts",
+        "JOURNALS": {
+          "LABEL": "Journals"
+        },
+        "COLLECTIVE_RECEIPTS": {
+          "LABEL": "Collective Receipts"
+        },
+        "COLLECTIVE_PAYMENTS": {
+          "LABEL": "Collective Payments"
+        },
+        "ACCOUNTS_TREE": {
+          "LABEL": "Accounts Tree"
+        }
+      },
+      "DELIVERY": {
+        "LABEL": "Delivery",
+        "DELIVERY_MEN": {
+          "LABEL": "Delivery Men"
+        }
+      },
+      "USERS": {
+        "LABEL": "Users",
+        "ADD_USER": {
+          "LABEL": "Add User"
+        }
+      },
+      "SETTINGS": {
+        "LABEL": "Settings",
+        "PROGRAM": {
+          "LABEL": "Program Settings"
+        },
+        "FINANCIAL": {
+          "LABEL": "Financial Settings"
+        },
+        "DAILY_JOURNAL": {
+          "LABEL": "Daily Journal Management"
+        },
+        "QR": {
+          "LABEL": "QR Printer"
+        },
+        "DEFAULT_ACCOUNTS": {
+          "LABEL": "Default Accounts Settings"
+        },
+        "ADD_PRINTER": {
+          "LABEL": "Add Printer"
+        },
+        "PRINTER": {
+          "LABEL": "Printer Settings"
+        }
+      },
+      "APP_INFO": {
+        "LABEL": "App Info",
+        "PROFILE": {
+          "LABEL": "Profile"
+        },
+        "RESTAURANT": {
+          "LABEL": "Restaurant Info"
+        }
+      }
+    }
   },
 
-  "items": {
-    "products": {
-      "productName": "Product Name",
-      "productPrice": "Product Price",
-      "costPrice": "Cost Price",
-      "group": "Group",
-      "tax": "Tax",
-      "excisetax": "Excise Tax",
-      "addproduct": "Treat as Add-on Product",
-      "productadditives": "Product Additives",
-      "description": "Description",
-      "productImage": "Product Image",
-      "productDetail": "Product Detail",
-      "productAddition": "Product Additions",
-      "productTax": "Product Tax"
+  "FORM": {
+    "PHONE_NUMBER": "Phone Number",
+    "NUMBER": "Number",
+    "EMAIL": "Email",
+    "DELIVERY_NAME": "Delivery Name",
+    "ADDRESS": "Address",
+    "IDENTITY_NUMBER": "Identity Number",
+    "DESCRIPTION": "Description",
+    "USER_NAME": "User Name",
+    "USER_TYPE": "User Type",
+    "USER_CONDITION": "User Condition",
+    "CASHIER_COLLECTION_ACCOUNT": "Cashier Collection Account",
+    "CUSTODY_ACCOUNT": "Custody Account",
+    "CASH_PAYMENT_ACCOUNT": "Cash Payment Account",
+    "BANK_PAYMENT_ACCOUNT": "Bank Payment Account",
+    "CUSTOMER_NAME": "Customer Name",
+    "CUSTOMER_ADDRESS": "Customer Address",
+    "SECONDARY_PHONE_NUMBER": "Additional Phone Number",
+    "COMMERCIAL_REGISTER": "Commercial Register",
+    "TAX_NUMBER": "Tax Number",
+    "CITY": "City",
+    "DISTRICT": "District",
+    "STREET": "Street",
+    "BUILDING": "Building",
+    "POSTAL_CODE": "Postal Code",
+    "FLOOR": "Floor",
+    "APARTMENT": "Apartment",
+    "IS_COMPANY": "Customer Is a Company",
+    "COMPANY": "Company",
+    "VOUCHER_NUMBER": "Voucher Number",
+    "DATE": "Date",
+    "LEDGER_NUMBER": "Ledger Number",
+    "AMOUNT": "Amount",
+    "PAID": "Paid",
+    "POSTPONED": "Postponed",
+    "NETWORK": "Network",
+    "CASH": "Cash",
+    "CASH_PAID": "Cash Paid",
+    "NETWORK_PAID": "Network Paid",
+    "ACCOUNT_NAME": "Account Name",
+    "CASH_ACCOUNT": "Cash Account",
+    "NETWORK_ACCOUNT": "Network Account",
+    "TAX_VALUE": "Tax Value",
+    "NAME_AR": "Name in Arabic",
+    "NAME_EN": "Name in English"
+  },
+
+  "ACTIONS": {
+    "SAVE": "Save",
+    "CANCEL": "Cancel",
+    "NEW": "New",
+    "SUBMIT": "Submit",
+    "ADD": "Add",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "OPEN": "Open",
+    "CLOSE": "Close",
+    "PRINT": "Print",
+    "DOWNLOAD": "Download",
+    "SEARCH": "Search",
+    "TOOLS": "Tools",
+    "ACTIVE": "Active",
+    "CLEAR_DEBT": "Clear Debt"
+  },
+
+  "DELIVERIES": {
+    "EXPLORER": "Delivery Explorer",
+    "ADD": "Add New Delivery"
+  },
+
+  "USERS": {
+    "EXPLORER": "Users Explorer",
+    "ADD": "Add New User"
+  },
+
+  "PURCHASES_REFUNDS": {
+    "EXPLORER": "Refunds Explorer",
+    "ADD": "Add New Refund"
+  },
+  "PURCHASES": {
+    "EXPLORER": "Purchases Explorer",
+    "ADD": "Add New Purchase"
+  },
+  "OPENING_BALANCES": {
+    "EXPLORER": "Balances Explorer",
+    "ADD": "Add New Opening Balances"
+  },
+  "CUSTOMERS": {
+    "EXPLORER": "Customers Explorer",
+    "ADD": "Add New Customer"
+  },
+  "PRODUCTS": {
+    "EXPLORER": "Products Explorer",
+    "ADD": "Add New Product"
+  },
+  "MEALS": {
+    "EXPLORER": "Meals Explorer",
+    "ADD": "Add New Meal"
+  },
+  "GROUPS": {
+    "EXPLORER": "Groups Explorer",
+    "ADD": "Add New Group"
+  },
+
+  "PURCHASES_RETURNS": {
+    "EXPLORER": "Refunds Explorer",
+    "ADD": "Add New Refund"
+  },
+
+  "INVENTORY": {
+    "EXPLORER": "Adjustments Explorer",
+    "ADD": "Add New Adjustment"
+  },
+
+  "COLLECTIVE_PAYMENTS": {
+    "EXPLORER": "Payments Explorer",
+    "ADD": "Add New Payments"
+  },
+
+  "COLLECTIVE_RECEIPTS": {
+    "EXPLORER": "Payments Explorer",
+    "ADD": "Add New Payments"
+  },
+
+  "JOURNALS": {
+    "EXPLORER": "Journals Explorer",
+    "ADD": "Add New Journal"
+  },
+
+  "CLASSES": {
+    "PRODUCTS": {
+      "NAME": "Product Name",
+      "PRICE": "Product Price",
+      "COST_PRICE": "Cost Price",
+      "GROUP": "Group",
+      "TAX": "Tax",
+      "EXCISE_TAX": "Excise Tax",
+      "IS_ADDITION": "Treat Product as Add-on",
+      "ADDITIONS": "Product Additions",
+      "DESCRIPTION": "Description",
+      "IMAGE": "Product Image",
+      "DETAIL": "Product Detail",
+      "UNITS": "Product Units",
+      "COMPONENTS": "Product Components",
+      "PRODUCT_ADDITION": "Product as Add-on"
     },
-    "groups": {
-      "groups": "groups",
-      "show": "show",
-      "groupName": "group name",
-      "printer": "printer",
-      "showgroup": "Show the group on the cashier screen",
-      "description": "description",
-      "all": "All"
+    "GROUPS": {
+      "GROUPS": "Groups",
+      "SHOW": "Show",
+      "GROUP_NAME": "Group Name",
+      "PRINTER": "Printer",
+      "SHOW_GROUP": "Show Group on Cashier Screen",
+      "DESCRIPTION": "Description",
+      "ALL": "All"
     }
   }
 }
