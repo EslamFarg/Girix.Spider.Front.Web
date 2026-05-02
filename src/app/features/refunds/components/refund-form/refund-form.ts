@@ -14,7 +14,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Button } from 'primeng/button';
+import { Button, ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { AllowNumbers } from '@/directives/allow-numbers';
@@ -56,7 +56,8 @@ type RefundAddonFormRowControls = ControlsOf<IRefundAddonFormRow>;
     FormsModule,
     RouterLink,
     DecimalPipe,
-  ],
+    ButtonDirective
+],
   templateUrl: './refund-form.html',
   styleUrl: './refund-form.css',
 })
@@ -149,7 +150,7 @@ export class RefundForm extends BaseComponent implements OnInit {
 
   createItemRow(item: IOrderLatestUpdateItem): FormGroup<RefundItemFormRowControls> {
     return this.fb.group<RefundItemFormRowControls>({
-      orderDetailId: this.fb.control(item.masterOrderDetailsId, { validators: [] }),
+      orderDetailId: this.fb.control(item.id, { validators: [] }),
       quantity: this.fb.control(item.qty, [Validators.required, Validators.min(0), Validators.max(item.qty)]),
       originalQuantity: this.fb.control(item.qty, { validators: [] }),
       name: this.fb.control(item.name, { validators: [] }),
@@ -171,7 +172,7 @@ export class RefundForm extends BaseComponent implements OnInit {
 
   createAddonRow(modifier: IOrderLatestUpdateModifier): FormGroup<RefundAddonFormRowControls> {
     return this.fb.group<RefundAddonFormRowControls>({
-      additionalOrderDetailsId: this.fb.control(modifier.masterOrderDetailsId, { validators: [] }),
+      additionalOrderDetailsId: this.fb.control(modifier.id, { validators: [] }),
       quantity: this.fb.control(modifier.qty, [Validators.required, Validators.min(0), Validators.max(modifier.qty)]),
       originalQuantity: this.fb.control(modifier.qty, { validators: [] }),
       name: this.fb.control(modifier.name, { validators: [] }),
@@ -292,7 +293,7 @@ export class RefundForm extends BaseComponent implements OnInit {
         payingNetwork: this.refundFg.value.payingNetwork ?? 0,
         items,
       };
-      this.refundService.patch(payload).subscribe({
+      this.refundService.put(payload).subscribe({
         next: () => this.router.navigate(['/invoices/refunds']),
       });
     }

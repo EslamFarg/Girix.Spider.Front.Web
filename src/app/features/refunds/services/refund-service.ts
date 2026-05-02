@@ -26,7 +26,7 @@ export class RefundService extends BaseSearchAndCrudService<
 
   constructor() {
     super();
-    this.patchEndpoints({ getById: '', patch: 'Update' });
+    this.patchEndpoints({ getById: '', put: 'Update' });
   }
 
   ///v1/OrderReturn/order/{orderMasterId}/remaining

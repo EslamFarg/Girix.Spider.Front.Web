@@ -12,9 +12,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Menu } from 'primeng/menu';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
+import { RouterLink } from "@angular/router";
 
 @Component({
-  selector: 'app-refunds',
   imports: [
     ReactiveFormsModule,
     InputErrorMessageHandler,
@@ -26,6 +26,7 @@ import { SelectModule } from 'primeng/select';
     DatePipe,
     Menu,
     Debounce,
+    RouterLink,
   ],
   templateUrl: './refunds.html',
   styleUrl: './refunds.css',

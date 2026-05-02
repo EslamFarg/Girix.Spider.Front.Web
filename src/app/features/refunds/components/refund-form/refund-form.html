@@ -105,7 +105,7 @@
               </app-input-error-message-handler>
             </td>
             <td>
-              <div>{{ calculateItemTotal(item, itemIndex) | number: '1.2-2' }}</div>
+              <div>{{ (item.value.quantity ?? 0) * (item.value.netUnitPrice ?? 0) | number: '1.2-2' }}</div>
             </td>
           </tr>
 
