@@ -71,12 +71,46 @@ export class RefundForm extends BaseComponent implements OnInit {
   isCreateMode = computed(() => this.formMode() === FormMode.Create);
 
   refundFg = this.fb.group({
-    payingCash: this.fb.control<number>(0, [Validators.required, Validators.min(0)]),
-    payingNetwork: this.fb.control<number>(0, [Validators.required, Validators.min(0)]),
+    payingCash: this.fb.control<number>(0, []),
+    payingNetwork: this.fb.control<number>(0, []),
     items: this.fb.array<FormGroup<RefundItemFormRowControls>>([], [Validators.required]),
   });
 
   addonArrays = signal<FormArray<FormGroup<RefundAddonFormRowControls>>[]>([]);
+
+  cashInputSubscription = this.refundFg.get('payingCash')?.valueChanges.subscribe((value) => {
+    const total = this.calculateRefundTotal();
+    let futureValue = value ?? 0;
+    if (futureValue > total) {
+      futureValue = total;
+    } else if (futureValue < 0) {
+      futureValue = 0;
+    }
+    this.refundFg.patchValue(
+      {
+        payingNetwork: total - futureValue,
+        payingCash: futureValue,
+      },
+      { emitEvent: false },
+    );
+  });
+
+  networkInputSubscription = this.refundFg.get('payingNetwork')?.valueChanges.subscribe((value) => {
+    const total = this.calculateRefundTotal();
+    let futureValue = value ?? 0;
+    if (futureValue > total) {
+      futureValue = total;
+    } else if (futureValue < 0) {
+      futureValue = 0;
+    }
+    this.refundFg.patchValue(
+      {
+        payingCash: total - futureValue,
+        payingNetwork: futureValue,
+      },
+      { emitEvent: false },
+    );
+  });
 
   get itemRows() {
     return this.refundFg.controls.items;
@@ -107,11 +141,6 @@ export class RefundForm extends BaseComponent implements OnInit {
   }
 
   patchFormFromOrder(order: IOrderLatestUpdateResponse) {
-    this.refundFg.patchValue({
-      payingCash: order.payments.payingCash,
-      payingNetwork: order.payments.payingNetwork,
-    });
-
     const itemsArray = this.fb.array<FormGroup<RefundItemFormRowControls>>(
       order.items.map((item) => this.createItemRow(item)),
       [Validators.required],
@@ -125,14 +154,15 @@ export class RefundForm extends BaseComponent implements OnInit {
         ),
       ),
     );
+
+    const total = this.calculateRefundTotal();
+    this.refundFg.patchValue({
+      payingCash: total,
+      payingNetwork: 0,
+    });
   }
 
   patchFormFromRefund(refund: IRefundResponse) {
-    this.refundFg.patchValue({
-      payingCash: refund.payments.payingCash,
-      payingNetwork: refund.payments.payingNetwork,
-    });
-
     const itemsArray = this.fb.array<FormGroup<RefundItemFormRowControls>>(
       refund.items.map((item) => this.createItemRowFromRefund(item)),
       [Validators.required],
@@ -146,6 +176,11 @@ export class RefundForm extends BaseComponent implements OnInit {
         ),
       ),
     );
+
+    this.refundFg.patchValue({
+      payingCash: refund.payments.payingCash,
+      payingNetwork: refund.payments.payingNetwork,
+    });
   }
 
   createItemRow(item: IOrderLatestUpdateItem): FormGroup<RefundItemFormRowControls> {
@@ -163,7 +198,7 @@ export class RefundForm extends BaseComponent implements OnInit {
     return this.fb.group<RefundItemFormRowControls>({
       orderDetailId: this.fb.control(item.masterOrderDetailsId, { validators: [] }),
       quantity: this.fb.control(item.qty, [Validators.required, Validators.min(0)]),
-      originalQuantity: this.fb.control(item.realQtyInMasterOrder, { validators: [] }),
+      originalQuantity: this.fb.control(item.qty, { validators: [] }),
       name: this.fb.control(item.name, { validators: [] }),
       unitPrice: this.fb.control(item.unitPrice, { validators: [] }),
       netUnitPrice: this.fb.control(item.netUnitPrice, { validators: [] }),
@@ -185,7 +220,7 @@ export class RefundForm extends BaseComponent implements OnInit {
     return this.fb.group<RefundAddonFormRowControls>({
       additionalOrderDetailsId: this.fb.control(modifier.masterOrderDetailsId ?? modifier.id, { validators: [] }),
       quantity: this.fb.control(modifier.qty, [Validators.required, Validators.min(0)]),
-      originalQuantity: this.fb.control(modifier.realQtyInMasterOrder ?? modifier.qty, { validators: [] }),
+      originalQuantity: this.fb.control(modifier.qty, { validators: [] }),
       name: this.fb.control(modifier.name, { validators: [] }),
       unitPrice: this.fb.control(modifier.unitPrice, { validators: [] }),
       netUnitPrice: this.fb.control(modifier.netUnitPrice, { validators: [] }),
@@ -197,39 +232,39 @@ export class RefundForm extends BaseComponent implements OnInit {
   }
 
   onItemQuantityChange(itemIndex: number, event: Event) {
-    if (!this.isCreateMode()) return;
     const input = event.target as HTMLInputElement;
     const row = this.itemRows.at(itemIndex);
-    const original = row.value.originalQuantity ?? 0;
+    const max = row.value.originalQuantity ?? 0;
     let val = Number(input.value);
 
-    if (val > original) {
-      val = original;
-      input.value = String(original);
+    if (val > max) {
+      val = max;
+      input.value = String(max);
     }
     if (val < 0) {
       val = 0;
       input.value = '0';
     }
     row.patchValue({ quantity: val });
+    this.syncPaymentWithTotal();
   }
 
   onAddonQuantityChange(itemIndex: number, addonIndex: number, event: Event) {
-    if (!this.isCreateMode()) return;
     const input = event.target as HTMLInputElement;
     const row = this.getAddonRows(itemIndex).at(addonIndex);
-    const original = row.value.originalQuantity ?? 0;
+    const max = row.value.originalQuantity ?? 0;
     let val = Number(input.value);
 
-    if (val > original) {
-      val = original;
-      input.value = String(original);
+    if (val > max) {
+      val = max;
+      input.value = String(max);
     }
     if (val < 0) {
       val = 0;
       input.value = '0';
     }
     row.patchValue({ quantity: val });
+    this.syncPaymentWithTotal();
   }
 
   calculateItemTotal(itemRow: FormGroup<RefundItemFormRowControls>, itemIndex: number): number {
@@ -242,6 +277,14 @@ export class RefundForm extends BaseComponent implements OnInit {
 
   calculateRefundTotal(): number {
     return this.itemRows.controls.reduce((sum, item, index) => sum + this.calculateItemTotal(item, index), 0);
+  }
+
+  syncPaymentWithTotal() {
+    const total = this.calculateRefundTotal();
+    this.refundFg.patchValue({
+      payingCash: total,
+      payingNetwork: 0,
+    });
   }
 
   onSubmitForm() {

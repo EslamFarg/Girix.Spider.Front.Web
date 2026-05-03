@@ -9,6 +9,7 @@
 ## notes:
 1. the edit icon is a link the redirects to the edit refund page route at src\app\routes\invoices.ts
 
+-------------------
 
 # task-2
 
@@ -20,3 +21,20 @@
 2. src\app\features\refunds\pages\edit-refund
 3. check the create/update refund type and see if it's setup with the needed controls and data
 
+-------------------
+
+# task-3
+
+## requirements:
+1. handle the refund form cash/network amounts inputs like cashier cash/network inputs which the total value is a must but the user can change how much to pay in each.
+
+## locations:
+1. src\app\features\orders\pages\cashier
+2. src\app\features\refunds\components\refund-form
+
+-------------------
+
+# task-4
+
+## requirements:
+1. remove the change api url user options at login and in header

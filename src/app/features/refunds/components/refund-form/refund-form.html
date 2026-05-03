@@ -15,16 +15,6 @@
       {{ 'ACTIONS.EDIT' | translate }}
     }
   </button>
-  @if (!isCreateMode()) {
-    <a
-      routerLink="/invoices/refunds/add"
-      pButton
-      class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
-      variant="outlined"
-    >
-      {{ 'ACTIONS.NEW' | translate }}
-    </a>
-  }
 </div>
 
 <form id="refundForm" class="mt-6 flex flex-col gap-4" [formGroup]="refundFg" (ngSubmit)="onSubmitForm()">
@@ -37,6 +27,8 @@
           pInputText
           appAllowNumbers
           [allowDecimal]="true"
+          [max]="calculateRefundTotal()"
+          [min]="0"
           id="payingCash"
           formControlName="payingCash"
           class="app-input"
@@ -51,6 +43,8 @@
           pInputText
           appAllowNumbers
           [allowDecimal]="true"
+          [max]="calculateRefundTotal()"
+          [min]="0"
           id="payingNetwork"
           formControlName="payingNetwork"
           class="app-input"
@@ -96,7 +90,7 @@
                   appAllowNumbers
                   [allowDecimal]="false"
                   [min]="0"
-                  [max]="isCreateMode() ? (item.value.originalQuantity ?? 0) : 999999"
+                  [max]="item.value.originalQuantity ?? 0"
                   [formControl]="item.controls.quantity"
                   class="app-input text-center"
                   placeholder="الكمية"
@@ -129,7 +123,7 @@
                     appAllowNumbers
                     [allowDecimal]="false"
                     [min]="0"
-                    [max]="isCreateMode() ? (addon.value.originalQuantity ?? 0) : 999999"
+                    [max]="addon.value.originalQuantity ?? 0"
                     [formControl]="addon.controls.quantity"
                     class="app-input text-center text-sm"
                     placeholder="الكمية"
