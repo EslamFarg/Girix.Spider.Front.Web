@@ -81,14 +81,14 @@
   <div class="grid md:grid-cols-2 gap-4 flex-1">
     <!-- deliveryName Ar -->
     <div class="col-span-2 md:col-span-1">
-      <label for="deliveryName">{{ 'form.deliveryName' | translate }} (Ar)</label>
+      <label for="deliveryName">{{ 'FORM.DELIVERY_NAME' | translate }} (Ar)</label>
       <app-input-error-message-handler [fc]="localize(deliveryFg.get('nameAr'), deliveryFg.get('nameEn'))">
         <input
           pInputText
           [id]="localize('nameAr', 'nameEn')"
           [formControlName]="localize('nameAr', 'nameEn')"
           aria-describedby="deliveryName-help"
-          [placeholder]="'form.deliveryName' | translate"
+          [placeholder]="'FORM.DELIVERY_NAME' | translate"
           id="deliveryName"
         />
       </app-input-error-message-handler>
@@ -135,7 +135,7 @@
     </div>
     <!-- identityNumber -->
     <div class="col-span-2 md:col-span-1">
-      <label for="identityNumber">{{ 'form.identityNumber' | translate }}</label>
+      <label for="identityNumber">{{ 'FORM.IDENTITY_NUMBER' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('identityNumber')">
         <input
           pInputText
@@ -143,7 +143,7 @@
           aria-describedby="identityNumber-help"
           formControlName="identityNumber"
           id="identityNumber"
-          [placeholder]="'form.identityNumber' | translate"
+          [placeholder]="'FORM.IDENTITY_NUMBER' | translate"
         />
       </app-input-error-message-handler>
     </div>

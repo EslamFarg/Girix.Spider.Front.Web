@@ -208,7 +208,8 @@
     "NETWORK_ACCOUNT": "حساب شبكة",
     "TAX_VALUE": "قيمه الضريبه",
     "NAME_AR": "الاسم بالعربي",
-    "NAME_EN": "الاسم بالانجليزي"
+    "NAME_EN": "الاسم بالانجليزي",
+    "TOTAL_SHORTAGE": "مجموع العجز"
   },
 
   "ACTIONS": {
@@ -227,6 +228,22 @@
     "TOOLS": "الادوات",
     "ACTIVE": "نشط",
     "CLEAR_DEBT": "تصفير العجز"
+  },
+
+  "DAILY_JOURNAL": {
+    "CLOSING": "الاغلاق",
+    "RESET_SHORTAGE": "تسوية العجز",
+    "SELECT_USER": "اختر المستخدم",
+    "PICK_USER_TO_START": "اختر مستخدم للبدء",
+    "PREVIOUS_BALANCE": "الرصيد السابق",
+    "CUSTODY_BALANCE": "العهدة",
+    "CASH_CLOSING_AMOUNT": "مبلغ غلق كاش",
+    "NETWORK_CLOSING_AMOUNT": "مبلغ غلق شبكة",
+    "NOTES": "ملاحظات",
+    "ACCOUNT": "الحساب",
+    "ENTER_AMOUNT": "ادخل المبلغ",
+    "DATE": "التاريخ",
+    "SHORTAGE": "العجز"
   },
 
   "DELIVERIES": {

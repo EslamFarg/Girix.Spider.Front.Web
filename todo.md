@@ -38,3 +38,18 @@
 
 ## requirements:
 1. remove the change api url user options at login and in header
+DAILY_JOURNAL.RESET_SHORTAGE
+
+-------------------
+
+# task-5
+
+## requirements:
+1. resetShortage submitting
+
+## locations:
+1. src\app\features\settings\pages\manage-daily-journal
+2. src\app\features\settings\services\daily-journal-service.ts
+
+## notes:
+1. i added a reset method in the service which receives the user id on whom to reset the shortage so add a submit button.

@@ -6,7 +6,7 @@
         [items]="displayedUsers()"
         (change)="onUserSelected($event)"
         bindLabel="name"
-        placeholder="Select user"
+        [placeholder]="'DAILY_JOURNAL.SELECT_USER' | translate"
         #userSelect
         appDebounce
         [customEvents]="[
@@ -20,19 +20,19 @@
     @if (currentUser()) {
       <section class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
         <div class="border border-text-gray flex items-center gap-4 rounded-lg h-8 px-4 text-sm">
-          <span class="text-dark-line">User name</span>
+          <span class="text-dark-line">{{'FORM.USER_NAME'|translate}}</span>
           <span class="text-text-gray">{{ currentUser()?.name }}</span>
         </div>
         <div class="border border-text-gray flex items-center gap-4 rounded-lg h-8 px-4 text-sm">
-          <span class="text-dark-line">Phone number</span>
+          <span class="text-dark-line">{{'FORM.PHONE_NUMBER'|translate}}</span>
           <span class="text-text-gray">{{ currentUser()?.phoneNumber }}</span>
         </div>
         <div class="border border-text-gray flex items-center gap-4 rounded-lg h-8 px-4 text-sm">
-          <span class="text-dark-line">Total shortage</span>
+          <span class="text-dark-line">{{'FORM.TOTAL_SHORTAGE'|translate}}</span>
           <span class="text-text-gray">{{ currentUser()?.totalShortage }}</span>
         </div>
         <div class="border border-text-gray flex items-center gap-4 rounded-lg h-8 px-4 text-sm">
-          <span class="text-dark-line">User type</span>
+          <span class="text-dark-line">{{'FORM.USER_TYPE'|translate}}</span>
           <span class="text-[#FF383C]">{{ currentUser()?.groupName }}</span>
         </div>
       </section>
@@ -75,7 +75,7 @@
         class="w-full max-w-100 mx-auto [&_.p-message-text]:w-full [&_.p-message-text]:text-center"
         severity="info"
       >
-        Pick a user to start
+        {{ 'DAILY_JOURNAL.PICK_USER_TO_START' | translate }}
       </p-message>
     }
   </app-section-wrapper>

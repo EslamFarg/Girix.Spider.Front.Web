@@ -1,7 +1,7 @@
 <form class="close-daily-journal" [formGroup]="fg" (ngSubmit)="onCloseDaily()">
   <div class="journal-row opacity-70 **:cursor-not-allowed!">
     <div class="journal-field">
-      <label class="journal-label">Previous balance</label>
+      <label class="journal-label">{{ 'DAILY_JOURNAL.PREVIOUS_BALANCE' | translate }}</label>
       <div class="doc-input">
         <input
           disabled
@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="journal-field">
-      <label class="journal-label">Account</label>
+      <label class="journal-label">{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
       <div class="doc-input">
         <input
           disabled
@@ -26,7 +26,7 @@
 
   <div class="journal-row opacity-70 **:cursor-not-allowed!">
     <div class="journal-field">
-      <label class="journal-label">Custody balance</label>
+      <label class="journal-label">{{ 'DAILY_JOURNAL.CUSTODY_BALANCE' | translate }}</label>
       <div class="doc-input">
         <input
           disabled
@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="journal-field">
-      <label class="journal-label">Account</label>
+      <label class="journal-label">{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
       <div class="doc-input">
         <input
           disabled
@@ -51,7 +51,7 @@
 
   <div class="journal-row">
     <div class="journal-field">
-      <label class="journal-label">Cash closing amount</label>
+      <label class="journal-label">{{ 'DAILY_JOURNAL.CASH_CLOSING_AMOUNT' | translate }}</label>
       <div class="doc-input">
         <app-input-error-message-handler [fc]="fg.get('cashClosingAmount')">
           <input
@@ -59,13 +59,13 @@
             id="cashClosingAmount"
             formControlName="cashClosingAmount"
             aria-describedby="cashClosingAmount-help"
-            placeholder="Enter amount"
+            [placeholder]="'DAILY_JOURNAL.ENTER_AMOUNT' | translate"
           />
         </app-input-error-message-handler>
       </div>
     </div>
     <div class="journal-field opacity-70 **:cursor-not-allowed!">
-      <label class="journal-label">Account</label>
+      <label class="journal-label">{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
       <div class="doc-input">
         <input pInputText disabled [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
       </div>
@@ -74,7 +74,7 @@
 
   <div class="journal-row">
     <div class="journal-field">
-      <label class="journal-label">Network closing amount</label>
+      <label class="journal-label">{{ 'DAILY_JOURNAL.NETWORK_CLOSING_AMOUNT' | translate }}</label>
       <div class="doc-input">
         <app-input-error-message-handler [fc]="fg.get('networkClosingAmount')">
           <input
@@ -88,7 +88,7 @@
       </div>
     </div>
     <div class="journal-field opacity-70 **:cursor-not-allowed!">
-      <label class="journal-label">Account</label>
+      <label class="journal-label">{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
       <div class="doc-input">
         <input pInputText disabled [value]="currentUserDaily()?.value?.dailyJournalPeriods?.networkAccountName" />
       </div>
@@ -96,7 +96,7 @@
   </div>
 
   <div class="journal-notes">
-    <label for="closingNotes" class="journal-label">Notes</label>
+    <label for="closingNotes" class="journal-label">{{ 'DAILY_JOURNAL.NOTES' | translate }}</label>
     <div class="doc-input my-1">
       <textarea
         rows="5"
@@ -106,7 +106,7 @@
         id="closingNotes"
         formControlName="closingNotes"
         aria-describedby="closingNotes-help"
-        placeholder="Notes"
+        [placeholder]="'DAILY_JOURNAL.NOTES' | translate"
       ></textarea>
     </div>
   </div>

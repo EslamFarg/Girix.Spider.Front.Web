@@ -46,39 +46,39 @@
     </app-input-error-message-handler>
   </div>
   <div class="md:col-span-2">
-    <label for="additional-phoneNumber">{{ 'form.secondaryPhoneNumber' | translate }}</label>
+    <label for="additional-phoneNumber">{{ 'FORM.SECONDARY_PHONE_NUMBER' | translate }}</label>
     <app-input-error-message-handler [fc]="customerFg.get('secondaryMobileNumber')">
       <input
         pInputText
         id="additional-phoneNumber"
         aria-describedby="additional-phoneNumber-help"
-        [placeholder]="'form.secondaryPhoneNumber' | translate"
+        [placeholder]="'FORM.SECONDARY_PHONE_NUMBER' | translate"
         formControlName="secondaryMobileNumber"
       />
     </app-input-error-message-handler>
   </div>
 
   <div class="md:col-span-2">
-    <label for="commercialRegister">{{ 'form.commercialRegister' | translate }}</label>
+    <label for="commercialRegister">{{ 'FORM.COMMERCIAL_REGISTER' | translate }}</label>
     <app-input-error-message-handler [fc]="customerFg.get('commercialRegister')">
       <input
         pInputText
         id="commercialRegister"
         formControlName="commercialRegister"
         aria-describedby="commercialRegister-help"
-        [placeholder]="'form.commercialRegister' | translate"
+        [placeholder]="'FORM.COMMERCIAL_REGISTER' | translate"
       />
     </app-input-error-message-handler>
   </div>
   <div class="md:col-span-2">
-    <label for="taxNumber">{{ 'form.taxNumber' | translate }}</label>
+    <label for="taxNumber">{{ 'FORM.TAX_NUMBER' | translate }}</label>
     <app-input-error-message-handler [fc]="customerFg.get('taxNumber')">
       <input
         pInputText
         id="taxNumber"
         formControlName="taxNumber"
         aria-describedby="taxNumber-help"
-        [placeholder]="'form.taxNumber' | translate"
+        [placeholder]="'FORM.TAX_NUMBER' | translate"
       />
     </app-input-error-message-handler>
   </div>
@@ -131,14 +131,14 @@
     </app-input-error-message-handler>
   </div>
   <div>
-    <label for="postalCode">{{ 'form.postalCode' | translate }}</label>
+    <label for="postalCode">{{ 'FORM.POSTAL_CODE' | translate }}</label>
     <app-input-error-message-handler [fc]="customerFg.get('postalCode')">
       <input
         pInputText
         id="postalCode"
         formControlName="postalCode"
         aria-describedby="postalCode-help"
-        [placeholder]="'form.postalCode' | translate"
+        [placeholder]="'FORM.POSTAL_CODE' | translate"
       />
     </app-input-error-message-handler>
   </div>
@@ -172,7 +172,7 @@
       <app-input-error-message-handler [fc]="customerFg.get('isCompany')">
         <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" formControlName="isCompany" />
       </app-input-error-message-handler>
-      <label for="productName" class="text-dark-line text-sm font-semibold">{{ 'form.isCompany' | translate }}</label>
+      <label for="productName" class="text-dark-line text-sm font-semibold">{{ 'FORM.IS_COMPANY' | translate }}</label>
     </div>
   </div>
 </form>

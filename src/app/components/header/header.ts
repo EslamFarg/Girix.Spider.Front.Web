@@ -141,7 +141,7 @@ export class Header extends BaseComponent implements AfterViewInit {
       routerLink: '/customers',
       children: [
         {
-          labelKey: 'ADDCUSTOMER',
+          labelKey: 'ADD_CUSTOMER',
           imgUrl: headerIcons.customers.children.add,
           routerLink: '/customers/add',
         },

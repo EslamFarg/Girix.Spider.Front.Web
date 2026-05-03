@@ -103,11 +103,11 @@ export class DailyJournalService extends BaseService {
   openStateLinks = [
     {
       routerLink: 'close-daily-journal',
-      labelKey: 'settings.daily-journal.closing',
+      labelKey: 'DAILY_JOURNAL.CLOSING',
     },
     {
       routerLink: 'reset-shortage',
-      labelKey: 'settings.daily-journal.reset-shortage',
+      labelKey: 'DAILY_JOURNAL.RESET_SHORTAGE',
     },
   ];
   closedStateLinks = [
@@ -147,62 +147,19 @@ export class DailyJournalService extends BaseService {
     this.http.post<any>(`${this.apiUrl}/CloseDailySession/ByUser/${this.currentUserId}`, dto);
 
   ///v1/DailyJournalPeriod/OpenDailySession
-  currentUserDaily=signal<null | IUserDailyJournalResponse>(null);
+  currentUserDaily = signal<null | IUserDailyJournalResponse>(null);
   getCurrentUserDaily = () => {
     return this.http
-      .get<ICurrentUserDailyJournalResponse>(`${this.apiUrl}/OpenDailySession`)
-      .pipe
-      // tap({
-      //   next: (res) => {
-      //     if (res?.isOpening) {
-      //       this.handleOpenedDailyJournalState();
-      //       if (this.router.url.includes('open-daily-journal')) {
-      //         console.log(this.router.url);
-      //         this.router.navigateByUrl('/daily-journal/close-daily-journal');
-      //       }
-      //     } else {
-      //       this.handleClosedDailyJournalState();
-      //       if (this.router.url.includes('open-daily-journal')) return;
-      //       this.router.navigate(['/daily-journal/open-daily-journal']);
-      //     }
-      //   },
-      //   error: (err) => {
-      //     this.handleClosedDailyJournalState();
-      //     if (this.router.url.includes('open-daily-journal')) return;
-      //     this.router.navigate(['/daily-journal/open-daily-journal']);
-      //   },
-      //   complete: () => {
-      //     console.log(this.links().length);
-      //   },
-      // }),
-      ();
+      .get<ICurrentUserDailyJournalResponse>(`${this.apiUrl}/OpenDailySession`);
   };
 
-  getUserDaily = (userId: number=this.currentUserId) =>
+  getUserDaily = (userId: number = this.currentUserId) =>
     this.http
-      .get<IUserDailyJournalResponse>(`${this.apiUrl}/UserDaily/ByUser/${userId}`)
-      .pipe
-      // tap({
-      //   next: (res) => {
-      //     if (res.value?.dailyJournalPeriods?.isOpening) {
-      //       this.handleOpenedDailyJournalState();
-      //       if (this.router.url.includes('open-daily-journal')) {
-      //         this.router.navigate(['/settings/daily-journal/close-daily-journal']);
-      //       }
-      //     } else {
-      //       this.handleClosedDailyJournalState();
-      //       if (this.router.url.includes('open-daily-journal')) return;
-      //       this.router.navigate(['/settings/daily-journal/open-daily-journal']);
-      //     }
-      //   },
-      //   error: (err) => {
-      //     this.handleClosedDailyJournalState();
-      //     if (this.router.url.includes('open-daily-journal')) return;
-      //     this.router.navigate(['/settings/daily-journal/open-daily-journal']);
-      //   },
-      //   complete: () => {
-      //     console.log(this.links().length);
-      //   },
-      // }),
-      ();
+      .get<IUserDailyJournalResponse>(`${this.apiUrl}/UserDaily/ByUser/${userId}`);
+
+
+      // /v1/DailyJournalPeriod/ResetTotalShortage/ByUser/{userId}
+  resetShortage = (userId: number = this.currentUserId) =>
+    this.http
+      .get<any>(`${this.apiUrl}/ResetTotalShortage/ByUser/${userId}`);
 }

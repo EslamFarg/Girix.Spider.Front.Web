@@ -48,11 +48,11 @@ export class ManageDailyJournal extends BaseComponent {
       ? [
           {
             key: ManageDailyJournalSections.closing,
-            labelKey: 'settings.daily-journal.closing',
+            labelKey: 'DAILY_JOURNAL.CLOSING',
           },
           {
             key: ManageDailyJournalSections.deficitReduction,
-            labelKey: 'settings.daily-journal.reset-shortage',
+            labelKey: 'DAILY_JOURNAL.RESET_SHORTAGE',
           },
         ]
       : [],

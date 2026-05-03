@@ -1,14 +1,16 @@
 <div class="flex items-center gap-4">
   <a
-      routerLink="/deliveries/delivery-men"
-      routerLinkActive="sub-nav-active-link" [routerLinkActiveOptions]="{exact:true }"
-      class="border border-dark-line text-dark-bg-1 py-1! flex-1 sm:flex-none px-4 sm:px-7 rounded font-semibold"
-      >{{"deliveries.explorer" | translate}}</a
-    >
-    <a
-      routerLink="/deliveries/delivery-men/add"
-      routerLinkActive="sub-nav-active-link" [routerLinkActiveOptions]="{exact:true }"
-      class="border border-dark-bg-1 text-dark-bg-1 py-1! flex-1 sm:flex-none px-4 sm:px-7 rounded font-semibold"
-      >{{"deliveries.add" | translate}}</a>
-    
-  </div>
+    routerLink="/deliveries/delivery-men"
+    routerLinkActive="sub-nav-active-link"
+    [routerLinkActiveOptions]="{ exact: true }"
+    class="border border-dark-line text-dark-bg-1 py-1! flex-1 sm:flex-none px-4 sm:px-7 rounded font-semibold"
+    >{{ 'DELIVERIES.EXPLORER' | translate }}</a
+  >
+  <a
+    routerLink="/deliveries/delivery-men/add"
+    routerLinkActive="sub-nav-active-link"
+    [routerLinkActiveOptions]="{ exact: true }"
+    class="border border-dark-bg-1 text-dark-bg-1 py-1! flex-1 sm:flex-none px-4 sm:px-7 rounded font-semibold"
+    >{{ 'DELIVERIES.ADD' | translate }}</a
+  >
+</div>
