@@ -408,7 +408,9 @@ export class Cashier extends BaseComponent implements OnInit {
     switch (this.formMode()) {
       case FormMode.Create:
         this.orderService.create(this.orderFg.value).subscribe({
-          next: (res) => {},
+          next: (res) => {
+            this.resetOrderForm();
+          },
           error: (err) => {
             console.log(err);
             this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم انشاء الطلب' });
@@ -425,6 +427,7 @@ export class Cashier extends BaseComponent implements OnInit {
           .subscribe({
             next: (res) => {
               this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم تعديل الطلب' });
+              this.resetOrderForm();
               this.router.navigate(['/']);
             },
             error: (err) => {
