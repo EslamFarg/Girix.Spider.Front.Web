@@ -37,6 +37,6 @@ export class OrderService extends BaseSearchAndCrudService<
 
   //v1/Order/change-type
   changeType(dto: IOrderChangeTypeRequest) {
-    return this.http.put<IOrderBillReadResponse>(`${this.apiUrl}/change-type`, dto);
+    return this.http.put<{invoice:IOrderBillReadResponse}>(`${this.apiUrl}/change-type`, dto);
   }
 }

@@ -1,0 +1,23 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.auth-layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* When in Electron with custom title bar, subtract 32px */
+:host(.electron) {
+  min-height: calc(100vh - 32px);
+}
+
+:host(.electron) .auth-layout-main {
+  min-height: calc(100vh - 32px);
+}

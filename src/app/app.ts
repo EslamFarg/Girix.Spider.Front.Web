@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
+import { TitleBar } from './components/title-bar/title-bar';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
@@ -38,12 +39,25 @@ declare global {
       saveLink: (key: string, link: string) => Promise<{ key: string; link: string }>;
       getLink: (key: string) => Promise<{ key: string; link: string | null }>;
       getAllLinks: () => Promise<Record<string, string>>;
+
+      // Window controls
+      windowMinimize: () => Promise<void>;
+      windowMaximize: () => Promise<void>;
+      windowClose: () => Promise<void>;
+      windowIsMaximized: () => Promise<boolean>;
+
+      // Auth / Main mode switching
+      setAuthMode: () => Promise<void>;
+      setMainMode: () => Promise<void>;
+
+      // Listen for maximize/unmaximize events
+      onWindowMaximized: (callback: (isMaximized: boolean) => void) => () => void;
     };
   }
 }
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ConfirmDialogModule, ToastModule, CollectionDialog, PrintDialog],
+  imports: [RouterOutlet, ConfirmDialogModule, ToastModule, CollectionDialog, PrintDialog, TitleBar],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers: [],
@@ -56,7 +70,11 @@ export class App {
   router = inject(Router);
   authService = inject(AuthService);
   isAuthenticated = this.authService.isAuthenticated;
+  isElectron = signal(typeof window !== 'undefined' && !!window.electronAPI);
   constructor() {
+    if (this.isElectron()) {
+      document.body.classList.add('electron');
+    }
     this.translate.addLangs(['ar', 'en']);
     this.translate.setFallbackLang('ar');
     this.translate.use('ar');

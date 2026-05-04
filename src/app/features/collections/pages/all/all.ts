@@ -48,6 +48,7 @@ import { HutCard, RoomCard, TableCard } from '@/components';
 import { Skeleton } from 'primeng/skeleton';
 import { AmountType } from '@/core';
 import { tap } from 'rxjs';
+import { Message } from 'primeng/message';
 
 @Component({
   selector: 'app-all',
@@ -73,6 +74,7 @@ import { tap } from 'rxjs';
     Skeleton,
     ButtonDirective,
     FormsModule,
+    Message,
   ],
   templateUrl: './all.html',
   styleUrl: './all.css',
@@ -247,14 +249,16 @@ export class All extends BaseComponent {
   openCollectionDialog = this.collectionsService.openCollectionDialog;
 
   //
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   //#region transferance
   //
+
   currentOrder = signal<IOrderSearchRow | null>(null);
   currentOrderNet = computed(() => this.currentOrder()?.netOrder || 0);
   currentOrderLocationType = computed(() => this.currentOrder()?.orderType);
   orderTransferenceType = signal<OrderLocationType | null>(null);
   toBePaidToClient = signal(0);
-  toBePaidFromClient = signal(0);
 
   transferenceCost = computed(() => {
     const serviceFee = this.serviceFee();
@@ -264,11 +268,11 @@ export class All extends BaseComponent {
     return sum;
   });
 
-  transferenceCostEffect = effect(() => {
-    this.transferanceFg.patchValue({
-      payingCash: this.transferenceCost(),
-    });
-  });
+  // transferenceCostEffect = effect(() => {
+  //   this.transferanceFg.patchValue({
+  //     payingCash: this.transferenceCost(),
+  //   });
+  // });
 
   financialSettings = signal<IFinancialSettingsResponse>({
     deliveryFee: 0,
@@ -287,9 +291,7 @@ export class All extends BaseComponent {
     { labelKey: 'توصيل (شركة)', value: OrderLocationType.CompanyDelivery },
     { labelKey: 'سفري', value: OrderLocationType.Takeaway },
   ]);
-  currentOrderType = computed(
-    () => this.allOrderTypes().find((opt) => opt.value === this.currentOrderLocationType()),
-  );
+  currentOrderType = computed(() => this.allOrderTypes().find((opt) => opt.value === this.currentOrderLocationType()));
   orderTypeOptions = computed(() => this.allOrderTypes().filter((opt) => opt.value !== this.currentOrderType()?.value));
   orderLocalTypeOptions = computed(() =>
     [
@@ -337,6 +339,7 @@ export class All extends BaseComponent {
     this.toBePaidToClient.set(0);
     this.isInvoiceTypeChangeDialogVisible = false;
     this.orderTransferenceType.set(null);
+    this.isConfirmTransference = false;
   }
 
   openInvoiceTypeChangeConfirmDialog() {
@@ -346,6 +349,8 @@ export class All extends BaseComponent {
   closeInvoiceTypeChangeConfirmDialog() {
     this.isInvoiceTypeChangeConfirmDialogVisible = false;
   }
+
+  phoneNumberValidators = [Validators.required, onlyNumbersAllowed, Validators.minLength(6), Validators.maxLength(16)];
 
   transferanceFg = this.fb.group({
     id: this.fb.control<null | number>(null, [Validators.required]),
@@ -360,21 +365,16 @@ export class All extends BaseComponent {
     durationMinutes: this.fb.control<number | null>(null, []),
     deliveryId: this.fb.control<null | number>(null, []),
     reservedAt: this.fb.control<string | null>(null, [Validators.required]),
-    payingCash: this.fb.control<null | number>(null, []),
-    cashAccountId: this.fb.control<null | number>(null, [Validators.required]),
-    payingNetwork: this.fb.control<null | number>(null, []),
-    networkAccountId: this.fb.control<null | number>(null, [Validators.required]),
+    // payingCash: this.fb.control<null | number>(null, []),
+    // cashAccountId: this.fb.control<null | number>(null, [Validators.required]),
+    // payingNetwork: this.fb.control<null | number>(null, []),
+    // networkAccountId: this.fb.control<null | number>(null, [Validators.required]),
     refund: this.fb.control<null | number>(null, []),
     customerRequest: this.fb.group({
       id: this.fb.control<null | number>(null, [Validators.required]),
       nameAr: this.fb.control<string | null>(null, [Validators.required]),
       nameEn: this.fb.control<string | null>(null, [Validators.required]),
-      phoneNumber: this.fb.control<string | null>(null, [
-        Validators.required,
-        onlyNumbersAllowed,
-        Validators.minLength(6),
-        Validators.maxLength(16),
-      ]),
+      phoneNumber: this.fb.control<string | null>(null, this.phoneNumberValidators),
       secondaryMobileNumber: this.fb.control<string | null>(null, []),
       addressDescription: this.fb.control<string | null>(null, [Validators.required]),
     }),
@@ -382,20 +382,23 @@ export class All extends BaseComponent {
 
   tranferanceFgOrderTypeListener = this.transferanceFg.controls.orderType.valueChanges.subscribe((orderType) => {
     this.orderTransferenceType.set(orderType);
-    const { payingCash, payingNetwork, deliveryId, placeRefId, durationMinutes, placeType } =
-      this.transferanceFg.controls;
+    const { deliveryId, placeRefId, durationMinutes, placeType } = this.transferanceFg.controls;
 
-    payingCash?.disable();
-    payingNetwork?.disable();
+    const { phoneNumber, addressDescription } = this.transferanceFg.controls.customerRequest.controls;
 
-    [deliveryId, durationMinutes, placeRefId, placeType].forEach((control) => control.clearValidators());
+    // payingCash?.disable();
+    // payingNetwork?.disable();
+
+    [deliveryId, durationMinutes, placeRefId, placeType, phoneNumber, addressDescription].forEach((control) =>
+      control.clearValidators(),
+    );
 
     durationMinutes?.setValue(null);
 
     switch (orderType) {
       case OrderLocationType.DineIn:
-        payingCash?.enable();
-        payingNetwork?.enable();
+        // payingCash?.enable();
+        // payingNetwork?.enable();
         durationMinutes?.setValidators([Validators.required]);
         placeRefId?.setValidators([Validators.required]);
         placeType?.setValidators([Validators.required]);
@@ -403,46 +406,62 @@ export class All extends BaseComponent {
         break;
 
       case OrderLocationType.CompanyDelivery:
+        // payingCash?.enable();
+        // payingNetwork?.enable();
+        addressDescription?.setValidators([Validators.required]);
+        deliveryId?.setValidators([Validators.required]);
+        break;
       case OrderLocationType.PersonDelivery:
-        payingCash?.enable();
-        payingNetwork?.enable();
+        // payingCash?.enable();
+        // payingNetwork?.enable();
+        phoneNumber?.setValidators(this.phoneNumberValidators);
+        addressDescription?.setValidators([Validators.required]);
         deliveryId?.setValidators([Validators.required]);
         break;
     }
+
+    deliveryId?.updateValueAndValidity();
+    durationMinutes?.updateValueAndValidity();
+    placeRefId?.updateValueAndValidity();
+    placeType?.updateValueAndValidity();
+    phoneNumber?.updateValueAndValidity();
+    addressDescription?.updateValueAndValidity();
   });
+
+  isConfirmTransference = false;
 
   submitOrderTransference() {
     this.transferanceFg.controls.customerRequest.patchValue({
       nameEn: this.transferanceFg.value?.customerRequest?.nameAr,
     });
+    console.log(this.transferanceFg.getRawValue());
     if (this.transferanceFg.invalid) {
+      //log erros
+      console.log('invalid');
+      Object.entries(this.transferanceFg.controls).forEach(([key, control]) => {
+        console.log(key, control.errors);
+      });
       this.transferanceFg.markAllAsTouched();
       return;
     }
 
-    return this.orderService.changeType(this.transferanceFg.getRawValue() as IOrderChangeTypeRequest).pipe(
-      tap({
-        next: () => {
+    let values = this.transferanceFg.getRawValue() as IOrderChangeTypeRequest;
+    if (!this.isConfirmTransference) {
+      Object.assign(values, { payingCash: null, payingNetwork: null, simulateOnly: true });
+    }else{
+      Object.assign(values, { simulateOnly: false });
+    }
+
+    this.orderService.changeType(values).subscribe({
+      next: (dto) => {
+        if (!this.isConfirmTransference) {
+          this.toBePaidToClient.set(dto?.invoice?.toBePaid?.amount || 0);
+          this.isConfirmTransference = true;
+        } else {
           this.searchOrders(1);
-        },
-      }),
-    );
-  }
-
-  submitOrderTransferenceSimulation() {
-    this.submitOrderTransference()?.subscribe({
-      next: (bill) => {
-        this.toBePaidToClient.set(bill?.toBePaid?.amount || 0);
-      },
-    });
-  }
-
-  confirmOrderTransference() {
-    this.transferanceFg.patchValue({ simulateOnly: false });
-    this.submitOrderTransference()?.subscribe({
-      next: () => {
-        this.closeInvoiceTypeChangeConfirmDialog();
-        this.closeInvoiceTypeChangeDialog();
+          this.closeInvoiceTypeChangeDialog();
+          this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم تغيير نوع الطلب بنجاح' });
+        }
       },
     });
   }
@@ -619,8 +638,8 @@ export class All extends BaseComponent {
         phoneNumber: event.phoneNumber,
         secondaryMobileNumber: event.secondaryMobileNumber,
         addressDescription: event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
-      })
-    }  
+      });
+    }
   }
   onCustomersNameSearch(event: any, searchTerm: string = '') {
     searchTerm = searchTerm ?? '';
@@ -646,72 +665,72 @@ export class All extends BaseComponent {
     this.paymentDialogVisible = true;
   }
 
-  getPaymentInvalidControl() {
-    const cashControl = this.transferanceFg.controls.payingCash;
-    const networkControl = this.transferanceFg.controls.payingNetwork;
-    if (cashControl?.invalid && cashControl?.touched) {
-      return cashControl;
-    } else if (networkControl?.invalid && networkControl?.touched) {
-      return networkControl;
-    }
-    return null;
-  }
+  // getPaymentInvalidControl() {
+  //   const cashControl = this.transferanceFg.controls.payingCash;
+  //   const networkControl = this.transferanceFg.controls.payingNetwork;
+  //   if (cashControl?.invalid && cashControl?.touched) {
+  //     return cashControl;
+  //   } else if (networkControl?.invalid && networkControl?.touched) {
+  //     return networkControl;
+  //   }
+  //   return null;
+  // }
 
   isPaid = signal<boolean>(true);
 
-  isPaidListener = effect(() => {
-    // let validators: ValidatorFn[] = [];
-    const cashControl = this.transferanceFg.controls.payingCash;
-    const networkControl = this.transferanceFg.controls.payingNetwork;
-    this.transferanceFg.patchValue({
-      payingCash: 0,
-      payingNetwork: 0,
-    });
-    if (this.isPaid()) {
-      // validators = [Validators.required];
-      cashControl?.enable();
-      networkControl?.enable();
-    } else {
-      cashControl?.disable();
-      networkControl?.disable();
-    }
-    // cashControl?.setValidators(validators);
-    // networkControl?.setValidators(validators);
-  });
+  // isPaidListener = effect(() => {
+  //   // let validators: ValidatorFn[] = [];
+  //   const cashControl = this.transferanceFg.controls.payingCash;
+  //   const networkControl = this.transferanceFg.controls.payingNetwork;
+  //   this.transferanceFg.patchValue({
+  //     payingCash: 0,
+  //     payingNetwork: 0,
+  //   });
+  //   if (this.isPaid()) {
+  //     // validators = [Validators.required];
+  //     cashControl?.enable();
+  //     networkControl?.enable();
+  //   } else {
+  //     cashControl?.disable();
+  //     networkControl?.disable();
+  //   }
+  //   // cashControl?.setValidators(validators);
+  //   // networkControl?.setValidators(validators);
+  // });
 
-  cashInputSubscription = this.transferanceFg.controls.payingCash?.valueChanges.subscribe((value) => {
-    const transferenceCost = this.transferenceCost();
-    let futureValue = value ?? 0;
-    if (futureValue > transferenceCost) {
-      futureValue = transferenceCost;
-    } else if (futureValue < 0) {
-      futureValue = 0;
-    }
-    this.transferanceFg.patchValue(
-      {
-        payingNetwork: transferenceCost - futureValue,
-        payingCash: futureValue,
-      },
-      { emitEvent: false },
-    );
-  });
+  // cashInputSubscription = this.transferanceFg.controls.payingCash?.valueChanges.subscribe((value) => {
+  //   const transferenceCost = this.transferenceCost();
+  //   let futureValue = value ?? 0;
+  //   if (futureValue > transferenceCost) {
+  //     futureValue = transferenceCost;
+  //   } else if (futureValue < 0) {
+  //     futureValue = 0;
+  //   }
+  //   this.transferanceFg.patchValue(
+  //     {
+  //       payingNetwork: transferenceCost - futureValue,
+  //       payingCash: futureValue,
+  //     },
+  //     { emitEvent: false },
+  //   );
+  // });
 
-  networkInputSubscription = this.transferanceFg.controls.payingNetwork?.valueChanges.subscribe((value) => {
-    const transferenceCost = this.transferenceCost();
-    let futureValue = value ?? 0;
-    if (futureValue > transferenceCost) {
-      futureValue = transferenceCost;
-    } else if (futureValue < 0) {
-      futureValue = 0;
-    }
-    this.transferanceFg.patchValue(
-      {
-        payingCash: transferenceCost - futureValue,
-        payingNetwork: futureValue,
-      },
-      { emitEvent: false },
-    );
-  });
+  // networkInputSubscription = this.transferanceFg.controls.payingNetwork?.valueChanges.subscribe((value) => {
+  //   const transferenceCost = this.transferenceCost();
+  //   let futureValue = value ?? 0;
+  //   if (futureValue > transferenceCost) {
+  //     futureValue = transferenceCost;
+  //   } else if (futureValue < 0) {
+  //     futureValue = 0;
+  //   }
+  //   this.transferanceFg.patchValue(
+  //     {
+  //       payingCash: transferenceCost - futureValue,
+  //       payingNetwork: futureValue,
+  //     },
+  //     { emitEvent: false },
+  //   );
+  // });
 
   //#endregion
 
@@ -952,7 +971,8 @@ export class All extends BaseComponent {
 
   onHutSelected(hut: IHutSearchRow) {
     if (hut.isAvailable) {
-      // this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
+      this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
+      this.transferanceFg.patchValue({ placeRefId: hut.id, placeType: OrderLocalType.Hut });
       this.currentHut.set(hut);
       // this.HutDialogVisible = false;
     }

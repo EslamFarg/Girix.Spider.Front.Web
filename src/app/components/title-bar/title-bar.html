@@ -1,0 +1,30 @@
+<div class="title-bar" [class.auth-title-bar]="isAuthPage()">
+  <div class="title-bar-drag-region"></div>
+  <div class="title-bar-content">
+    <span class="title-bar-text">Restaurant Dashboard</span>
+  </div>
+  <div class="title-bar-controls">
+    <button class="title-bar-btn minimize" (click)="minimize()" title="Minimize">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+        <rect x="0" y="4" width="10" height="2" fill="currentColor"/>
+      </svg>
+    </button>
+    <button class="title-bar-btn maximize" (click)="maximize()" title="Maximize / Restore">
+      @if (isMaximized()) {
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <path d="M2 2h6v6H2z" stroke="currentColor" stroke-width="1" fill="none"/>
+          <path d="M3 0h6v6" stroke="currentColor" stroke-width="1" fill="none"/>
+        </svg>
+      } @else {
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" fill="none"/>
+        </svg>
+      }
+    </button>
+    <button class="title-bar-btn close" (click)="close()" title="Close">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+        <path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+    </button>
+  </div>
+</div>

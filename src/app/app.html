@@ -1,3 +1,6 @@
+@if (isElectron()) {
+  <app-title-bar />
+}
 <router-outlet />
 <p-confirmdialog [styleClass]="'min-w-100 max-w-[100vw]'" />
 <p-toast class="max-w-[90%]" />
