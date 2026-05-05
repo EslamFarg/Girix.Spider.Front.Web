@@ -2,6 +2,7 @@
 <p-dialog
   [(visible)]="printerService.isPrinterDialogVisible"
   [modal]="true"
+  [dismissableMask]="true"
   [style]="{ width: '80%', maxWidth: '300px' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-text-lighter!"

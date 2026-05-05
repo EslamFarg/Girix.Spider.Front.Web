@@ -347,3 +347,8 @@ label + app-input-error-message-handler input */ {
   opacity: 0.5 !important;
   user-select: none !important;
 }
+
+.p-galleria-nav-button {
+  background-color: #6b6b6b !important;
+  color: white !important;
+}

@@ -10,7 +10,7 @@
           formControlName="searchTerm"
           placeholder="بحث"
         />
-        <p-inputgroup-addon class="p-0!">
+        <!-- <p-inputgroup-addon class="p-0!">
           <div class="relative flex items-center justify-center">
             <svg
               (click)="filterMenu.toggle($event)"
@@ -35,7 +35,7 @@
               [style]="{ insetInlineEnd: '100%' }"
             />
           </div>
-        </p-inputgroup-addon>
+        </p-inputgroup-addon> -->
 
         <p-inputgroup-addon class="p-0!">
           <button type="submit" class="cursor-pointer">
@@ -87,7 +87,8 @@
       @for (item of menuItems(); track $index) {
         <div
           [style]="`animation-delay: ${item.index * 0.05}s`"
-          class="slide-in h-fit text-white bg-form-bg rounded-xl flex flex-col gap-1.5 p-3 items-center justify-center"
+          (click)="addMenuItem(item, 1)"
+          class="slide-in h-fit text-white bg-form-bg rounded-xl cursor-pointer flex flex-col gap-1.5 p-3 items-center justify-center"
         >
           <div class="h-8 w-20 relative rounded-full">
             <div
@@ -102,6 +103,7 @@
                   item.meal ? baseUrl + item.meal.images?.[0]?.fullPath : baseUrl + item.product?.images?.[0]?.fullPath
                 "
                 alt=""
+                (click)="previewMenuItem($event, item)"
               />
             </div>
           </div>
@@ -114,64 +116,39 @@
             {{ label }}
           </p>
           <!-- price -->
-          <div class="flex items-center justify-between w-full">
-            <a
-              [routerLink]="
+           <!-- [routerLink]="
                 item.meal
                   ? ['classes', 'meals', item.meal!.id, 'edit']
                   : ['classes', 'products', item.product!.id, 'edit']
-              "
+              " -->
+          <div class="flex items-center justify-between w-full">
+            <button
+              
               type="button"
-              class="underline text-[8px] font-semibold"
-              >تفاصيل</a
-            >
+              
+              class="underline text-[8px] font-semibold cursor-pointer"
+              >تفاصيل</button>
             @let price = item.meal ? item.meal.priceWithTax : item.product?.priceWithTax;
 
             <span class="text-xs font-bold">{{ price?.toFixed(2) }}</span>
           </div>
-          <!-- quantity editor -->
-          <div class="flex items-center gap-2 w-full justify-between">
-            <!-- add -->
-            <button
-              (click)="addMenuItem(item, +quantity.value)"
-              type="button"
-              pButton
-              class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
-              style="
-                --p-button-primary-background: var(--color-text-gray);
-                --p-button-primary-color: var(--color-text-lighter);
-              "
-            >
-              <i class="pi pi-plus text-[8px]!"></i>
-            </button>
-            <!-- quantity -->
-            <input
-              class="text-xs font-bold flex-1 w-full text-center outline-none no-input-spinner"
-              #quantity
-              appAllowNumbers
-              type="number"
-              [min]="1"
-              [max]="1000"
-              [defaultValue]="1"
-            />
-            <!-- remove -->
-            <button
-              (click)="removeMenuItem(item, +quantity.value)"
-              type="button"
-              pButton
-              class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
-              style="
-                --p-button-primary-background: var(--color-text-gray);
-                --p-button-primary-color: var(--color-text-lighter);
-                --p-button-primary-hover-background: red;
-                --p-button-primary-active-background: rgba(255, 0, 0, 0.538);
-              "
-            >
-              <i class="pi pi-minus text-[8px]!"></i>
-            </button>
-          </div>
+          
         </div>
       }
     </div>
   </section>
 </div>
+
+<p-galleria
+  [(visible)]="galleriaVisible"
+  [value]="images()"
+  [circular]="true"
+  [showItemNavigators]="true"
+  [showThumbnails]="false"
+  [fullScreen]="true"
+  [containerStyle]="{ 'max-width': '640px' }"
+>
+  <ng-template #item let-item>
+    <img [src]="baseUrl + item.fullPath" style="width: 100%; display: block" />
+  </ng-template>
+</p-galleria>

@@ -1551,7 +1551,7 @@ export class Cashier extends BaseComponent implements OnInit {
   getPaymentInvalidControl() {
     const cashControl = this.orderFg.get('payingCash');
     const networkControl = this.orderFg.get('payingNetwork');
-    if (cashControl?.invalid && cashControl?.touched) {
+    if (cashControl?.invalid ) {
       return cashControl;
     } else if (networkControl?.invalid && networkControl?.touched) {
       return networkControl;

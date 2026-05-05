@@ -1,5 +1,5 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { Component, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, input, model, output, signal, viewChild } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
@@ -15,6 +15,8 @@ import { IGroupSearchRow } from '@/features/classes/services/group-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { ButtonDirective } from 'primeng/button';
 import { RouterLink } from '@angular/router';
+import { GalleriaModule } from 'primeng/galleria';
+
 export interface IMenuItem {
   id: string;
   index: number;
@@ -46,6 +48,7 @@ export interface IOrderMenuItem {
     AllowNumbers,
     ButtonDirective,
     RouterLink,
+    GalleriaModule,
   ],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
@@ -243,4 +246,63 @@ export class Menu extends BaseComponent {
   removeMenuItem(menuItem: IMenuItem, quantity: number) {
     this.menuItemChange.emit({ menuItem: { ...menuItem, quantity: -quantity }, additions: [] });
   }
+
+  currentPreviewMenuItem = signal<IMenuItem | null>(null);
+  galleriaVisible = signal(false);
+
+  images = computed(
+    () => (this.currentPreviewMenuItem()?.product?.images ?? this.currentPreviewMenuItem()?.meal?.images) || [],
+  );
+
+  previewMenuItem(event: Event, menuItem: IMenuItem) {
+    event.stopPropagation();
+    this.currentPreviewMenuItem.set(menuItem);
+    if (this.images().length > 0) {
+      this.galleriaVisible.set(true);
+    }
+  }
 }
+
+/*
+<!-- quantity editor -->
+          <div class="flex items-center gap-2 w-full justify-between">
+            <!-- add -->
+            <button
+              (click)="addMenuItem(item, +quantity.value)"
+              type="button"
+              pButton
+              class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
+              style="
+                --p-button-primary-background: var(--color-text-gray);
+                --p-button-primary-color: var(--color-text-lighter);
+              "
+            >
+              <i class="pi pi-plus text-[8px]!"></i>
+            </button>
+            <!-- quantity -->
+            <input
+              class="text-xs font-bold flex-1 w-full text-center outline-none no-input-spinner"
+              #quantity
+              appAllowNumbers
+              type="number"
+              [min]="1"
+              [max]="1000"
+              [defaultValue]="1"
+            />
+            <!-- remove -->
+            <button
+              (click)="removeMenuItem(item, +quantity.value)"
+              type="button"
+              pButton
+              class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
+              style="
+                --p-button-primary-background: var(--color-text-gray);
+                --p-button-primary-color: var(--color-text-lighter);
+                --p-button-primary-hover-background: red;
+                --p-button-primary-active-background: rgba(255, 0, 0, 0.538);
+              "
+            >
+              <i class="pi pi-minus text-[8px]!"></i>
+            </button>
+          </div>
+*/

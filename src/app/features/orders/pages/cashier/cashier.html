@@ -498,7 +498,13 @@
           بيانات العميل
         </button>
       </app-input-error-message-handler>
-      <app-input-error-message-handler [grouped]="false" [fc]="getPaymentInvalidControl()">
+      <app-input-error-message-handler
+        [grouped]="false"
+        [fc]="
+          orderFg.controls.cashAccountId.invalid ? orderFg.controls.cashAccountId : orderFg.controls.networkAccountId
+        "
+      >
+      <!-- [fc]="getPaymentInvalidControl()" -->
         <button
           class="text-dark-line! py-2 lg:py-0! lg:leading-12.5 h-12.5 rounded-[14px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base! lg:text-lg! xl:text-xl!"
           pButton
@@ -535,7 +541,6 @@
   </p-drawer>
 </div>
 
-
 <!--  -->
 <!--  -->
 <!--  -->
@@ -555,6 +560,7 @@
 <p-dialog
   [(visible)]="additionsDialogVisible"
   [modal]="true"
+  [dismissableMask]="true"
   [style]="{ width: '80%', maxWidth: '50rem' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-text-lighter!"
@@ -670,6 +676,7 @@
 <p-dialog
   [(visible)]="HutDialogVisible"
   [modal]="true"
+  [dismissableMask]="true"
   [style]="{ width: '80%', maxWidth: '50rem' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-text-lighter!"
@@ -748,6 +755,7 @@
 <p-dialog
   [(visible)]="RoomDialogVisible"
   [modal]="true"
+  [dismissableMask]="true"
   [style]="{ width: '80%', maxWidth: '50rem' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-text-lighter!"
@@ -787,6 +795,7 @@
 <p-dialog
   [(visible)]="TableDialogVisible"
   [modal]="true"
+  [dismissableMask]="true"
   [style]="{ width: '80%', maxWidth: '50rem' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-text-lighter!"
@@ -825,6 +834,7 @@
 <p-dialog
   [(visible)]="customerDialogVisible"
   [modal]="true"
+  [dismissableMask]="true"
   (onHide)="closeFullKeyboard()"
   [style]="{ width: '80%', maxWidth: '50rem' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
@@ -903,6 +913,7 @@
 <p-dialog
   [(visible)]="paymentDialogVisible"
   [modal]="true"
+  [dismissableMask]="true"
   [style]="{ width: '80%', maxWidth: '50rem' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-white!"
@@ -1044,6 +1055,7 @@
 <p-dialog
   [(visible)]="DeliveryDialogVisible"
   [modal]="true"
+  [dismissableMask]="true"
   [style]="{ width: '80%', maxWidth: '50rem' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
   styleClass="bg-text-lighter!"

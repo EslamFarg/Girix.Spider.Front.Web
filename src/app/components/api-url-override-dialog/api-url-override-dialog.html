@@ -4,6 +4,7 @@
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
+  [dismissableMask]="true"
   [style]="{ width: 'min(92vw, 40rem)' }"
   [visible]="apiUrlOverrideService.isDialogVisible()"
   (onHide)="apiUrlOverrideService.closeDialog()"

@@ -1,6 +1,8 @@
 import { BaseComponent } from '@/components';
 import { Component, viewChild } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime } from 'rxjs';
 import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdown';
 import { InputOtp } from 'primeng/inputotp';
 import { InputErrorMessageHandler } from '@/yn-ng';
@@ -29,6 +31,13 @@ export class CrmOtpValidation extends BaseComponent {
     if (!this.authService.currentCrmEmail) {
       this.router.navigate(['/auth/crm-login']);
     }
+
+    this.fg.get('otp')?.valueChanges.pipe(debounceTime(100), takeUntilDestroyed()).subscribe((otp) => {
+      console.log('otp value changed:', otp, 'valid:', this.fg.valid);
+      if (otp && otp.length === 6 && this.fg.valid) {
+        this.onSubmit();
+      }
+    });
   }
 
   onSubmit() {

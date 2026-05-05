@@ -35,7 +35,6 @@ export class OrderCalculationsService {
         total + (addition.product.priceWithTax - addition.product.priceWithSelectiveTax) * addition.quantity,
       0,
     );
-    console.log(mainItemsTaxValue, additionsTaxValue);
     return mainItemsTaxValue + additionsTaxValue;
   };
 
