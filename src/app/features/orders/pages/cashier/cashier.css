@@ -1,9 +1,92 @@
+:host{
+  display: block;
+  height: 100%;
+}
 .location-active {
-  /* bg-dark-bg-2! */
-  background-color: var(--color-dark-bg-2);
-  box-shadow: 0px 0px 15px 0px #ffffff80 inset;
+  background-color: #10b981;
+  /* box-shadow: 0px 0px 15px 0px #34d39980 inset; */
   font-weight: bold;
   color: white;
+}
+
+/* Base location button style */
+.loc-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0.25rem 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-text-lighter);
+  color: var(--color-dark-line);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.loc-btn:hover {
+  filter: brightness(1.05);
+}
+
+/* Segmented control group */
+.segmented-group {
+  background-color: var(--color-text-lighter);
+  box-shadow: 0px 0px 15px 0px #ffffff80 inset;
+  outline: 2px solid var(--color-dark-line);
+  outline-offset: -2px;
+}
+
+.segmented-group .loc-btn {
+  background: transparent;
+  border-radius: 0;
+}
+
+.segmented-group .loc-btn:hover {
+  filter: none;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Sub-buttons inside segmented group */
+.segment-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0.25rem 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--color-dark-line);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.segment-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.segment-btn.location-active {
+  background-color: var(--color-dark-bg-2);
+  box-shadow: 0px 0px 15px 0px #ffffff80 inset;
+  color: white;
+  font-weight: bold;
+}
+
+/* Info pill inside segmented group */
+.info-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 34px;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--color-dark-bg-2);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .addition-dialog::ng-deep .p-dialog-header {

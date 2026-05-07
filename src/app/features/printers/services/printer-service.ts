@@ -92,6 +92,50 @@ export class PrinterService extends BaseSearchAndCrudService<
       .finally(() => this.loadingService.removeLoading());
   }
 
+  printJobs(jobs: { printer: IPrinterSearchRow; html: string; css: string }[]) {
+    if (jobs.length === 0) return;
+
+    this.loadingService.addLoading();
+
+    const promises = jobs.map((job) => {
+      const electronPrintOpts: IElectonPrintOptions = {
+        printers: [
+          {
+            id: job.printer.id,
+            type: job.printer.type,
+            ipAddressOrMacAddress: job.printer.ipAddressOrMacAddress,
+            port: job.printer.port,
+            name: job.printer.name,
+          },
+        ],
+        html: job.html,
+        css: job.css,
+      };
+      return window.electronAPI.print(electronPrintOpts);
+    });
+
+    Promise.all(promises)
+      .then((results) => {
+        const allErrors = results.flat().filter(Boolean);
+        allErrors.forEach((failMsg) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'خطأ',
+            detail: failMsg,
+          });
+        });
+        if (allErrors.length === 0) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'نجاح',
+            detail: 'تم الطباعة بنجاح',
+          });
+        }
+      })
+      .catch((e) => console.log(e))
+      .finally(() => this.loadingService.removeLoading());
+  }
+
   async getLocalBluetoothPrinters() {
     this.loadingService.addLoading();
     try {

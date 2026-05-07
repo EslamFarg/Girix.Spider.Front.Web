@@ -1,0 +1,99 @@
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [dismissableMask]="false"
+  [closable]="false"
+  [style]="{ width: '90%', maxWidth: '480px' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-text-lighter!"
+  [contentStyleClass]="'flex flex-col'"
+  (onHide)="onHide()"
+>
+  <ng-template #header>
+    <div class="w-full text-center">
+      <div class="flex items-center justify-center gap-2 text-green-500 mb-1">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <p class="font-bold text-dark-bg-2 text-lg">تم إنشاء الطلب بنجاح</p>
+    </div>
+  </ng-template>
+
+  @if (order(); as o) {
+    <div class="flex flex-col gap-4">
+      <!-- Order Info -->
+      <div class="bg-white/60 rounded-xl p-4 flex flex-col gap-2 text-sm">
+        <div class="flex justify-between items-center">
+          <span class="text-text-gray">رقم الفاتورة</span>
+          <span class="text-dark-line font-bold">{{ o.invoiceNo ?? o.orderNo }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-text-gray">العميل</span>
+          <span class="text-dark-line font-bold">{{ o.customer?.name ?? 'عميل نقدي' }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-text-gray">عدد الأصناف</span>
+          <span class="text-dark-line font-bold">{{ o.items?.length ?? 0 }}</span>
+        </div>
+        <div class="flex justify-between items-center border-t border-text-light pt-2 mt-1">
+          <span class="text-text-gray font-bold">الإجمالي</span>
+          <span class="text-dark-line font-bold text-lg">{{ o.summary?.totalNet?.toFixed(2) ?? '0.00' }}</span>
+        </div>
+      </div>
+
+      <!-- Items grouped by printer -->
+      @if (itemsByPrinter().size > 0) {
+        <div class="flex flex-col gap-2">
+          <span class="text-text-gray text-xs font-medium">الأصناف حسب الطابعة</span>
+          <div class="flex flex-col gap-2">
+            @for (group of itemsByPrinter() | keyvalue; track $index) {
+              <div class="bg-white/40 rounded-lg p-2.5">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span class="text-dark-line text-xs font-bold">{{ group.value.printer.name }}</span>
+                </div>
+                <div class="flex flex-wrap gap-1">
+                  @for (item of group.value.items; track $index) {
+                    <span class="px-2 py-0.5 bg-text-lighter rounded text-[10px] text-dark-line font-medium">
+                      {{ item.name }} x{{ item.qty }}
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <ng-template #footer>
+    <div class="flex justify-center items-center gap-3 w-full pt-2">
+      <button
+        pButton
+        type="button"
+        style="--p-button-primary-background: var(--color-dark-bg-2)"
+        class="text-white! py-1! px-6! text-sm! font-bold!"
+        (click)="onPrint()"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+          <polyline points="6 9 6 2 18 2 18 9"/>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <rect x="6" y="14" width="12" height="8"/>
+        </svg>
+        طباعة
+      </button>
+      <button
+        pButton
+        type="button"
+        class="border-dark-line! text-dark-line! py-1! px-6! text-sm! font-bold!"
+        variant="outlined"
+        (click)="onHide()"
+      >
+        إغلاق
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

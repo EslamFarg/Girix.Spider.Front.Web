@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, input, OnInit, signal, untracked } from '@angular/core';
 import { IMenuItem, IOrderMenuItem, Menu } from '../../components/menu/menu';
+import { OrderSuccessDialog } from '../../components/order-success-dialog/order-success-dialog';
 import { ButtonModule } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -94,6 +95,7 @@ interface IOrderCreateFgValue {
   selector: 'app-home',
   imports: [
     Menu,
+    OrderSuccessDialog,
     ButtonModule,
     ReactiveFormsModule,
     Dialog,
@@ -155,6 +157,8 @@ export class Cashier extends BaseComponent implements OnInit {
   orderService = inject(OrderService);
   financialSettingsService = inject(FinancialSettingsService);
   existingOrderBill = signal<IOrderBillReadResponse | null>(null);
+  lastCreatedOrder = signal<any | null>(null);
+  successDialogVisible = signal(false);
 
   orderCreateItems = computed<IOrderCreateItem[]>(() => {
     return this.orderMenuItems().map((item) => ({
@@ -277,6 +281,10 @@ export class Cashier extends BaseComponent implements OnInit {
         placeRefId: null,
         deliveryId: null,
       });
+      this.currentHut.set(null);
+      this.currentTable.set(null);
+      this.currentRoom.set(null);
+      this.activeLocalType.set(null);
       switch (orderType) {
         case OrderLocationType.Takeaway:
           this.isPaid.set(true);
@@ -409,7 +417,8 @@ export class Cashier extends BaseComponent implements OnInit {
       case FormMode.Create:
         this.orderService.create(this.orderFg.value).subscribe({
           next: (res) => {
-            this.resetOrderForm();
+            this.lastCreatedOrder.set(res);
+            this.successDialogVisible.set(true);
           },
           error: (err) => {
             console.log(err);
@@ -445,6 +454,12 @@ export class Cashier extends BaseComponent implements OnInit {
     this.orderFg.patchValue({
       idempotencyKey: Date.now() + Math.random().toString(),
     });
+  }
+
+  onSuccessDialogHide() {
+    this.successDialogVisible.set(false);
+    this.lastCreatedOrder.set(null);
+    this.resetOrderForm();
   }
 
   //
@@ -825,6 +840,22 @@ export class Cashier extends BaseComponent implements OnInit {
   //local space
   //
 
+  activeLocalType = signal<OrderLocalType | null>(null);
+
+  openLocalTypeDialog(type: OrderLocalType) {
+    switch (type) {
+      case OrderLocalType.Table:
+        this.TableDialogVisible = true;
+        break;
+      case OrderLocalType.Room:
+        this.RoomDialogVisible = true;
+        break;
+      case OrderLocalType.Hut:
+        this.HutDialogVisible = true;
+        break;
+    }
+  }
+
   //huts
   HutDialogVisible: boolean = false;
 
@@ -846,11 +877,22 @@ export class Cashier extends BaseComponent implements OnInit {
     const minutes = this.currentHutMinutes();
     const price = hutPricePerHour * (minutes / 60);
 
-    if (this.orderFg.value.placeType == OrderLocalType.Hut && this.currentHut()) {
+    if (this.activeLocalType() === OrderLocalType.Hut && this.currentHut()) {
       return price * (1 + vat / 100);
     } else {
       return 0;
     }
+  });
+
+  selectedLocalLocationLabel = computed(() => {
+    const hut = this.currentHut();
+    const table = this.currentTable();
+    const room = this.currentRoom();
+
+    if (hut) return hut.name;
+    if (table) return table.name;
+    if (room) return room.name;
+    return '-';
   });
   hutPaginationInfo: {
     pageIndex: number;
@@ -912,11 +954,14 @@ export class Cashier extends BaseComponent implements OnInit {
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لم يتم اختيار كوخ' });
       return;
     }
+    this.currentTable.set(null);
+    this.currentRoom.set(null);
     this.orderFg.patchValue({
       placeRefId: hut.id,
       placeType: OrderLocalType.Hut,
       durationMinutes: this.currentHutMinutes(),
     });
+    this.activeLocalType.set(OrderLocalType.Hut);
     this.HutDialogVisible = false;
     this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع بنجاح' });
   }
@@ -938,6 +983,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
   tableService = inject(TableService);
   tables = signal<ITableSearchRow[]>([]);
+  currentTable = signal<ITableSearchRow | null>(null);
 
   tablePaginationInfo: {
     pageIndex: number;
@@ -984,7 +1030,11 @@ export class Cashier extends BaseComponent implements OnInit {
   }
   onTableSelected(table: ITableSearchRow) {
     if (table.isAvailable) {
+      this.currentHut.set(null);
+      this.currentTable.set(table);
+      this.currentRoom.set(null);
       this.orderFg.patchValue({ placeRefId: table.id, placeType: OrderLocalType.Table });
+      this.activeLocalType.set(OrderLocalType.Table);
       this.TableDialogVisible = false;
       this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
     } else {
@@ -1005,6 +1055,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
   roomService = inject(RoomService);
   rooms = signal<IRoomSearchRow[]>([]);
+  currentRoom = signal<IRoomSearchRow | null>(null);
   roomPaginationInfo: {
     pageIndex: number;
     totalPagesCount: number;
@@ -1051,7 +1102,11 @@ export class Cashier extends BaseComponent implements OnInit {
   }
   onRoomSelected(room: IRoomSearchRow) {
     if (room.isAvailable) {
+      this.currentHut.set(null);
+      this.currentTable.set(null);
+      this.currentRoom.set(room);
       this.orderFg.patchValue({ placeRefId: room.id, placeType: OrderLocalType.Room });
+      this.activeLocalType.set(OrderLocalType.Room);
       this.RoomDialogVisible = false;
       this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع بنجاح' });
     } else {

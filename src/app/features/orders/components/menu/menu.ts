@@ -5,8 +5,8 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { InputTextModule } from 'primeng/inputtext';
 import { ImgFallback } from '@/directives/img-fallback';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { IMealSearchRow } from '@/features/classes/services/meal-service';
-import { IProductSearchRow } from '@/features/classes/services/product-service';
+import { IMealSearchRow, MealService, IMealReadResponse } from '@/features/classes/services/meal-service';
+import { IProductSearchRow, ProductService, IProductReadResponse } from '@/features/classes/services/product-service';
 import { ProductsAndMealsService, ProductAndMealsSearchEnum } from '@/features/orders';
 import { Debounce } from '@/directives/debounce';
 import { MenuItem } from 'primeng/api';
@@ -16,6 +16,7 @@ import { AllowNumbers } from '@/directives/allow-numbers';
 import { ButtonDirective } from 'primeng/button';
 import { RouterLink } from '@angular/router';
 import { GalleriaModule } from 'primeng/galleria';
+import { Dialog } from 'primeng/dialog';
 
 export interface IMenuItem {
   id: string;
@@ -49,6 +50,7 @@ export interface IOrderMenuItem {
     ButtonDirective,
     RouterLink,
     GalleriaModule,
+    Dialog,
   ],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
@@ -56,8 +58,22 @@ export interface IOrderMenuItem {
 export class Menu extends BaseComponent {
   groups = input<IGroupSearchRow[]>([]);
   menuItemChange = output<IOrderMenuItem>();
+  pickedItems = input<IOrderMenuItem[]>([]);
 
   menuItems = signal<IMenuItem[]>([]);
+
+  pickedItemCounts = computed(() => {
+    const counts = new Map<string, number>();
+    for (const item of this.pickedItems()) {
+      const id = item.menuItem.id;
+      counts.set(id, (counts.get(id) ?? 0) + item.menuItem.quantity);
+    }
+    return counts;
+  });
+
+  getItemCount(item: IMenuItem): number {
+    return this.pickedItemCounts().get(item.id) ?? 0;
+  }
 
   selectCategory(category: { id: number; label: string }) {
     const previousCategoryId = this.menuSearchFg.getRawValue().category?.id;
@@ -85,6 +101,8 @@ export class Menu extends BaseComponent {
   }
 
   productsAndMealsService = inject(ProductsAndMealsService);
+  productService = inject(ProductService);
+  mealService = inject(MealService);
 
   initialMenuSearchFgValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
@@ -157,7 +175,7 @@ export class Menu extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 15,
+          pageSize: 30,
         },
         searchFilters,
         fromDate: this.menuSearchFg.getRawValue().fromDate,
@@ -260,6 +278,57 @@ export class Menu extends BaseComponent {
     if (this.images().length > 0) {
       this.galleriaVisible.set(true);
     }
+  }
+
+  // Product / Meal detail dialog
+  detailDialogVisible = signal(false);
+  detailLoading = signal(false);
+  currentProductDetail = signal<IProductReadResponse | null>(null);
+  currentMealDetail = signal<IMealReadResponse | null>(null);
+
+  activeDetailImageIndex = signal(0);
+  detailImages = computed(() => {
+    const productImages = this.currentProductDetail()?.images ?? [];
+    const mealImages = this.currentMealDetail()?.images ?? [];
+    return productImages.length > 0 ? productImages : mealImages;
+  });
+  activeDetailImage = computed(() => {
+    const images = this.detailImages();
+    return images[this.activeDetailImageIndex()] ?? images[0] ?? null;
+  });
+
+  openDetailDialog(event: Event, menuItem: IMenuItem) {
+    event.stopPropagation();
+    this.detailLoading.set(true);
+    this.detailDialogVisible.set(true);
+    this.currentProductDetail.set(null);
+    this.currentMealDetail.set(null);
+    this.activeDetailImageIndex.set(0);
+
+    if (menuItem.product) {
+      this.productService.getById(menuItem.product.id).subscribe({
+        next: (res) => {
+          this.currentProductDetail.set(res);
+          this.detailLoading.set(false);
+        },
+        error: () => this.detailLoading.set(false),
+      });
+    } else if (menuItem.meal) {
+      this.mealService.getById(menuItem.meal.id).subscribe({
+        next: (res) => {
+          this.currentMealDetail.set(res);
+          this.detailLoading.set(false);
+        },
+        error: () => this.detailLoading.set(false),
+      });
+    }
+  }
+
+  closeDetailDialog() {
+    this.detailDialogVisible.set(false);
+    this.currentProductDetail.set(null);
+    this.currentMealDetail.set(null);
+    this.activeDetailImageIndex.set(0);
   }
 }
 
