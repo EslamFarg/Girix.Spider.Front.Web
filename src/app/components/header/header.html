@@ -20,7 +20,7 @@
         <p class="font-semibold text-xs max-w-25 text-ellipsis overflow-hidden">{{ userDetails()?.fullName }}</p>
         <i class="pi pi-angle-down text-sm! transition-all" [class.rotate-180]="menu.visible"></i>
       </div>
-      <p-menu dir="rtl" #menu [model]="popUpMenuItems" [popup]="true" [style]="{ insetInlineEnd: '100%' }" />
+      <p-menu dir="rtl" #menu [model]="popUpMenuItems" [popup]="true" appendTo="body" [style]="{ insetInlineEnd: '100%' }" />
 
 
     </div>

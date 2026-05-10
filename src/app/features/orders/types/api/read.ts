@@ -109,7 +109,7 @@ export interface IOrderBillReadResponse {
       port: number;
       type: number;
     };
-    modifiers: any[];
+    modifiers: IModifier[];
   }[];
   summary: {
     totalUnitPrice: number;
@@ -136,6 +136,29 @@ export interface IOrderBillReadResponse {
     afterNetOrder: number;
     amount: number;
   };
+}
+
+export interface IModifier {
+  id: number
+  name: string
+  qty: number
+  returnedQty: number
+  remainingQty: number
+  unitPrice: number
+  selectiveTax: number
+  netUnitPrice: number
+  unitPriceWithTax: number
+  netUnitPriceWithTax: number
+  printer: IModifierPrinter
+}
+
+export interface IModifierPrinter {
+  id: number
+  name: string
+  ipAddressOrMacAddress: string
+  port: number
+  comPort: string
+  type: number
 }
 
 

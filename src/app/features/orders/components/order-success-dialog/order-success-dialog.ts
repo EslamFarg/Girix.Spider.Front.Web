@@ -2,7 +2,7 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { Dialog } from 'primeng/dialog';
 import { ButtonDirective } from 'primeng/button';
 import { KeyValuePipe } from '@angular/common';
-import { PrinterService } from '@/features/printers';
+import { PrinterService, IPrintOrderOption } from '@/features/printers';
 import { IPrinterSearchRow } from '@/features/printers/types/printer-api';
 
 interface IOrderSuccessItem {
@@ -123,13 +123,13 @@ export class OrderSuccessDialog {
     const order = this.order();
     if (!order) return;
 
-    const jobs: IPrintJob[] = [];
+    const options: IPrintOrderOption[] = [];
     const styles = this.getReceiptStyles();
 
     for (const [, group] of this.itemsByPrinter()) {
       const receiptHtml = this.generateReceiptHtml(order, group.items);
-      jobs.push({
-        printer: group.printer,
+      options.push({
+        printer: { ...group.printer, appPrinterType: '' as any },
         html: receiptHtml,
         css: styles,
       });
@@ -137,17 +137,16 @@ export class OrderSuccessDialog {
 
     // Also print cashier receipt (all items)
     const cashierReceipt = this.generateReceiptHtml(order, order.items);
-    // Use the first printer as cashier printer for now, or we could add a dedicated cashier printer
     const firstPrinter = order.items[0]?.printer;
     if (firstPrinter) {
-      jobs.push({
-        printer: firstPrinter,
+      options.push({
+        printer: { ...firstPrinter, appPrinterType: '' as any },
         html: cashierReceipt,
         css: styles,
       });
     }
 
-    this.printerService.printJobs(jobs);
+    this.printerService.printOrder(options);
   }
 
   private getReceiptStyles(): string {

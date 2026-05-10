@@ -13,6 +13,7 @@
   position: relative;
   z-index: 9999;
   flex-shrink: 0;
+  direction: ltr;
 }
 
 .title-bar-drag-region {

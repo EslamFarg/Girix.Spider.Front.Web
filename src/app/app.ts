@@ -19,10 +19,14 @@ export interface IElectronPrinter {
   type: PrinterType;
 }
 
-export interface IElectonPrintOptions {
-  printers: IElectronPrinter[];
+export interface IElectronPrintJob {
+  printer: IElectronPrinter;
   html: string;
   css: string;
+}
+
+export interface IElectonPrintOptions {
+  jobs: IElectronPrintJob[];
 }
 export interface IBluetoothPrinter {
   id: string;

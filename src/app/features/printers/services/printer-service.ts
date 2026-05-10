@@ -1,4 +1,4 @@
-import { IElectonPrintOptions } from '@/app';
+import { IElectonPrintOptions, IElectronPrintJob } from '@/app';
 import { BaseCrudService } from '@/core/services/BaseCrudService';
 import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
@@ -21,6 +21,15 @@ export interface IAppPrintOptions {
   css: string;
 }
 
+/** Combined print option where each entry has its own printer + html + css */
+export interface IPrintOrderOption {
+  printer: IAppPrinter;
+  html: string;
+  css: string;
+}
+
+
+
 @Injectable({
   providedIn: 'root',
 })
@@ -34,6 +43,8 @@ export class PrinterService extends BaseSearchAndCrudService<
   override apiRoute = 'Printer';
   isPrinterDialogVisible = false;
   printOptions: IAppPrintOptions | null = null;
+  /** When set, contains pre-grouped print jobs (one per printer) */
+  printJobsQueue: IPrintOrderOption[] | null = null;
 
   /**
    *
@@ -48,83 +59,57 @@ export class PrinterService extends BaseSearchAndCrudService<
 
   openPrinterDialog(opts: IAppPrintOptions) {
     this.printOptions = opts;
+    this.printJobsQueue = null;
+    this.isPrinterDialogVisible = true;
+  }
+
+  openPrinterDialogWithJobs(jobs: IPrintOrderOption[]) {
+    this.printOptions = null;
+    this.printJobsQueue = jobs;
     this.isPrinterDialogVisible = true;
   }
 
   closePrinterDialog() {
     this.isPrinterDialogVisible = false;
     this.printOptions = null;
+    this.printJobsQueue = null;
   }
 
-  printOrder(printers: IAppPrinter[]) {
-    if (this.printOptions === null) return;
+  printOrder(options: IPrintOrderOption[]) {
+    if (options.length === 0) return;
+
+    console.log('--- PrinterService.printOrder ---');
+    console.log(`Sending ${options.length} print jobs:`);
+    options.forEach((o, i) => console.log(`  Job ${i}: type=${o.printer.appPrinterType}, printer=${o.printer.name} (id=${o.printer.id}), html length=${o.html.length}`));
 
     this.loadingService.addLoading();
-    const electronPrintOpts: IElectonPrintOptions = {
-      printers: printers.map((p) => ({
-        id: p.id,
-        type: p.type,
-        ipAddressOrMacAddress: p.ipAddressOrMacAddress,
-        port: p.port,
-        name: p.name,
-      })),
-      html: this.printOptions.html,
-      css: this.printOptions.css,
-    };
+
+    const jobs: IElectronPrintJob[] = options.map((opt) => ({
+      printer: {
+        id: opt.printer.id,
+        type: opt.printer.type,
+        ipAddressOrMacAddress: opt.printer.ipAddressOrMacAddress,
+        port: opt.printer.port,
+        name: opt.printer.name,
+      },
+      html: opt.html,
+      css: opt.css,
+    }));
+
+    const electronPrintOpts: IElectonPrintOptions = { jobs };
 
     window.electronAPI
       .print(electronPrintOpts)
-      .then((e) => {
-        console.log('------------printer finished printing-----------');
-        console.log(e);
-
-        e?.forEach((failMsg) => {
-          console.log(failMsg);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'خطأ',
-            detail: failMsg,
-          });
-        });
-        console.log('-----------------------');
-      })
-      .catch((e) => console.log(e))
-      .finally(() => this.loadingService.removeLoading());
-  }
-
-  printJobs(jobs: { printer: IPrinterSearchRow; html: string; css: string }[]) {
-    if (jobs.length === 0) return;
-
-    this.loadingService.addLoading();
-
-    const promises = jobs.map((job) => {
-      const electronPrintOpts: IElectonPrintOptions = {
-        printers: [
-          {
-            id: job.printer.id,
-            type: job.printer.type,
-            ipAddressOrMacAddress: job.printer.ipAddressOrMacAddress,
-            port: job.printer.port,
-            name: job.printer.name,
-          },
-        ],
-        html: job.html,
-        css: job.css,
-      };
-      return window.electronAPI.print(electronPrintOpts);
-    });
-
-    Promise.all(promises)
       .then((results) => {
-        const allErrors = results.flat().filter(Boolean);
-        allErrors.forEach((failMsg) => {
+        const errors = (results ?? []).filter(Boolean);
+        errors.forEach((failMsg) => {
           this.messageService.add({
             severity: 'error',
             summary: 'خطأ',
             detail: failMsg,
           });
         });
-        if (allErrors.length === 0) {
+        if (errors.length === 0) {
           this.messageService.add({
             severity: 'success',
             summary: 'نجاح',

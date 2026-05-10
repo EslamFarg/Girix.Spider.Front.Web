@@ -39,6 +39,7 @@
   
 }
 @custom-variant dark (&:where(.dark-mode, .dark-mode *));
+@custom-variant electron (&:where(.electron, .electron *));
 
 html, body {
   margin: 0;

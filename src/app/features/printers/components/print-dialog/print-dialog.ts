@@ -57,20 +57,46 @@ export class PrintDialog extends BaseComponent {
   }
 
   print() {
-    
     if (this.selectedPrinters().length === 0) {
       this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب تحديد طابعة' });
       return;
     }
 
-    this.printerService.printOrder(this.selectedPrinters());
-    // if (printer.isAvailable) {
-    //   this.orderFg.patchValue({ placeRefId: printer.id, placeType: OrderLocalType.Printer });
-    //   this.printerDialogVisible = false;
-    //   this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
-    // } else {
-    //   this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
-    // }
+    console.log('--- PrintDialog.print ---');
+    console.log('Selected printers:', this.selectedPrinters().map(p => ({ type: p.appPrinterType, name: p.name, id: p.id })));
+
+    // If pre-grouped print jobs are queued, filter by selected printer types
+    const queuedJobs = this.printerService.printJobsQueue;
+    if (queuedJobs && queuedJobs.length > 0) {
+      console.log(`Queued jobs: ${queuedJobs.length}`);
+      queuedJobs.forEach((j, i) => console.log(`  Queued ${i}: type=${j.printer.appPrinterType}, printer=${j.printer.name} (id=${j.printer.id})`));
+
+      const selectedTypes = new Set(this.selectedPrinters().map((p) => p.appPrinterType));
+      console.log('Selected types:', [...selectedTypes]);
+
+      const filteredOptions = queuedJobs.filter((job) => selectedTypes.has(job.printer.appPrinterType));
+      console.log(`Filtered options: ${filteredOptions.length}`);
+      filteredOptions.forEach((j, i) => console.log(`  Filtered ${i}: type=${j.printer.appPrinterType}`));
+
+      if (filteredOptions.length > 0) {
+        this.printerService.printOrder(filteredOptions);
+      } else {
+        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا توجد عناصر مطابقة للطابعات المحددة' });
+      }
+      this.printerService.closePrinterDialog();
+      return;
+    }
+
+    // Fallback: legacy single-HTML print to all selected printers
+    const opts = this.printerService.printOptions;
+    if (opts) {
+      const printOptions = this.selectedPrinters().map((p) => ({
+        printer: p,
+        html: opts.html,
+        css: opts.css,
+      }));
+      this.printerService.printOrder(printOptions);
+    }
   }
 
 

@@ -403,7 +403,8 @@
     header=""
     position="right"
     [maskStyle]="{ 'z-index': 1 }"
-    styleClass="w-full! bg-white!"
+    styleClass="w-full! bg-white! "
+    class="no-scrollbar [&_.p-drawer-content]:ps-0!"
     [style]="{ zIndex: 1111 }"
   >
     <app-menu (menuItemChange)="onMenuItemChange($event)" [groups]="groups()" [pickedItems]="orderMenuItems()" />
