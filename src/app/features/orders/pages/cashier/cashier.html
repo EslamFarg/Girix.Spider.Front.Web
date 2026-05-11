@@ -997,4 +997,37 @@
   [visible]="successDialogVisible()"
   [order]="lastCreatedOrder()"
   (hide)="onSuccessDialogHide()"
+  (print)="onSuccessDialogPrint()"
 />
+
+<!-- Print Dialog -->
+<p-dialog
+  [visible]="printDialogVisible"
+  (visibleChange)="printDialogVisible = $event; !$event && onPrintDialogHide()"
+  [modal]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '100%', maxWidth: '50rem' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-white!"
+  class="addition-dialog"
+  [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+>
+  <ng-template #header>
+    <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">التحصيل</p>
+  </ng-template>
+
+  <!-- body -->
+  <app-printable-order-invoice [data]="printBill()" #printableOrderInvoice />
+
+  <ng-template #footer>
+    <div class="w-full p-4 pb-0 flex items-center justify-center gap-2">
+      <p-button
+        label="Print"
+        [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
+        styleClass=" bg-[#EA7C69]! text-white! px-6!"
+        [text]="true"
+        (click)="printOrder()"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>

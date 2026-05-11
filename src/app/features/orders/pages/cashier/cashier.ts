@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, OnInit, signal, untracked } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, input, OnInit, signal, untracked, viewChild } from '@angular/core';
 import { IMenuItem, IOrderMenuItem, Menu } from '../../components/menu/menu';
 import { OrderSuccessDialog } from '../../components/order-success-dialog/order-success-dialog';
 import { ButtonModule } from 'primeng/button';
@@ -48,7 +48,9 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { ICustomerSearchRow } from '@/features/customers/services/customer-types';
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { PrinterService } from '@/features/printers';
+import { PrinterService, IPrintOrderOption, AppPrinterType } from '@/features/printers';
+import { PrinterSettingsService } from '@/features/printers/services/printer-settings-service';
+import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
 import {
   FinancialSettingsService,
   IFinancialSettingsResponse,
@@ -127,6 +129,7 @@ interface IOrderCreateFgValue {
     FormControlNotifier,
     SkeletonModule,
     RouterLink,
+    PrintableOrderInvoice,
   ],
   templateUrl: './cashier.html',
   styleUrl: './cashier.css',
@@ -159,6 +162,13 @@ export class Cashier extends BaseComponent implements OnInit {
   existingOrderBill = signal<IOrderBillReadResponse | null>(null);
   lastCreatedOrder = signal<any | null>(null);
   successDialogVisible = signal(false);
+
+  // Print dialog
+  printService = inject(PrinterService);
+  printerSettingsService = inject(PrinterSettingsService);
+  printDialogVisible = false;
+  printBill = signal<IOrderBillReadResponse | null>(null);
+  printableOrderInvoice = viewChild<PrintableOrderInvoice>('printableOrderInvoice');
 
   orderCreateItems = computed<IOrderCreateItem[]>(() => {
     return this.orderMenuItems().map((item) => ({
@@ -266,6 +276,18 @@ export class Cashier extends BaseComponent implements OnInit {
       next: (res) => {
         this.cashAccounts.set(res.value.rows);
         this.networkAccounts.set(res.value.rows);
+
+        const userDetails = this.userDetails();
+        if (userDetails?.cashPaymentAccountId) {
+          this.orderFg.patchValue({
+            cashAccountId: userDetails.cashPaymentAccountId,
+          });
+        }
+        if (userDetails?.bankPaymentAccountId) {
+          this.orderFg.patchValue({
+            networkAccountId: userDetails.bankPaymentAccountId,
+          });
+        }
       },
     });
     // this.searchAdditions(1);
@@ -418,6 +440,8 @@ export class Cashier extends BaseComponent implements OnInit {
         this.orderService.create(this.orderFg.value).subscribe({
           next: (res) => {
             this.lastCreatedOrder.set(res);
+            this.printBill.set(res as unknown as IOrderBillReadResponse);
+            this.resetOrderForm();
             this.successDialogVisible.set(true);
           },
           error: (err) => {
@@ -462,7 +486,294 @@ export class Cashier extends BaseComponent implements OnInit {
     this.resetOrderForm();
   }
 
+  onSuccessDialogPrint() {
+    this.successDialogVisible.set(false);
+    this.lastCreatedOrder.set(null);
+    // Open the 3-options printer selection dialog
+    this.printOrder();
+  }
+
   //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  // Print
+  //
+
+  openPrintDialog() {
+    this.printDialogVisible = true;
+  }
+
+  onPrintDialogHide() {
+    this.printDialogVisible = false;
+    this.printBill.set(null);
+  }
+
+  /**
+   * Groups items and their modifiers by printer id.
+   */
+  private groupItemsByPrinter(bill: IOrderBillReadResponse): Map<number, { printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }> {
+    const groups = new Map<number, { printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }>();
+
+    for (const item of bill.items) {
+      const itemPrinterId = item.printer?.id;
+      if (itemPrinterId != null) {
+        if (!groups.has(itemPrinterId)) {
+          groups.set(itemPrinterId, { printer: item.printer, items: [] });
+        }
+        groups.get(itemPrinterId)!.items.push(item);
+      }
+
+      for (const modifier of item.modifiers ?? []) {
+        const modPrinterId = modifier.printer?.id;
+        if (modPrinterId != null) {
+          if (!groups.has(modPrinterId)) {
+            groups.set(modPrinterId, {
+              printer: {
+                id: modifier.printer.id,
+                name: modifier.printer.name,
+                ipAddressOrMacAddress: modifier.printer.ipAddressOrMacAddress,
+                port: modifier.printer.port,
+                type: modifier.printer.type,
+              },
+              items: [],
+            });
+          }
+          groups.get(modPrinterId)!.items.push({
+            ...item,
+            name: `+ ${modifier.name}`,
+            qty: modifier.qty,
+            unitPrice: modifier.unitPrice,
+            modifiers: [],
+          });
+        }
+      }
+    }
+
+    return groups;
+  }
+
+  /**
+   * Generates a simplified kitchen/captain receipt HTML (no prices, just items + qty).
+   */
+  private generateSimplifiedReceiptHtml(
+    bill: IOrderBillReadResponse,
+    items: IOrderBillReadResponse['items'],
+    title: string
+  ): string {
+    const itemRows = items
+      .map((item) => {
+        let rows = `
+      <tr>
+        <td style="padding:4px 0;text-align:right;border-bottom:1px dashed #ccc;">${item.name}</td>
+        <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #ccc;">${item.qty}</td>
+      </tr>`;
+        for (const modifier of item.modifiers ?? []) {
+          rows += `
+      <tr>
+        <td style="padding:4px 16px 4px 4px;text-align:right;border-bottom:1px dashed #eee;color:#555;font-size:13px;">+ ${modifier.name}</td>
+        <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #eee;color:#555;font-size:13px;">${modifier.qty}</td>
+      </tr>`;
+        }
+        return rows;
+      })
+      .join('');
+
+    const totalQty = items.reduce((sum, item) => {
+      let qty = item.qty;
+      for (const modifier of item.modifiers ?? []) {
+        qty += modifier.qty;
+      }
+      return sum + qty;
+    }, 0);
+
+    return `
+<div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:16px;max-width:300px;">
+  <div style="text-align:center;margin-bottom:8px;font-weight:bold;font-size:16px;">
+    ${title}
+  </div>
+  <div style="margin-bottom:8px;text-align:center;font-size:12px;">
+    <div>رقم الفاتورة ${bill.invoiceNo}</div>
+    <div>${new DatePipe('en-US').transform(bill.dateTime, 'dd/MM/yyyy h:mm a')}</div>
+    <div>نوع الطلب: ${bill.orderType === 1 ? 'سفري' : bill.orderType === 2 ? 'محلي' : 'توصيل'}</div>
+  </div>
+  <table style="width:100%;border-collapse:collapse;">
+    <thead>
+      <tr style="border-bottom:2px solid #000;">
+        <th style="padding:4px;text-align:right;">الصنف</th>
+        <th style="padding:4px;text-align:center;">الكمية</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${itemRows}
+      <tr style="border-top:2px solid #000;">
+        <td style="padding:4px;text-align:right;font-weight:bold;">المجموع</td>
+        <td style="padding:4px;text-align:center;font-weight:bold;">${totalQty.toFixed(2)}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="text-align:center;margin-top:8px;font-size:12px;">
+    رقم الطلب ${bill.orderNo}
+  </div>
+</div>`;
+  }
+
+  /**
+   * Generates a full cashier-style receipt HTML for a group of items.
+   */
+  private generateCashierReceiptHtml(bill: IOrderBillReadResponse, items: IOrderBillReadResponse['items']): string {
+    const itemRows = items
+      .map((item) => {
+        let rows = `
+      <tr>
+        <td style="padding:4px;text-align:right;">${item.name}</td>
+        <td style="padding:4px;text-align:center;">${item.qty}</td>
+        <td style="padding:4px;text-align:left;">${item.unitPriceWithTax?.toFixed(2)}</td>
+      </tr>`;
+        for (const modifier of item.modifiers ?? []) {
+          rows += `
+      <tr>
+        <td style="padding:4px 16px 4px 4px;text-align:right;color:#555;font-size:12px;">+ ${modifier.name}</td>
+        <td style="padding:4px;text-align:center;color:#555;font-size:12px;">${modifier.qty}</td>
+        <td style="padding:4px;text-align:left;color:#555;font-size:12px;">${modifier.unitPriceWithTax?.toFixed(2)}</td>
+      </tr>`;
+        }
+        return rows;
+      })
+      .join('');
+
+    const totalUnitPrice = items.reduce((sum, item) => {
+      let itemTotal = (item.unitPriceWithTax ?? 0) * item.qty;
+      for (const modifier of item.modifiers ?? []) {
+        itemTotal += (modifier.unitPriceWithTax ?? 0) * modifier.qty;
+      }
+      return sum + itemTotal;
+    }, 0);
+
+    return `
+<div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:14px;max-width:300px;">
+  <div style="text-align:center;margin-bottom:8px;font-weight:bold;font-size:16px;">
+    فاتورة كاشير
+  </div>
+  <div style="margin-bottom:8px;font-size:12px;text-align:center;">
+    <div><strong>رقم الفاتورة:</strong> ${bill.invoiceNo}</div>
+    <div><strong>رقم الطلب:</strong> ${bill.orderNo}</div>
+    <div><strong>التاريخ:</strong> ${new DatePipe('en-US').transform(bill.dateTime, 'dd/MM/yyyy h:mm a')}</div>
+    <div><strong>العميل:</strong> ${bill.customer?.name ?? ''}</div>
+    <div><strong>رقم الجوال:</strong> ${bill.customer?.phone ?? ''}</div>
+    <div><strong>نوع الدفع:</strong> ${bill.paymentType ? 'مدفوع' : 'غير مدفوع'}</div>
+  </div>
+  <table style="width:100%;border-collapse:collapse;">
+    <thead>
+      <tr style="border-bottom:2px solid #000;">
+        <th style="padding:4px;text-align:right;">الصنف</th>
+        <th style="padding:4px;text-align:center;">الكمية</th>
+        <th style="padding:4px;text-align:left;">السعر</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${itemRows}
+      <tr style="border-top:2px solid #000;">
+        <td style="padding:4px;text-align:right;font-weight:bold;">المجموع</td>
+        <td></td>
+        <td style="padding:4px;text-align:left;font-weight:bold;">${totalUnitPrice.toFixed(2)}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>`;
+  }
+
+  printOrder() {
+    const bill = this.printBill();
+    if (!bill) return;
+
+    this.printerSettingsService.getSettings().subscribe({
+      next: (settings) => {
+        const options: IPrintOrderOption[] = [];
+        const baseCss = `
+          body { font-family: 'Cairo', sans-serif; }
+          table { border-collapse: collapse; width: 100%; }
+          th, td { padding: 4px; }
+        `;
+
+        // Kitchen (programPrinter): group items by their item-level printer id
+        if (settings.programPrinter?.id) {
+          const kitchenGroups = this.groupItemsByPrinter(bill);
+          for (const [, group] of kitchenGroups) {
+            options.push({
+              printer: {
+                id: group.printer.id,
+                name: group.printer.name,
+                ipAddressOrMacAddress: group.printer.ipAddressOrMacAddress,
+                port: group.printer.port,
+                type: group.printer.type,
+                comPort: (group.printer as any).comPort ?? 0,
+                appPrinterType: AppPrinterType.programPrinter,
+              },
+              html: this.generateSimplifiedReceiptHtml(bill, group.items, 'فاتورة المطبخ'),
+              css: baseCss,
+            });
+          }
+        }
+
+        // Captain (captionOrderPrinter): full receipt, simplified format
+        if (settings.captionOrderPrinter?.id) {
+          options.push({
+            printer: {
+              id: settings.captionOrderPrinter.id,
+              name: settings.captionOrderPrinter.name,
+              ipAddressOrMacAddress: settings.captionOrderPrinter.ipAddressOrMacAddress,
+              port: settings.captionOrderPrinter.port,
+              type: settings.captionOrderPrinter.type,
+              comPort: settings.captionOrderPrinter.comPort ?? 0,
+              appPrinterType: AppPrinterType.captionOrderPrinter,
+            },
+            html: this.generateSimplifiedReceiptHtml(bill, bill.items, 'أمر كابتن'),
+            css: baseCss,
+          });
+        }
+
+        // Cashier (cashierPrinter): full receipt, full format with prices
+        if (settings.cashierPrinter?.id) {
+          options.push({
+            printer: {
+              id: settings.cashierPrinter.id,
+              name: settings.cashierPrinter.name,
+              ipAddressOrMacAddress: settings.cashierPrinter.ipAddressOrMacAddress,
+              port: settings.cashierPrinter.port,
+              type: settings.cashierPrinter.type,
+              comPort: settings.cashierPrinter.comPort ?? 0,
+              appPrinterType: AppPrinterType.cashierPrinter,
+            },
+            html: this.generateCashierReceiptHtml(bill, bill.items),
+            css: baseCss,
+          });
+        }
+
+        if (options.length === 0) {
+          this.printService.openPrinterDialog({
+            css: this.printableOrderInvoice()?.styles ?? '',
+            html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
+          });
+          return;
+        }
+
+        this.printService.openPrinterDialogWithJobs(options);
+      },
+      error: () => {
+        this.printService.openPrinterDialog({
+          css: this.printableOrderInvoice()?.styles ?? '',
+          html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
+        });
+      },
+    });
+  }
+
   //
   //
   //
@@ -596,10 +907,11 @@ export class Cashier extends BaseComponent implements OnInit {
   //print
   //
 
-  printService = inject(PrinterService);
-
   onPrint() {
-    // this.printService.printOrder();
+    const bill = this.existingOrderBill();
+    if (!bill) return;
+    this.printBill.set(bill);
+    this.openPrintDialog();
   }
 
   //
@@ -664,8 +976,31 @@ export class Cashier extends BaseComponent implements OnInit {
   cashAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
   networkAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
 
-  displayedCashAccounts = computed(() => [...this.cashAccounts()]);
-  displayedNetworkAccounts = computed(() => [...this.networkAccounts()]);
+  displayedCashAccounts = computed(() => {
+    const accounts = this.cashAccounts();
+    const userDetails = this.userDetails();
+    const defaultAccount: ITreeFinancialAccountSearchRow | null = userDetails?.cashPaymentAccountId
+      ? ({ id: userDetails.cashPaymentAccountId, name: userDetails.cashPaymentAccountName ?? '' } as ITreeFinancialAccountSearchRow)
+      : null;
+    if (!defaultAccount) return [...accounts];
+    // Avoid duplicate if default account is already in fetched accounts
+    const hasDefault = accounts.some((a) => a.id === defaultAccount.id);
+    if (hasDefault) return [...accounts];
+    return [defaultAccount, ...accounts];
+  });
+
+  displayedNetworkAccounts = computed(() => {
+    const accounts = this.networkAccounts();
+    const userDetails = this.userDetails();
+    const defaultAccount: ITreeFinancialAccountSearchRow | null = userDetails?.bankPaymentAccountId
+      ? ({ id: userDetails.bankPaymentAccountId, name: userDetails.bankPaymentAccountName ?? '' } as ITreeFinancialAccountSearchRow)
+      : null;
+    if (!defaultAccount) return [...accounts];
+    // Avoid duplicate if default account is already in fetched accounts
+    const hasDefault = accounts.some((a) => a.id === defaultAccount.id);
+    if (hasDefault) return [...accounts];
+    return [defaultAccount, ...accounts];
+  });
 
   searchAccounts(data: { pageIndex: number; searchTerm?: string }) {
     return this.financialAccountService.search({

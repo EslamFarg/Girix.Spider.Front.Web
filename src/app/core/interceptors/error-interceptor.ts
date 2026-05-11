@@ -28,7 +28,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       layoutService.messageService.add({
         severity: 'error',
         // summary: 'خطأ',
-        detail: errorResponse.error.detail ?? errorResponse.error.title,
+        detail: errorResponse?.error?.detail || errorResponse?.error?.title || 'لا يمكن اتمام العملية',
       });
       throw errorResponse.error;
     })

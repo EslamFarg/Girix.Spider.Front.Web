@@ -218,16 +218,30 @@ export class Orders extends BaseComponent {
     title: string
   ): string {
     const itemRows = items
-      .map(
-        (item) => `
+      .map((item) => {
+        let rows = `
       <tr>
         <td style="padding:4px 0;text-align:right;border-bottom:1px dashed #ccc;">${item.name}</td>
         <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #ccc;">${item.qty}</td>
-      </tr>`
-      )
+      </tr>`;
+        for (const modifier of item.modifiers ?? []) {
+          rows += `
+      <tr>
+        <td style="padding:4px 16px 4px 4px;text-align:right;border-bottom:1px dashed #eee;color:#555;font-size:13px;">+ ${modifier.name}</td>
+        <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #eee;color:#555;font-size:13px;">${modifier.qty}</td>
+      </tr>`;
+        }
+        return rows;
+      })
       .join('');
 
-    const totalQty = items.reduce((sum, item) => sum + item.qty, 0);
+    const totalQty = items.reduce((sum, item) => {
+      let qty = item.qty;
+      for (const modifier of item.modifiers ?? []) {
+        qty += modifier.qty;
+      }
+      return sum + qty;
+    }, 0);
 
     return `
 <div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:14px;max-width:300px;">
@@ -351,24 +365,39 @@ export class Orders extends BaseComponent {
    */
   private generateCashierReceiptHtml(bill: IOrderBillReadResponse, items: IOrderBillReadResponse['items']): string {
     const itemRows = items
-      .map(
-        (item) => `
+      .map((item) => {
+        let rows = `
       <tr>
         <td style="padding:4px;text-align:right;">${item.name}</td>
         <td style="padding:4px;text-align:center;">${item.qty}</td>
         <td style="padding:4px;text-align:left;">${item.unitPriceWithTax?.toFixed(2)}</td>
-      </tr>`
-      )
+      </tr>`;
+        for (const modifier of item.modifiers ?? []) {
+          rows += `
+      <tr>
+        <td style="padding:4px 16px 4px 4px;text-align:right;color:#555;font-size:12px;">+ ${modifier.name}</td>
+        <td style="padding:4px;text-align:center;color:#555;font-size:12px;">${modifier.qty}</td>
+        <td style="padding:4px;text-align:left;color:#555;font-size:12px;">${modifier.unitPriceWithTax?.toFixed(2)}</td>
+      </tr>`;
+        }
+        return rows;
+      })
       .join('');
 
-    const totalUnitPrice = items.reduce((sum, item) => sum + (item.unitPriceWithTax ?? 0) * item.qty, 0);
+    const totalUnitPrice = items.reduce((sum, item) => {
+      let itemTotal = (item.unitPriceWithTax ?? 0) * item.qty;
+      for (const modifier of item.modifiers ?? []) {
+        itemTotal += (modifier.unitPriceWithTax ?? 0) * modifier.qty;
+      }
+      return sum + itemTotal;
+    }, 0);
 
     return `
 <div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:14px;max-width:300px;">
   <div style="text-align:center;margin-bottom:8px;font-weight:bold;font-size:16px;">
     فاتورة كاشير
   </div>
-  <div style="margin-bottom:8px;font-size:12px;">
+  <div style="margin-bottom:8px;font-size:12px;text-align:center;">
     <div><strong>رقم الفاتورة:</strong> ${bill.invoiceNo}</div>
     <div><strong>رقم الطلب:</strong> ${bill.orderNo}</div>
     <div><strong>التاريخ:</strong> ${new DatePipe('en-US').transform(bill.dateTime, 'dd/MM/yyyy h:mm a')}</div>

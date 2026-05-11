@@ -97,6 +97,7 @@ export class OrderSuccessDialog {
   visible = input<boolean>(false);
   order = input<IOrderSuccessResponse | null>(null);
   hide = output<void>();
+  print = output<void>();
 
   itemsByPrinter = computed(() => {
     const order = this.order();
@@ -120,33 +121,7 @@ export class OrderSuccessDialog {
   }
 
   onPrint() {
-    const order = this.order();
-    if (!order) return;
-
-    const options: IPrintOrderOption[] = [];
-    const styles = this.getReceiptStyles();
-
-    for (const [, group] of this.itemsByPrinter()) {
-      const receiptHtml = this.generateReceiptHtml(order, group.items);
-      options.push({
-        printer: { ...group.printer, appPrinterType: '' as any },
-        html: receiptHtml,
-        css: styles,
-      });
-    }
-
-    // Also print cashier receipt (all items)
-    const cashierReceipt = this.generateReceiptHtml(order, order.items);
-    const firstPrinter = order.items[0]?.printer;
-    if (firstPrinter) {
-      options.push({
-        printer: { ...firstPrinter, appPrinterType: '' as any },
-        html: cashierReceipt,
-        css: styles,
-      });
-    }
-
-    this.printerService.printOrder(options);
+    this.print.emit();
   }
 
   private getReceiptStyles(): string {

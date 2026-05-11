@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
 import { BaseComponent } from '@/components/base-component/base-component';
@@ -29,10 +29,12 @@ export class Login extends BaseComponent {
     }
 
     this.authService.login(this.fg.getRawValue()).subscribe({
-      next: (data) => {
+      next: (userDetails) => {
+        this.authService.userDetails.set(userDetails);
         if (this.isRememberLogin) {
-          this.authService.save('userDetails', data);
+          this.authService.save('userDetails', userDetails);
         }
+        this.authService.router.navigate(['/']);
         this.messageService.add({
           severity: 'success',
           summary: 'تم تسجيل الدخول',

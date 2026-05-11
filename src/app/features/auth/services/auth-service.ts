@@ -10,21 +10,27 @@ export interface ILoginDto {
 }
 
 export interface IUserDetails {
-  userId: string;
-  fullName: string;
-  email: string;
-  phoneNumber: string;
-  token: string;
-  groups: [
-    {
-      id: number;
-      name: string;
-    },
-  ];
+   userId: string
+  fullName: string
+  email: string
+  phoneNumber: any
+  token: string
+  cashierCollectionAccountId: number
+  cashierCollectionAccountName: string
+  custodyAccountId: number
+  custodyAccountName: string
+  cashPaymentAccountId: number
+  cashPaymentAccountName: string
+  bankPaymentAccountId: number
+  bankPaymentAccountName: string
+  groups: {
+    id: number
+    name: string
+  }[]
   setting: {
-    name: string;
-    phoneNumber: string;
-  };
+    name: string
+    phoneNumber: string
+  }
 }
 
 @Injectable({
@@ -58,6 +64,14 @@ export class AuthService extends BaseService {
             name: 'John Doe',
             phoneNumber: '1234567890',
           },
+          cashierCollectionAccountId: 1,
+          cashierCollectionAccountName: 'Cashier Collection Account',
+          custodyAccountId: 2,
+          custodyAccountName: 'Custody Account',
+          cashPaymentAccountId: 3,
+          cashPaymentAccountName: 'Cash Payment Account',
+          bankPaymentAccountId: 4,
+          bankPaymentAccountName: 'Bank Payment Account',
         });
         observer.complete();
       });
@@ -69,14 +83,7 @@ export class AuthService extends BaseService {
       });
     }
 
-    return loginResultObs.pipe(
-      tap({
-        next: (userDetails) => {
-          this.userDetails.set(userDetails);
-          this.router.navigate(['/']);
-        },
-      }),
-    );
+    return loginResultObs;
   }
 
   get forgotPasswordEmail() {
