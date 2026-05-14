@@ -14,6 +14,9 @@ export enum TableStatus {
 export class TableCard {
   TableStatus = TableStatus;
   data = input.required<ITableSearchRow>();
- 
-  tableStatusClass = computed(() => (this.data()?.isAvailable ? ' table-available' : ' table-reserved'));
+  active = input<boolean>(false);
+
+  tableStatusClass = computed(() =>
+    this.active() ? 'active table-available' : this.data()?.isAvailable ? ' table-available' : ' table-reserved',
+  );
 }

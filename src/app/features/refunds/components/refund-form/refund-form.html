@@ -27,7 +27,7 @@
           pInputText
           appAllowNumbers
           [allowDecimal]="true"
-          [max]="calculateRefundTotal()"
+          [max]="isOrderPaid() ?calculateRefundTotal():0"
           [min]="0"
           id="payingCash"
           formControlName="payingCash"
@@ -43,7 +43,7 @@
           pInputText
           appAllowNumbers
           [allowDecimal]="true"
-          [max]="calculateRefundTotal()"
+          [max]="isOrderPaid() ?calculateRefundTotal():0"
           [min]="0"
           id="payingNetwork"
           formControlName="payingNetwork"
@@ -78,7 +78,7 @@
               <div>{{ item.value.name }}</div>
             </td>
             <td>
-              <div>{{ item.value.netUnitPrice }}</div>
+              <div>{{ item.value.netUnitPriceWithTax }}</div>
             </td>
             <td>
               <div>{{ item.value.originalQuantity }}</div>
@@ -99,7 +99,7 @@
               </app-input-error-message-handler>
             </td>
             <td>
-              <div>{{ (item.value.quantity ?? 0) * (item.value.netUnitPrice ?? 0) | number: '1.2-2' }}</div>
+              <div>{{ (item.value.quantity ?? 0) * (item.value.netUnitPriceWithTax ?? 0) | number: '1.2-2' }}</div>
             </td>
           </tr>
 
@@ -111,7 +111,7 @@
                 <div class="text-sm text-text-gray">↳ {{ addon.value.name }}</div>
               </td>
               <td>
-                <div class="text-sm">{{ addon.value.netUnitPrice }}</div>
+                <div class="text-sm">{{ addon.value.netUnitPriceWithTax }}</div>
               </td>
               <td>
                 <div class="text-sm">{{ addon.value.originalQuantity }}</div>
@@ -132,7 +132,7 @@
                 </app-input-error-message-handler>
               </td>
               <td>
-                <div class="text-sm">{{ (addon.value.quantity ?? 0) * (addon.value.netUnitPrice ?? 0) | number: '1.2-2' }}</div>
+                <div class="text-sm">{{ (addon.value.quantity ?? 0) * (addon.value.netUnitPriceWithTax ?? 0) | number: '1.2-2' }}</div>
               </td>
             </tr>
           }

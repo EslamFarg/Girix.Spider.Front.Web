@@ -15,16 +15,17 @@ export class KeyboardService extends BaseService {
   //numbers
   //
 
-  isNumbersKeyboardVisible = false;
+  isNumbersKeyboardVisible = signal(false);
   openNumbersKeyboard = () => {
-    this.isNumbersKeyboardVisible = true;
-    console.log('open keyboard', this.isNumbersKeyboardVisible);
+    this.isNumbersKeyboardVisible.set(true);
+    console.log('after open keyboard', this.isNumbersKeyboardVisible());
   };
 
-  closeNumbersKeyboard() {
-    console.log('close keyboard', this.isNumbersKeyboardVisible);
-    this.isNumbersKeyboardVisible = false;
+  closeNumbersKeyboard = () => {
+    console.log('before close keyboard', this.isNumbersKeyboardVisible());
+    this.isNumbersKeyboardVisible.set(false);
     this.currentNumbersKeyboardInput = null;
+    console.log('after close keyboard', this.isNumbersKeyboardVisible());
   }
 
   currentNumbersKeyboardInput: HTMLInputElement | null = null;

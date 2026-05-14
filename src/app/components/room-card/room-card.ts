@@ -18,8 +18,11 @@ export class RoomCard {
   roomStatus = computed<RoomStatus>(() => (this.data().isAvailable ? RoomStatus.Available : RoomStatus.Reserved));
 
   data = input.required<IRoomSearchRow>();
-
+  active = input<boolean>(false);
+  
   roomStatusClass = computed(() => {
+    if(this.active()) return 'room-available active';
+
     switch (this.roomStatus()) {
       case RoomStatus.Available:
         return 'room-available';

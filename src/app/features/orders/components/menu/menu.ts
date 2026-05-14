@@ -213,11 +213,11 @@ export class Menu extends BaseComponent {
 
           const menuEl = this.itemsContainer()!.nativeElement;
 
-          setTimeout(() => {
-            const newScrollTop = menuEl.scrollHeight - menuEl.clientHeight - 2;
+          // setTimeout(() => {
+          //   const newScrollTop = menuEl.scrollHeight - menuEl.clientHeight - 2;
 
-            menuEl.scrollTop = newScrollTop;
-          }, 500);
+          //   menuEl.scrollTop = newScrollTop;
+          // }, 500);
         },
       });
   }

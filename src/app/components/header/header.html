@@ -38,6 +38,7 @@
     <div class="container flex items-center h-full px-4 gap-2 py-1 min-w-max w-full transition-all" #navItemsContainer>
       @for (parent of navItems; track $index) {
         <div
+        [appAllowedRoles]="parent.roles"
           class="relative flex items-center h-full"
           #parentElWrapper
           [id]="`header-link-wrapper-${parent.routerLink}`"
@@ -111,6 +112,7 @@
           >
             @for (child of parent.children; track $index) {
               <a
+              [appAllowedRoles]="child.roles"
                 [id]="`header-link-${child.routerLink}`"
                 class="child nav-item h-full mx-0! transition-all duration-500 flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg"
                 [style]="`--ix:${$index}`"
@@ -134,26 +136,6 @@
                   translate(`HEADER.NAV.${parent.labelKey}.${child.labelKey}.LABEL`)
                 }}</span>
               </a>
-              <!-- <a
-              class="nav-item opacity-0 mx-0! transition-all duration-500 flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg min-w-fit"
-              [style]="`--ix:${$index}`"
-              [class.nav-item-active]="
-                child.routerLink === activeLink || isAnySubLinksActive(parent.routerLink, child.routerLink)
-              "
-              [class.nav-item-visible]="
-                isParentActive(parent.routerLink) ||
-                isAnyChildSubLinksActive(parent.routerLink) ||
-                child.routerLink === activeLink ||
-                !isShowingMenu
-              "
-              (click)="toggleActiveLink(child?.subLinks ? child.subLinks![0] : child.routerLink!,parentEl.offsetLeft)"
-              [routerLink]="child?.subLinks ? child.subLinks![0] : child.routerLink!"
-            >
-              <img class="h-10" [src]="'/images/icons/header/' + parent.imgUrl + '/' + child.imgUrl + '.png'" alt="" />
-              <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{
-                translate(`header.nav.${parent.labelKey}.${child.labelKey}.label`)
-              }}</span>
-            </a> -->
             }
           </div>
         </div>

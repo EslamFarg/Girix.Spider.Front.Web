@@ -13,11 +13,4 @@
   min-height: 100vh;
 }
 
-/* When in Electron with custom title bar, subtract 32px */
-:host(.electron) {
-  min-height: calc(100vh - 32px);
-}
 
-:host(.electron) .auth-layout-main {
-  min-height: calc(100vh - 32px);
-}

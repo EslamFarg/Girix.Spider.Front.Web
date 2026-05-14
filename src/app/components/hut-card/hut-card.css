@@ -13,6 +13,7 @@
 
 .hut-available {
   --color: black;
+  &.active ,
   &:hover {
     --color: 80, 209, 170;
     & .bordered {

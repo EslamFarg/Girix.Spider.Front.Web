@@ -7,7 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { IOrderBillReadResponse, IOrderSearchRow, OrderSearchEnum, OrderService } from '@/features/orders';
+import { IOrderBillReadResponse, IOrderSearchRow, OrderPaymentType, OrderSearchEnum, OrderService } from '@/features/orders';
 import { DatePipe } from '@angular/common';
 import { Menu } from 'primeng/menu';
 import { Button } from 'primeng/button';
@@ -44,6 +44,7 @@ import { PrinterSettingsService, IPrinterSettingsReadResponse } from '@/features
   styleUrl: './orders.css',
 })
 export class Orders extends BaseComponent {
+  OrderPaymentType = OrderPaymentType;
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
     searchEnum: this.fb.control<OrderSearchEnum>(OrderSearchEnum.CustomerName, [Validators.required]),

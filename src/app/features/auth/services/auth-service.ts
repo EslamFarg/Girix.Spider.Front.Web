@@ -1,3 +1,4 @@
+import { Role } from '@/core';
 import { ApiUrlOverrideService } from '@/core/services/api-url-override-service';
 import BaseService from '@/core/services/BaseService';
 import { computed, inject, Injectable, signal } from '@angular/core';
@@ -42,6 +43,8 @@ export class AuthService extends BaseService {
   apiUrlOverrideService = inject(ApiUrlOverrideService);
   override apiRoute = 'Auth';
   integrationApi = 'https://majedsoftcompany-001-site17.stempurl.com';
+  roles = computed(() => this.userDetails()?.groups.map((g) => g.id) ?? []);
+  isWaiter = computed(() => this.roles().includes(Role.Waiter));
 
   login(dto: ILoginDto) {
     let loginResultObs: Observable<IUserDetails>;

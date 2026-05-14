@@ -1,4 +1,15 @@
-import { Component, computed, effect, ElementRef, inject, input, OnInit, signal, untracked, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  OnInit,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { IMenuItem, IOrderMenuItem, Menu } from '../../components/menu/menu';
 import { OrderSuccessDialog } from '../../components/order-success-dialog/order-success-dialog';
 import { ButtonModule } from 'primeng/button';
@@ -73,6 +84,7 @@ import {
   FinancialAccountService,
 } from '@/features/accounts/services/financial-account-service';
 import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
+import { AllowedRolesDirective } from '@/directives/allowed-roles';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -130,6 +142,7 @@ interface IOrderCreateFgValue {
     SkeletonModule,
     RouterLink,
     PrintableOrderInvoice,
+    AllowedRolesDirective,
   ],
   templateUrl: './cashier.html',
   styleUrl: './cashier.css',
@@ -185,7 +198,7 @@ export class Cashier extends BaseComponent implements OnInit {
     }));
   });
   initialOrderFgValue: IOrderCreateFgValue = {
-    orderType: this.fb.control<OrderLocationType>(OrderLocationType.Takeaway, [Validators.required]),
+    orderType: this.fb.control<OrderLocationType>(OrderLocationType.DineIn, [Validators.required]),
     paymentType: this.fb.control<OrderPaymentType>(OrderPaymentType.Pending, [Validators.required]),
     placeType: this.fb.control<OrderLocalType | null>(null, []),
     placeName: this.fb.control<string | null>(null, []),
@@ -264,11 +277,7 @@ export class Cashier extends BaseComponent implements OnInit {
     });
 
     this.financialSettingsService.getSettings().subscribe((res) => this.financialSettings.set(res));
-
-    this.searchHuts(1);
-    this.searchRooms(1);
-    this.searchTables(1);
-    this.searchDeliveries(1);
+    this.resetData();
     this.searchAccounts({
       pageIndex: 1,
       searchTerm: '',
@@ -307,6 +316,7 @@ export class Cashier extends BaseComponent implements OnInit {
       this.currentTable.set(null);
       this.currentRoom.set(null);
       this.activeLocalType.set(null);
+      console.log(orderType);
       switch (orderType) {
         case OrderLocationType.Takeaway:
           this.isPaid.set(true);
@@ -331,6 +341,13 @@ export class Cashier extends BaseComponent implements OnInit {
     // this.orderFg.get('placeType')?.valueChanges.subscribe((placeType) => {
     //   this.localPlaceType.set(placeType);
     // });
+  }
+
+  resetData(){
+    this.searchHuts(1);
+    this.searchRooms(1);
+    this.searchTables(1);
+    this.searchDeliveries(1);
   }
 
   ngOnInit(): void {
@@ -384,6 +401,7 @@ export class Cashier extends BaseComponent implements OnInit {
     // } else {
     // }
   }
+  
   test() {
     // window.electronAPI.getPrinters().then((e) => console.log(e));
   }
@@ -437,7 +455,7 @@ export class Cashier extends BaseComponent implements OnInit {
     console.log('valid order');
     switch (this.formMode()) {
       case FormMode.Create:
-        this.orderService.create(this.orderFg.value).subscribe({
+        this.orderService.create({ ...this.orderFg.value, createAt: this.localDateIso }).subscribe({
           next: (res) => {
             this.lastCreatedOrder.set(res);
             this.printBill.set(res as unknown as IOrderBillReadResponse);
@@ -475,9 +493,15 @@ export class Cashier extends BaseComponent implements OnInit {
   resetOrderForm() {
     this.orderMenuItems.set([]);
     this.currentCustomer.set(null);
+    this.currentHut.set(null);
+    this.currentRoom.set(null);
+    this.currentTable.set(null);
     this.orderFg.patchValue({
       idempotencyKey: Date.now() + Math.random().toString(),
+      placeRefId: null,
     });
+    this.orderFg.updateValueAndValidity();
+    this.resetData();
   }
 
   onSuccessDialogHide() {
@@ -517,8 +541,13 @@ export class Cashier extends BaseComponent implements OnInit {
   /**
    * Groups items and their modifiers by printer id.
    */
-  private groupItemsByPrinter(bill: IOrderBillReadResponse): Map<number, { printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }> {
-    const groups = new Map<number, { printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }>();
+  private groupItemsByPrinter(
+    bill: IOrderBillReadResponse,
+  ): Map<number, { printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }> {
+    const groups = new Map<
+      number,
+      { printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }
+    >();
 
     for (const item of bill.items) {
       const itemPrinterId = item.printer?.id;
@@ -564,7 +593,7 @@ export class Cashier extends BaseComponent implements OnInit {
   private generateSimplifiedReceiptHtml(
     bill: IOrderBillReadResponse,
     items: IOrderBillReadResponse['items'],
-    title: string
+    title: string,
   ): string {
     const itemRows = items
       .map((item) => {
@@ -867,7 +896,8 @@ export class Cashier extends BaseComponent implements OnInit {
     const net =
       this.orderItemsNet() + this.hutNet() + this.serviceFee() + this.deliveryFee() - this.itemsDiscountAmount();
 
-    return net;
+    return this.isPaid()?net:0;
+
   });
 
   netListener = effect(() => {
@@ -929,9 +959,12 @@ export class Cashier extends BaseComponent implements OnInit {
 
   keyboardService = inject(KeyboardService);
   closeFullKeyboard = this.keyboardService.closeFullKeyboard;
-  openNumbersKeyboard = () => {
-    this.keyboardService.openNumbersKeyboard();
-    this.changeDetectionRef.markForCheck();
+  toggleNumbersKeyboard = () => {
+    if (this.keyboardService.isNumbersKeyboardVisible()) {
+      this.closeNumbersKeyboard();
+    } else {
+      this.keyboardService.openNumbersKeyboard();
+    }
   };
   triggerFullKeyboard(inputClassSelector: string) {
     this.keyboardService.triggerFullKeyboard(inputClassSelector, 'full-keyboard');
@@ -980,7 +1013,10 @@ export class Cashier extends BaseComponent implements OnInit {
     const accounts = this.cashAccounts();
     const userDetails = this.userDetails();
     const defaultAccount: ITreeFinancialAccountSearchRow | null = userDetails?.cashPaymentAccountId
-      ? ({ id: userDetails.cashPaymentAccountId, name: userDetails.cashPaymentAccountName ?? '' } as ITreeFinancialAccountSearchRow)
+      ? ({
+          id: userDetails.cashPaymentAccountId,
+          name: userDetails.cashPaymentAccountName ?? '',
+        } as ITreeFinancialAccountSearchRow)
       : null;
     if (!defaultAccount) return [...accounts];
     // Avoid duplicate if default account is already in fetched accounts
@@ -993,7 +1029,10 @@ export class Cashier extends BaseComponent implements OnInit {
     const accounts = this.networkAccounts();
     const userDetails = this.userDetails();
     const defaultAccount: ITreeFinancialAccountSearchRow | null = userDetails?.bankPaymentAccountId
-      ? ({ id: userDetails.bankPaymentAccountId, name: userDetails.bankPaymentAccountName ?? '' } as ITreeFinancialAccountSearchRow)
+      ? ({
+          id: userDetails.bankPaymentAccountId,
+          name: userDetails.bankPaymentAccountName ?? '',
+        } as ITreeFinancialAccountSearchRow)
       : null;
     if (!defaultAccount) return [...accounts];
     // Avoid duplicate if default account is already in fetched accounts
@@ -1366,8 +1405,8 @@ export class Cashier extends BaseComponent implements OnInit {
   onTableSelected(table: ITableSearchRow) {
     if (table.isAvailable) {
       this.currentHut.set(null);
-      this.currentTable.set(table);
       this.currentRoom.set(null);
+      this.currentTable.set(table);
       this.orderFg.patchValue({ placeRefId: table.id, placeType: OrderLocalType.Table });
       this.activeLocalType.set(OrderLocalType.Table);
       this.TableDialogVisible = false;
@@ -1941,7 +1980,7 @@ export class Cashier extends BaseComponent implements OnInit {
   getPaymentInvalidControl() {
     const cashControl = this.orderFg.get('payingCash');
     const networkControl = this.orderFg.get('payingNetwork');
-    if (cashControl?.invalid ) {
+    if (cashControl?.invalid) {
       return cashControl;
     } else if (networkControl?.invalid && networkControl?.touched) {
       return networkControl;
@@ -1949,7 +1988,7 @@ export class Cashier extends BaseComponent implements OnInit {
     return null;
   }
 
-  isPaid = signal<boolean>(true);
+  isPaid = signal<boolean>(false);
 
   isPaidListener = effect(() => {
     let validators: ValidatorFn[] = [];

@@ -21,6 +21,8 @@ import {
 } from '@/features/accounts/services/financial-account-service';
 import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { noSymbolsAllowed } from '@/yn-ng';
+import { SpaceTypeEnum } from '@/features/replacements/services/replacements-service';
+import { OrderCollectionCalculationsService } from '../../services/order-collection-calculations-service';
 
 @Component({
   selector: 'app-collection-dialog',
@@ -49,6 +51,7 @@ export class CollectionDialog extends BaseComponent {
   collectPersonDelivery = this.collectionsService.collectPersonDelivery;
   collectCompanyDelivery = this.collectionsService.collectCompanyDelivery;
   orderService = inject(OrderService);
+  ordersCollectionsCaluclationsService=inject(OrderCollectionCalculationsService)
   currentBill = this.collectionsService.currentBill;
   isCollectionInvoiceDialogVisible = this.collectionsService.isCollectionInvoiceDialogVisible;
 
@@ -67,7 +70,8 @@ export class CollectionDialog extends BaseComponent {
         }, 0)
         .toFixed(2);
     } else {
-      return +(this.currentBill()?.summary.totalNet ?? 0).toFixed(2);
+      if(!this.currentBill()) return 0
+      return this.ordersCollectionsCaluclationsService.calculateBillNet(this.currentBill()!)
     }
   });
   isDeliveryDialog = this.collectionsService.isDeliveryDialog;
@@ -124,9 +128,9 @@ export class CollectionDialog extends BaseComponent {
       return;
     }
 
-    const cashPaymentAmount = (+(this.paymentFg.get('cashPaymentAmount')?.value ?? 0)).toFixed(2);
-    const networkPaymentAmount = (+(this.paymentFg.get('networkPaymentAmount')?.value ?? 0)).toFixed(2);
-    let formValue: any = { ...this.paymentFg.value, cashPaymentAmount, networkPaymentAmount };
+    const cashPaymentAmount = (+(this.paymentFg.get('cashPaymentAmount')?.value ?? 0));
+    const networkPaymentAmount = (+(this.paymentFg.get('networkPaymentAmount')?.value ?? 0));
+    let formValue: any = { ...this.paymentFg.value, cashPaymentAmount, networkPaymentAmount, collectionDate: this.localDateIso };
     //        orderId: ,
 
     switch (this.currentDeliveryType()) {
@@ -150,6 +154,7 @@ export class CollectionDialog extends BaseComponent {
         break;
       case null:
       default:
+        console.log('non delivery');
         formValue = { ...formValue, orderId: this.currentBill()!.id };
         this.collectNonDelivery(formValue).subscribe({
           next: (value) => {
@@ -367,6 +372,7 @@ export class CollectionDialog extends BaseComponent {
     const cashControl = this.paymentFg.get('cashPaymentAmount');
     const networkControl = this.paymentFg.get('networkPaymentAmount');
     // console.log(this.currentBill());
+    
     if (this.currentBill() || this.checkedOrderIds().length > 0) {
       validators = [];
       this.paymentFg.patchValue({

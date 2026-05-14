@@ -1,8 +1,17 @@
 import { IOrderBillReadResponse } from '@/features/orders';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, input, viewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  ElementRef,
+  inject,
+  input,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { BaseComponent } from '../../../../components/base-component/base-component';
 import { DatePipe } from '@angular/common';
 import { ImgFallback } from '@/directives/img-fallback';
+import { OrderCollectionCalculationsService } from '@/features/collections/services/order-collection-calculations-service';
 
 @Component({
   selector: 'app-printable-order-invoice',
@@ -13,6 +22,7 @@ import { ImgFallback } from '@/directives/img-fallback';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class PrintableOrderInvoice extends BaseComponent {
+  orderCollectionCalculationService = inject(OrderCollectionCalculationsService);
   data = input<IOrderBillReadResponse | null>();
   html = viewChild<ElementRef<HTMLElement>>('printableOrderInvoice');
   styles = `
@@ -111,4 +121,6 @@ export class PrintableOrderInvoice extends BaseComponent {
 
     this.loaded = true;
   }
+
+  getFinalNet = this.orderCollectionCalculationService.calculateBillNet;
 }

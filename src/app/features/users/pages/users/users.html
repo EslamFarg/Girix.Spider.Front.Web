@@ -54,14 +54,15 @@
         <td>{{ getRowNumber($index, usersPaginationInfo.pageIndex) }}</td>
         <td>{{ item.name }}</td>
         <td>{{ item.phoneNumber }}</td>
-        <td>مدير</td>
         <td>
-          @if ($even) {
-            نشط
-          } @else {
-            غير نشط
+          @switch (item.groupId) {
+            @case (Role.Admin) {ادمن}
+            @case (Role.Cashier){كاشير}
+            @case (Role.Waiter){واتير}
+            @default {غير محدد}
           }
         </td>
+        <td>{{item.isActive ? 'مفعل' : 'غير مفعل'}}</td>
         <td>
           <div class="actions">
             <a [routerLink]="`/users/${item.userId}/edit`" class="edit">

@@ -48,23 +48,6 @@ html, body {
   overflow: hidden;
 }
 
-/* Push PrimeNG toasts down when custom title bar is present */
-body.electron .p-toast {
-  top: 40px !important;
-}
-
-body.electron .p-toast-top-right {
-  top: 40px !important;
-}
-
-body.electron .p-toast-top-left {
-  top: 40px !important;
-}
-
-body.electron .p-toast-top-center {
-  top: 40px !important;
-}
-
 body {
   font-family: 'Cairo', sans-serif !important;
 }

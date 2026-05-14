@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { TitleBar } from './components/title-bar/title-bar';
+
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
@@ -56,19 +56,23 @@ declare global {
 
       // Listen for maximize/unmaximize events
       onWindowMaximized: (callback: (isMaximized: boolean) => void) => () => void;
+      showContextMenu: (options: {  x: number; y: number }) => Promise<void>;
     };
   }
 }
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ConfirmDialogModule, ToastModule, CollectionDialog, PrintDialog, TitleBar],
+  imports: [RouterOutlet, ConfirmDialogModule, ToastModule, CollectionDialog, PrintDialog],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers: [],
+  host: {
+    '(window:contextmenu)': 'window.electronAPI?.showContextMenu({ x: $event.clientX, y: $event.clientY })',
+  }
 })
 export class App {
   protected readonly title = signal('restaurant-dashboard-angular');
-
+  window=window
   private translate = inject(TranslateService);
   keyboardService = inject(KeyboardService);
   router = inject(Router);
@@ -76,6 +80,7 @@ export class App {
   isAuthenticated = this.authService.isAuthenticated;
   isElectron = signal(typeof window !== 'undefined' && !!window.electronAPI);
   constructor() {
+    
     if (this.isElectron()) {
       document.body.classList.add('electron');
     }

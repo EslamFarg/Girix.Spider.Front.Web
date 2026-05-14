@@ -184,7 +184,7 @@
       }
     </section>
   } @else {
-    <app-printable-order-invoice [data]="currentBill()" />
+    <app-printable-order-invoice [data]="currentBill()"  class="[&_.paid-cash,&_.paid-network]:hidden"/>
   }
 
   <form [formGroup]="paymentFg" class="flex flex-col gap-4 py-4">

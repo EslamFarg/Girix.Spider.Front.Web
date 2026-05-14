@@ -19,6 +19,7 @@ export class HutCard {
   HutStatus = HutStatus;
 
   data = input.required<IHutSearchRow>();
+  active = input<boolean>(false);
   // id: number;
   // name: string;
   // pricePerHour: number;
@@ -111,6 +112,7 @@ export class HutCard {
   ngOnInit() {}
 
   hutStatusClass = computed(() => {
+    if(this.active()) return 'hut-available active';
     switch (this.hutStatus()) {
       case HutStatus.Available:
         return 'hut-available';

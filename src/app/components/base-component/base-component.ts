@@ -10,7 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { SpaceTypeEnum } from '@/features/replacements/services/replacements-service';
 import { BehaviorSubject, debounceTime, Observable, Subject } from 'rxjs';
 import { LoadingService } from '@/yn-ng/services/loading-service';
-import { AmountType } from '@/core/enums';
+import { AmountType, Role } from '@/core/enums';
 export interface IPaginationInfo {
   pageIndex: number;
   totalRowsCount: number;
@@ -38,6 +38,7 @@ export class BaseComponent {
   localSpaceTypeEnum = SpaceTypeEnum;
   FormMode = FormMode;
   AmountType = AmountType;
+  Role=Role;
   //
   nullableFb = inject(FormBuilder);
   fb = this.nullableFb.nonNullable;

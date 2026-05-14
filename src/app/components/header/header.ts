@@ -8,6 +8,8 @@ import { Menu } from 'primeng/menu';
 import { ProgressBarModule, ProgressBar } from 'primeng/progressbar';
 import { LayoutService } from '@/layouts/services/layout-service';
 import { MessageModule } from 'primeng/message';
+import { Role } from '@/core';
+import { AllowedRolesDirective } from "@/directives/allowed-roles";
 
 export interface IMainNavItem {
   labelKey: string;
@@ -16,6 +18,7 @@ export interface IMainNavItem {
   routerLink: string;
   children?: ISubNavItem[];
   isLink?: boolean;
+  roles: number[];
 }
 
 export interface ISubNavItem {
@@ -23,17 +26,12 @@ export interface ISubNavItem {
   imgUrl: string;
   routerLink: string;
   subLinks?: string[];
+  roles: number[];
 }
 
 @Component({
   selector: 'app-header',
-  imports: [
-    ImgFallback,
-    RouterLink,
-    Menu,
-    ProgressBar,
-    MessageModule,
-  ],
+  imports: [ImgFallback, RouterLink, Menu, ProgressBar, MessageModule, AllowedRolesDirective],
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
@@ -57,290 +55,356 @@ export class Header extends BaseComponent implements AfterViewInit {
   ];
 
   navItems: IMainNavItem[] = [
+    // home
     {
       labelKey: 'HOME',
       imgUrl: headerIcons.home.imgUrl,
       routerLink: '/',
       isLink: true,
+      roles: [Role.Admin, Role.Cashier, Role.Waiter],
     },
+    // daily journal
     {
       labelKey: 'DAILY_JOURNAL',
       imgUrl: headerIcons.dailyJournal.imgUrl,
       routerLink: '/daily-journal',
       isLink: true,
+      roles: [Role.Admin, Role.Cashier],
     },
+    // invoices
     {
       labelKey: 'INVOICES',
       imgUrl: headerIcons.invoices.imgUrl,
       routerLink: '/invoices',
+      roles: [Role.Admin, Role.Cashier],
       children: [
         {
           labelKey: 'ORDERS',
           imgUrl: headerIcons.invoices.children.orders,
           routerLink: '/invoices/orders',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'REFUNDS',
           imgUrl: headerIcons.invoices.children.refunds,
           routerLink: '/invoices/refunds',
+          roles: [Role.Admin, Role.Cashier],
         },
       ],
     },
+    // classes
     {
       labelKey: 'CLASSES',
       imgUrl: headerIcons.classes.imgUrl,
       routerLink: '/classes',
+      roles: [Role.Admin, Role.Cashier],
       children: [
         {
           labelKey: 'PRODUCTS',
           imgUrl: headerIcons.classes.children.products,
           routerLink: '/classes/products',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'MEALS',
           imgUrl: headerIcons.classes.children.meals,
           routerLink: '/classes/meals',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'GROUPS',
           imgUrl: headerIcons.classes.children.groups,
           routerLink: '/classes/groups',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'COMPONENTS',
           imgUrl: headerIcons.classes.children.components,
           routerLink: '/classes/product-components',
+          roles: [Role.Admin, Role.Cashier],
         },
       ],
     },
+    // restaurant
     {
       labelKey: 'RESTAURANT',
       imgUrl: headerIcons.restaurant.imgUrl,
       routerLink: '/restaurant',
+      roles: [Role.Admin, Role.Cashier],
       children: [
         {
           labelKey: 'TABLES',
           imgUrl: headerIcons.restaurant.children.tables,
           routerLink: '/restaurant/tables',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'HUTS',
           imgUrl: headerIcons.restaurant.children.huts,
           routerLink: '/restaurant/huts',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'ROOMS',
           imgUrl: headerIcons.restaurant.children.rooms,
           routerLink: '/restaurant/rooms',
+          roles: [Role.Admin, Role.Cashier],
         },
       ],
     },
+    // customers
     {
       labelKey: 'CUSTOMERS',
       imgUrl: headerIcons.customers.imgUrl,
       routerLink: '/customers',
+      roles: [Role.Admin, Role.Cashier],
       children: [
         {
           labelKey: 'ADD_CUSTOMER',
           imgUrl: headerIcons.customers.children.add,
           routerLink: '/customers/add',
+          roles: [Role.Admin, Role.Cashier],
         },
       ],
     },
+    // storage
     {
       labelKey: 'STORAGE',
       imgUrl: headerIcons.storage.imgUrl,
       routerLink: '/storage',
+      roles: [Role.Admin, Role.Cashier],
       children: [
         {
           labelKey: 'OPENING_BALANCES',
           imgUrl: headerIcons.storage.children.openingBalances,
           routerLink: '/storage/opening-balances',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'PURCHASES',
           imgUrl: headerIcons.storage.children.purchases,
           routerLink: '/storage/purchases',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'PURCHASES_REFUNDS',
           imgUrl: headerIcons.storage.children.purchasesRefunds,
           routerLink: '/storage/purchases-returns',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'INVENTORY',
           imgUrl: headerIcons.storage.children.inventory,
           routerLink: '/storage/inventory',
+          roles: [Role.Admin, Role.Cashier],
         },
       ],
     },
+    // replacements
     {
       labelKey: 'REPLACEMENTS',
       imgUrl: headerIcons.replacements.imgUrl,
       routerLink: '/replacements',
+      roles: [Role.Admin, Role.Cashier, Role.Waiter],
       children: [
         {
           labelKey: 'ROOMS',
           imgUrl: headerIcons.replacements.children.rooms,
           routerLink: '/replacements/rooms',
+          roles: [Role.Admin, Role.Cashier, Role.Waiter],
         },
         {
           labelKey: 'HUTS',
           imgUrl: headerIcons.replacements.children.huts,
           routerLink: '/replacements/huts',
+          roles: [Role.Admin, Role.Cashier, Role.Waiter],
         },
         {
           labelKey: 'TABLES',
           imgUrl: headerIcons.replacements.children.tables,
           routerLink: '/replacements/tables',
+          roles: [Role.Admin, Role.Cashier, Role.Waiter],
         },
       ],
     },
+    // collections
     {
       labelKey: 'COLLECTIONS',
       imgUrl: headerIcons.collections.imgUrl,
       routerLink: '/collections',
+      roles: [Role.Admin, Role.Cashier, Role.Waiter],
       children: [
         {
           labelKey: 'ALL',
           imgUrl: headerIcons.collections.children.all,
           routerLink: '/collections/all',
+          roles: [Role.Admin, Role.Cashier, Role.Waiter],
         },
         {
           labelKey: 'TABLES',
           imgUrl: headerIcons.collections.children.tables,
           routerLink: '/collections/tables',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'ROOMS',
           imgUrl: headerIcons.collections.children.rooms,
           routerLink: '/collections/rooms',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'HUTS',
           imgUrl: headerIcons.collections.children.huts,
           routerLink: '/collections/huts',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'DELIVERIES',
           imgUrl: headerIcons.collections.children.deliveries,
           routerLink: '/collections/deliveries',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'COMPANIES',
           imgUrl: headerIcons.collections.children.deliveries,
           routerLink: '/collections/company-deliveries',
+          roles: [Role.Admin, Role.Cashier],
         },
       ],
     },
+    // accounts
     {
       labelKey: 'ACCOUNTS',
       imgUrl: headerIcons.accounts.imgUrl,
       routerLink: '/accounts',
+      roles: [Role.Admin],
       children: [
         {
           labelKey: 'JOURNALS',
           imgUrl: headerIcons.accounts.children.journals,
           routerLink: '/accounts/journals',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'COLLECTIVE_RECEIPTS',
           imgUrl: headerIcons.accounts.children.collectiveReceipts,
           routerLink: '/accounts/collective-receipts',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'COLLECTIVE_PAYMENTS',
           imgUrl: headerIcons.accounts.children.collectivePayments,
           routerLink: '/accounts/collective-payments',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'ACCOUNTS_TREE',
           imgUrl: headerIcons.accounts.children.accountsTree,
           routerLink: '/accounts/accounts-tree',
+          roles: [Role.Admin, Role.Cashier],
         },
       ],
     },
+    // deliveries
     {
       labelKey: 'DELIVERY',
       imgUrl: headerIcons.deliveries.imgUrl,
       routerLink: '/deliveries',
+      roles: [Role.Admin],
       children: [
         {
           labelKey: 'DELIVERY_MEN',
           imgUrl: headerIcons.deliveries.children.deliveryMen,
           routerLink: '/deliveries/delivery-men',
+          roles: [Role.Admin],
         },
       ],
     },
+    // users
     {
       labelKey: 'USERS',
       imgUrl: headerIcons.users.imgUrl,
       routerLink: '/users',
+      roles: [Role.Admin],
       children: [
         {
           labelKey: 'ADD_USER',
           imgUrl: headerIcons.users.children.add,
           routerLink: '/users/add',
+          roles: [Role.Admin],
         },
       ],
     },
+    // settings
     {
       labelKey: 'SETTINGS',
       imgUrl: headerIcons.settings.imgUrl,
       routerLink: '/settings',
+      roles: [Role.Admin, Role.Cashier, Role.Waiter],
       children: [
         {
           labelKey: 'PROGRAM',
           imgUrl: headerIcons.settings.children.program,
           routerLink: '/settings/program',
           subLinks: ['/settings/program/language', '/settings/program/support', '/settings/program/about'],
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'FINANCIAL',
           imgUrl: headerIcons.settings.children.financial,
           routerLink: '/settings/financial',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'DAILY_JOURNAL',
           imgUrl: headerIcons.settings.children.dailyJournal,
           routerLink: '/settings/manage-daily-journal',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'QR',
           imgUrl: headerIcons.settings.children.qr,
           routerLink: '/settings/qr',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'DEFAULT_ACCOUNTS',
           imgUrl: headerIcons.settings.children.defaultAccounts,
           routerLink: '/settings/default-accounts',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'ADD_PRINTER',
           imgUrl: headerIcons.settings.children.addPrinter,
           routerLink: '/settings/add-printer',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'PRINTER',
           imgUrl: headerIcons.settings.children.printerSettings,
           routerLink: '/settings/printer',
+          roles: [Role.Admin, Role.Cashier],
         },
       ],
     },
+    // app info
     {
       labelKey: 'APP_INFO',
       imgUrl: headerIcons.appInfo.imgUrl,
       routerLink: '/app-info',
+      roles: [Role.Admin, Role.Cashier],
       children: [
         {
           labelKey: 'PROFILE',
           imgUrl: headerIcons.appInfo.children.profile,
           routerLink: '/app-info/profile',
+          roles: [Role.Admin, Role.Cashier],
         },
         {
           labelKey: 'RESTAURANT',
           imgUrl: headerIcons.appInfo.children.restaurant,
           routerLink: '/app-info/restaurant',
+          roles: [Role.Admin, Role.Cashier],
         },
       ],
     },

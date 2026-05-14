@@ -96,7 +96,7 @@
       <!-- location btns -->
       <div class="flex gap-2 w-full min-h-[34px]" [class.hidden]="!isCreateMode()">
         <!-- سفري group -->
-        <div class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300" [class.flex-1]="!localRadio.checked"
+        <div [appAllowedRoles]="[Role.Cashier,Role.Admin]" class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300" [class.flex-1]="!localRadio.checked"
           [class.w-20]="localRadio.checked" [class.segmented-group]="takeAwayRadio.checked">
           <input type="radio" hidden name="orderType" id="takeAway" [value]="OrderLocationType.Takeaway" #takeAwayRadio
             formControlName="orderType" />
@@ -138,7 +138,7 @@
         </div>
     
         <!-- توصيل group -->
-        <div class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300" [class.flex-1]="!localRadio.checked"
+        <div [appAllowedRoles]="[Role.Cashier,Role.Admin]" class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300" [class.flex-1]="!localRadio.checked"
           [class.w-20]="localRadio.checked" [class.segmented-group]="deliveryRadio.checked">
           <input type="radio" hidden #deliveryRadio name="orderType" id="delivery" formControlName="orderType"
             [value]="OrderLocationType.PersonDelivery" />
@@ -160,7 +160,7 @@
       <div class="w-full flex-1 overflow-hidden pb-0.5">
         <div class="h-full overflow-auto no-scrollbar">
           <table class="text-dark-bg-2 text-center min-w-full">
-            <thead>
+            <thead class="select-none">
               <tr class="border-b border-text-gray *:pb-2 *:text-xs *:font-bold">
                 <th></th>
                 <th class="px-2">الصنف</th>
@@ -384,7 +384,7 @@
       </app-input-error-message-handler>
       <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
         <button
-          (click)="openNumbersKeyboard()"
+          (click)="toggleNumbersKeyboard()"
           type="button"
           pButton
           class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
@@ -395,20 +395,19 @@
       </app-input-error-message-handler>
     </div>
   </form>
-
- 
 </div>
- <p-drawer
-    [(visible)]="isMenuVisible"
-    header=""
-    position="right"
-    [maskStyle]="{ 'z-index': 1 }"
-    styleClass="w-full! bg-white! "
-    class="no-scrollbar [&_.p-drawer-content]:ps-0!"
-    [style]="{ zIndex: 1111 }"
-  >
-    <app-menu (menuItemChange)="onMenuItemChange($event)" [groups]="groups()" [pickedItems]="orderMenuItems()" />
-  </p-drawer>
+
+<p-drawer
+  [(visible)]="isMenuVisible"
+  header=""
+  position="right"
+  [maskStyle]="{ 'z-index': 1 }"
+  styleClass="w-full! bg-white! "
+  class="no-scrollbar [&_.p-drawer-content]:ps-0!"
+  [style]="{ zIndex: 1111 }"
+>
+  <app-menu (menuItemChange)="onMenuItemChange($event)" [groups]="groups()" [pickedItems]="orderMenuItems()" />
+</p-drawer>
 
 <!--  -->
 <!-- dialogs ahmed -->
@@ -552,7 +551,7 @@
   >
     <div class="h-fit grid mt-10  items-center justify-center  grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-[90px_20px]">
       @for (item of huts(); track $index) {
-        <app-hut-card [data]="item" (click)="onHutSelected(item)" class="max-w-full!" />
+        <app-hut-card [active]="item.id == currentHut()?.id" [data]="item" (click)="onHutSelected(item)" class="max-w-full!" />
       }
     </div>
   </div>
@@ -631,7 +630,7 @@
   >
     <div class="h-fit grid mt-10  items-center justify-center  grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
       @for (item of rooms(); track $index) {
-        <app-room-card [data]="item" (click)="onRoomSelected(item)" class="max-w-full" />
+        <app-room-card [active]="item.id == currentRoom()?.id" [data]="item" (click)="onRoomSelected(item)" class="max-w-full" />
       }
     </div>
   </div>
@@ -670,7 +669,7 @@
   >
     <div class="h-fit grid mt-10  items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
       @for (item of tables(); track $index) {
-        <app-table-card [data]="item" (click)="onTableSelected(item)" class="max-w-full" />
+        <app-table-card [active]="item.id == currentTable()?.id" [data]="item" (click)="onTableSelected(item)" class="max-w-full" />
       }
     </div>
   </div>
@@ -788,7 +787,8 @@
         <div
           class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4 border-b border-b-text-light pb-4 [&_input]:w-5 [&_input]:aspect-square"
         >
-          <div class="flex items-center gap-1">
+        <!-- paid -->
+          <div  [appAllowedRoles]="[Role.Cashier,Role.Admin]"  class="flex items-center gap-1">
             <input
               type="radio"
               name="isPaid"
@@ -800,6 +800,7 @@
             />
             <label for="paymentInfoPaid">{{ 'FORM.PAID' | translate }}</label>
           </div>
+          <!-- postponed -->
           <div class="flex items-center gap-1">
             <input
               [disabled]="orderLocationType() == OrderLocationType.Takeaway"

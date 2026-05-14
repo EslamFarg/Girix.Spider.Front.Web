@@ -56,10 +56,8 @@
           <tr>
             <th>#</th>
             <th>رقم الفاتورة</th>
-            <th>وقت الطلب</th>
-            <th>اسم العميل</th>
-            <th>رقم العميل</th>
-            <th>موقع الطلب</th>
+            <th>وقت الطلب</th>           
+            <th>نوع الدفع</th>
             <th>حاله الفاتورة</th>
             <th>المدفوع كاش</th>
             <th>المدفوع شبكة</th>
@@ -81,24 +79,32 @@
                 <div>{{ order.createdAt | date: 'dd/MM/yyyy h:mm a' }}</div>
               </td>
               <td>
-                <div>{{ order.customerName }}</div>
-              </td>
-              <td>
-                <div>{{ order.customerPhone }}</div>
-              </td>
-              <td>
-                <div>{{ order.customerAdress }}</div>
+                @switch (order.paymentType) {
+                  @case (OrderPaymentType.Paid) {
+                    <div class="status active">
+                      <span></span>
+                      <span>مدفوع</span>
+                    </div>
+                  }
+                  @case (OrderPaymentType.Pending) {
+                    <div class="status in-active">
+                      <span></span>
+                      <span>معلق</span>
+                    </div>
+                  }
+                }
+                
               </td>
               <td>
                 @if (order.isCollected) {
                   <div class="status active">
                     <span></span>
-                    <span>مدفوع</span>
+                    <span>محصل</span>
                   </div>
                 } @else {
-                  <div class="status inActive">
+                  <div class="status in-active">
                     <span></span>
-                    <span>غير مدفوع</span>
+                    <span>غير محصل</span>
                   </div>
                 }
               </td>

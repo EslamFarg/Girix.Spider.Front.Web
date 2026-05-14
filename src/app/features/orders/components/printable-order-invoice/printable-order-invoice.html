@@ -130,14 +130,14 @@
             <tr class="border-b" style="border-bottom-width: 2px">
               <td>الاجمالي بالضريبة (الصافي)</td>
               <td></td>
-              <td>{{ data()?.summary?.totalNet?.toFixed(2) }}</td>
+              <td>{{ data()?getFinalNet(data()!).toFixed(2):0 }}</td>
             </tr>
-            <tr class="border-b">
+            <tr class="border-b paid-cash">
               <td>مدفوع كاش</td>
               <td></td>
               <td>{{ data()?.payments?.payingCash?.toFixed(2) ?? 0 }}</td>
             </tr>
-            <tr>
+            <tr class=" paid-network">
               <td>مدفوع شبكة</td>
               <td></td>
               <td>{{ data()?.payments?.payingNetwork?.toFixed(2) ?? 0 }}</td>

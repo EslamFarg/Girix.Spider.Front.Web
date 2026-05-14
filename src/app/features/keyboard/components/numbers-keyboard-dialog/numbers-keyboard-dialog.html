@@ -1,5 +1,6 @@
 <p-dialog
-  [(visible)]="keyboardService.isNumbersKeyboardVisible"
+  [visible]="keyboardService.isNumbersKeyboardVisible()"
+  (visibleChange)="keyboardService.isNumbersKeyboardVisible.set($event)"
   (onHide)="closeKeyboard()"
   [draggable]="true"
   [modal]="true"

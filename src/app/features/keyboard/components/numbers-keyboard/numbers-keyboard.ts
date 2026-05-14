@@ -14,7 +14,7 @@ import { ButtonDirective } from "primeng/button";
 export class NumbersKeyboard extends BaseComponent {
   keyboardService = inject(KeyboardService);
 
-  isVisible = this.keyboardService.isNumbersKeyboardVisible;
+  isVisible = this.keyboardService.isNumbersKeyboardVisible();
   closeKeyboard = this.keyboardService.closeNumbersKeyboard;
 
   btns = this.keyboardService.btns;

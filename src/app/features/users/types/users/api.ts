@@ -25,11 +25,17 @@ export interface IUserCreateUpdateRequest {
 
 
 export interface IUserRowResponse {
-  userId: number;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  groupId: number;
+  userId: number
+  name: string
+  email: string
+  phoneNumber: string
+  imageUrl: any
+  isActive: boolean
+  cashierCollectionAccountId: number
+  custodyAccountId: number
+  cashPaymentAccountId: number
+  bankPaymentAccountId: number
+  groupId: number
 }
 
 export interface IUserSearchResponseValue {

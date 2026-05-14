@@ -12,10 +12,11 @@
 }
 .table-available {
   --color: black;
+  &.active ,
   &:hover {
-    --color: 80, 209, 170;
+    --color: 80, 209, 170 !important;
     & .bordered {
-      border-color: rgb(var(--color));
+      border-color: rgb(var(--color)) !important;
     }
   }
   border-color: rgb(var(--color));
