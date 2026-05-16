@@ -43,15 +43,20 @@ export class Header extends BaseComponent implements AfterViewInit {
   userDetails = this.authService.userDetails;
   popUpMenuItems: MenuItem[] = [
     {
-      label: 'الاجاراءات',
-      items: [
-        {
           label: 'تسجيل الخروج',
           icon: 'pi pi-sign-out',
           command: (event) => this.onLogoutClick(event.originalEvent!),
         },
-      ],
-    },
+    // {
+    //   // label: 'الاجاراءات',
+    //   items: [
+    //     {
+    //       label: 'تسجيل الخروج',
+    //       icon: 'pi pi-sign-out',
+    //       command: (event) => this.onLogoutClick(event.originalEvent!),
+    //     },
+    //   ],
+    // },
   ];
 
   navItems: IMainNavItem[] = [

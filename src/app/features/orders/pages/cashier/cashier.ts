@@ -150,6 +150,11 @@ interface IOrderCreateFgValue {
 export class Cashier extends BaseComponent implements OnInit {
   //
   //
+  // template helpers
+  //
+  Math = Math;
+  //
+  //
   // enums
   //
   OrderLocationType = OrderLocationType;
@@ -343,7 +348,7 @@ export class Cashier extends BaseComponent implements OnInit {
     // });
   }
 
-  resetData(){
+  resetData() {
     this.searchHuts(1);
     this.searchRooms(1);
     this.searchTables(1);
@@ -401,7 +406,7 @@ export class Cashier extends BaseComponent implements OnInit {
     // } else {
     // }
   }
-  
+
   test() {
     // window.electronAPI.getPrinters().then((e) => console.log(e));
   }
@@ -455,6 +460,12 @@ export class Cashier extends BaseComponent implements OnInit {
     console.log('valid order');
     switch (this.formMode()) {
       case FormMode.Create:
+        if (this.orderFg.value.orderType == OrderLocationType.DineIn) {
+          if (!this.orderFg.value.placeRefId) {
+            this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم اختيار المكان' });
+            return;
+          }
+        }
         this.orderService.create({ ...this.orderFg.value, createAt: this.localDateIso }).subscribe({
           next: (res) => {
             this.lastCreatedOrder.set(res);
@@ -892,12 +903,15 @@ export class Cashier extends BaseComponent implements OnInit {
     return this.orderMenuItems().reduce((total, item) => total + this.getMenuItemNetValue(item), 0);
   });
 
+  netPreview = computed(
+    () => this.orderItemsNet() + this.hutNet() + this.serviceFee() + this.deliveryFee() - this.itemsDiscountAmount(),
+  );
+
   net = computed(() => {
     const net =
       this.orderItemsNet() + this.hutNet() + this.serviceFee() + this.deliveryFee() - this.itemsDiscountAmount();
 
-    return this.isPaid()?net:0;
-
+    return this.isPaid() ? net : 0;
   });
 
   netListener = effect(() => {
@@ -1989,6 +2003,16 @@ export class Cashier extends BaseComponent implements OnInit {
   }
 
   isPaid = signal<boolean>(false);
+
+  // Amount received from customer (for change calculation only)
+  amountReceived = signal<number>(0);
+
+  // Calculate change (positive = return to customer, negative = still required)
+  changeAmount = computed(() => {
+    const received = this.amountReceived() ?? 0;
+    const total = this.net() ?? 0;
+    return received - total;
+  });
 
   isPaidListener = effect(() => {
     let validators: ValidatorFn[] = [];

@@ -59,6 +59,8 @@ export class Menu extends BaseComponent {
   groups = input<IGroupSearchRow[]>([]);
   menuItemChange = output<IOrderMenuItem>();
   pickedItems = input<IOrderMenuItem[]>([]);
+  options =input<{continueBtn: boolean}>({continueBtn: false});
+  onContinue = output<boolean>();
 
   menuItems = signal<IMenuItem[]>([]);
 
