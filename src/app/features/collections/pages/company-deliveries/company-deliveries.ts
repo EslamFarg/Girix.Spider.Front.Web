@@ -1,7 +1,7 @@
 import { BaseComponent, IPaginationInfo, SectionWrapper } from '@/components';
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
 import { ICustomerSearchRow } from '@/features/customers/services/customer-types';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -49,6 +49,15 @@ export class CompanyDeliveries extends BaseComponent {
     super();
 
     this.searchCustomers(1);
+
+    effect(() => {
+      const collectedIds = this.collectionsService.collectedOrderIds();
+      if (collectedIds.length > 0) {
+        this.customers.update((rows) =>
+          rows.map((c) => (c.id === this.collectionsService.currentDeliveryId() ? { ...c, orderNumbers: Math.max(0, c.orderNumbers - collectedIds.length) } : c)),
+        );
+      }
+    });
   }
   customersService = inject(CustomerService);
 

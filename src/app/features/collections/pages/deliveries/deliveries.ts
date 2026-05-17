@@ -1,5 +1,5 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { CollectionsService } from '../../services/collections-service';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
@@ -67,6 +67,15 @@ export class Deliveries extends BaseComponent {
     super();
 
     this.searchDeliverys(1);
+
+    effect(() => {
+      const collectedIds = this.collectionsService.collectedOrderIds();
+      if (collectedIds.length > 0) {
+        this.deliveryMen.update((rows) =>
+          rows.map((d) => (d.id === this.collectionsService.currentDeliveryId() ? { ...d, orderNumber: Math.max(0, d.orderNumber - collectedIds.length) } : d)),
+        );
+      }
+    });
   }
 
   companyFilter = [

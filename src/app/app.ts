@@ -40,6 +40,7 @@ declare global {
       getBluetoothPrinters: () => Promise<IBluetoothPrinter[]>;
       ping: (msg: unknown) => Promise<unknown>;
       print: (msg: IElectonPrintOptions) => Promise<string[]>;
+      testPrinterConnection: (printer: IElectronPrinter) => Promise<{ success: boolean; message: string }>;
       saveLink: (key: string, link: string) => Promise<{ key: string; link: string }>;
       getLink: (key: string) => Promise<{ key: string; link: string | null }>;
       getAllLinks: () => Promise<Record<string, string>>;

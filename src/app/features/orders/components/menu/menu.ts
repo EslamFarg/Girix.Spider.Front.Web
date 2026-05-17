@@ -1,5 +1,5 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { Component, computed, ElementRef, inject, input, model, output, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, input, model, output, signal, viewChild, OnDestroy } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
@@ -55,7 +55,7 @@ export interface IOrderMenuItem {
   templateUrl: './menu.html',
   styleUrl: './menu.css',
 })
-export class Menu extends BaseComponent {
+export class Menu extends BaseComponent implements OnDestroy {
   groups = input<IGroupSearchRow[]>([]);
   menuItemChange = output<IOrderMenuItem>();
   pickedItems = input<IOrderMenuItem[]>([]);
@@ -63,6 +63,8 @@ export class Menu extends BaseComponent {
   onContinue = output<boolean>();
 
   menuItems = signal<IMenuItem[]>([]);
+
+  private isLoadingMore = false;
 
   pickedItemCounts = computed(() => {
     const counts = new Map<string, number>();
@@ -100,6 +102,69 @@ export class Menu extends BaseComponent {
     const formHeight = +(this.form()?.nativeElement.offsetHeight ?? 0);
     const itemsContainerHeight = `calc(100% - ${navHeight + formHeight}px)`;
     this.itemsContainer()!.nativeElement.style.height = `${itemsContainerHeight}px`;
+    this.setupScrollObserver();
+  }
+
+  override ngOnDestroy() {
+    super.ngOnDestroy();
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout);
+    }
+    const container = this.itemsContainer()?.nativeElement;
+    if (container) {
+      container.removeEventListener('scroll', this.onScrollHandler);
+    }
+  }
+
+  private setupScrollObserver() {
+    const container = this.itemsContainer()?.nativeElement;
+    if (!container) return;
+
+    // Use a direct scroll listener — simpler and more reliable than IntersectionObserver for this case
+    container.addEventListener('scroll', this.onScrollHandler, { passive: true });
+  }
+
+  private scrollTimeout?: ReturnType<typeof setTimeout>;
+
+  private onScrollHandler = () => {
+    if (this.scrollTimeout) return; // Already have a pending check
+    this.scrollTimeout = setTimeout(() => {
+      this.scrollTimeout = undefined;
+      this.checkAndLoadMore();
+    }, 150);
+  };
+
+  private checkAndLoadMore() {
+    if (this.isLoadingMore) return;
+
+    const container = this.itemsContainer()?.nativeElement;
+    if (!container) return;
+
+    const scrollTop = container.scrollTop;
+    const clientHeight = container.clientHeight;
+    const scrollHeight = container.scrollHeight;
+
+    // Trigger when within 200px of the bottom
+    const threshold = 200;
+    const isNearBottom = scrollTop + clientHeight >= scrollHeight - threshold;
+
+    console.log('[Menu Scroll]', { scrollTop, clientHeight, scrollHeight, isNearBottom, pageIndex: this.menuItemsPaginationInfo.pageIndex, totalPages: this.menuItemsPaginationInfo.totalPagesCount, itemCount: this.menuItems().length });
+
+    if (isNearBottom) {
+      this.isLoadingMore = true;
+      this.loadMoreItems();
+    }
+  }
+
+  private loadMoreItems() {
+    const nextPage = this.menuItemsPaginationInfo.pageIndex + 1;
+    console.log('[Menu LoadMore]', { nextPage, totalPages: this.menuItemsPaginationInfo.totalPagesCount });
+    // Don't load if we've reached the end
+    if (nextPage > this.menuItemsPaginationInfo.totalPagesCount && this.menuItemsPaginationInfo.totalPagesCount > 0) {
+      this.isLoadingMore = false;
+      return;
+    }
+    this.searchProductsAndMeals(nextPage);
   }
 
   productsAndMealsService = inject(ProductsAndMealsService);
@@ -153,6 +218,7 @@ export class Menu extends BaseComponent {
   };
 
   searchProductsAndMeals(pageIndex: number) {
+    console.log('[Menu Search]', { requestedPage: pageIndex, isIdentical: this.isPreviousSearchCriteriaIdentical(), currentPage: this.menuItemsPaginationInfo.pageIndex });
     if (this.isPreviousSearchCriteriaIdentical()) {
       //handle stopping pagination if no more data
     } else {
@@ -187,12 +253,13 @@ export class Menu extends BaseComponent {
         next: (res) => {
           let newItems: IMenuItem[] = [];
           const length = res.value.menuItems.rows.length + res.value.meals.rows.length;
+          const mealsPages = res.value.meals.paginationInfo.totalPagesCount;
+          const itemsPages = res.value.menuItems.paginationInfo.totalPagesCount;
+          console.log('[Menu Response]', { pageIndex, mealsCount: res.value.meals.rows.length, itemsCount: res.value.menuItems.rows.length, mealsPages, itemsPages });
           if (length > 0) {
             this.menuItemsPaginationInfo = {
               pageIndex,
-              totalPagesCount:
-                (res.value.meals.paginationInfo.totalPagesCount + res.value.menuItems.paginationInfo.totalPagesCount) /
-                2,
+              totalPagesCount: Math.max(mealsPages, itemsPages),
               totalRowsCount:
                 (res.value.meals.paginationInfo.totalRowsCount + res.value.menuItems.paginationInfo.totalRowsCount) / 2,
             };
@@ -213,13 +280,15 @@ export class Menu extends BaseComponent {
 
           this.previousSearchCriteria = this.menuSearchFg.getRawValue();
 
-          const menuEl = this.itemsContainer()!.nativeElement;
-
-          // setTimeout(() => {
-          //   const newScrollTop = menuEl.scrollHeight - menuEl.clientHeight - 2;
-
-          //   menuEl.scrollTop = newScrollTop;
-          // }, 500);
+          // Check if we need to load more (content doesn't fill viewport)
+          // Use setTimeout to ensure DOM has updated with new items
+          setTimeout(() => {
+            this.isLoadingMore = false;
+            this.checkAndLoadMore();
+          }, 50);
+        },
+        error: () => {
+          this.isLoadingMore = false;
         },
       });
   }
@@ -242,13 +311,6 @@ export class Menu extends BaseComponent {
       meal: meal,
       quantity: 1,
     };
-  }
-
-  onMenuScroll(event: Event, menuContainer: HTMLElement) {
-    if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
-      // if at bottom
-      this.searchProductsAndMeals(this.menuItemsPaginationInfo.pageIndex + 1);
-    }
   }
 
   onSubmitSearch() {

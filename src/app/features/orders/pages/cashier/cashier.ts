@@ -989,6 +989,12 @@ export class Cashier extends BaseComponent implements OnInit {
     this.keyboardService.triggerNumbersKeyboard(input);
   }
 
+  // Local numbers keyboard visibility for payment dialog
+  isPaymentNumbersKeyboardVisible = signal(false);
+  togglePaymentNumbersKeyboard() {
+    this.isPaymentNumbersKeyboardVisible.update((v) => !v);
+  }
+
   //
   //
   //

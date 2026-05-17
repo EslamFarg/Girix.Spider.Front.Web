@@ -1,6 +1,6 @@
-<div class="ps-4 h-full no-scrollbar overflow-auto" [class.cursor-wait]="isLoading()">
+<div class=" h-full no-scrollbar overflow-auto" [class.cursor-wait]="isLoading()">
   <section class="borde1r no-scrollbar overflow-auto border-text-lig1ht rounded-[8px] pt-5 flex flex-col gap-3 h-full">
-    <div class="flex gap-2">
+    <div class="flex ps-4 gap-2">
       <div class="flex-1 flex flex-col gap-2">
         <!-- search -->
         <form #form [formGroup]="menuSearchFg" appDebounce [domEvents]="['submit']" (debounced)="onSubmitSearch()">
@@ -13,11 +13,12 @@
               placeholder="بحث"
               #search
             />
-            <p-inputgroup-addon class="p-0!">
-          <div class="relative flex items-center justify-center">
-            <!-- clear search -->
-            <i  class="pi pi-times cursor-pointer"  (click)="menuSearchFg.controls.searchTerm.setValue('')" ></i>
-            <!-- <svg
+            @if (menuSearchFg.controls.searchTerm.value) {
+              <p-inputgroup-addon class="p-0!">
+                <div class="relative flex items-center justify-center">
+                  <!-- clear search -->
+                  <i class="pi pi-times cursor-pointer" (click)="menuSearchFg.controls.searchTerm.setValue('')"></i>
+                  <!-- <svg
               (click)="filterMenu.toggle($event)"
               class="cursor-pointer"
               width="20"
@@ -31,7 +32,7 @@
                 fill="#7F7F7F"
               />
             </svg> -->
-            <!-- <p-menu
+                  <!-- <p-menu
               dir="rtl"
               [class]="`*:top-full! *:left-0! `"
               #filterMenu
@@ -39,8 +40,9 @@
               [popup]="true"
               [style]="{ insetInlineEnd: '100%' }"
             /> -->
-          </div>
-        </p-inputgroup-addon>
+                </div>
+              </p-inputgroup-addon>
+            }
 
             <p-inputgroup-addon class="p-0!">
               <button type="submit" class="cursor-pointer">
@@ -91,11 +93,8 @@
 
     <div
       #itemsContainer
-      class="no-scrollbar select-none overflow-auto scroll-smooth auto-rows-min pb-4 w-full grid  lg:grid-cols-[repeat(auto-fill,minmax(130px,1fr))]  gap-3.5 pt-10 h-full"
+      class="no-scrollbar ps-4 select-none overflow-auto scroll-smooth auto-rows-min pb-4 w-full grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-3.5 pt-10 h-full"
       style="row-gap: 50px"
-      appDebounce
-      [domEvents]="['scroll']"
-      (debounced)="onMenuScroll($event, itemsContainer)"
     >
       <!--  -->
       @for (item of menuItems(); track $index) {

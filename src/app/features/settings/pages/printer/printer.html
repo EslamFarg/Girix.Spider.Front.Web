@@ -15,6 +15,9 @@
           class="w-full! h-12! *:text-dark-line! border-text-gray! bg-base-bg!"
         />
       </app-input-error-message-handler>
+      @if (fg.value.cashierPrinterId) {
+        <button type="button" pButton class="app-p-btn" styleClass="px-3!" label="اختبار" severity="info" variant="outlined" (click)="testPrinterConnection(printers()!.find(p => p.id === fg.value.cashierPrinterId)!)"></button>
+      }
     </div>
     <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 md:gap-6">
       <label for="" class="mb-0! text-dark-line text-xl font-bold">طابعـه كابتن اوردر</label>
@@ -28,6 +31,9 @@
           class="w-full! h-12! *:text-dark-line! border-text-gray! bg-base-bg!"
         />
       </app-input-error-message-handler>
+      @if (fg.value.captionOrderPrinterId) {
+        <button type="button" pButton class="app-p-btn" styleClass="px-3!" label="اختبار" severity="info" variant="outlined" (click)="testPrinterConnection(printers()!.find(p => p.id === fg.value.captionOrderPrinterId)!)"></button>
+      }
     </div>
     <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 md:gap-6">
       <label for="" class="mb-0! text-dark-line text-xl font-bold">الطابعه الافتراضيه</label>
@@ -41,9 +47,12 @@
           class="w-full! h-12! *:text-dark-line! border-text-gray! bg-base-bg!"
         />
       </app-input-error-message-handler>
+      @if (fg.value.programPrinterId) {
+        <button type="button" pButton class="app-p-btn" styleClass="px-3!" label="اختبار" severity="info" variant="outlined" (click)="testPrinterConnection(printers()!.find(p => p.id === fg.value.programPrinterId)!)"></button>
+      }
     </div>
 
-    <div class="ms-auto w-fit">
+    <div class="ms-auto w-fit flex items-center gap-2">
       <button pButton type="submit" class="border-dark-line! bg-dark-line! text-white! py-1! md:px-8!">حفظ</button>
     </div>
   </app-section-wrapper>

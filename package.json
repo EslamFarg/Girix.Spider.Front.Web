@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "postbuild": "node -e \"const fs=require('fs'),path=require('path');const src='dist/restaurant-dashboard-angular/browser';const dst='../restaurant-desktop/src/browser';if(!fs.existsSync(src)){console.error('Source not found:',src);process.exit(1);}fs.rmSync(dst,{recursive:true,force:true});fs.cpSync(src,dst,{recursive:true});console.log('Copied Angular build to',dst);\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

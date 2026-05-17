@@ -1,5 +1,5 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -90,6 +90,15 @@ export class Rooms extends BaseComponent {
     super();
 
     this.searchRooms(1);
+
+    effect(() => {
+      const collectedIds = this.collectionsService.collectedOrderIds();
+      if (collectedIds.length > 0) {
+        this.rooms.update((rows) =>
+          rows.map((r) => (collectedIds.includes(r.orderId) ? { ...r, isAvailable: true } : r)),
+        );
+      }
+    });
   }
 
   periodOptions = [

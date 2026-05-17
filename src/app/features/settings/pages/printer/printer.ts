@@ -84,4 +84,14 @@ export class Printer extends BaseComponent {
     }
     this.printerSettingsService.create(this.fg.value).subscribe();
   }
+
+  async testPrinterConnection(printer: IPrinterSearchRow) {
+    await this.printerService.testPrinterConnection({
+      id: printer.id,
+      name: printer.name,
+      ipAddressOrMacAddress: printer.ipAddressOrMacAddress,
+      port: printer.port,
+      type: printer.type,
+    });
+  }
 }

@@ -101,6 +101,25 @@ export class AddPrinter extends BaseComponent {
     this.currentPrinter.set(item);
   }
 
+  async testConnection(item?: IPrinterSearchRow) {
+    const printer = item ?? this.currentPrinter();
+    if (!printer) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'خطأ',
+        detail: 'يرجى اختيار طابعة أولاً',
+      });
+      return;
+    }
+    await this.printerService.testPrinterConnection({
+      id: printer.id,
+      name: printer.name,
+      ipAddressOrMacAddress: printer.ipAddressOrMacAddress,
+      port: printer.port,
+      type: printer.type,
+    });
+  }
+
   deletePrinter(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,

@@ -1,4 +1,4 @@
-import { IElectonPrintOptions, IElectronPrintJob } from '@/app';
+import { IElectonPrintOptions, IElectronPrintJob, IElectronPrinter } from '@/app';
 import { BaseCrudService } from '@/core/services/BaseCrudService';
 import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
@@ -127,6 +127,37 @@ export class PrinterService extends BaseSearchAndCrudService<
       const e = await window.electronAPI
         .getBluetoothPrinters();
       return e;
+    } finally {
+      this.loadingService.removeLoading();
+    }
+  }
+
+  async testPrinterConnection(printer: IElectronPrinter) {
+    this.loadingService.addLoading();
+    try {
+      const result = await window.electronAPI.testPrinterConnection(printer);
+      if (result.success) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'نجاح',
+          detail: result.message,
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'خطأ',
+          detail: result.message,
+        });
+      }
+      return result;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      this.messageService.add({
+        severity: 'error',
+        summary: 'خطأ',
+        detail: msg,
+      });
+      return { success: false, message: msg };
     } finally {
       this.loadingService.removeLoading();
     }

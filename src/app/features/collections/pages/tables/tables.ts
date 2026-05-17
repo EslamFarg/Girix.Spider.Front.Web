@@ -1,6 +1,6 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SpaceTypeEnum } from '@/features/replacements/services/replacements-service';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -75,6 +75,15 @@ export class Tables extends BaseComponent {
     super();
 
     this.searchTables(1);
+
+    effect(() => {
+      const collectedIds = this.collectionsService.collectedOrderIds();
+      if (collectedIds.length > 0) {
+        this.tables.update((rows) =>
+          rows.map((t) => (collectedIds.includes(t.orderId) ? { ...t, isAvailable: true } : t)),
+        );
+      }
+    });
   }
 
   periodOptions = [

@@ -1,5 +1,5 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdown';
 import { Paginator, PaginatorState } from 'primeng/paginator';
@@ -91,6 +91,15 @@ export class Huts extends BaseComponent {
     super();
 
     this.searchHuts(1);
+
+    effect(() => {
+      const collectedIds = this.collectionsService.collectedOrderIds();
+      if (collectedIds.length > 0) {
+        this.huts.update((rows) =>
+          rows.map((h) => (collectedIds.includes(h.orderId) ? { ...h, isAvailable: true } : h)),
+        );
+      }
+    });
   }
 
   periodOptions = [

@@ -96,79 +96,137 @@
       <!-- location btns -->
       <div class="flex gap-2 w-full min-h-[34px]" [class.hidden]="!isCreateMode()">
         <!-- سفري group -->
-        <div [appAllowedRoles]="[Role.Cashier,Role.Admin]" class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300" [class.flex-1]="!localRadio.checked"
-          [class.w-20]="localRadio.checked" [class.segmented-group]="takeAwayRadio.checked">
-          <input type="radio" hidden name="orderType" id="takeAway" [value]="OrderLocationType.Takeaway" #takeAwayRadio
-            formControlName="orderType" />
-          <label class="loc-btn flex-1" [class.location-active]="takeAwayRadio.checked"
-            for="takeAway"><span>سفري</span></label>
+        <div
+          [appAllowedRoles]="[Role.Cashier, Role.Admin]"
+          class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
+          [class.flex-1]="!localRadio.checked"
+          [class.w-20]="localRadio.checked"
+          [class.segmented-group]="takeAwayRadio.checked"
+        >
+          <input
+            type="radio"
+            hidden
+            name="orderType"
+            id="takeAway"
+            [value]="OrderLocationType.Takeaway"
+            #takeAwayRadio
+            formControlName="orderType"
+          />
+          <label class="loc-btn flex-1" [class.location-active]="takeAwayRadio.checked" for="takeAway"
+            ><span>سفري</span></label
+          >
         </div>
-    
+
         <!-- محلي group -->
-        <div class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300" [class.flex-3]="localRadio.checked"
-          [class.flex-1]="!localRadio.checked" [class.segmented-group]="localRadio.checked">
-          <input type="radio" hidden #localRadio name="orderType" id="local" formControlName="orderType"
-            [value]="OrderLocationType.DineIn" />
+        <div
+          class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
+          [class.flex-3]="localRadio.checked"
+          [class.flex-1]="!localRadio.checked"
+          [class.segmented-group]="localRadio.checked"
+        >
+          <input
+            type="radio"
+            hidden
+            #localRadio
+            name="orderType"
+            id="local"
+            formControlName="orderType"
+            [value]="OrderLocationType.DineIn"
+          />
           @if (!localRadio.checked) {
-          <label class="loc-btn flex-1" [class.location-active]="localRadio.checked" for="local"><span>محلي</span></label>
+            <label class="loc-btn flex-1" [class.location-active]="localRadio.checked" for="local"
+              ><span>محلي</span></label
+            >
           }
-    
+
           @if (localRadio.checked) {
-          <button type="button" (click)="openLocalTypeDialog(OrderLocalType.Table)" class="segment-btn flex-1"
-            [class.location-active]="activeLocalType() === OrderLocalType.Table">
-            <span>طاوله</span>
-          </button>
-          <button type="button" (click)="openLocalTypeDialog(OrderLocalType.Room)" class="segment-btn flex-1"
-            [class.location-active]="activeLocalType() === OrderLocalType.Room">
-            <span>غرفه</span>
-          </button>
-          <button type="button" (click)="openLocalTypeDialog(OrderLocalType.Hut)" class="segment-btn flex-1"
-            [class.location-active]="activeLocalType() === OrderLocalType.Hut">
-            <span>كوخ</span>
-          </button>
-    
-          <!-- info pill -->
-          <div class="info-pill">
-            <span class="inline-block max-w-20 overflow-hidden text-ellipsis">{{ selectedLocalLocationLabel() }}</span>
-            @if (activeLocalType() === OrderLocalType.Hut && (orderFg.value.placeRefId ?? 0) > 0) {
-              <span class="text-text-lighter">{{ formatMinutesToHHMMSS(orderFg.value.durationMinutes ?? 0) }}</span>
-            }
-          </div>
+            <button
+              type="button"
+              (click)="openLocalTypeDialog(OrderLocalType.Table)"
+              class="segment-btn flex-1"
+              [class.location-active]="activeLocalType() === OrderLocalType.Table"
+            >
+              <span>طاوله</span>
+            </button>
+            <button
+              type="button"
+              (click)="openLocalTypeDialog(OrderLocalType.Room)"
+              class="segment-btn flex-1"
+              [class.location-active]="activeLocalType() === OrderLocalType.Room"
+            >
+              <span>غرفه</span>
+            </button>
+            <button
+              type="button"
+              (click)="openLocalTypeDialog(OrderLocalType.Hut)"
+              class="segment-btn flex-1"
+              [class.location-active]="activeLocalType() === OrderLocalType.Hut"
+            >
+              <span>كوخ</span>
+            </button>
+
+            <!-- info pill -->
+            <div class="info-pill">
+              <span class="inline-block max-w-20 overflow-hidden text-ellipsis">{{
+                selectedLocalLocationLabel()
+              }}</span>
+              @if (activeLocalType() === OrderLocalType.Hut && (orderFg.value.placeRefId ?? 0) > 0) {
+                <span class="text-text-lighter">{{ formatMinutesToHHMMSS(orderFg.value.durationMinutes ?? 0) }}</span>
+              }
+            </div>
           }
         </div>
-    
+
         <!-- توصيل group -->
-        <div [appAllowedRoles]="[Role.Cashier,Role.Admin]" class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300" [class.flex-1]="!localRadio.checked"
-          [class.w-20]="localRadio.checked" [class.segmented-group]="deliveryRadio.checked">
-          <input type="radio" hidden #deliveryRadio name="orderType" id="delivery" formControlName="orderType"
-            [value]="OrderLocationType.PersonDelivery" />
-          <label class="loc-btn flex-1" (click)="DeliveryDialogVisible = true"
-            [class.location-active]="deliveryRadio.checked" for="delivery"><span>توصيل</span></label>
+        <div
+          [appAllowedRoles]="[Role.Cashier, Role.Admin]"
+          class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
+          [class.flex-1]="!localRadio.checked"
+          [class.w-20]="localRadio.checked"
+          [class.segmented-group]="deliveryRadio.checked"
+        >
+          <input
+            type="radio"
+            hidden
+            #deliveryRadio
+            name="orderType"
+            id="delivery"
+            formControlName="orderType"
+            [value]="OrderLocationType.PersonDelivery"
+          />
+          <label
+            class="loc-btn flex-1"
+            (click)="DeliveryDialogVisible = true"
+            [class.location-active]="deliveryRadio.checked"
+            for="delivery"
+            ><span>توصيل</span></label
+          >
         </div>
       </div>
-    
+
       <!-- local space validation -->
       <div [class.hidden]="!isCreateMode()">
-        <app-input-error-message-handler class="w-fit block mx-auto"
-          [fc]="orderFg.controls.deliveryId.invalid?orderFg.controls.deliveryId:orderFg.controls.placeRefId" />
+        <app-input-error-message-handler
+          class="w-fit block mx-auto"
+          [fc]="orderFg.controls.deliveryId.invalid ? orderFg.controls.deliveryId : orderFg.controls.placeRefId"
+        />
       </div>
     </div>
 
     <!-- order items -->
-    <div class="p-2 border border-text-light rounded-[8px] w-full flex flex-col   flex-1 overflow-hidden">
+    <div class="p-2 border border-text-light rounded-[8px] w-full flex flex-col flex-1 overflow-hidden">
       <!-- items -->
       <div class="w-full flex-1 overflow-hidden pb-0.5">
         <div class="h-full overflow-auto no-scrollbar">
           <table class="text-dark-bg-2 text-center min-w-full">
             <thead class="select-none">
               <tr class="border-b border-text-gray *:pb-2 *:text-xs *:font-bold">
-                
                 <th class="px-2">الصنف</th>
                 <th class="px-2">الكميه</th>
                 <!-- <th class="px-2">
                   <div><span>السعر</span>&nbsp;<span class="text-xs font-light">(شامل الضريبه)</span></div>
                 </th> -->
-          
+
                 <!-- <th class="px-2">المجموع</th> -->
                 <!-- <th class="px-2">الضريبه</th> -->
                 <th class="px-2">الاجمالي</th>
@@ -177,129 +235,182 @@
             </thead>
             <tbody class="text-sm">
               @for (orderMenuItem of orderMenuItems(); track $index) {
-              <tr class="text-xs *:py-1 fade-in">
-                
-                <!-- label -->
-                <td>
-                  <div class="flex flex-col gap-2 text-center px-4 items-center">
-                    @let label =
-                    orderMenuItem.menuItem.meal
-                    ? orderMenuItem.menuItem.meal.name
-                    : orderMenuItem.menuItem.product?.name;
-                    <div class="overflow-hidden text-ellipsis whitespace-nowrap max-w-37.5">{{ label }}</div>
-                    <!--  additional items -->
-                    <app-slider [class]="
-                                  `max-w-75 -mt-1.5 overflow-hidden xl:max-w-62.5 [&_.nav-btn]:p-1! [&_.nav-btn_*]:text-sm!  `
-                                " [template]="additionTemplate" [items]="orderMenuItems()[$index].additions"
-                      [config]="{ itemWidth: 70 }" />
-          
-                    <ng-template #additionTemplate let-addition>
-                      <div class="relative pt-1.5 pl-1.5">
-                        <div class="border border-text-light rounded-md overflow-visible!">
-                          <div [title]="addition.product.name"
-                            class="py-0.5 px-1 text-[10px] font-semibold overflow-hidden text-ellipsis whitespace-nowrap">
-                            {{ addition.product.name }}
+                <tr class="text-xs *:py-1 fade-in">
+                  <!-- label -->
+                  <td>
+                    <div class="flex flex-col gap-2 text-center px-4 items-center">
+                      @let label =
+                        orderMenuItem.menuItem.meal
+                          ? orderMenuItem.menuItem.meal.name
+                          : orderMenuItem.menuItem.product?.name;
+                      <div class="overflow-hidden text-ellipsis whitespace-nowrap max-w-37.5">{{ label }}</div>
+                      <!--  additional items -->
+                      <app-slider
+                        [class]="
+                          `max-w-75 -mt-1.5 overflow-hidden xl:max-w-62.5 [&_.nav-btn]:p-1! [&_.nav-btn_*]:text-sm!  `
+                        "
+                        [template]="additionTemplate"
+                        [items]="orderMenuItems()[$index].additions"
+                        [config]="{ itemWidth: 70 }"
+                      />
+
+                      <ng-template #additionTemplate let-addition>
+                        <div class="relative pt-1.5 pl-1.5">
+                          <div class="border border-text-light rounded-md overflow-visible!">
+                            <div
+                              [title]="addition.product.name"
+                              class="py-0.5 px-1 text-[10px] font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                            >
+                              {{ addition.product.name }}
+                            </div>
+                          </div>
+                          <div
+                            class="flex items-center justify-center rounded-sm bg-text-lighter h-fit p-1 leading-none text-[#FA8D7B] font-bold text-[10px] absolute -top-0 -left-0"
+                          >
+                            <span class="h-fit">{{ addition.quantity }}</span>
                           </div>
                         </div>
-                        <div
-                          class="flex items-center justify-center rounded-sm bg-text-lighter h-fit p-1 leading-none text-[#FA8D7B] font-bold text-[10px] absolute -top-0 -left-0">
-                          <span class="h-fit">{{ addition.quantity }}</span>
-                        </div>
-                      </div>
-                    </ng-template>
-                  </div>
-                </td>
-                <!-- quantity -->
-                <td>
-                  <div class="flex items-center justify-center gap-2 px-4">
-                    <!-- add quantity -->
-                    <button (click)="onOrderMenuItemQuantityChange($index, +quantity.value + 1)" type="button" pButton
-                      class="w-8 h-8  border-0! px-2! rounded cursor-pointer" style="
-                                  --p-button-primary-background: var(--color-text-gray);
-                                  --p-button-primary-color: var(--color-dark-line);
-                                  --p-button-primary-hover-background: green;
-                                  --p-button-primary-active-background: rgba(0, 255, 8, 0.538);
-                                ">
-                      <svg   viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                          d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
-                          fill="#393C49" />
-                      </svg>
-                    </button>
-                    <!-- quantity -->
-                    <!-- <span >{{ orderMenuItem.menuItem.quantity }}</span> -->
-                    <input class="text-xs font-bold flex-1 max-w-8 text-center outline-none no-input-spinner" #quantity
-                      appAllowNumbers type="number" [min]="1" [max]="1000" [value]="orderMenuItem.menuItem.quantity"
-                      (input)="onOrderMenuItemQuantityChange($index, +quantity.value)" />
-          
-                    <!-- reduce quantity -->
-                    <button pButton (click)="onOrderMenuItemQuantityChange($index, +quantity.value - 1)" type="button" style="
-                                  --p-button-primary-background: var(--color-text-gray);
-                                  --p-button-primary-color: var(--color-dark-line);
-                                  --p-button-primary-hover-background: red;
-                                  --p-button-primary-active-background: rgba(255, 0, 0, 0.538);
-                                " class="w-8 h-8 border-0! px-2! rounded cursor-pointer">
-                      <svg   viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                          d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
-                          fill="#393C49" />
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-                <!-- price -->
-          
-                <!-- <td>
+                      </ng-template>
+                    </div>
+                  </td>
+                  <!-- quantity -->
+                  <td>
+                    <div class="flex items-center justify-center gap-2 px-4">
+                      <!-- add quantity -->
+                      <button
+                        (click)="onOrderMenuItemQuantityChange($index, +quantity.value + 1)"
+                        type="button"
+                        pButton
+                        class="w-8 h-8 border-0! px-2! rounded cursor-pointer"
+                        style="
+                          --p-button-primary-background: var(--color-text-gray);
+                          --p-button-primary-color: var(--color-dark-line);
+                          --p-button-primary-hover-background: green;
+                          --p-button-primary-active-background: rgba(0, 255, 8, 0.538);
+                        "
+                      >
+                        <svg viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
+                            fill="#393C49"
+                          />
+                        </svg>
+                      </button>
+                      <!-- quantity -->
+                      <!-- <span >{{ orderMenuItem.menuItem.quantity }}</span> -->
+                      <input
+                        class="text-xs font-bold flex-1 max-w-8 text-center outline-none no-input-spinner"
+                        #quantity
+                        appAllowNumbers
+                        type="number"
+                        [min]="1"
+                        [max]="1000"
+                        [value]="orderMenuItem.menuItem.quantity"
+                        (input)="onOrderMenuItemQuantityChange($index, +quantity.value)"
+                      />
+
+                      <!-- reduce quantity -->
+                      <button
+                        pButton
+                        (click)="onOrderMenuItemQuantityChange($index, +quantity.value - 1)"
+                        type="button"
+                        style="
+                          --p-button-primary-background: var(--color-text-gray);
+                          --p-button-primary-color: var(--color-dark-line);
+                          --p-button-primary-hover-background: red;
+                          --p-button-primary-active-background: rgba(255, 0, 0, 0.538);
+                        "
+                        class="w-8 h-8 border-0! px-2! rounded cursor-pointer"
+                      >
+                        <svg viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
+                            fill="#393C49"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                  <!-- price -->
+
+                  <!-- <td>
                   <div
                     class="mx-auto font-semibold border border-text-light rounded text-center w-fit h-fit px-2 py-0.5 leading-none">
                     {{ getMenuItemUnitPriceWithoutAdditionsWithTax(orderMenuItem)?.toFixed(2) }}
                   </div>
                 </td> -->
-                <!-- total -->
-                <!-- <td class="font-semibold">
+                  <!-- total -->
+                  <!-- <td class="font-semibold">
                             <div class="scale-in">{{ (+(unitPrice ?? 0) * orderMenuItem.menuItem.quantity).toFixed(2) }}</div>
                           </td> -->
-                <!-- tax -->
-                <!-- <td class="font-semibold">
+                  <!-- tax -->
+                  <!-- <td class="font-semibold">
                   <div class="scale-in">{{ getMenuItemTaxValue(orderMenuItem).toFixed(2) }}</div>
                 </td> -->
-                <!-- net -->
-                <td class="font-semibold">
-                  <div class="scale-in">{{ getMenuItemNetValue(orderMenuItem).toFixed(2) }}</div>
-                </td>
-                <!-- actions -->
-                <td>
-                  <div class="flex items-center w-full justify-end gap-2 overflow-visible!">
-                    <!-- remove -->
-                    <svg (click)="onRemoveOrderMenuItem($index)"  
-                      class="cursor-pointer w-8 hover:text-red-500 hover:scale-110 transition-all"  viewBox="0 0 20 20"
-                      fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                      <path fill-rule="evenodd" clip-rule="evenodd"
-                        d="M10.7517 1.24995C12.7517 1.37495 14.6267 2.37495 16.0017 3.74995C17.6267 5.49995 18.5017 7.62495 18.5017 10.125C18.5017 12.125 17.7517 14 16.5017 15.625C15.2517 17.125 13.5017 18.25 11.5017 18.625C9.50174 18.9999 7.50174 18.75 5.75174 17.75C4.00174 16.7499 2.62674 15.25 1.87674 13.375C1.12674 11.5 1.00174 9.37495 1.62674 7.49995C2.25174 5.49995 3.37674 3.87495 5.12674 2.74995C6.75174 1.62495 8.75174 1.12495 10.7517 1.24995ZM11.3767 17.375C13.0017 16.9999 14.5017 16.125 15.6267 14.75C16.6267 13.375 17.2517 11.75 17.1267 9.99995C17.1267 7.99995 16.3767 5.99995 15.0017 4.62495C13.7517 3.37495 12.2517 2.62495 10.5017 2.49995C8.87674 2.37495 7.12674 2.74995 5.75174 3.74995C4.37674 4.74995 3.37674 6.12495 2.87674 7.87495C2.37674 9.49995 2.37674 11.25 3.12674 12.875C3.87674 14.5 5.00174 15.75 6.50174 16.625C8.00174 17.5 9.75174 17.75 11.3767 17.375ZM9.87674 9.37495L12.8767 6.24995L13.7517 7.12495L10.7517 10.2499L13.7517 13.375L12.8767 14.2499L9.87674 11.1249L6.87674 14.2499L6.00174 13.375L9.00174 10.2499L6.00174 7.12495L6.87674 6.24995L9.87674 9.37495Z"
-                        fill="currentColor" />
-                    </svg>
-                    <!-- additions -->
-                    @if (orderMenuItem.menuItem.product) {
-                    <svg 
-                    (click)="getProductAdditions(orderMenuItem.menuItem.product, $index)" viewBox="0 0 20 20" 
-                    class="cursor-pointer hover:text-blue-500 hover:scale-110 transition-all w-8"
-                      fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M6.875 3.125H4.79167C3.87119 3.125 3.125 3.87119 3.125 4.79167V6.875C3.125 7.79547 3.87119 8.54167 4.79167 8.54167H6.875C7.79547 8.54167 8.54167 7.79547 8.54167 6.875V4.79167C8.54167 3.87119 7.79547 3.125 6.875 3.125Z"
-                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                      <path d="M14.1654 3.125V5.83333M14.1654 5.83333V8.54167M14.1654 5.83333H11.457M14.1654 5.83333H16.8737"
-                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                      <path
-                        d="M6.875 11.4584H4.79167C3.87119 11.4584 3.125 12.2046 3.125 13.125V15.2084C3.125 16.1288 3.87119 16.875 4.79167 16.875H6.875C7.79547 16.875 8.54167 16.1288 8.54167 15.2084V13.125C8.54167 12.2046 7.79547 11.4584 6.875 11.4584Z"
-                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                      <path
-                        d="M15.207 11.4584H13.1237C12.2032 11.4584 11.457 12.2046 11.457 13.125V15.2084C11.457 16.1288 12.2032 16.875 13.1237 16.875H15.207C16.1275 16.875 16.8737 16.1288 16.8737 15.2084V13.125C16.8737 12.2046 16.1275 11.4584 15.207 11.4584Z"
-                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    }
-                  </div>
-                </td>
-              </tr>
+                  <!-- net -->
+                  <td class="font-semibold">
+                    <div class="scale-in">{{ getMenuItemNetValue(orderMenuItem).toFixed(2) }}</div>
+                  </td>
+                  <!-- actions -->
+                  <td>
+                    <div class="flex items-center w-full justify-end gap-2 overflow-visible!">
+                      <!-- additions -->
+                      @if (orderMenuItem.menuItem.product) {
+                        <svg
+                          (click)="getProductAdditions(orderMenuItem.menuItem.product, $index)"
+                          viewBox="0 0 20 20"
+                          class="cursor-pointer hover:text-blue-500 hover:scale-110 transition-all w-8"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M6.875 3.125H4.79167C3.87119 3.125 3.125 3.87119 3.125 4.79167V6.875C3.125 7.79547 3.87119 8.54167 4.79167 8.54167H6.875C7.79547 8.54167 8.54167 7.79547 8.54167 6.875V4.79167C8.54167 3.87119 7.79547 3.125 6.875 3.125Z"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M14.1654 3.125V5.83333M14.1654 5.83333V8.54167M14.1654 5.83333H11.457M14.1654 5.83333H16.8737"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M6.875 11.4584H4.79167C3.87119 11.4584 3.125 12.2046 3.125 13.125V15.2084C3.125 16.1288 3.87119 16.875 4.79167 16.875H6.875C7.79547 16.875 8.54167 16.1288 8.54167 15.2084V13.125C8.54167 12.2046 7.79547 11.4584 6.875 11.4584Z"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M15.207 11.4584H13.1237C12.2032 11.4584 11.457 12.2046 11.457 13.125V15.2084C11.457 16.1288 12.2032 16.875 13.1237 16.875H15.207C16.1275 16.875 16.8737 16.1288 16.8737 15.2084V13.125C16.8737 12.2046 16.1275 11.4584 15.207 11.4584Z"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      }
+                      <!-- remove -->
+                      <svg
+                        (click)="onRemoveOrderMenuItem($index)"
+                        class="cursor-pointer w-8 hover:text-red-500 hover:scale-110 transition-all"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          clip-rule="evenodd"
+                          d="M10.7517 1.24995C12.7517 1.37495 14.6267 2.37495 16.0017 3.74995C17.6267 5.49995 18.5017 7.62495 18.5017 10.125C18.5017 12.125 17.7517 14 16.5017 15.625C15.2517 17.125 13.5017 18.25 11.5017 18.625C9.50174 18.9999 7.50174 18.75 5.75174 17.75C4.00174 16.7499 2.62674 15.25 1.87674 13.375C1.12674 11.5 1.00174 9.37495 1.62674 7.49995C2.25174 5.49995 3.37674 3.87495 5.12674 2.74995C6.75174 1.62495 8.75174 1.12495 10.7517 1.24995ZM11.3767 17.375C13.0017 16.9999 14.5017 16.125 15.6267 14.75C16.6267 13.375 17.2517 11.75 17.1267 9.99995C17.1267 7.99995 16.3767 5.99995 15.0017 4.62495C13.7517 3.37495 12.2517 2.62495 10.5017 2.49995C8.87674 2.37495 7.12674 2.74995 5.75174 3.74995C4.37674 4.74995 3.37674 6.12495 2.87674 7.87495C2.37674 9.49995 2.37674 11.25 3.12674 12.875C3.87674 14.5 5.00174 15.75 6.50174 16.625C8.00174 17.5 9.75174 17.75 11.3767 17.375ZM9.87674 9.37495L12.8767 6.24995L13.7517 7.12495L10.7517 10.2499L13.7517 13.375L12.8767 14.2499L9.87674 11.1249L6.87674 14.2499L6.00174 13.375L9.00174 10.2499L6.00174 7.12495L6.87674 6.24995L9.87674 9.37495Z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </div>
+                  </td>
+                </tr>
               }
             </tbody>
           </table>
@@ -320,31 +431,30 @@
         >
           <div class="absolute w-0.5 h-[calc(100%-35px)] left-1/2 top-2 -translate-x-1/2 bg-dark-bg-2/20"></div>
           @if (itemsDiscountAmount()) {
-          <div class="px-1">
-            <span>الخصم</span>
-            <div>{{ itemsDiscountAmount().toFixed(2) }}</div>
-          </div>
+            <div class="px-1">
+              <span>الخصم</span>
+              <div>{{ itemsDiscountAmount().toFixed(2) }}</div>
+            </div>
           }
           @if (serviceFee()) {
-          <div class="px-1">
-            <span>الخدمه</span>
-            <div>{{ serviceFee().toFixed(2) }}</div>
-          </div>
+            <div class="px-1">
+              <span>الخدمه</span>
+              <div>{{ serviceFee().toFixed(2) }}</div>
+            </div>
           }
           @if (hutNet()) {
-          <div class="px-1">
-            <span>حجز الكوخ</span>
-            <div>{{ hutNet().toFixed(2) }}</div>
-          </div>
+            <div class="px-1">
+              <span>حجز الكوخ</span>
+              <div>{{ hutNet().toFixed(2) }}</div>
+            </div>
           }
           @if (deliveryFee()) {
-          <div class="px-1">
-            <span>الدليفري</span>
-            <div>{{ deliveryFee().toFixed(2) }}</div>
-          </div>
+            <div class="px-1">
+              <span>الدليفري</span>
+              <div>{{ deliveryFee().toFixed(2) }}</div>
+            </div>
           }
 
-          
           <div class="px-1">
             <span>الضريبة</span>
             <div>{{ totalMenuItemsTax().toFixed(2) }}</div>
@@ -420,7 +530,13 @@
   [style]="{ zIndex: 1111 }"
   [showCloseIcon]="false"
 >
-  <app-menu [options]="{ continueBtn: true }" (onContinue)="isMenuVisible = false" (menuItemChange)="onMenuItemChange($event)" [groups]="groups()" [pickedItems]="orderMenuItems()" />
+  <app-menu
+    [options]="{ continueBtn: true }"
+    (onContinue)="isMenuVisible = false"
+    (menuItemChange)="onMenuItemChange($event)"
+    [groups]="groups()"
+    [pickedItems]="orderMenuItems()"
+  />
 </p-drawer>
 
 <!-- additions -->
@@ -559,9 +675,16 @@
     [domEvents]="['scroll']"
     (debounced)="onHutsScroll($event, hutsScroller)"
   >
-    <div class="h-fit grid mt-10  items-center justify-center  grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-[90px_20px]">
+    <div
+      class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-[90px_20px]"
+    >
       @for (item of huts(); track $index) {
-        <app-hut-card [active]="item.id == currentHut()?.id" [data]="item" (click)="onHutSelected(item)" class="max-w-full!" />
+        <app-hut-card
+          [active]="item.id == currentHut()?.id"
+          [data]="item"
+          (click)="onHutSelected(item)"
+          class="max-w-full!"
+        />
       }
     </div>
   </div>
@@ -638,9 +761,14 @@
     [domEvents]="['scroll']"
     (debounced)="onRoomsScroll($event, roomsScroller)"
   >
-    <div class="h-fit grid mt-10  items-center justify-center  grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
+    <div class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
       @for (item of rooms(); track $index) {
-        <app-room-card [active]="item.id == currentRoom()?.id" [data]="item" (click)="onRoomSelected(item)" class="max-w-full" />
+        <app-room-card
+          [active]="item.id == currentRoom()?.id"
+          [data]="item"
+          (click)="onRoomSelected(item)"
+          class="max-w-full"
+        />
       }
     </div>
   </div>
@@ -677,9 +805,14 @@
     [domEvents]="['scroll']"
     (debounced)="onTablesScroll($event, tablesScroller)"
   >
-    <div class="h-fit grid mt-10  items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
+    <div class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
       @for (item of tables(); track $index) {
-        <app-table-card [active]="item.id == currentTable()?.id" [data]="item" (click)="onTableSelected(item)" class="max-w-full" />
+        <app-table-card
+          [active]="item.id == currentTable()?.id"
+          [data]="item"
+          (click)="onTableSelected(item)"
+          class="max-w-full"
+        />
       }
     </div>
   </div>
@@ -797,8 +930,8 @@
         <div
           class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4 border-b border-b-text-light pb-4 [&_input]:w-5 [&_input]:aspect-square"
         >
-        <!-- paid -->
-          <div  [appAllowedRoles]="[Role.Cashier,Role.Admin]"  class="flex items-center gap-1">
+          <!-- paid -->
+          <div [appAllowedRoles]="[Role.Cashier, Role.Admin]" class="flex items-center gap-1">
             <input
               type="radio"
               name="isPaid"
@@ -914,46 +1047,78 @@
           </app-input-error-message-handler>
         </div>
 
-        <!-- amount received from customer (for change calculation) -->
-        <div class="md:col-span-2 border-t border-b-text-light pt-4 mt-2">
-          <label for="amountReceived">المبلغ المستلم من العميل</label>
-          <input
-            pInputText
-            appAllowNumbers
-            [allowDecimal]="true"
-            [min]="0"
-            id="amountReceived"
-            aria-describedby="amountReceived-help"
-            placeholder="أدخل المبلغ المستلم"
-            [ngModel]="amountReceived()"
-            (ngModelChange)="amountReceived.set(+$event || 0)"
-            [ngModelOptions]="{ standalone: true }"
-            #amountReceivedInput
-            appDebounce
-            class="app-input"
-            (click)="triggerNumbersKeyboard(amountReceivedInput)"
-          />
+        <!-- number keyboard toggle -->
+        <div class="md:col-span-2 flex justify-end">
+          <button
+            type="button"
+            pButton
+            class="cursor-pointer"
+            styleClass="px-3! py-1!"
+            severity="secondary"
+            variant="outlined"
+            (click)="togglePaymentNumbersKeyboard()"
+            title="لوحة المفاتيح"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M4 6H20M4 10H20M4 14H16M4 18H12"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
         </div>
 
-        <!-- change / remaining amount display -->
-        <div class="md:col-span-2">
-          @if (changeAmount() > 0) {
-            <div class="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-4 py-3">
-              <span class="font-bold text-green-700">الباقي للعميل:</span>
-              <span class="font-bold text-green-700 text-lg">{{ changeAmount().toFixed(2) }}</span>
-            </div>
-          } @else if (changeAmount() < 0) {
-            <div class="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-              <span class="font-bold text-red-700">المبلغ المتبقي:</span>
-              <span class="font-bold text-red-700 text-lg">{{ Math.abs(changeAmount()).toFixed(2) }}</span>
-            </div>
-          } @else if (amountReceived() > 0) {
-            <div class="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-              <span class="font-bold text-blue-700">المبلغ بالضبط</span>
-              <span class="font-bold text-blue-700 text-lg">0.00</span>
-            </div>
-          }
-        </div>
+        @if (isPaymentNumbersKeyboardVisible()) {
+          <div class="md:col-span-2">
+            <app-numbers-keyboard />
+          </div>
+        }
+
+        @if (isPaid()) {
+          <!-- amount received from customer (for change calculation) -->
+          <div class="md:col-span-2 border-t border-b-text-light pt-4 mt-2">
+            <label for="amountReceived">المبلغ المستلم من العميل</label>
+            <input
+              pInputText
+              appAllowNumbers
+              [allowDecimal]="true"
+              [min]="0"
+              id="amountReceived"
+              aria-describedby="amountReceived-help"
+              placeholder="أدخل المبلغ المستلم"
+              [ngModel]="amountReceived()"
+              (ngModelChange)="amountReceived.set(+$event || 0)"
+              [ngModelOptions]="{ standalone: true }"
+              #amountReceivedInput
+              appDebounce
+              class="app-input"
+              (click)="triggerNumbersKeyboard(amountReceivedInput)"
+            />
+          </div>
+
+          <!-- change / remaining amount display -->
+          <div class="md:col-span-2">
+            @if (changeAmount() > 0) {
+              <div class="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+                <span class="font-bold text-green-700">الباقي للعميل:</span>
+                <span class="font-bold text-green-700 text-lg">{{ changeAmount().toFixed(2) }}</span>
+              </div>
+            } @else if (changeAmount() < 0) {
+              <div class="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                <span class="font-bold text-red-700">المبلغ المتبقي:</span>
+                <span class="font-bold text-red-700 text-lg">{{ Math.abs(changeAmount()).toFixed(2) }}</span>
+              </div>
+            } @else if (amountReceived() > 0) {
+              <div class="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+                <span class="font-bold text-blue-700">المبلغ بالضبط</span>
+                <span class="font-bold text-blue-700 text-lg">0.00</span>
+              </div>
+            }
+          </div>
+        }
       </div>
     </div>
   </ng-template>

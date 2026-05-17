@@ -54,6 +54,8 @@ export class CollectionsService extends BaseService {
   lastCollectedId = signal<number | null>(null);
   currentOrderType = signal<OrderLocationType | null>(null);
   currentDeliveryId = signal<number | null>(null);
+  currentOrderId = signal<number | null>(null);
+  collectedOrderIds = signal<number[]>([]);
 
   openCollectionDialog = (
     opts: Partial<IOpenCollectionDialogOpts & Pick<IOpenCollectionDialogOpts, 'orderType'>> = {
@@ -65,6 +67,8 @@ export class CollectionsService extends BaseService {
 
     this.currentOrderType.set(opts?.orderType ?? null);
     this.currentDeliveryId.set(opts?.deliveryId ?? null);
+    this.currentOrderId.set(opts?.orderId ?? null);
+    this.collectedOrderIds.set([]);
     //
     //
     //

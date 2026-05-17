@@ -161,8 +161,12 @@ export class All extends BaseComponent {
       deliveryId?.updateValueAndValidity();
     });
     effect(() => {
-      this.collectionsService.lastCollectedId();
-      this.searchOrders(1);
+      const collectedIds = this.collectionsService.collectedOrderIds();
+      if (collectedIds.length > 0) {
+        this.orders.update((rows) =>
+          rows.map((o) => (collectedIds.includes(o.id) ? { ...o, isCollected: true } : o)),
+        );
+      }
     });
   }
 

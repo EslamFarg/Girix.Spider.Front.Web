@@ -51,7 +51,7 @@ export class CollectionDialog extends BaseComponent {
   collectPersonDelivery = this.collectionsService.collectPersonDelivery;
   collectCompanyDelivery = this.collectionsService.collectCompanyDelivery;
   orderService = inject(OrderService);
-  ordersCollectionsCaluclationsService=inject(OrderCollectionCalculationsService)
+  ordersCollectionsCaluclationsService = inject(OrderCollectionCalculationsService);
   currentBill = this.collectionsService.currentBill;
   isCollectionInvoiceDialogVisible = this.collectionsService.isCollectionInvoiceDialogVisible;
 
@@ -70,8 +70,8 @@ export class CollectionDialog extends BaseComponent {
         }, 0)
         .toFixed(2);
     } else {
-      if(!this.currentBill()) return 0
-      return this.ordersCollectionsCaluclationsService.calculateBillNet(this.currentBill()!)
+      if (!this.currentBill()) return 0;
+      return this.ordersCollectionsCaluclationsService.calculateBillNet(this.currentBill()!);
     }
   });
   isDeliveryDialog = this.collectionsService.isDeliveryDialog;
@@ -128,9 +128,14 @@ export class CollectionDialog extends BaseComponent {
       return;
     }
 
-    const cashPaymentAmount = (+(this.paymentFg.get('cashPaymentAmount')?.value ?? 0));
-    const networkPaymentAmount = (+(this.paymentFg.get('networkPaymentAmount')?.value ?? 0));
-    let formValue: any = { ...this.paymentFg.value, cashPaymentAmount, networkPaymentAmount, collectionDate: this.localDateIso };
+    const cashPaymentAmount = +(this.paymentFg.get('cashPaymentAmount')?.value ?? 0);
+    const networkPaymentAmount = +(this.paymentFg.get('networkPaymentAmount')?.value ?? 0);
+    let formValue: any = {
+      ...this.paymentFg.value,
+      cashPaymentAmount: Math.floor(cashPaymentAmount * 100) / 100,
+      networkPaymentAmount: Math.floor(networkPaymentAmount * 100) / 100,
+      collectionDate: this.localDateIso,
+    };
     //        orderId: ,
 
     switch (this.currentDeliveryType()) {
@@ -140,6 +145,8 @@ export class CollectionDialog extends BaseComponent {
           next: (value) => {
             this.closeCollectionInvoiceDialog();
             this.collectionsService.lastCollectedId.set(value.id);
+            this.optimisticallyMarkOrdersAsCollected(this.checkedOrderIds());
+            this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
           },
         });
         break;
@@ -149,6 +156,8 @@ export class CollectionDialog extends BaseComponent {
           next: (value) => {
             this.closeCollectionInvoiceDialog();
             this.collectionsService.lastCollectedId.set(value.id);
+            this.optimisticallyMarkOrdersAsCollected(this.checkedOrderIds());
+            this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
           },
         });
         break;
@@ -160,12 +169,24 @@ export class CollectionDialog extends BaseComponent {
           next: (value) => {
             this.closeCollectionInvoiceDialog();
             this.collectionsService.lastCollectedId.set(value.id);
+            const orderId = this.collectionsService.currentOrderId();
+            if (orderId != null) {
+              this.collectionsService.collectedOrderIds.set([orderId]);
+            }
+            this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
           },
         });
         break;
     }
   }
-  
+
+  private optimisticallyMarkOrdersAsCollected(orderIds: number[]) {
+    this.collectionsService.currentDeliveryOrders.update((orders) =>
+      orders.filter((o) => !orderIds.includes(o.orderId)),
+    );
+    this.collectionsService.collectedOrderIds.set(orderIds);
+  }
+
   //
   //
   //
@@ -335,6 +356,10 @@ export class CollectionDialog extends BaseComponent {
   //
   //
   keyboardService = inject(KeyboardService);
+  isNumbersKeyboardVisible = signal(false);
+  toggleNumbersKeyboard() {
+    this.isNumbersKeyboardVisible.update((v) => !v);
+  }
   triggerNumbersKeyboard(input: HTMLInputElement) {
     this.keyboardService.triggerNumbersKeyboard(input);
   }
@@ -372,7 +397,7 @@ export class CollectionDialog extends BaseComponent {
     const cashControl = this.paymentFg.get('cashPaymentAmount');
     const networkControl = this.paymentFg.get('networkPaymentAmount');
     // console.log(this.currentBill());
-    
+
     if (this.currentBill() || this.checkedOrderIds().length > 0) {
       validators = [];
       this.paymentFg.patchValue({
