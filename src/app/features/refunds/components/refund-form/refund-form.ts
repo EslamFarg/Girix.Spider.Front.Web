@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, OnInit, signal } from '@angular/core';
 import { BaseComponent, FormMode } from '@/components/base-component/base-component';
 import { RefundService } from '../../services/refund-service';
 import {
@@ -61,6 +61,7 @@ export class RefundForm extends BaseComponent implements OnInit {
 
   formMode = input<FormMode>(FormMode.Create);
   refundId = input<number>(0);
+
 
   orderData = signal<IOrderLatestUpdateResponse | IRefundResponse | null>(null);
   isOrderPaid= computed(() => this.orderData()?.paymentType === OrderPaymentType.Paid);
@@ -324,8 +325,8 @@ export class RefundForm extends BaseComponent implements OnInit {
 
       const payload = {
         orderMasterId: orderId,
-        payingCash: isPaid ? (this.refundFg.value.payingCash ?? 0) : 0,
-        payingNetwork: isPaid ? (this.refundFg.value.payingNetwork ?? 0) : 0,
+        payingCash: isPaid ? +(this.refundFg.value.payingCash ?? 0).toFixed(2) : 0,
+        payingNetwork: isPaid ? +(this.refundFg.value.payingNetwork ?? 0).toFixed(2) : 0,
         createAt: this.localDateIso,
         idempotencyKey: crypto.randomUUID(),
         items,
@@ -337,8 +338,8 @@ export class RefundForm extends BaseComponent implements OnInit {
       const payload = {
         id: this.refundId(),
         paymentType: (this.orderData() as IRefundResponse)?.paymentType ?? 0,
-        payingCash: this.refundFg.value.payingCash ?? 0,
-        payingNetwork: this.refundFg.value.payingNetwork ?? 0,
+        payingCash: +(this.refundFg.value.payingCash ?? 0).toFixed(2),
+        payingNetwork: +(this.refundFg.value.payingNetwork ?? 0).toFixed(2),
         items,
       };
       this.refundService.put(payload).subscribe({

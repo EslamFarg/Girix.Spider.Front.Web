@@ -1,10 +1,22 @@
-<div class=" h-full no-scrollbar overflow-auto" [class.cursor-wait]="isLoading()">
+<div class="h-full no-scrollbar overflow-auto" [class.cursor-wait]="isLoading()">
   <section class="borde1r no-scrollbar overflow-auto border-text-lig1ht rounded-[8px] pt-5 flex flex-col gap-3 h-full">
-    <div class="flex ps-4 gap-2">
+    <div class="ps-4 gap-2">
       <div class="flex-1 flex flex-col gap-2">
         <!-- search -->
-        <form #form [formGroup]="menuSearchFg" appDebounce [domEvents]="['submit']" (debounced)="onSubmitSearch()">
-          <app-input-error-message-handler [fc]="menuSearchFg.get('searchTerm')">
+        <form
+          #form
+          class="w-full pb-2 border-b-2 border-text-light/50 flex gap-4"
+          [formGroup]="menuSearchFg"
+          appDebounce
+          [domEvents]="['submit']"
+          (debounced)="onSubmitSearch()"
+        >
+          <app-input-error-message-handler
+            class="flex-1"
+            [class.max-w-[700px]]="options().continueBtn"
+            [class.ps-16]="options().continueBtn"
+            [fc]="menuSearchFg.get('searchTerm')"
+          >
             <input
               class="w-full bg-transparent! h-8!"
               pInputText
@@ -65,6 +77,14 @@
               </button>
             </p-inputgroup-addon>
           </app-input-error-message-handler>
+
+          @if (options().continueBtn) {
+            <button pButton type="button" class="app-p-btn px-6! py-1!" (click)="onContinue.emit(true)">
+              <span>استمرار</span>
+              <!-- arrow -->
+              <i class="pi pi-arrow-left"></i>
+            </button>
+          }
         </form>
 
         <!-- categories | groups -->
@@ -82,13 +102,6 @@
           }
         </nav>
       </div>
-      @if (options().continueBtn) {
-        <button pButton class="ms-auto app-p-btn px-6! py-1!" (click)="onContinue.emit(true)">
-          <span>استمرار</span>
-          <!-- arrow -->
-          <i class="pi pi-arrow-left"></i>
-        </button>
-      }
     </div>
 
     <div

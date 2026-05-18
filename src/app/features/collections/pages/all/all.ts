@@ -117,6 +117,7 @@ export class All extends BaseComponent {
   constructor() {
     super();
     this.financialSettingsService.getSettings().subscribe((res) => this.financialSettings.set(res));
+    this.searchOrders(1);
     this.searchHuts(1);
     this.searchRooms(1);
     this.searchTables(1);

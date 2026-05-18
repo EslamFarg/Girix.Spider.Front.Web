@@ -217,7 +217,7 @@
         <app-input-error-message-handler [fc]="paymentFg.get('cashAccountId')">
           <ng-select
             class="app-select w-full"
-            [items]="cashAccounts()"
+            [items]="displayedCashAccounts()"
             [formControl]="getFormControl(paymentFg, 'cashAccountId')"
             bindLabel="name"
             bindValue="id"
@@ -261,7 +261,7 @@
         <app-input-error-message-handler [fc]="paymentFg.get('networkAccountId')">
           <ng-select
             class="app-select w-full"
-            [items]="networkAccounts()"
+            [items]="displayedNetworkAccounts()"
             [formControl]="getFormControl(paymentFg, 'networkAccountId')"
             bindLabel="name"
             bindValue="id"

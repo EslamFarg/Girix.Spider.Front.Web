@@ -57,28 +57,77 @@ export class CollectionDialog extends BaseComponent {
 
   net = computed(() => {
     // console.log('net change:');
-    if (this.isDeliveryDialog()) {
-      // console.log(`current delivery orders: ${JSON.stringify(this.currentDeliveryOrders())}`);
-      return +this.currentDeliveryOrders()
-        .reduce((acc, item) => {
-          if (this.checkedOrderIds().includes(item.orderId)) {
-            // console.log(`item: ${item.netOrder}`);
-            return acc + item.netOrder;
+    let finalNet = 0;
+
+    switch (this.currentBill()?.orderType) {
+      case OrderLocationType.PersonDelivery:
+      case OrderLocationType.CompanyDelivery:
+        finalNet = +this.currentDeliveryOrders()
+          .reduce((acc, item) => {
+            if (this.checkedOrderIds().includes(item.orderId)) {
+              // console.log(`item: ${item.netOrder}`);
+              return acc + item.netOrder;
+            } else {
+              return acc;
+            }
+          }, 0)
+          .toFixed(2);
+        break;
+      case OrderLocationType.DineIn:
+        if (this.currentBill()?.place.placeType === SpaceTypeEnum.Hut) {
+          let hutPrice = this.currentBill()?.summary?.priceForPlace ?? 0;
+          const originalHutPrice = hutPrice ?? 0;
+          const net = this.currentBill()?.summary?.totalNet ?? 0;
+          const reservedFrom = new Date(this.currentBill()?.place?.reservedFrom ?? '');
+          const reservedTo = new Date(this.currentBill()?.place?.reservedTo ?? '');
+          const originalDiffMinutes = (reservedTo.getTime() - reservedFrom.getTime()) / 1000 / 60;
+          const currentDiffMinutes = (Date.now() - reservedFrom.getTime()) / 1000 / 60;
+          if (originalDiffMinutes < 10) {
+            hutPrice = 0;
+          } else if (originalDiffMinutes > currentDiffMinutes - 10) {
+            hutPrice = hutPrice;
           } else {
-            return acc;
+            const minutePrice = hutPrice / originalDiffMinutes;
+            const newHourMinutes = currentDiffMinutes % 60;
+            let billedMinutes = currentDiffMinutes - newHourMinutes;
+            let billedNewHourMinutes = 0;
+            if (newHourMinutes >= 41) {
+              billedNewHourMinutes = 60;
+            } else if (newHourMinutes >= 11) {
+              billedNewHourMinutes = 30;
+            }else{
+              billedNewHourMinutes = newHourMinutes;
+            }
+            billedMinutes += billedNewHourMinutes;
+            console.log(`
+              originalDiffMinutes: ${originalDiffMinutes}
+              currentDiffMinutes: ${currentDiffMinutes}
+              newHourMinutes: ${newHourMinutes}
+              billedMinutes: ${billedMinutes}
+              `);
+            hutPrice = billedMinutes * minutePrice;
+            console.log('hutPrice', hutPrice);
           }
-        }, 0)
-        .toFixed(2);
-    } else {
-      if (!this.currentBill()) return 0;
-      return this.ordersCollectionsCaluclationsService.calculateBillNet(this.currentBill()!);
+          finalNet= net + hutPrice - originalHutPrice;
+        } else {
+          finalNet= +(this.currentBill()?.summary?.totalNet ?? 0);
+        }
+        break;
+      default:
+        if (!this.currentBill()) finalNet= 0;
+        finalNet= this.ordersCollectionsCaluclationsService.calculateBillNet(this.currentBill()!);
     }
+
+    const netReturnOrder = this.currentBill()?.summary?.netReturnOrder ?? 0;
+    return finalNet - netReturnOrder;
   });
   isDeliveryDialog = this.collectionsService.isDeliveryDialog;
   currentDeliveryOrders = this.collectionsService.currentDeliveryOrders;
   /**
    *
    */
+  userDetails = this.authService.userDetails;
+
   constructor() {
     super();
     this.searchAccounts({
@@ -88,6 +137,18 @@ export class CollectionDialog extends BaseComponent {
       next: (res) => {
         this.cashAccounts.set(res.value.rows);
         this.networkAccounts.set(res.value.rows);
+
+        const userDetails = this.userDetails();
+        if (userDetails?.cashPaymentAccountId) {
+          this.paymentFg.patchValue({
+            cashAccountId: userDetails.cashPaymentAccountId,
+          });
+        }
+        if (userDetails?.bankPaymentAccountId) {
+          this.paymentFg.patchValue({
+            networkAccountId: userDetails.bankPaymentAccountId,
+          });
+        }
       },
     });
   }
@@ -132,8 +193,8 @@ export class CollectionDialog extends BaseComponent {
     const networkPaymentAmount = +(this.paymentFg.get('networkPaymentAmount')?.value ?? 0);
     let formValue: any = {
       ...this.paymentFg.value,
-      cashPaymentAmount: Math.floor(cashPaymentAmount * 100) / 100,
-      networkPaymentAmount: Math.floor(networkPaymentAmount * 100) / 100,
+      cashPaymentAmount: +cashPaymentAmount.toFixed(2),
+      networkPaymentAmount: +networkPaymentAmount.toFixed(2),
       collectionDate: this.localDateIso,
     };
     //        orderId: ,
@@ -222,8 +283,35 @@ export class CollectionDialog extends BaseComponent {
   cashAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
   networkAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
 
-  displayedCashAccounts = computed(() => [this.currentCashAccount(), ...this.cashAccounts()]);
-  displayedNetworkAccounts = computed(() => [this.currentNetworkAccount(), ...this.networkAccounts()]);
+  displayedCashAccounts = computed(() => {
+    const accounts = this.cashAccounts();
+    const userDetails = this.userDetails();
+    const defaultAccount: ITreeFinancialAccountSearchRow | null = userDetails?.cashPaymentAccountId
+      ? ({
+          id: userDetails.cashPaymentAccountId,
+          name: userDetails.cashPaymentAccountName ?? '',
+        } as ITreeFinancialAccountSearchRow)
+      : null;
+    if (!defaultAccount) return [...accounts];
+    const hasDefault = accounts.some((a) => a.id === defaultAccount.id);
+    if (hasDefault) return [...accounts];
+    return [defaultAccount, ...accounts];
+  });
+
+  displayedNetworkAccounts = computed(() => {
+    const accounts = this.networkAccounts();
+    const userDetails = this.userDetails();
+    const defaultAccount: ITreeFinancialAccountSearchRow | null = userDetails?.bankPaymentAccountId
+      ? ({
+          id: userDetails.bankPaymentAccountId,
+          name: userDetails.bankPaymentAccountName ?? '',
+        } as ITreeFinancialAccountSearchRow)
+      : null;
+    if (!defaultAccount) return [...accounts];
+    const hasDefault = accounts.some((a) => a.id === defaultAccount.id);
+    if (hasDefault) return [...accounts];
+    return [defaultAccount, ...accounts];
+  });
 
   searchAccounts(data: { pageIndex: number; searchTerm?: string }) {
     return this.financialAccountService.search({

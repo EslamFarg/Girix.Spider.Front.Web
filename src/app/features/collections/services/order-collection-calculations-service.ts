@@ -6,17 +6,16 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class OrderCollectionCalculationsService {
+
   calculateBillNet(bill: IOrderBillReadResponse): number {
     let billNet = bill?.summary?.totalNet ?? 0;
     if (bill?.orderType === OrderLocationType.DineIn && bill?.place.placeType === SpaceTypeEnum.Hut) {
       const toDate = new Date(bill?.place?.reservedTo);
       const fromDate = new Date(bill?.place?.reservedFrom);
-      console.log('fromDate', !!fromDate, 'toDate', !!toDate);
       //didn't pass 10 minutes
       if (fromDate) {
         const diff = Math.abs(Date.now() - fromDate.getTime());
         const minutes = Math.floor(diff / 1000 / 60);
-        console.log('minutes', minutes);
         
         if (minutes < 10) {
           billNet -= bill?.summary?.priceForPlace;
@@ -27,4 +26,5 @@ export class OrderCollectionCalculationsService {
     }
     return +(bill?.summary?.totalNet ?? 0)
   }
+  
 }

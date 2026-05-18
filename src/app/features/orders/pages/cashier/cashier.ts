@@ -871,9 +871,12 @@ export class Cashier extends BaseComponent implements OnInit {
   });
 
   serviceFee = computed(() => {
-    if (this.orderLocationType() !== OrderLocationType.DineIn) return 0;
+    console.log('---------------',this.orderLocationType())
+    // if (this.orderLocationType() !== OrderLocationType.DineIn) return 0;
+    // else{
 
-    const itemsWithSelectiveTaxSum = this.orderMenuItems().reduce(
+      
+      const itemsWithSelectiveTaxSum = this.orderMenuItems().reduce(
       (total, item) => total + this.getMenuItemPriceWithAdditionsWithSelectiveTax(item),
       0,
     );
@@ -885,8 +888,14 @@ export class Cashier extends BaseComponent implements OnInit {
     } else {
       serviceFeeAfterTax = this.financialSettings().serviceFee * (1 + this.financialSettings().vat / 100);
     }
-    return serviceFeeAfterTax;
-  });
+    console.log(`
+      serviceFee: ${serviceFee}
+      serviceFeeAfterTax: ${serviceFeeAfterTax}
+      itemsWithSelectiveTaxSum: ${itemsWithSelectiveTaxSum}
+      `)
+      return serviceFeeAfterTax;
+    // }
+    });
 
   itemsDiscountAmount = computed(() => {
     const discountValue = this.financialSettings().discount;
