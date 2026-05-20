@@ -8,10 +8,11 @@ import { InputOtp } from 'primeng/inputotp';
 import { InputErrorMessageHandler } from '@/yn-ng';
 import { Button } from 'primeng/button';
 import { RouterLink } from '@angular/router';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-crm-otp-validation',
-  imports: [InputOtp, InputErrorMessageHandler, CountdownComponent, Button, ReactiveFormsModule, RouterLink],
+  imports: [InputOtp, InputErrorMessageHandler, CountdownComponent, Button, ReactiveFormsModule, RouterLink, LoadingDisabledDirective],
   templateUrl: './crm-otp-validation.html',
   styleUrl: './crm-otp-validation.css',
 })

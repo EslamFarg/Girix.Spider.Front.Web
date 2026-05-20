@@ -1,6 +1,6 @@
 <div class="custom-scroll overflow-auto h-full">
   <app-section-wrapper class="p-4 sm:px-6 min-h-full" styleClass="flex flex-col gap-4">
-    <form [formGroup]="fg" (ngSubmit)="onSubmit()" (reset)="onReset()" action="" class="flex flex-col gap-4 md:gap-6">
+    <form appLoadingDisabled [formGroup]="fg" (ngSubmit)="onSubmit()" (reset)="onReset()" action="" class="flex flex-col gap-4 md:gap-6">
       <!-- اسم الطابعه -->
       <div>
         <label for="productPrice">اسم الطابعه</label>
@@ -88,7 +88,7 @@
           </div>
           <!-- bluetooth printer search -->
           @if (fg.value.type === PrinterType.Bluetooth) {
-            <button type="button" class="flex cursor-pointer items-center gap-2" (click)="getLocalBluetoothPrinters()">
+            <button appLoadingDisabled type="button" class="flex cursor-pointer items-center gap-2" (click)="getLocalBluetoothPrinters()">
               <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   opacity="0.5"
@@ -108,9 +108,9 @@
       </div>
 
       <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 md:mt-4">
-        <p-button class="app-p-btn" styleClass="md:px-8!" label="حفظ" type="submit" />
-        <p-button class="app-p-btn" styleClass="md:px-8!" label="جديد" type="reset" variant="outlined" />
-        <p-button class="app-p-btn" styleClass="md:px-8!" label="اختبار الاتصال" type="button" variant="outlined" severity="info" (onClick)="testConnection()" />
+        <p-button appLoadingDisabled class="app-p-btn" styleClass="md:px-8!" label="حفظ" type="submit" />
+        <p-button appLoadingDisabled class="app-p-btn" styleClass="md:px-8!" label="جديد" type="reset" variant="outlined" />
+        <p-button appLoadingDisabled class="app-p-btn" styleClass="md:px-8!" label="اختبار الاتصال" type="button" variant="outlined" severity="info" (onClick)="testConnection()" />
       </div>
     </form>
 
@@ -140,12 +140,12 @@
               </td>
               <td>
                 <div class="actions">
-                  <button type="button" class="test" (click)="testConnection(item)" title="اختبار الاتصال">
+                  <button appLoadingDisabled type="button" class="test" (click)="testConnection(item)" title="اختبار الاتصال">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M8 1L10.5 5.5L15 6.5L12 10L12.5 15L8 12.5L3.5 15L4 10L1 6.5L5.5 5.5L8 1Z" fill="#4CAF50" stroke="#4CAF50" stroke-width="1"/>
                     </svg>
                   </button>
-                  <button type="button" class="edit" (click)="editPrinter(item)">
+                  <button appLoadingDisabled type="button" class="edit" (click)="editPrinter(item)">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
                         opacity="0.4"
@@ -163,7 +163,7 @@
                       />
                     </svg>
                   </button>
-                  <button type="button" class="delete" (click)="deletePrinter(item.id, $event)">
+                  <button appLoadingDisabled type="button" class="delete" (click)="deletePrinter(item.id, $event)">
                     <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
                         opacity="0.4"

@@ -14,6 +14,7 @@ import { RouterLink } from '@angular/router';
 import { Debounce } from '@/directives/debounce';
 import { ICustomerSearchRow } from '../../services/customer-types';
 import { TranslatePipe } from '@ngx-translate/core';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-customers',
@@ -27,8 +28,9 @@ import { TranslatePipe } from '@ngx-translate/core';
     InputText,
     RouterLink,
     Debounce,
-    TranslatePipe
-  ],
+    TranslatePipe,
+    LoadingDisabledDirective
+],
   templateUrl: './customers.html',
   styleUrl: './customers.css',
 })

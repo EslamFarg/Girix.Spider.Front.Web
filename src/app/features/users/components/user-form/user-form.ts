@@ -20,6 +20,7 @@ import {
 import { IUserReadResponse } from '../../types/users/api';
 import { UserType } from '../../types';
 import { RouterLink } from "@angular/router";
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 // import { IusersFgControls } from '@/features/deliveries/components/users-man-form/types';
 // import { usersService } from '@/features/deliveries/services/users-service';
 
@@ -34,7 +35,8 @@ import { RouterLink } from "@angular/router";
     Select,
     TranslatePipe,
     ReactiveFormsModule,
-    RouterLink
+    RouterLink,
+    LoadingDisabledDirective
 ],
   templateUrl: './user-form.html',
   styleUrl: './user-form.css',

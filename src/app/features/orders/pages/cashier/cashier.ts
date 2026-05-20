@@ -85,6 +85,7 @@ import {
 } from '@/features/accounts/services/financial-account-service';
 import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { AllowedRolesDirective } from '@/directives/allowed-roles';
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -143,6 +144,7 @@ interface IOrderCreateFgValue {
     RouterLink,
     PrintableOrderInvoice,
     AllowedRolesDirective,
+    LoadingDisabledDirective,
   ],
   templateUrl: './cashier.html',
   styleUrl: './cashier.css',
@@ -375,36 +377,6 @@ export class Cashier extends BaseComponent implements OnInit {
     if (changedItem.menuItem.quantity <= 0) return;
 
     this.orderMenuItems.update((items) => items.concat(changedItem));
-    // return;
-    // const existingItem = this.orderMenuItems().find((item) => item.menuItem.id == changedItem.menuItem.id);
-    // if (existingItem) {
-    //   const futureQuantity = existingItem.menuItem.quantity + changedItem.menuItem.quantity;
-
-    //   if (futureQuantity >= 1000) {
-    //     this.orderMenuItems.update((items) =>
-    //       items.map((item) =>
-    //         item.menuItem.id == existingItem.menuItem.id
-    //           ? { ...item, menuItem: { ...item.menuItem, quantity: 1000 } }
-    //           : item,
-    //       ),
-    //     );
-    //     return;
-    //   }
-
-    //   if (futureQuantity <= 0) {
-    //     this.orderMenuItems.update((items) => items.filter((item) => item.menuItem.id != changedItem.menuItem.id));
-    //     return;
-    //   }
-
-    //   this.orderMenuItems.update((items) =>
-    //     items.map((item) =>
-    //       item.menuItem.id == existingItem.menuItem.id
-    //         ? { ...item, menuItem: { ...item.menuItem, quantity: futureQuantity } }
-    //         : item,
-    //     ),
-    //   );
-    // } else {
-    // }
   }
 
   test() {
@@ -510,6 +482,7 @@ export class Cashier extends BaseComponent implements OnInit {
     this.orderFg.patchValue({
       idempotencyKey: Date.now() + Math.random().toString(),
       placeRefId: null,
+      placeType: null,
     });
     this.orderFg.updateValueAndValidity();
     this.resetData();
@@ -871,7 +844,6 @@ export class Cashier extends BaseComponent implements OnInit {
   });
 
   serviceFee = computed(() => {
-
     const itemsWithSelectiveTaxSum = this.orderMenuItems().reduce(
       (total, item) => total + this.getMenuItemPriceWithAdditionsWithSelectiveTax(item),
       0,
@@ -885,6 +857,8 @@ export class Cashier extends BaseComponent implements OnInit {
       serviceFeeAfterTax = this.financialSettings().serviceFee * (1 + this.financialSettings().vat / 100);
     }
 
+    console.log('service fee after tax:', serviceFeeAfterTax);
+    console.log('location type:', this.orderLocationType());
     if (this.orderLocationType() !== OrderLocationType.DineIn) return 0;
     return serviceFeeAfterTax;
     // }
@@ -1305,7 +1279,7 @@ export class Cashier extends BaseComponent implements OnInit {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 20,
+          pageSize: 40,
         },
         searchFilters: [
           {
@@ -1318,7 +1292,11 @@ export class Cashier extends BaseComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.value.rows.length > 0) {
-            this.huts.update((prev) => prev.concat(res.value.rows));
+            if (pageIndex == 1) {
+              this.huts.set(res.value.rows);
+            } else {
+              this.huts.update((prev) => prev.concat(res.value.rows));
+            }
             this.hutPaginationInfo = {
               pageIndex,
               totalPagesCount: res.value.paginationInfo.totalPagesCount,
@@ -1339,6 +1317,10 @@ export class Cashier extends BaseComponent implements OnInit {
   onHutSelected(hut: IHutSearchRow) {
     if (hut.isAvailable) {
       // this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
+      this.orderFg.patchValue({
+        orderType: OrderLocationType.DineIn,
+      })
+      this.orderLocationType.set(OrderLocationType.DineIn);
       this.currentHut.set(hut);
       // this.HutDialogVisible = false;
     }
@@ -1395,7 +1377,7 @@ export class Cashier extends BaseComponent implements OnInit {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 20,
+          pageSize: 40,
         },
         searchFilters: [
           {
@@ -1408,7 +1390,11 @@ export class Cashier extends BaseComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.value.rows.length > 0) {
-            this.tables.update((prev) => prev.concat(res.value.rows));
+            if (pageIndex == 1) {
+              this.tables.set(res.value.rows);
+            } else {
+              this.tables.update((prev) => prev.concat(res.value.rows));
+            }
             this.tablePaginationInfo = {
               pageIndex,
               totalPagesCount: res.value.paginationInfo.totalPagesCount,
@@ -1429,7 +1415,12 @@ export class Cashier extends BaseComponent implements OnInit {
       this.currentHut.set(null);
       this.currentRoom.set(null);
       this.currentTable.set(table);
-      this.orderFg.patchValue({ placeRefId: table.id, placeType: OrderLocalType.Table });
+      this.orderFg.patchValue({
+        placeRefId: table.id,
+        placeType: OrderLocalType.Table,
+        orderType: OrderLocationType.DineIn,
+      });
+      this.orderLocationType.set(OrderLocationType.DineIn);
       this.activeLocalType.set(OrderLocalType.Table);
       this.TableDialogVisible = false;
       this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
@@ -1466,7 +1457,7 @@ export class Cashier extends BaseComponent implements OnInit {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 20,
+          pageSize: 40,
         },
         searchFilters: [
           {
@@ -1479,7 +1470,11 @@ export class Cashier extends BaseComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.value.rows.length > 0) {
-            this.rooms.update((prev) => prev.concat(res.value.rows));
+            if (pageIndex == 1) {
+              this.rooms.set(res.value.rows);
+            } else {
+              this.rooms.update((prev) => prev.concat(res.value.rows));
+            }
             this.roomPaginationInfo = {
               pageIndex,
               totalPagesCount: res.value.paginationInfo.totalPagesCount,
@@ -1501,7 +1496,12 @@ export class Cashier extends BaseComponent implements OnInit {
       this.currentHut.set(null);
       this.currentTable.set(null);
       this.currentRoom.set(room);
-      this.orderFg.patchValue({ placeRefId: room.id, placeType: OrderLocalType.Room });
+      this.orderFg.patchValue({
+        placeRefId: room.id,
+        placeType: OrderLocalType.Room,
+        orderType: OrderLocationType.DineIn,
+      });
+      this.orderLocationType.set(OrderLocationType.DineIn);
       this.activeLocalType.set(OrderLocalType.Room);
       this.RoomDialogVisible = false;
       this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع بنجاح' });
@@ -1559,7 +1559,7 @@ export class Cashier extends BaseComponent implements OnInit {
         .search({
           paginationInfo: {
             pageIndex: pageIndex,
-            pageSize: 20,
+            pageSize: 40,
           },
           searchFilters: [
             {
@@ -1591,7 +1591,7 @@ export class Cashier extends BaseComponent implements OnInit {
         .search({
           paginationInfo: {
             pageIndex: pageIndex,
-            pageSize: 20,
+            pageSize: 40,
           },
           searchFilters: [
             {
@@ -1625,9 +1625,9 @@ export class Cashier extends BaseComponent implements OnInit {
       this.searchDeliveries(this.deliveryPaginationInfo.pageIndex + 1);
     }
   }
-  onDeliverySelected(deliveryId: number) {
+  onDeliverySelected(deliveryId: number,orderType:OrderLocationType) {
     // if (delivery.isAvailable) {
-    this.orderFg.patchValue({ deliveryId });
+    this.orderFg.patchValue({ deliveryId, orderType });
     this.DeliveryDialogVisible = false;
     this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الدليفري بنجاح' });
     // } else {
@@ -2034,9 +2034,15 @@ export class Cashier extends BaseComponent implements OnInit {
       validators = [Validators.required];
       cashControl?.enable();
       networkControl?.enable();
+      this.orderFg.patchValue({
+        paymentType: OrderPaymentType.Paid,
+      })
     } else {
       cashControl?.disable();
       networkControl?.disable();
+      this.orderFg.patchValue({
+        paymentType: OrderPaymentType.Pending,
+      })
     }
     cashControl?.setValidators(validators);
     networkControl?.setValidators(validators);

@@ -13,6 +13,7 @@ import { Menu } from 'primeng/menu';
 import { ImgFallback } from '@/directives/img-fallback';
 import { Debounce } from '@/directives/debounce';
 import { RouterLink } from "@angular/router";
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-meals',
@@ -27,7 +28,8 @@ import { RouterLink } from "@angular/router";
     Menu,
     ImgFallback,
     Debounce,
-    RouterLink
+    RouterLink,
+    LoadingDisabledDirective
 ],
   templateUrl: './meals.html',
   styleUrl: './meals.css',
@@ -48,7 +50,7 @@ export class Meals extends BaseComponent {
       command: (event) => this.fg.patchValue({ searchEnum: MealSearchEnum.Name }),
     },
     {
-      label: 'اسم الفئة',
+      label: 'اسم المجموعة',
       command: (event) => this.fg.patchValue({ searchEnum: MealSearchEnum.CategoryName }),
     },
   ]);
@@ -119,8 +121,8 @@ export class Meals extends BaseComponent {
   deleteMeal(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف المنتج',
-      header: 'حذف المنتج',
+      message: 'هل انت متاكد من حذف الوجبة',
+      header: 'حذف الوجبة',
       icon: 'pi pi-info-circle',
       rejectLabel: 'الغاء',
       rejectButtonProps: {

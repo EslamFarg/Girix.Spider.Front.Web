@@ -11,6 +11,7 @@ import { IPrinterSearchRow, PrinterService, PrinterType } from '@/features/print
 import { Dialog } from 'primeng/dialog';
 import { IBluetoothPrinter } from '@/app';
 import { onlyNumbersAllowed } from '@/yn-ng';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-add-printer',
@@ -23,7 +24,8 @@ import { onlyNumbersAllowed } from '@/yn-ng';
     Paginator,
     ReactiveFormsModule,
     Dialog,
-    ButtonDirective
+    ButtonDirective,
+    LoadingDisabledDirective
 ],
   templateUrl: './add-printer.html',
   styleUrl: './add-printer.css',

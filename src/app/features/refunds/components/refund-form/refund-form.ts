@@ -17,6 +17,7 @@ import { ControlsOf } from '@/yn-ng/types/helpers';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { OrderPaymentType } from '@/features/orders';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 interface IRefundItemFormRow {
   orderDetailId: number;
@@ -52,7 +53,8 @@ type RefundAddonFormRowControls = ControlsOf<IRefundAddonFormRow>;
     RouterLink,
     DecimalPipe,
     ButtonDirective,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './refund-form.html',
   styleUrl: './refund-form.css',
 })

@@ -16,6 +16,7 @@ import { Debounce, IDebounceEvent } from '@/directives/debounce';
 import { tap } from 'rxjs';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { onlyNumbersAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
  
  
@@ -54,7 +55,8 @@ enum QuantityOptions {
     Debounce,
     AllowNumbers,
     ButtonDirective,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './inventory-settlement-form.html',
   styleUrl: './inventory-settlement-form.css',
 })

@@ -14,6 +14,7 @@ import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-delivery-men',
@@ -30,7 +31,8 @@ import { TranslatePipe } from '@ngx-translate/core';
     Menu,
     RouterLink,
     TranslatePipe,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './delivery-men.html',
   styleUrl: './delivery-men.css',
 })

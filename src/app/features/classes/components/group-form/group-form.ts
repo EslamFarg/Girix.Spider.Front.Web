@@ -20,6 +20,7 @@ import { ImgFallback } from '@/directives/img-fallback';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from "@angular/router";
 import { IPrinterSearchRow } from '@/features/printers';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-group-form',
@@ -37,7 +38,8 @@ import { IPrinterSearchRow } from '@/features/printers';
     TranslatePipe,
     ɵInternalFormsSharedModule,
     ReactiveFormsModule,
-    RouterLink
+    RouterLink,
+    LoadingDisabledDirective
 ],
   templateUrl: './group-form.html',
   styleUrl: './group-form.css',
@@ -155,6 +157,7 @@ export class GroupForm extends BaseComponent implements OnInit {
         this.groupService.create(formData).subscribe({
           next: (res) => {
             console.log(res);
+            this.router.navigate(['/classes/groups']);
           },
         });
         break;
@@ -162,6 +165,7 @@ export class GroupForm extends BaseComponent implements OnInit {
         this.groupService.patch(formData).subscribe({
           next: (res) => {
             console.log(res);
+              this.router.navigate(['/classes/groups']);
           },
         });
         break;

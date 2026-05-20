@@ -17,6 +17,7 @@ import { IUnitSearchRow, UnitSearchEnum, UnitService } from '../../services/unit
 import { ProductComponentsService } from '../../services/product-components-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { ButtonDirective } from 'primeng/button';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 interface IProductComponentFormRow {
   componentId: number | null;
@@ -38,7 +39,8 @@ type ProductComponentFormRowControls = ControlsOf<IProductComponentFormRow>;
     ReactiveFormsModule,
     AllowNumbers,
     ButtonDirective,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './product-components-form.html',
   styleUrl: './product-components-form.css',
 })

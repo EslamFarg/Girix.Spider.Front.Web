@@ -6,10 +6,11 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { InputOtpModule } from 'primeng/inputotp';
 import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdown';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-otp-verification',
-  imports: [InputErrorMessageHandler, Button, ReactiveFormsModule, RouterLink, InputOtpModule, CountdownComponent],
+  imports: [InputErrorMessageHandler, Button, ReactiveFormsModule, RouterLink, InputOtpModule, CountdownComponent, LoadingDisabledDirective],
   templateUrl: './otp-verification.html',
   styleUrl: './otp-verification.css',
 })

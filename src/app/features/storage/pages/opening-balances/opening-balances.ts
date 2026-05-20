@@ -15,6 +15,7 @@ import { Debounce } from "@/directives/debounce";
 import { Menu } from "primeng/menu";
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from "@angular/router";
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-opening-balances',
@@ -30,7 +31,8 @@ import { RouterLink } from "@angular/router";
     Debounce,
     Menu,
     TranslatePipe,
-    RouterLink
+    RouterLink,
+    LoadingDisabledDirective
 ],
   templateUrl: './opening-balances.html',
   styleUrl: './opening-balances.css',

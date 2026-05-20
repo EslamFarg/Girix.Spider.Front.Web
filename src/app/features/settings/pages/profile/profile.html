@@ -1,26 +1,5 @@
 <form class="overflow-auto h-full no-scrollbar" [formGroup]="userFg" (ngSubmit)="onSubmitForm()">
   <app-section-wrapper class="p-4">
-    <!-- <div
-      class="flex items-center justify-center bg-dark-line w-10 h-10 rounded-lg ms-auto cursor-pointer"
-      style="box-shadow: 0px 4px 4px 0px #71717199"
-    >
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          opacity="0.4"
-          d="M15.1055 14.1797H10.0439C9.55009 14.1797 9.14844 14.5877 9.14844 15.0894C9.14844 15.592 9.55009 15.999 10.0439 15.999H15.1055C15.5993 15.999 16.001 15.592 16.001 15.0894C16.001 14.5877 15.5993 14.1797 15.1055 14.1797Z"
-          fill="white"
-        />
-        <path
-          d="M6.49691 3.46944L11.2932 7.34508C11.4089 7.43776 11.4287 7.60785 11.3384 7.72633L5.65222 15.1355C5.29477 15.5932 4.76801 15.8522 4.20363 15.8617L1.09952 15.8999C0.933968 15.9019 0.789109 15.7872 0.751484 15.6228L0.0460042 12.5556C-0.0762789 11.9918 0.0460042 11.409 0.403447 10.9599L6.11783 3.51531C6.21001 3.39586 6.38027 3.37484 6.49691 3.46944Z"
-          fill="white"
-        />
-        <path
-          opacity="0.4"
-          d="M13.4398 5.03595L12.5152 6.19023C12.4221 6.30776 12.2546 6.32687 12.1389 6.23323C11.0149 5.32356 8.1365 2.9892 7.3379 2.3423C7.22126 2.24675 7.20527 2.07666 7.29933 1.95818L8.19106 0.850717C9.00001 -0.190812 10.411 -0.286365 11.5491 0.62139L12.8566 1.66292C13.3928 2.08335 13.7502 2.63756 13.8725 3.22044C14.0136 3.8616 13.8631 4.49129 13.4398 5.03595Z"
-          fill="white"
-        />
-      </svg>
-    </div> -->
 
     <div class="mt-6 flex flex-col md:flex-row gap-4 md:col-span-2 flex-1 [&_label]:text-dark-bg-1!">
       <div
@@ -37,6 +16,7 @@
         />
         @if (currentImage()) {
           <button
+          appLoadingDisabled
             (click)="onDeleteImage()"
             type="button"
             class="absolute animate-shake cursor-pointer backdrop-blur-[10px] transition-all top-2 z-10 left-2 p-1.5 rounded border border-transparent hover:bg-rose-500/10 hover:border-red-500/50 group"
@@ -168,7 +148,7 @@
 
     <div class="flex justify-end mt-4 md:mt-6">
       <p-button
-      
+        appLoadingDisabled
         class="flex-1 md:flex-none"
         styleClass="border-dark-line! bg-dark-line! text-white! py-1! w-full  md:px-8!"
         type="submit"

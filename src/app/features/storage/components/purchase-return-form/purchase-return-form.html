@@ -1,6 +1,6 @@
 <!-- actions -->
 <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 mb-4">
-  <button type="submit" form="openingBalancesForm" pButton class="flex-1 md:flex-none app-p-btn py-1! md:px-8!">
+  <button appLoadingDisabled type="submit" form="openingBalancesForm" pButton class="flex-1 md:flex-none app-p-btn py-1! md:px-8!">
     حفظ
   </button>
   @switch (formMode()) {
@@ -19,6 +19,7 @@
 
 <form
   [formGroup]="fg"
+  appLoadingDisabled
   (ngSubmit)="onSubmitPurchase()"
   id="openingBalancesForm"
   class="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1 my-4"
@@ -59,6 +60,7 @@
     class="col-span-1"
     id="searchVoucherForm"
     [formGroup]="shallowFg"
+    appLoadingDisabled
     appDebounce
     [domEvents]="['submit']"
     (debounced)="debouncedFindPurchaseInvoiceByNumber($event, voucherSearchInput.value)"
@@ -76,7 +78,7 @@
         placeholder="بحث برقم الفاتوره/المرتجع"
       />
       <p-inputgroup-addon class="p-0! cursor-pointer relative">
-        <button type="button" form="searchVoucherForm" class="flex cursor-pointer" (click)="filterMenu.toggle($event)">
+        <button appLoadingDisabled type="button" form="searchVoucherForm" class="flex cursor-pointer" (click)="filterMenu.toggle($event)">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               opacity="0.4"

@@ -6,6 +6,7 @@ import { ButtonDirective } from 'primeng/button';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IPrinterSettingsReadResponse, PrinterSettingsService } from '../../services/printer-settings-service';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
  
 
@@ -15,7 +16,7 @@ export interface IAppPrinter extends IPrinterSearchRow {
 
 @Component({
   selector: 'app-print-dialog',
-  imports: [Dialog, ButtonDirective, TranslatePipe, FormsModule, ReactiveFormsModule],
+  imports: [Dialog, ButtonDirective, TranslatePipe, FormsModule, ReactiveFormsModule, LoadingDisabledDirective],
   templateUrl: './print-dialog.html',
   styleUrl: './print-dialog.css',
 })
@@ -28,7 +29,11 @@ export class PrintDialog extends BaseComponent {
   closePrinterDialog = this.printerService.closePrinterDialog;
 
   printerItems = computed<IAppPrinter[]>(() => {
-    if (!this.printerSettings()) return [];
+    const printers=this.printerSettings();
+    
+    if (!printers) {
+      return [];
+    }
 
     return Object.entries(this.printerSettings()!).map(([key, value]) => {
       return { appPrinterType: key, ...value };

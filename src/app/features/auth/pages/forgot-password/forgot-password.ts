@@ -6,9 +6,10 @@ import { InputText } from 'primeng/inputtext';
 import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { ButtonModule } from 'primeng/button';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 @Component({
   selector: 'app-forgot-password',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputText, RouterLink, ButtonModule],
+  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputText, RouterLink, ButtonModule, LoadingDisabledDirective],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.css',
 })

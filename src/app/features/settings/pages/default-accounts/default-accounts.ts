@@ -18,6 +18,7 @@ import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { InputText } from 'primeng/inputtext';
 import { TranslatePipe } from '@ngx-translate/core';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 interface IAppDefaultAccountItem {
   id: number | null;
@@ -26,7 +27,7 @@ interface IAppDefaultAccountItem {
 type IAppDefaultAccountItemControls = ControlsOf<IFixedFinancialAccountPatchRow>;
 @Component({
   selector: 'app-default-accounts',
-  imports: [SectionWrapper, InputErrorMessageHandler, Select, Button, ReactiveFormsModule, InputText, TranslatePipe],
+  imports: [SectionWrapper, InputErrorMessageHandler, Select, Button, ReactiveFormsModule, InputText, TranslatePipe, LoadingDisabledDirective],
   templateUrl: './default-accounts.html',
   styleUrl: './default-accounts.css',
 })

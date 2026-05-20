@@ -7,10 +7,11 @@ import { BaseComponent } from '@/components';
 import { IPrinterSearchRow, PrinterType, PrinterSearchEnum, PrinterService } from '@/features/printers';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { PrinterSettingsService } from '@/features/printers/services/printer-settings-service';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-printer',
-  imports: [SectionWrapper, InputErrorMessageHandler, Select, Button, ReactiveFormsModule, ButtonDirective],
+  imports: [SectionWrapper, InputErrorMessageHandler, Select, Button, ReactiveFormsModule, ButtonDirective, LoadingDisabledDirective],
   templateUrl: './printer.html',
   styleUrl: './printer.css',
 })

@@ -13,6 +13,7 @@ import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 @Component({
   selector: 'app-groups',
   imports: [
@@ -27,7 +28,8 @@ import { RouterLink } from '@angular/router';
     Menu,
     TranslatePipe,
     RouterLink,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './groups.html',
   styleUrl: './groups.css',
 })
@@ -101,8 +103,8 @@ export class Groups extends BaseComponent {
   deleteGroup(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف الطابعة',
-      header: 'حذف الطابعة',
+      message: 'هل انت متاكد من حذف المجموعة',
+      header: 'حذف المجموعة',
       icon: 'pi pi-info-circle',
       rejectLabel: 'الغاء',
       rejectButtonProps: {

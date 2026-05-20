@@ -29,6 +29,7 @@ import {
 import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 interface IAppPurchaseItem {
   menuItemsId: number | null;
@@ -59,7 +60,8 @@ type IAppPurchaseItemControls = ControlsOf<IAppPurchaseItem>;
     NgSelectComponent,
     TranslatePipe,
     RouterLink,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './purchases-form.html',
   styleUrl: './purchases-form.css',
 })

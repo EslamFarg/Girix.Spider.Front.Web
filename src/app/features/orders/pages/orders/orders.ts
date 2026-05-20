@@ -20,6 +20,7 @@ import { FormControlNotifier } from '@/directives/form-control-notifier';
 import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
 import { IPrinterSearchRow } from '@/features/printers';
 import { PrinterSettingsService, IPrinterSettingsReadResponse } from '@/features/printers/services/printer-settings-service';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-orders',
@@ -39,7 +40,8 @@ import { PrinterSettingsService, IPrinterSettingsReadResponse } from '@/features
     Dialog,
     FormControlNotifier,
     PrintableOrderInvoice,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })
@@ -65,14 +67,14 @@ export class Orders extends BaseComponent {
       label: 'رقم الطلب',
       command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderNumber }),
     },
-    {
-      label: 'موقع الطلب',
-      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderPlace }),
-    },
-    {
-      label: 'نوع الطلب',
-      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderType }),
-    },
+    // {
+    //   label: 'موقع الطلب',
+    //   command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderPlace }),
+    // },
+    // {
+    //   label: 'نوع الطلب',
+    //   command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderType }),
+    // },
   ]);
 
   constructor() {

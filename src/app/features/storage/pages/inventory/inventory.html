@@ -2,6 +2,7 @@
   <!-- search -->
   <form
     #form
+    appLoadingDisabled
     [formGroup]="fg"
     appDebounce
     [domEvents]="['submit']"
@@ -89,7 +90,7 @@
                   />
                 </svg>
               </a>
-              <button type="button" class="delete" (click)="deleteInventory(item.id, $event)">
+              <button appLoadingDisabled type="button" class="delete" (click)="deleteInventory(item.id, $event)">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"

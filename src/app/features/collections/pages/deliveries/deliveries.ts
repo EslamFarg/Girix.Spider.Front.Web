@@ -20,6 +20,7 @@ import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
 import { OrderLocationType } from '@/features/orders';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-deliveries',
@@ -37,7 +38,8 @@ import { OrderLocationType } from '@/features/orders';
     Debounce,
     Menu,
     TranslatePipe,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './deliveries.html',
   styleUrl: './deliveries.css',
 })

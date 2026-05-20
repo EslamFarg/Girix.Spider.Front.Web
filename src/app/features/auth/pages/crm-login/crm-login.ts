@@ -6,10 +6,11 @@ import { InputText } from 'primeng/inputtext';
 import { Password } from 'primeng/password';
 import { Button } from 'primeng/button';
 import { RouterLink } from '@angular/router';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-crm-login',
-  imports: [InputErrorMessageHandler, InputText, Password, Button, ReactiveFormsModule, RouterLink],
+  imports: [InputErrorMessageHandler, InputText, Password, Button, ReactiveFormsModule, RouterLink, LoadingDisabledDirective],
   templateUrl: './crm-login.html',
   styleUrl: './crm-login.css',
 })

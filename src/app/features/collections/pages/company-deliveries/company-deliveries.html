@@ -3,6 +3,7 @@
   <form
     #form
     [formGroup]="fg"
+    appLoadingDisabled
     appDebounce
     [domEvents]="['submit']"
     (debounced)="onSearchSubmit()"

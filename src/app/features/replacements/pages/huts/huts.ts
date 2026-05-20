@@ -15,6 +15,7 @@ import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { MenuItem } from 'primeng/api';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { OrderService } from '@/features/orders';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 @Component({
   selector: 'app-huts',
   imports: [
@@ -26,7 +27,8 @@ import { OrderService } from '@/features/orders';
     Paginator,
     CountdownComponent,
     HutCard,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './huts.html',
   styleUrl: './huts.css',
 })

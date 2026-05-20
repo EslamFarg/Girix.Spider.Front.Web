@@ -13,6 +13,7 @@ import { Debounce } from '@/directives/debounce';
 import { InputText } from 'primeng/inputtext';
 import { CollectionsService } from '../../services/collections-service';
 import { OrderLocationType } from '@/features/orders';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-company-deliveries',
@@ -27,7 +28,8 @@ import { OrderLocationType } from '@/features/orders';
     Debounce,
     SectionWrapper,
     InputText,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './company-deliveries.html',
   styleUrl: './company-deliveries.css',
 })

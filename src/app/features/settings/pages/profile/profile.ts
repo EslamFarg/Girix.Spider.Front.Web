@@ -12,6 +12,7 @@ import { FinancialAccountService } from '@/features/accounts/services/financial-
 import { TranslatePipe } from '@ngx-translate/core';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { ImgFallback } from '@/directives/img-fallback';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-profile',
@@ -24,7 +25,8 @@ import { ImgFallback } from '@/directives/img-fallback';
     SectionWrapper,
     ReactiveFormsModule,
     ImgFallback,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })

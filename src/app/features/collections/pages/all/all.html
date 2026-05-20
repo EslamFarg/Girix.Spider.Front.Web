@@ -2,19 +2,32 @@
   <app-section-wrapper>
     <!-- search -->
     <div class="flex h-fit items-start gap-2 w-full">
-      <form #form [formGroup]="fg" (ngSubmit)="onSubmit()" class="flex-1">
+      <form #form [formGroup]="fg" appLoadingDisabled (ngSubmit)="onSubmit()" class="flex-1">
         <app-input-error-message-handler [fc]="fg.get('searchTerm')">
           <input class="w-full bg-transparent!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
           <p-inputgroup-addon>
-            <i class="pi pi-filter"></i>
+            <div class="relative flex items-center justify-center">
+              <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+              <p-menu
+                dir="rtl"
+                [class]="`*:top-full! *:left-0! `"
+                #filterMenu
+                [model]="filterMenuItems()"
+                [popup]="true"
+                [style]="{ insetInlineEnd: '100%' }"
+              />
+            </div>
           </p-inputgroup-addon>
+
           <p-inputgroup-addon>
-            <i class="pi pi-search"></i>
+            <button class="cursor-pointer flex" type="submit">
+              <i class="pi pi-search"></i>
+            </button>
           </p-inputgroup-addon>
         </app-input-error-message-handler>
       </form>
 
-      <p-select [options]="periodOptions" optionLabel="label" placeholder="الكل" class="h-fit hidden! sm:flex! w-40" />
+      <p-select [options]="periodOptions" [formControl]="fg.controls.fromDate" optionValue="value" optionLabel="label" placeholder="الكل" class="h-fit hidden! sm:flex! w-40" />
     </div>
 
     <div class="overflow-auto custom-scroll">
@@ -25,7 +38,7 @@
             <th>رقم الفاتوره</th>
             <th>وقت الطلب</th>
             <th>اسم العميل</th>
-            <th>رقم العميل</th>
+            <th>التحصيل</th>
             <th>حاله الفاتوره</th>
             <th>نوع الفاتوره</th>
             <th>المبلغ</th>
@@ -48,10 +61,20 @@
                 <div>{{ order.customerName }}</div>
               </td>
               <td>
-                <div>{{ order.customerPhone }}</div>
+                @if (order.isCollected) {
+                  <div class="status active">
+                    <span></span>
+                    <span>محصل</span>
+                  </div>
+                } @else {
+                  <div class="status in-active">
+                    <span></span>
+                    <span>غير محصل</span>
+                  </div>
+                }
               </td>
               <td>
-                @if (order.isCollected) {
+                @if (order.paymentType == OrderPaymentType.Paid) {
                   <div class="status active">
                     <span></span>
                     <span>مدفوع</span>
@@ -88,6 +111,7 @@
                 <div class="actions">
                   <!-- collect -->
                   <button
+                  appLoadingDisabled
                     type="button"
                     [disabled]="order.isCollected"
                     (click)="
@@ -169,7 +193,7 @@
                     </svg>
                   </button>
                   <!-- change location type -->
-                  <button (click)="openInvoiceTypeChangeDialog(order)" type="button" class="edit bg-text-light!">
+                  <button appLoadingDisabled (click)="openInvoiceTypeChangeDialog(order)" type="button" class="edit bg-text-light!">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M14.7073 6.37467C14.0026 5.45926 13.0464 4.7691 11.9556 4.38861C10.8649 4.00813 9.68685 3.95382 8.5657 4.23234C7.44455 4.51086 6.42889 5.11012 5.64299 5.95682C4.85708 6.80351 4.335 7.86092 4.14062 8.99967M14.999 3.33301V6.66634H11.6656M5.28896 13.6247C5.99344 14.5404 6.94963 15.2309 8.04049 15.6117C9.13135 15.9924 10.3095 16.0468 11.4309 15.7682C12.5522 15.4897 13.5679 14.8902 14.3538 14.0433C15.1397 13.1963 15.6616 12.1387 15.8556 10.9997M4.99812 16.6663V13.333H8.33146"
@@ -180,7 +204,7 @@
                       />
                     </svg>
                   </button>
-                  <button type="button" class="delete" (click)="deleteOrder(order, $event)">
+                  <button appLoadingDisabled type="button" class="delete" (click)="deleteOrder(order, $event)">
                     <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
                         opacity="0.4"
@@ -558,6 +582,7 @@
     <div class="flex justify-center w-full">
       <p-button
         label="متابعة"
+        appLoadingDisabled
         styleClass=" bg-dark-line! text-white! w-25 h-[32px]!"
         [class]="`${isLoading() && 'pointer-events-none cursor-wait disabled'}`"
         severity="secondary"

@@ -1,4 +1,4 @@
-<form class="flex flex-col gap-4" [formGroup]="fg" (ngSubmit)="onSubmitOpenDaily()">
+<form appLoadingDisabled class="flex flex-col gap-4" [formGroup]="fg" (ngSubmit)="onSubmitOpenDaily()">
   <div class="doc-input flex opacity-70">
     <label for="previousBalance" class="mb-0!">{{ 'DAILY_JOURNAL.PREVIOUS_BALANCE' | translate }}</label>
     <input
@@ -47,6 +47,7 @@
     style="--p-button-primary-background: var(--color-dark-line)"
     class="border-dark-line! text-white! py-1! md:px-8! w-fit ms-auto mt-4"
     type="submit"
+    appLoadingDisabled
   >
     {{ 'ACTIONS.OPEN' | translate }}
   </button>

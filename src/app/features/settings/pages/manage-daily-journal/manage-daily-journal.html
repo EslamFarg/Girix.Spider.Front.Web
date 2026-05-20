@@ -3,6 +3,7 @@
     <div class="h-fit items-start gap-2 w-full">
       <ng-select
         class="app-select"
+        appLoadingDisabled
         [items]="displayedUsers()"
         (change)="onUserSelected($event)"
         bindLabel="name"

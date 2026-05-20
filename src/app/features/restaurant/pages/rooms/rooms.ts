@@ -13,6 +13,7 @@ import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { Debounce } from '@/directives/debounce';
 import { MenuItem } from 'primeng/api';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-rooms',
@@ -27,7 +28,8 @@ import { MenuItem } from 'primeng/api';
     Paginator,
     ButtonDirective,
     Debounce,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './rooms.html',
   styleUrl: './rooms.css',
 })
@@ -57,7 +59,7 @@ export class Rooms extends BaseComponent {
   searchFg = this.fb.group(this.initialSearchFormValue);
 
   resetRoomForm = () => {
-    this.roomFg = this.fb.group(this.initialRoomFormValue);
+    this.roomFg.reset();
     this.currentItem = null;
   };
 

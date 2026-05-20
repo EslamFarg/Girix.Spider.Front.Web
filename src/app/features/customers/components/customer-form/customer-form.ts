@@ -13,6 +13,7 @@ import { ICustomerFgControls } from './types';
 import { CustomerService } from '../../services/customer-service';
 import { ICustomerReadResponse } from '../../services/customer-types';
 import { RouterLink } from '@angular/router';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-customer-form',
@@ -27,7 +28,8 @@ import { RouterLink } from '@angular/router';
     ButtonDirective,
     ReactiveFormsModule,
     RouterLink,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './customer-form.html',
   styleUrl: './customer-form.css',
 })
@@ -113,10 +115,18 @@ export class CustomerForm extends BaseComponent implements OnInit {
 
     switch (this.formMode()) {
       case FormMode.Create:
-        this.customerService.create(this.customerFg.value).subscribe();
+        this.customerService.create(this.customerFg.value).subscribe({
+          next: (res) => {
+            this.router.navigate(['/customers']);
+          },
+        });
         break;
       case FormMode.Update:
-        this.customerService.put({ ...this.customerFg.value, id: Number(this.id()) }).subscribe();
+        this.customerService.put({ ...this.customerFg.value, id: Number(this.id()) }).subscribe({
+          next: (res) => {
+            this.router.navigate(['/customers']);
+          },
+        });
         break;
     }
   }

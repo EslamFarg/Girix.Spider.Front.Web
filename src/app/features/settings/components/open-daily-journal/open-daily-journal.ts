@@ -7,12 +7,13 @@ import { Validators, ɵInternalFormsSharedModule, ReactiveFormsModule } from '@a
 import { DailyJournalService } from '../../services/daily-journal-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-open-daily-journal',
   templateUrl: './open-daily-journal.html',
   styleUrl: './open-daily-journal.css',
-  imports: [InputErrorMessageHandler, InputText, Textarea, TranslatePipe, ButtonDirective, ɵInternalFormsSharedModule, ReactiveFormsModule],
+  imports: [InputErrorMessageHandler, InputText, Textarea, TranslatePipe, ButtonDirective, ɵInternalFormsSharedModule, ReactiveFormsModule, LoadingDisabledDirective],
 })
 export class OpenDailyJournal extends BaseComponent {
   initialFgValue = {

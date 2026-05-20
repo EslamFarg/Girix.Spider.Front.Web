@@ -21,6 +21,7 @@ import { ImgFallback } from '@/directives/img-fallback';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ImgOnly } from '@/directives/img-only';
 import { RouterLink } from '@angular/router';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-meal-form',
@@ -43,7 +44,8 @@ import { RouterLink } from '@angular/router';
     TranslatePipe,
     ImgOnly,
     RouterLink,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './meal-form.html',
   styleUrl: './meal-form.css',
 })
@@ -185,6 +187,8 @@ export class MealForm extends BaseComponent implements OnInit {
         this.mealService.create(formData).subscribe({
           next: (res) => {
             console.log(res);
+            this.router.navigate(['/classes/meals']);
+            
           },
         });
         break;
@@ -192,6 +196,7 @@ export class MealForm extends BaseComponent implements OnInit {
         this.mealService.patch(formData).subscribe({
           next: (res) => {
             console.log(res);
+             this.router.navigate(['/classes/meals']);
           },
         });
         break;

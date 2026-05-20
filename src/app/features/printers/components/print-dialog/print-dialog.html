@@ -57,7 +57,7 @@
 
   <ng-template #footer>
     <div class="flex justify-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
-      <button pButton form="pickPrinterForm" severity="secondary" type="button" (click)="print()">
+      <button appLoadingDisabled pButton form="pickPrinterForm" severity="secondary" type="button" (click)="print()">
         {{ 'ACTIONS.PRINT' | translate }}
       </button>
       <!-- <button pButton severity="secondary" type="button" (click)="closePrinterDialog()">

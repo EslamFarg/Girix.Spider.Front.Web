@@ -14,6 +14,7 @@ import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-huts',
@@ -29,7 +30,8 @@ import { Debounce } from '@/directives/debounce';
     AllowNumbers,
     ButtonDirective,
     Debounce,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './huts.html',
   styleUrl: './huts.css',
 })
@@ -60,7 +62,7 @@ export class Huts extends BaseComponent {
   hutService = inject(HutService);
 
   resetHutForm = () => {
-    this.hutFg = this.fb.group(this.initialHutFormValue);
+    this.hutFg.reset();
     this.currentItem = null;
   };
 

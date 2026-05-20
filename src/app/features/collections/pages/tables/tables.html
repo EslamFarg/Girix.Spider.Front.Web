@@ -1,6 +1,6 @@
 <app-section-wrapper class="block mt-4 p-4 overflow-auto custom-scroll h-full" styleClass="no-scrollbar">
   <!-- search -->
-  <form #form [formGroup]="searchFg" (ngSubmit)="onSearchSubmit()">
+  <form appLoadingDisabled #form [formGroup]="searchFg" (ngSubmit)="onSearchSubmit()">
     <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
       <input class="w-full bg-transparent! h-8!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
       <p-inputgroup-addon class="p-0!">

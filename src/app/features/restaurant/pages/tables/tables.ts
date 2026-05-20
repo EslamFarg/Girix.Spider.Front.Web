@@ -13,6 +13,7 @@ import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-tables',
@@ -27,7 +28,8 @@ import { Debounce } from '@/directives/debounce';
     Paginator,
     ButtonDirective,
     Debounce,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './tables.html',
   styleUrl: './tables.css',
 })
@@ -58,7 +60,7 @@ export class Tables extends BaseComponent {
   tableService = inject(TableService);
 
   resetTableForm = () => {
-    this.tableFg = this.fb.group(this.initialTableFormValue);
+    this.tableFg.reset();
     this.currentItem = null;
   };
 

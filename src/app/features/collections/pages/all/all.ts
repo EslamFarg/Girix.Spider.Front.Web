@@ -17,6 +17,7 @@ import {
   OrderLocationType,
   OrderLocalType,
   IOrderChangeTypeRequest,
+  OrderPaymentType,
 } from '@/features/orders';
 import { MenuItem } from 'primeng/api';
 import { DatePipe } from '@angular/common';
@@ -49,6 +50,8 @@ import { Skeleton } from 'primeng/skeleton';
 import { AmountType } from '@/core';
 import { tap } from 'rxjs';
 import { Message } from 'primeng/message';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Menu } from "primeng/menu";
 
 @Component({
   selector: 'app-all',
@@ -75,13 +78,16 @@ import { Message } from 'primeng/message';
     ButtonDirective,
     FormsModule,
     Message,
-  ],
+    LoadingDisabledDirective,
+    Menu
+],
   templateUrl: './all.html',
   styleUrl: './all.css',
 })
 export class All extends BaseComponent {
   OrderLocationType = OrderLocationType;
   OrderLocalType = OrderLocalType;
+  OrderPaymentType=OrderPaymentType;
 
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),

@@ -4,6 +4,7 @@
     <form
       id="tableForm"
       #form
+      appLoadingDisabled
       (reset)="resetTableForm()"
       [formGroup]="tableFg"
       appDebounce
@@ -33,6 +34,7 @@
         form="tableForm"
         class="flex-1 md:flex-none border-dark-line! bg-dark-line! text-white! py-1! md:px-8!"
         pButton
+        appLoadingDisabled
       >
         @if(currentItem) { تحديث } @else { حفظ }
       </button>
@@ -41,6 +43,7 @@
         form="tableForm"
         class="flex-1 md:flex-none p-button-outlined border-dark-line! text-dark-line! py-1! md:px-8!"
         pButton
+        appLoadingDisabled
       >
         جديد
       </button>
@@ -63,7 +66,7 @@
           <td>
             <div class="actions">
               <!-- edit -->
-              <button type="button" class="edit" (click)="fetchAndBindTableData(table.id)">
+              <button appLoadingDisabled type="button" class="edit" (click)="fetchAndBindTableData(table.id)">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"
@@ -82,7 +85,7 @@
                 </svg>
               </button>
               <!-- delete -->
-              <button type="button" class="delete" (click)="deleteTable(table.id, $event)">
+              <button appLoadingDisabled type="button" class="delete" (click)="deleteTable(table.id, $event)">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"

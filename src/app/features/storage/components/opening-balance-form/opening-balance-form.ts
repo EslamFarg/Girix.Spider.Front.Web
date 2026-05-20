@@ -17,6 +17,7 @@ import { AllowNumbers } from '@/directives/allow-numbers';
 import { IUnitSearchRow, UnitSearchEnum, UnitService } from '@/features/classes/services/unit-service';
 import { FormControlNotifier } from '@/directives/form-control-notifier';
 import { onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 interface IAppOpeningBalanceItem {
   itemId: number | null;
@@ -50,7 +51,8 @@ interface IAppOpeningBalanceItemControls {
     AllowNumbers,
     FormControlNotifier,
     ButtonDirective,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './opening-balance-form.html',
   styleUrl: './opening-balance-form.css',
 })

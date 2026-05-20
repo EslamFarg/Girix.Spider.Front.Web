@@ -12,6 +12,7 @@ import { TableCard } from '@/components/table-card/table-card';
 import { ITableReadResponse, TableSearchEnum, ITableSearchRow } from '@/features/restaurant/services/table-service';
 import { MenuItem } from 'primeng/api';
 import { TableService } from '@/features/restaurant/services/table-service';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-tables',
@@ -23,7 +24,8 @@ import { TableService } from '@/features/restaurant/services/table-service';
     InputText,
     ReactiveFormsModule,
     TableCard,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './tables.html',
   styleUrl: './tables.css',
 })

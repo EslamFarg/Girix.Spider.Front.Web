@@ -33,12 +33,14 @@
         class="text-app-blue text-sm cursor-pointer"
         (click)="resendOtp()"
         [class.hidden]="!isResendCountdownOver"
+        appLoadingDisabled
         type="button"
       >
         اعاده ارسال الرمز ؟
       </button>
       <p-button
         type="submit"
+        appLoadingDisabled
         label="إستمرار"
         class="w-full max-w-44 mx-auto"
         [style]="{

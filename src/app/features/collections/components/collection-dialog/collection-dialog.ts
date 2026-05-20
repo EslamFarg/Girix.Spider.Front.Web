@@ -23,6 +23,7 @@ import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { noSymbolsAllowed } from '@/yn-ng';
 import { SpaceTypeEnum } from '@/features/replacements/services/replacements-service';
 import { OrderCollectionCalculationsService } from '../../services/order-collection-calculations-service';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-collection-dialog',
@@ -40,7 +41,8 @@ import { OrderCollectionCalculationsService } from '../../services/order-collect
     NgSelectComponent,
     Debounce,
     ButtonDirective,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './collection-dialog.html',
   styleUrl: './collection-dialog.css',
 })

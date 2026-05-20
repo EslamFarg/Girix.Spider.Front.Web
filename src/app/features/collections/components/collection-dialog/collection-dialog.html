@@ -14,159 +14,6 @@
       التحصيل
     </div>
   </ng-template>
-
-  <!-- <div class="text-dark-bg-2 flex flex-col gap-4">
-    <section class="border border-text-gray p-2 rounded-lg">
-      <section class="flex justify-between text-sm">
-        <ul class="flex flex-col gap-2 [&>li>span:nth-child(1)]:font-bold *:flex *:items-center *:gap-2">
-          <li>
-            <span>رقم الفاتوره</span>
-            <span class="font-bold">#12345</span>
-          </li>
-          <li>
-            <span>رقم الطلب</span>
-            <span class="font-bold">102</span>
-          </li>
-          <li>
-            <span>اسم العميل:</span>
-            <span>محمد احمد</span>
-          </li>
-          <li>
-            <span>عنوان العميل</span>
-            <span>السعوديه - حي البساتين - شارع السعدني</span>
-          </li>
-        </ul>
-        <ul class="flex flex-col gap-2 *:flex *:items-center *:gap-2 *:justify-end">
-          <li>20 يناير 2026 04:25 م</li>
-          <li class="font-bold">
-            <span>نوع الدفع:</span>
-            <span>معلق</span>
-          </li>
-          <li>
-            <span class="font-bold">رقم الجوال</span>
-            <span>0123456789</span>
-          </li>
-        </ul>
-      </section>
-      <section class="mt-4">
-        <table class="w-full text-center" style="border-collapse: separate; border-spacing: 0 8px">
-          <thead class="text-sm font-bold">
-            <tr>
-              <th class="text-start">الصنف</th>
-              <th>الاضافات</th>
-              <th>الكميه</th>
-              <th class="text-end">الاجمالي</th>
-            </tr>
-          </thead>
-          <tr>
-            <td colspan="4" class="border-b border-text-gray"></td>
-          </tr>
-          <tbody class="text-xs font-semibold">
-            @for(item of [1,2,3];track $index){
-            <tr>
-              <td class="text-start">ماكرونه</td>
-              <td>بيبسي - مناقيش - كولا - شيبسي</td>
-              <td>1</td>
-              <td class="text-end pe-2">200.00</td>
-            </tr>
-            }
-          </tbody>
-          <tr>
-            <td colspan="4" class="border-t border-text-gray"></td>
-          </tr>
-          <tfoot class="text-sm font-bold">
-            <tr>
-              <th class="text-start">الاجمالي</th>
-              <th></th>
-              <th>9</th>
-              <th class="text-end pe-2">900.00</th>
-            </tr>
-          </tfoot>
-        </table>
-      </section>
-      <section class="text-xs font-semibold pe-2">
-        <ul class="flex flex-col gap-2 *:flex *:justify-between">
-          <li>
-            <span>خصم</span>
-            <span>0.00</span>
-          </li>
-          <li>
-            <span>الخدمه</span>
-            <span>15.00 </span>
-          </li>
-          <li>
-            <span>الكوخ</span>
-            <span>0.00</span>
-          </li>
-          <li>
-            <span>الضريبه</span>
-            <span>15.00</span>
-          </li>
-          <li>
-            <span>الاجمالي بالضريبه</span>
-            <span>915.00</span>
-          </li>
-          <li>
-            <span>مدفوع كاش</span>
-            <span>800.00</span>
-          </li>
-          <li>
-            <span>مدفوع شبكه</span>
-            <span>130.00</span>
-          </li>
-        </ul>
-      </section>
-    </section>
-    <section class="text-sm">
-      <label for="productName" class="font-semibold ">اجمالي المبلغ</label>
-      <div class="bg-dark-line h-9 rounded-lg px-3 mt-2 py-2 text-text-lighter font-bold">
-        $ 52.00
-      </div>
-    </section>
-    <section>
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label for="productName">المدفوع كاش</label>
-          <app-input-error-message-handler>
-            <input pInputText id="productName" aria-describedby="productName-help" placeholder="0" />
-          </app-input-error-message-handler>
-        </div>
-        <div>
-          <label for="productName">اسم الحساب</label>
-          <app-input-error-message-handler>
-            <p-select [options]="[]" optionLabel="name" placeholder="الاسم" class="w-full!" />
-          </app-input-error-message-handler>
-        </div>
-        <div>
-          <label for="productName">المدفوع شبكه</label>
-          <app-input-error-message-handler>
-            <input pInputText id="productName" aria-describedby="productName-help" placeholder="0" />
-          </app-input-error-message-handler>
-        </div>
-        <div>
-          <label for="productName">اسم الحساب</label>
-          <app-input-error-message-handler>
-            <p-select [options]="[]" optionLabel="name" placeholder="الاسم" class="w-full!" />
-          </app-input-error-message-handler>
-        </div>
-      </div>
-    </section>
-    <section class="flex justify-center w-full gap-4 mt-2 ">
-      <p-button
-        label="تحصيل"
-        styleClass=" bg-dark-line! text-white!  w-25 h-[32px]!"
-         severity="secondary"
-        (click)="closeCollectionInvoiceDialog()"
-      />
-      <p-button
-        label="طباعه"
-        styleClass="     w-25 h-[32px]!"
-        severity="secondary"
-        variant="outlined"
-        (click)="closeCollectionInvoiceDialog()"
-      />
-    </section>
-  </div> -->
   @if (isDeliveryDialog()) {
     <section class="border border-text-gray p-2 rounded-lg flex flex-col gap-4">
       @for (item of currentDeliveryOrders(); track $index) {
@@ -303,10 +150,10 @@
   </form>
   <ng-template #footer>
     <div class="flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
-      <button pButton severity="secondary" class="bg-dark-bg-2" (click)="onSubmitCollection()">
+      <button appLoadingDisabled pButton severity="secondary" class="bg-dark-bg-2" (click)="onSubmitCollection()">
         {{ 'ACTIONS.SAVE' | translate }}
       </button>
-      <button pButton severity="secondary" (click)="closeCollectionInvoiceDialog()">
+      <button appLoadingDisabled pButton severity="secondary" (click)="closeCollectionInvoiceDialog()">
         {{ 'ACTIONS.CANCEL' | translate }}
       </button>
     </div>

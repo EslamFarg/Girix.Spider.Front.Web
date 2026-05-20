@@ -33,6 +33,7 @@ import { ControlsOf } from '@/yn-ng/types/helpers';
 import { IUnitSearchRow, UnitSearchEnum, UnitService } from '../../services/unit-service';
 import { RouterLink } from '@angular/router';
 import { ProductComponentsService } from '../../services/product-components-service';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 interface IProductUnitFormRow {
   unitId: number | null;
@@ -67,7 +68,8 @@ type ProductUnitFormRowControls = ControlsOf<IProductUnitFormRow>;
     NgOptionTemplateDirective,
     NgLabelTemplateDirective,
     RouterLink,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './product-form.html',
   styleUrl: './product-form.css',
 })

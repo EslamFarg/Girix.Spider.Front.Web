@@ -17,6 +17,7 @@ import { ButtonDirective } from 'primeng/button';
 import { RouterLink } from '@angular/router';
 import { GalleriaModule } from 'primeng/galleria';
 import { Dialog } from 'primeng/dialog';
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 
 export interface IMenuItem {
   id: string;
@@ -51,6 +52,7 @@ export interface IOrderMenuItem {
     RouterLink,
     GalleriaModule,
     Dialog,
+    LoadingDisabledDirective,
   ],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
@@ -65,6 +67,7 @@ export class Menu extends BaseComponent implements OnDestroy {
   menuItems = signal<IMenuItem[]>([]);
 
   private isLoadingMore = false;
+  private hasReachedEnd = false;
 
   pickedItemCounts = computed(() => {
     const counts = new Map<string, number>();
@@ -107,12 +110,11 @@ export class Menu extends BaseComponent implements OnDestroy {
 
   override ngOnDestroy() {
     super.ngOnDestroy();
-    if (this.scrollTimeout) {
-      clearTimeout(this.scrollTimeout);
-    }
     const container = this.itemsContainer()?.nativeElement;
     if (container) {
-      container.removeEventListener('scroll', this.onScrollHandler);
+      container.removeEventListener('wheel', this.onUserScrollAttempt);
+      container.removeEventListener('keydown', this.onUserScrollAttempt);
+      container.removeEventListener('touchmove', this.onUserScrollAttempt);
     }
   }
 
@@ -120,22 +122,15 @@ export class Menu extends BaseComponent implements OnDestroy {
     const container = this.itemsContainer()?.nativeElement;
     if (!container) return;
 
-    // Use a direct scroll listener — simpler and more reliable than IntersectionObserver for this case
-    container.addEventListener('scroll', this.onScrollHandler, { passive: true });
+    // Listen for explicit user scroll attempts (wheel, touch, keyboard)
+    // NOT the passive scroll event which fires continuously at bottom
+    container.addEventListener('wheel', this.onUserScrollAttempt, { passive: true });
+    container.addEventListener('keydown', this.onUserScrollAttempt);
+    container.addEventListener('touchmove', this.onUserScrollAttempt, { passive: true });
   }
 
-  private scrollTimeout?: ReturnType<typeof setTimeout>;
-
-  private onScrollHandler = () => {
-    if (this.scrollTimeout) return; // Already have a pending check
-    this.scrollTimeout = setTimeout(() => {
-      this.scrollTimeout = undefined;
-      this.checkAndLoadMore();
-    }, 150);
-  };
-
-  private checkAndLoadMore() {
-    if (this.isLoadingMore) return;
+  private onUserScrollAttempt = (event: Event) => {
+    if (this.isLoadingMore || this.hasReachedEnd) return;
 
     const container = this.itemsContainer()?.nativeElement;
     if (!container) return;
@@ -144,23 +139,21 @@ export class Menu extends BaseComponent implements OnDestroy {
     const clientHeight = container.clientHeight;
     const scrollHeight = container.scrollHeight;
 
-    // Trigger when within 200px of the bottom
-    const threshold = 200;
-    const isNearBottom = scrollTop + clientHeight >= scrollHeight - threshold;
+    // Trigger when within 100px of the bottom
+    const threshold = 100;
+    const isAtBottom = scrollTop + clientHeight >= scrollHeight - threshold;
 
-    console.log('[Menu Scroll]', { scrollTop, clientHeight, scrollHeight, isNearBottom, pageIndex: this.menuItemsPaginationInfo.pageIndex, totalPages: this.menuItemsPaginationInfo.totalPagesCount, itemCount: this.menuItems().length });
-
-    if (isNearBottom) {
+    if (isAtBottom) {
       this.isLoadingMore = true;
       this.loadMoreItems();
     }
-  }
+  };
 
   private loadMoreItems() {
     const nextPage = this.menuItemsPaginationInfo.pageIndex + 1;
-    console.log('[Menu LoadMore]', { nextPage, totalPages: this.menuItemsPaginationInfo.totalPagesCount });
     // Don't load if we've reached the end
     if (nextPage > this.menuItemsPaginationInfo.totalPagesCount && this.menuItemsPaginationInfo.totalPagesCount > 0) {
+      this.hasReachedEnd = true;
       this.isLoadingMore = false;
       return;
     }
@@ -218,11 +211,11 @@ export class Menu extends BaseComponent implements OnDestroy {
   };
 
   searchProductsAndMeals(pageIndex: number) {
-    console.log('[Menu Search]', { requestedPage: pageIndex, isIdentical: this.isPreviousSearchCriteriaIdentical(), currentPage: this.menuItemsPaginationInfo.pageIndex });
     if (this.isPreviousSearchCriteriaIdentical()) {
       //handle stopping pagination if no more data
     } else {
       pageIndex = 1;
+      this.hasReachedEnd = false;
     }
 
     const searchFilters = [
@@ -280,12 +273,7 @@ export class Menu extends BaseComponent implements OnDestroy {
 
           this.previousSearchCriteria = this.menuSearchFg.getRawValue();
 
-          // Check if we need to load more (content doesn't fill viewport)
-          // Use setTimeout to ensure DOM has updated with new items
-          setTimeout(() => {
-            this.isLoadingMore = false;
-            this.checkAndLoadMore();
-          }, 50);
+          this.isLoadingMore = false;
         },
         error: () => {
           this.isLoadingMore = false;

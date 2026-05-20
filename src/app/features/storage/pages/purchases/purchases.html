@@ -3,6 +3,7 @@
     #form
     [formGroup]="fg"
     appDebounce
+    appLoadingDisabled
     [domEvents]="['submit']"
     (debounced)="onSubmit()"
     class="flex h-fit items-start gap-2 w-full"
@@ -96,7 +97,7 @@
                   />
                 </svg>
               </a>
-              <button type="button" class="delete" (click)="deletePurchase(item.id, $event)">
+              <button appLoadingDisabled type="button" class="delete" (click)="deletePurchase(item.id, $event)">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"

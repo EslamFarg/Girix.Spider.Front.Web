@@ -4,6 +4,7 @@
 >
   <button
     pButton
+    appLoadingDisabled
     style="--p-button-primary-background: var(--color-dark-line)"
     class="border-dark-line! text-white!"
     form="customerForm"
@@ -15,12 +16,12 @@
       {{ 'ACTIONS.EDIT' | translate }}
     }
   </button>
-  <button pButton [routerLink]="'/customers/add'" class="border-dark-line! text-dark-line!" variant="outlined">
+  <button appLoadingDisabled pButton [routerLink]="'/customers/add'" class="border-dark-line! text-dark-line!" variant="outlined">
     {{ 'ACTIONS.NEW' | translate }}
   </button>
 </div>
 
-<form id="customerForm" class="grid md:grid-cols-4 gap-4 flex-1" (ngSubmit)="onSubmitForm()" [formGroup]="customerFg">
+<form appLoadingDisabled id="customerForm" class="grid md:grid-cols-4 gap-4 flex-1" (ngSubmit)="onSubmitForm()" [formGroup]="customerFg">
   <div class="md:col-span-4">
     <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
     <app-input-error-message-handler [fc]="customerFg.get('nameAr')">

@@ -15,6 +15,7 @@ import { Debounce } from '@/directives/debounce';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { PurchaseSearchEnum, PurchaseService } from '../../services/purchase-service';
 import { IPurchaseSearchRow } from '../../types/api/purchases/responses';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-purchases',
@@ -31,7 +32,8 @@ import { IPurchaseSearchRow } from '../../types/api/purchases/responses';
     Menu,
     TranslatePipe,
     RouterLink,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './purchases.html',
   styleUrl: './purchases.css',
 })

@@ -3,6 +3,7 @@
     <!-- search -->
     <form
       #form
+      appLoadingDisabled
       (reset)="resetHutForm()"
       id="hutForm"
       [formGroup]="hutFg"
@@ -46,12 +47,14 @@
       <button
         class="flex-1 md:flex-none border-dark-line! bg-dark-line! text-white! py-1! md:px-8!"
         pButton
+        appLoadingDisabled
         form="hutForm"
         type="submit"
       >
         @if(currentItem) { تحديث } @else { حفظ }
       </button>
       <button
+      appLoadingDisabled
         class="flex-1 md:flex-none border-dark-line! text-dark-line! py-1! md:px-8! p-button-outlined"
         form="hutForm"
         pButton
@@ -79,7 +82,7 @@
           <td><div>{{ item.pricePerHour }}</div></td>
           <td>
             <div class="actions">
-              <button type="button" class="edit" (click)="fetchAndBindTableData(item.id)">
+              <button appLoadingDisabled type="button" class="edit" (click)="fetchAndBindTableData(item.id)">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"
@@ -97,7 +100,7 @@
                   />
                 </svg>
               </button>
-              <button type="button" class="delete" (click)="deleteHut(item.id, $event)">
+              <button appLoadingDisabled type="button" class="delete" (click)="deleteHut(item.id, $event)">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"

@@ -33,6 +33,7 @@ import { PurchaseReturnService } from '../../services/purchase-return-service';
 import { IPurchaseReturnReadResponse } from '../../types/api/purchase-return/responses';
 import { Menu } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 interface IAppPurchaseReturnItem {
   menuItemsId: number | null;
@@ -65,7 +66,8 @@ enum FilterOption {
     TranslatePipe,
     RouterLink,
     Menu,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './purchase-return-form.html',
   styleUrl: './purchase-return-form.css',
 })

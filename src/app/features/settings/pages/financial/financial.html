@@ -1,9 +1,10 @@
 <div class="custom-scroll overflow-auto h-full">
   <app-section-wrapper class="p-4 sm:px-6 min-h-full h-full">
-    <form action="" id="financialForm" (ngSubmit)="onSubmit()"  class="flex flex-col gap-4 md:gap-6" [formGroup]="fg">
+    <form appLoadingDisabled action="" id="financialForm" (ngSubmit)="onSubmit()"  class="flex flex-col gap-4 md:gap-6" [formGroup]="fg">
       <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 md:mt-4">
         <button
           pButton
+          appLoadingDisabled
           form="financialForm"
           type="submit"
           style="

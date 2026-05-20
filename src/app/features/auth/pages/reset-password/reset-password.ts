@@ -5,10 +5,11 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { Password } from 'primeng/password';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-reset-password',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, Password, Button, InputText],
+  imports: [ReactiveFormsModule, InputErrorMessageHandler, Password, Button, InputText, LoadingDisabledDirective],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.css',
 })

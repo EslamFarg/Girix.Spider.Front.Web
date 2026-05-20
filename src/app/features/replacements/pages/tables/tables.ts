@@ -17,6 +17,7 @@ import {
 } from '@/features/restaurant/services/table-service';
 import { MenuItem } from 'primeng/api';
 import { OrderService } from '@/features/orders';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-tables',
@@ -28,7 +29,8 @@ import { OrderService } from '@/features/orders';
     ReactiveFormsModule,
     Paginator,
     TableCard,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './tables.html',
   styleUrl: './tables.css',
 })

@@ -13,6 +13,7 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
 import { InputText } from 'primeng/inputtext';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-inventory',
@@ -28,7 +29,8 @@ import { InputText } from 'primeng/inputtext';
     Menu,
     TranslatePipe,
     InputText,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
 })

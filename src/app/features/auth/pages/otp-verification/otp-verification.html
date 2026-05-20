@@ -26,12 +26,13 @@
         <countdown #countdown class="mx-auto w-fit" [config]="countdownConfig" (event)="handleCountdownEvent($event)" />
         ثانيه
       </p>
-      <button class="text-app-blue text-sm cursor-pointer" [class.hidden]="!isResendCountdownOver" type="button">
+      <button appLoadingDisabled class="text-app-blue text-sm cursor-pointer" [class.hidden]="!isResendCountdownOver" type="button">
         اعاده ارسال الرمز ؟
       </button>
       <p-button
         type="submit"
         label="إستمرار"
+        appLoadingDisabled
         class="w-full max-w-44 mx-auto"
         [style]="{
           '--p-button-primary-background': 'var(--color-dark-bg-1)',

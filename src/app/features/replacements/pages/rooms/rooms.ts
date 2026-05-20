@@ -17,6 +17,7 @@ import {
 } from '@/features/restaurant/services/room-service';
 import { MenuItem } from 'primeng/api';
 import { OrderService } from '@/features/orders';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-rooms',
@@ -28,7 +29,8 @@ import { OrderService } from '@/features/orders';
     InputTextModule,
     Paginator,
     RoomCard,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './rooms.html',
   styleUrl: './rooms.css',
 })

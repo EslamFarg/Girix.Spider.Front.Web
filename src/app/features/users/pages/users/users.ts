@@ -15,6 +15,7 @@ import { Menu } from 'primeng/menu';
 import { RouterLink } from '@angular/router';
 import { IUserRowResponse } from '../../types/users/api';
 import { TranslatePipe } from '@ngx-translate/core';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-users',
@@ -31,7 +32,8 @@ import { TranslatePipe } from '@ngx-translate/core';
     Menu,
     RouterLink,
     TranslatePipe,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './users.html',
   styleUrl: './users.css',
 })

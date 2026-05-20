@@ -1,13 +1,8 @@
 <!-- actions -->
 <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 mb-4">
-  <button type="submit" form="openingBalancesForm" pButton class="flex-1 md:flex-none app-p-btn py-1! md:px-8!">
+  <button appLoadingDisabled type="submit" form="openingBalancesForm" pButton class="flex-1 md:flex-none app-p-btn py-1! md:px-8!">
     حفظ
   </button>
-  @switch (formMode()) {
-    @case (FormMode.Update) {
-      <a pButton class="app-p-btn py-1! flex-1 md:flex-none md:px-8!" variant="outlined"> جديد </a>
-    }
-  }
 </div>
 
 <form
@@ -36,6 +31,7 @@
     #searchVoucherForm
     id="searchVoucherForm"
     [formGroup]="shallowFg"
+    appLoadingDisabled
     appDebounce
     [domEvents]="['submit']"
     (debounced)="debouncedFindOpeningBalanceInvoiceByNumberByNumber($event, voucherSearchInput.value)"
@@ -184,6 +180,7 @@
             bindLabel="name"
             [formControl]="getFormControl(newOpeningBalanceItemRowFg, 'itemId')"
             (change)="onCurrentItemChange($event)"
+            appLoadingDisabled
             bindValue="id"
             placeholder="الكل"
             [clearable]="false"
@@ -207,6 +204,7 @@
             [formControl]="getFormControl(newOpeningBalanceItemRowFg, 'itemId')"
             bindValue="id"
             (change)="onCurrentItemChange($event)"
+            appLoadingDisabled
             placeholder="الكل"
             [clearable]="false"
             #newOpeningBalanceItemSearchByName
@@ -336,6 +334,7 @@
               bindLabel="name"
               bindValue="id"
               placeholder="الكل"
+              appLoadingDisabled
               [clearable]="false"
               #printerSelect2
               appDebounce
@@ -355,6 +354,7 @@
               [items]="displayedProducts()"
               [formControl]="getFormControl(item, 'itemId')"
               bindLabel="name"
+              appLoadingDisabled
               bindValue="id"
               placeholder="الكل"
               [clearable]="false"
@@ -442,7 +442,7 @@
         <!-- actions -->
         <td class="min-w-40 w-40">
           <div class="actions">
-            <button type="button" class="edit" (click)="editOpeningBalanceRow($index)">
+            <button appLoadingDisabled type="button" class="edit" (click)="editOpeningBalanceRow($index)">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   opacity="0.4"
@@ -460,7 +460,7 @@
                 />
               </svg>
             </button>
-            <button type="button" class="delete" (click)="deleteOpeningBalanceRow($index)">
+            <button appLoadingDisabled type="button" class="delete" (click)="deleteOpeningBalanceRow($index)">
               <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   opacity="0.4"

@@ -7,12 +7,13 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { DailyJournalService } from '../../services/daily-journal-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-close-daily-journal',
   templateUrl: './close-daily-journal.html',
   styleUrl: './close-daily-journal.css',
-  imports: [InputErrorMessageHandler, InputText, Textarea, ReactiveFormsModule, TranslatePipe, ButtonDirective],
+  imports: [InputErrorMessageHandler, InputText, Textarea, ReactiveFormsModule, TranslatePipe, ButtonDirective, LoadingDisabledDirective],
 })
 export class CloseDailyJournal extends BaseComponent {
   initialFgValue = {

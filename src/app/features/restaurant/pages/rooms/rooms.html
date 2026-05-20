@@ -6,6 +6,7 @@
        (reset)="resetRoomForm()"
       id="roomForm"
       [formGroup]="roomFg"
+      appLoadingDisabled
       appDebounce
       [domEvents]="['submit']"
       (debounced)="onRoomFormSubmit()"
@@ -33,6 +34,7 @@
         form="roomForm"
         class="flex-1 md:flex-none border-dark-line! bg-dark-line! text-white! py-1! md:px-8!"
         pButton
+        appLoadingDisabled
       >
         @if(currentItem) { تحديث } @else { حفظ }
       </button>
@@ -41,6 +43,7 @@
         form="roomForm"
         class="flex-1 md:flex-none p-button-outlined border-dark-line! text-dark-line! py-1! md:px-8!"
         pButton
+        appLoadingDisabled
       >
         جديد
       </button>
@@ -62,7 +65,7 @@
           <td><div>{{ item.name }}</div></td>
           <td>
             <div class="actions">
-              <button type="button" class="edit" (click)="fetchAndBindTableData(item.id)">
+              <button appLoadingDisabled type="button" class="edit" (click)="fetchAndBindTableData(item.id)">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"
@@ -80,7 +83,7 @@
                   />
                 </svg>
               </button>
-              <button type="button" class="delete" (click)="deleteRoom(item.id, $event)">
+              <button appLoadingDisabled type="button" class="delete" (click)="deleteRoom(item.id, $event)">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"

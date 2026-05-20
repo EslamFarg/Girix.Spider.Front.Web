@@ -7,12 +7,13 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { DailyJournalService } from '../../services/daily-journal-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-manage-open-daily-journal',
   templateUrl: './manage-open-daily-journal.html',
   styleUrl: './manage-open-daily-journal.css',
-  imports: [InputErrorMessageHandler, InputText, Textarea, TranslatePipe, ButtonDirective, ReactiveFormsModule],
+  imports: [InputErrorMessageHandler, InputText, Textarea, TranslatePipe, ButtonDirective, ReactiveFormsModule, LoadingDisabledDirective],
 })
 export class ManageOpenDailyJournal extends BaseComponent {
   dailyJournalService = inject(DailyJournalService);

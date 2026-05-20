@@ -6,10 +6,11 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { PasswordModule } from 'primeng/password';
 import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-login',
-  imports: [InputErrorMessageHandler, InputTextModule, ReactiveFormsModule, PasswordModule, RouterLink, Button],
+  imports: [InputErrorMessageHandler, InputTextModule, ReactiveFormsModule, PasswordModule, RouterLink, Button, LoadingDisabledDirective],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })

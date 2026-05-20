@@ -1,0 +1,166 @@
+<div class="p-4 h-full overflow-auto no-scrollbar">
+  <app-section-wrapper class="h-full">
+    <!-- Search Form -->
+    <form
+      appLoadingDisabled
+      [formGroup]="fg"
+      appDebounce
+      [domEvents]="['submit']"
+      (debounced)="onSubmit()"
+      class="flex h-fit items-start gap-2 w-full flex-col sm:flex-row"
+    >
+      <div class="w-full sm:flex-1">
+        <app-input-error-message-handler [fc]="fg.get('searchTerm')">
+          <input
+            class="w-full bg-transparent! text-dark-line!"
+            pInputText
+            type="text"
+            formControlName="searchTerm"
+            placeholder="بحث"
+          />
+          <p-inputgroup-addon>
+            <div class="relative flex items-center justify-center">
+              <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+              <p-menu
+                dir="rtl"
+                [class]="`*:top-full! *:left-0! `"
+                #filterMenu
+                [model]="filterMenuItems()"
+                [popup]="true"
+                [style]="{ insetInlineEnd: '100%' }"
+              />
+            </div>
+          </p-inputgroup-addon>
+
+          <p-inputgroup-addon>
+            <div class="cursor-pointer flex" (click)="onSubmit()">
+              <i class="pi pi-search"></i>
+            </div>
+          </p-inputgroup-addon>
+        </app-input-error-message-handler>
+      </div>
+
+      <p-select
+        [options]="periodOptions"
+        formControlName="fromDate"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="كل الطلبات"
+        class="h-fit hidden! sm:flex! w-40"
+      />
+    </form>
+
+    <!-- Table -->
+    <div class="w-full overflow-auto custom-scroll my-2 sm:my-4">
+      <table class="w-full main-table">
+        <thead>
+          <tr>
+            <th>
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="allSelected()"
+                [indeterminate]="someSelected()"
+                (onChange)="toggleSelectAll()"
+              />
+            </th>
+            <th>رقم الطلب</th>
+            <th>العنوان</th>
+            <th>رقم الجوال</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of orders(); track $index) {
+            <tr [style]="`--ix: ${$index};`">
+              <td>
+                <p-checkbox
+                  [binary]="true"
+                  [ngModel]="isOrderSelected(order.id)"
+                  (onChange)="toggleOrderSelection(order.id)"
+                />
+              </td>
+              <td>
+                <div>{{ order.orderNumber }}</div>
+              </td>
+              <td>
+                <div>{{ order.customerAdress || '-' }}</div>
+              </td>
+              <td>
+                <div>{{ order.customerPhone || '-' }}</div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p-paginator
+      (onPageChange)="onPageChange($event)"
+      [first]="(ordersPaginationInfo().pageIndex - 1) * 10"
+      [rows]="10"
+      [totalRecords]="ordersPaginationInfo().totalRowsCount"
+    />
+
+    <!-- Selected Delivery + Save Section -->
+    @if (selectedDelivery(); as delivery) {
+      <div class="mt-4 p-3 bg-form-bg rounded-lg flex items-center gap-4 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span class="text-text-gray text-sm">الدليفري المختار:</span>
+          <span class="text-white font-bold">{{ delivery.name }}</span>
+        </div>
+        <button
+          pButton
+          type="button"
+          class="p-button-sm p-button-secondary"
+          (click)="changeDelivery()"
+        >
+          تغيير
+        </button>
+        <button
+          pButton
+          type="button"
+          class="p-button-sm p-button-success"
+          (click)="saveAssignment()"
+        >
+          حفظ
+        </button>
+      </div>
+    } @else if (selectedOrderIds().size > 0) {
+      <div class="mt-4">
+        <button
+          pButton
+          type="button"
+          class="p-button-primary"
+          (click)="openDeliveryDialog()"
+        >
+          اختيار دليفري
+        </button>
+      </div>
+    }
+  </app-section-wrapper>
+</div>
+
+<!-- Choose Delivery Dialog -->
+<p-dialog
+  [(visible)]="deliveryDialogVisible"
+  [modal]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '100%', maxWidth: '40rem' }"
+  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+  styleClass="bg-white!"
+  [header]="'اختيار دليفري'"
+>
+  <div class="flex flex-col gap-2">
+    @for (delivery of deliveryMen(); track $index) {
+      <div
+        class="flex items-center justify-between p-3 bg-form-bg rounded-lg cursor-pointer hover:bg-dark-bg-2 transition-colors"
+        (click)="selectDelivery(delivery)"
+      >
+        <div class="flex flex-col gap-1">
+          <span class="text-white font-bold">{{ delivery.name }}</span>
+          <span class="text-text-gray text-sm">{{ delivery.phoneNumber }}</span>
+        </div>
+        <i class="pi pi-chevron-left text-text-gray"></i>
+      </div>
+    }
+  </div>
+</p-dialog>

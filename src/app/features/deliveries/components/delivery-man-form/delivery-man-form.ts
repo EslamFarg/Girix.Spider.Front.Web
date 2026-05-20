@@ -16,10 +16,11 @@ import { IDeliveryFgControls } from './types';
 import { DeliveryService, IDeliveryReadResponse } from '../../services/delivery-service';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { TranslatePipe } from '@ngx-translate/core';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-delivery-man-form',
-  imports: [Button, InputErrorMessageHandler, InputText, Textarea, ReactiveFormsModule, ButtonDirective, TranslatePipe],
+  imports: [Button, InputErrorMessageHandler, InputText, Textarea, ReactiveFormsModule, ButtonDirective, TranslatePipe, LoadingDisabledDirective],
   templateUrl: './delivery-man-form.html',
   styleUrl: './delivery-man-form.css',
 })

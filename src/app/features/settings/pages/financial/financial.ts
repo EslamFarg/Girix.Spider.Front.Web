@@ -10,6 +10,7 @@ import { FinancialSettingsService } from '../../services/financial-settings-serv
 import { IFinancialSettingsFgControls } from './types';
 import { AmountType } from '@/core';
 import { AllowNumbers } from '@/directives/allow-numbers';
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 @Component({
   selector: 'app-financial',
@@ -23,7 +24,8 @@ import { AllowNumbers } from '@/directives/allow-numbers';
     ReactiveFormsModule,
     AllowNumbers,
     ButtonDirective,
-  ],
+    LoadingDisabledDirective
+],
   templateUrl: './financial.html',
   styleUrl: './financial.css',
 })

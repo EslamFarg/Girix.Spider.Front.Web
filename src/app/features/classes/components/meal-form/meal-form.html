@@ -7,6 +7,7 @@
     style="--p-button-primary-background: var(--color-dark-line)"
     class="border-dark-line! text-white! py-1! md:px-8! md:flex-none"
     form="mealForm"
+    appLoadingDisabled
     type="submit"
   >
     @if (formMode() === FormMode.Create) {
@@ -19,6 +20,7 @@
     <a
       routerLink="/classes/meals/add"
       pButton
+      appLoadingDisabled
       class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
       variant="outlined"
     >

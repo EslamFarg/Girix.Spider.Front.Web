@@ -1,4 +1,4 @@
-<div class="h-full no-scrollbar overflow-auto" [class.cursor-wait]="isLoading()">
+<div class="h-full no-scrollbar overflow-auto" appLoadingDisabled>
   <section class="borde1r no-scrollbar overflow-auto border-text-lig1ht rounded-[8px] pt-5 flex flex-col gap-3 h-full">
     <div class="ps-4 gap-2">
       <div class="flex-1 flex flex-col gap-2">
@@ -106,6 +106,7 @@
 
     <div
       #itemsContainer
+      tabindex="0"
       class="no-scrollbar ps-4 select-none overflow-auto scroll-smooth auto-rows-min pb-4 w-full grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-3.5 pt-10 h-full"
       style="row-gap: 50px"
     >
@@ -135,7 +136,7 @@
                 appImgFallback
                 fallBackLink="/images/placeholders/menu-item.png"
                 [src]="
-                  item.meal ? baseUrl + item.meal.images?.[0]?.fullPath : baseUrl + item.product?.images?.[0]?.fullPath
+                  item.meal ? baseUrl + item?.meal?.images?.[0]?.fullPath : baseUrl + item?.product?.images?.[0]?.fullPath
                 "
                 alt=""
                 (click)="previewMenuItem($event, item)"
@@ -184,7 +185,7 @@
   [containerStyle]="{ 'max-width': '640px' }"
 >
   <ng-template #item let-item>
-    <img [src]="baseUrl + item.fullPath" appImgFallback decoding="async" style="width: 100%; display: block" />
+    <img [src]="baseUrl + item?.fullPath" appImgFallback decoding="async" style="width: 100%; display: block" />
   </ng-template>
 </p-galleria>
 
@@ -216,7 +217,7 @@
             class="w-full h-full object-cover"
             appImgFallback
             fallBackLink="/images/placeholders/menu-item.png"
-            [src]="baseUrl + img.fullPath"
+            [src]="baseUrl + img?.fullPath"
             [alt]="currentProductDetail()?.name ?? currentMealDetail()?.name"
           />
           @if (detailImages().length > 1) {
