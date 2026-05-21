@@ -93,6 +93,7 @@ export class CompanyDeliveries extends BaseComponent {
         },
         searchFilters: searchFilters,
         fromDate: null,
+        searchEndpoint:"SearchCompany"
       })
       .subscribe({
         next: (res) => {

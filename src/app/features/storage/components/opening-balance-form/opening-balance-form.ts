@@ -112,6 +112,12 @@ export class OpeningBalanceForm extends BaseComponent {
               date: new Date(data.date),
               notes: data.notes,
             });
+            this.currentProducts.set(
+              data.items.map((item) => ({
+                id: item.itemId,
+                name: item.itemName,
+              })),
+            );
             this.fg.setControl(
               'items',
               this.fb.array(
@@ -196,6 +202,12 @@ export class OpeningBalanceForm extends BaseComponent {
           date: new Date(data.date),
           notes: data.notes,
         });
+        this.currentProducts.set(
+          data.items.map((item) => ({
+            id: item.itemId,
+            name: item.itemName,
+          })),
+        );
         this.fg.setControl(
           'items',
           this.fb.array(

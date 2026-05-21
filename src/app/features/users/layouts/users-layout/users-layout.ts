@@ -13,11 +13,11 @@ export class UsersLayout {
   links: ISectionLink[] = [
     {
       labelKey: 'USERS.EXPLORER',
-      url: '/users',
+      url: '/settings/users',
     },
     {
       labelKey: 'USERS.ADD',
-      url: '/users/add',
+      url: '/settings/users/add',
     },
   ];
 }

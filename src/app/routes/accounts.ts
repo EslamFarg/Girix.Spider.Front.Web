@@ -12,7 +12,14 @@ import { CollectiveReceiptsLayout } from '@/features/accounts/layouts/collective
 import { JournalsLayout } from '@/features/accounts/layouts/journals-layout/journals-layout';
 import { AddJournal } from '@/features/accounts/pages/add-journal/add-journal';
 import { EditJournal } from '@/features/accounts/pages/edit-journal/edit-journal';
-
+import { Customers } from '@/features/customers/pages/customers/customers';
+import { AddCustomer } from '@/features/customers/pages/add-customer/add-customer';
+import { EditCustomer } from '@/features/customers/pages/edit-customer/edit-customer';
+import { CustomersLayout } from '@/features/customers/layouts/customers-layout/customers-layout';
+import { SuppliersLayout } from '@/features/suppliers/layouts/suppliers-layout/suppliers-layout';
+import { Suppliers } from '@/features/suppliers/pages/suppliers/suppliers';
+import { AddSupplier } from '@/features/suppliers/pages/add-supplier/add-supplier';
+import { EditSupplier } from '@/features/suppliers/pages/edit-supplier/edit-supplier';
 export default [
   {
     path: 'journals',
@@ -79,5 +86,43 @@ export default [
   {
     path: 'accounts-tree',
     component: AccountsTree,
+  },
+    {
+    path: 'customers',
+    component: CustomersLayout,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: Customers,
+      },
+      {
+        path: 'add',
+        component: AddCustomer,
+      },
+      {
+        path: ':id/edit',
+        component: EditCustomer,
+      },
+    ],
+  },
+  {
+    path: 'suppliers',
+    component: SuppliersLayout,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: Suppliers,
+      },
+      {
+        path: 'add',
+        component: AddSupplier,
+      },
+      {
+        path: ':id/edit',
+        component: EditSupplier,
+      },
+    ],
   },
 ] satisfies Route[];

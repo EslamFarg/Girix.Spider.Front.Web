@@ -12,6 +12,7 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { labeledRequiredValidator, noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
 import { RestaurantInfoService } from '../../services/restaurant-info-service';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { ImgOnly } from "@/directives/img-only";
 
 @Component({
   selector: 'app-restaurant',
@@ -24,7 +25,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     SectionWrapper,
     ReactiveFormsModule,
     ButtonDirective,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    ImgOnly
 ],
   templateUrl: './restaurant.html',
   styleUrl: './restaurant.css',

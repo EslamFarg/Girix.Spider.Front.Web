@@ -479,6 +479,7 @@ export class Cashier extends BaseComponent implements OnInit {
     this.currentHut.set(null);
     this.currentRoom.set(null);
     this.currentTable.set(null);
+    this.amountReceived.set(0);
     this.orderFg.patchValue({
       idempotencyKey: Date.now() + Math.random().toString(),
       placeRefId: null,
@@ -1418,7 +1419,6 @@ export class Cashier extends BaseComponent implements OnInit {
       this.orderFg.patchValue({
         placeRefId: table.id,
         placeType: OrderLocalType.Table,
-        orderType: OrderLocationType.DineIn,
       });
       this.orderLocationType.set(OrderLocationType.DineIn);
       this.activeLocalType.set(OrderLocalType.Table);
@@ -1499,7 +1499,6 @@ export class Cashier extends BaseComponent implements OnInit {
       this.orderFg.patchValue({
         placeRefId: room.id,
         placeType: OrderLocalType.Room,
-        orderType: OrderLocationType.DineIn,
       });
       this.orderLocationType.set(OrderLocationType.DineIn);
       this.activeLocalType.set(OrderLocalType.Room);
@@ -1625,9 +1624,10 @@ export class Cashier extends BaseComponent implements OnInit {
       this.searchDeliveries(this.deliveryPaginationInfo.pageIndex + 1);
     }
   }
-  onDeliverySelected(deliveryId: number,orderType:OrderLocationType) {
+  onDeliverySelected(deliveryId: number, orderType: OrderLocationType) {
     // if (delivery.isAvailable) {
-    this.orderFg.patchValue({ deliveryId, orderType });
+    this.orderLocationType.set(orderType);
+    this.orderFg.patchValue({ deliveryId });
     this.DeliveryDialogVisible = false;
     this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الدليفري بنجاح' });
     // } else {

@@ -6,6 +6,7 @@ import { Rooms } from '@/features/collections/pages/rooms/rooms';
 import { Huts } from '@/features/collections/pages/huts/huts';
 import { Deliveries } from '@/features/collections/pages/deliveries/deliveries';
 import { CompanyDeliveries } from '@/features/collections/pages/company-deliveries/company-deliveries';
+import { AssignToDelivery } from '@/features/orders/pages/assign-to-delivery/assign-to-delivery';
 
 export default [
   {
@@ -31,5 +32,9 @@ export default [
   {
     path: 'company-deliveries',
     component: CompanyDeliveries,
+  },
+  {
+    path: 'delivery-swapping',
+    component: AssignToDelivery,
   },
 ] satisfies Route[];

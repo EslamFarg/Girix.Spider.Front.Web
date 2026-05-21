@@ -18,6 +18,7 @@ import {
 import { MenuItem } from 'primeng/api';
 import { OrderService } from '@/features/orders';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Debounce } from "@/directives/debounce";
 
 @Component({
   selector: 'app-tables',
@@ -29,7 +30,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     ReactiveFormsModule,
     Paginator,
     TableCard,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    Debounce
 ],
   templateUrl: './tables.html',
   styleUrl: './tables.css',

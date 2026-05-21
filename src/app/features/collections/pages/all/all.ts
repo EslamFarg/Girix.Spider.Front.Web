@@ -171,7 +171,7 @@ export class All extends BaseComponent {
       const collectedIds = this.collectionsService.collectedOrderIds();
       if (collectedIds.length > 0) {
         this.orders.update((rows) =>
-          rows.map((o) => (collectedIds.includes(o.id) ? { ...o, isCollected: true } : o)),
+          rows.map((o) => (collectedIds.includes(o.id) ? { ...o, isCollected: true,paymentType:OrderPaymentType.Paid } : o)),
         );
       }
     });

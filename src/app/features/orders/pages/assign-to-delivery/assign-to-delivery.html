@@ -93,13 +93,13 @@
       </table>
     </div>
 
-    <p-paginator
+    <div class="mt-4 flex items-center justify-between">
+      <p-paginator
       (onPageChange)="onPageChange($event)"
       [first]="(ordersPaginationInfo().pageIndex - 1) * 10"
       [rows]="10"
       [totalRecords]="ordersPaginationInfo().totalRowsCount"
     />
-
     <!-- Selected Delivery + Save Section -->
     @if (selectedDelivery(); as delivery) {
       <div class="mt-4 p-3 bg-form-bg rounded-lg flex items-center gap-4 flex-wrap">
@@ -124,18 +124,21 @@
           حفظ
         </button>
       </div>
-    } @else if (selectedOrderIds().size > 0) {
+    }@else if ( selectedOrderIds().size > 0) {
       <div class="mt-4">
         <button
           pButton
           type="button"
-          class="p-button-primary"
+          class="app-p-btn"
           (click)="openDeliveryDialog()"
         >
           اختيار دليفري
         </button>
       </div>
     }
+    </div>
+
+    
   </app-section-wrapper>
 </div>
 

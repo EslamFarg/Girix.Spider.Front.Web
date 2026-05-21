@@ -12,7 +12,13 @@ import { MealsLayout } from '@/features/classes/layouts/meals-layout/meals-layou
 import { GroupsLayout } from '@/features/classes/layouts/groups-layout/groups-layout';
 import { EditMeal } from '@/features/classes/pages/edit-meal/edit-meal';
 import { ProductComponents } from '@/features/classes/pages/product-components/product-components';
-
+import { Tables } from '@/features/restaurant/pages/tables/tables';
+import { Rooms } from '@/features/restaurant/pages/rooms/rooms';
+import { Huts } from '@/features/restaurant/pages/huts/huts';
+import { DeliveryMen } from '@/features/deliveries/pages/delivery-men/delivery-men';
+import { AddDeliveryMan } from '@/features/deliveries/pages/add-delivery-man/add-delivery-man';
+import { EditDeliveryMan } from '@/features/deliveries/pages/edit-delivery-man/edit-delivery-man';
+import { AssignToDelivery } from '@/features/orders/pages/assign-to-delivery/assign-to-delivery';
 export default [
   //products
   {
@@ -79,6 +85,36 @@ export default [
       {
         path: ':id/edit',
         component: EditGroup,
+      },
+    ],
+  },
+  //
+  {
+    path: 'tables',
+    component: Tables,
+  },
+  {
+    path: 'rooms',
+    component: Rooms,
+  },
+  {
+    path: 'huts',
+    component: Huts,
+  },
+  {
+    path: 'deliveries',
+    children: [
+      {
+        path: '',
+        component: DeliveryMen,
+      },
+      {
+        path: 'add',
+        component: AddDeliveryMan,
+      },
+      {
+        path: ':id/edit',
+        component: EditDeliveryMan,
       },
     ],
   },

@@ -79,7 +79,7 @@
               <div>{{ item.value.name }}</div>
             </td>
             <td>
-              <div>{{ item.value.netUnitPriceWithTax }}</div>
+              <div>{{ item.value.netUnitPriceWithTax?.toFixed(2) }}</div>
             </td>
             <td>
               <div>{{ item.value.originalQuantity }}</div>
@@ -100,7 +100,7 @@
               </app-input-error-message-handler>
             </td>
             <td>
-              <div>{{ (item.value.quantity ?? 0) * (item.value.netUnitPriceWithTax ?? 0) | number: '1.2-2' }}</div>
+              <div>{{ ((item.value.quantity ?? 0) * (item.value.netUnitPriceWithTax ?? 0)).toFixed(2) }}</div>
             </td>
           </tr>
 
@@ -149,8 +149,20 @@
   </div>
 
   <!-- Summary -->
-  <div class="flex justify-end items-center gap-4 mt-2 p-4 bg-dark-bg-2 rounded-lg">
-    <span class="text-text-lighter font-bold">إجمالي المرتجع:</span>
-    <span class="text-white font-bold text-lg">{{ calculateRefundTotal() | number: '1.2-2' }}</span>
+  <div class="flex flex-col gap-2 mt-2 p-4 bg-dark-bg-2 rounded-lg">
+    <!-- <div class="flex items-center gap-4">
+      <span class="text-text-lighter font-bold">إجمالي العناصر:</span>
+      <span class="text-white font-bold w-20 text-left">{{ calculateItemsTotal() | number: '1.2-2' }}</span>
+    </div>
+    @if (calculateReturnedServiceFee() > 0) {
+      <div class="flex items-center gap-4">
+        <span class="text-text-lighter font-bold">رسوم الخدمة المسترجعة:</span>
+        <span class="text-white font-bold w-20 text-left">{{ calculateReturnedServiceFee() | number: '1.2-2' }}</span>
+      </div>
+    } -->
+    <div class="flex items-center gap-4 justify-end">
+      <span class="text-text-lighter font-bold">إجمالي المرتجع:</span>
+      <span class="text-white font-bold text-lg w-20 text-left">{{ calculateRefundTotal() | number: '1.2-2' }}</span>
+    </div>
   </div>
 </form>

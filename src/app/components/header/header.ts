@@ -9,7 +9,7 @@ import { ProgressBarModule, ProgressBar } from 'primeng/progressbar';
 import { LayoutService } from '@/layouts/services/layout-service';
 import { MessageModule } from 'primeng/message';
 import { Role } from '@/core';
-import { AllowedRolesDirective } from "@/directives/allowed-roles";
+import { AllowedRolesDirective } from '@/directives/allowed-roles';
 
 export interface IMainNavItem {
   labelKey: string;
@@ -43,10 +43,10 @@ export class Header extends BaseComponent implements AfterViewInit {
   userDetails = this.authService.userDetails;
   popUpMenuItems: MenuItem[] = [
     {
-          label: 'تسجيل الخروج',
-          icon: 'pi pi-sign-out',
-          command: (event) => this.onLogoutClick(event.originalEvent!),
-        },
+      label: 'تسجيل الخروج',
+      icon: 'pi pi-sign-out',
+      command: (event) => this.onLogoutClick(event.originalEvent!),
+    },
     // {
     //   // label: 'الاجاراءات',
     //   items: [
@@ -60,23 +60,15 @@ export class Header extends BaseComponent implements AfterViewInit {
   ];
 
   navItems: IMainNavItem[] = [
-    // home
+    // cashier
     {
-      labelKey: 'HOME',
+      labelKey: 'CASHIER',
       imgUrl: headerIcons.home.imgUrl,
       routerLink: '/',
       isLink: true,
       roles: [Role.Admin, Role.Cashier, Role.Waiter],
     },
-    // daily journal
-    {
-      labelKey: 'DAILY_JOURNAL',
-      imgUrl: headerIcons.dailyJournal.imgUrl,
-      routerLink: '/daily-journal',
-      isLink: true,
-      roles: [Role.Admin, Role.Cashier],
-    },
-    // invoices
+    // invoices and replacements
     {
       labelKey: 'INVOICES',
       imgUrl: headerIcons.invoices.imgUrl,
@@ -95,150 +87,40 @@ export class Header extends BaseComponent implements AfterViewInit {
           routerLink: '/invoices/refunds',
           roles: [Role.Admin, Role.Cashier],
         },
-      ],
-    },
-    // classes
-    {
-      labelKey: 'CLASSES',
-      imgUrl: headerIcons.classes.imgUrl,
-      routerLink: '/classes',
-      roles: [Role.Admin, Role.Cashier],
-      children: [
-        {
-          labelKey: 'PRODUCTS',
-          imgUrl: headerIcons.classes.children.products,
-          routerLink: '/classes/products',
-          roles: [Role.Admin, Role.Cashier],
-        },
-        {
-          labelKey: 'MEALS',
-          imgUrl: headerIcons.classes.children.meals,
-          routerLink: '/classes/meals',
-          roles: [Role.Admin, Role.Cashier],
-        },
-        {
-          labelKey: 'GROUPS',
-          imgUrl: headerIcons.classes.children.groups,
-          routerLink: '/classes/groups',
-          roles: [Role.Admin, Role.Cashier],
-        },
-        {
-          labelKey: 'COMPONENTS',
-          imgUrl: headerIcons.classes.children.components,
-          routerLink: '/classes/product-components',
-          roles: [Role.Admin, Role.Cashier],
-        },
-      ],
-    },
-    // restaurant
-    {
-      labelKey: 'RESTAURANT',
-      imgUrl: headerIcons.restaurant.imgUrl,
-      routerLink: '/restaurant',
-      roles: [Role.Admin, Role.Cashier],
-      children: [
-        {
-          labelKey: 'TABLES',
-          imgUrl: headerIcons.restaurant.children.tables,
-          routerLink: '/restaurant/tables',
-          roles: [Role.Admin, Role.Cashier],
-        },
-        {
-          labelKey: 'HUTS',
-          imgUrl: headerIcons.restaurant.children.huts,
-          routerLink: '/restaurant/huts',
-          roles: [Role.Admin, Role.Cashier],
-        },
-        {
-          labelKey: 'ROOMS',
-          imgUrl: headerIcons.restaurant.children.rooms,
-          routerLink: '/restaurant/rooms',
-          roles: [Role.Admin, Role.Cashier],
-        },
-      ],
-    },
-    // customers
-    {
-      labelKey: 'CUSTOMERS',
-      imgUrl: headerIcons.customers.imgUrl,
-      routerLink: '/customers',
-      roles: [Role.Admin, Role.Cashier],
-      children: [
-        {
-          labelKey: 'ADD_CUSTOMER',
-          imgUrl: headerIcons.customers.children.add,
-          routerLink: '/customers/add',
-          roles: [Role.Admin, Role.Cashier],
-        },
-      ],
-    },
-    // storage
-    {
-      labelKey: 'STORAGE',
-      imgUrl: headerIcons.storage.imgUrl,
-      routerLink: '/storage',
-      roles: [Role.Admin, Role.Cashier],
-      children: [
-        {
-          labelKey: 'OPENING_BALANCES',
-          imgUrl: headerIcons.storage.children.openingBalances,
-          routerLink: '/storage/opening-balances',
-          roles: [Role.Admin, Role.Cashier],
-        },
-        {
-          labelKey: 'PURCHASES',
-          imgUrl: headerIcons.storage.children.purchases,
-          routerLink: '/storage/purchases',
-          roles: [Role.Admin, Role.Cashier],
-        },
-        {
-          labelKey: 'PURCHASES_REFUNDS',
-          imgUrl: headerIcons.storage.children.purchasesRefunds,
-          routerLink: '/storage/purchases-returns',
-          roles: [Role.Admin, Role.Cashier],
-        },
-        {
-          labelKey: 'INVENTORY',
-          imgUrl: headerIcons.storage.children.inventory,
-          routerLink: '/storage/inventory',
-          roles: [Role.Admin, Role.Cashier],
-        },
-      ],
-    },
-    // replacements
-    {
-      labelKey: 'REPLACEMENTS',
-      imgUrl: headerIcons.replacements.imgUrl,
-      routerLink: '/replacements',
-      roles: [Role.Admin, Role.Cashier, Role.Waiter],
-      children: [
         {
           labelKey: 'ROOMS',
           imgUrl: headerIcons.replacements.children.rooms,
-          routerLink: '/replacements/rooms',
+          routerLink: '/invoices/replacements/rooms',
           roles: [Role.Admin, Role.Cashier, Role.Waiter],
         },
         {
           labelKey: 'HUTS',
           imgUrl: headerIcons.replacements.children.huts,
-          routerLink: '/replacements/huts',
+          routerLink: '/invoices/replacements/huts',
           roles: [Role.Admin, Role.Cashier, Role.Waiter],
         },
         {
           labelKey: 'TABLES',
           imgUrl: headerIcons.replacements.children.tables,
-          routerLink: '/replacements/tables',
+          routerLink: '/invoices/replacements/tables',
           roles: [Role.Admin, Role.Cashier, Role.Waiter],
         },
       ],
     },
-    // collections
+    // collections and daily journal
     {
       labelKey: 'COLLECTIONS',
       imgUrl: headerIcons.collections.imgUrl,
       routerLink: '/collections',
       roles: [Role.Admin, Role.Cashier, Role.Waiter],
       children: [
+        // daily journal
+        {
+          labelKey: 'DAILY_JOURNAL',
+          imgUrl: headerIcons.dailyJournal.imgUrl,
+          routerLink: '/daily-journal',
+          roles: [Role.Admin, Role.Cashier],
+        },
         {
           labelKey: 'ALL',
           imgUrl: headerIcons.collections.children.all,
@@ -275,8 +157,105 @@ export class Header extends BaseComponent implements AfterViewInit {
           routerLink: '/collections/company-deliveries',
           roles: [Role.Admin, Role.Cashier],
         },
+        {
+          labelKey: 'DELIVERY_SWAPPING',
+          imgUrl: headerIcons.collections.children.deliverySwapping,
+          routerLink: '/collections/delivery-swapping',
+          roles: [Role.Admin, Role.Cashier],
+        },
       ],
     },
+    // classes and tables
+    {
+      labelKey: 'CLASSES',
+      imgUrl: headerIcons.classes.imgUrl,
+      routerLink: '/classes',
+      roles: [Role.Admin, Role.Cashier],
+      children: [
+        {
+          labelKey: 'PRODUCTS',
+          imgUrl: headerIcons.classes.children.products,
+          routerLink: '/classes/products',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'MEALS',
+          imgUrl: headerIcons.classes.children.meals,
+          routerLink: '/classes/meals',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'GROUPS',
+          imgUrl: headerIcons.classes.children.groups,
+          routerLink: '/classes/groups',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'COMPONENTS',
+          imgUrl: headerIcons.classes.children.components,
+          routerLink: '/classes/product-components',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'TABLES',
+          imgUrl: headerIcons.classes.children.tables,
+          routerLink: '/classes/tables',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'HUTS',
+          imgUrl: headerIcons.classes.children.huts,
+          routerLink: '/classes/huts',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'ROOMS',
+          imgUrl: headerIcons.classes.children.rooms,
+          routerLink: '/classes/rooms',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'DELIVERY_MEN',
+          imgUrl: headerIcons.classes.children.deliveryMen,
+          routerLink: '/classes/deliveries',
+          roles: [Role.Admin],
+        },
+      ],
+    },
+    // storage
+    {
+      labelKey: 'STORAGE',
+      imgUrl: headerIcons.storage.imgUrl,
+      routerLink: '/storage',
+      roles: [Role.Admin, Role.Cashier],
+      children: [
+        {
+          labelKey: 'OPENING_BALANCES',
+          imgUrl: headerIcons.storage.children.openingBalances,
+          routerLink: '/storage/opening-balances',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'PURCHASES',
+          imgUrl: headerIcons.storage.children.purchases,
+          routerLink: '/storage/purchases',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'PURCHASES_REFUNDS',
+          imgUrl: headerIcons.storage.children.purchasesRefunds,
+          routerLink: '/storage/purchases-returns',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'INVENTORY',
+          imgUrl: headerIcons.storage.children.inventory,
+          routerLink: '/storage/inventory',
+          roles: [Role.Admin, Role.Cashier],
+        },
+      ],
+    },
+
     // accounts
     {
       labelKey: 'ACCOUNTS',
@@ -284,6 +263,24 @@ export class Header extends BaseComponent implements AfterViewInit {
       routerLink: '/accounts',
       roles: [Role.Admin],
       children: [
+        {
+          labelKey: 'ACCOUNTS_TREE',
+          imgUrl: headerIcons.accounts.children.accountsTree,
+          routerLink: '/accounts/accounts-tree',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'ADD_CUSTOMER',
+          imgUrl: headerIcons.accounts.children.add,
+          routerLink: '/accounts/customers/add',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'ADD_SUPPLIER',
+          imgUrl: headerIcons.accounts.children.add,
+          routerLink: '/accounts/suppliers/add',
+          roles: [Role.Admin, Role.Cashier],
+        },
         {
           labelKey: 'JOURNALS',
           imgUrl: headerIcons.accounts.children.journals,
@@ -302,42 +299,6 @@ export class Header extends BaseComponent implements AfterViewInit {
           routerLink: '/accounts/collective-payments',
           roles: [Role.Admin, Role.Cashier],
         },
-        {
-          labelKey: 'ACCOUNTS_TREE',
-          imgUrl: headerIcons.accounts.children.accountsTree,
-          routerLink: '/accounts/accounts-tree',
-          roles: [Role.Admin, Role.Cashier],
-        },
-      ],
-    },
-    // deliveries
-    {
-      labelKey: 'DELIVERY',
-      imgUrl: headerIcons.deliveries.imgUrl,
-      routerLink: '/deliveries',
-      roles: [Role.Admin],
-      children: [
-        {
-          labelKey: 'DELIVERY_MEN',
-          imgUrl: headerIcons.deliveries.children.deliveryMen,
-          routerLink: '/deliveries/delivery-men',
-          roles: [Role.Admin],
-        },
-      ],
-    },
-    // users
-    {
-      labelKey: 'USERS',
-      imgUrl: headerIcons.users.imgUrl,
-      routerLink: '/users',
-      roles: [Role.Admin],
-      children: [
-        {
-          labelKey: 'ADD_USER',
-          imgUrl: headerIcons.users.children.add,
-          routerLink: '/users/add',
-          roles: [Role.Admin],
-        },
       ],
     },
     // settings
@@ -351,7 +312,7 @@ export class Header extends BaseComponent implements AfterViewInit {
           labelKey: 'PROGRAM',
           imgUrl: headerIcons.settings.children.program,
           routerLink: '/settings/program',
-          subLinks: ['/settings/program/language', '/settings/program/support', '/settings/program/about'],
+          subLinks: ['/settings/program/support', '/settings/program/language', '/settings/program/about'],
           roles: [Role.Admin, Role.Cashier],
         },
         {
@@ -389,6 +350,12 @@ export class Header extends BaseComponent implements AfterViewInit {
           imgUrl: headerIcons.settings.children.printerSettings,
           routerLink: '/settings/printer',
           roles: [Role.Admin, Role.Cashier],
+        },
+        {
+          labelKey: 'ADD_USER',
+          imgUrl: headerIcons.settings.children.add,
+          routerLink: '/settings/users/add',
+          roles: [Role.Admin],
         },
       ],
     },

@@ -130,6 +130,8 @@
           <input
             pInputText
             id="mealPrice"
+            appAllowNumbers
+            [allowDecimal]="true"
             formControlName="price"
             class="app-input"
             aria-describedby="mealPrice-help"
@@ -143,6 +145,8 @@
           <input
             pInputText
             id="costPrice"
+            appAllowNumbers
+            [allowDecimal]="true"
             formControlName="costPrice"
             class="app-input"
             aria-describedby="costPrice-help"

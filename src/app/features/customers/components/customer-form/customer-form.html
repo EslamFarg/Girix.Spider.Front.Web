@@ -40,6 +40,7 @@
       <input
         pInputText
         id="phoneNumber"
+        appAllowNumbers
         formControlName="phoneNumber"
         aria-describedby="phoneNumber-help"
         [placeholder]="'FORM.PHONE_NUMBER' | translate"
@@ -51,6 +52,7 @@
     <app-input-error-message-handler [fc]="customerFg.get('secondaryMobileNumber')">
       <input
         pInputText
+        appAllowNumbers
         id="additional-phoneNumber"
         aria-describedby="additional-phoneNumber-help"
         [placeholder]="'FORM.SECONDARY_PHONE_NUMBER' | translate"
@@ -149,6 +151,7 @@
       <input
         pInputText
         id="costPrice"
+        appAllowNumbers
         formControlName="numberOfFloor"
         aria-describedby="costPrice-help"
         [placeholder]="'FORM.FLOOR' | translate"

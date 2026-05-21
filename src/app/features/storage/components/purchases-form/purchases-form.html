@@ -199,7 +199,6 @@
         #SupplierSearchInput
         id="supplierCode"
         aria-describedby="supplierCode-help"
-        placeholder="بحث برقم الفاتوره"
       />
       <p-inputgroup-addon class="p-0! cursor-pointer">
         <button type="submit" form="searchSupplierForm" class="flex cursor-pointer">
@@ -275,7 +274,7 @@
       <th class="">سعر البيع</th>
       <th class="">سعر الشراء</th>
       <th class="">الضريبه</th>
-      <th class="">المجموع</th>
+      <th class="">الاجمالي</th>
       <th class="min-w-40 w-40">الأدوات</th>
     </tr>
   </thead>
@@ -431,8 +430,8 @@
         <div class="app-input flex justify-center items-center" pInputText>
           <span class="disabled">
             {{
-              +(newPurchaseItemRowFg.get('purchasePrice')?.value ?? 0) *
-                +(newPurchaseItemRowFg.get('quantity')?.value ?? 0)
+              (+((newPurchaseItemRowFg.value.purchasePrice ?? 0) + (newPurchaseItemRowFg.value.taxAmount??0)) *
+                +(newPurchaseItemRowFg.value.quantity ?? 0)).toFixed(2)
             }}
           </span>
         </div>
@@ -501,7 +500,7 @@
             <ng-select
               class="app-select"
               [items]="units.get(item.get('menuItemsId')!.value!)!()"
-              (open)="getProductUnits(newPurchaseItemRowFg.get('menuItemsId')?.value ?? 0)()"
+              (open)="getProductUnits(item.get('menuItemsId')?.value ?? 0)()"
               [formControl]="getFormControl(item, 'unitId')"
               bindLabel="unitName"
               bindValue="unitId"

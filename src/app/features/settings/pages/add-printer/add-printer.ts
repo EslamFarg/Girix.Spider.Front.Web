@@ -11,7 +11,7 @@ import { IPrinterSearchRow, PrinterService, PrinterType } from '@/features/print
 import { Dialog } from 'primeng/dialog';
 import { IBluetoothPrinter } from '@/app';
 import { onlyNumbersAllowed } from '@/yn-ng';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 
 @Component({
   selector: 'app-add-printer',
@@ -25,8 +25,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     ReactiveFormsModule,
     Dialog,
     ButtonDirective,
-    LoadingDisabledDirective
-],
+    LoadingDisabledDirective,
+  ],
   templateUrl: './add-printer.html',
   styleUrl: './add-printer.css',
 })
@@ -41,22 +41,22 @@ export class AddPrinter extends BaseComponent {
   };
   fg = this.fb.group(this.printerFg);
   fgListener = this.fg.valueChanges.subscribe((values) => {
-    const portControl= this.fg.controls.port;
-    const comPortControl= this.fg.controls.comPort;
+    const portControl = this.fg.controls.port;
+    const comPortControl = this.fg.controls.comPort;
 
-    if(values.type === PrinterType.Network){
-      portControl.setValidators([Validators.required,onlyNumbersAllowed]);
+    if (values.type === PrinterType.Network) {
+      portControl.setValidators([Validators.required, onlyNumbersAllowed]);
       comPortControl.clearValidators();
-      comPortControl.setValue(null,{emitEvent:false});
-    }else{
+      comPortControl.setValue(null, { emitEvent: false });
+    } else {
       portControl.clearValidators();
-      portControl.setValue(0,{emitEvent:false});
+      portControl.setValue(0, { emitEvent: false });
       comPortControl.setValidators([Validators.required]);
     }
 
     // portControl.updateValueAndValidity();
     // comPortControl.updateValueAndValidity();
-  })
+  });
   printers = signal<IPrinterSearchRow[]>([]);
   currentPrinter = signal<IPrinterSearchRow | null>(null);
   /**
@@ -80,7 +80,10 @@ export class AddPrinter extends BaseComponent {
     switch (!!this.currentPrinter()) {
       case true:
         this.printerService.put({ id: this.currentPrinter()!.id, ...this.fg.value }).subscribe({
-          next: () => this.updatePrintersList(),
+          next: () => {
+            this.updatePrintersList();
+            this.onReset();
+          },
         });
         break;
       case false:

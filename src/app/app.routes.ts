@@ -24,20 +24,12 @@ export const routes: Routes = [
         loadChildren: () => import('@/routes/classes').then((m) => m.default),
       },
       {
-        path: 'restaurant',
-        loadChildren: () => import('@/routes/restaurant').then((m) => m.default),
-      },
-      {
         path: 'storage',
         loadChildren: () => import('@/routes/storage').then((m) => m.default),
       },
       {
-        path: 'replacements',
-        loadChildren: () => import('@/routes/replacements').then((m) => m.default),
-      },
-      {
-        path: 'customers',
-        loadChildren: () => import('@/routes/customers').then((m) => m.default),
+        path: 'customers-suppliers',
+        loadChildren: () => import('@/routes/customers-suppliers').then((m) => m.default),
       },
       {
         path: 'collections',
@@ -50,10 +42,6 @@ export const routes: Routes = [
       {
         path: 'deliveries',
         loadChildren: () => import('@/routes/deliveries').then((m) => m.default),
-      },
-      {
-        path: 'users',
-        loadChildren: () => import('@/routes/users').then((m) => m.default),
       },
       {
         path: 'settings',

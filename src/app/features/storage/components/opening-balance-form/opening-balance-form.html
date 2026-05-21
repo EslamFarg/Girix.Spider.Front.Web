@@ -374,7 +374,7 @@
             <ng-select
               class="app-select"
               [items]="units.get(item.get('itemId')!.value!)!()"
-              (open)="getProductUnits(newOpeningBalanceItemRowFg.get('itemId')?.value ?? 0)()"
+              (open)="getProductUnits(item.get('itemId')?.value ?? 0)()"
               [formControl]="getFormControl(item, 'unitId')"
               bindLabel="unitName"
               bindValue="unitId"

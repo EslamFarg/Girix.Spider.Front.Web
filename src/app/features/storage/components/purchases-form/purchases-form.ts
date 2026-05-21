@@ -181,6 +181,12 @@ export class PurchasesForm extends BaseComponent {
               ...data,
               invoiceDate: new Date(data.invoiceDate),
             });
+            this.currentProducts.set(
+              data.items.map((item) => ({
+                id: item.menuItemsId,
+                name: item.menuItemName,
+              })),
+            );
             this.fg.setControl(
               'items',
               this.fb.array(
@@ -215,12 +221,15 @@ export class PurchasesForm extends BaseComponent {
       console.log(this.fg.getRawValue());
       return;
     }
+    
 
-    if (!this.currentSupplier()) return;
+    if (!this.currentSupplier() && FormMode.Create === this.formMode()) {
+      return this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب اختيار المورد' });
+    };
 
-    if (this.currentSupplier()!.id !== this.fg.value.supplierId) {
-      return this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'المورد غير متطابق' });
-    }
+    // if (this.currentSupplier()!.id !== this.fg.value.supplierId) {
+    //   return this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'المورد غير متطابق' });
+    // }
 
     //collect data to send
     let data = {
@@ -271,6 +280,12 @@ export class PurchasesForm extends BaseComponent {
           ...data,
           invoiceDate: new Date(data.invoiceDate),
         });
+        this.currentProducts.set(
+          data.items.map((item) => ({
+            id: item.menuItemsId,
+            name: item.menuItemName,
+          })),
+        );
         this.fg.setControl(
           'items',
           this.fb.array(
@@ -437,6 +452,7 @@ export class PurchasesForm extends BaseComponent {
       this.productService.getUnitsByProductId(productId).subscribe({
         next: (res) => {
           unitsSignal.set(res);
+          this.newPurchaseItemRowFg.patchValue({ unitId: res[0].unitId });
         },
       });
       return unitsSignal;
@@ -556,10 +572,17 @@ export class PurchasesForm extends BaseComponent {
     console.log(this.fg.value);
   }
 
-  onCurrentItemChange(itemId: IProductSearchRow) {
-    this.newPurchaseItemRowFg.controls.menuItemsId.setValue(itemId.id);
+  onCurrentItemChange(item: IProductSearchRow) {
+    this.newPurchaseItemRowFg.controls.menuItemsId.setValue(item.id);
     this.newPurchaseItemRowFg.controls.unitId.setValue(null);
-    this.getProductUnits(itemId.id);
+    this.newPurchaseItemRowFg.patchValue({
+      quantity: 1,
+      salePrice: item.priceWithTax,
+      purchasePrice: item.costPrice,
+      taxAmount: item.tax/100 * item.costPrice,
+      // total: item.costPrice+(item.tax/100 * item.costPrice),  
+    })
+    this.getProductUnits(item.id);
   }
   //
   //
@@ -630,21 +653,7 @@ export class PurchasesForm extends BaseComponent {
     //   },
     // });
   }
-  // onAccountSelected(event: ITreeFinancialAccountSearchRow, isCash: boolean) {
-  //   if (!event.id) return;
-
-  //   if (isCash) {
-  //     this.currentCashAccount.set({
-  //       id: event.id,
-  //       name: event.name,
-  //     });
-  //   } else {
-  //     this.currentNetworkAccount.set({
-  //       id: event.id,
-  //       name: event.name,
-  //     });
-  //   }
-  // }
+ 
   cashAccountsSearchPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalRowsCount: 0,

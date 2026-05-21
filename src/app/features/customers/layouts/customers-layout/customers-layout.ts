@@ -13,11 +13,11 @@ export class CustomersLayout {
   links: ISectionLink[] = [
     {
       labelKey: 'CUSTOMERS.EXPLORER',
-      url: '/customers',
+      url: '/accounts/customers',
     },
     {
       labelKey: 'CUSTOMERS.ADD',
-      url: '/customers/add',
+      url: '/accounts/customers/add',
     },
   ];
 }

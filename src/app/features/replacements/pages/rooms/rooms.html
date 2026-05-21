@@ -1,6 +1,7 @@
 <app-section-wrapper class="block mt-4 p-4 overflow-auto custom-scroll h-full" styleClass="no-scrollbar">
   <!-- search -->
-  <form appLoadingDisabled #form [formGroup]="searchFg" (ngSubmit)="onSearchSubmit()">
+  <form appLoadingDisabled appDebounce
+    [domEvents]="['submit']" #form [formGroup]="searchFg" (ngSubmit)="onSearchSubmit()">
     <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
       <input
         class="w-full bg-transparent! h-8!"
@@ -10,22 +11,9 @@
         placeholder="بحث"
       />
       <p-inputgroup-addon class="p-0!">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M10.4154 17.5C6.04311 17.5 2.4987 13.9555 2.4987 9.58329C2.4987 5.21104 6.04311 1.66663 10.4154 1.66663C14.7876 1.66663 18.332 5.21104 18.332 9.58329C18.332 13.9555 14.7876 17.5 10.4154 17.5Z"
-            stroke="#7F7F7F"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M1.66536 18.3333L3.33203 16.6666"
-            stroke="#7F7F7F"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+        <button type="submit" class="flex cursor-pointer">
+            <i class="pi pi-search"></i>
+          </button>
       </p-inputgroup-addon>
     </app-input-error-message-handler>
   </form>

@@ -3,7 +3,7 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { ILocalSpaceItem, ReplacementsService, SpaceTypeEnum } from '../../services/replacements-service';
 import { CountdownConfig, CountdownEvent, CountdownComponent } from 'ngx-countdown';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { Button } from 'primeng/button';
+import { Button, ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { Select } from 'primeng/select';
 import { InputText } from 'primeng/inputtext';
@@ -34,7 +34,8 @@ type allowedDurationMinute = 30 | 60 | 90 | 120 | 150 | 180;
     TableCard,
     ɵInternalFormsSharedModule,
     ReactiveFormsModule,
-  ],
+    ButtonDirective
+],
   templateUrl: './repalcements-layout.html',
   styleUrl: './repalcements-layout.css',
 })

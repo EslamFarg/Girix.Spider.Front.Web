@@ -1161,7 +1161,7 @@
     >
       @if (isCompanyDelivery) {
         @for (item of companyDeliveries(); track $index) {
-          <button pButton (click)="onDeliverySelected(item.id,OrderLocationType.CompanyDelivery)">
+          <button pButton (click)="onDeliverySelected(item.id, OrderLocationType.CompanyDelivery)">
             <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
@@ -1182,7 +1182,11 @@
         }
       } @else {
         @for (item of deliveries(); track $index) {
-          <button pButton class="relative overflow-visible!" (click)="onDeliverySelected(item.id,OrderLocationType.PersonDelivery)">
+          <button
+            pButton
+            class="relative overflow-visible!"
+            (click)="onDeliverySelected(item.id, OrderLocationType.PersonDelivery)"
+          >
             <span
               class="absolute -top-2.5 -left-2.5 text-xs text-white bg-rose-600 rounded-full w-5 h-5 flex items-center justify-center"
               >{{ item.orderNumber }}</span

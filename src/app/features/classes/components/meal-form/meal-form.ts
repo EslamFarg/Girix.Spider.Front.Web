@@ -22,6 +22,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { ImgOnly } from '@/directives/img-only';
 import { RouterLink } from '@angular/router';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { AllowNumbers } from "@/directives/allow-numbers";
 
 @Component({
   selector: 'app-meal-form',
@@ -44,7 +45,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     TranslatePipe,
     ImgOnly,
     RouterLink,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    AllowNumbers
 ],
   templateUrl: './meal-form.html',
   styleUrl: './meal-form.css',

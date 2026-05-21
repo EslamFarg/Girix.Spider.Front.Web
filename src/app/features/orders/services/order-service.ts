@@ -40,8 +40,9 @@ export class OrderService extends BaseSearchAndCrudService<
     return this.http.put<{invoice:IOrderBillReadResponse}>(`${this.apiUrl}/change-type`, dto);
   }
 
+  ///v1/Order/change-OrderDelivery
   assignOrdersToDelivery(dto: { deliveryId: number; orderIds: number[] }) {
-    return this.http.put<any>(`${this.apiUrl}/assign-to-delivery`, dto);
+    return this.http.put<any>(`${this.apiUrl}/change-OrderDelivery`, dto);
   }
 
   //

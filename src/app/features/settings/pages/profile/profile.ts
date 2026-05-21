@@ -13,6 +13,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { ImgFallback } from '@/directives/img-fallback';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { ImgOnly } from "@/directives/img-only";
 
 @Component({
   selector: 'app-profile',
@@ -25,7 +26,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     SectionWrapper,
     ReactiveFormsModule,
     ImgFallback,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    ImgOnly
 ],
   templateUrl: './profile.html',
   styleUrl: './profile.css',

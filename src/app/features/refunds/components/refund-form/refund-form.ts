@@ -280,8 +280,41 @@ export class RefundForm extends BaseComponent implements OnInit {
     return itemTotal + addonsTotal;
   }
 
-  calculateRefundTotal(): number {
+  calculateItemsTotal(): number {
     return this.itemRows.controls.reduce((sum, item, index) => sum + this.calculateItemTotal(item, index), 0);
+  }
+
+  calculateReturnedServiceFee(): number {
+    const summary = (this.orderData() as any)?.summary;
+    const originalServiceFee = summary?.serviceFee ?? 0;
+    if (originalServiceFee <= 0) return 0;
+
+    let refundedQtySum = 0;
+    let originalQtySum = 0;
+
+    for (let i = 0; i < this.itemRows.controls.length; i++) {
+      const item = this.itemRows.controls[i];
+      const itemQty = item.value.quantity ?? 0;
+      const itemOriginalQty = item.value.originalQuantity ?? 0;
+
+      refundedQtySum += itemQty;
+      originalQtySum += itemOriginalQty;
+
+      const addons = this.addonArrays()[i]?.controls ?? [];
+      for (const addon of addons) {
+        refundedQtySum += addon.value.quantity ?? 0;
+        originalQtySum += addon.value.originalQuantity ?? 0;
+      }
+    }
+
+    if (originalQtySum === 0) return 0;
+
+    const ratio = refundedQtySum / originalQtySum;
+    return originalServiceFee * ratio;
+  }
+
+  calculateRefundTotal(): number {
+    return this.calculateItemsTotal() + this.calculateReturnedServiceFee();
   }
 
   syncPaymentWithTotal() {

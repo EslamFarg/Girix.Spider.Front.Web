@@ -8,6 +8,9 @@ import { DefaultAccounts } from '@/features/settings/pages/default-accounts/defa
 import { AddPrinter } from '@/features/settings/pages/add-printer/add-printer';
 import { ManageDailyJournal } from '@/features/settings/pages/manage-daily-journal/manage-daily-journal';
 import { Financial } from '@/features/settings/pages/financial/financial';
+import { UsersLayout } from '@/features/users/layouts/users-layout/users-layout';
+import { Users } from '@/features/users/pages/users/users';
+import { AddUser, EditUser } from '@/features/users';
 
 export default [
   {
@@ -46,5 +49,24 @@ export default [
   {
     path: 'manage-daily-journal',
     component: ManageDailyJournal,
+  },
+  {
+    path: 'users',
+    component: UsersLayout,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: Users,
+      },
+      {
+        path: 'add',
+        component: AddUser,
+      },
+      {
+        path: ':id/edit',
+        component: EditUser,
+      },
+    ],
   },
 ] satisfies Route[];

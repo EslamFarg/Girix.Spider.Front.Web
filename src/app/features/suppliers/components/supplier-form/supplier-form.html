@@ -1,0 +1,181 @@
+<div
+  class="w-full overflow-auto flex items-center justify-end gap-2 *:flex-1 *:md:flex-none *:py-1! *:md:px-8!"
+  style="--p-button-primary-background: transparent"
+>
+  <button
+    pButton
+    appLoadingDisabled
+    style="--p-button-primary-background: var(--color-dark-line)"
+    class="border-dark-line! text-white!"
+    form="supplierForm"
+    type="submit"
+  >
+    @if (formMode() === FormMode.Create) {
+      {{ 'ACTIONS.SAVE' | translate }}
+    } @else {
+      {{ 'ACTIONS.EDIT' | translate }}
+    }
+  </button>
+  <button appLoadingDisabled pButton [routerLink]="'/suppliers/add'" class="border-dark-line! text-dark-line!" variant="outlined">
+    {{ 'ACTIONS.NEW' | translate }}
+  </button>
+</div>
+
+<form appLoadingDisabled id="supplierForm" class="grid md:grid-cols-4 gap-4 flex-1" (ngSubmit)="onSubmitForm()" [formGroup]="supplierFg">
+  <div class="md:col-span-4">
+    <label for="supplierName">{{ 'FORM.SUPPLIER_NAME' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('nameAr')">
+      <input
+        pInputText
+        id="supplierName"
+        aria-describedby="supplierName-help"
+        [placeholder]="'FORM.SUPPLIER_NAME' | translate"
+        formControlName="nameAr"
+      />
+    </app-input-error-message-handler>
+  </div>
+  <div class="md:col-span-2">
+    <label for="phoneNumber">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('phoneNumber')">
+      <input
+        pInputText
+        appAllowNumbers
+        id="phoneNumber"
+        formControlName="phoneNumber"
+        aria-describedby="phoneNumber-help"
+        [placeholder]="'FORM.PHONE_NUMBER' | translate"
+      />
+    </app-input-error-message-handler>
+  </div>
+  <div class="md:col-span-2">
+    <label for="additional-phoneNumber">{{ 'FORM.SECONDARY_PHONE_NUMBER' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('secondaryMobileNumber')">
+      <input
+        pInputText
+        appAllowNumbers
+        id="additional-phoneNumber"
+        aria-describedby="additional-phoneNumber-help"
+        [placeholder]="'FORM.SECONDARY_PHONE_NUMBER' | translate"
+        formControlName="secondaryMobileNumber"
+      />
+    </app-input-error-message-handler>
+  </div>
+
+  <div class="md:col-span-2">
+    <label for="commercialRegister">{{ 'FORM.COMMERCIAL_REGISTER' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('commercialRegister')">
+      <input
+        pInputText
+        id="commercialRegister"
+        formControlName="commercialRegister"
+        aria-describedby="commercialRegister-help"
+        [placeholder]="'FORM.COMMERCIAL_REGISTER' | translate"
+      />
+    </app-input-error-message-handler>
+  </div>
+  <div class="md:col-span-2">
+    <label for="taxNumber">{{ 'FORM.TAX_NUMBER' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('taxNumber')">
+      <input
+        pInputText
+        id="taxNumber"
+        formControlName="taxNumber"
+        aria-describedby="taxNumber-help"
+        [placeholder]="'FORM.TAX_NUMBER' | translate"
+      />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="city">{{ 'FORM.CITY' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('city')">
+      <input
+        pInputText
+        id="city"
+        formControlName="city"
+        aria-describedby="city-help"
+        [placeholder]="'FORM.CITY' | translate"
+      />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="district">{{ 'FORM.DISTRICT' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('district')">
+      <input
+        pInputText
+        id="district"
+        formControlName="district"
+        aria-describedby="district-help"
+        [placeholder]="'FORM.DISTRICT' | translate"
+      />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="street">{{ 'FORM.STREET' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('street')">
+      <input
+        pInputText
+        id="street"
+        formControlName="street"
+        aria-describedby="street-help"
+        [placeholder]="'FORM.STREET' | translate"
+      />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="buildingNumber">{{ 'FORM.BUILDING' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('buildingNumber')">
+      <input
+        pInputText
+        id="buildingNumber"
+        formControlName="buildingNumber"
+        aria-describedby="buildingNumber-help"
+        [placeholder]="'FORM.BUILDING' | translate"
+      />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="postalCode">{{ 'FORM.POSTAL_CODE' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('postalCode')">
+      <input
+        pInputText
+        id="postalCode"
+        formControlName="postalCode"
+        aria-describedby="postalCode-help"
+        [placeholder]="'FORM.POSTAL_CODE' | translate"
+      />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="productName">{{ 'FORM.FLOOR' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('numberOfFloor')">
+      <input
+        pInputText
+        id="costPrice"
+        formControlName="numberOfFloor"
+        aria-describedby="costPrice-help"
+        [placeholder]="'FORM.FLOOR' | translate"
+      />
+    </app-input-error-message-handler>
+  </div>
+  <div>
+    <label for="apartment">{{ 'FORM.APARTMENT' | translate }}</label>
+    <app-input-error-message-handler [fc]="supplierFg.get('apartment')">
+      <input
+        pInputText
+        id="apartment"
+        formControlName="apartment"
+        aria-describedby="apartment-help"
+        [placeholder]="'FORM.APARTMENT' | translate"
+      />
+    </app-input-error-message-handler>
+  </div>
+
+  <div class="flex flex-col justify-end">
+    <div class="flex items-center h-fit gap-2 pb-1">
+      <app-input-error-message-handler [fc]="supplierFg.get('isCompany')">
+        <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" formControlName="isCompany" />
+      </app-input-error-message-handler>
+      <label for="productName" class="text-dark-line text-sm font-semibold">{{ 'FORM.IS_COMPANY' | translate }}</label>
+    </div>
+  </div>
+</form>

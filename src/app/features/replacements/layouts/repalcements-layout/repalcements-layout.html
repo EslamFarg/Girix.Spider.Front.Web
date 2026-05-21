@@ -162,8 +162,8 @@
 
     <!--  -->
     <div class="flex justify-end gap-2">
-      <p-button label="Cancel" severity="secondary" (click)="closeDialog()" />
-      <p-button label="Save" (click)="submitItemChange()" />
+      <button pButton severity="secondary" (click)="closeDialog()">الغاء</button>
+      <button pButton class="app-p-btn" (click)="submitItemChange()">حفظ</button>
     </div>
   </div>
 </p-dialog>

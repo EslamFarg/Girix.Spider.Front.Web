@@ -46,7 +46,7 @@ export class Journals extends BaseComponent {
 
   filterMenuItems: MenuItem[] = [
     {
-      label: 'رقم القيد',
+      label: 'الرقم الدفتري',
       command: () => this.fg.patchValue({ searchEnum: JournalEntrySearchEnum.InvoiceNumber }),
     },
     {
@@ -81,6 +81,7 @@ export class Journals extends BaseComponent {
           },
         ],
         fromDate: this.fg.getRawValue().fromDate,
+        toDate: null,
       })
       .subscribe({
         next: (res) => {

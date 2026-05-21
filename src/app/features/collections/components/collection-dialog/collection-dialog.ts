@@ -20,10 +20,10 @@ import {
   FinancialAccountService,
 } from '@/features/accounts/services/financial-account-service';
 import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
-import { noSymbolsAllowed } from '@/yn-ng';
+import { noSymbolsAllowed, omitKeys } from '@/yn-ng';
 import { SpaceTypeEnum } from '@/features/replacements/services/replacements-service';
 import { OrderCollectionCalculationsService } from '../../services/order-collection-calculations-service';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 
 @Component({
   selector: 'app-collection-dialog',
@@ -41,8 +41,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     NgSelectComponent,
     Debounce,
     ButtonDirective,
-    LoadingDisabledDirective
-],
+    LoadingDisabledDirective,
+  ],
   templateUrl: './collection-dialog.html',
   styleUrl: './collection-dialog.css',
 })
@@ -56,72 +56,29 @@ export class CollectionDialog extends BaseComponent {
   ordersCollectionsCaluclationsService = inject(OrderCollectionCalculationsService);
   currentBill = this.collectionsService.currentBill;
   isCollectionInvoiceDialogVisible = this.collectionsService.isCollectionInvoiceDialogVisible;
+  currentOrderType = this.collectionsService.currentOrderType;
 
   net = computed(() => {
-    // console.log('net change:');
-    let finalNet = 0;
-
-    switch (this.currentBill()?.orderType) {
+    if (this.currentBill()) {
+      return this.ordersCollectionsCaluclationsService.calculateBillNet(this.currentBill()!);
+    }
+    switch (this.currentOrderType()) {
       case OrderLocationType.PersonDelivery:
       case OrderLocationType.CompanyDelivery:
-        finalNet = +this.currentDeliveryOrders()
-          .reduce((acc, item) => {
-            if (this.checkedOrderIds().includes(item.orderId)) {
-              // console.log(`item: ${item.netOrder}`);
-              return acc + item.netOrder;
-            } else {
-              return acc;
-            }
-          }, 0)
-          .toFixed(2);
-        break;
-      case OrderLocationType.DineIn:
-        if (this.currentBill()?.place.placeType === SpaceTypeEnum.Hut) {
-          let hutPrice = this.currentBill()?.summary?.priceForPlace ?? 0;
-          const originalHutPrice = hutPrice ?? 0;
-          const net = this.currentBill()?.summary?.totalNet ?? 0;
-          const reservedFrom = new Date(this.currentBill()?.place?.reservedFrom ?? '');
-          const reservedTo = new Date(this.currentBill()?.place?.reservedTo ?? '');
-          const originalDiffMinutes = (reservedTo.getTime() - reservedFrom.getTime()) / 1000 / 60;
-          const currentDiffMinutes = (Date.now() - reservedFrom.getTime()) / 1000 / 60;
-          if (originalDiffMinutes < 10) {
-            hutPrice = 0;
-          } else if (originalDiffMinutes > currentDiffMinutes - 10) {
-            hutPrice = hutPrice;
+        console.log(this.currentDeliveryOrders());
+        console.log(this.checkedOrderIds());
+        let finalNet = +this.currentDeliveryOrders().reduce((acc, item) => {
+          if (this.checkedOrderIds().includes(item.orderId)) {
+            // console.log(`item: ${item.netOrder}`);
+            return acc + item.netOrder;
           } else {
-            const minutePrice = hutPrice / originalDiffMinutes;
-            const newHourMinutes = currentDiffMinutes % 60;
-            let billedMinutes = currentDiffMinutes - newHourMinutes;
-            let billedNewHourMinutes = 0;
-            if (newHourMinutes >= 41) {
-              billedNewHourMinutes = 60;
-            } else if (newHourMinutes >= 11) {
-              billedNewHourMinutes = 30;
-            }else{
-              billedNewHourMinutes = newHourMinutes;
-            }
-            billedMinutes += billedNewHourMinutes;
-            console.log(`
-              originalDiffMinutes: ${originalDiffMinutes}
-              currentDiffMinutes: ${currentDiffMinutes}
-              newHourMinutes: ${newHourMinutes}
-              billedMinutes: ${billedMinutes}
-              `);
-            hutPrice = billedMinutes * minutePrice;
-            console.log('hutPrice', hutPrice);
+            return acc;
           }
-          finalNet= net + hutPrice - originalHutPrice;
-        } else {
-          finalNet= +(this.currentBill()?.summary?.totalNet ?? 0);
-        }
-        break;
+        }, 0);
+        return finalNet;
       default:
-        if (!this.currentBill()) finalNet= 0;
-        finalNet= this.ordersCollectionsCaluclationsService.calculateBillNet(this.currentBill()!);
+        return 0;
     }
-
-    const netReturnOrder = this.currentBill()?.summary?.netReturnOrder ?? 0;
-    return finalNet - netReturnOrder;
   });
   isDeliveryDialog = this.collectionsService.isDeliveryDialog;
   currentDeliveryOrders = this.collectionsService.currentDeliveryOrders;
@@ -201,6 +158,22 @@ export class CollectionDialog extends BaseComponent {
     };
     //        orderId: ,
 
+    if (this.currentBill()) {
+      formValue = { ...formValue, orderId: this.currentBill()!.id };
+      this.collectNonDelivery(formValue).subscribe({
+        next: (value) => {
+          this.closeCollectionInvoiceDialog();
+          this.collectionsService.lastCollectedId.set(value.id);
+          const orderId = this.collectionsService.currentOrderId();
+          if (orderId != null) {
+            this.collectionsService.collectedOrderIds.set([orderId]);
+          }
+          this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
+        },
+      });
+      return;
+    }
+
     switch (this.currentDeliveryType()) {
       case OrderLocationType.PersonDelivery:
         formValue = { ...formValue, deliveryId: this.currentDeliveryId(), orderIds: this.checkedOrderIds() };
@@ -220,22 +193,6 @@ export class CollectionDialog extends BaseComponent {
             this.closeCollectionInvoiceDialog();
             this.collectionsService.lastCollectedId.set(value.id);
             this.optimisticallyMarkOrdersAsCollected(this.checkedOrderIds());
-            this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
-          },
-        });
-        break;
-      case null:
-      default:
-        console.log('non delivery');
-        formValue = { ...formValue, orderId: this.currentBill()!.id };
-        this.collectNonDelivery(formValue).subscribe({
-          next: (value) => {
-            this.closeCollectionInvoiceDialog();
-            this.collectionsService.lastCollectedId.set(value.id);
-            const orderId = this.collectionsService.currentOrderId();
-            if (orderId != null) {
-              this.collectionsService.collectedOrderIds.set([orderId]);
-            }
             this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
           },
         });

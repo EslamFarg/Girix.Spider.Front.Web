@@ -22,6 +22,7 @@ interface IOpenCollectionDialogOpts {
   isCollected: boolean;
   orderType:  OrderLocationType;
   deliveryId: number;
+  singleOrder: boolean;
 }
 export interface ICollectionPersonDeliveryRequest {
   deliveryId: number;
@@ -62,6 +63,7 @@ export class CollectionsService extends BaseService {
       isCollected: false,
     },
   ) => {
+    console.log(opts);
     if (opts.isCollected)
       return this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'هذا الطلب محصل بالفعل' });
 
@@ -72,6 +74,15 @@ export class CollectionsService extends BaseService {
     //
     //
     //
+
+    if (opts.singleOrder) {
+      this.orderService.getBill(opts.orderId!).subscribe({
+        next: (bill) => {
+          this.currentBill.set(bill);
+        },
+      });
+      return;
+    }
 
     switch (opts.orderType) {
       case OrderLocationType.PersonDelivery:

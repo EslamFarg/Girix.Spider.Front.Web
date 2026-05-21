@@ -12,6 +12,7 @@ import {
   labeledRegexValidator,
   noSymbolsAllowed,
   onlyArLettersAllowed,
+  onlyNumbersAllowed,
   onlyNumbersOrEnLettersAllowed,
 } from '@/yn-ng';
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -85,8 +86,13 @@ export class JournalForm extends BaseComponent {
       ),
     ]),
     // الرقم الدفتري
-    voucherNo: this.fb.control<string | null>(null, [Validators.required]),
-    voucherDate: this.fb.control<Date | null>(null, [Validators.required]),
+    voucherNo: this.fb.control<string | null>(null, [
+      Validators.required,
+      onlyNumbersAllowed,
+      Validators.minLength(2),
+      Validators.maxLength(7),
+    ]),
+    voucherDate: this.fb.control<Date | null>(new Date(), [Validators.required]),
     notes: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(1000)]),
     items: this.fb.array<FormGroup<IAppJournalItemControls>>([], [Validators.required, Validators.minLength(1)]),
   };

@@ -34,10 +34,10 @@ interface IInventorySettlementBulkSearchControls {
 }
 
 enum QuantityOptions {
-  LessThanZero = -1,
+  LessThanZero = 2,
   Zero = 0,
   MoreThanZero = 1,
-  All = 2,
+  All = 3,
 }
 
 @Component({

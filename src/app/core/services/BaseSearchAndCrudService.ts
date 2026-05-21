@@ -38,7 +38,7 @@ export interface ISearchCriteria<SearchEnum> {
   paginationInfo: Partial<{ pageIndex: number; pageSize: number }>;
   searchFilters: { column: SearchEnum; values: string[] }[];
   fromDate: string | null; //start | past
-  toDate?: string; //end;
+  toDate?: string| null; //end;
   removeDateFilter?: boolean;
   searchEndpoint?: string;
 }
@@ -50,6 +50,7 @@ export class BaseSearchAndCrudService<
   IUpdateDto = any,
   IGetByIdDto = any,
 > extends BaseCrudService<ICreateDto, IUpdateDto, IGetByIdDto> {
+
   search<T = IBaseSearchResponse<ISearchResponseValue>>(criteriaDto: ISearchCriteria<SearchEnum>) {
     const searchEndpoint = criteriaDto.searchEndpoint ?? this.endpoints.search;
     // if (this.isMock) {
@@ -67,6 +68,16 @@ export class BaseSearchAndCrudService<
     //     observer.complete();
     //   });
     // }
+    let toDate = criteriaDto.toDate;
+
+    switch(criteriaDto.toDate){
+      case undefined:
+        toDate = this.localDateIso;
+        break;
+      case null:
+        toDate = null;
+        break;
+    }
 
     let body: any = {
       criteriaDto: {
@@ -80,7 +91,7 @@ export class BaseSearchAndCrudService<
         values: x.values.map((y) => y?.trim() ?? ''),
       })),
       fromDate: criteriaDto?.fromDate ?? null,
-      toDate: criteriaDto?.toDate ?? this.localDateIso,
+      toDate,
     };
 
     // if (criteriaDto.removeDateFilter) {

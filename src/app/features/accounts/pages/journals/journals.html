@@ -37,7 +37,7 @@
   <thead>
     <tr>
       <th>#</th>
-      <th>رقم القيد</th>
+      <th>الرقم الدفتري</th>
       <th>التاريخ</th>
       <th>المرجع</th>
       <th>المدين</th>
@@ -52,7 +52,7 @@
           <div>{{ getRowNumber($index, journalsPaginationInfo.pageIndex) }}</div>
         </td>
         <td>
-          <div>{{ item.id }}</div>
+          <div>{{ item.voucherNo }}</div>
         </td>
         <td>
           <div>{{ item.voucherDate | date }}</div>

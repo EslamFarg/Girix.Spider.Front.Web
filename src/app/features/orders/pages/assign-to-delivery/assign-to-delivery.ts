@@ -7,11 +7,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { IOrderSearchRow, OrderSearchEnum, OrderService } from '@/features/orders';
+import { IOrderSearchRow, OrderLocationType, OrderSearchEnum, OrderService } from '@/features/orders';
 import { Debounce } from '@/directives/debounce';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-import { Button } from 'primeng/button';
+import { Button, ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { DeliveryService, IDeliverySearchRow } from '@/features/deliveries/services/delivery-service';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -34,7 +34,8 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
     Dialog,
     CheckboxModule,
     LoadingDisabledDirective,
-  ],
+    ButtonDirective
+],
   templateUrl: './assign-to-delivery.html',
   styleUrl: './assign-to-delivery.css',
 })
@@ -110,6 +111,10 @@ export class AssignToDelivery extends BaseComponent {
           pageSize: 10,
         },
         searchFilters: [
+          {
+            column: OrderSearchEnum.OrderType,
+            values: [OrderLocationType.PersonDelivery.toString(), OrderLocationType.CompanyDelivery.toString()],
+          },
           {
             column: this.fg.getRawValue().searchEnum,
             values: [this.fg.getRawValue().searchTerm],

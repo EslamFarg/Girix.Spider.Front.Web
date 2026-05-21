@@ -2,23 +2,30 @@
   "HEADER": {
     "LOGOUT": { "LABEL": "تسجيل الخروج" },
     "NAV": {
-      "HOME": {
-        "LABEL": "الرئيسية"
+      "CASHIER": {
+        "LABEL": "الكاشير"
       },
-      "DAILY_JOURNAL": {
-        "LABEL": "اليوميه"
-      },
+
       "INVOICES": {
-        "LABEL": "الفواتير",
+        "LABEL": "الفواتير و التبديلات",
         "ORDERS": {
-          "LABEL": "الطلبات"
+          "LABEL": "مستكشف الكاشير"
         },
         "REFUNDS": {
-          "LABEL": "المرتجعات"
+          "LABEL": "مستكشف المرتجعات"
+        },
+        "ROOMS": {
+          "LABEL": "تبديل الغرف"
+        },
+        "HUTS": {
+          "LABEL": "تبديل الاكواخ"
+        },
+        "TABLES": {
+          "LABEL": "تبديل الطاولات"
         }
       },
       "CLASSES": {
-        "LABEL": "الأصناف",
+        "LABEL": "الأصناف والطاولات",
         "PRODUCTS": {
           "LABEL": "المنتجات"
         },
@@ -30,10 +37,7 @@
         },
         "COMPONENTS": {
           "LABEL": "مكونات المنتج"
-        }
-      },
-      "RESTAURANT": {
-        "LABEL": "المطعم",
+        },
         "TABLES": {
           "LABEL": "الطاولات"
         },
@@ -42,6 +46,9 @@
         },
         "ROOMS": {
           "LABEL": "الغرف"
+        },
+        "DELIVERY_MEN": {
+          "LABEL": "الديليفري"
         }
       },
       "CUSTOMERS": {
@@ -65,25 +72,13 @@
           "LABEL": "تسويه جرديه"
         }
       },
-      "REPLACEMENTS": {
-        "LABEL": "التبديلات",
-        "ROOMS": {
-          "LABEL": "الغرف"
-        },
-        "HUTS": {
-          "LABEL": "الاكواخ"
-        },
-        "TABLES": {
-          "LABEL": "الطاولات"
-        },
-        "DELIVERIES": {
-          "LABEL": "ديليفري"
-        }
-      },
       "COLLECTIONS": {
-        "LABEL": "التحصيلات",
+        "LABEL": "التحصيلات وفتح اليومية",
+        "DAILY_JOURNAL": {
+          "LABEL": "اليوميه"
+        },
         "ALL": {
-          "LABEL": "الكل"
+          "LABEL": "كل الفواتير"
         },
         "TABLES": {
           "LABEL": "الطاولات"
@@ -95,10 +90,13 @@
           "LABEL": "الاكواخ"
         },
         "DELIVERIES": {
-          "LABEL": "ديليفري"
+          "LABEL": "تحصيل الديليفري"
         },
         "COMPANIES": {
           "LABEL": "الشركات"
+        },
+        "DELIVERY_SWAPPING": {
+          "LABEL": "تحويل لدليفري"
         }
       },
       "ACCOUNTS": {
@@ -114,20 +112,15 @@
         },
         "ACCOUNTS_TREE": {
           "LABEL": "شجره الحسابات"
+        },
+        "ADD_SUPPLIER": {
+          "LABEL": "اضافة مورد"
+        },
+        "ADD_CUSTOMER": {
+          "LABEL": "اضافة عميل"
         }
       },
-      "DELIVERY": {
-        "LABEL": "الديليفري",
-        "DELIVERY_MEN": {
-          "LABEL": "بيانات الديليفري"
-        }
-      },
-      "USERS": {
-        "LABEL": "المستخدمين",
-        "ADD_USER": {
-          "LABEL": "إضافه مستخدم"
-        }
-      },
+
       "SETTINGS": {
         "LABEL": "الاعدادات",
         "PROGRAM": {
@@ -150,6 +143,9 @@
         },
         "PRINTER": {
           "LABEL": "اعدادات الطابعه"
+        },
+        "ADD_USER": {
+          "LABEL": "إضافه مستخدم"
         }
       },
       "APP_INFO": {
@@ -209,6 +205,7 @@
     "TAX_VALUE": "قيمه الضريبه",
     "NAME_AR": "الاسم بالعربي",
     "NAME_EN": "الاسم بالانجليزي",
+    "SUPPLIER_NAME": "اسم المورد",
     "TOTAL_SHORTAGE": "مجموع العجز"
   },
 
@@ -271,6 +268,10 @@
   "CUSTOMERS": {
     "EXPLORER": "مستكشف العملاء",
     "ADD": "إضافة عميل جديد"
+  },
+  "SUPPLIERS": {
+    "EXPLORER": "مستكشف الموردين",
+    "ADD": "إضافة مورد جديد"
   },
   "PRODUCTS": {
     "EXPLORER": "مستكشف المنتجات",

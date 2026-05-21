@@ -24,6 +24,7 @@ export interface IUserDetails {
   cashPaymentAccountName: string
   bankPaymentAccountId: number
   bankPaymentAccountName: string
+  imageUrl: string
   groups: {
     id: number
     name: string
@@ -56,6 +57,7 @@ export class AuthService extends BaseService {
           fullName: 'John Doe',
           email: '0Eg0w@example.com',
           phoneNumber: '1234567890',
+          imageUrl: 'https://via.placeholder.com/150',
           token: 'token',
           groups: [
             {
