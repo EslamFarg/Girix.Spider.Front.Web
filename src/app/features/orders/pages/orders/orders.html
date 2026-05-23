@@ -57,7 +57,7 @@
           <tr>
             <th>#</th>
             <th>رقم الفاتورة</th>
-            <th>وقت الطلب</th>           
+            <th>وقت الطلب</th>
             <th>نوع الدفع</th>
             <th>حاله الفاتورة</th>
             <th>المدفوع كاش</th>
@@ -94,7 +94,6 @@
                     </div>
                   }
                 }
-                
               </td>
               <td>
                 @if (order.isCollected) {
@@ -135,7 +134,7 @@
                   </a>
                   <!-- refund -->
                   <a class="view" [routerLink]="['/invoices/refunds/add']" [queryParams]="{ orderId: order.id }">
-                   <i class="pi pi-replay"></i>
+                    <i class="pi pi-replay"></i>
                   </a>
                   <!-- delete -->
                   <button appLoadingDisabled type="button" class="delete" (click)="deleteOrder(order.id, $event)">
@@ -189,7 +188,7 @@
   <ng-template #footer>
     <div class="w-full p-4 pb-0 flex items-center justify-center gap-2">
       <p-button
-        label="Print"
+        label="طباعة"
         [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
         styleClass=" bg-[#EA7C69]! text-white! px-6!"
         [text]="true"

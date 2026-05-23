@@ -1,3 +1,4 @@
+import { AuthService } from '@/features/auth/services/auth-service';
 import { LayoutService } from '@/layouts/services/layout-service';
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
@@ -23,8 +24,10 @@ export interface ErrorItem {
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const layoutService = inject(LayoutService);
+  const authService = inject(AuthService);
   return next(req).pipe(
     catchError((errorResponse: IApiError) => {
+      if(errorResponse.status === 401) authService.logout();
       layoutService.messageService.add({
         severity: 'error',
         // summary: 'خطأ',

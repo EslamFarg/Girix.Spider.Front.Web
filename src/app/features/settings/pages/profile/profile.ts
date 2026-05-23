@@ -119,6 +119,7 @@ export class Profile extends BaseComponent {
 
     // console.log(dto);
     const formData = new FormData();
+    const values=this.userFg.getRawValue()
 
     Object.entries(this.userFg.value).forEach(([key, value]: [string, any]) => {
       formData.append(key, value);
@@ -128,7 +129,18 @@ export class Profile extends BaseComponent {
       formData.delete('image');
     }
 
-    this.usersService.put(formData).subscribe();
+    this.usersService.put(formData).subscribe({
+      next: (res) => {
+        if(values.userId==this.authService.userDetails()?.userId){
+          this.usersService.getById(+values.userId!).subscribe((user: IUserReadResponse) => {
+            this.authService.userDetails.update(prev=>({
+              ...prev!,
+              imageUrl:user.imageUrl??""
+            }));
+          })
+        }
+      },
+    });
   }
 
   //

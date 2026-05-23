@@ -155,6 +155,9 @@
         },
         "RESTAURANT": {
           "LABEL": "بيانات المطعم"
+        },
+        "CHANGE_PASSWORD": {
+          "LABEL": "تغيير كلمة المرور"
         }
       }
     }

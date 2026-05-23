@@ -313,20 +313,26 @@ export class Cashier extends BaseComponent implements OnInit {
       const placeRefId = this.orderFg.get('placeRefId');
       const deliveryId = this.orderFg.get('deliveryId');
       this.orderLocationType.set(orderType);
+      const paymentType = this.orderFg.controls.paymentType;
       placeRefId?.setValidators([]);
       deliveryId?.setValidators([]);
       this.orderFg?.patchValue({
         placeRefId: null,
         deliveryId: null,
+        durationMinutes: null,
       });
+      this.currentDelivery.set(null);
+      this.currentCompanyDelivery.set(null);
       this.currentHut.set(null);
       this.currentTable.set(null);
       this.currentRoom.set(null);
-      this.activeLocalType.set(null);
-      console.log(orderType);
+      paymentType.enable();
+
       switch (orderType) {
         case OrderLocationType.Takeaway:
           this.isPaid.set(true);
+          paymentType.setValue(OrderPaymentType.Paid);
+          paymentType.disable();
           break;
         case OrderLocationType.PersonDelivery:
         case OrderLocationType.CompanyDelivery:
@@ -429,6 +435,25 @@ export class Cashier extends BaseComponent implements OnInit {
       return;
     }
 
+    const values=this.orderFg.getRawValue()
+
+    switch (values.orderType){
+      case OrderLocationType.CompanyDelivery:
+        const currentCompany=this.currentCompanyDelivery();
+        this.orderFg.patchValue({
+          deliveryId:null,
+          customerRequest: {
+            nameAr: currentCompany?.name||"",
+            phoneNumber:  currentCompany?.phoneNumber ||"",
+            addressDescription:  currentCompany?.city||currentCompany?.district ||"",
+            id: currentCompany?.id!,
+            nameEn: currentCompany?.name||"",
+            secondaryMobileNumber:  currentCompany?.secondaryMobileNumber ||"",
+          }
+        })
+        
+    }
+
     console.log('valid order');
     switch (this.formMode()) {
       case FormMode.Create:
@@ -448,6 +473,8 @@ export class Cashier extends BaseComponent implements OnInit {
           error: (err) => {
             console.log(err);
             this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم انشاء الطلب' });
+            this.resetIdempotencyKey();
+            
           },
         });
         break;
@@ -467,10 +494,17 @@ export class Cashier extends BaseComponent implements OnInit {
             error: (err) => {
               console.log(err);
               this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم تعديل الطلب' });
+              this.resetIdempotencyKey();
             },
           });
         break;
     }
+  }
+
+  resetIdempotencyKey() {
+    this.orderFg.patchValue({
+      idempotencyKey: Date.now() + Math.random().toString(),
+    });
   }
 
   resetOrderForm() {
@@ -479,12 +513,14 @@ export class Cashier extends BaseComponent implements OnInit {
     this.currentHut.set(null);
     this.currentRoom.set(null);
     this.currentTable.set(null);
+    this.currentDelivery.set(null);
+    this.currentCompanyDelivery.set(null);
     this.amountReceived.set(0);
     this.orderFg.patchValue({
-      idempotencyKey: Date.now() + Math.random().toString(),
-      placeRefId: null,
+       placeRefId: null,
       placeType: null,
     });
+    this.resetIdempotencyKey();
     this.orderFg.updateValueAndValidity();
     this.resetData();
   }
@@ -1419,6 +1455,7 @@ export class Cashier extends BaseComponent implements OnInit {
       this.orderFg.patchValue({
         placeRefId: table.id,
         placeType: OrderLocalType.Table,
+        durationMinutes: null,
       });
       this.orderLocationType.set(OrderLocationType.DineIn);
       this.activeLocalType.set(OrderLocalType.Table);
@@ -1499,6 +1536,7 @@ export class Cashier extends BaseComponent implements OnInit {
       this.orderFg.patchValue({
         placeRefId: room.id,
         placeType: OrderLocalType.Room,
+        durationMinutes: null,
       });
       this.orderLocationType.set(OrderLocationType.DineIn);
       this.activeLocalType.set(OrderLocalType.Room);
@@ -1531,16 +1569,25 @@ export class Cashier extends BaseComponent implements OnInit {
   deliveryService = inject(DeliveryService);
   deliveries = signal<IDeliverySearchRow[]>([]);
   companyDeliveries = signal<ICustomerSearchRow[]>([]);
+  currentDelivery = signal<IDeliverySearchRow | null>(null);
+  currentCompanyDelivery = signal<ICustomerSearchRow | null>(null);
+  selectedDeliveryLabel = computed(() => {
+    const delivery = this.currentDelivery();
+    const companyDelivery = this.currentCompanyDelivery();
+    if (delivery) return delivery.name;
+    if (companyDelivery) return companyDelivery.name;
+    return '-';
+  });
 
   isCompanyDelivery: boolean = false;
 
-  changeDeliveryType(isCompany: boolean) {
-    this.isCompanyDelivery = isCompany;
+  changeDeliveryType(type: OrderLocationType) {
+    this.isCompanyDelivery = type === OrderLocationType.CompanyDelivery;
     this.orderFg.patchValue({
-      orderType: isCompany ? OrderLocationType.CompanyDelivery : OrderLocationType.PersonDelivery,
+      orderType: type,
       deliveryId: null,
     });
-    this.searchDeliveries(1, isCompany);
+    this.searchDeliveries(1, type === OrderLocationType.CompanyDelivery);
   }
 
   deliveryPaginationInfo: {
@@ -1624,15 +1671,18 @@ export class Cashier extends BaseComponent implements OnInit {
       this.searchDeliveries(this.deliveryPaginationInfo.pageIndex + 1);
     }
   }
-  onDeliverySelected(deliveryId: number, orderType: OrderLocationType) {
-    // if (delivery.isAvailable) {
+  onDeliverySelected( orderType: OrderLocationType, delivery?: IDeliverySearchRow | ICustomerSearchRow) {
     this.orderLocationType.set(orderType);
-    this.orderFg.patchValue({ deliveryId });
+    this.orderFg.patchValue({ deliveryId: delivery?.id }, { emitEvent: false });
+    if (orderType === OrderLocationType.CompanyDelivery) {
+      this.currentCompanyDelivery.set(delivery as ICustomerSearchRow);
+      this.currentDelivery.set(null);
+    } else {
+      this.currentDelivery.set(delivery as IDeliverySearchRow);
+      this.currentCompanyDelivery.set(null);
+    }
     this.DeliveryDialogVisible = false;
     this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الدليفري بنجاح' });
-    // } else {
-    //   this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
-    // }
   }
 
   //

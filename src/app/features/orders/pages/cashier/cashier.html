@@ -187,15 +187,7 @@
           [class.w-20]="localRadio.checked"
           [class.segmented-group]="deliveryRadio.checked"
         >
-          <input
-            type="radio"
-            hidden
-            #deliveryRadio
-            name="orderType"
-            id="delivery"
-            formControlName="orderType"
-            [value]="OrderLocationType.PersonDelivery"
-          />
+          <input type="radio" hidden #deliveryRadio name="orderType" id="delivery" />
           <label
             class="loc-btn flex-1"
             (click)="DeliveryDialogVisible = true"
@@ -1145,8 +1137,20 @@
     class="flex gap-2 w-full justify-center pt-4"
     style="--p-button-primary-background: #fff; --p-button-primary-color: #1f1d2b"
   >
-    <button pButton [class.text-green-500!]="!isCompanyDelivery" (click)="changeDeliveryType(false)">دليفري</button>
-    <button pButton [class.text-green-500!]="isCompanyDelivery" (click)="changeDeliveryType(true)">شركة</button>
+    <button
+      pButton
+      [class.text-green-500!]="!isCompanyDelivery"
+      (click)="changeDeliveryType(OrderLocationType.PersonDelivery)"
+    >
+      دليفري
+    </button>
+    <button
+      pButton
+      [class.text-green-500!]="isCompanyDelivery"
+      (click)="changeDeliveryType(OrderLocationType.CompanyDelivery)"
+    >
+      شركة
+    </button>
   </div>
   <div
     class="flex-1 overflow-visible no-scrollbar"
@@ -1161,7 +1165,11 @@
     >
       @if (isCompanyDelivery) {
         @for (item of companyDeliveries(); track $index) {
-          <button pButton (click)="onDeliverySelected(item.id, OrderLocationType.CompanyDelivery)">
+          <button
+            pButton
+            [class.location-active]="item.id === currentCompanyDelivery()?.id"
+            (click)="onDeliverySelected(OrderLocationType.CompanyDelivery, item)"
+          >
             <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
@@ -1185,7 +1193,8 @@
           <button
             pButton
             class="relative overflow-visible!"
-            (click)="onDeliverySelected(item.id, OrderLocationType.PersonDelivery)"
+            [class.location-active]="item.id === currentDelivery()?.id"
+            (click)="onDeliverySelected(OrderLocationType.PersonDelivery, item)"
           >
             <span
               class="absolute -top-2.5 -left-2.5 text-xs text-white bg-rose-600 rounded-full w-5 h-5 flex items-center justify-center"
@@ -1244,7 +1253,7 @@
   <ng-template #footer>
     <div class="w-full p-4 pb-0 flex items-center justify-center gap-2">
       <p-button
-        label="Print"
+        label="طباعة"
         [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
         styleClass=" bg-[#EA7C69]! text-white! px-6!"
         [text]="true"

@@ -150,6 +150,9 @@
         },
         "PRINTER": {
           "LABEL": "Printer Settings"
+        },
+        "CHANGE_PASSWORD": {
+          "LABEL": "Change Password"
         }
       },
       "APP_INFO": {

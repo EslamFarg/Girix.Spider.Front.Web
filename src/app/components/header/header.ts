@@ -373,6 +373,12 @@ export class Header extends BaseComponent implements AfterViewInit {
           roles: [Role.Admin, Role.Cashier],
         },
         {
+          labelKey: 'CHANGE_PASSWORD',
+          imgUrl: headerIcons.appInfo.children.changePassword,
+          routerLink: '/app-info/change-password',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
           labelKey: 'RESTAURANT',
           imgUrl: headerIcons.appInfo.children.restaurant,
           routerLink: '/app-info/restaurant',
