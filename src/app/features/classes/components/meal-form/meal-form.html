@@ -131,6 +131,7 @@
             pInputText
             id="mealPrice"
             appAllowNumbers
+              type="number"
             [allowDecimal]="true"
             formControlName="price"
             class="app-input"
@@ -144,6 +145,7 @@
         <app-input-error-message-handler [fc]="mealFg.get('costPrice')">
           <input
             pInputText
+              type="number"
             id="costPrice"
             appAllowNumbers
             [allowDecimal]="true"

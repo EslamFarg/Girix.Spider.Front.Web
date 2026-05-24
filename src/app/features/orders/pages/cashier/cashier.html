@@ -18,20 +18,13 @@
         pButton
         type="button"
         (click)="isMenuVisible = true"
-        class="border-dark-line! text-dark-line! py-1! m1d:flex-none md:px-8! xl:hid1den! me-auto"
+        class="app-p-btn py-1! m1d:flex-none md:px-8! xl:hid1den! me-auto"
         variant="outlined"
         type="button"
       >
         المينيو
       </button>
-      <button
-        pButton
-        style="--p-button-primary-background: var(--color-dark-line)"
-        class="border-dark-line! text-white! py-1! md:px-8! md:flex-none"
-        form="orderForm"
-        type="submit"
-        appLoadingDisabled
-      >
+      <button pButton class="app-p-btn py-1! md:px-8! md:flex-none" form="orderForm" type="submit" appLoadingDisabled>
         @if (formMode() === FormMode.Create) {
           {{ 'ACTIONS.SAVE' | translate }}
         } @else {
@@ -42,7 +35,7 @@
         type="button"
         routerLink="/"
         pButton
-        class="border-dark-line! text-dark-line! py-1! md:flex-none md:px-8!"
+        class="app-p-btn p-button-outlined py-1! md:flex-none md:px-8!"
         variant="outlined"
         (click)="resetOrderForm()"
       >
@@ -54,7 +47,7 @@
           type="button"
           appLoadingDisabled
           pButton
-          class="border-dark-line! text-dark-line! py-1! md:flex-none md:px-8!"
+          class="app-p-btn py-1! md:flex-none md:px-8!"
           variant="outlined"
         >
           {{ 'ACTIONS.PRINT' | translate }}
@@ -200,10 +193,14 @@
 
       <!-- local space validation -->
       <div [class.hidden]="!isCreateMode()">
-        <app-input-error-message-handler
-          class="w-fit block mx-auto"
-          [fc]="orderFg.controls.deliveryId.invalid ? orderFg.controls.deliveryId : orderFg.controls.placeRefId"
-        />
+        @if (orderLocationType() === OrderLocationType.DineIn) {
+          <app-input-error-message-handler
+            class="w-fit block mx-auto"
+            [fc]="orderFg.controls.deliveryId.invalid ? orderFg.controls.deliveryId : orderFg.controls.placeRefId"
+          />
+        } @else if (orderLocationType() === OrderLocationType.PersonDelivery || orderLocationType() === OrderLocationType.CompanyDelivery) {
+          <app-input-error-message-handler class="w-fit block mx-auto" [fc]="orderFg.controls.deliveryId" />
+        }
       </div>
     </div>
 
@@ -471,17 +468,20 @@
       class="flex gap-2 location-btns *:flex-1 w-full justify-end mt-auto"
       style="--p-button-primary-background: transparent"
     >
-      <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
-        <button
-          pButton
-          type="button"
-          class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
-          variant="outlined"
-          (click)="showCustomerDialog()"
-        >
-          بيانات العميل
-        </button>
-      </app-input-error-message-handler>
+      @if (orderLocationType() !== OrderLocationType.CompanyDelivery) {
+        <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
+          <button
+            pButton
+            type="button"
+            class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
+            variant="outlined"
+            (click)="showCustomerDialog()"
+          >
+            بيانات العميل
+          </button>
+        </app-input-error-message-handler>
+      }
+
       <app-input-error-message-handler
         [grouped]="false"
         [fc]="
@@ -726,7 +726,7 @@
   <ng-template #footer>
     <div class="flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
       <button pButton severity="secondary" class="bg-dark-bg-2" (click)="submitHut()">
-        {{ 'ACTIONS.SAVE' | translate }}
+        {{ 'ACTIONS.CONTINUE' | translate }}
       </button>
       <button pButton severity="secondary" (click)="HutDialogVisible = false">
         {{ 'ACTIONS.CANCEL' | translate }}
@@ -768,15 +768,9 @@
   </div>
 
   <ng-template #footer>
-    <p-button
-      label="Cancel"
-      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
-      styleClass=" bg-[#EA7C69]! text-white! px-6!"
-      [text]="true"
-      class="mx-auto"
-      severity="secondary"
-      (click)="RoomDialogVisible = false"
-    />
+    <button pButton styleClass="app-p-btn" class="mx-auto" severity="secondary" (click)="RoomDialogVisible = false">
+      استمرار
+    </button>
   </ng-template>
 </p-dialog>
 
@@ -812,15 +806,9 @@
   </div>
 
   <ng-template #footer>
-    <p-button
-      label="Cancel"
-      [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
-      styleClass=" bg-[#EA7C69]! text-white! px-6!"
-      [text]="true"
-      class="mx-auto"
-      severity="secondary"
-      (click)="TableDialogVisible = false"
-    />
+    <button pButton styleClass="app-p-btn" class="mx-auto" severity="secondary" (click)="TableDialogVisible = false">
+      استمرار
+    </button>
   </ng-template>
 </p-dialog>
 
@@ -900,6 +888,15 @@
 
         <!-- <app-full-keyboard /> -->
       </form>
+      <button
+        pButton
+        styleClass="app-p-btn"
+        class="mx-auto"
+        severity="secondary"
+        (click)="customerDialogVisible = false"
+      >
+        استمرار
+      </button>
     </div>
   </ng-template>
 </p-dialog>
@@ -967,6 +964,7 @@
               [allowDecimal]="true"
               #payingCash
               id="payingCash"
+              type="number"
               appDebounce
               class="app-input"
               (click)="triggerNumbersKeyboard(payingCash)"
@@ -1009,6 +1007,7 @@
               [min]="0"
               [disabled]="!isPaid()"
               id="payingNetwork"
+              type="number"
               aria-describedby="network-help"
               #payingNetwork
               (click)="triggerNumbersKeyboard(payingNetwork)"
@@ -1043,7 +1042,7 @@
         </div>
 
         <!-- number keyboard toggle -->
-        <div class="md:col-span-2 flex justify-end">
+        <div class="flex justify-between items-center md:col-span-2">
           <button
             type="button"
             pButton
@@ -1063,6 +1062,10 @@
                 stroke-linejoin="round"
               />
             </svg>
+          </button>
+
+          <button pButton styleClass="app-p-btn" severity="secondary" (click)="paymentDialogVisible = false">
+            استمرار
           </button>
         </div>
 
@@ -1221,6 +1224,11 @@
       }
     </div>
   </div>
+  <ng-template #footer>
+    <button pButton styleClass="app-p-btn" class="mx-auto" severity="secondary" (click)="DeliveryDialogVisible = false">
+      استمرار
+    </button>
+  </ng-template>
 </p-dialog>
 
 <!-- Order Success Dialog -->
@@ -1251,15 +1259,6 @@
   <app-printable-order-invoice [data]="printBill()" #printableOrderInvoice />
 
   <ng-template #footer>
-    <div class="w-full p-4 pb-0 flex items-center justify-center gap-2">
-      <p-button
-        label="طباعة"
-        [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
-        styleClass=" bg-[#EA7C69]! text-white! px-6!"
-        [text]="true"
-        appLoadingDisabled
-        (click)="printOrder()"
-      ></p-button>
-    </div>
+    <button pButton styleClass="app-p-btn" class="mx-auto" appLoadingDisabled (click)="printOrder()">استمرار</button>
   </ng-template>
 </p-dialog>

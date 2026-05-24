@@ -164,7 +164,6 @@
     <thead>
       <tr>
         <th class="min-w-12.5 w-12.5">#</th>
-        <th>رقم الحساب</th>
         <th>الحساب</th>
         <th>تفعيل الضريبة</th>
         <th>الاجمالي بالضريبة</th>
@@ -178,40 +177,7 @@
         class="*:overflow-visible!"
       >
         <td class="text-start">#</td>
-        <td>
-          <app-input-error-message-handler
-            [grouped]="false"
-            [fc]="newReceiptVoucherDetailsItemFg.controls.finincalAccountId"
-          >
-            <ng-select
-              class="app-select"
-              [items]="financialAccounts()"
-              bindLabel="name"
-              bindValue="id"
-              [formControl]="newReceiptVoucherDetailsItemFg.controls.finincalAccountId"
-              placeholder="رقم الحساب"
-              (change)="onReceiptVoucherDetailsItemAccountChange(newReceiptVoucherDetailsItemFg, $event.id)"
-              [clearable]="false"
-              #receiptAccountCodeSelect
-              appDebounce
-              [customEvents]="[
-                { type: 'searchEvent', value: receiptAccountCodeSelect.searchEvent },
-                { type: 'scrollToEnd', value: receiptAccountCodeSelect.scrollToEnd },
-              ]"
-              (debounced)="
-                debouncedFinancialAccountsSearch(
-                  $event,
-                  receiptAccountCodeSelect.searchTerm,
-                  FinancialAccountSearchEnum.FinNumber
-                )
-              "
-            >
-              <ng-template ng-label-tmp let-item="item">
-                {{ item?.finNumber }}
-              </ng-template>
-            </ng-select>
-          </app-input-error-message-handler>
-        </td>
+ 
         <td>
           <app-input-error-message-handler
             [grouped]="false"
@@ -221,24 +187,14 @@
               class="app-select"
               [items]="financialAccounts()"
               (change)="onReceiptVoucherDetailsItemAccountChange(newReceiptVoucherDetailsItemFg, $event.id)"
-              bindLabel="name"
+              bindLabel="label"
               bindValue="id"
               [formControl]="newReceiptVoucherDetailsItemFg.controls.finincalAccountId"
               placeholder="الحساب"
               [clearable]="false"
               #receiptAccountNameSelect
               appDebounce
-              [customEvents]="[
-                { type: 'searchEvent', value: receiptAccountNameSelect.searchEvent },
-                { type: 'scrollToEnd', value: receiptAccountNameSelect.scrollToEnd },
-              ]"
-              (debounced)="
-                debouncedFinancialAccountsSearch(
-                  $event,
-                  receiptAccountNameSelect.searchTerm,
-                  FinancialAccountSearchEnum.Name
-                )
-              "
+              [searchFn]="filterFinancialAccounts"
             />
           </app-input-error-message-handler>
         </td>
@@ -288,56 +244,15 @@
               <ng-select
                 class="app-select"
                 [items]="financialAccounts()"
-                bindLabel="finNumber"
                 (change)="onReceiptVoucherDetailsItemAccountChange(item, $event.id)"
-                bindValue="id"
-                [formControl]="item.controls.finincalAccountId"
-                placeholder="رقم الحساب"
-                [clearable]="false"
-                #editReceiptAccountCodeSelect
-                appDebounce
-                [customEvents]="[
-                  { type: 'searchEvent', value: editReceiptAccountCodeSelect.searchEvent },
-                  { type: 'scrollToEnd', value: editReceiptAccountCodeSelect.scrollToEnd },
-                ]"
-                (debounced)="
-                  debouncedFinancialAccountsSearch(
-                    $event,
-                    editReceiptAccountCodeSelect.searchTerm,
-                    FinancialAccountSearchEnum.FinNumber
-                  )
-                "
-              >
-                <ng-template ng-label-tmp let-item="item">
-                  {{ item?.finNumber }}
-                </ng-template>
-              </ng-select>
-            </app-input-error-message-handler>
-          </td>
-          <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
-            <app-input-error-message-handler [grouped]="false" [fc]="item.controls.finincalAccountId">
-              <ng-select
-                class="app-select"
-                [items]="financialAccounts()"
-                (change)="onReceiptVoucherDetailsItemAccountChange(item, $event.id)"
-                bindLabel="name"
+                bindLabel="label"
                 bindValue="id"
                 [formControl]="item.controls.finincalAccountId"
                 placeholder="الحساب"
                 [clearable]="false"
                 #editReceiptAccountNameSelect
                 appDebounce
-                [customEvents]="[
-                  { type: 'searchEvent', value: editReceiptAccountNameSelect.searchEvent },
-                  { type: 'scrollToEnd', value: editReceiptAccountNameSelect.scrollToEnd },
-                ]"
-                (debounced)="
-                  debouncedFinancialAccountsSearch(
-                    $event,
-                    editReceiptAccountNameSelect.searchTerm,
-                    FinancialAccountSearchEnum.Name
-                  )
-                "
+                [searchFn]="filterFinancialAccounts"
               />
             </app-input-error-message-handler>
           </td>

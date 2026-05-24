@@ -14,7 +14,13 @@ import { IProductSearchRow, IProductUnit, ProductSearchEnum, ProductService } fr
 import { IDebounceEvent, Debounce } from '@/directives/debounce';
 import { PaginatorState } from 'primeng/paginator';
 import { UnitService } from '@/features/classes/services/unit-service';
-import { mustIncludeLetters, noSymbolsAllowed, onlyNumbersAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
+import {
+  mustIncludeLetters,
+  noSymbolsAllowed,
+  onlyNumbersAllowed,
+  onlyNumbersOrDotAllowed,
+  onlyNumbersOrEnLettersAllowed,
+} from '@/yn-ng';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { OrderPaymentType } from '@/features/orders';
 import { SupplierService } from '../../services/supplier-service';
@@ -29,7 +35,7 @@ import {
 import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 
 interface IAppPurchaseItem {
   menuItemsId: number | null;
@@ -39,6 +45,7 @@ interface IAppPurchaseItem {
   salePrice: number | null;
   taxAmount: number | null;
   total: number | null;
+  taxPercentage: number | null;
 }
 type IAppPurchaseItemControls = ControlsOf<IAppPurchaseItem>;
 
@@ -60,8 +67,8 @@ type IAppPurchaseItemControls = ControlsOf<IAppPurchaseItem>;
     NgSelectComponent,
     TranslatePipe,
     RouterLink,
-    LoadingDisabledDirective
-],
+    LoadingDisabledDirective,
+  ],
   templateUrl: './purchases-form.html',
   styleUrl: './purchases-form.css',
 })
@@ -87,14 +94,14 @@ export class PurchasesForm extends BaseComponent {
     // الرقم الفاتورة
     invoiceNumber: this.fb.control<string | null>({ value: null, disabled: true }, []),
     paymentType: this.fb.control<number | null>(OrderPaymentType.Paid, [Validators.required]),
-    invoiceDate: this.fb.control<Date | string | null>(null, [Validators.required]),
+    invoiceDate: this.fb.control<Date | string | null>(new Date(), [Validators.required]),
     notes: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(1000)]),
     items: this.fb.array<FormGroup<IAppPurchaseItemControls>>([], [Validators.required, Validators.minLength(1)]),
     //
     supplierId: this.fb.control<number | null>(null, [Validators.required]),
     supplierName: this.fb.control<string | null>(null, [
       Validators.required,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
       noSymbolsAllowed,
       mustIncludeLetters,
@@ -112,8 +119,12 @@ export class PurchasesForm extends BaseComponent {
       Validators.maxLength(16),
     ]),
     //
-    cashAmount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
-    networkAmount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
+    cashAmount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0), onlyNumbersOrDotAllowed]),
+    networkAmount: this.fb.control<number | null>(null, [
+      Validators.required,
+      Validators.min(0),
+      onlyNumbersOrDotAllowed,
+    ]),
     cashAccountId: this.fb.control<number | null>(null, [Validators.required]),
     networkAccountId: this.fb.control<number | null>(null, [Validators.required]),
     //
@@ -141,6 +152,54 @@ export class PurchasesForm extends BaseComponent {
         });
       }
     },
+  });
+
+  fgItemsListener = this.fg.controls.items.valueChanges.subscribe({
+    next: (data) => {
+      const total = data?.reduce((acc, item) => {
+        const itemPrice = (item?.purchasePrice ?? 0) + (item?.taxAmount ?? 0);
+        const total = itemPrice * (item?.quantity ?? 0);
+        return acc + (total ?? 0);
+      }, 0);
+
+      this.net.set(+(total?.toFixed(2) ?? 0));
+    },
+  });
+
+  net = signal(0);
+
+  cashInputSubscription = this.fg.controls.cashAmount.valueChanges.subscribe((value) => {
+    const net = this.net();
+    let futureValue = value ?? 0;
+    if (futureValue > net) {
+      futureValue = net;
+    } else if (futureValue < 0) {
+      futureValue = 0;
+    }
+    this.fg.patchValue(
+      {
+        networkAmount: net - futureValue,
+        cashAmount: futureValue,
+      },
+      { emitEvent: false },
+    );
+  });
+
+  networkInputSubscription = this.fg.controls.networkAmount?.valueChanges.subscribe((value) => {
+    const net = this.net();
+    let futureValue = value ?? 0;
+    if (futureValue > net) {
+      futureValue = net;
+    } else if (futureValue < 0) {
+      futureValue = 0;
+    }
+    this.fg.patchValue(
+      {
+        cashAmount: net - futureValue,
+        networkAmount: futureValue,
+      },
+      { emitEvent: false },
+    );
   });
 
   //
@@ -221,22 +280,27 @@ export class PurchasesForm extends BaseComponent {
       console.log(this.fg.getRawValue());
       return;
     }
-    
 
     if (!this.currentSupplier() && FormMode.Create === this.formMode()) {
       return this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب اختيار المورد' });
-    };
+    }
 
     // if (this.currentSupplier()!.id !== this.fg.value.supplierId) {
     //   return this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'المورد غير متطابق' });
     // }
-
+    console.log(this.fg.getRawValue());
     //collect data to send
     let data = {
       ...this.fg.getRawValue(),
       cashAmount: +(this.fg.value.cashAmount || 0),
       networkAmount: +(this.fg.value.networkAmount || 0),
       invoiceDate: this.UtcToLocalIso((this.fg.value.invoiceDate as Date)!.toISOString()),
+      items: this.fg.value.items?.map((item: any) => ({
+        ...item,
+        quantity: +item.quantity,
+        taxAmount: +item.taxAmount *item.quantity,
+        purchasePrice: (+item.purchasePrice + +item.taxAmount) *item.quantity,
+      })),
     };
 
     switch (this.formMode()) {
@@ -387,6 +451,10 @@ export class PurchasesForm extends BaseComponent {
             column: ProductSearchEnum.Name,
             values: [searchValue],
           },
+          {
+            column: ProductSearchEnum.Id,
+            values: [searchValue],
+          },
         ],
         fromDate: null,
         removeDateFilter: true,
@@ -409,13 +477,13 @@ export class PurchasesForm extends BaseComponent {
       });
   }
 
-  debouncedProductsSearch(event: IDebounceEvent, searchValue: string, searchEnum: ProductSearchEnum) {
+  debouncedProductsSearch(event: IDebounceEvent, searchValue: string) {
     console.log(event);
 
     if (event.type === 'scrollToEnd') {
       this.searchProducts(this.productsPaginationInfo.pageIndex + 1);
     } else {
-      this.searchProducts(1, searchValue, searchEnum);
+      this.searchProducts(1, searchValue);
     }
   }
 
@@ -528,6 +596,7 @@ export class PurchasesForm extends BaseComponent {
       salePrice: this.fb.control<number | null>(data?.salePrice ?? null, [Validators.required, Validators.min(1)]),
       total: this.fb.control<number | null>(data?.total ?? null, []),
       taxAmount: this.fb.control<number | null>(data?.taxAmount ?? null, [Validators.required, Validators.min(0)]),
+      taxPercentage: this.fb.control<number | null>(data?.taxPercentage ?? null, []),
     });
   }
 
@@ -551,7 +620,8 @@ export class PurchasesForm extends BaseComponent {
       return;
     }
 
-    const fgValue = this.newPurchaseItemRowFg.value;
+    const _fgValue = this.newPurchaseItemRowFg.value;
+    const fgValue = { ..._fgValue, taxPercentage: (_fgValue?.taxAmount ?? 0) / (_fgValue?.quantity ?? 0) };
 
     this.fg.controls.items!.push(this.createItemFg(fgValue as IAppPurchaseItem));
 
@@ -575,13 +645,14 @@ export class PurchasesForm extends BaseComponent {
   onCurrentItemChange(item: IProductSearchRow) {
     this.newPurchaseItemRowFg.controls.menuItemsId.setValue(item.id);
     this.newPurchaseItemRowFg.controls.unitId.setValue(null);
+    console.log(item);
     this.newPurchaseItemRowFg.patchValue({
       quantity: 1,
-      salePrice: item.priceWithTax,
-      purchasePrice: item.costPrice,
-      taxAmount: item.tax/100 * item.costPrice,
-      // total: item.costPrice+(item.tax/100 * item.costPrice),  
-    })
+      salePrice: +item.costPrice.toFixed(2),
+      purchasePrice: +item.price.toFixed(2),
+      taxAmount: +((item.tax / 100) * item.costPrice).toFixed(2),
+      // total: item.costPrice+(item.tax/100 * item.costPrice),
+    });
     this.getProductUnits(item.id);
   }
   //
@@ -653,7 +724,7 @@ export class PurchasesForm extends BaseComponent {
     //   },
     // });
   }
- 
+
   cashAccountsSearchPaginationInfo: IPaginationInfo = {
     pageIndex: 1,
     totalRowsCount: 0,

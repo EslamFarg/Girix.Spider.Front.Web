@@ -177,7 +177,6 @@
     <thead>
       <tr>
         <th class="min-w-12.5 w-12.5">#</th>
-        <th>رقم الحساب</th>
         <th>الحساب</th>
         <th>تفعيل الضريبة</th>
         <th>الاجمالي بالضريبة</th>
@@ -199,60 +198,27 @@
             <ng-select
               class="app-select"
               [items]="financialAccounts()"
-              bindLabel="name"
-              bindValue="id"
-              [formControl]="newPaymentVoucherDetailsItemFg.controls.finincalAccountId"
-              (change)="onPaymentVoucherDetailsItemAccountChange(newPaymentVoucherDetailsItemFg, $event.id)"
-              placeholder="رقم الحساب"
-              [clearable]="false"
-              #paymentAccountCodeSelect
-              appDebounce
-              [customEvents]="[
-                { type: 'searchEvent', value: paymentAccountCodeSelect.searchEvent },
-                { type: 'scrollToEnd', value: paymentAccountCodeSelect.scrollToEnd },
-              ]"
-              (debounced)="
-                debouncedFinancialAccountsSearch(
-                  $event,
-                  paymentAccountCodeSelect.searchTerm,
-                  FinancialAccountSearchEnum.FinNumber
-                )
-              "
-            >
-              <ng-template ng-label-tmp let-item="item">
-                {{ item?.finNumber }}
-              </ng-template>
-            </ng-select>
-          </app-input-error-message-handler>
-        </td>
-        <td>
-          <app-input-error-message-handler
-            [grouped]="false"
-            [fc]="newPaymentVoucherDetailsItemFg.controls.finincalAccountId"
-          >
-            <ng-select
-              class="app-select"
-              [items]="financialAccounts()"
-              bindLabel="name"
+              bindLabel="label"
               bindValue="id"
               [formControl]="newPaymentVoucherDetailsItemFg.controls.finincalAccountId"
               (change)="onPaymentVoucherDetailsItemAccountChange(newPaymentVoucherDetailsItemFg, $event.id)"
               placeholder="الحساب"
               [clearable]="false"
               #paymentAccountNameSelect
+              [searchFn]="filterFinancialAccounts"
               appDebounce
-              [customEvents]="[
+              
+            />
+            <!-- [customEvents]="[
                 { type: 'searchEvent', value: paymentAccountNameSelect.searchEvent },
                 { type: 'scrollToEnd', value: paymentAccountNameSelect.scrollToEnd },
               ]"
               (debounced)="
                 debouncedFinancialAccountsSearch(
                   $event,
-                  paymentAccountNameSelect.searchTerm,
-                  FinancialAccountSearchEnum.Name
+                  paymentAccountNameSelect.searchTerm
                 )
-              "
-            />
+              " -->
           </app-input-error-message-handler>
         </td>
         <td>
@@ -296,51 +262,23 @@
           (click)="lastClickedTableRowIndex.set($index)"
         >
           <td class="min-w-12.5 w-12.5" [class.disabled]="!isRowEditable($index)">{{ $index + 1 }}</td>
-          <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
-            <app-input-error-message-handler [grouped]="false" [fc]="item.controls.finincalAccountId">
-              <ng-select
-                class="app-select"
-                [items]="financialAccounts()"
-                bindLabel="finNumber"
-                bindValue="id"
-                [formControl]="item.controls.finincalAccountId"
-                (change)="onPaymentVoucherDetailsItemAccountChange(item, $event.id)"
-                placeholder="رقم الحساب"
-                [clearable]="false"
-                #editPaymentAccountCodeSelect
-                appDebounce
-                [customEvents]="[
-                  { type: 'searchEvent', value: editPaymentAccountCodeSelect.searchEvent },
-                  { type: 'scrollToEnd', value: editPaymentAccountCodeSelect.scrollToEnd },
-                ]"
-                (debounced)="
-                  debouncedFinancialAccountsSearch(
-                    $event,
-                    editPaymentAccountCodeSelect.searchTerm,
-                    FinancialAccountSearchEnum.FinNumber
-                  )
-                "
-              >
-                <ng-template ng-label-tmp let-item="item">
-                  {{ item?.finNumber }}
-                </ng-template>
-              </ng-select>
-            </app-input-error-message-handler>
-          </td>
+
           <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
             <app-input-error-message-handler [grouped]="false" [fc]="item.controls.finincalAccountId">
               <ng-select
                 class="app-select"
                 (change)="onPaymentVoucherDetailsItemAccountChange(item, $event.id)"
                 [items]="financialAccounts()"
-                bindLabel="name"
+                bindLabel="label"
                 bindValue="id"
                 [formControl]="item.controls.finincalAccountId"
                 placeholder="الحساب"
                 [clearable]="false"
                 #editPaymentAccountNameSelect
                 appDebounce
-                [customEvents]="[
+                [searchFn]="filterFinancialAccounts"
+              />
+              <!-- [customEvents]="[
                   { type: 'searchEvent', value: editPaymentAccountNameSelect.searchEvent },
                   { type: 'scrollToEnd', value: editPaymentAccountNameSelect.scrollToEnd },
                 ]"
@@ -350,8 +288,7 @@
                     editPaymentAccountNameSelect.searchTerm,
                     FinancialAccountSearchEnum.Name
                   )
-                "
-              />
+                " -->
             </app-input-error-message-handler>
           </td>
           <td [class.disabled]="!isRowEditable($index)">

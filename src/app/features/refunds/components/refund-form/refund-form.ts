@@ -18,7 +18,9 @@ import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { OrderPaymentType } from '@/features/orders';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
-
+import { InputGroupAddon } from "primeng/inputgroupaddon";
+import { TagModule } from 'primeng/tag';
+import { onlyNumbersOrDotAllowed } from '@/yn-ng';
 interface IRefundItemFormRow {
   orderDetailId: number;
   quantity: number;
@@ -53,7 +55,8 @@ type RefundAddonFormRowControls = ControlsOf<IRefundAddonFormRow>;
     RouterLink,
     DecimalPipe,
     ButtonDirective,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    InputGroupAddon,TagModule
 ],
   templateUrl: './refund-form.html',
   styleUrl: './refund-form.css',
@@ -70,8 +73,8 @@ export class RefundForm extends BaseComponent implements OnInit {
   isCreateMode = computed(() => this.formMode() === FormMode.Create);
 
   refundFg = this.fb.group({
-    payingCash: this.fb.control<number>(0, []),
-    payingNetwork: this.fb.control<number>(0, []),
+    payingCash: this.fb.control<number>(0, [onlyNumbersOrDotAllowed]),
+    payingNetwork: this.fb.control<number>(0, [onlyNumbersOrDotAllowed]),
     items: this.fb.array<FormGroup<RefundItemFormRowControls>>([], [Validators.required]),
   });
 

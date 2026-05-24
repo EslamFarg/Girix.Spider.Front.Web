@@ -41,7 +41,7 @@ export class Rooms extends BaseComponent {
     searchEnum: this.fb.control<RoomSearchEnum>(RoomSearchEnum.Name, []),
     name: this.fb.control<string>('', [
       Validators.required,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
       noSymbolsAllowed,
     ]),

@@ -5,7 +5,7 @@ import { Validators, FormGroup, FormControl, ReactiveFormsModule } from '@angula
 import { PaginatorState } from 'primeng/paginator';
 import { FinancialAccountService, FinancialAccountSearchEnum } from '../../services/financial-account-service';
 import { JournalEntryService } from '../../services/journal-entry-service';
-import { ITreeFinancialAccountSearchRow, IJournalEntryReadResponse } from '../../types';
+import { ITreeFinancialAccountSearchRow, IJournalEntryReadResponse, IFinancialAccountSearchRow } from '../../types';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import {
   InputErrorMessageHandler,
@@ -13,6 +13,7 @@ import {
   noSymbolsAllowed,
   onlyArLettersAllowed,
   onlyNumbersAllowed,
+  onlyNumbersOrDotAllowed,
   onlyNumbersOrEnLettersAllowed,
 } from '@/yn-ng';
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -110,7 +111,7 @@ export class JournalForm extends BaseComponent {
    */
   constructor() {
     super();
-    this.searchFinancialAccounts(1);
+    this.searchFinancialAccounts(0);
     this.setUpNewJournalDetailsRowFg();
   }
   //
@@ -237,7 +238,10 @@ export class JournalForm extends BaseComponent {
   //
 
   currentAccount = signal<{ id: number; name: string } | null>(null);
-  financialAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
+  _financialAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
+  financialAccounts = computed(() => this._financialAccounts().map(a=>({
+    ...a,label:`${a.name} - ${a.finNumber}`,
+  })));
   financialAccountService = inject(FinancialAccountService);
   displayedAccounts = computed(() => {
     const accounts = this.financialAccounts();
@@ -302,7 +306,7 @@ export class JournalForm extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 10,
+          pageSize: 0,
         },
         searchFilters: [
           {
@@ -314,20 +318,27 @@ export class JournalForm extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
-          if (res.value.rows.length === 0) return;
-          if (pageIndex == 1) {
-            this.financialAccounts.set(res.value.rows);
-          } else {
-            this.financialAccounts.update((pre) => [...pre, ...res.value.rows]);
-          }
-          this.financialAccountsPaginationInfo = {
-            pageIndex,
-            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
+          // if (res.value.rows.length === 0) return;
+          // if (pageIndex == 1) {
+            this._financialAccounts.set(res.value.rows);
+          // } else {
+          //   this.financialAccounts.update((pre) => [...pre, ...res.value.rows]);
+          // }
+          // this.financialAccountsPaginationInfo = {
+          //   pageIndex,
+          //   totalPagesCount: res.value.paginationInfo.totalPagesCount,
+          //   totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          // };
         },
       });
   }
+  filterFinancialAccounts(term: string, item: IFinancialAccountSearchRow) {
+        return (
+          item.name.toLowerCase().includes(term.toLowerCase()) ||
+          item.finNumber.toLowerCase().includes(term.toLowerCase()) ||
+          String(item.id).includes(term.toLowerCase())
+        );
+      }
 
   debouncedFinancialAccountsSearch(event: IDebounceEvent, searchValue: string) {
     console.log(event);
@@ -386,8 +397,8 @@ export class JournalForm extends BaseComponent {
 
   createNewJournalDetailsItemFg(data?: IAppJournalItem) {
     const fg = this.fb.group<IAppJournalItemControls>({
-      creditorAmount: this.fb.control<number>(data?.creditorAmount ?? 0, [Validators.required]),
-      debtorAmount: this.fb.control<number>(data?.debtorAmount ?? 0, [Validators.required]),
+      creditorAmount: this.fb.control<number>(data?.creditorAmount ?? 0, [Validators.required,onlyNumbersOrDotAllowed]),
+      debtorAmount: this.fb.control<number>(data?.debtorAmount ?? 0, [Validators.required,onlyNumbersOrDotAllowed]),
       notes: this.fb.control<string | null>(data?.notes ?? null, [Validators.required, Validators.maxLength(1000)]),
       finincalAccountId: this.fb.control<number | null>(data?.finincalAccountId ?? null, [Validators.required]),
     });

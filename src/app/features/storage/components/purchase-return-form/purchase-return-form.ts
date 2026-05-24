@@ -14,7 +14,7 @@ import { IProductSearchRow, IProductUnit, ProductSearchEnum, ProductService } fr
 import { IDebounceEvent, Debounce } from '@/directives/debounce';
 import { PaginatorState } from 'primeng/paginator';
 import { UnitService } from '@/features/classes/services/unit-service';
-import { mustIncludeLetters, noSymbolsAllowed, onlyNumbersAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
+import { mustIncludeLetters, noSymbolsAllowed, onlyNumbersAllowed, onlyNumbersOrDotAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { OrderPaymentType } from '@/features/orders';
 import { SupplierService } from '../../services/supplier-service';
@@ -111,8 +111,8 @@ export class PurchaseReturnForm extends BaseComponent {
     notes: this.fb.control<string | null>(null, []),
     items: this.fb.array<FormGroup<IAppPurchaseReturnItemControls>>([], [Validators.required, Validators.minLength(1)]),
     //
-    cashAmount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
-    networkAmount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
+    cashAmount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0),onlyNumbersOrDotAllowed]),
+    networkAmount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0),onlyNumbersOrDotAllowed]),
     cashAccountId: this.fb.control<number | null>(null, [Validators.required]),
     networkAccountId: this.fb.control<number | null>(null, [Validators.required]),
     //
@@ -329,6 +329,7 @@ export class PurchaseReturnForm extends BaseComponent {
       quantity: this.fb.control<number | null>(data?.quantity ?? null, [
         Validators.required,
         Validators.min(0),
+        onlyNumbersOrDotAllowed,
         Validators.max(data?.quantity ?? 0),
       ]),
       purchaseInvoiceItemId: this.fb.control<number | null>(data?.purchaseInvoiceItemId ?? null, [Validators.required]),

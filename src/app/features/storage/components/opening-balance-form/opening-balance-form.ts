@@ -16,7 +16,7 @@ import { ConsoleService, NgSelectComponent } from '@ng-select/ng-select';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { IUnitSearchRow, UnitSearchEnum, UnitService } from '@/features/classes/services/unit-service';
 import { FormControlNotifier } from '@/directives/form-control-notifier';
-import { onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
+import { onlyNumbersAllowed, onlyNumbersOrDotAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
 interface IAppOpeningBalanceItem {
@@ -75,7 +75,7 @@ export class OpeningBalanceForm extends BaseComponent {
     ]),
     // الرقم الفاتورة
     invoiceNumber: this.fb.control<string | null>({ value: null, disabled: true }, []),
-    date: this.fb.control<Date | null>(null, [Validators.required]),
+    date: this.fb.control<Date | null>(new Date(), [Validators.required]),
     notes: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(1000)]),
     items: this.fb.array<FormGroup<IAppOpeningBalanceItemControls>>([], [Validators.required, Validators.minLength(1)]),
   };
@@ -241,10 +241,10 @@ export class OpeningBalanceForm extends BaseComponent {
     return this.fb.group<IAppOpeningBalanceItemControls>({
       itemId: this.fb.control<number | null>(data?.itemId ?? null, [Validators.required]),
       unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
-      quantity: this.fb.control<number | null>(data?.quantity ?? null, [Validators.required]),
-      purchasePrice: this.fb.control<number | null>(data?.purchasePrice ?? null, [Validators.required]),
-      salePrice: this.fb.control<number | null>(data?.salePrice ?? null, [Validators.required]),
-      total: this.fb.control<number | null>(data?.total ?? null, []),
+      quantity: this.fb.control<number | null>(data?.quantity ?? null, [Validators.required,onlyNumbersAllowed]),
+      purchasePrice: this.fb.control<number | null>(data?.purchasePrice ?? null, [Validators.required,onlyNumbersOrDotAllowed]),
+      salePrice: this.fb.control<number | null>(data?.salePrice ?? null, [Validators.required,onlyNumbersOrDotAllowed]),
+      total: this.fb.control<number | null>(data?.total ?? null, [onlyNumbersOrDotAllowed]),
     });
   }
 
@@ -364,6 +364,10 @@ export class OpeningBalanceForm extends BaseComponent {
             column: ProductSearchEnum.Name,
             values: [searchValue],
           },
+          {
+            column: ProductSearchEnum.Id,
+            values: [searchValue],
+          }
         ],
         fromDate: null,
         removeDateFilter: true,

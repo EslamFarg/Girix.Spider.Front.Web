@@ -55,36 +55,36 @@ export class SupplierForm extends BaseComponent implements OnInit {
   initialSupplierFgValue: ISupplierFgControls = {
     id: this.fb.control(null, []),
     nameAr: this.fb.control(null, [Validators.required, noSymbolsAllowed]),
-    nameEn: this.fb.control(null, [Validators.required, noSymbolsAllowed]),
+    nameEn: this.fb.control(null, [ noSymbolsAllowed]),
     phoneNumber: this.fb.control(null, [
-      Validators.required,
+      
       onlyNumbersAllowed,
       Validators.minLength(6),
       Validators.maxLength(16),
     ]),
-    secondaryMobileNumber: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
-    city: this.fb.control(null, [Validators.required]),
-    district: this.fb.control(null, [Validators.required]),
-    street: this.fb.control(null, [Validators.required]),
-    buildingNumber: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
-    apartment: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
-    landmark: this.fb.control(null, [Validators.required]),
-    postalCode: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
+    secondaryMobileNumber: this.fb.control(null, [ onlyNumbersAllowed]),
+    city: this.fb.control(null, []),
+    district: this.fb.control(null, []),
+    street: this.fb.control(null, []),
+    buildingNumber: this.fb.control(null, [ onlyNumbersAllowed]),
+    apartment: this.fb.control(null, [ onlyNumbersAllowed]),
+    landmark: this.fb.control(null, []),
+    postalCode: this.fb.control(null, [ onlyNumbersAllowed]),
     commercialRegister: this.fb.control(null, [
-      Validators.required,
+      
       onlyNumbersAllowed,
-      Validators.minLength(10),
+      // Validators.minLength(10),
       Validators.maxLength(10),
     ]),
     taxNumber: this.fb.control(null, [
-      Validators.required,
-      Validators.minLength(15),
+      
+      // Validators.minLength(15),
       Validators.maxLength(15),
       onlyNumbersAllowed,
-      Validators.pattern(/^3.*3$/),
+      // Validators.pattern(/^3.*3$/),
     ]),
-    numberOfFloor: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
-    isCompany: this.fb.control(true, [Validators.required]),
+    numberOfFloor: this.fb.control(null, [ onlyNumbersAllowed]),
+    isCompany: this.fb.control(false, []),
   };
 
   supplierFg = this.fb.group(this.initialSupplierFgValue);

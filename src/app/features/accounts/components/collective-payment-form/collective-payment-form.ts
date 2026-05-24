@@ -1,7 +1,7 @@
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { Debounce, IDebounceEvent } from '@/directives/debounce';
-import { InputErrorMessageHandler } from '@/yn-ng';
+import { InputErrorMessageHandler, onlyNumbersOrDotAllowed } from '@/yn-ng';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
@@ -19,6 +19,8 @@ import {
   IBankFinancialAccount,
   ICashFinancialAccount,
   ICustodyFinancialAccount,
+  IFinancialAccountSearchResponseValue,
+  IFinancialAccountSearchRow,
   IPaymentVoucherReadResponse,
   ITreeFinancialAccountSearchRow,
 } from '../../types';
@@ -66,7 +68,7 @@ export class CollectivePaymentForm extends BaseComponent {
   initialFormValue = {
     id: this.fb.control<number | null>({ value: null, disabled: true }, []),
     voucherNo: this.fb.control<string | null>(null, [Validators.required]),
-    voucherDate: this.fb.control<Date | null>(null, [Validators.required]),
+    voucherDate: this.fb.control<Date | null>(new Date(), [Validators.required]),
     payee: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(300)]),
     creditAccountId: this.fb.control<number | null>(null, [Validators.required]),
     isHasTax: this.fb.control<boolean>(false, []),
@@ -77,7 +79,7 @@ export class CollectivePaymentForm extends BaseComponent {
 
   constructor() {
     super();
-    this.searchFinancialAccounts(1);
+    this.searchFinancialAccounts(0);
     this.getCashAndBankAccountsAndCustodyAccounts();
     this.setUpNewPaymentVoucherDetailsRowFg();
   }
@@ -145,8 +147,7 @@ export class CollectivePaymentForm extends BaseComponent {
             ...data,
           })
           .subscribe({
-            next: () => {
-            },
+            next: () => {},
           });
         break;
     }
@@ -171,7 +172,10 @@ export class CollectivePaymentForm extends BaseComponent {
     });
   }
 
-  financialAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
+  _financialAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
+  financialAccounts = computed(() => this._financialAccounts().filter(a=>a.stage>=3).map(a=>({
+    ...a,label:`${a.name} - ${a.finNumber}`,
+  })));
   financialAccountService = inject(FinancialAccountService);
   financialAccountsPaginationInfo: IPaginationInfo = {
     pageIndex: 0,
@@ -219,11 +223,19 @@ export class CollectivePaymentForm extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex,
-          pageSize: 10,
+          pageSize: 0,
         },
         searchFilters: [
           {
-            column: searchEnum,
+            column: FinancialAccountSearchEnum.Name,
+            values: [searchValue],
+          },
+          {
+            column: FinancialAccountSearchEnum.FinNumber,
+            values: [searchValue],
+          },
+          {
+            column: FinancialAccountSearchEnum.Id,
             values: [searchValue],
           },
         ],
@@ -231,31 +243,35 @@ export class CollectivePaymentForm extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
-          if (pageIndex === 1) {
-            this.financialAccounts.set(res.value.rows);
-          } else {
-            this.financialAccounts.update((pre) => [...pre, ...res.value.rows]);
-          }
-          this.financialAccountsPaginationInfo = {
-            pageIndex,
-            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
+          // if (pageIndex === 1) {
+          this._financialAccounts.set(res.value.rows);
+          // } else {
+          //   this.financialAccounts.update((pre) => [...pre, ...res.value.rows]);
+          // }
+          // this.financialAccountsPaginationInfo = {
+          //   pageIndex,
+          //   totalPagesCount: res.value.paginationInfo.totalPagesCount,
+          //   totalRowsCount: res.value.paginationInfo.totalRowsCount,
+          // };
         },
       });
   }
 
-  debouncedFinancialAccountsSearch(
-    event: IDebounceEvent,
-    searchValue: string,
-    searchEnum: FinancialAccountSearchEnum = FinancialAccountSearchEnum.Name,
-  ) {
+  filterFinancialAccounts(term: string, item: IFinancialAccountSearchRow) {
+    return (
+      item.name.toLowerCase().includes(term.toLowerCase()) ||
+      item.finNumber.toLowerCase().includes(term.toLowerCase()) ||
+      String(item.id).includes(term.toLowerCase())
+    );
+  }
+
+  debouncedFinancialAccountsSearch(event: IDebounceEvent, searchValue: string) {
     if (event.type === 'scrollToEnd') {
       if (this.financialAccountsPaginationInfo.pageIndex < this.financialAccountsPaginationInfo.totalPagesCount) {
-        this.searchFinancialAccounts(this.financialAccountsPaginationInfo.pageIndex + 1, searchValue, searchEnum);
+        this.searchFinancialAccounts(this.financialAccountsPaginationInfo.pageIndex + 1, searchValue);
       }
     } else {
-      this.searchFinancialAccounts(1, searchValue, searchEnum);
+      this.searchFinancialAccounts(1, searchValue);
     }
   }
 
@@ -286,7 +302,7 @@ export class CollectivePaymentForm extends BaseComponent {
     return this.fb.group<IAppPaymentVoucherItemControls>({
       finincalAccountId: this.fb.control<number | null>(data?.finincalAccountId ?? null, [Validators.required]),
       isHasTax: this.fb.control<boolean>(data?.isHasTax ?? false, []),
-      totalAmount: this.fb.control<number>(data?.totalAmount ?? 0, [Validators.required, Validators.min(0.01)]),
+      totalAmount: this.fb.control<number>(data?.totalAmount ?? 0, [Validators.required, Validators.min(0),onlyNumbersOrDotAllowed]),
     });
   }
 

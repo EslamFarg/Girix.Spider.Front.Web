@@ -56,7 +56,7 @@ export class GroupForm extends BaseComponent implements OnInit {
     nameAr: this.fb.control<string>('', [
       Validators.required,
       noSymbolsAllowed,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(200),
     ]),
     isOnCasher: this.fb.control(false, []),

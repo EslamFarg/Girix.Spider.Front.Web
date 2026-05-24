@@ -304,6 +304,8 @@ export class AccountsTree extends BaseComponent {
   private resetFormState() {
     this.selectedFinancialAccount.set(null);
     this.selectedTreeNode.set(null);
+    this.currentParentAccountId.set(null);
+    this.currentAccountId.set(null);
     this.fg.reset({
       id: null,
       parentId: null,

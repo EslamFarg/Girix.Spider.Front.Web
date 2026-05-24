@@ -37,14 +37,14 @@ export class Profile extends BaseComponent {
     nameAr: this.fb.control(null, [
       Validators.required,
       noSymbolsAllowed,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
     ]),
 
     nameEn: this.fb.control(null, [
       Validators.required,
       noSymbolsAllowed,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
     ]),
 

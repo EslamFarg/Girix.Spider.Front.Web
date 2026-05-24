@@ -43,7 +43,7 @@ export class Huts extends BaseComponent {
     name: this.fb.control<string>('', [
       noSymbolsAllowed,
       Validators.required,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
     ]),
     pricePerHour: this.fb.control<number>(0, [Validators.required, Validators.min(1), Validators.max(1_000_000)]),

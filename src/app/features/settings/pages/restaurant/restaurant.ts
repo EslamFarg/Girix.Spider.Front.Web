@@ -36,7 +36,7 @@ export class Restaurant extends BaseComponent {
     nameAr: this.fb.control<string>('', [
       Validators.required,
       noSymbolsAllowed,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(200),
     ]),
     nameEn: this.fb.control<string>('', [Validators.required]),

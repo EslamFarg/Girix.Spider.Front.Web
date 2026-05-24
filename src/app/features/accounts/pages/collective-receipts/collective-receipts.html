@@ -57,7 +57,7 @@
           <div>{{ receiptVoucher.voucherNo }}</div>
         </td>
         <td>
-          <div>{{ receiptVoucher.totalAmount | currency }}</div>
+          <div>{{ receiptVoucher?.totalAmount?.toFixed(2) }}</div>
         </td>
         <td>
           <div class="actions">

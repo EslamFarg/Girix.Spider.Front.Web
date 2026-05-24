@@ -129,6 +129,7 @@
             appAllowNumbers
             [allowDecimal]="true"
             id="productPrice"
+            type="number"
             formControlName="price"
             aria-describedby="productPrice-help"
             [placeholder]="'CLASSES.PRODUCTS.PRICE' | translate"
@@ -145,6 +146,7 @@
             appAllowNumbers
             [allowDecimal]="true"
             id="costPrice"
+            type="number"
             formControlName="costPrice"
             aria-describedby="costPrice-help"
             [placeholder]="'CLASSES.PRODUCTS.COST_PRICE' | translate"
@@ -386,6 +388,7 @@
                 appAllowNumbers
                 [allowDecimal]="true"
                 [min]="1"
+                  type="number"
                 [formControl]="newProductUnitRowFg.controls.quantity"
                 class="app-input text-center"
                 aria-describedby="unitQuantity-help"
@@ -454,6 +457,7 @@
                 <input
                   pInputText
                   appAllowNumbers
+                    type="number"
                   [allowDecimal]="true"
                   [formControl]="item.controls.quantity"
                   class="app-input text-center"

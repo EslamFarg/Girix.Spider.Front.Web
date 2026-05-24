@@ -40,7 +40,7 @@ export class Tables extends BaseComponent {
     id: this.fb.control<number>(0, []),
     name: this.fb.control<string>('', [
       Validators.required,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
       noSymbolsAllowed,
     ]),

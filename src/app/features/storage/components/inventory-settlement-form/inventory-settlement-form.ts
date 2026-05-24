@@ -15,7 +15,7 @@ import { NgSelectComponent } from '@ng-select/ng-select';
 import { Debounce, IDebounceEvent } from '@/directives/debounce';
 import { tap } from 'rxjs';
 import { AllowNumbers } from '@/directives/allow-numbers';
-import { onlyNumbersAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
+import { onlyNumbersAllowed, onlyNumbersOrDotAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
  
@@ -77,7 +77,7 @@ export class InventorySettlementForm extends BaseComponent {
     // المرجع
     referenceNumber: this.fb.control<string | null>(null, [Validators.required,Validators.maxLength(16),onlyNumbersOrEnLettersAllowed]),
     // الرقم الفاتورة
-    settlementDate: this.fb.control<Date | null>(null, [Validators.required]),
+    settlementDate: this.fb.control<Date | null>(new Date(), [Validators.required]),
     items: this.fb.array<FormGroup<IAppInventoryItemControls>>([], [Validators.required, Validators.minLength(1)]),
   };
   fg = this.fb.group(this.initialFormValue);
@@ -241,8 +241,8 @@ export class InventorySettlementForm extends BaseComponent {
     return this.fb.group<IAppInventoryItemControls>({
       itemId: this.fb.control<number | null>(data?.itemId ?? null, [Validators.required]),
       unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
-      systemQuantity: this.fb.control<number | null>(data?.systemQuantity ?? null, [Validators.required]),
-      actualQuantity: this.fb.control<number | null>(data?.actualQuantity ?? null, [Validators.required]),
+      systemQuantity: this.fb.control<number | null>(data?.systemQuantity ?? null, [Validators.required,onlyNumbersOrDotAllowed]),
+      actualQuantity: this.fb.control<number | null>(data?.actualQuantity ?? null, [Validators.required,onlyNumbersOrDotAllowed]),
     });
   }
 

@@ -1,6 +1,12 @@
 <!-- actions -->
 <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 mb-4">
-  <button appLoadingDisabled type="submit" form="openingBalancesForm" pButton class="flex-1 md:flex-none app-p-btn py-1! md:px-8!">
+  <button
+    appLoadingDisabled
+    type="submit"
+    form="openingBalancesForm"
+    pButton
+    class="flex-1 md:flex-none app-p-btn py-1! md:px-8!"
+  >
     حفظ
   </button>
   @switch (formMode()) {
@@ -267,8 +273,7 @@
   <thead>
     <tr>
       <th class="min-w-12.5 w-12.5">#</th>
-      <th class="">كود المنتج</th>
-      <th class="">اسم المنتج</th>
+      <th class="">المنتج</th>
       <th class="">الوحدة</th>
       <th class="">الكميه</th>
       <th class="">سعر البيع</th>
@@ -296,28 +301,6 @@
       <td>
         <div>#</div>
       </td>
-      <!-- كود المنتج -->
-      <td>
-        <app-input-error-message-handler [grouped]="false" [fc]="newPurchaseItemRowFg.get('menuItemsId')">
-          <ng-select
-            class="app-select"
-            [items]="displayedProducts()"
-            bindLabel="name"
-            [formControl]="getFormControl(newPurchaseItemRowFg, 'menuItemsId')"
-            (change)="onCurrentItemChange($event)"
-            bindValue="id"
-            placeholder="الكل"
-            [clearable]="false"
-            #newPurchaseItemSearchByCode
-            appDebounce
-            [customEvents]="[
-              { type: 'searchEvent', value: newPurchaseItemSearchByCode.searchEvent },
-              { type: 'scrollToEnd', value: newPurchaseItemSearchByCode.scrollToEnd },
-            ]"
-            (debounced)="debouncedProductsSearch($event, newPurchaseItemSearchByCode.searchTerm, ProductSearchEnum.Id)"
-          />
-        </app-input-error-message-handler>
-      </td>
       <!-- اسم المنتج -->
       <td>
         <app-input-error-message-handler [grouped]="false" [fc]="newPurchaseItemRowFg.get('menuItemsId')">
@@ -336,9 +319,7 @@
               { type: 'searchEvent', value: newPurchaseItemSearchByName.searchEvent },
               { type: 'scrollToEnd', value: newPurchaseItemSearchByName.scrollToEnd },
             ]"
-            (debounced)="
-              debouncedProductsSearch($event, newPurchaseItemSearchByName.searchTerm, ProductSearchEnum.Name)
-            "
+            (debounced)="debouncedProductsSearch($event, newPurchaseItemSearchByName.searchTerm)"
           />
         </app-input-error-message-handler>
       </td>
@@ -410,28 +391,23 @@
       </td>
       <!-- الضريبه -->
       <td>
-        <app-input-error-message-handler [fc]="newPurchaseItemRowFg.get('taxAmount')">
-          <input
-            pInputText
-            type="number"
-            id="taxAmount"
-            appAllowNumbers
-            [defaultChecked]="true"
-            [min]="0"
-            [formControl]="getFormControl(newPurchaseItemRowFg, 'taxAmount')"
-            class="app-input text-center"
-            aria-describedby="taxAmount-help"
-            placeholder="0.00"
-          />
-        </app-input-error-message-handler>
+        <div class="app-input flex justify-center items-center" pInputText>
+          <span class="disabled">
+            {{
+              (+(newPurchaseItemRowFg.value.taxAmount ?? 0) * +(newPurchaseItemRowFg.value.quantity ?? 0)).toFixed(2)
+            }}
+          </span>
+        </div>
       </td>
       <!-- المجموع -->
       <td>
         <div class="app-input flex justify-center items-center" pInputText>
           <span class="disabled">
             {{
-              (+((newPurchaseItemRowFg.value.purchasePrice ?? 0) + (newPurchaseItemRowFg.value.taxAmount??0)) *
-                +(newPurchaseItemRowFg.value.quantity ?? 0)).toFixed(2)
+              (
+                +((newPurchaseItemRowFg.value.purchasePrice ?? 0) + (newPurchaseItemRowFg.value.taxAmount ?? 0)) *
+                +(newPurchaseItemRowFg.value.quantity ?? 0)
+              ).toFixed(2)
             }}
           </span>
         </div>
@@ -452,27 +428,6 @@
         (click)="lastClickedTableRowIndex.set($index)"
       >
         <td class="min-w-12.5 w-12.5" [class.disabled]="!isRowEditable($index)">{{ $index + 1 }}</td>
-        <!-- كود المنتج -->
-        <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
-          <app-input-error-message-handler [grouped]="false" [fc]="item.get('menuItemsId')">
-            <ng-select
-              class="app-select"
-              [items]="displayedProducts()"
-              [formControl]="getFormControl(item, 'menuItemsId')"
-              bindLabel="name"
-              bindValue="id"
-              placeholder="الكل"
-              [clearable]="false"
-              #printerSelect2
-              appDebounce
-              [customEvents]="[
-                { type: 'searchEvent', value: printerSelect2.searchEvent },
-                { type: 'scrollToEnd', value: printerSelect2.scrollToEnd },
-              ]"
-              (debounced)="debouncedProductsSearch($event, printerSelect2.searchTerm, ProductSearchEnum.Id)"
-            />
-          </app-input-error-message-handler>
-        </td>
         <!-- اسم المنتج -->
         <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
           <app-input-error-message-handler [grouped]="false" [fc]="item.get('menuItemsId')">
@@ -490,7 +445,7 @@
                 { type: 'searchEvent', value: printerSelect2.searchEvent },
                 { type: 'scrollToEnd', value: printerSelect2.scrollToEnd },
               ]"
-              (debounced)="debouncedProductsSearch($event, printerSelect2.searchTerm, ProductSearchEnum.Name)"
+              (debounced)="debouncedProductsSearch($event, printerSelect2.searchTerm)"
             />
           </app-input-error-message-handler>
         </td>
@@ -515,6 +470,7 @@
             <input
               pInputText
               appAllowNumbers
+              type="number"
               id="debtorAmount"
               [formControl]="getFormControl(item, 'quantity')"
               class="app-input text-center"
@@ -559,28 +515,21 @@
         </td>
         <!-- الضريبه -->
         <td>
-          <app-input-error-message-handler [fc]="item.get('taxAmount')">
-            <input
-              pInputText
-              type="number"
-              id="taxAmount"
-              appAllowNumbers
-              [defaultChecked]="true"
-              [min]="0"
-              [formControl]="getFormControl(item, 'taxAmount')"
-              class="app-input text-center"
-              aria-describedby="taxAmount-help"
-              placeholder="0.00"
-            />
-          </app-input-error-message-handler>
+          <div class="app-input flex justify-center items-center" pInputText>
+            <span class="disabled">
+              {{ (+(item.value.taxAmount ?? 0) * +(item.value.quantity ?? 0)).toFixed(2) }}
+            </span>
+          </div>
         </td>
         <!-- المجموع -->
         <td class="" [class.disabled]="!isRowEditable($index)">
           <div class="app-input flex justify-center items-center" pInputText>
             <span class="disabled">
               {{
-                +(item.get('purchasePrice')?.value ?? 0) * +(item.get('quantity')?.value ?? 0) +
-                  +(item.get('taxAmount')?.value ?? 0)
+                (
+                  (+(item.get('purchasePrice')?.value ?? 0) + +(item.get('taxAmount')?.value ?? 0)) *
+                  +(item.get('quantity')?.value ?? 0)
+                ).toFixed(2)
               }}
             </span>
           </div>
@@ -639,6 +588,7 @@
         [formControl]="getFormControl(fg, 'cashAmount')"
         appAllowNumbers
         [min]="0"
+        [max]="net()"
         [allowDecimal]="true"
         #cashAmount
         id="cashAmount"
@@ -681,6 +631,7 @@
         appAllowNumbers
         [allowDecimal]="true"
         [min]="0"
+        [max]="net()"
         id="networkAmount"
         aria-describedby="network-help"
         #networkAmount

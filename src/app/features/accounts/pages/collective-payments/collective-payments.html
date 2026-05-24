@@ -52,7 +52,7 @@
           <div>{{ collectivePayment.voucherNo }}</div>
         </td>
         <td>
-          <div>{{ collectivePayment.totalAmount | currency }}</div>
+          <div>{{ collectivePayment?.totalAmount?.toFixed(2) }}</div>
         </td>
         <td>
           <div class="actions">

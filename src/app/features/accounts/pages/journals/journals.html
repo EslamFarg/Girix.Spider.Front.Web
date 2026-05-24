@@ -62,10 +62,10 @@
         </td>
 
         <td>
-          <div>{{ item.totalDebit | number: '1.2-2' }}</div>
+          <div>{{ item?.totalDebit?.toFixed(2) }}</div>
         </td>
         <td>
-          <div>{{ item.totalCredit | number: '1.2-2' }}</div>
+          <div>{{ item?.totalCredit?.toFixed(2) }}</div>
         </td>
         <td>
           <div class="actions">

@@ -87,13 +87,13 @@ export class ProductForm extends BaseComponent implements OnInit {
     nameAr: this.fb.control<string>('', [
       Validators.required,
       noSymbolsAllowed,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(200),
     ]),
     descriptionEn: this.fb.control<string>('', [Validators.required]),
     descriptionAr: this.fb.control<string>('', [
       Validators.required,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(1000),
     ]),
     price: this.fb.control<number | null>(0, [Validators.required, Validators.min(0)]),
@@ -483,12 +483,12 @@ export class ProductForm extends BaseComponent implements OnInit {
     id: this.fb.control<number | null>(null, []),
     nameAr: this.fb.control<string | null>(null, [
       Validators.required,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
     ]),
     nameEn: this.fb.control<string | null>(null, [
       Validators.required,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
     ]),
   };

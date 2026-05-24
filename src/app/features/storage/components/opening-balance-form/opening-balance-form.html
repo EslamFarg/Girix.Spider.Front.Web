@@ -143,8 +143,7 @@
   <thead>
     <tr>
       <th class="min-w-12.5 w-12.5">#</th>
-      <th class="">كود المنتج</th>
-      <th class="">اسم المنتج</th>
+      <th class="">المنتج</th>
       <th class="">الوحدة</th>
       <th class="">الكميه</th>
       <th class="">سعر البيع</th>
@@ -171,30 +170,7 @@
       <td>
         <div>#</div>
       </td>
-      <!-- كود المنتج -->
-      <td>
-        <app-input-error-message-handler [grouped]="false" [fc]="newOpeningBalanceItemRowFg.get('itemId')">
-          <ng-select
-            class="app-select"
-            [items]="displayedProducts()"
-            bindLabel="name"
-            [formControl]="getFormControl(newOpeningBalanceItemRowFg, 'itemId')"
-            (change)="onCurrentItemChange($event)"
-            appLoadingDisabled
-            bindValue="id"
-            placeholder="الكل"
-            [clearable]="false"
-            #newOpeningBalanceItemSearchByCode
-            appDebounce
-            [customEvents]="[
-              { type: 'searchEvent', value: newOpeningBalanceItemSearchByCode.searchEvent },
-              { type: 'scrollToEnd', value: newOpeningBalanceItemSearchByCode.scrollToEnd },
-            ]"
-            (debounced)="debouncedProductsSearch($event, newOpeningBalanceItemSearchByCode.searchTerm)"
-          />
-        </app-input-error-message-handler>
-      </td>
-      <!-- اسم المنتج -->
+      <!--  المنتج -->
       <td>
         <app-input-error-message-handler [grouped]="false" [fc]="newOpeningBalanceItemRowFg.get('itemId')">
           <ng-select
@@ -324,29 +300,7 @@
         (click)="lastClickedTableRowIndex.set($index)"
       >
         <td class="min-w-12.5 w-12.5" [class.disabled]="!isRowEditable($index)">{{ $index + 1 }}</td>
-        <!-- كود المنتج -->
-        <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
-          <app-input-error-message-handler [grouped]="false" [fc]="item.get('itemId')">
-            <ng-select
-              class="app-select"
-              [items]="displayedProducts()"
-              [formControl]="getFormControl(item, 'itemId')"
-              bindLabel="name"
-              bindValue="id"
-              placeholder="الكل"
-              appLoadingDisabled
-              [clearable]="false"
-              #printerSelect2
-              appDebounce
-              [customEvents]="[
-                { type: 'searchEvent', value: printerSelect2.searchEvent },
-                { type: 'scrollToEnd', value: printerSelect2.scrollToEnd },
-              ]"
-              (debounced)="debouncedProductsSearch($event, printerSelect2.searchTerm)"
-            />
-          </app-input-error-message-handler>
-        </td>
-        <!-- اسم المنتج -->
+        <!--  المنتج -->
         <td class="overflow-visible!" [class.disabled]="!isRowEditable($index)">
           <app-input-error-message-handler [grouped]="false" [fc]="item.get('itemId')">
             <ng-select

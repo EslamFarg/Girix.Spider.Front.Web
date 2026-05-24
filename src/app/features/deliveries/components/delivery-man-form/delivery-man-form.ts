@@ -42,15 +42,14 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
       Validators.required,
       noSymbolsAllowed,
       onlyArLettersAllowed,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
     ]),
 
     nameEn: this.fb.control(null, [
       Validators.required,
       noSymbolsAllowed,
-      onlyEngLettersAllowed,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
     ]),
 
@@ -125,7 +124,7 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
     }
     // debugger;
     if (this.deliveryFg.invalid) {
-      console.log('invalid form', this.deliveryFg.value);
+      console.log('invalid form', this.deliveryFg.getRawValue());
       this.deliveryFg.markAllAsTouched();
       return;
     }

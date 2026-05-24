@@ -15,7 +15,7 @@ import { ICustomerReadResponse } from '../../services/customer-types';
 import { RouterLink } from '@angular/router';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { AllowNumbers } from '@/directives/allow-numbers';
-
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 @Component({
   selector: 'app-customer-form',
   imports: [
@@ -31,6 +31,7 @@ import { AllowNumbers } from '@/directives/allow-numbers';
     RouterLink,
     LoadingDisabledDirective,
     AllowNumbers,
+    ToggleSwitchModule
   ],
   templateUrl: './customer-form.html',
   styleUrl: './customer-form.css',
@@ -55,38 +56,43 @@ export class CustomerForm extends BaseComponent implements OnInit {
   initialCustomerFgValue: ICustomerFgControls = {
     id: this.fb.control(null, []),
     nameAr: this.fb.control(null, [Validators.required, noSymbolsAllowed]),
-    nameEn: this.fb.control(null, [Validators.required, noSymbolsAllowed]),
+    nameEn: this.fb.control(null, [ noSymbolsAllowed]),
     phoneNumber: this.fb.control(null, [
-      Validators.required,
+      // ,
       onlyNumbersAllowed,
-      Validators.minLength(6),
+      // Validators.minLength(6),
       Validators.maxLength(16),
     ]),
-    secondaryMobileNumber: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
-    city: this.fb.control(null, [Validators.required]),
-    district: this.fb.control(null, [Validators.required]),
-    street: this.fb.control(null, [Validators.required]),
-    buildingNumber: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
-    apartment: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
-    landmark: this.fb.control(null, [Validators.required]),
-    postalCode: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
-    commercialRegister: this.fb.control(null, [
-      Validators.required,
+    secondaryMobileNumber: this.fb.control(null, [
+      // Validators.required,
       onlyNumbersAllowed,
-      Validators.minLength(10),
+      // Validators.minLength(6),
+      Validators.maxLength(16),
+    ]),
+    city: this.fb.control(null, []),
+    district: this.fb.control(null, []),
+    street: this.fb.control(null, []),
+    buildingNumber: this.fb.control(null, [ onlyNumbersAllowed]),
+    apartment: this.fb.control(null, [ onlyNumbersAllowed]),
+    landmark: this.fb.control(null, []),
+    postalCode: this.fb.control(null, [ onlyNumbersAllowed]),
+    commercialRegister: this.fb.control(null, [
+      // ,
+      onlyNumbersAllowed,
+      // Validators.minLength(10),
       Validators.maxLength(10),
     ]),
     //ends and starts with  3
     taxNumber: this.fb.control(null, [
-      Validators.required,
-      Validators.minLength(15),
+      
+      // Validators.minLength(15),
       Validators.maxLength(15),
       onlyNumbersAllowed,
       Validators.pattern(/^3.*3$/),
     ]),
-    numberOfFloor: this.fb.control(null, [Validators.required, onlyNumbersAllowed]),
-    isCompany: this.fb.control(true, [Validators.required]),
-    consumeInventory: this.fb.control(true, [Validators.required]),
+    numberOfFloor: this.fb.control(null, [ onlyNumbersAllowed]),
+    isCompany: this.fb.control(false, []),
+    consumeInventory: this.fb.control(true, []),
   };
 
   customerFg = this.fb.group(this.initialCustomerFgValue);

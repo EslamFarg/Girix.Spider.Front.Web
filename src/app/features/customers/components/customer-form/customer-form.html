@@ -5,8 +5,7 @@
   <button
     pButton
     appLoadingDisabled
-    style="--p-button-primary-background: var(--color-dark-line)"
-    class="border-dark-line! text-white!"
+    class="app-p-btn py-1! md:px-8!"
     form="customerForm"
     type="submit"
   >
@@ -174,7 +173,8 @@
   <div class="flex flex-col justify-end">
     <div class="flex items-center h-fit gap-2 pb-1">
       <app-input-error-message-handler [fc]="customerFg.get('isCompany')">
-        <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" formControlName="isCompany" />
+        <p-toggleswitch formControlName="isCompany"   />
+        <!-- <input type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" formControlName="isCompany" /> -->
       </app-input-error-message-handler>
       <label for="productName" class="text-dark-line text-sm font-semibold">{{ 'FORM.IS_COMPANY' | translate }}</label>
     </div>

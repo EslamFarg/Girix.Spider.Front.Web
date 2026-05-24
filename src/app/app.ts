@@ -96,6 +96,18 @@ export class App {
         this.keyboardService.currentNumbersKeyboardInput = target;
       }
     };
+
+    document.addEventListener('input', (event: Event) => {
+      const target = event.target as HTMLInputElement;
+      if (target && target.tagName === 'INPUT' && target.type === 'number') {
+        const sanitized = target.value.replace(/[^0-9.]/g, '');
+        if (target.value !== sanitized) {
+          target.value = sanitized;
+          target.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    });
+    
     //go to replacements
     // this.router.navigate(['replacements/huts']);
   }

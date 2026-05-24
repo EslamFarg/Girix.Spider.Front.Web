@@ -176,8 +176,7 @@
       <thead>
         <tr>
           <th class="min-w-12.5 w-12.5">#</th>
-          <th>كود المنتج</th>
-          <th>اسم المنتج</th>
+          <th> المنتج</th>
           <th>الوحدة</th>
           <th>الكمية بالنظام</th>
           <th>الكمية الفعلية</th>
@@ -200,35 +199,6 @@
               <ng-select
                 class="app-select"
                 [items]="displayedInventoryProducts()"
-                bindLabel="itemId"
-                [formControl]="getFormControl(newInventorySettlementItemRowFg, 'itemId')"
-                bindValue="itemId"
-                (change)="onCurrentInventoryItemChange($event)"
-                placeholder="الكل"
-                [clearable]="false"
-                appLoadingDisabled
-                #newInventorySettlementItemSearchByCode
-                appDebounce
-                [customEvents]="[
-                  { type: 'searchEvent', value: newInventorySettlementItemSearchByCode.searchEvent },
-                  { type: 'scrollToEnd', value: newInventorySettlementItemSearchByCode.scrollToEnd },
-                ]"
-                (debounced)="
-                  debouncedInventoryProductsSearch(
-                    $event,
-                    newInventorySettlementItemSearchByCode.searchTerm,
-                    InventoryProductSearchEnum.Id
-                  )
-                "
-              />
-            </app-input-error-message-handler>
-          </td>
-
-          <td>
-            <app-input-error-message-handler [grouped]="false" [fc]="newInventorySettlementItemRowFg.get('itemId')">
-              <ng-select
-                class="app-select"
-                [items]="displayedInventoryProducts()"
                 bindLabel="itemName"
                 [formControl]="getFormControl(newInventorySettlementItemRowFg, 'itemId')"
                 bindValue="itemId"
@@ -236,6 +206,7 @@
                 placeholder="الكل"
                 [clearable]="false"
                 appLoadingDisabled
+                appendTo="body"
                 #newInventorySettlementItemSearchByName
                 appDebounce
                 [customEvents]="[
@@ -267,6 +238,7 @@
                 pInputText
                 type="number"
                 appAllowNumbers
+                [allowDecimal]="true"
                 [formControl]="getFormControl(newInventorySettlementItemRowFg, 'actualQuantity')"
                 class="app-input text-center"
                 aria-describedby="new-actualQuantity-help"
@@ -318,6 +290,7 @@
                   pInputText
                   type="number"
                   appAllowNumbers
+                  [allowDecimal]="true"
                   [formControl]="getFormControl(item, 'actualQuantity')"
                   class="app-input text-center"
                   aria-describedby="actualQuantity-help"

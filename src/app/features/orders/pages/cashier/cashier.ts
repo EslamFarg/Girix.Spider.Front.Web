@@ -66,7 +66,7 @@ import {
   FinancialSettingsService,
   IFinancialSettingsResponse,
 } from '@/features/settings/services/financial-settings-service';
-import { labeledRequiredValidator, noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
+import { labeledRequiredValidator, noSymbolsAllowed, onlyNumbersOrDotAllowed } from '@/yn-ng/utils/text-validators';
 import { Select, SelectChangeEvent } from 'primeng/select';
 import { KeyboardService } from '@/features/keyboard/services/keyboard-service';
 import { FullKeyboard } from '@/features/keyboard/components/full-keyboard/full-keyboard';
@@ -205,7 +205,7 @@ export class Cashier extends BaseComponent implements OnInit {
     }));
   });
   initialOrderFgValue: IOrderCreateFgValue = {
-    orderType: this.fb.control<OrderLocationType>(OrderLocationType.DineIn, [Validators.required]),
+    orderType: this.fb.control<OrderLocationType>(OrderLocationType.Takeaway, [Validators.required]),
     paymentType: this.fb.control<OrderPaymentType>(OrderPaymentType.Pending, [Validators.required]),
     placeType: this.fb.control<OrderLocalType | null>(null, []),
     placeName: this.fb.control<string | null>(null, []),
@@ -213,8 +213,8 @@ export class Cashier extends BaseComponent implements OnInit {
     placeRefId: this.fb.control<number | null>(null, []),
     durationMinutes: this.fb.control<number | null>(null, []),
     deliveryId: this.fb.control<number | null>(null, []),
-    payingCash: this.fb.control<number | null>(null, [Validators.required]),
-    payingNetwork: this.fb.control<number | null>(null, [Validators.required]),
+    payingCash: this.fb.control<number | null>(null, [Validators.required,onlyNumbersOrDotAllowed]),
+    payingNetwork: this.fb.control<number | null>(null, [Validators.required,onlyNumbersOrDotAllowed]),
     createAt: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
     idempotencyKey: this.fb.control<string>(Date.now() + Math.random().toString(), [Validators.required]),
     cashAccountId: this.fb.control<number | null>(null, [Validators.required]),
@@ -1673,7 +1673,7 @@ export class Cashier extends BaseComponent implements OnInit {
   }
   onDeliverySelected( orderType: OrderLocationType, delivery?: IDeliverySearchRow | ICustomerSearchRow) {
     this.orderLocationType.set(orderType);
-    this.orderFg.patchValue({ deliveryId: delivery?.id }, { emitEvent: false });
+    this.orderFg.patchValue({ deliveryId: delivery?.id,orderType,durationMinutes: null,placeType: null,placeRefId: null }, { emitEvent: false });
     if (orderType === OrderLocationType.CompanyDelivery) {
       this.currentCompanyDelivery.set(delivery as ICustomerSearchRow);
       this.currentDelivery.set(null);

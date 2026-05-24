@@ -173,6 +173,12 @@ export class Header extends BaseComponent implements AfterViewInit {
       roles: [Role.Admin, Role.Cashier],
       children: [
         {
+          labelKey: 'GROUPS',
+          imgUrl: headerIcons.classes.children.groups,
+          routerLink: '/classes/groups',
+          roles: [Role.Admin, Role.Cashier],
+        },
+        {
           labelKey: 'PRODUCTS',
           imgUrl: headerIcons.classes.children.products,
           routerLink: '/classes/products',
@@ -182,12 +188,6 @@ export class Header extends BaseComponent implements AfterViewInit {
           labelKey: 'MEALS',
           imgUrl: headerIcons.classes.children.meals,
           routerLink: '/classes/meals',
-          roles: [Role.Admin, Role.Cashier],
-        },
-        {
-          labelKey: 'GROUPS',
-          imgUrl: headerIcons.classes.children.groups,
-          routerLink: '/classes/groups',
           roles: [Role.Admin, Role.Cashier],
         },
         {
@@ -255,7 +255,6 @@ export class Header extends BaseComponent implements AfterViewInit {
         },
       ],
     },
-
     // accounts
     {
       labelKey: 'ACCOUNTS',

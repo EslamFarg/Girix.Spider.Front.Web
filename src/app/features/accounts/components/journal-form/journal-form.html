@@ -187,7 +187,7 @@
               <ng-select
                 class="app-select"
                 [items]="financialAccounts()"
-                bindLabel="name"
+                bindLabel="label"
                 [formControl]="newJournalDetailsItemFg.controls.finincalAccountId"
                 bindValue="id"
                 placeholder="الكل"
@@ -195,11 +195,7 @@
                 [clearable]="false"
                 #printerSelect1
                 appDebounce
-                [customEvents]="[
-                  { type: 'searchEvent', value: printerSelect1.searchEvent },
-                  { type: 'scrollToEnd', value: printerSelect1.scrollToEnd },
-                ]"
-                (debounced)="debouncedFinancialAccountsSearch($event, printerSelect1.searchTerm)"
+                [searchFn]="filterFinancialAccounts"
               />
             </app-input-error-message-handler>
           </td>
@@ -273,17 +269,13 @@
                   class="app-select"
                   [items]="financialAccounts()"
                   [formControl]="item.controls.finincalAccountId"
-                  bindLabel="name"
+                  bindLabel="label"
                   bindValue="id"
                   placeholder="الكل"
                   [clearable]="false"
                   #printerSelect2
                   appDebounce
-                  [customEvents]="[
-                    { type: 'searchEvent', value: printerSelect2.searchEvent },
-                    { type: 'scrollToEnd', value: printerSelect2.scrollToEnd },
-                  ]"
-                  (debounced)="debouncedFinancialAccountsSearch($event, printerSelect2.searchTerm)"
+                  [searchFn]="filterFinancialAccounts"
                 />
               </app-input-error-message-handler>
             </td>

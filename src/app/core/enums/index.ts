@@ -5,6 +5,11 @@ export enum AmountType {
 
 export enum Role {
   Admin = 1,
-  Cashier =2,
-  Waiter = 3
+  Cashier = 2,
+  Waiter = 3,
+}
+
+export enum DefaultCashierPaymentType {
+  Cash = 1,
+  Bank = 2,
 }

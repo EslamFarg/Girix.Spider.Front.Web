@@ -27,13 +27,13 @@ export class AddCustomer extends BaseComponent {
     landmark: this.fb.control<string>('', [Validators.required]),
     nameAr: this.fb.control<string>('', [
       Validators.required,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
       noSymbolsAllowed,
     ]),
     nameEn: this.fb.control<string>('', [
       Validators.required,
-      Validators.minLength(3),
+      Validators.minLength(2),
       Validators.maxLength(100),
       noSymbolsAllowed,
     ]),

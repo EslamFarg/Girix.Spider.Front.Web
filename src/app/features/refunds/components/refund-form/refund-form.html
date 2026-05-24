@@ -1,24 +1,32 @@
-<div
-  class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
-  style="--p-button-primary-background: transparent"
->
-  <button
-    pButton
-    style="--p-button-primary-background: var(--color-dark-line)"
-    class="border-dark-line! text-white! py-1! md:px-8! md:flex-none"
-    form="refundForm"
-    type="submit"
-    appLoadingDisabled
+<div class="flex justify-between">
+   @if (!isOrderPaid()) {
+    <p-tag severity="warn" class="w-max inline-block *:inline-block *:w-max"  value="فاتورة غير مدفوعة" />
+  }
+  <div
+    class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
+    style="--p-button-primary-background: transparent"
   >
-    @if (isCreateMode()) {
-      {{ 'ACTIONS.SAVE' | translate }}
-    } @else {
-      {{ 'ACTIONS.EDIT' | translate }}
-    }
-  </button>
+    <button
+      pButton
+      style="--p-button-primary-background: var(--color-dark-line)"
+      class="border-dark-line! text-white! py-1! md:px-8! md:flex-none"
+      form="refundForm"
+      type="submit"
+      appLoadingDisabled
+    >
+      @if (isCreateMode()) {
+        {{ 'ACTIONS.SAVE' | translate }}
+      } @else {
+        {{ 'ACTIONS.EDIT' | translate }}
+      }
+    </button>
+  </div>
+ 
 </div>
 
 <form id="refundForm" class="mt-6 flex flex-col gap-4" [formGroup]="refundFg" (ngSubmit)="onSubmitForm()">
+  @if (isOrderPaid()) {
+
   <!-- Payment Info -->
   <div class="grid md:grid-cols-2 gap-4">
     <div>
@@ -28,9 +36,10 @@
           pInputText
           appAllowNumbers
           [allowDecimal]="true"
-          [max]="isOrderPaid() ?calculateRefundTotal():0"
+          [max]="isOrderPaid() ? calculateRefundTotal() : 0"
           [min]="0"
           id="payingCash"
+          type="number"
           formControlName="payingCash"
           class="app-input"
           placeholder="المدفوع كاش"
@@ -44,8 +53,9 @@
           pInputText
           appAllowNumbers
           [allowDecimal]="true"
-          [max]="isOrderPaid() ?calculateRefundTotal():0"
+          [max]="isOrderPaid() ? calculateRefundTotal() : 0"
           [min]="0"
+          type="number"
           id="payingNetwork"
           formControlName="payingNetwork"
           class="app-input"
@@ -54,6 +64,7 @@
       </app-input-error-message-handler>
     </div>
   </div>
+  }
 
   <!-- Items Table -->
   <div class="overflow-x-auto mt-4">
@@ -89,7 +100,7 @@
                 <input
                   pInputText
                   appAllowNumbers
-                  [allowDecimal]="false"
+                  [allowDecimal]="true"
                   [min]="0"
                   [max]="item.value.originalQuantity ?? 0"
                   [formControl]="item.controls.quantity"
@@ -122,7 +133,7 @@
                   <input
                     pInputText
                     appAllowNumbers
-                    [allowDecimal]="false"
+                    [allowDecimal]="true"
                     [min]="0"
                     [max]="addon.value.originalQuantity ?? 0"
                     [formControl]="addon.controls.quantity"
@@ -133,7 +144,9 @@
                 </app-input-error-message-handler>
               </td>
               <td>
-                <div class="text-sm">{{ (addon.value.quantity ?? 0) * (addon.value.netUnitPriceWithTax ?? 0) | number: '1.2-2' }}</div>
+                <div class="text-sm">
+                  {{ (addon.value.quantity ?? 0) * (addon.value.netUnitPriceWithTax ?? 0) | number: '1.2-2' }}
+                </div>
               </td>
             </tr>
           }

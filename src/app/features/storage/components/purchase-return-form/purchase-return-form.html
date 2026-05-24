@@ -287,8 +287,7 @@
   <thead>
     <tr>
       <th class="min-w-12.5 w-12.5">#</th>
-      <th class="">كود المنتج</th>
-      <th class="">اسم المنتج</th>
+      <th class=""> المنتج</th>
       <th class="">الوحدة</th>
       <th class="">الكميه</th>
       <th>الكميه المرتجعة</th>
@@ -302,12 +301,6 @@
     @for (item of fg.controls.items.controls; track $index) {
       <tr>
         <td class="min-w-12.5 w-12.5">{{ $index + 1 }}</td>
-        <!-- كود المنتج -->
-        <td>
-          <div>
-            {{ currentItems()[$index]?.menuItemsId }}
-          </div>
-        </td>
         <!-- اسم المنتج -->
         <td>
           <div>{{ currentItems()[$index]?.menuItemName }}</div>
