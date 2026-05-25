@@ -165,10 +165,18 @@ export class UserForm extends BaseComponent {
 
     switch (this.formMode()) {
       case FormMode.Create:
-        this.usersService.create(formData).subscribe();
+        this.usersService.create(formData).subscribe({
+          next: (res) => {
+            this.router.navigate([`/settings/users`]);
+          },
+        });
         break;
       case FormMode.Update:
-        this.usersService.put(formData).subscribe();
+        this.usersService.put(formData).subscribe({
+          next: (res) => {
+            this.router.navigate([`/settings/users`]);
+          },
+        });
         break;
     }
   }

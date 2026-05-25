@@ -55,6 +55,16 @@
             class="app-input"
             (click)="triggerNumbersKeyboard(cashPaymentAmount)"
           />
+          <p-inputgroup-addon class="flex p-0!">
+              <button
+                pButton
+                class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
+                type="button"
+                (click)="paymentFg.controls.cashPaymentAmount.setValue(0)"
+              >
+                <i class="pi pi-arrow-down"></i>
+              </button>
+            </p-inputgroup-addon>
         </app-input-error-message-handler>
       </div>
 
@@ -99,6 +109,16 @@
             [placeholder]="'FORM.NETWORK' | translate"
             class="app-input"
           />
+          <p-inputgroup-addon class="flex p-0!">
+              <button
+                pButton
+                class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
+                type="button"
+                (click)="paymentFg.controls.networkPaymentAmount.setValue(0)"
+              >
+                <i class="pi pi-arrow-up"></i>
+              </button>
+            </p-inputgroup-addon>
         </app-input-error-message-handler>
       </div>
 

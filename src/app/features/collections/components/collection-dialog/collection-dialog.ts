@@ -24,6 +24,7 @@ import { noSymbolsAllowed, omitKeys } from '@/yn-ng';
 import { SpaceTypeEnum } from '@/features/replacements/services/replacements-service';
 import { OrderCollectionCalculationsService } from '../../services/order-collection-calculations-service';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { InputGroupAddon } from "primeng/inputgroupaddon";
 
 @Component({
   selector: 'app-collection-dialog',
@@ -42,7 +43,8 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
     Debounce,
     ButtonDirective,
     LoadingDisabledDirective,
-  ],
+    InputGroupAddon
+],
   templateUrl: './collection-dialog.html',
   styleUrl: './collection-dialog.css',
 })

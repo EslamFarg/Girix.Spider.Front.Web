@@ -21,8 +21,8 @@ export class ManageOpenDailyJournal extends BaseComponent {
 
   initialFgValue = {
     custodyBalance: this.fb.control<number>(0, [Validators.required]),
-    openingNotes: this.fb.control<string | null>(null, [Validators.required]),
-    dateTime: this.fb.control(this.localDateIso, [Validators.required]),
+    openingNotes: this.fb.control<string | null>(null, []),
+    dateTime: this.fb.control(this.localDateIso, []),
   };
   fg = this.fb.group(this.initialFgValue);
 

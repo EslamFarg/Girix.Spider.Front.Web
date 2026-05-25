@@ -86,6 +86,7 @@ import {
 import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { AllowedRolesDirective } from '@/directives/allowed-roles';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { InputGroupAddon } from "primeng/inputgroupaddon";
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -145,7 +146,8 @@ interface IOrderCreateFgValue {
     PrintableOrderInvoice,
     AllowedRolesDirective,
     LoadingDisabledDirective,
-  ],
+    InputGroupAddon,
+],
   templateUrl: './cashier.html',
   styleUrl: './cashier.css',
 })
@@ -213,8 +215,8 @@ export class Cashier extends BaseComponent implements OnInit {
     placeRefId: this.fb.control<number | null>(null, []),
     durationMinutes: this.fb.control<number | null>(null, []),
     deliveryId: this.fb.control<number | null>(null, []),
-    payingCash: this.fb.control<number | null>(null, [Validators.required,onlyNumbersOrDotAllowed]),
-    payingNetwork: this.fb.control<number | null>(null, [Validators.required,onlyNumbersOrDotAllowed]),
+    payingCash: this.fb.control<number | null>(null, [Validators.required, onlyNumbersOrDotAllowed]),
+    payingNetwork: this.fb.control<number | null>(null, [Validators.required, onlyNumbersOrDotAllowed]),
     createAt: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
     idempotencyKey: this.fb.control<string>(Date.now() + Math.random().toString(), [Validators.required]),
     cashAccountId: this.fb.control<number | null>(null, [Validators.required]),
@@ -435,23 +437,22 @@ export class Cashier extends BaseComponent implements OnInit {
       return;
     }
 
-    const values=this.orderFg.getRawValue()
+    const values = this.orderFg.getRawValue();
 
-    switch (values.orderType){
+    switch (values.orderType) {
       case OrderLocationType.CompanyDelivery:
-        const currentCompany=this.currentCompanyDelivery();
+        const currentCompany = this.currentCompanyDelivery();
         this.orderFg.patchValue({
-          deliveryId:null,
+          deliveryId: null,
           customerRequest: {
-            nameAr: currentCompany?.name||"",
-            phoneNumber:  currentCompany?.phoneNumber ||"",
-            addressDescription:  currentCompany?.city||currentCompany?.district ||"",
+            nameAr: currentCompany?.name || '',
+            phoneNumber: currentCompany?.phoneNumber || '',
+            addressDescription: currentCompany?.city || currentCompany?.district || '',
             id: currentCompany?.id!,
-            nameEn: currentCompany?.name||"",
-            secondaryMobileNumber:  currentCompany?.secondaryMobileNumber ||"",
-          }
-        })
-        
+            nameEn: currentCompany?.name || '',
+            secondaryMobileNumber: currentCompany?.secondaryMobileNumber || '',
+          },
+        });
     }
 
     console.log('valid order');
@@ -474,7 +475,6 @@ export class Cashier extends BaseComponent implements OnInit {
             console.log(err);
             this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم انشاء الطلب' });
             this.resetIdempotencyKey();
-            
           },
         });
         break;
@@ -517,7 +517,7 @@ export class Cashier extends BaseComponent implements OnInit {
     this.currentCompanyDelivery.set(null);
     this.amountReceived.set(0);
     this.orderFg.patchValue({
-       placeRefId: null,
+      placeRefId: null,
       placeType: null,
     });
     this.resetIdempotencyKey();
@@ -1356,7 +1356,7 @@ export class Cashier extends BaseComponent implements OnInit {
       // this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
       this.orderFg.patchValue({
         orderType: OrderLocationType.DineIn,
-      })
+      });
       this.orderLocationType.set(OrderLocationType.DineIn);
       this.currentHut.set(hut);
       // this.HutDialogVisible = false;
@@ -1671,9 +1671,12 @@ export class Cashier extends BaseComponent implements OnInit {
       this.searchDeliveries(this.deliveryPaginationInfo.pageIndex + 1);
     }
   }
-  onDeliverySelected( orderType: OrderLocationType, delivery?: IDeliverySearchRow | ICustomerSearchRow) {
+  onDeliverySelected(orderType: OrderLocationType, delivery?: IDeliverySearchRow | ICustomerSearchRow) {
     this.orderLocationType.set(orderType);
-    this.orderFg.patchValue({ deliveryId: delivery?.id,orderType,durationMinutes: null,placeType: null,placeRefId: null }, { emitEvent: false });
+    this.orderFg.patchValue(
+      { deliveryId: delivery?.id, orderType, durationMinutes: null, placeType: null, placeRefId: null },
+      { emitEvent: false },
+    );
     if (orderType === OrderLocationType.CompanyDelivery) {
       this.currentCompanyDelivery.set(delivery as ICustomerSearchRow);
       this.currentDelivery.set(null);
@@ -2086,13 +2089,13 @@ export class Cashier extends BaseComponent implements OnInit {
       networkControl?.enable();
       this.orderFg.patchValue({
         paymentType: OrderPaymentType.Paid,
-      })
+      });
     } else {
       cashControl?.disable();
       networkControl?.disable();
       this.orderFg.patchValue({
         paymentType: OrderPaymentType.Pending,
-      })
+      });
     }
     cashControl?.setValidators(validators);
     networkControl?.setValidators(validators);

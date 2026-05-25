@@ -22,7 +22,7 @@ export class ManageCloseDailyJournal extends BaseComponent {
   initialFgValue = {
     cashClosingAmount: this.fb.control<number>(0, [Validators.required]),
     networkClosingAmount: this.fb.control<number>(0, [Validators.required]),
-    closingNotes: this.fb.control<string | null>(null, [Validators.required]),
+    closingNotes: this.fb.control<string | null>(null, []),
     closingDate: this.fb.control(this.localDateIso, []),
   };
   fg = this.fb.group(this.initialFgValue);
