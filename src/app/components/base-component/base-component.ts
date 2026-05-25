@@ -39,6 +39,7 @@ export class BaseComponent {
   FormMode = FormMode;
   AmountType = AmountType;
   Role=Role;
+  Math = Math;
   //
   nullableFb = inject(FormBuilder);
   fb = this.nullableFb.nonNullable;

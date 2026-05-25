@@ -6,12 +6,11 @@
     <ng-container *ngTemplateOutlet="content"></ng-container>
   </p-inputgroup>
 } @else {
-    <ng-container *ngTemplateOutlet="content"></ng-container>
-  
+  <ng-container *ngTemplateOutlet="content"></ng-container>
 }
 
 @if (fc()?.invalid && fc()?.touched) {
-  <p-message   severity="error" size="small" styleClass="[&_*]:text-xs! " variant="simple">{{
-    getErrorMessage()
-  }}</p-message>
+  <p-message severity="error" size="small" styleClass="[&_*]:text-xs! " variant="simple">
+    {{ getErrorMessage() }}
+  </p-message>
 }

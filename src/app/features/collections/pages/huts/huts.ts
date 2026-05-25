@@ -102,6 +102,13 @@ export class Huts extends BaseComponent {
         );
       }
     });
+
+    effect(() => {
+      const lastId = this.collectionsService.lastCollectedId();
+      if (lastId != null) {
+        this.searchHuts(1);
+      }
+    });
   }
 
   periodOptions = [

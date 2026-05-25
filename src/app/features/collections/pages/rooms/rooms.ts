@@ -101,6 +101,13 @@ export class Rooms extends BaseComponent {
         );
       }
     });
+
+    effect(() => {
+      const lastId = this.collectionsService.lastCollectedId();
+      if (lastId != null) {
+        this.searchRooms(1);
+      }
+    });
   }
 
   periodOptions = [

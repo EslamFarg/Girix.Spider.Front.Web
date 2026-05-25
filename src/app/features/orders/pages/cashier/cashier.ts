@@ -154,11 +154,6 @@ interface IOrderCreateFgValue {
 export class Cashier extends BaseComponent implements OnInit {
   //
   //
-  // template helpers
-  //
-  Math = Math;
-  //
-  //
   // enums
   //
   OrderLocationType = OrderLocationType;

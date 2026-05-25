@@ -11,6 +11,17 @@
     >
       <div class="w-full sm:flex-1">
         <app-input-error-message-handler [fc]="fg.get('searchTerm')">
+          <p-inputgroup-addon class="hidden! sm:flex! border-e border-gray-300! w-1/4">
+            <p-select
+              [options]="periodOptions"
+              formControlName="fromDate"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="كل المرتجعات"
+              class="h-full w-32 border-none! shadow-none! bg-transparent! *:py-0!"
+            />
+          </p-inputgroup-addon>
+
           <input
             class="w-full bg-transparent! text-dark-line!"
             pInputText
@@ -18,17 +29,8 @@
             formControlName="searchTerm"
             placeholder="بحث"
           />
-          <p-inputgroup-addon class="hidden! sm:flex! border-e border-e-gray-300!">
-            <p-select
-              [options]="periodOptions"
-              formControlName="fromDate"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="كل المرتجعات"
-              class="h-full w-32 border-none!  shadow-none! bg-transparent! *:py-0!"
-            />
-          </p-inputgroup-addon>
-          <p-inputgroup-addon class="border-e border-e-gray-300!">
+
+          <p-inputgroup-addon>
             <div class="relative flex items-center justify-center">
               <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
               <p-menu
@@ -43,7 +45,12 @@
           </p-inputgroup-addon>
 
           <p-inputgroup-addon>
-            <button class="cursor-pointer flex" type="submit">
+            <button
+              pButton
+              class="cursor-pointer flex gap-3 px-4 h-full py-0! app-p-btn rounded-e-md!"
+              (click)="onSubmit()"
+            >
+              <span>بحث</span>
               <i class="pi pi-search"></i>
             </button>
           </p-inputgroup-addon>

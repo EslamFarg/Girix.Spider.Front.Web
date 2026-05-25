@@ -1,6 +1,8 @@
 <!-- Table -->
 <p-dialog
-  [(visible)]="printerService.isPrinterDialogVisible"
+  [visible]="printerService.isPrinterDialogVisible()"
+  (visibleChange)="printerService.isPrinterDialogVisible.set($event)"
+  (onShow)="visibleChange(true)"
   [modal]="true"
   [dismissableMask]="true"
   [style]="{ width: '80%', maxWidth: '300px' }"
@@ -8,7 +10,6 @@
   styleClass="bg-text-lighter!"
   class="addition-dialog"
   [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
-  (visibleChange)="visibleChange($event)"
 >
   <ng-template #header>
     <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الطابعة</p>

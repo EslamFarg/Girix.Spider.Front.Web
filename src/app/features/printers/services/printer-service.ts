@@ -2,7 +2,7 @@ import { IElectonPrintOptions, IElectronPrintJob, IElectronPrinter } from '@/app
 import { BaseCrudService } from '@/core/services/BaseCrudService';
 import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
 import BaseService from '@/core/services/BaseService';
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import {
   IPrinterCreateRequest,
   IPrinterReadResponse,
@@ -41,7 +41,7 @@ export class PrinterService extends BaseSearchAndCrudService<
   IPrinterReadResponse
 > {
   override apiRoute = 'Printer';
-  isPrinterDialogVisible = false;
+  isPrinterDialogVisible = signal(false);
   printOptions: IAppPrintOptions | null = null;
   /** When set, contains pre-grouped print jobs (one per printer) */
   printJobsQueue: IPrintOrderOption[] | null = null;
@@ -60,17 +60,17 @@ export class PrinterService extends BaseSearchAndCrudService<
   openPrinterDialog(opts: IAppPrintOptions) {
     this.printOptions = opts;
     this.printJobsQueue = null;
-    this.isPrinterDialogVisible = true;
+    this.isPrinterDialogVisible.set(true);
   }
 
   openPrinterDialogWithJobs(jobs: IPrintOrderOption[]) {
     this.printOptions = null;
     this.printJobsQueue = jobs;
-    this.isPrinterDialogVisible = true;
+    this.isPrinterDialogVisible.set(true);
   }
 
   closePrinterDialog() {
-    this.isPrinterDialogVisible = false;
+    this.isPrinterDialogVisible.set(false);
     this.printOptions = null;
     this.printJobsQueue = null;
   }

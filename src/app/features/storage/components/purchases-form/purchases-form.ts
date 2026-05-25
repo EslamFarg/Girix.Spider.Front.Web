@@ -26,6 +26,7 @@ import { OrderPaymentType } from '@/features/orders';
 import { SupplierService } from '../../services/supplier-service';
 import { ISupplierReadResponse } from '../../types/api/supplier/responses';
 import { AllowNumbers } from '@/directives/allow-numbers';
+import { DecimalMask } from '@/directives/decimal-mask';
 import { ImgOnly } from '@/directives/img-only';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import {
@@ -36,6 +37,7 @@ import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { date } from '@primeuix/themes/aura/datepicker';
 
 interface IAppPurchaseItem {
   menuItemsId: number | null;
@@ -63,6 +65,7 @@ type IAppPurchaseItemControls = ControlsOf<IAppPurchaseItem>;
     ReactiveFormsModule,
     Debounce,
     AllowNumbers,
+    DecimalMask,
     ImgOnly,
     NgSelectComponent,
     TranslatePipe,
@@ -87,7 +90,7 @@ export class PurchasesForm extends BaseComponent {
   initialFormValue = {
     // المرجع
     referenceNumber: this.fb.control<string | null>(null, [
-      Validators.required,
+    //   Validators.required,
       Validators.maxLength(16),
       onlyNumbersOrEnLettersAllowed,
     ]),
@@ -95,7 +98,7 @@ export class PurchasesForm extends BaseComponent {
     invoiceNumber: this.fb.control<string | null>({ value: null, disabled: true }, []),
     paymentType: this.fb.control<number | null>(OrderPaymentType.Paid, [Validators.required]),
     invoiceDate: this.fb.control<Date | string | null>(new Date(), [Validators.required]),
-    notes: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(1000)]),
+    notes: this.fb.control<string | null>(null, [ Validators.maxLength(1000)]),
     items: this.fb.array<FormGroup<IAppPurchaseItemControls>>([], [Validators.required, Validators.minLength(1)]),
     //
     supplierId: this.fb.control<number | null>(null, [Validators.required]),
@@ -156,15 +159,14 @@ export class PurchasesForm extends BaseComponent {
 
   fgItemsListener = this.fg.controls.items.valueChanges.subscribe({
     next: (data) => {
-      const total = data?.reduce((acc, item) => {
-        const itemPrice = (item?.purchasePrice ?? 0) + (item?.taxAmount ?? 0);
-        const total = itemPrice * (item?.quantity ?? 0);
-        return acc + (total ?? 0);
-      }, 0);
-
-      this.net.set(+(total?.toFixed(2) ?? 0));
+      this.updateNet();
     },
   });
+
+  updateNet = () => {
+    const total = this.fg.controls.items.value?.reduce((acc, item) => acc + (item.total ?? 0), 0);
+    this.net.set(+(total ?? 0));
+  };
 
   net = signal(0);
 
@@ -251,10 +253,11 @@ export class PurchasesForm extends BaseComponent {
               this.fb.array(
                 data.items.map((item) => {
                   this.getProductUnits(item.menuItemsId);
-                  return this.createItemFg(item as any);
+                  return this.createItemFg({ ...item, taxAmount: item.taxAmount / item.quantity } as any);
                 }),
               ),
             );
+            this.updateNet();
           },
         });
         break;
@@ -288,18 +291,20 @@ export class PurchasesForm extends BaseComponent {
     // if (this.currentSupplier()!.id !== this.fg.value.supplierId) {
     //   return this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'المورد غير متطابق' });
     // }
+    const fgValue = this.fg.getRawValue();
     console.log(this.fg.getRawValue());
     //collect data to send
     let data = {
       ...this.fg.getRawValue(),
-      cashAmount: +(this.fg.value.cashAmount || 0),
-      networkAmount: +(this.fg.value.networkAmount || 0),
-      invoiceDate: this.UtcToLocalIso((this.fg.value.invoiceDate as Date)!.toISOString()),
-      items: this.fg.value.items?.map((item: any) => ({
+      cashAmount: +(fgValue.cashAmount || 0).toFixed(2),
+      networkAmount: +(fgValue.networkAmount || 0).toFixed(2),
+      invoiceDate: this.UtcToLocalIso((fgValue.invoiceDate as Date)!.toISOString()),
+      items: fgValue.items?.map((item: any) => ({
         ...item,
         quantity: +item.quantity,
-        taxAmount: +item.taxAmount *item.quantity,
-        purchasePrice: (+item.purchasePrice + +item.taxAmount) *item.quantity,
+        taxAmount: +(item.taxAmount * item.quantity).toFixed(2),
+        salePrice: +item.salePrice.toFixed(2),
+        purchasePrice: +item.purchasePrice.toFixed(2),
       })),
     };
 
@@ -513,16 +518,18 @@ export class PurchasesForm extends BaseComponent {
   };
   previousUnitSearchValue = '';
 
-  getProductUnits(productId: number) {
+  getProductUnits(productId: number, fg: FormGroup<IAppPurchaseItemControls> = this.newPurchaseItemRowFg) {
+    console.log('getProductUnits', productId);
     if (!this.units.has(productId)) {
       const unitsSignal = signal<IProductUnit[]>([]);
       this.units.set(productId, unitsSignal);
       this.productService.getUnitsByProductId(productId).subscribe({
         next: (res) => {
           unitsSignal.set(res);
-          this.newPurchaseItemRowFg.patchValue({ unitId: res[0].unitId });
+          fg.patchValue({ unitId: res[0]?.unitId });
         },
       });
+      console.log('unitsSignal', unitsSignal);
       return unitsSignal;
     } else {
       return this.units.get(productId)!;
@@ -585,7 +592,7 @@ export class PurchasesForm extends BaseComponent {
   newPurchaseItemRowFg!: FormGroup<IAppPurchaseItemControls>;
 
   createItemFg(data?: IAppPurchaseItem) {
-    return this.fb.group<IAppPurchaseItemControls>({
+    const fg = this.fb.group<IAppPurchaseItemControls>({
       menuItemsId: this.fb.control<number | null>(data?.menuItemsId ?? null, [Validators.required]),
       unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
       quantity: this.fb.control<number | null>(data?.quantity ?? null, [Validators.required, Validators.min(1)]),
@@ -594,10 +601,32 @@ export class PurchasesForm extends BaseComponent {
         Validators.min(1),
       ]),
       salePrice: this.fb.control<number | null>(data?.salePrice ?? null, [Validators.required, Validators.min(1)]),
-      total: this.fb.control<number | null>(data?.total ?? null, []),
+      total: this.fb.control<number | null>(this.calculateItemTotal(data).total ?? null, []),
       taxAmount: this.fb.control<number | null>(data?.taxAmount ?? null, [Validators.required, Validators.min(0)]),
-      taxPercentage: this.fb.control<number | null>(data?.taxPercentage ?? null, []),
+      taxPercentage: this.fb.control<number | null>(data?.taxPercentage ?? -1, []),
     });
+    fg.valueChanges.subscribe({
+      next: (values) => {
+        const { total, taxAmount } = this.calculateItemTotal(values);
+        fg.patchValue({ total, taxAmount }, { emitEvent: false });
+        //trigger main fg value changes listener
+        this.fg.updateValueAndValidity();
+      },
+    });
+    return fg;
+  }
+
+  calculateItemTotal(data?: Partial<IAppPurchaseItem>) {
+    const taxPercentage = data?.taxPercentage === -1 ? 0 : (data?.taxPercentage ?? 0);
+    const applyTaxAmountDirectly = taxPercentage === 0;
+    const purchasePrice = data?.purchasePrice ?? 0;
+    const priceWithTax = applyTaxAmountDirectly
+      ? purchasePrice + (data?.taxAmount ?? 0)
+      : purchasePrice * (1 + taxPercentage / 100);
+    const quantity = data?.quantity ?? 0;
+    const taxAmount = priceWithTax - purchasePrice;
+    const total = priceWithTax * quantity;
+    return { total, taxAmount };
   }
 
   setUpNewPurchaseDetailRowFg() {
@@ -621,7 +650,7 @@ export class PurchasesForm extends BaseComponent {
     }
 
     const _fgValue = this.newPurchaseItemRowFg.value;
-    const fgValue = { ..._fgValue, taxPercentage: (_fgValue?.taxAmount ?? 0) / (_fgValue?.quantity ?? 0) };
+    const fgValue = { ..._fgValue };
 
     this.fg.controls.items!.push(this.createItemFg(fgValue as IAppPurchaseItem));
 
@@ -642,18 +671,26 @@ export class PurchasesForm extends BaseComponent {
     console.log(this.fg.value);
   }
 
-  onCurrentItemChange(item: IProductSearchRow) {
-    this.newPurchaseItemRowFg.controls.menuItemsId.setValue(item.id);
-    this.newPurchaseItemRowFg.controls.unitId.setValue(null);
-    console.log(item);
-    this.newPurchaseItemRowFg.patchValue({
+  onItemChange(item: IProductSearchRow, fg: FormGroup<IAppPurchaseItemControls>) {
+    const purchasePrice = item.costPrice / (1 + item.tax / 100);
+    const { total, taxAmount } = this.calculateItemTotal({
       quantity: 1,
-      salePrice: +item.costPrice.toFixed(2),
-      purchasePrice: +item.price.toFixed(2),
-      taxAmount: +((item.tax / 100) * item.costPrice).toFixed(2),
-      // total: item.costPrice+(item.tax/100 * item.costPrice),
+      salePrice: +item.priceWithTax,
+      purchasePrice: +purchasePrice,
+      taxAmount: +(item.costPrice - purchasePrice),
+      taxPercentage: item.tax,
     });
-    this.getProductUnits(item.id);
+    fg.patchValue({
+      unitId: null,
+      menuItemsId: item.id,
+      quantity: 1,
+      salePrice: +item.priceWithTax,
+      purchasePrice: +purchasePrice,
+      taxAmount,
+      taxPercentage: item.tax,
+      total,
+    });
+    this.getProductUnits(item.id, fg);
   }
   //
   //

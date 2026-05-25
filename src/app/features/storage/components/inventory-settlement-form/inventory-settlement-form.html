@@ -3,7 +3,7 @@
     <div [formGroup]="inventoryBulkSearchFg" class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 my-4">
       <div>
         <label for="settlementNumber">رقم التسوية</label>
-        <app-input-error-message-handler  >
+        <app-input-error-message-handler>
           <input
             type="number"
             [disabled]="true"
@@ -176,7 +176,7 @@
       <thead>
         <tr>
           <th class="min-w-12.5 w-12.5">#</th>
-          <th> المنتج</th>
+          <th>المنتج</th>
           <th>الوحدة</th>
           <th>الكمية بالنظام</th>
           <th>الكمية الفعلية</th>
@@ -229,17 +229,20 @@
           </td>
 
           <td>
-            <div>{{ newInventorySettlementItemRowFg.get('systemQuantity')?.value }}</div>
+            <div>{{ newInventorySettlementItemRowFg.value.systemQuantity }}</div>
           </td>
 
           <td>
-            <app-input-error-message-handler [grouped]="false" [fc]="newInventorySettlementItemRowFg.get('actualQuantity')">
+            <app-input-error-message-handler
+              [grouped]="false"
+              [fc]="newInventorySettlementItemRowFg.get('actualQuantity')"
+            >
               <input
                 pInputText
                 type="number"
                 appAllowNumbers
                 [allowDecimal]="true"
-                [formControl]="getFormControl(newInventorySettlementItemRowFg, 'actualQuantity')"
+                [formControl]="newInventorySettlementItemRowFg.controls.actualQuantity"
                 class="app-input text-center"
                 aria-describedby="new-actualQuantity-help"
                 placeholder="0.00"
@@ -247,7 +250,16 @@
             </app-input-error-message-handler>
           </td>
 
-          <td></td>
+          <td>
+            <div>
+              {{
+                Math.abs(
+                  (newInventorySettlementItemRowFg?.value?.actualQuantity ?? 0) -
+                    (newInventorySettlementItemRowFg?.value?.systemQuantity ?? 0)
+                )
+              }}
+            </div>
+          </td>
 
           <td>
             <p-button
@@ -266,10 +278,6 @@
           >
             <td class="min-w-12.5 w-12.5" [class.disabled]="!isInventorySettlementRowEditable($index)">
               {{ $index + 1 }}
-            </td>
-
-            <td class="overflow-visible!" [class.disabled]="!isInventorySettlementRowEditable($index)">
-              <div>{{ item.get('itemId')?.value }}</div>
             </td>
 
             <td class="overflow-visible!" [class.disabled]="!isInventorySettlementRowEditable($index)">
@@ -363,7 +371,9 @@
         </button>
         @switch (currentFormMode()) {
           @case (FormMode.Update) {
-            <a pButton appLoadingDisabled class="app-p-btn py-1! flex-1 md:flex-none md:px-8!" variant="outlined"> جديد </a>
+            <a pButton appLoadingDisabled class="app-p-btn py-1! flex-1 md:flex-none md:px-8!" variant="outlined">
+              جديد
+            </a>
           }
         }
       </div>

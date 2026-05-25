@@ -86,6 +86,13 @@ export class Tables extends BaseComponent {
         );
       }
     });
+
+    effect(() => {
+      const lastId = this.collectionsService.lastCollectedId();
+      if (lastId != null) {
+        this.searchTables(1);
+      }
+    });
   }
 
   periodOptions = [

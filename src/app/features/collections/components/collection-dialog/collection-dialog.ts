@@ -115,6 +115,7 @@ export class CollectionDialog extends BaseComponent {
   }
 
   closeCollectionInvoiceDialog() {
+    this.checkedOrderIds.set([]);
     this.collectionsService.closeCollectionInvoiceDialog();
   }
 
@@ -166,6 +167,7 @@ export class CollectionDialog extends BaseComponent {
         next: (value) => {
           this.closeCollectionInvoiceDialog();
           this.collectionsService.lastCollectedId.set(value.id);
+          this.collectionsService.collectionCompleted$.next();
           const orderId = this.collectionsService.currentOrderId();
           if (orderId != null) {
             this.collectionsService.collectedOrderIds.set([orderId]);
@@ -183,6 +185,7 @@ export class CollectionDialog extends BaseComponent {
           next: (value) => {
             this.closeCollectionInvoiceDialog();
             this.collectionsService.lastCollectedId.set(value.id);
+            this.collectionsService.collectionCompleted$.next();
             this.optimisticallyMarkOrdersAsCollected(this.checkedOrderIds());
             this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
           },
@@ -194,6 +197,7 @@ export class CollectionDialog extends BaseComponent {
           next: (value) => {
             this.closeCollectionInvoiceDialog();
             this.collectionsService.lastCollectedId.set(value.id);
+            this.collectionsService.collectionCompleted$.next();
             this.optimisticallyMarkOrdersAsCollected(this.checkedOrderIds());
             this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
           },

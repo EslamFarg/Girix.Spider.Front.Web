@@ -13,7 +13,7 @@
     @case (FormMode.Update) {
       <a
         pButton
-        routerLink="/storage/purchases"
+        routerLink="/storage/purchases/add"
         class="app-p-btn py-1! flex-1 md:flex-none md:px-8!"
         variant="outlined"
       >
@@ -310,7 +310,7 @@
             bindLabel="name"
             [formControl]="getFormControl(newPurchaseItemRowFg, 'menuItemsId')"
             bindValue="id"
-            (change)="onCurrentItemChange($event)"
+            (change)="onItemChange($event, newPurchaseItemRowFg)"
             placeholder="الكل"
             [clearable]="false"
             #newPurchaseItemSearchByName
@@ -361,6 +361,8 @@
           <input
             pInputText
             appAllowNumbers
+            appDecimalMask
+            [allowDecimal]="true"
             type="number"
             [defaultChecked]="true"
             [min]="0"
@@ -380,6 +382,8 @@
             type="number"
             id="purchasePrice"
             appAllowNumbers
+            appDecimalMask
+            [allowDecimal]="true"
             [defaultChecked]="true"
             [min]="0"
             [formControl]="getFormControl(newPurchaseItemRowFg, 'purchasePrice')"
@@ -403,12 +407,7 @@
       <td>
         <div class="app-input flex justify-center items-center" pInputText>
           <span class="disabled">
-            {{
-              (
-                +((newPurchaseItemRowFg.value.purchasePrice ?? 0) + (newPurchaseItemRowFg.value.taxAmount ?? 0)) *
-                +(newPurchaseItemRowFg.value.quantity ?? 0)
-              ).toFixed(2)
-            }}
+            {{ (+(newPurchaseItemRowFg.value.total ?? 0)).toFixed(2) }}
           </span>
         </div>
       </td>
@@ -438,6 +437,7 @@
               bindLabel="name"
               bindValue="id"
               placeholder="الكل"
+              (change)="onItemChange($event, item)"
               [clearable]="false"
               #printerSelect2
               appDebounce
@@ -454,9 +454,9 @@
           <app-input-error-message-handler [grouped]="false" [fc]="item.get('unitId')">
             <ng-select
               class="app-select"
-              [items]="units.get(item.get('menuItemsId')!.value!)!()"
-              (open)="getProductUnits(item.get('menuItemsId')?.value ?? 0)()"
-              [formControl]="getFormControl(item, 'unitId')"
+              [items]="units.get(item.value.menuItemsId ?? 0)!()"
+              (open)="getProductUnits(item.value.menuItemsId ?? 0)()"
+              [formControl]="item.controls.unitId"
               bindLabel="unitName"
               bindValue="unitId"
               placeholder="الكل"
@@ -486,6 +486,7 @@
               pInputText
               type="number"
               appAllowNumbers
+              appDecimalMask
               [allowDecimal]="true"
               id="creditorAmount"
               [formControl]="getFormControl(item, 'salePrice')"
@@ -502,6 +503,7 @@
             <input
               pInputText
               appAllowNumbers
+              appDecimalMask
               [allowDecimal]="true"
               type="number"
               id="creditorAmount"
@@ -525,12 +527,7 @@
         <td class="" [class.disabled]="!isRowEditable($index)">
           <div class="app-input flex justify-center items-center" pInputText>
             <span class="disabled">
-              {{
-                (
-                  (+(item.get('purchasePrice')?.value ?? 0) + +(item.get('taxAmount')?.value ?? 0)) *
-                  +(item.get('quantity')?.value ?? 0)
-                ).toFixed(2)
-              }}
+              {{ (+(item.value.total ?? 0)).toFixed(2) }}
             </span>
           </div>
         </td>
@@ -587,6 +584,7 @@
         [placeholder]="'FORM.CASH' | translate"
         [formControl]="getFormControl(fg, 'cashAmount')"
         appAllowNumbers
+        appDecimalMask
         [min]="0"
         [max]="net()"
         [allowDecimal]="true"
@@ -595,6 +593,16 @@
         appDebounce
         class="app-input"
       />
+      <p-inputgroup-addon class="flex p-0!">
+        <button
+          pButton
+          class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
+          type="button"
+          (click)="fg.controls.cashAmount.setValue(0)"
+        >
+          <i class="pi pi-arrow-down"></i>
+        </button>
+      </p-inputgroup-addon>
     </app-input-error-message-handler>
   </div>
 
@@ -629,6 +637,7 @@
         pInputText
         type="number"
         appAllowNumbers
+        appDecimalMask
         [allowDecimal]="true"
         [min]="0"
         [max]="net()"
@@ -639,6 +648,16 @@
         [placeholder]="'FORM.NETWORK' | translate"
         class="app-input"
       />
+      <p-inputgroup-addon class="flex p-0!">
+        <button
+          pButton
+          class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
+          type="button"
+          (click)="fg.controls.networkAmount.setValue(0)"
+        >
+          <i class="pi pi-arrow-up"></i>
+        </button>
+      </p-inputgroup-addon>
     </app-input-error-message-handler>
   </div>
 

@@ -16,11 +16,20 @@ import { IDeliveryFgControls } from './types';
 import { DeliveryService, IDeliveryReadResponse } from '../../services/delivery-service';
 import { IFormImage } from '@/yn-ng/types/forms/IFormImage';
 import { TranslatePipe } from '@ngx-translate/core';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 
 @Component({
   selector: 'app-delivery-man-form',
-  imports: [Button, InputErrorMessageHandler, InputText, Textarea, ReactiveFormsModule, ButtonDirective, TranslatePipe, LoadingDisabledDirective],
+  imports: [
+    Button,
+    InputErrorMessageHandler,
+    InputText,
+    Textarea,
+    ReactiveFormsModule,
+    ButtonDirective,
+    TranslatePipe,
+    LoadingDisabledDirective,
+  ],
   templateUrl: './delivery-man-form.html',
   styleUrl: './delivery-man-form.css',
 })
@@ -41,7 +50,7 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
     nameAr: this.fb.control(null, [
       Validators.required,
       noSymbolsAllowed,
-      onlyArLettersAllowed,
+    //   onlyArLettersAllowed,
       Validators.minLength(2),
       Validators.maxLength(100),
     ]),
@@ -145,7 +154,11 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
 
     switch (this.formMode()) {
       case FormMode.Create:
-        this.deliveryService.create(formData).subscribe();
+        this.deliveryService.create(formData).subscribe({
+          next: () => {
+            this.router.navigateByUrl('/classes/deliveries');
+          },
+        });
         break;
       case FormMode.Update:
         // formData.append('images','');
@@ -158,7 +171,11 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
           });
         }
         console.log(formData);
-        this.deliveryService.put(formData).subscribe();
+        this.deliveryService.put(formData).subscribe({
+          next: () => {
+            this.router.navigateByUrl('/classes/deliveries');
+          },
+        });
         break;
     }
   }

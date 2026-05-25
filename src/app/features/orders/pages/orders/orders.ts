@@ -10,7 +10,7 @@ import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { IOrderBillReadResponse, IOrderSearchRow, OrderPaymentType, OrderSearchEnum, OrderService } from '@/features/orders';
 import { DatePipe } from '@angular/common';
 import { Menu } from 'primeng/menu';
-import { Button } from 'primeng/button';
+import { Button, ButtonDirective } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
 import { PrinterService, IPrintOrderOption, AppPrinterType } from '@/features/printers';
@@ -40,7 +40,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     Dialog,
     FormControlNotifier,
     PrintableOrderInvoice,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    ButtonDirective
 ],
   templateUrl: './orders.html',
   styleUrl: './orders.css',

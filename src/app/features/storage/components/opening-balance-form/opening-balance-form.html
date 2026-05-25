@@ -66,7 +66,7 @@
   <!-- الرقم الدفتري-->
   <div>
     <label for="costPrice">الرقم الدفتري</label>
-    <app-input-error-message-handler>
+    <app-input-error-message-handler [fc]="fg.controls.referenceNumber">
       <input
         pInputText
         type="text"
@@ -125,7 +125,7 @@
   <!-- البيان -->
   <div class="col-span-4">
     <label for="productName">البيان</label>
-    <app-input-error-message-handler [grouped]="false">
+    <app-input-error-message-handler [grouped]="false" [fc]="fg.controls.notes">
       <textarea
         class="block w-full"
         rows="5"

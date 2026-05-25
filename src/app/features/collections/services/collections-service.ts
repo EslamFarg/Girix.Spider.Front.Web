@@ -1,6 +1,7 @@
 import BaseService from '@/core/services/BaseService';
 import { IOrderBillReadResponse, IOrderReadResponse, OrderLocationType, OrderService } from '@/features/orders';
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { Subject } from 'rxjs';
 
 export interface ICollectionRequest {
   orderId: number;
@@ -53,6 +54,7 @@ export class CollectionsService extends BaseService {
   currentDeliveryOrders = signal<IDeliveryOrder[]>([]);
   orderService = inject(OrderService);
   lastCollectedId = signal<number | null>(null);
+  collectionCompleted$ = new Subject<void>();
   currentOrderType = signal<OrderLocationType | null>(null);
   currentDeliveryId = signal<number | null>(null);
   currentOrderId = signal<number | null>(null);
@@ -98,6 +100,7 @@ export class CollectionsService extends BaseService {
       case OrderLocationType.CompanyDelivery:
         this.getOrdersForCompany(opts.deliveryId!).subscribe({
           next: (orders) => {
+            console.log("fetched CompanyDelivery orders",orders);
             this.currentDeliveryOrders.set(orders);
           },
         });

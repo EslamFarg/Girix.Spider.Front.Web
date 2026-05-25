@@ -70,7 +70,7 @@ export class CollectiveReceiptForm extends BaseComponent {
     debitAccountId: this.fb.control<number | null>(null, [Validators.required]),
     isHasTax: this.fb.control<boolean>(false, []),
     paymentMethod: this.fb.control<string | null>('cash', []),
-    notes: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(1000)]),
+    notes: this.fb.control<string | null>(null, [Validators.required, Validators.minLength(2), Validators.maxLength(1000)]),
     items: this.fb.array<FormGroup<IAppReceiptVoucherItemControls>>([], [Validators.required, Validators.minLength(1)]),
   };
   fg = this.fb.group(this.initialFormValue);

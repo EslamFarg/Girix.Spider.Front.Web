@@ -71,12 +71,12 @@ export class OpeningBalanceForm extends BaseComponent {
     referenceNumber: this.fb.control<string | null>(null, [
       Validators.required,
       Validators.maxLength(16),
-      onlyNumbersOrEnLettersAllowed,
+      onlyNumbersAllowed,
     ]),
     // الرقم الفاتورة
     invoiceNumber: this.fb.control<string | null>({ value: null, disabled: true }, []),
     date: this.fb.control<Date | null>(new Date(), [Validators.required]),
-    notes: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(1000)]),
+    notes: this.fb.control<string | null>(null, [  Validators.maxLength(1000)]),
     items: this.fb.array<FormGroup<IAppOpeningBalanceItemControls>>([], [Validators.required, Validators.minLength(1)]),
   };
   fg = this.fb.group(this.initialFormValue);

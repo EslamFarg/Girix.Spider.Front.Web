@@ -1,14 +1,12 @@
 import { BaseComponent } from '@/components';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Dialog } from 'primeng/dialog';
- import { IPrinterSearchRow, PrinterType,PrinterSearchEnum, PrinterService, AppPrinterType } from '../..';
+import { IPrinterSearchRow, PrinterType, PrinterSearchEnum, PrinterService, AppPrinterType } from '../..';
 import { ButtonDirective } from 'primeng/button';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IPrinterSettingsReadResponse, PrinterSettingsService } from '../../services/printer-settings-service';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
-
- 
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 
 export interface IAppPrinter extends IPrinterSearchRow {
   appPrinterType: AppPrinterType;
@@ -29,8 +27,8 @@ export class PrintDialog extends BaseComponent {
   closePrinterDialog = this.printerService.closePrinterDialog;
 
   printerItems = computed<IAppPrinter[]>(() => {
-    const printers=this.printerSettings();
-    
+    const printers = this.printerSettings();
+
     if (!printers) {
       return [];
     }
@@ -45,7 +43,9 @@ export class PrintDialog extends BaseComponent {
    */
   constructor() {
     super();
-    this.printerSettingsService.getSettings().subscribe((res) => this.printerSettings.set(res));
+    this.printerSettingsService.getSettings().subscribe({
+      next: (res) => this.printerSettings.set(res),
+    });
   }
 
   printers = signal<IPrinterSearchRow[]>([]);
@@ -68,13 +68,18 @@ export class PrintDialog extends BaseComponent {
     }
 
     console.log('--- PrintDialog.print ---');
-    console.log('Selected printers:', this.selectedPrinters().map(p => ({ type: p.appPrinterType, name: p.name, id: p.id })));
+    console.log(
+      'Selected printers:',
+      this.selectedPrinters().map((p) => ({ type: p.appPrinterType, name: p.name, id: p.id })),
+    );
 
     // If pre-grouped print jobs are queued, filter by selected printer types
     const queuedJobs = this.printerService.printJobsQueue;
     if (queuedJobs && queuedJobs.length > 0) {
       console.log(`Queued jobs: ${queuedJobs.length}`);
-      queuedJobs.forEach((j, i) => console.log(`  Queued ${i}: type=${j.printer.appPrinterType}, printer=${j.printer.name} (id=${j.printer.id})`));
+      queuedJobs.forEach((j, i) =>
+        console.log(`  Queued ${i}: type=${j.printer.appPrinterType}, printer=${j.printer.name} (id=${j.printer.id})`),
+      );
 
       const selectedTypes = new Set(this.selectedPrinters().map((p) => p.appPrinterType));
       console.log('Selected types:', [...selectedTypes]);
@@ -86,7 +91,11 @@ export class PrintDialog extends BaseComponent {
       if (filteredOptions.length > 0) {
         this.printerService.printOrder(filteredOptions);
       } else {
-        this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا توجد عناصر مطابقة للطابعات المحددة' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'خطأ',
+          detail: 'لا توجد عناصر مطابقة للطابعات المحددة',
+        });
       }
       this.printerService.closePrinterDialog();
       return;
@@ -106,6 +115,7 @@ export class PrintDialog extends BaseComponent {
 
 
   visibleChange(isVisible:boolean) {
-    this.printerSettingsService.getSettings().subscribe((res) => this.printerSettings.set(res));
+    console.log('print visibleChange', isVisible);
+    this.printerSettingsService.getSettings().subscribe({next: (res) => this.printerSettings.set(res)});
   }
 }

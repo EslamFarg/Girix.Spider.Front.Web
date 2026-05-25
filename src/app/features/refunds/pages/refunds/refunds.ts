@@ -14,6 +14,7 @@ import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { RouterLink } from "@angular/router";
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { ButtonDirective } from "primeng/button";
 
 @Component({
   imports: [
@@ -28,7 +29,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     Menu,
     Debounce,
     RouterLink,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    ButtonDirective
 ],
   templateUrl: './refunds.html',
   styleUrl: './refunds.css',

@@ -1,5 +1,5 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { CollectionsService } from '../../services/collections-service';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
@@ -43,7 +43,7 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
   templateUrl: './deliveries.html',
   styleUrl: './deliveries.css',
 })
-export class Deliveries extends BaseComponent {
+export class Deliveries extends BaseComponent implements OnInit, OnDestroy {
   OrderLocationType = OrderLocationType;
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
@@ -78,6 +78,19 @@ export class Deliveries extends BaseComponent {
         );
       }
     });
+  }
+
+  collectionSub?: ReturnType<typeof this.collectionsService.collectionCompleted$.subscribe>;
+
+  ngOnInit() {
+    this.collectionSub = this.collectionsService.collectionCompleted$.subscribe(() => {
+      this.searchDeliverys(1);
+    });
+  }
+
+  override ngOnDestroy() {
+    this.collectionSub?.unsubscribe();
+    super.ngOnDestroy();
   }
 
   companyFilter = [

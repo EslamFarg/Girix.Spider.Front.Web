@@ -61,7 +61,7 @@ export class GroupForm extends BaseComponent implements OnInit {
     ]),
     isOnCasher: this.fb.control(false, []),
     printerId: this.fb.control(null, [Validators.required]),
-    description: this.fb.control<string>('', [Validators.required]),
+    description: this.fb.control<string>('', []),
     images: this.fb.control<File[]>([], []),
     //
     //

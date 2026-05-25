@@ -1,7 +1,7 @@
 import { BaseComponent, IPaginationInfo, SectionWrapper } from '@/components';
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
 import { ICustomerSearchRow } from '@/features/customers/services/customer-types';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -33,7 +33,7 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
   templateUrl: './company-deliveries.html',
   styleUrl: './company-deliveries.css',
 })
-export class CompanyDeliveries extends BaseComponent {
+export class CompanyDeliveries extends BaseComponent implements OnInit, OnDestroy {
     OrderLocationType = OrderLocationType;
   
   initialFormValue = {
@@ -60,6 +60,19 @@ export class CompanyDeliveries extends BaseComponent {
         );
       }
     });
+  }
+
+  collectionSub?: ReturnType<typeof this.collectionsService.collectionCompleted$.subscribe>;
+
+  ngOnInit() {
+    this.collectionSub = this.collectionsService.collectionCompleted$.subscribe(() => {
+      this.searchCustomers(1);
+    });
+  }
+
+  override ngOnDestroy() {
+    this.collectionSub?.unsubscribe();
+    super.ngOnDestroy();
   }
   customersService = inject(CustomerService);
 

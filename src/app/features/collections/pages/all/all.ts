@@ -455,6 +455,17 @@ export class All extends BaseComponent {
         );
       }
     });
+
+    effect(() => {
+      const lastId = this.collectionsService.lastCollectedId();
+      if (lastId != null) {
+        this.searchOrders(1);
+        this.searchHuts(1);
+        this.searchRooms(1);
+        this.searchTables(1);
+        this.searchDeliveries(1);
+      }
+    });
   }
 
   periodOptions = [

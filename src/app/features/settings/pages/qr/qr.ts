@@ -20,7 +20,9 @@ export class Qr extends BaseComponent {
 
   backendApiUrl = BaseService.getResolvedApiBaseUrl().replace('/v1', '');
 
-  get encryptedValue() {
+  encryptedValue: string = '';
+
+  ngAfterViewInit() {
     const activationCode = this.authService.get<string>('activationToken');
     const expireDate = this.authService.get<string>('expireDate');
     const crmEmail = this.authService.get<string>('crmEmail');
@@ -28,9 +30,10 @@ export class Qr extends BaseComponent {
       link: this.backendApiUrl ?? '',
       expiryDate: expireDate ?? '',
       cloudIdActivation: activationCode ?? '',
-      crmEmail: crmEmail ?? '',
+      email: crmEmail ?? '',
     });
-    return this.cryptoService.encrypt(value);
+    console.log(value);
+    this.encryptedValue = this.cryptoService.encrypt(value);
   }
 
   copyUrl() {

@@ -94,7 +94,7 @@ export class JournalForm extends BaseComponent {
       Validators.maxLength(7),
     ]),
     voucherDate: this.fb.control<Date | null>(new Date(), [Validators.required]),
-    notes: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(1000)]),
+    notes: this.fb.control<string | null>(null, [ Validators.maxLength(1000)]),
     items: this.fb.array<FormGroup<IAppJournalItemControls>>([], [Validators.required, Validators.minLength(1)]),
   };
   fg = this.fb.group(this.initialFormValue);
@@ -399,7 +399,7 @@ export class JournalForm extends BaseComponent {
     const fg = this.fb.group<IAppJournalItemControls>({
       creditorAmount: this.fb.control<number>(data?.creditorAmount ?? 0, [Validators.required,onlyNumbersOrDotAllowed]),
       debtorAmount: this.fb.control<number>(data?.debtorAmount ?? 0, [Validators.required,onlyNumbersOrDotAllowed]),
-      notes: this.fb.control<string | null>(data?.notes ?? null, [Validators.required, Validators.maxLength(1000)]),
+      notes: this.fb.control<string | null>(data?.notes ?? null, [  Validators.maxLength(1000)]),
       finincalAccountId: this.fb.control<number | null>(data?.finincalAccountId ?? null, [Validators.required]),
     });
 
