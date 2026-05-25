@@ -18,7 +18,18 @@
             formControlName="searchTerm"
             placeholder="بحث"
           />
-          <p-inputgroup-addon>
+          <p-inputgroup-addon class="hidden! sm:flex! border-e border-e-gray-300!">
+            <p-select
+              [options]="periodOptions"
+              formControlName="fromDate"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="كل الطلبات"
+              class="h-full w-32 border-none!  shadow-none! bg-transparent! *:py-0!"
+            />
+          </p-inputgroup-addon>
+
+          <p-inputgroup-addon class="border-e border-e-gray-300!">
             <div class="relative flex items-center justify-center">
               <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
               <p-menu
@@ -39,15 +50,6 @@
           </p-inputgroup-addon>
         </app-input-error-message-handler>
       </div>
-
-      <p-select
-        [options]="periodOptions"
-        formControlName="fromDate"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="كل الطلبات"
-        class="h-fit hidden! sm:flex! w-40"
-      />
     </form>
 
     <!-- Table -->
@@ -95,50 +97,27 @@
 
     <div class="mt-4 flex items-center justify-between">
       <p-paginator
-      (onPageChange)="onPageChange($event)"
-      [first]="(ordersPaginationInfo().pageIndex - 1) * 10"
-      [rows]="10"
-      [totalRecords]="ordersPaginationInfo().totalRowsCount"
-    />
-    <!-- Selected Delivery + Save Section -->
-    @if (selectedDelivery(); as delivery) {
-      <div class="mt-4 p-3 bg-form-bg rounded-lg flex items-center gap-4 flex-wrap">
-        <div class="flex items-center gap-2">
-          <span class="text-text-gray text-sm">الدليفري المختار:</span>
-          <span class="text-white font-bold">{{ delivery.name }}</span>
+        (onPageChange)="onPageChange($event)"
+        [first]="(ordersPaginationInfo().pageIndex - 1) * 10"
+        [rows]="10"
+        [totalRecords]="ordersPaginationInfo().totalRowsCount"
+      />
+      <!-- Selected Delivery + Save Section -->
+      @if (selectedDelivery(); as delivery) {
+        <div class="mt-4 p-3 bg-form-bg rounded-lg flex items-center gap-4 flex-wrap">
+          <div class="flex items-center gap-2">
+            <span class="text-text-gray text-sm">الدليفري المختار:</span>
+            <span class="text-white font-bold">{{ delivery.name }}</span>
+          </div>
+          <button pButton type="button" class="p-button-sm p-button-secondary" (click)="changeDelivery()">تغيير</button>
+          <button pButton type="button" class="p-button-sm p-button-success" (click)="saveAssignment()">حفظ</button>
         </div>
-        <button
-          pButton
-          type="button"
-          class="p-button-sm p-button-secondary"
-          (click)="changeDelivery()"
-        >
-          تغيير
-        </button>
-        <button
-          pButton
-          type="button"
-          class="p-button-sm p-button-success"
-          (click)="saveAssignment()"
-        >
-          حفظ
-        </button>
-      </div>
-    }@else if ( selectedOrderIds().size > 0) {
-      <div class="mt-4">
-        <button
-          pButton
-          type="button"
-          class="app-p-btn"
-          (click)="openDeliveryDialog()"
-        >
-          اختيار دليفري
-        </button>
-      </div>
-    }
+      } @else if (selectedOrderIds().size > 0) {
+        <div class="mt-4">
+          <button pButton type="button" class="app-p-btn" (click)="openDeliveryDialog()">اختيار دليفري</button>
+        </div>
+      }
     </div>
-
-    
   </app-section-wrapper>
 </div>
 

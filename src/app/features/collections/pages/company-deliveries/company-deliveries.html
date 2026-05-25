@@ -21,20 +21,23 @@
         <!-- <p-inputgroup-addon>
             <i class="pi pi-filter"></i>
           </p-inputgroup-addon> -->
-        <p-inputgroup-addon>
-          <button type="submit" class="flex cursor-pointer"><i class="pi pi-search"></i></button>
-        </p-inputgroup-addon>
-      </app-input-error-message-handler>
-    </div>
-
-    <p-select
+          <p-inputgroup-addon class="hidden! sm:flex! border-e border-e-gray-300!">
+            <p-select
       [options]="filterOptions"
       formControlName="searchEnum"
       optionLabel="label"
       optionValue="value"
       [placeholder]="'actions.all' | translate"
-      class="h-fit hidden! sm:flex! w-40"
+      class="h-full w-32 border-none!  shadow-none! bg-transparent! *:py-0!"
     />
+          </p-inputgroup-addon>
+        <p-inputgroup-addon >
+          <button type="submit" class="flex cursor-pointer"><i class="pi pi-search"></i></button>
+        </p-inputgroup-addon>
+      </app-input-error-message-handler>
+    </div>
+
+    
   </form>
 
   <!-- items grid -->

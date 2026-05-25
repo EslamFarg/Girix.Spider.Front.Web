@@ -11,7 +11,7 @@
     >
       <!-- search -->
       <div class="w-full sm:flex-1">
-        <app-input-error-message-handler [fc]="fg.get('searchTerm')">
+        <app-input-error-message-handler [fc]="fg.get('searchTerm')" class="">
           <input
             class="w-full bg-transparent! text-dark-line!"
             pInputText
@@ -19,7 +19,18 @@
             formControlName="searchTerm"
             placeholder="بحث"
           />
-          <p-inputgroup-addon>
+          <p-inputgroup-addon class="hidden! sm:flex! border-e border-e-gray-300!">
+            <p-select
+              [options]="periodOptions"
+              formControlName="fromDate"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="كل الطلبات"
+              class="h-full w-32 border-none!  shadow-none! bg-transparent! *:py-0!"
+            />
+          </p-inputgroup-addon>
+
+          <p-inputgroup-addon class="border-e border-e-gray-300!">
             <div class="relative flex items-center justify-center">
               <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
               <p-menu
@@ -40,15 +51,6 @@
           </p-inputgroup-addon>
         </app-input-error-message-handler>
       </div>
-
-      <p-select
-        [options]="periodOptions"
-        formControlName="fromDate"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="كل الطلبات"
-        class="h-fit hidden! sm:flex! w-40"
-      />
     </form>
 
     <div class="w-full overflow-auto custom-scroll my-2 sm:my-4">
