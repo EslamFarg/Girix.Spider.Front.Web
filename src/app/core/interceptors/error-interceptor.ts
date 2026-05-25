@@ -13,6 +13,7 @@ export interface IApiError extends HttpErrorResponse {
     instance: string;
     traceId: string;
     requestId: string;
+    message?: string;
     errors?: ErrorItem[];
   };
 }
@@ -27,13 +28,27 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   return next(req).pipe(
     catchError((errorResponse: IApiError) => {
-      if(errorResponse.status === 401) authService.logout();
+      if (errorResponse.status === 401) authService.logout();
+      let errorMessage =
+        errorResponse?.error?.message ||
+        errorResponse?.error?.detail ||
+        errorResponse?.error?.title ||
+        'لا يمكن اتمام العملية';
+
+      const erros = errorResponse?.error?.errors ?? [];
+
+      if (Array.isArray(erros) && erros.length > 0) {
+        if (erros[0]?.detail) {
+          errorMessage = erros[0]?.detail;
+        }
+      }
+
       layoutService.messageService.add({
         severity: 'error',
         // summary: 'خطأ',
-        detail: errorResponse?.error?.detail || errorResponse?.error?.title || 'لا يمكن اتمام العملية',
+        detail: errorMessage,
       });
       throw errorResponse.error;
-    })
+    }),
   );
 };
