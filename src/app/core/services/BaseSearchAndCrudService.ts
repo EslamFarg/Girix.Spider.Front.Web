@@ -88,7 +88,7 @@ export class BaseSearchAndCrudService<
       },
       searchFilters: criteriaDto.searchFilters.map((x) => ({
         column: x.column,
-        values: x.values.map((y) => y?.trim() ?? ''),
+        values: x.values.map((y) => y?.toString().trim() ?? ''),
       })),
       fromDate: criteriaDto?.fromDate ?? null,
       toDate,

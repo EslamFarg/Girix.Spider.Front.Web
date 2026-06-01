@@ -14,6 +14,9 @@ import { InputText } from 'primeng/inputtext';
 import { CollectionsService } from '../../services/collections-service';
 import { OrderLocationType } from '@/features/orders';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Menu } from "primeng/menu";
+import { Listbox } from "primeng/listbox";
+import { ButtonDirective } from "primeng/button";
 
 @Component({
   selector: 'app-company-deliveries',
@@ -28,7 +31,10 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     Debounce,
     SectionWrapper,
     InputText,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    Menu,
+    Listbox,
+    ButtonDirective
 ],
   templateUrl: './company-deliveries.html',
   styleUrl: './company-deliveries.css',

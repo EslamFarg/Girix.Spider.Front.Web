@@ -21,6 +21,7 @@ import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
 import { OrderLocationType } from '@/features/orders';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-deliveries',
@@ -38,7 +39,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     Debounce,
     Menu,
     TranslatePipe,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    Listbox
 ],
   templateUrl: './deliveries.html',
   styleUrl: './deliveries.css',
@@ -54,14 +56,14 @@ export class Deliveries extends BaseComponent implements OnInit, OnDestroy {
   searchFg = this.fb.group(this.initialSearchFormValue);
 
   deliveryService = inject(DeliveryService);
-  filterMenuItems = signal<MenuItem[]>([
+  filterMenuItems = signal([
     {
       label: 'الاسم',
-      command: (event) => this.searchFg.patchValue({ searchEnum: DeliverySearchEnum.Name }),
+      value: DeliverySearchEnum.Name,
     },
     {
       label: 'رقم الهاتف',
-      command: (event) => this.searchFg.patchValue({ searchEnum: DeliverySearchEnum.PhoneNumber }),
+      value: DeliverySearchEnum.PhoneNumber,
     },
   ]);
 

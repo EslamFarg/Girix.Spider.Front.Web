@@ -1,206 +1,243 @@
 <div class="p-4 h-full overflow-auto no-scrollbar">
-  <app-section-wrapper class="h-full">
-    <form
-      #form
-      appLoadingDisabled
-      [formGroup]="fg"
-      appDebounce
-      [domEvents]="['submit']"
-      (debounced)="onSubmit()"
-      class="flex h-fit items-start gap-2 w-full flex-col sm:flex-row"
-    >
-      <!-- search -->
-      <div class="w-full sm:flex-1">
-        <app-input-error-message-handler [fc]="fg.get('searchTerm')" class="">
-          <p-inputgroup-addon class="hidden! sm:flex! border border-gray-300! w-1/4">
-            <p-select
-              [options]="periodOptions"
-              formControlName="fromDate"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="كل الطلبات"
-              class="h-full w-32 border-none! shadow-none! bg-transparent! *:py-0!"
-            />
-          </p-inputgroup-addon>
-          <input
-            class="w-full bg-transparent! text-dark-line!"
-            pInputText
-            type="text"
-            formControlName="searchTerm"
-            placeholder="بحث"
-          />
+    <app-section-wrapper class="h-full">
+        <form
+            #form
+            appLoadingDisabled
+            [formGroup]="fg"
+            appDebounce
+            [domEvents]="['submit']"
+            (debounced)="onSubmit()"
+            class="flex h-fit items-start gap-2 w-full flex-col sm:flex-row"
+        >
+            <!-- search -->
+            <div class="w-full sm:flex-1">
+                <app-input-error-message-handler [fc]="fg.get('searchTerm')" class="">
+                    <p-inputgroup-addon class="hidden! sm:flex! border border-gray-300! w-1/4">
+                        <p-select
+                            [options]="periodOptions"
+                            formControlName="fromDate"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="كل الطلبات"
+                            class="h-full w-32 border-none! shadow-none! bg-transparent! *:py-0!"
+                        />
+                    </p-inputgroup-addon>
+                    <input
+                        class="w-full bg-transparent! text-dark-line!"
+                        pInputText
+                        type="text"
+                        formControlName="searchTerm"
+                        placeholder="بحث"
+                    />
 
-          <p-inputgroup-addon >
-            <div class="relative flex items-center justify-center">
-              <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
-              <p-menu
-                dir="rtl"
-                [class]="`*:top-full! *:left-0! `"
-                #filterMenu
-                [model]="filterMenuItems()"
-                [popup]="true"
-                [style]="{ insetInlineEnd: '100%' }"
-              />
+                    <p-inputgroup-addon>
+                        <div class="relative flex items-center justify-center">
+                            <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+
+                            <p-menu
+                                dir="rtl"
+                                [class]="`*:top-full! *:left-0! `"
+                                #filterMenu
+                                [popup]="true"
+                                [style]="{ insetInlineEnd: '100%' }"
+                                styleClass="[&>.p-menu-list]:hidden!"
+                            >
+                                <ng-template #start>
+                                    <p-listbox
+                                        [options]="filterMenuItems()"
+                                        formControlName="searchEnum"
+                                        optionValue="value"
+                                        optionLabel="label"
+                                        class="w-full md:w-56"
+                                    />
+                                </ng-template>
+                            </p-menu>
+                        </div>
+                    </p-inputgroup-addon>
+
+                    <p-inputgroup-addon>
+                        <button
+                            pButton
+                            class="cursor-pointer flex gap-3 px-4 h-full py-0! app-p-btn rounded-e-md!"
+                            type="submit"
+                        >
+                            <span>بحث</span>
+                            <i class="pi pi-search"></i>
+                        </button>
+                    </p-inputgroup-addon>
+                </app-input-error-message-handler>
             </div>
-          </p-inputgroup-addon>
+        </form>
 
-          <p-inputgroup-addon>
-            <button
-              pButton
-              class="cursor-pointer flex gap-3 px-4 h-full py-0! app-p-btn rounded-e-md!"
-              (click)="onSubmit()"
-            >
-              <span>بحث</span>
-              <i class="pi pi-search"></i>
-            </button>
-          </p-inputgroup-addon>
-        </app-input-error-message-handler>
-      </div>
-    </form>
+        <div class="w-full overflow-auto custom-scroll my-2 sm:my-4">
+            <table class="w-full main-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>رقم الطلب</th>
+                        <th>وقت الطلب</th>
+                        <th>نوع الدفع</th>
+                        <th>حاله الفاتورة</th>
+                        <th>المدفوع كاش</th>
+                        <th>المدفوع شبكة</th>
+                        <th>الاجمالي</th>
+                        <th>الأدوات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (order of orders(); track $index) {
+                        <tr [style]="`--ix: ${$index};`">
+                            <td>
+                                <div>{{ getRowNumber($index, ordersPaginationInfo().pageIndex) }}</div>
+                            </td>
+                            <td>
+                                <div>{{ order.orderNumber }}</div>
+                            </td>
+                            <!-- date and time -->
+                            <td>
+                                <div>{{ order.createdAt | date: 'dd/MM/yyyy h:mm a' }}</div>
+                            </td>
+                            <td>
+                                @switch (order.paymentType) {
+                                    @case (OrderPaymentType.Paid) {
+                                        <div class="status active">
+                                            <span></span>
+                                            <span>مدفوع</span>
+                                        </div>
+                                    }
+                                    @case (OrderPaymentType.Pending) {
+                                        <div class="status in-active">
+                                            <span></span>
+                                            <span>معلق</span>
+                                        </div>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @if (order.isCollected) {
+                                    <div class="status active">
+                                        <span></span>
+                                        <span>محصل</span>
+                                    </div>
+                                } @else {
+                                    <div class="status in-active">
+                                        <span></span>
+                                        <span>غير محصل</span>
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <div>{{ order?.payingCash?.toFixed(2) }}</div>
+                            </td>
+                            <td>
+                                <div>{{ order?.payingNetwork?.toFixed(2) }}</div>
+                            </td>
+                            <td>
+                                <div>{{ order?.netOrder?.toFixed(2) }}</div>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <!-- print -->
+                                    <button
+                                        appLoadingDisabled
+                                        type="button"
+                                        class="print"
+                                        (click)="openOrderDialog(order.id)"
+                                    >
+                                        <svg
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 16 16"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M12.75 3.5H3.3125C2.8318 3.5 2.37078 3.69096 2.03087 4.03087C1.69096 4.37078 1.5 4.8318 1.5 5.3125V10.25C1.5 10.7141 1.68437 11.1592 2.01256 11.4874C2.34075 11.8156 2.78587 12 3.25 12H3.5V13.24C3.5 13.5742 3.63275 13.8947 3.86905 14.131C4.10534 14.3673 4.42583 14.5 4.76 14.5H11.24C11.5742 14.5 11.8947 14.3673 12.131 14.131C12.3673 13.8947 12.5 13.5742 12.5 13.24V12H12.75C13.2141 12 13.6592 11.8156 13.9874 11.4874C14.3156 11.1592 14.5 10.7141 14.5 10.25V5.25C14.5 4.78587 14.3156 4.34075 13.9874 4.01256C13.6592 3.68437 13.2141 3.5 12.75 3.5ZM11.5 13.24C11.4998 13.3089 11.4723 13.3749 11.4236 13.4236C11.3749 13.4723 11.3089 13.4998 11.24 13.5H4.76C4.69112 13.4998 4.62513 13.4723 4.57643 13.4236C4.52772 13.3749 4.50025 13.3089 4.5 13.24V8.26C4.50025 8.19112 4.52772 8.12513 4.57643 8.07643C4.62513 8.02772 4.69112 8.00025 4.76 8H11.24C11.3089 8.00025 11.3749 8.02772 11.4236 8.07643C11.4723 8.12513 11.4998 8.19112 11.5 8.26V13.24ZM12.3125 6.4975C12.1595 6.5098 12.0065 6.47487 11.874 6.39743C11.7415 6.32 11.6359 6.20379 11.5716 6.06447C11.5072 5.92516 11.4871 5.76946 11.514 5.61837C11.541 5.46729 11.6136 5.3281 11.7221 5.21958C11.8306 5.11107 11.9698 5.03845 12.1209 5.01154C12.272 4.98462 12.4277 5.0047 12.567 5.06907C12.7063 5.13343 12.8225 5.23898 12.8999 5.37148C12.9774 5.50397 13.0123 5.65703 13 5.81C12.9857 5.98758 12.9087 6.15427 12.7827 6.28024C12.6568 6.40621 12.4901 6.48323 12.3125 6.4975ZM10.75 1.5H5.25C4.82938 1.50063 4.42301 1.65249 4.10506 1.92787C3.78711 2.20324 3.57879 2.58378 3.51813 3H12.4819C12.4212 2.58378 12.2129 2.20324 11.8949 1.92787C11.577 1.65249 11.1706 1.50063 10.75 1.5Z"
+                                                fill="#1F1D2B"
+                                            />
+                                        </svg>
+                                    </button>
+                                    <!-- edit -->
+                                    <a class="view" [routerLink]="`/${order.id}/edit`">
+                                        <i class="pi pi-cart-plus"></i>
+                                    </a>
+                                    <!-- refund -->
+                                    <a
+                                        class="view"
+                                        [routerLink]="['/invoices/refunds/add']"
+                                        [queryParams]="{ orderId: order.id }"
+                                    >
+                                        <i class="pi pi-replay"></i>
+                                    </a>
+                                    <!-- delete -->
+                                    <button
+                                        appLoadingDisabled
+                                        type="button"
+                                        class="delete"
+                                        (click)="deleteOrder(order.id, $event)"
+                                    >
+                                        <svg
+                                            width="15"
+                                            height="16"
+                                            viewBox="0 0 15 16"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                opacity="0.4"
+                                                d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z"
+                                                fill="#FF383C"
+                                            />
+                                            <path
+                                                d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z"
+                                                fill="#FF383C"
+                                            />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-    <div class="w-full overflow-auto custom-scroll my-2 sm:my-4">
-      <table class="w-full main-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>رقم الفاتورة</th>
-            <th>وقت الطلب</th>
-            <th>نوع الدفع</th>
-            <th>حاله الفاتورة</th>
-            <th>المدفوع كاش</th>
-            <th>المدفوع شبكة</th>
-            <th>الاجمالي</th>
-            <th>الأدوات</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (order of orders(); track $index) {
-            <tr [style]="`--ix: ${$index};`">
-              <td>
-                <div>{{ getRowNumber($index, ordersPaginationInfo().pageIndex) }}</div>
-              </td>
-              <td>
-                <div>{{ order.orderNumber }}</div>
-              </td>
-              <!-- date and time -->
-              <td>
-                <div>{{ order.createdAt | date: 'dd/MM/yyyy h:mm a' }}</div>
-              </td>
-              <td>
-                @switch (order.paymentType) {
-                  @case (OrderPaymentType.Paid) {
-                    <div class="status active">
-                      <span></span>
-                      <span>مدفوع</span>
-                    </div>
-                  }
-                  @case (OrderPaymentType.Pending) {
-                    <div class="status in-active">
-                      <span></span>
-                      <span>معلق</span>
-                    </div>
-                  }
-                }
-              </td>
-              <td>
-                @if (order.isCollected) {
-                  <div class="status active">
-                    <span></span>
-                    <span>محصل</span>
-                  </div>
-                } @else {
-                  <div class="status in-active">
-                    <span></span>
-                    <span>غير محصل</span>
-                  </div>
-                }
-              </td>
-              <td>
-                <div>{{ order?.payingCash?.toFixed(2) }}</div>
-              </td>
-              <td>
-                <div>{{ order?.payingNetwork?.toFixed(2) }}</div>
-              </td>
-              <td>
-                <div>{{ order?.netOrder?.toFixed(2) }}</div>
-              </td>
-              <td>
-                <div class="actions">
-                  <!-- print -->
-                  <button appLoadingDisabled type="button" class="print" (click)="openOrderDialog(order.id)">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M12.75 3.5H3.3125C2.8318 3.5 2.37078 3.69096 2.03087 4.03087C1.69096 4.37078 1.5 4.8318 1.5 5.3125V10.25C1.5 10.7141 1.68437 11.1592 2.01256 11.4874C2.34075 11.8156 2.78587 12 3.25 12H3.5V13.24C3.5 13.5742 3.63275 13.8947 3.86905 14.131C4.10534 14.3673 4.42583 14.5 4.76 14.5H11.24C11.5742 14.5 11.8947 14.3673 12.131 14.131C12.3673 13.8947 12.5 13.5742 12.5 13.24V12H12.75C13.2141 12 13.6592 11.8156 13.9874 11.4874C14.3156 11.1592 14.5 10.7141 14.5 10.25V5.25C14.5 4.78587 14.3156 4.34075 13.9874 4.01256C13.6592 3.68437 13.2141 3.5 12.75 3.5ZM11.5 13.24C11.4998 13.3089 11.4723 13.3749 11.4236 13.4236C11.3749 13.4723 11.3089 13.4998 11.24 13.5H4.76C4.69112 13.4998 4.62513 13.4723 4.57643 13.4236C4.52772 13.3749 4.50025 13.3089 4.5 13.24V8.26C4.50025 8.19112 4.52772 8.12513 4.57643 8.07643C4.62513 8.02772 4.69112 8.00025 4.76 8H11.24C11.3089 8.00025 11.3749 8.02772 11.4236 8.07643C11.4723 8.12513 11.4998 8.19112 11.5 8.26V13.24ZM12.3125 6.4975C12.1595 6.5098 12.0065 6.47487 11.874 6.39743C11.7415 6.32 11.6359 6.20379 11.5716 6.06447C11.5072 5.92516 11.4871 5.76946 11.514 5.61837C11.541 5.46729 11.6136 5.3281 11.7221 5.21958C11.8306 5.11107 11.9698 5.03845 12.1209 5.01154C12.272 4.98462 12.4277 5.0047 12.567 5.06907C12.7063 5.13343 12.8225 5.23898 12.8999 5.37148C12.9774 5.50397 13.0123 5.65703 13 5.81C12.9857 5.98758 12.9087 6.15427 12.7827 6.28024C12.6568 6.40621 12.4901 6.48323 12.3125 6.4975ZM10.75 1.5H5.25C4.82938 1.50063 4.42301 1.65249 4.10506 1.92787C3.78711 2.20324 3.57879 2.58378 3.51813 3H12.4819C12.4212 2.58378 12.2129 2.20324 11.8949 1.92787C11.577 1.65249 11.1706 1.50063 10.75 1.5Z"
-                        fill="#1F1D2B"
-                      />
-                    </svg>
-                  </button>
-                  <!-- edit -->
-                  <a class="view" [routerLink]="`/${order.id}/edit`">
-                    <i class="pi pi-cart-plus"></i>
-                  </a>
-                  <!-- refund -->
-                  <a class="view" [routerLink]="['/invoices/refunds/add']" [queryParams]="{ orderId: order.id }">
-                    <i class="pi pi-replay"></i>
-                  </a>
-                  <!-- delete -->
-                  <button appLoadingDisabled type="button" class="delete" (click)="deleteOrder(order.id, $event)">
-                    <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        opacity="0.4"
-                        d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z"
-                        fill="#FF383C"
-                      />
-                      <path
-                        d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z"
-                        fill="#FF383C"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <p-paginator
-      (onPageChange)="onPageChange($event)"
-      [first]="(ordersPaginationInfo().pageIndex - 1) * 10"
-      [rows]="10"
-      [totalRecords]="ordersPaginationInfo().totalRowsCount"
-    />
-  </app-section-wrapper>
+        <p-paginator
+            (onPageChange)="onPageChange($event)"
+            [first]="(ordersPaginationInfo().pageIndex - 1) * 10"
+            [rows]="10"
+            [totalRecords]="ordersPaginationInfo().totalRowsCount"
+        />
+    </app-section-wrapper>
 </div>
 
 <!-- payment info -->
 <p-dialog
-  [(visible)]="orderDialogVisible"
-  [modal]="true"
-  [dismissableMask]="true"
-  [style]="{ width: '100%', maxWidth: '50rem' }"
-  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-white!"
-  class="addition-dialog"
-  [contentStyleClass]="`flex flex-col    ${isLoading() && 'opacity-50 cursor-wait'}`"
+    [(visible)]="orderDialogVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '100%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-white!"
+    class="addition-dialog"
+    [contentStyleClass]="`flex flex-col    ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-  <ng-template #header>
-    <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">التحصيل</p>
-  </ng-template>
+    <ng-template #header>
+        <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">التحصيل</p>
+    </ng-template>
 
-  <!-- body -->
-  <app-printable-order-invoice [data]="currentOrderBill()" #printableOrderInvoice />
+    <!-- body -->
+    <app-printable-order-invoice [data]="currentOrderBill()" #printableOrderInvoice />
 
-  <ng-template #footer>
-    <div class="w-full p-4 pb-0 flex items-center justify-center gap-2">
-      <p-button
-        label="طباعة"
-        [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
-        styleClass=" bg-[#EA7C69]! text-white! px-6!"
-        [text]="true"
-        (click)="printOrder()"
-      ></p-button>
-    </div>
-  </ng-template>
+    <ng-template #footer>
+        <div class="w-full p-4 pb-0 flex items-center justify-center gap-2">
+            <p-button
+                label="طباعة"
+                [style]="{ boxShadow: '0px 4px 4px 0px #EA7C6999' }"
+                styleClass=" bg-[#EA7C69]! text-white! px-6!"
+                [text]="true"
+                (click)="printOrder()"
+            ></p-button>
+        </div>
+    </ng-template>
 </p-dialog>

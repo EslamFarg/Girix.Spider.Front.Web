@@ -87,6 +87,7 @@ import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { AllowedRolesDirective } from '@/directives/allowed-roles';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { InputGroupAddon } from "primeng/inputgroupaddon";
+import { DecimalMask } from "@/directives/decimal-mask";
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -147,6 +148,7 @@ interface IOrderCreateFgValue {
     AllowedRolesDirective,
     LoadingDisabledDirective,
     InputGroupAddon,
+    DecimalMask
 ],
   templateUrl: './cashier.html',
   styleUrl: './cashier.css',

@@ -16,6 +16,7 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { PurchaseSearchEnum, PurchaseService } from '../../services/purchase-service';
 import { IPurchaseSearchRow } from '../../types/api/purchases/responses';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-purchases',
@@ -32,7 +33,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     Menu,
     TranslatePipe,
     RouterLink,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    Listbox
 ],
   templateUrl: './purchases.html',
   styleUrl: './purchases.css',
@@ -50,15 +52,15 @@ export class Purchases extends BaseComponent {
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'رقم الفاتورة',
-      command: () => this.fg.patchValue({ searchEnum: PurchaseSearchEnum.InvoiceNumber }),
+      value:PurchaseSearchEnum.InvoiceNumber,
     },
     {
       label: 'الرقم الدفتري',
-      command: () => this.fg.patchValue({ searchEnum: PurchaseSearchEnum.ReferenceNumber }),
+      value:PurchaseSearchEnum.ReferenceNumber,
     },
     {
       label: 'اسم المورد',
-      command: () => this.fg.patchValue({ searchEnum: PurchaseSearchEnum.Name }),
+      value:PurchaseSearchEnum.Name,
     },
   ]);
 

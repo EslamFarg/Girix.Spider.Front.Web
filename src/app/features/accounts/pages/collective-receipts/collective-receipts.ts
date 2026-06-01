@@ -9,18 +9,20 @@ import { BaseComponent, IPaginationInfo } from '@/components/base-component/base
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { ReceiptVoucherSearchEnum, ReceiptVoucherService } from '../../services/receipt-voucher-service';
-import {  IReceiptVoucherSearchRow } from '../../types';
+import { IReceiptVoucherSearchRow } from '../../types';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { Debounce } from '@/directives/debounce';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
-import { Menu } from "primeng/menu";
-import { RouterLink } from "@angular/router";
+import { Menu } from 'primeng/menu';
+import { RouterLink } from '@angular/router';
+import { ButtonDirective } from 'primeng/button';
+import { Listbox } from "primeng/listbox";
 
 @Component({
-  selector: 'app-collective-receipts',
-  imports: [
+    selector: 'app-collective-receipts',
+    imports: [
     SectionWrapper,
     ReactiveFormsModule,
     InputErrorMessageHandler,
@@ -34,103 +36,107 @@ import { RouterLink } from "@angular/router";
     CurrencyPipe,
     TranslatePipe,
     Menu,
-    RouterLink
+    RouterLink,
+    ButtonDirective,
+    Listbox
 ],
-  templateUrl: './collective-receipts.html',
-  styleUrl: './collective-receipts.css',
+    templateUrl: './collective-receipts.html',
+    styleUrl: './collective-receipts.css',
 })
 export class CollectiveReceipts extends BaseComponent {
-  
-  initialSearchFormValue = {
-    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
-    searchEnum: this.fb.control<ReceiptVoucherSearchEnum>(ReceiptVoucherSearchEnum.Id, [Validators.required]),
-    fromDate: this.fb.control<string | null>(null, []),
-    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
-  };
+    initialSearchFormValue = {
+        searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+        searchEnum: this.fb.control<ReceiptVoucherSearchEnum>(ReceiptVoucherSearchEnum.Id, []),
+        fromDate: this.fb.control<string | null>(null, []),
+        toDate: this.fb.control<string>(this.dateNowIso, [Validators.required]),
+    };
 
-  fg = this.fb.group(this.initialSearchFormValue);
-  receiptVoucherService = inject(ReceiptVoucherService);
+    fg = this.fb.group(this.initialSearchFormValue);
+    receiptVoucherService = inject(ReceiptVoucherService);
 
-  filterMenuItems: MenuItem[] = [
-    {
-      label: 'رقم القيد',
-      command: () => this.fg.patchValue({ searchEnum: ReceiptVoucherSearchEnum.Id }),
-    },
-    {
-      label: 'الرقم الدفتري',
-      command: () => this.fg.patchValue({ searchEnum: ReceiptVoucherSearchEnum.VoucherNo }),
-    },
-  ];
-
-  receiptVouchers = signal<IReceiptVoucherSearchRow[]>([]);
-  receiptVouchersPaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
-    totalPagesCount: 0,
-    totalRowsCount: 0,
-  };
-
-  constructor() {
-    super();
-    this.searchReceiptVouchers(1);
-  }
-
-  searchReceiptVouchers(pageIndex: number) {
-    this.receiptVoucherService
-      .search({
-        paginationInfo: {
-          pageIndex,
-          pageSize: 10,
+    filterMenuItems = [
+        {
+            label: 'رقم القيد',
+            value: ReceiptVoucherSearchEnum.Id,
         },
-        searchFilters: [
-          {
-            column: this.fg.getRawValue().searchEnum!,
-            values: [this.fg.getRawValue().searchTerm],
-          },
-        ],
-        fromDate: this.fg.getRawValue().fromDate,
-      })
-      .subscribe({
-        next: (res) => {
-          this.receiptVouchers.set(res.rows);
-          this.receiptVouchersPaginationInfo = {
-            pageIndex,
-            totalPagesCount: res.paginationInfo.totalPagesCount,
-            totalRowsCount: res.paginationInfo.totalRowsCount,
-          };
+        {
+            label: 'الرقم الدفتري',
+            value: ReceiptVoucherSearchEnum.VoucherNo,
         },
-      });
-  }
+    ];
 
-  onSubmit = () => this.fg.valid && this.searchReceiptVouchers(1);
+    receiptVouchers = signal<IReceiptVoucherSearchRow[]>([]);
+    receiptVouchersPaginationInfo: IPaginationInfo = {
+        pageIndex: 1,
+        totalPagesCount: 0,
+        totalRowsCount: 0,
+    };
 
-  onPageChange = (event: PaginatorState) => this.searchReceiptVouchers(event.page! + 1);
+    constructor() {
+        super();
+        this.searchReceiptVouchers(1);
+    }
 
-  deleteReceiptVoucher(id: number, event: Event) {
-    this.confirmationService.confirm({
-      target: event.target as EventTarget,
-      message: 'هل أنت متأكد من حذف القيد؟',
-      header: 'حذف القيد',
-      icon: 'pi pi-info-circle',
-      rejectLabel: 'إلغاء',
-      rejectButtonProps: {
-        label: 'إلغاء',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'حذف',
-        severity: 'danger',
-      },
-      accept: () => {
-        this.receiptVoucherService.delete(id).subscribe({
-          next: () => {
-            this.searchReceiptVouchers(1);
-          },
+    searchReceiptVouchers(pageIndex: number) {
+        this.receiptVoucherService
+            .search({
+                paginationInfo: {
+                    pageIndex,
+                    pageSize: 10,
+                },
+                searchFilters: [
+                    {
+                        column: this.fg.getRawValue().searchEnum!,
+                        values: [this.fg.getRawValue().searchTerm],
+                    },
+                ],
+                fromDate: this.fg.getRawValue().fromDate,
+            })
+            .subscribe({
+                next: (res) => {
+                    this.receiptVouchers.set(res.rows);
+                    this.receiptVouchersPaginationInfo = {
+                        pageIndex,
+                        totalPagesCount: res.paginationInfo.totalPagesCount,
+                        totalRowsCount: res.paginationInfo.totalRowsCount,
+                    };
+                },
+            });
+    }
+
+    onSubmit = () => {
+        console.log(this.fg.value);
+        this.fg.valid && this.searchReceiptVouchers(1);
+    };
+
+    onPageChange = (event: PaginatorState) => this.searchReceiptVouchers(event.page! + 1);
+
+    deleteReceiptVoucher(id: number, event: Event) {
+        this.confirmationService.confirm({
+            target: event.target as EventTarget,
+            message: 'هل أنت متأكد من حذف القيد؟',
+            header: 'حذف القيد',
+            icon: 'pi pi-info-circle',
+            rejectLabel: 'إلغاء',
+            rejectButtonProps: {
+                label: 'إلغاء',
+                severity: 'secondary',
+                outlined: true,
+            },
+            acceptButtonProps: {
+                label: 'حذف',
+                severity: 'danger',
+            },
+            accept: () => {
+                this.receiptVoucherService.delete(id).subscribe({
+                    next: () => {
+                        this.searchReceiptVouchers(1);
+                    },
+                });
+            },
+            reject: () => {
+                this.messageService.add({ severity: 'error', summary: 'إلغاء', detail: 'تم إلغاء الحذف' });
+            },
         });
-      },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'إلغاء', detail: 'تم إلغاء الحذف' });
-      },
-    });
-  }
+    }
 }

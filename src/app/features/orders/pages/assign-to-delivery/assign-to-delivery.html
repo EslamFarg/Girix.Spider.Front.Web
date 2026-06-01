@@ -19,8 +19,24 @@
                     <p-inputgroup-addon >
                         <div class="relative flex items-center justify-center">
                             <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
-                            <p-menu dir="rtl" [class]="`*:top-full! *:left-0! `" #filterMenu [model]="filterMenuItems()"
-                                [popup]="true" [style]="{ insetInlineEnd: '100%' }" />
+                            <p-menu
+                                dir="rtl"
+                                [class]="`*:top-full! *:left-0! `"
+                                #filterMenu
+                                [popup]="true"
+                                [style]="{ insetInlineEnd: '100%' }"
+                                styleClass="[&>.p-menu-list]:hidden!"
+                            >
+                                <ng-template #start>
+                                    <p-listbox
+                                        [options]="filterMenuItems()"
+                                        formControlName="searchEnum"
+                                        optionValue="value"
+                                        optionLabel="label"
+                                        class="w-full md:w-56"
+                                    />
+                                </ng-template>
+                            </p-menu>
                         </div>
                     </p-inputgroup-addon>
 

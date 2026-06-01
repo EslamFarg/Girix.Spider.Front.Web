@@ -9,7 +9,7 @@ export enum RefundSearchEnum {
   Id = SearchColumEnum.Id,
   InvoiceNumber = SearchColumEnum.InvoiceNumber,
   ReferenceNumber = SearchColumEnum.ReferenceNumber,
-  Name = SearchColumEnum.Name,
+  CustomerName = SearchColumEnum.CustomerName,
 }
 
 @Injectable({

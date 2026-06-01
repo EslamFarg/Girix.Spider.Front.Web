@@ -12,7 +12,7 @@ export interface IFinancialAccountCreateRequest {
   };
 }
 export interface IFinancialAccountUpdateRequest {
-  createFinancialAccountDto: {
+  updateFinancialAccountDto: {
     id: number;
     nameAr: string;
     nameEn: string;

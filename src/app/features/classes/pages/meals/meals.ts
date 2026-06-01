@@ -14,6 +14,7 @@ import { ImgFallback } from '@/directives/img-fallback';
 import { Debounce } from '@/directives/debounce';
 import { RouterLink } from "@angular/router";
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-meals',
@@ -29,7 +30,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     ImgFallback,
     Debounce,
     RouterLink,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    Listbox
 ],
   templateUrl: './meals.html',
   styleUrl: './meals.css',
@@ -44,14 +46,14 @@ export class Meals extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
 
   mealService = inject(MealService);
-  filterMenuItems = signal<MenuItem[]>([
+  filterMenuItems = signal([
     {
       label: 'الاسم',
-      command: (event) => this.fg.patchValue({ searchEnum: MealSearchEnum.Name }),
+      value: MealSearchEnum.Name,
     },
     {
       label: 'اسم المجموعة',
-      command: (event) => this.fg.patchValue({ searchEnum: MealSearchEnum.CategoryName }),
+      value: MealSearchEnum.CategoryName,
     },
   ]);
 

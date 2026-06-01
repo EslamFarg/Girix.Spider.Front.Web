@@ -1,85 +1,95 @@
 <app-section-wrapper class="block mt-4 p-4 overflow-auto custom-scroll">
-  <!-- search -->
-  <form
-    #form
-    appLoadingDisabled
-    [formGroup]="searchFg"
-    appDebounce
-    [domEvents]="['submit']"
-    (debounced)="onSubmit()"
-    class="flex h-fit items-start gap-2 w-full"
-  >
-    <div class="flex-1">
-      <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
-        <input
-          class="w-full bg-transparent!"
-          pInputText
-          type="text"
-          formControlName="searchTerm"
-          [placeholder]="'ACTIONS.SEARCH' | translate"
-        />
-        <p-inputgroup-addon class="relative">
-          <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
-          <p-menu
-            dir="rtl"
-            [class]="`*:top-full! *:left-0! `"
-            #filterMenu
-            [model]="filterMenuItems()"
-            [popup]="true"
-            [style]="{ insetInlineEnd: '100%' }"
-          />
-        </p-inputgroup-addon>
-        <p-inputgroup-addon>
-          <button type="submit" class="flex cursor-pointer">
-            <i class="pi pi-search"></i>
-          </button>
-        </p-inputgroup-addon>
-      </app-input-error-message-handler>
-    </div>
+    <!-- search -->
+    <form
+        #form
+        appLoadingDisabled
+        [formGroup]="searchFg"
+        appDebounce
+        [domEvents]="['submit']"
+        (debounced)="onSubmit()"
+        class="flex h-fit items-start gap-2 w-full"
+    >
+        <div class="flex-1">
+            <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
+                <input
+                    class="w-full bg-transparent!"
+                    pInputText
+                    type="text"
+                    formControlName="searchTerm"
+                    [placeholder]="'ACTIONS.SEARCH' | translate"
+                />
+                <p-inputgroup-addon class="relative">
+                    <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+                    <p-menu
+                        dir="rtl"
+                        [class]="`*:top-full! *:left-0! `"
+                        #filterMenu
+                        [popup]="true"
+                        [style]="{ insetInlineEnd: '100%' }"
+                        styleClass="[&>.p-menu-list]:hidden!"
+                    >
+                        <ng-template #start>
+                            <p-listbox
+                                [options]="filterMenuItems()"
+                                formControlName="searchEnum"
+                                optionValue="value"
+                                optionLabel="label"
+                                class="w-full md:w-56"
+                            />
+                        </ng-template>
+                    </p-menu>
+                </p-inputgroup-addon>
+                <p-inputgroup-addon>
+                    <button type="submit" class="flex cursor-pointer">
+                        <i class="pi pi-search"></i>
+                    </button>
+                </p-inputgroup-addon>
+            </app-input-error-message-handler>
+        </div>
 
-    <!-- <p-select
+        <!-- <p-select
         [options]="companyFilter"
         optionLabel="label"
         formControlName="isCompany"
         optionValue="value"
         class="h-fit w-40"
       /> -->
-  </form>
+    </form>
 
-  <!-- items grid -->
-  <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-8 my-4 mt-8">
-    @for (item of deliveryMen(); track $index) {
-      <div
-        style="backdrop-filter: blur(20px); box-shadow: 0px 0px 27.14px 0px #6a6a6acc inset"
-        class="flex border-2 relative cursor-pointer border-[#393C49] aspect-[1.84] available items-center justify-center bg-white rounded-[14px]"
-        [class.replacements-reserved]="item.orderNumber > 0"
-        (click)="
-          openCollectionDialog({
-            deliveryId: item.id,
-            orderType: OrderLocationType.PersonDelivery,
-          })
-        "
-      >
-        @if (item.orderNumber > 0) {
-          <div
-            class="absolute -top-3.5 -right-0.5 w-[23px] aspect-square flex items-center justify-center text-base font-bold bg-dark-line text-[#FA8D7B] rounded-full"
-          >
-            <span>{{ item.orderNumber }}</span>
-          </div>
+    <!-- items grid -->
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-8 my-4 mt-8">
+        @for (item of deliveryMen(); track $index) {
+            <div
+                style="backdrop-filter: blur(20px); box-shadow: 0px 0px 27.14px 0px #6a6a6acc inset"
+                class="flex border-2 relative cursor-pointer border-[#393C49] aspect-[1.84] available items-center justify-center bg-white rounded-[14px]"
+                [class.replacements-reserved]="item.orderNumber > 0"
+                (click)="
+                    openCollectionDialog({
+                        deliveryId: item.id,
+                        orderType: OrderLocationType.PersonDelivery,
+                    })
+                "
+            >
+                @if (item.orderNumber > 0) {
+                    <div
+                        class="absolute -top-3.5 -right-0.5 w-[23px] aspect-square flex items-center justify-center text-base font-bold bg-dark-line text-[#FA8D7B] rounded-full"
+                    >
+                        <span>{{ item.orderNumber }}</span>
+                    </div>
+                }
+                <span
+                    class="text-black font-bold mx-auto min-w-[95%] w-[95%] text-center text-ellipsis overflow-hidden whitespace-nowrap"
+                    >{{ item.name }}</span
+                >
+            </div>
         }
-        <span
-          class="text-black font-bold mx-auto min-w-[95%] w-[95%] text-center text-ellipsis overflow-hidden whitespace-nowrap"
-          >{{ item.name }}</span
-        >
-      </div>
-    }
-  </div>
+    </div>
 
-  <p-paginator
-    (onPageChange)="onPageChange($event)"
-    [first]="getCurrentRowsIx(1)"
-    [showFirstLastIcon]="false"
-    [rows]="10"
-    [totalRecords]="deliveryMenPaginationInfo.totalRowsCount"
-  />
+    <p-paginator
+        (onPageChange)="onPageChange($event)"
+        [first]="getCurrentRowsIx(1)"
+        [showFirstLastIcon]="false"
+        [rows]="10"
+        [totalRecords]="deliveryMenPaginationInfo.totalRowsCount"
+    />
 </app-section-wrapper>

@@ -16,6 +16,7 @@ import { Dialog } from 'primeng/dialog';
 import { DeliveryService, IDeliverySearchRow } from '@/features/deliveries/services/delivery-service';
 import { CheckboxModule } from 'primeng/checkbox';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-assign-to-delivery',
@@ -34,7 +35,8 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
     Dialog,
     CheckboxModule,
     LoadingDisabledDirective,
-    ButtonDirective
+    ButtonDirective,
+    Listbox
 ],
   templateUrl: './assign-to-delivery.html',
   styleUrl: './assign-to-delivery.css',
@@ -55,11 +57,11 @@ export class AssignToDelivery extends BaseComponent {
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'اسم العميل',
-      command: () => this.fg.patchValue({ searchEnum: OrderSearchEnum.CustomerName }),
+      value: OrderSearchEnum.CustomerName,
     },
     {
       label: 'رقم الطلب',
-      command: () => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderNumber }),
+      value: OrderSearchEnum.OrderNumber,
     },
   ]);
 

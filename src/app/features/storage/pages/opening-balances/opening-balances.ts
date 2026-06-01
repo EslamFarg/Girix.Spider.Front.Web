@@ -16,6 +16,7 @@ import { Menu } from "primeng/menu";
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from "@angular/router";
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-opening-balances',
@@ -32,7 +33,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     Menu,
     TranslatePipe,
     RouterLink,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    Listbox
 ],
   templateUrl: './opening-balances.html',
   styleUrl: './opening-balances.css',
@@ -47,14 +49,14 @@ export class OpeningBalances extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
 
   openingBalanceService = inject(OpeningBalanceService);
-  filterMenuItems = signal<MenuItem[]>([
+  filterMenuItems = signal([
     {
       label: 'رقم الفاتورة',
-      command: (event) => this.fg.patchValue({ searchEnum: OpeningBalanceSearchEnum.InvoiceNumber }),
+      value: OpeningBalanceSearchEnum.InvoiceNumber,
     },
     {
       label: 'رقم المرجع',
-      command: (event) => this.fg.patchValue({ searchEnum: OpeningBalanceSearchEnum.ReferenceNumber }),
+      value: OpeningBalanceSearchEnum.ReferenceNumber,
     },
   ]);
 

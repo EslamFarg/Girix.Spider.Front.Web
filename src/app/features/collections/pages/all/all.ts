@@ -56,6 +56,7 @@ import { tap } from 'rxjs';
 import { Message } from 'primeng/message';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Menu } from "primeng/menu";
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-all',
@@ -85,6 +86,7 @@ import { Menu } from "primeng/menu";
     LoadingDisabledDirective,
     Menu,
     PrintableOrderInvoice,
+    Listbox
 ],
   templateUrl: './all.html',
   styleUrl: './all.css',
@@ -381,22 +383,22 @@ export class All extends BaseComponent {
     });
   }
 
-  filterMenuItems = signal<MenuItem[]>([
+  filterMenuItems = signal([
     {
       label: 'اسم العميل',
-      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.CustomerName }),
+      value: OrderSearchEnum.CustomerName ,
     },
     {
       label: 'رقم الطلب',
-      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderNumber }),
+      value: OrderSearchEnum.OrderNumber ,
     },
     {
       label: 'موقع الطلب',
-      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderPlace }),
+      value: OrderSearchEnum.OrderPlace ,
     },
     {
       label: 'نوع الطلب',
-      command: (event) => this.fg.patchValue({ searchEnum: OrderSearchEnum.OrderType }),
+      value: OrderSearchEnum.OrderType ,
     },
   ]);
 

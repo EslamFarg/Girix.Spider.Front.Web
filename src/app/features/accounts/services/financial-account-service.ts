@@ -54,6 +54,11 @@ export class FinancialAccountService extends BaseSearchAndCrudService<
    */
   constructor() {
     super();
+
+  }
+
+  update(request: IFinancialAccountUpdateRequest) {
+    return this.http.post(`${this.apiUrl}/Update`, request);
   }
 
   getFullTree() {

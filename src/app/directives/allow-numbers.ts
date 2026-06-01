@@ -16,8 +16,12 @@ export class AllowNumbers {
 
   @HostListener('keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
-    // allow control keys (backspace, delete, arrows, tab, etc.)
-    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(event.key)) {
+    if ((event.ctrlKey || event.metaKey) && ['c', 'v', 'x', 'a'].includes(event.key.toLowerCase())) {
+      return;
+    }
+
+    // allow control keys (backspace, delete, arrows, tab, enter, etc.)
+    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', 'NumpadEnter'].includes(event.key)) {
       return;
     }
 

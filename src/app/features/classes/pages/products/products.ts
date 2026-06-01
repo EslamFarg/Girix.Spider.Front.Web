@@ -15,6 +15,7 @@ import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-products',
@@ -33,7 +34,8 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
     Menu,
     TranslatePipe,
     LoadingDisabledDirective,
-  ],
+    Listbox
+],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
@@ -47,14 +49,14 @@ export class Products extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
   productService = inject(ProductService);
   calculatePrice = this.productService.calculatePrice;
-  filterMenuItems = signal<MenuItem[]>([
+  filterMenuItems = signal([
     {
       label: 'اسم المنتج',
-      command: () => this.fg.patchValue({ searchEnum: ProductSearchEnum.Name }),
+      value: ProductSearchEnum.Name,
     },
     {
       label: 'اسم المجموعة',
-      command: () => this.fg.patchValue({ searchEnum: ProductSearchEnum.CategoryName }),
+      value: ProductSearchEnum.CategoryName,
     },
   ]);
 

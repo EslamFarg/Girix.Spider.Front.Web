@@ -14,6 +14,9 @@ import { Menu } from 'primeng/menu';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { PaymentVoucherSearchEnum, PaymentVoucherService } from '../../services/payment-voucher-service';
 import { IPaymentVoucherSearchRow } from '../../types';
+import { ButtonDirective } from "primeng/button";
+import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-collective-payments',
@@ -30,7 +33,10 @@ import { IPaymentVoucherSearchRow } from '../../types';
     TranslatePipe,
     Menu,
     RouterLink,
-  ],
+    ButtonDirective,
+    LoadingDisabledDirective,
+    Listbox
+],
   templateUrl: './collective-payments.html',
   styleUrl: './collective-payments.css',
 })
@@ -47,14 +53,14 @@ export class CollectivePayments extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
   paymentVoucherService = inject(PaymentVoucherService);
 
-  filterMenuItems: MenuItem[] = [
+  filterMenuItems = [
     {
       label: 'رقم القيد',
-      command: () => this.fg.patchValue({ searchEnum: PaymentVoucherSearchEnum.Id }),
+      value:PaymentVoucherSearchEnum.Id,
     },
     {
       label: 'الرقم الدفتري',
-      command: () => this.fg.patchValue({ searchEnum: PaymentVoucherSearchEnum.VoucherNo }),
+      value:PaymentVoucherSearchEnum.VoucherNo,
     },
   ];
 
@@ -79,7 +85,7 @@ export class CollectivePayments extends BaseComponent {
         },
         searchFilters: [
           {
-            column: this.fg.getRawValue().searchEnum!,
+            column: this.fg.getRawValue().searchEnum,
             values: [this.fg.getRawValue().searchTerm],
           },
         ],
@@ -97,7 +103,7 @@ export class CollectivePayments extends BaseComponent {
       });
   }
 
-  onSubmit = () => this.fg.valid && this.searchPaymentVouchers(1);
+  onSubmit = () => {this.fg.valid && this.searchPaymentVouchers(1)};
 
   onPageChange = (event: PaginatorState) => this.searchPaymentVouchers(event.page! + 1);
 

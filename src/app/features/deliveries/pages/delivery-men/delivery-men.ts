@@ -15,6 +15,7 @@ import { Menu } from 'primeng/menu';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-delivery-men',
@@ -31,7 +32,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     Menu,
     RouterLink,
     TranslatePipe,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    Listbox
 ],
   templateUrl: './delivery-men.html',
   styleUrl: './delivery-men.css',
@@ -49,11 +51,11 @@ export class DeliveryMen extends BaseComponent {
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'الاسم',
-      command: (event) => this.searchFg.patchValue({ searchEnum: DeliverySearchEnum.Name }),
+      value: DeliverySearchEnum.Name,
     },
     {
       label: 'رقم الهاتف',
-      command: (event) => this.searchFg.patchValue({ searchEnum: DeliverySearchEnum.PhoneNumber }),
+      value: DeliverySearchEnum.PhoneNumber,
     },
   ]);
 

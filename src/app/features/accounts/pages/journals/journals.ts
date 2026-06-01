@@ -13,6 +13,7 @@ import { RouterLink } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { JournalEntrySearchEnum, JournalEntryService } from '../../services/journal-entry-service';
 import { IJournalEntrySearchRow } from '../../types';
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-journals',
@@ -31,7 +32,8 @@ import { IJournalEntrySearchRow } from '../../types';
     Menu,
     TranslatePipe,
     InputText,
-  ],
+    Listbox
+],
 })
 export class Journals extends BaseComponent {
   initialSearchFormValue = {
@@ -44,14 +46,14 @@ export class Journals extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
   journalService = inject(JournalEntryService);
 
-  filterMenuItems: MenuItem[] = [
+  filterMenuItems = [
     {
       label: 'الرقم الدفتري',
-      command: () => this.fg.patchValue({ searchEnum: JournalEntrySearchEnum.InvoiceNumber }),
+      value:JournalEntrySearchEnum.InvoiceNumber,
     },
     {
       label: 'رقم المرجع',
-      command: () => this.fg.patchValue({ searchEnum: JournalEntrySearchEnum.ReferenceNumber }),
+      value:JournalEntrySearchEnum.ReferenceNumber,
     },
   ];
 

@@ -966,6 +966,7 @@
               [min]="0"
               [allowDecimal]="true"
               #payingCash
+              appDecimalMask
               id="payingCash"
               type="number"
               appDebounce
@@ -1018,6 +1019,7 @@
               [allowDecimal]="true"
               [max]="net()"
               [min]="0"
+              appDecimalMask
               [disabled]="!isPaid()"
               id="payingNetwork"
               type="number"

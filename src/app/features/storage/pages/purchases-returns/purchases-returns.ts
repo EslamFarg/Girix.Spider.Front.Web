@@ -16,6 +16,7 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { PurchaseReturnSearchEnum, PurchaseReturnService } from '../../services/purchase-return-service';
 import { IPurchaseReturnSearchRow } from '../../types/api/purchase-return/responses';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-purchases-returns',
@@ -32,7 +33,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     Menu,
     TranslatePipe,
     RouterLink,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    Listbox
 ],
   templateUrl: './purchases-returns.html',
   styleUrl: './purchases-returns.css',
@@ -50,19 +52,19 @@ export class PurchasesReturns extends BaseComponent {
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'رقم المرتجع',
-      command: () => this.fg.patchValue({ searchEnum: PurchaseReturnSearchEnum.Id }),
+      value:PurchaseReturnSearchEnum.Id,
     },
     {
       label: 'رقم الفاتورة',
-      command: () => this.fg.patchValue({ searchEnum: PurchaseReturnSearchEnum.InvoiceNumber }),
+      value:PurchaseReturnSearchEnum.InvoiceNumber,
     },
     {
       label: 'الرقم الدفتري',
-      command: () => this.fg.patchValue({ searchEnum: PurchaseReturnSearchEnum.ReferenceNumber }),
+      value:PurchaseReturnSearchEnum.ReferenceNumber,
     },
     {
       label: 'اسم المورد',
-      command: () => this.fg.patchValue({ searchEnum: PurchaseReturnSearchEnum.Name }),
+      value:PurchaseReturnSearchEnum.Name,
     },
   ]);
 

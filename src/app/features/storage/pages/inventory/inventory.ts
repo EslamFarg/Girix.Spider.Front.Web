@@ -14,6 +14,7 @@ import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
 import { InputText } from 'primeng/inputtext';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Listbox } from "primeng/listbox";
 
 @Component({
   selector: 'app-inventory',
@@ -29,7 +30,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     Menu,
     TranslatePipe,
     InputText,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    Listbox
 ],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
@@ -51,14 +53,14 @@ export class Inventory extends BaseComponent {
     super();
     this.searchInventorySettlements(1);
   }
-  filterMenuItems: MenuItem[] = [
+  filterMenuItems = [
     {
       label: 'رقم التسوية',
-      command: (event) => this.fg.patchValue({ searchEnum: InventorySettlementSearchEnum.InvoiceNumber }),
+      value:InventorySettlementSearchEnum.InvoiceNumber,
     },
     {
       label: 'رقم المرجع',
-      command: (event) => this.fg.patchValue({ searchEnum: InventorySettlementSearchEnum.ReferenceNumber }),
+      value:InventorySettlementSearchEnum.ReferenceNumber,
     },
   ];
   periodOptions = [
