@@ -11,6 +11,8 @@ import { SpaceTypeEnum } from '@/features/replacements/services/replacements-ser
 import { BehaviorSubject, debounceTime, Observable, Subject } from 'rxjs';
 import { LoadingService } from '@/yn-ng/services/loading-service';
 import { AmountType, Role } from '@/core/enums';
+import { DialogService } from '@/features/dialogs/services/dialog-service';
+import { DialogType } from '@/features/dialogs/enums';
 export interface IPaginationInfo {
   pageIndex: number;
   totalRowsCount: number;
@@ -39,6 +41,7 @@ export class BaseComponent {
   FormMode = FormMode;
   AmountType = AmountType;
   Role=Role;
+  DialogType = DialogType;
   Math = Math;
   //
   nullableFb = inject(FormBuilder);
@@ -56,6 +59,7 @@ export class BaseComponent {
   // layoutService = inject(LayoutService);
   loadingService = inject(LoadingService);
   translateService = inject(TranslateService);
+  dialogService = inject(DialogService);
   changeDetectionRef = inject(ChangeDetectorRef);
   dateNow = new Date();
   dateNowIso = this.dateNow.toISOString();

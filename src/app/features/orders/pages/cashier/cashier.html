@@ -1,62 +1,71 @@
 <div class="container w-full h-full lg:grid grid-cols-5 gap-4 overflow-hidden">
-  <app-menu
-    (menuItemChange)="onMenuItemChange($event)"
-    [groups]="groups()"
-    [pickedItems]="orderMenuItems()"
-    class="hidden lg:inline-block col-span-3"
-  />
+    <app-menu
+        (menuItemChange)="onMenuItemChange($event)"
+        [groups]="groups()"
+        [pickedItems]="orderMenuItems()"
+        class="hidden lg:inline-block col-span-3"
+    />
 
-  <form
-    [formGroup]="orderFg"
-    (ngSubmit)="onSubmitOrder()"
-    id="orderForm"
-    class="flex w-full flex-col gap-4 h-full no-scrollbar overflow-auto p-4 lg:ps-0 lg:col-span-2"
-  >
-    <!-- actions btns -->
-    <div class="w-full flex h-fit items-center justify-end gap-2" style="--p-button-primary-background: transparent">
-      <button
-        pButton
-        type="button"
-        (click)="isMenuVisible = true"
-        class="app-p-btn py-1! m1d:flex-none md:px-8! xl:hid1den! me-auto"
-        variant="outlined"
-        type="button"
-      >
-        المينيو
-      </button>
-      <button pButton class="app-p-btn py-1! md:px-8! md:flex-none" form="orderForm" type="submit" appLoadingDisabled>
-        @if (formMode() === FormMode.Create) {
-          {{ 'ACTIONS.SAVE' | translate }}
-        } @else {
-          {{ 'ACTIONS.EDIT' | translate }}
-        }
-      </button>
-      <a
-        type="button"
-        routerLink="/"
-        pButton
-        class="app-p-btn p-button-outlined py-1! md:flex-none md:px-8!"
-        variant="outlined"
-        (click)="resetOrderForm()"
-      >
-        {{ 'ACTIONS.NEW' | translate }}
-      </a>
-      @if (existingOrderBill()) {
-        <button
-          (click)="onPrint()"
-          type="button"
-          appLoadingDisabled
-          pButton
-          class="app-p-btn py-1! md:flex-none md:px-8!"
-          variant="outlined"
+    <form
+        [formGroup]="orderFg"
+        (ngSubmit)="onSubmitOrder()"
+        id="orderForm"
+        class="flex w-full flex-col gap-4 h-full no-scrollbar overflow-auto p-4 lg:ps-0 lg:col-span-2"
+    >
+        <!-- actions btns -->
+        <div
+            class="w-full flex h-fit items-center justify-end gap-2"
+            style="--p-button-primary-background: transparent"
         >
-          {{ 'ACTIONS.PRINT' | translate }}
-        </button>
-      }
-    </div>
+            <button
+                pButton
+                type="button"
+                (click)="isMenuVisible = true"
+                class="app-p-btn py-1! m1d:flex-none md:px-8! xl:hid1den! me-auto"
+                variant="outlined"
+                type="button"
+            >
+                المينيو
+            </button>
+            <button
+                pButton
+                class="app-p-btn py-1! md:px-8! md:flex-none"
+                form="orderForm"
+                type="submit"
+                appLoadingDisabled
+            >
+                @if (formMode() === FormMode.Create) {
+                    {{ 'ACTIONS.SAVE' | translate }}
+                } @else {
+                    {{ 'ACTIONS.EDIT' | translate }}
+                }
+            </button>
+            <a
+                type="button"
+                routerLink="/"
+                pButton
+                class="app-p-btn p-button-outlined py-1! md:flex-none md:px-8!"
+                variant="outlined"
+                (click)="resetOrderForm()"
+            >
+                {{ 'ACTIONS.NEW' | translate }}
+            </a>
+            @if (existingOrderBill()) {
+                <button
+                    (click)="onPrint()"
+                    type="button"
+                    appLoadingDisabled
+                    pButton
+                    class="app-p-btn py-1! md:flex-none md:px-8!"
+                    variant="outlined"
+                >
+                    {{ 'ACTIONS.PRINT' | translate }}
+                </button>
+            }
+        </div>
 
-    <!-- receipt summary -->
-    <!-- <div class="flex justify-between text-dark-line border border-text-gray rounded-[8px] p-2">
+        <!-- receipt summary -->
+        <!-- <div class="flex justify-between text-dark-line border border-text-gray rounded-[8px] p-2">
       <ul class="flex flex-col gap-2 *:text-xs *:font-bold *:flex *:items-center *:gap-2">
         <li>
           <span>رقم الفاتوره:</span>
@@ -87,1203 +96,1273 @@
       </ul>
     </div> -->
 
-    <div>
-      <!-- location btns -->
-      <div class="flex gap-2 w-full min-h-[34px]" [class.hidden]="!isCreateMode()">
-        <!-- سفري group -->
-        <div
-          [appAllowedRoles]="[Role.Cashier, Role.Admin]"
-          class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
-          [class.flex-1]="!localRadio.checked"
-          [class.w-20]="localRadio.checked"
-          [class.segmented-group]="takeAwayRadio.checked"
-        >
-          <input
-            type="radio"
-            hidden
-            name="orderType"
-            id="takeAway"
-            [value]="OrderLocationType.Takeaway"
-            #takeAwayRadio
-            formControlName="orderType"
-          />
-          <label class="loc-btn flex-1" [class.location-active]="takeAwayRadio.checked" for="takeAway"
-            ><span>سفري</span></label
-          >
-        </div>
+        <div>
+            <!-- location btns -->
+            <div class="flex gap-2 w-full min-h-[34px]" [class.hidden]="!isCreateMode()">
+                <!-- سفري group -->
+                <div
+                    [appAllowedRoles]="[Role.Cashier, Role.Admin]"
+                    class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
+                    [class.flex-1]="!localRadio.checked"
+                    [class.w-20]="localRadio.checked"
+                    [class.segmented-group]="takeAwayRadio.checked"
+                >
+                    <input
+                        type="radio"
+                        hidden
+                        name="orderType"
+                        id="takeAway"
+                        [value]="OrderLocationType.Takeaway"
+                        #takeAwayRadio
+                        formControlName="orderType"
+                    />
+                    <label class="loc-btn flex-1" [class.location-active]="takeAwayRadio.checked" for="takeAway"
+                        ><span>سفري</span></label
+                    >
+                </div>
 
-        <!-- محلي group -->
-        <div
-          class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
-          [class.flex-3]="localRadio.checked"
-          [class.flex-1]="!localRadio.checked"
-          [class.segmented-group]="localRadio.checked"
-        >
-          <input
-            type="radio"
-            hidden
-            #localRadio
-            name="orderType"
-            id="local"
-            formControlName="orderType"
-            [value]="OrderLocationType.DineIn"
-          />
-          @if (!localRadio.checked) {
-            <label class="loc-btn flex-1" [class.location-active]="localRadio.checked" for="local"
-              ><span>محلي</span></label
-            >
-          }
+                <!-- محلي group -->
+                <div
+                    class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
+                    [class.flex-3]="localRadio.checked"
+                    [class.flex-1]="!localRadio.checked"
+                    [class.segmented-group]="localRadio.checked"
+                >
+                    <input
+                        type="radio"
+                        hidden
+                        #localRadio
+                        name="orderType"
+                        id="local"
+                        formControlName="orderType"
+                        [value]="OrderLocationType.DineIn"
+                    />
+                    @if (!localRadio.checked) {
+                        <label class="loc-btn flex-1" [class.location-active]="localRadio.checked" for="local"
+                            ><span>محلي</span></label
+                        >
+                    }
 
-          @if (localRadio.checked) {
-            <button
-              type="button"
-              (click)="openLocalTypeDialog(OrderLocalType.Table)"
-              class="segment-btn flex-1"
-              [class.location-active]="activeLocalType() === OrderLocalType.Table"
-            >
-              <span>طاوله</span>
-            </button>
-            <button
-              type="button"
-              (click)="openLocalTypeDialog(OrderLocalType.Room)"
-              class="segment-btn flex-1"
-              [class.location-active]="activeLocalType() === OrderLocalType.Room"
-            >
-              <span>غرفه</span>
-            </button>
-            <button
-              type="button"
-              (click)="openLocalTypeDialog(OrderLocalType.Hut)"
-              class="segment-btn flex-1"
-              [class.location-active]="activeLocalType() === OrderLocalType.Hut"
-            >
-              <span>كوخ</span>
-            </button>
+                    @if (localRadio.checked) {
+                        <button
+                            type="button"
+                            (click)="
+                                this.dialogService.open({
+                                    type: DialogType.LocalPlaceSelect,
+                                    inputs: { placeType: OrderLocalType.Table },
+                                })
+                            "
+                            class="segment-btn flex-1"
+                            [class.location-active]="activeLocalType() === OrderLocalType.Table"
+                        >
+                            <!-- openLocalTypeDialog()" -->
+                            <span>طاوله</span>
+                        </button>
+                        <button
+                            type="button"
+                            (click)="
+                                this.dialogService.open({
+                                    type: DialogType.LocalPlaceSelect,
+                                    inputs: { placeType: OrderLocalType.Room },
+                                })
+                            "
+                            class="segment-btn flex-1"
+                            [class.location-active]="activeLocalType() === OrderLocalType.Room"
+                        >
+                            <!-- openLocalTypeDialog(OrderLocalType.Room) -->
+                            <span>غرفه</span>
+                        </button>
+                        <button
+                            type="button"
+                            (click)="
+                                this.dialogService.open({
+                                    type: DialogType.LocalPlaceSelect,
+                                    inputs: { placeType: OrderLocalType.Hut },
+                                })
+                            "
+                            class="segment-btn flex-1"
+                            [class.location-active]="activeLocalType() === OrderLocalType.Hut"
+                        >
+                            <!-- openLocalTypeDialog(OrderLocalType.Hut) -->
+                            <span>كوخ</span>
+                        </button>
 
-            <!-- info pill -->
-            <div class="info-pill">
-              <span class="inline-block max-w-20 overflow-hidden text-ellipsis">{{
-                selectedLocalLocationLabel()
-              }}</span>
-              @if (activeLocalType() === OrderLocalType.Hut && (orderFg.value.placeRefId ?? 0) > 0) {
-                <span class="text-text-lighter">{{ formatMinutesToHHMMSS(orderFg.value.durationMinutes ?? 0) }}</span>
-              }
+                        <!-- info pill -->
+                        <div class="info-pill">
+                            <span class="inline-block max-w-20 overflow-hidden text-ellipsis">{{
+                                selectedLocalLocationLabel()
+                            }}</span>
+                            @if (activeLocalType() === OrderLocalType.Hut && (orderFg.value.placeRefId ?? 0) > 0) {
+                                <span class="text-text-lighter">{{
+                                    formatMinutesToHHMMSS(orderFg.value.durationMinutes ?? 0)
+                                }}</span>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- توصيل group -->
+                <div
+                    [appAllowedRoles]="[Role.Cashier, Role.Admin]"
+                    class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
+                    [class.flex-1]="!localRadio.checked"
+                    [class.w-20]="localRadio.checked"
+                    [class.segmented-group]="deliveryRadio.checked"
+                >
+                    <input type="radio" hidden #deliveryRadio name="orderType" id="delivery" />
+                    <label
+                        class="loc-btn flex-1"
+                        (click)="DeliveryDialogVisible = true"
+                        [class.location-active]="deliveryRadio.checked"
+                        for="delivery"
+                        ><span>توصيل</span></label
+                    >
+                </div>
             </div>
-          }
+
+            <!-- local space validation -->
+            <div [class.hidden]="!isCreateMode()">
+                @if (orderLocationType() === OrderLocationType.DineIn) {
+                    <app-input-error-message-handler
+                        class="w-fit block mx-auto"
+                        [fc]="
+                            orderFg.controls.deliveryId.invalid
+                                ? orderFg.controls.deliveryId
+                                : orderFg.controls.placeRefId
+                        "
+                    />
+                } @else if (
+                    orderLocationType() === OrderLocationType.PersonDelivery ||
+                    orderLocationType() === OrderLocationType.CompanyDelivery
+                ) {
+                    <app-input-error-message-handler class="w-fit block mx-auto" [fc]="orderFg.controls.deliveryId" />
+                }
+            </div>
         </div>
 
-        <!-- توصيل group -->
-        <div
-          [appAllowedRoles]="[Role.Cashier, Role.Admin]"
-          class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
-          [class.flex-1]="!localRadio.checked"
-          [class.w-20]="localRadio.checked"
-          [class.segmented-group]="deliveryRadio.checked"
-        >
-          <input type="radio" hidden #deliveryRadio name="orderType" id="delivery" />
-          <label
-            class="loc-btn flex-1"
-            (click)="DeliveryDialogVisible = true"
-            [class.location-active]="deliveryRadio.checked"
-            for="delivery"
-            ><span>توصيل</span></label
-          >
-        </div>
-      </div>
-
-      <!-- local space validation -->
-      <div [class.hidden]="!isCreateMode()">
-        @if (orderLocationType() === OrderLocationType.DineIn) {
-          <app-input-error-message-handler
-            class="w-fit block mx-auto"
-            [fc]="orderFg.controls.deliveryId.invalid ? orderFg.controls.deliveryId : orderFg.controls.placeRefId"
-          />
-        } @else if (
-          orderLocationType() === OrderLocationType.PersonDelivery ||
-          orderLocationType() === OrderLocationType.CompanyDelivery
-        ) {
-          <app-input-error-message-handler class="w-fit block mx-auto" [fc]="orderFg.controls.deliveryId" />
-        }
-      </div>
-    </div>
-
-    <!-- order items -->
-    <div class="p-2 border border-text-light rounded-[8px] w-full flex flex-col flex-1 overflow-hidden">
-      <!-- items -->
-      <div class="w-full flex-1 overflow-hidden pb-0.5">
-        <div class="h-full overflow-auto no-scrollbar">
-          <table class="text-dark-bg-2 text-center min-w-full">
-            <thead class="select-none">
-              <tr class="border-b border-text-gray *:pb-2 *:text-xs *:font-bold">
-                <th class="px-2">الصنف</th>
-                <th class="px-2">الكميه</th>
-                <!-- <th class="px-2">
+        <!-- order items -->
+        <div class="p-2 border border-text-light rounded-[8px] w-full flex flex-col flex-1 overflow-hidden">
+            <!-- items -->
+            <div class="w-full flex-1 overflow-hidden pb-0.5">
+                <div class="h-full overflow-auto no-scrollbar">
+                    <table class="text-dark-bg-2 text-center min-w-full">
+                        <thead class="select-none">
+                            <tr class="border-b border-text-gray *:pb-2 *:text-xs *:font-bold">
+                                <th class="px-2">الصنف</th>
+                                <th class="px-2">الكميه</th>
+                                <!-- <th class="px-2">
                   <div><span>السعر</span>&nbsp;<span class="text-xs font-light">(شامل الضريبه)</span></div>
                 </th> -->
 
-                <!-- <th class="px-2">المجموع</th> -->
-                <!-- <th class="px-2">الضريبه</th> -->
-                <th class="px-2">الاجمالي</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody class="text-sm">
-              @for (orderMenuItem of orderMenuItems(); track $index) {
-                <tr class="text-xs *:py-1 fade-in">
-                  <!-- label -->
-                  <td>
-                    <div class="flex flex-col gap-2 text-center px-4 items-center">
-                      @let label =
-                        orderMenuItem.menuItem.meal
-                          ? orderMenuItem.menuItem.meal.name
-                          : orderMenuItem.menuItem.product?.name;
-                      <div class="overflow-hidden text-ellipsis whitespace-nowrap max-w-37.5">{{ label }}</div>
-                      <!--  additional items -->
-                      <app-slider
-                        [class]="
-                          `max-w-75 -mt-1.5 overflow-hidden xl:max-w-62.5 [&_.nav-btn]:p-1! [&_.nav-btn_*]:text-sm!  `
-                        "
-                        [template]="additionTemplate"
-                        [items]="orderMenuItems()[$index].additions"
-                        [config]="{ itemWidth: 70 }"
-                      />
+                                <!-- <th class="px-2">المجموع</th> -->
+                                <!-- <th class="px-2">الضريبه</th> -->
+                                <th class="px-2">الاجمالي</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            @for (orderMenuItem of orderMenuItems(); track $index) {
+                                <tr class="text-xs *:py-1 fade-in">
+                                    <!-- label -->
+                                    <td>
+                                        <div class="flex flex-col gap-2 text-center px-4 items-center">
+                                            @let label =
+                                                orderMenuItem.menuItem.meal
+                                                    ? orderMenuItem.menuItem.meal.name
+                                                    : orderMenuItem.menuItem.product?.name;
+                                            <div class="overflow-hidden text-ellipsis whitespace-nowrap max-w-37.5">
+                                                {{ label }}
+                                            </div>
+                                            <!--  additional items -->
+                                            <app-slider
+                                                [class]="
+                                                    `max-w-75 -mt-1.5 overflow-hidden xl:max-w-62.5 [&_.nav-btn]:p-1! [&_.nav-btn_*]:text-sm!  `
+                                                "
+                                                [template]="additionTemplate"
+                                                [items]="orderMenuItems()[$index].additions"
+                                                [config]="{ itemWidth: 70 }"
+                                            />
 
-                      <ng-template #additionTemplate let-addition>
-                        <div class="relative pt-1.5 pl-1.5">
-                          <div class="border border-text-light rounded-md overflow-visible!">
-                            <div
-                              [title]="addition.product.name"
-                              class="py-0.5 px-1 text-[10px] font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-                            >
-                              {{ addition.product.name }}
-                            </div>
-                          </div>
-                          <div
-                            class="flex items-center justify-center rounded-sm bg-text-lighter h-fit p-1 leading-none text-[#FA8D7B] font-bold text-[10px] absolute -top-0 -left-0"
-                          >
-                            <span class="h-fit">{{ addition.quantity }}</span>
-                          </div>
-                        </div>
-                      </ng-template>
-                    </div>
-                  </td>
-                  <!-- quantity -->
-                  <td>
-                    <div class="flex items-center justify-center gap-2 px-4">
-                      <!-- add quantity -->
-                      <button
-                        (click)="onOrderMenuItemQuantityChange($index, +quantity.value + 1)"
-                        type="button"
-                        pButton
-                        class="w-8 h-8 border-0! px-2! rounded cursor-pointer"
-                        style="
-                          --p-button-primary-background: var(--color-text-gray);
-                          --p-button-primary-color: var(--color-dark-line);
-                          --p-button-primary-hover-background: green;
-                          --p-button-primary-active-background: rgba(0, 255, 8, 0.538);
-                        "
-                      >
-                        <svg viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path
-                            d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
-                            fill="#393C49"
-                          />
-                        </svg>
-                      </button>
-                      <!-- quantity -->
-                      <!-- <span >{{ orderMenuItem.menuItem.quantity }}</span> -->
-                      <input
-                        class="text-xs font-bold flex-1 max-w-8 text-center outline-none no-input-spinner"
-                        #quantity
-                        appAllowNumbers
-                        type="number"
-                        [min]="1"
-                        [max]="1000"
-                        [value]="orderMenuItem.menuItem.quantity"
-                        (input)="onOrderMenuItemQuantityChange($index, +quantity.value)"
-                      />
+                                            <ng-template #additionTemplate let-addition>
+                                                <div class="relative pt-1.5 pl-1.5">
+                                                    <div class="border border-text-light rounded-md overflow-visible!">
+                                                        <div
+                                                            [title]="addition.product.name"
+                                                            class="py-0.5 px-1 text-[10px] font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                                                        >
+                                                            {{ addition.product.name }}
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        class="flex items-center justify-center rounded-sm bg-text-lighter h-fit p-1 leading-none text-[#FA8D7B] font-bold text-[10px] absolute -top-0 -left-0"
+                                                    >
+                                                        <span class="h-fit">{{ addition.quantity }}</span>
+                                                    </div>
+                                                </div>
+                                            </ng-template>
+                                        </div>
+                                    </td>
+                                    <!-- quantity -->
+                                    <td>
+                                        <div class="flex items-center justify-center gap-2 px-4">
+                                            <!-- add quantity -->
+                                            <button
+                                                (click)="onOrderMenuItemQuantityChange($index, +quantity.value + 1)"
+                                                type="button"
+                                                pButton
+                                                class="w-8 h-8 border-0! px-2! rounded cursor-pointer"
+                                                style="
+                                                    --p-button-primary-background: var(--color-text-gray);
+                                                    --p-button-primary-color: var(--color-dark-line);
+                                                    --p-button-primary-hover-background: green;
+                                                    --p-button-primary-active-background: rgba(0, 255, 8, 0.538);
+                                                "
+                                            >
+                                                <svg viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
+                                                        fill="#393C49"
+                                                    />
+                                                </svg>
+                                            </button>
+                                            <!-- quantity -->
+                                            <!-- <span >{{ orderMenuItem.menuItem.quantity }}</span> -->
+                                            <input
+                                                class="text-xs font-bold flex-1 max-w-8 text-center outline-none no-input-spinner"
+                                                #quantity
+                                                appAllowNumbers
+                                                type="number"
+                                                [min]="1"
+                                                [max]="1000"
+                                                [value]="orderMenuItem.menuItem.quantity"
+                                                (input)="onOrderMenuItemQuantityChange($index, +quantity.value)"
+                                            />
 
-                      <!-- reduce quantity -->
-                      <button
-                        pButton
-                        (click)="onOrderMenuItemQuantityChange($index, +quantity.value - 1)"
-                        type="button"
-                        style="
-                          --p-button-primary-background: var(--color-text-gray);
-                          --p-button-primary-color: var(--color-dark-line);
-                          --p-button-primary-hover-background: red;
-                          --p-button-primary-active-background: rgba(255, 0, 0, 0.538);
-                        "
-                        class="w-8 h-8 border-0! px-2! rounded cursor-pointer"
-                      >
-                        <svg viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path
-                            d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
-                            fill="#393C49"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                  <!-- price -->
+                                            <!-- reduce quantity -->
+                                            <button
+                                                pButton
+                                                (click)="onOrderMenuItemQuantityChange($index, +quantity.value - 1)"
+                                                type="button"
+                                                style="
+                                                    --p-button-primary-background: var(--color-text-gray);
+                                                    --p-button-primary-color: var(--color-dark-line);
+                                                    --p-button-primary-hover-background: red;
+                                                    --p-button-primary-active-background: rgba(255, 0, 0, 0.538);
+                                                "
+                                                class="w-8 h-8 border-0! px-2! rounded cursor-pointer"
+                                            >
+                                                <svg viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
+                                                        fill="#393C49"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <!-- price -->
 
-                  <!-- <td>
+                                    <!-- <td>
                   <div
                     class="mx-auto font-semibold border border-text-light rounded text-center w-fit h-fit px-2 py-0.5 leading-none">
                     {{ getMenuItemUnitPriceWithoutAdditionsWithTax(orderMenuItem)?.toFixed(2) }}
                   </div>
                 </td> -->
-                  <!-- total -->
-                  <!-- <td class="font-semibold">
+                                    <!-- total -->
+                                    <!-- <td class="font-semibold">
                             <div class="scale-in">{{ (+(unitPrice ?? 0) * orderMenuItem.menuItem.quantity).toFixed(2) }}</div>
                           </td> -->
-                  <!-- tax -->
-                  <!-- <td class="font-semibold">
+                                    <!-- tax -->
+                                    <!-- <td class="font-semibold">
                   <div class="scale-in">{{ getMenuItemTaxValue(orderMenuItem).toFixed(2) }}</div>
                 </td> -->
-                  <!-- net -->
-                  <td class="font-semibold">
-                    <div class="scale-in">{{ getMenuItemNetValue(orderMenuItem).toFixed(2) }}</div>
-                  </td>
-                  <!-- actions -->
-                  <td>
-                    <div class="flex items-center w-full justify-end gap-2 overflow-visible!">
-                      <!-- additions -->
-                      @if (orderMenuItem.menuItem.product) {
-                        <svg
-                          (click)="getProductAdditions(orderMenuItem.menuItem.product, $index)"
-                          viewBox="0 0 20 20"
-                          class="cursor-pointer hover:text-blue-500 hover:scale-110 transition-all w-8"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M6.875 3.125H4.79167C3.87119 3.125 3.125 3.87119 3.125 4.79167V6.875C3.125 7.79547 3.87119 8.54167 4.79167 8.54167H6.875C7.79547 8.54167 8.54167 7.79547 8.54167 6.875V4.79167C8.54167 3.87119 7.79547 3.125 6.875 3.125Z"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M14.1654 3.125V5.83333M14.1654 5.83333V8.54167M14.1654 5.83333H11.457M14.1654 5.83333H16.8737"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M6.875 11.4584H4.79167C3.87119 11.4584 3.125 12.2046 3.125 13.125V15.2084C3.125 16.1288 3.87119 16.875 4.79167 16.875H6.875C7.79547 16.875 8.54167 16.1288 8.54167 15.2084V13.125C8.54167 12.2046 7.79547 11.4584 6.875 11.4584Z"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M15.207 11.4584H13.1237C12.2032 11.4584 11.457 12.2046 11.457 13.125V15.2084C11.457 16.1288 12.2032 16.875 13.1237 16.875H15.207C16.1275 16.875 16.8737 16.1288 16.8737 15.2084V13.125C16.8737 12.2046 16.1275 11.4584 15.207 11.4584Z"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                        </svg>
-                      }
-                      <!-- remove -->
-                      <svg
-                        (click)="onRemoveOrderMenuItem($index)"
-                        class="cursor-pointer w-8 hover:text-red-500 hover:scale-110 transition-all"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
-                          d="M10.7517 1.24995C12.7517 1.37495 14.6267 2.37495 16.0017 3.74995C17.6267 5.49995 18.5017 7.62495 18.5017 10.125C18.5017 12.125 17.7517 14 16.5017 15.625C15.2517 17.125 13.5017 18.25 11.5017 18.625C9.50174 18.9999 7.50174 18.75 5.75174 17.75C4.00174 16.7499 2.62674 15.25 1.87674 13.375C1.12674 11.5 1.00174 9.37495 1.62674 7.49995C2.25174 5.49995 3.37674 3.87495 5.12674 2.74995C6.75174 1.62495 8.75174 1.12495 10.7517 1.24995ZM11.3767 17.375C13.0017 16.9999 14.5017 16.125 15.6267 14.75C16.6267 13.375 17.2517 11.75 17.1267 9.99995C17.1267 7.99995 16.3767 5.99995 15.0017 4.62495C13.7517 3.37495 12.2517 2.62495 10.5017 2.49995C8.87674 2.37495 7.12674 2.74995 5.75174 3.74995C4.37674 4.74995 3.37674 6.12495 2.87674 7.87495C2.37674 9.49995 2.37674 11.25 3.12674 12.875C3.87674 14.5 5.00174 15.75 6.50174 16.625C8.00174 17.5 9.75174 17.75 11.3767 17.375ZM9.87674 9.37495L12.8767 6.24995L13.7517 7.12495L10.7517 10.2499L13.7517 13.375L12.8767 14.2499L9.87674 11.1249L6.87674 14.2499L6.00174 13.375L9.00174 10.2499L6.00174 7.12495L6.87674 6.24995L9.87674 9.37495Z"
-                          fill="currentColor"
-                        />
-                      </svg>
+                                    <!-- net -->
+                                    <td class="font-semibold">
+                                        <div class="scale-in">{{ getMenuItemNetValue(orderMenuItem).toFixed(2) }}</div>
+                                    </td>
+                                    <!-- actions -->
+                                    <td>
+                                        <div class="flex items-center w-full justify-end gap-2 overflow-visible!">
+                                            <!-- additions -->
+                                            @if (orderMenuItem.menuItem.product) {
+                                                <svg
+                                                    (click)="
+                                                        getProductAdditions(orderMenuItem.menuItem.product, $index)
+                                                    "
+                                                    viewBox="0 0 20 20"
+                                                    class="cursor-pointer hover:text-blue-500 hover:scale-110 transition-all w-8"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M6.875 3.125H4.79167C3.87119 3.125 3.125 3.87119 3.125 4.79167V6.875C3.125 7.79547 3.87119 8.54167 4.79167 8.54167H6.875C7.79547 8.54167 8.54167 7.79547 8.54167 6.875V4.79167C8.54167 3.87119 7.79547 3.125 6.875 3.125Z"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.5"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                    />
+                                                    <path
+                                                        d="M14.1654 3.125V5.83333M14.1654 5.83333V8.54167M14.1654 5.83333H11.457M14.1654 5.83333H16.8737"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.5"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                    />
+                                                    <path
+                                                        d="M6.875 11.4584H4.79167C3.87119 11.4584 3.125 12.2046 3.125 13.125V15.2084C3.125 16.1288 3.87119 16.875 4.79167 16.875H6.875C7.79547 16.875 8.54167 16.1288 8.54167 15.2084V13.125C8.54167 12.2046 7.79547 11.4584 6.875 11.4584Z"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.5"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                    />
+                                                    <path
+                                                        d="M15.207 11.4584H13.1237C12.2032 11.4584 11.457 12.2046 11.457 13.125V15.2084C11.457 16.1288 12.2032 16.875 13.1237 16.875H15.207C16.1275 16.875 16.8737 16.1288 16.8737 15.2084V13.125C16.8737 12.2046 16.1275 11.4584 15.207 11.4584Z"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.5"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                    />
+                                                </svg>
+                                            }
+                                            <!-- remove -->
+                                            <svg
+                                                (click)="onRemoveOrderMenuItem($index)"
+                                                class="cursor-pointer w-8 hover:text-red-500 hover:scale-110 transition-all"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fill-rule="evenodd"
+                                                    clip-rule="evenodd"
+                                                    d="M10.7517 1.24995C12.7517 1.37495 14.6267 2.37495 16.0017 3.74995C17.6267 5.49995 18.5017 7.62495 18.5017 10.125C18.5017 12.125 17.7517 14 16.5017 15.625C15.2517 17.125 13.5017 18.25 11.5017 18.625C9.50174 18.9999 7.50174 18.75 5.75174 17.75C4.00174 16.7499 2.62674 15.25 1.87674 13.375C1.12674 11.5 1.00174 9.37495 1.62674 7.49995C2.25174 5.49995 3.37674 3.87495 5.12674 2.74995C6.75174 1.62495 8.75174 1.12495 10.7517 1.24995ZM11.3767 17.375C13.0017 16.9999 14.5017 16.125 15.6267 14.75C16.6267 13.375 17.2517 11.75 17.1267 9.99995C17.1267 7.99995 16.3767 5.99995 15.0017 4.62495C13.7517 3.37495 12.2517 2.62495 10.5017 2.49995C8.87674 2.37495 7.12674 2.74995 5.75174 3.74995C4.37674 4.74995 3.37674 6.12495 2.87674 7.87495C2.37674 9.49995 2.37674 11.25 3.12674 12.875C3.87674 14.5 5.00174 15.75 6.50174 16.625C8.00174 17.5 9.75174 17.75 11.3767 17.375ZM9.87674 9.37495L12.8767 6.24995L13.7517 7.12495L10.7517 10.2499L13.7517 13.375L12.8767 14.2499L9.87674 11.1249L6.87674 14.2499L6.00174 13.375L9.00174 10.2499L6.00174 7.12495L6.87674 6.24995L9.87674 9.37495Z"
+                                                    fill="currentColor"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <app-input-error-message-handler class="w-fit block mx-auto" [fc]="orderFg.get('items')" />
+            <!-- items summary -->
+            <div class="border-t border-text-light pt-2 mt-auto">
+                <!-- head -->
+                <div class="bg-text-light grid grid-cols-2 text-xs font-bold text-dark-bg-2 py-1 px-2 rounded">
+                    <span>المجموع (شامل الضريبة)</span>
+                    <span class="ms-auto">{{ orderItemsNet().toFixed(2) }}</span>
+                </div>
+                <!-- body -->
+                <div
+                    class="p-4 pb-0 relative grid grid-cols-2 text-dark-bg-2 *:flex *:justify-between *:items-center gap-3 text-xs font-semibold"
+                    [class.hidden]="!isCreateMode()"
+                >
+                    <div
+                        class="absolute w-0.5 h-[calc(100%-35px)] left-1/2 top-2 -translate-x-1/2 bg-dark-bg-2/20"
+                    ></div>
+                    @if (itemsDiscountAmount()) {
+                        <div class="px-1">
+                            <span>الخصم</span>
+                            <div>{{ itemsDiscountAmount().toFixed(2) }}</div>
+                        </div>
+                    }
+                    @if (serviceFee()) {
+                        <div class="px-1">
+                            <span>الخدمه</span>
+                            <div>{{ serviceFee().toFixed(2) }}</div>
+                        </div>
+                    }
+                    @if (hutNet()) {
+                        <div class="px-1">
+                            <span>حجز الكوخ</span>
+                            <div>{{ hutNet().toFixed(2) }}</div>
+                        </div>
+                    }
+                    @if (deliveryFee()) {
+                        <div class="px-1">
+                            <span>الدليفري</span>
+                            <div>{{ deliveryFee().toFixed(2) }}</div>
+                        </div>
+                    }
+
+                    <div class="px-1">
+                        <span>الضريبة</span>
+                        <div>{{ totalMenuItemsTax().toFixed(2) }}</div>
                     </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+                    <div
+                        class="flex text-xs col-span-2 mt-1 pt-1 font-bold justify-between items-center border-t border-text-light text-dark-bg-2"
+                    >
+                        <span>الصافي</span>
+                        <span>{{ netPreview().toFixed(2) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 mt-2"></div>
         </div>
-      </div>
-      <app-input-error-message-handler class="w-fit block mx-auto" [fc]="orderFg.get('items')" />
-      <!-- items summary -->
-      <div class="border-t border-text-light pt-2 mt-auto">
-        <!-- head -->
-        <div class="bg-text-light grid grid-cols-2 text-xs font-bold text-dark-bg-2 py-1 px-2 rounded">
-          <span>المجموع (شامل الضريبة)</span>
-          <span class="ms-auto">{{ orderItemsNet().toFixed(2) }}</span>
-        </div>
-        <!-- body -->
+
+        <!-- options -->
         <div
-          class="p-4 pb-0 relative grid grid-cols-2 text-dark-bg-2 *:flex *:justify-between *:items-center gap-3 text-xs font-semibold"
-          [class.hidden]="!isCreateMode()"
+            [class.hidden]="!isCreateMode()"
+            class="flex gap-2 location-btns *:flex-1 w-full justify-end mt-auto"
+            style="--p-button-primary-background: transparent"
         >
-          <div class="absolute w-0.5 h-[calc(100%-35px)] left-1/2 top-2 -translate-x-1/2 bg-dark-bg-2/20"></div>
-          @if (itemsDiscountAmount()) {
-            <div class="px-1">
-              <span>الخصم</span>
-              <div>{{ itemsDiscountAmount().toFixed(2) }}</div>
-            </div>
-          }
-          @if (serviceFee()) {
-            <div class="px-1">
-              <span>الخدمه</span>
-              <div>{{ serviceFee().toFixed(2) }}</div>
-            </div>
-          }
-          @if (hutNet()) {
-            <div class="px-1">
-              <span>حجز الكوخ</span>
-              <div>{{ hutNet().toFixed(2) }}</div>
-            </div>
-          }
-          @if (deliveryFee()) {
-            <div class="px-1">
-              <span>الدليفري</span>
-              <div>{{ deliveryFee().toFixed(2) }}</div>
-            </div>
-          }
+            @if (orderLocationType() !== OrderLocationType.CompanyDelivery) {
+                <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
+                    <button
+                        pButton
+                        type="button"
+                        class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
+                        variant="outlined"
+                        (click)="showCustomerDialog()"
+                    >
+                        بيانات العميل
+                    </button>
+                </app-input-error-message-handler>
+            }
 
-          <div class="px-1">
-            <span>الضريبة</span>
-            <div>{{ totalMenuItemsTax().toFixed(2) }}</div>
-          </div>
-          <div
-            class="flex text-xs col-span-2 mt-1 pt-1 font-bold justify-between items-center border-t border-text-light text-dark-bg-2"
-          >
-            <span>الصافي</span>
-            <span>{{ netPreview().toFixed(2) }}</span>
-          </div>
+            <app-input-error-message-handler
+                [grouped]="false"
+                [fc]="
+                    orderFg.controls.cashAccountId.invalid
+                        ? orderFg.controls.cashAccountId
+                        : orderFg.controls.networkAccountId
+                "
+            >
+                <!-- [fc]="getPaymentInvalidControl()" -->
+                <button
+                    class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
+                    pButton
+                    type="button"
+                    variant="outlined"
+                    (click)="showPaymentDialog()"
+                >
+                    بيانات الدفع
+                </button>
+            </app-input-error-message-handler>
+            <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
+                <button
+                    (click)="toggleNumbersKeyboard()"
+                    type="button"
+                    pButton
+                    class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
+                    variant="outlined"
+                >
+                    لوحه المفاتيح
+                </button>
+            </app-input-error-message-handler>
         </div>
-      </div>
-
-      <div class="flex items-center justify-end gap-2 mt-2"></div>
-    </div>
-
-    <!-- options -->
-    <div
-      [class.hidden]="!isCreateMode()"
-      class="flex gap-2 location-btns *:flex-1 w-full justify-end mt-auto"
-      style="--p-button-primary-background: transparent"
-    >
-      @if (orderLocationType() !== OrderLocationType.CompanyDelivery) {
-        <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
-          <button
-            pButton
-            type="button"
-            class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
-            variant="outlined"
-            (click)="showCustomerDialog()"
-          >
-            بيانات العميل
-          </button>
-        </app-input-error-message-handler>
-      }
-
-      <app-input-error-message-handler
-        [grouped]="false"
-        [fc]="
-          orderFg.controls.cashAccountId.invalid ? orderFg.controls.cashAccountId : orderFg.controls.networkAccountId
-        "
-      >
-        <!-- [fc]="getPaymentInvalidControl()" -->
-        <button
-          class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
-          pButton
-          type="button"
-          variant="outlined"
-          (click)="showPaymentDialog()"
-        >
-          بيانات الدفع
-        </button>
-      </app-input-error-message-handler>
-      <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
-        <button
-          (click)="toggleNumbersKeyboard()"
-          type="button"
-          pButton
-          class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
-          variant="outlined"
-        >
-          لوحه المفاتيح
-        </button>
-      </app-input-error-message-handler>
-    </div>
-  </form>
+    </form>
 </div>
 
 <p-drawer
-  [(visible)]="isMenuVisible"
-  header=""
-  position="right"
-  [maskStyle]="{ 'z-index': 1 }"
-  styleClass="w-full! bg-white! "
-  class="no-scrollbar [&_.p-drawer-content]:ps-0! [&_.p-drawer-header]:hidden!"
-  [style]="{ zIndex: 1111 }"
-  [showCloseIcon]="false"
+    [(visible)]="isMenuVisible"
+    header=""
+    position="right"
+    [maskStyle]="{ 'z-index': 1 }"
+    styleClass="w-full! bg-white! "
+    class="no-scrollbar [&_.p-drawer-content]:ps-0! [&_.p-drawer-header]:hidden!"
+    [style]="{ zIndex: 1111 }"
+    [showCloseIcon]="false"
 >
-  <app-menu
-    [options]="{ continueBtn: true }"
-    (onContinue)="isMenuVisible = false"
-    (menuItemChange)="onMenuItemChange($event)"
-    [groups]="groups()"
-    [pickedItems]="orderMenuItems()"
-  />
+    <app-menu
+        [options]="{ continueBtn: true }"
+        (onContinue)="isMenuVisible = false"
+        (menuItemChange)="onMenuItemChange($event)"
+        [groups]="groups()"
+        [pickedItems]="orderMenuItems()"
+    />
 </p-drawer>
 
 <!-- additions -->
 <p-dialog
-  [(visible)]="additionsDialogVisible"
-  [modal]="true"
-  [dismissableMask]="true"
-  [style]="{ width: '80%', maxWidth: '50rem' }"
-  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-text-lighter!"
-  class="addition-dialog"
-  [contentStyleClass]="`no-scrollbar flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+    [(visible)]="additionsDialogVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '80%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-text-lighter!"
+    class="addition-dialog"
+    [contentStyleClass]="`no-scrollbar flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-  <!-- <ng-template #header >
+    <!-- <ng-template #header >
     <div class="inline-flex items-center justify-center gap-2">
       <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
       <span class="font-bold whitespace-nowrap">Amy Elsner</span>
     </div>
   </ng-template> -->
 
-  <p class="font-bold text-center text-dark-bg-2 text-lg">الاضافات</p>
+    <p class="font-bold text-center text-dark-bg-2 text-lg">الاضافات</p>
 
-  <div class="flex-1 overflow-auto no-scrollbar" appDebounce [domEvents]="['scroll']" #additionsScroller>
-    <div class="grid grid-cols-4 gap-2">
-      @for (item of additionProducts(); track $index) {
-        <div class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-between p-2">
-          <img
-            class="w-20 h-20 object-cover rounded-md"
-            appImgFallback
-            fallBackLink="/images/placeholders/menu-item.png"
-            [src]="baseUrl + item.images[0]?.fullPath"
-            alt=""
-          />
-          <div class="flex items-center justify-between w-full text-dark-line font-bold">
-            <span class="w-full text-ellipsis overflow-hidden">{{ item.name }}</span>
-            <span>{{ item.price.toFixed(2) }}</span>
-          </div>
-          <div class="w-full flex items-center justify-center gap-4">
-            <!-- add -->
-            <button
-              (click)="addAdditionQuantity(item, +additionQuantity.value)"
-              type="button"
-              pButton
-              class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
-              style="
-                --p-button-primary-background: var(--color-text-gray);
-                --p-button-primary-color: var(--color-text-lighter);
-              "
-            >
-              <i class="pi pi-plus text-[8px]!"></i>
-            </button>
-            <!-- quantity -->
-            <input
-              #additionQuantity
-              appAllowNumbers
-              type="number"
-              [min]="1"
-              [max]="1000"
-              [defaultValue]="1"
-              class="font-bold text-dark-line w-full flex-1 text-center outline-none no-input-spinner"
-            />
-            <!-- remove -->
-            <button
-              (click)="addAdditionQuantity(item, -additionQuantity.value)"
-              type="button"
-              pButton
-              class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
-              style="
-                --p-button-primary-background: var(--color-text-gray);
-                --p-button-primary-color: var(--color-text-lighter);
-                --p-button-primary-hover-background: red;
-                --p-button-primary-active-background: rgba(255, 0, 0, 0.538);
-              "
-            >
-              <i class="pi pi-minus text-[8px]!"></i>
-            </button>
-          </div>
+    <div class="flex-1 overflow-auto no-scrollbar" appDebounce [domEvents]="['scroll']" #additionsScroller>
+        <div class="grid grid-cols-4 gap-2">
+            @for (item of additionProducts(); track $index) {
+                <div
+                    class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-between p-2"
+                >
+                    <img
+                        class="w-20 h-20 object-cover rounded-md"
+                        appImgFallback
+                        fallBackLink="/images/placeholders/menu-item.png"
+                        [src]="baseUrl + item.images[0]?.fullPath"
+                        alt=""
+                    />
+                    <div class="flex items-center justify-between w-full text-dark-line font-bold">
+                        <span class="w-full text-ellipsis overflow-hidden">{{ item.name }}</span>
+                        <span>{{ item.price.toFixed(2) }}</span>
+                    </div>
+                    <div class="w-full flex items-center justify-center gap-4">
+                        <!-- add -->
+                        <button
+                            (click)="addAdditionQuantity(item, +additionQuantity.value)"
+                            type="button"
+                            pButton
+                            class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
+                            style="
+                                --p-button-primary-background: var(--color-text-gray);
+                                --p-button-primary-color: var(--color-text-lighter);
+                            "
+                        >
+                            <i class="pi pi-plus text-[8px]!"></i>
+                        </button>
+                        <!-- quantity -->
+                        <input
+                            #additionQuantity
+                            appAllowNumbers
+                            type="number"
+                            [min]="1"
+                            [max]="1000"
+                            [defaultValue]="1"
+                            class="font-bold text-dark-line w-full flex-1 text-center outline-none no-input-spinner"
+                        />
+                        <!-- remove -->
+                        <button
+                            (click)="addAdditionQuantity(item, -additionQuantity.value)"
+                            type="button"
+                            pButton
+                            class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
+                            style="
+                                --p-button-primary-background: var(--color-text-gray);
+                                --p-button-primary-color: var(--color-text-lighter);
+                                --p-button-primary-hover-background: red;
+                                --p-button-primary-active-background: rgba(255, 0, 0, 0.538);
+                            "
+                        >
+                            <i class="pi pi-minus text-[8px]!"></i>
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
-      }
     </div>
-  </div>
 
-  <ng-template #footer>
-    <app-slider
-      [template]="additionTemplate"
-      [items]="orderMenuItems()[currentMenuItemIx()].additions"
-      [config]="{ itemWidth: 80 }"
-    />
+    <ng-template #footer>
+        <app-slider
+            [template]="additionTemplate"
+            [items]="orderMenuItems()[currentMenuItemIx()].additions"
+            [config]="{ itemWidth: 80 }"
+        />
 
-    <ng-template #additionTemplate let-addition>
-      <div class="w-20 py-4" [title]="addition.product.name">
-        <div
-          class="border relative border-text-light rounded-md px-1 py-2 overflow-visible! flex flex-col gap-1 items-center justify-center"
-        >
-          <i
-            (click)="addAdditionQuantity(addition.product, null)"
-            class="pi pi-times-circle absolute text-lg! top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all hover:scale-115 hover:text-red-600"
-          ></i>
-          <img
-            [src]="baseUrl + addition.product?.images[0]?.fullPath"
-            appImgFallback
-            alt=""
-            class="rounded-md w-full aspect-square object-cover"
-          />
-          <span class="py-0.5 px-1 text-[10px] w-full font-bold overflow-hidden text-ellipsis whitespace-nowrap">{{
-            addition.product.name
-          }}</span>
-          <div
-            class="flex items-center justify-center border rounded-sm p-0.5 bg-text-lighter h-fit text-green-500 font-bold text-[14px] leading-none absolute -bottom-2.5 left-1/2 -translate-x-1/2"
-          >
-            <span class="h-fit">{{ addition.quantity }}</span>
-          </div>
-        </div>
-      </div>
+        <ng-template #additionTemplate let-addition>
+            <div class="w-20 py-4" [title]="addition.product.name">
+                <div
+                    class="border relative border-text-light rounded-md px-1 py-2 overflow-visible! flex flex-col gap-1 items-center justify-center"
+                >
+                    <i
+                        (click)="addAdditionQuantity(addition.product, null)"
+                        class="pi pi-times-circle absolute text-lg! top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all hover:scale-115 hover:text-red-600"
+                    ></i>
+                    <img
+                        [src]="baseUrl + addition.product?.images[0]?.fullPath"
+                        appImgFallback
+                        alt=""
+                        class="rounded-md w-full aspect-square object-cover"
+                    />
+                    <span
+                        class="py-0.5 px-1 text-[10px] w-full font-bold overflow-hidden text-ellipsis whitespace-nowrap"
+                        >{{ addition.product.name }}</span
+                    >
+                    <div
+                        class="flex items-center justify-center border rounded-sm p-0.5 bg-text-lighter h-fit text-green-500 font-bold text-[14px] leading-none absolute -bottom-2.5 left-1/2 -translate-x-1/2"
+                    >
+                        <span class="h-fit">{{ addition.quantity }}</span>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
     </ng-template>
-  </ng-template>
 </p-dialog>
 
 <!-- Hut -->
 <p-dialog
-  [(visible)]="HutDialogVisible"
-  [modal]="true"
-  [dismissableMask]="true"
-  [style]="{ width: '80%', maxWidth: '50rem' }"
-  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-text-lighter!"
-  class="addition-dialog"
-  [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+    [(visible)]="HutDialogVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '80%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-text-lighter!"
+    class="addition-dialog"
+    [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-  <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الكوخ</p>
+    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الكوخ</p>
 
-  <div
-    class="flex-1 overflow-auto no-scrollbar"
-    appDebounce
-    #hutsScroller
-    [domEvents]="['scroll']"
-    (debounced)="onHutsScroll($event, hutsScroller)"
-  >
     <div
-      class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-[90px_20px]"
+        class="flex-1 overflow-auto no-scrollbar"
+        appDebounce
+        #hutsScroller
+        [domEvents]="['scroll']"
+        (debounced)="onHutsScroll($event, hutsScroller)"
     >
-      @for (item of huts(); track $index) {
-        <app-hut-card
-          [active]="item.id == currentHut()?.id"
-          [data]="item"
-          (click)="onHutSelected(item)"
-          class="max-w-full!"
-        />
-      }
+        <div
+            class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-[90px_20px]"
+        >
+            @for (item of huts(); track $index) {
+                <app-hut-card
+                    [active]="item.id == currentHut()?.id"
+                    [data]="item"
+                    (click)="onHutSelected(item)"
+                    class="max-w-full!"
+                />
+            }
+        </div>
     </div>
-  </div>
 
-  <div class="grid grid-cols-3 gap-4 border-t border-dark-line pt-4 [&_label]:mb-1 [&_label]:inline-block">
-    <!-- reservation time -->
-    <div>
-      <label for="">مدة الحجز</label>
-      <p-select
-        style="--p-select-background: #ffffff"
-        class="w-full border border-dark-line!"
-        [options]="[30, 60, 90, 120, 150, 180]"
-        [ngModel]="currentHutMinutes()"
-        (onChange)="onHutDurationChange($event)"
-      />
+    <div class="grid grid-cols-3 gap-4 border-t border-dark-line pt-4 [&_label]:mb-1 [&_label]:inline-block">
+        <!-- reservation time -->
+        <div>
+            <label for="">مدة الحجز</label>
+            <p-select
+                style="--p-select-background: #ffffff"
+                class="w-full border border-dark-line!"
+                [options]="[30, 60, 90, 120, 150, 180]"
+                [ngModel]="currentHutMinutes()"
+                (onChange)="onHutDurationChange($event)"
+            />
+        </div>
+        <!-- hut name/id -->
+        <div>
+            <label for="">رقم / اسم الكوخ</label>
+            <input
+                type="text"
+                name=""
+                class="w-full border border-dark-line!"
+                disabled
+                [value]="currentHut()?.name"
+                pInputText
+                id=""
+            />
+        </div>
+        <!-- hut price -->
+        <div>
+            <label for="">سعر الكوخ في الساعه</label>
+            <input
+                type="text"
+                name=""
+                class="w-full border border-dark-line!"
+                disabled
+                [value]="currentHutPrice().toFixed(2)"
+                pInputText
+                id=""
+            />
+        </div>
     </div>
-    <!-- hut name/id -->
-    <div>
-      <label for="">رقم / اسم الكوخ</label>
-      <input
-        type="text"
-        name=""
-        class="w-full border border-dark-line!"
-        disabled
-        [value]="currentHut()?.name"
-        pInputText
-        id=""
-      />
-    </div>
-    <!-- hut price -->
-    <div>
-      <label for="">سعر الكوخ في الساعه</label>
-      <input
-        type="text"
-        name=""
-        class="w-full border border-dark-line!"
-        disabled
-        [value]="currentHutPrice().toFixed(2)"
-        pInputText
-        id=""
-      />
-    </div>
-  </div>
 
-  <ng-template #footer>
-    <div class="flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
-      <button pButton severity="secondary" class="bg-dark-bg-2" (click)="submitHut()">
-        {{ 'ACTIONS.CONTINUE' | translate }}
-      </button>
-      <button pButton severity="secondary" (click)="HutDialogVisible = false">
-        {{ 'ACTIONS.CANCEL' | translate }}
-      </button>
-    </div>
-  </ng-template>
+    <ng-template #footer>
+        <div class="flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
+            <button pButton severity="secondary" class="bg-dark-bg-2" (click)="submitHut()">
+                {{ 'ACTIONS.CONTINUE' | translate }}
+            </button>
+            <button pButton severity="secondary" (click)="HutDialogVisible = false">
+                {{ 'ACTIONS.CANCEL' | translate }}
+            </button>
+        </div>
+    </ng-template>
 </p-dialog>
 
 <!-- Room -->
 <p-dialog
-  [(visible)]="RoomDialogVisible"
-  [modal]="true"
-  [dismissableMask]="true"
-  [style]="{ width: '80%', maxWidth: '50rem' }"
-  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-text-lighter!"
-  class="addition-dialog"
-  [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+    [(visible)]="RoomDialogVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '80%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-text-lighter!"
+    class="addition-dialog"
+    [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-  <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الغرفة</p>
+    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الغرفة</p>
 
-  <div
-    class="flex-1 overflow-auto no-scrollbar"
-    appDebounce
-    #roomsScroller
-    [domEvents]="['scroll']"
-    (debounced)="onRoomsScroll($event, roomsScroller)"
-  >
-    <div class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
-      @for (item of rooms(); track $index) {
-        <app-room-card
-          [active]="item.id == currentRoom()?.id"
-          [data]="item"
-          (click)="onRoomSelected(item)"
-          class="max-w-full"
-        />
-      }
+    <div
+        class="flex-1 overflow-auto no-scrollbar"
+        appDebounce
+        #roomsScroller
+        [domEvents]="['scroll']"
+        (debounced)="onRoomsScroll($event, roomsScroller)"
+    >
+        <div class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
+            @for (item of rooms(); track $index) {
+                <app-room-card
+                    [active]="item.id == currentRoom()?.id"
+                    [data]="item"
+                    (click)="onRoomSelected(item)"
+                    class="max-w-full"
+                />
+            }
+        </div>
     </div>
-  </div>
 
-  <ng-template #footer>
-    <button pButton styleClass="app-p-btn" class="mx-auto" severity="secondary" (click)="RoomDialogVisible = false">
-      استمرار
-    </button>
-  </ng-template>
+    <ng-template #footer>
+        <button pButton styleClass="app-p-btn" class="mx-auto" severity="secondary" (click)="RoomDialogVisible = false">
+            استمرار
+        </button>
+    </ng-template>
 </p-dialog>
 
 <!-- Table -->
 <p-dialog
-  [(visible)]="TableDialogVisible"
-  [modal]="true"
-  [dismissableMask]="true"
-  [style]="{ width: '80%', maxWidth: '50rem' }"
-  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-text-lighter!"
-  class="addition-dialog"
-  [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+    [(visible)]="TableDialogVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '80%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-text-lighter!"
+    class="addition-dialog"
+    [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-  <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الطاولة</p>
-  <div
-    class="flex-1 overflow-auto no-scrollbar"
-    appDebounce
-    #tablesScroller
-    [domEvents]="['scroll']"
-    (debounced)="onTablesScroll($event, tablesScroller)"
-  >
-    <div class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
-      @for (item of tables(); track $index) {
-        <app-table-card
-          [active]="item.id == currentTable()?.id"
-          [data]="item"
-          (click)="onTableSelected(item)"
-          class="max-w-full"
-        />
-      }
+    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الطاولة</p>
+    <div
+        class="flex-1 overflow-auto no-scrollbar"
+        appDebounce
+        #tablesScroller
+        [domEvents]="['scroll']"
+        (debounced)="onTablesScroll($event, tablesScroller)"
+    >
+        <div class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
+            @for (item of tables(); track $index) {
+                <app-table-card
+                    [active]="item.id == currentTable()?.id"
+                    [data]="item"
+                    (click)="onTableSelected(item)"
+                    class="max-w-full"
+                />
+            }
+        </div>
     </div>
-  </div>
 
-  <ng-template #footer>
-    <button pButton styleClass="app-p-btn" class="mx-auto" severity="secondary" (click)="TableDialogVisible = false">
-      استمرار
-    </button>
-  </ng-template>
+    <ng-template #footer>
+        <button
+            pButton
+            styleClass="app-p-btn"
+            class="mx-auto"
+            severity="secondary"
+            (click)="TableDialogVisible = false"
+        >
+            استمرار
+        </button>
+    </ng-template>
 </p-dialog>
 
 <!-- customer info -->
 <p-dialog
-  [(visible)]="customerDialogVisible"
-  [modal]="true"
-  [dismissableMask]="true"
-  (onHide)="closeFullKeyboard()"
-  [style]="{ width: '80%', maxWidth: '50rem' }"
-  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-white!"
-  class="addition-dialog"
-  [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
+    [(visible)]="customerDialogVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    (onHide)="closeFullKeyboard()"
+    [style]="{ width: '80%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-white!"
+    class="addition-dialog"
+    [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-  <ng-template #headless>
-    <div class="flex flex-col p-4 gap-4">
-      <button class="cursor-pointer p-1 w-fit ms-auto" (click)="customerDialogVisible = false">
-        <i class="pi pi-times"></i>
-      </button>
-      <form id="customerForm" class="overflow-visible grid gap-4 md:grid-cols-2" [formGroup]="customerFg">
-        <!-- name (search) -->
-        <div>
-          <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
-          <app-input-error-message-handler [fc]="customerFg.get('id')">
-            <ng-select
-              class="app-select w-full"
-              [items]="displayedCustomers()"
-              formControlName="id"
-              bindLabel="name"
-              bindValue="id"
-              [clearable]="false"
-              appLoadingDisabled
-              placeholder="الكل"
-              #customerSelect
-              appDebounce
-              [customEvents]="[
-                { type: 'searchEvent', value: customerSelect.searchEvent },
-                { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
-              ]"
-              (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
-              (change)="onCustomerSelected($event)"
-            />
-          </app-input-error-message-handler>
-        </div>
+    <ng-template #headless>
+        <div class="flex flex-col p-4 gap-4">
+            <button class="cursor-pointer p-1 w-fit ms-auto" (click)="customerDialogVisible = false">
+                <i class="pi pi-times"></i>
+            </button>
+            <form id="customerForm" class="overflow-visible grid gap-4 md:grid-cols-2" [formGroup]="customerFg">
+                <!-- name (search) -->
+                <div>
+                    <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
+                    <app-input-error-message-handler [fc]="customerFg.get('id')">
+                        <ng-select
+                            class="app-select w-full"
+                            [items]="displayedCustomers()"
+                            formControlName="id"
+                            bindLabel="name"
+                            bindValue="id"
+                            [clearable]="false"
+                            appLoadingDisabled
+                            placeholder="الكل"
+                            #customerSelect
+                            appDebounce
+                            [customEvents]="[
+                                { type: 'searchEvent', value: customerSelect.searchEvent },
+                                { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
+                            ]"
+                            (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
+                            (change)="onCustomerSelected($event)"
+                        />
+                    </app-input-error-message-handler>
+                </div>
 
-        <!-- phone -->
-        <div>
-          <label for="phoneNumber">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
-          <app-input-error-message-handler [fc]="customerFg.get('phoneNumber')">
-            <input
-              pInputText
-              formControlName="phoneNumber"
-              aria-describedby="phoneNumber-help"
-              [placeholder]="'FORM.PHONE_NUMBER' | translate"
-              #customerPhoneSearch
-              appDebounce
-              class="app-input"
-            />
-          </app-input-error-message-handler>
-        </div>
+                <!-- phone -->
+                <div>
+                    <label for="phoneNumber">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
+                    <app-input-error-message-handler [fc]="customerFg.get('phoneNumber')">
+                        <input
+                            pInputText
+                            formControlName="phoneNumber"
+                            aria-describedby="phoneNumber-help"
+                            [placeholder]="'FORM.PHONE_NUMBER' | translate"
+                            #customerPhoneSearch
+                            appDebounce
+                            class="app-input"
+                        />
+                    </app-input-error-message-handler>
+                </div>
 
-        <!-- address -->
-        <div class="md:col-span-2">
-          <label for="customerAddress">{{ 'FORM.CUSTOMER_ADDRESS' | translate }}</label>
-          <app-input-error-message-handler [fc]="customerFg.get('addressDescription')">
-            <input
-              pInputText
-              formControlName="addressDescription"
-              aria-describedby="productAddress-help"
-              [placeholder]="'FORM.CUSTOMER_ADDRESS' | translate"
-              class="app-input order-customer-address"
-              (click)="triggerFullKeyboard('.order-customer-address')"
-            />
-          </app-input-error-message-handler>
-        </div>
+                <!-- address -->
+                <div class="md:col-span-2">
+                    <label for="customerAddress">{{ 'FORM.CUSTOMER_ADDRESS' | translate }}</label>
+                    <app-input-error-message-handler [fc]="customerFg.get('addressDescription')">
+                        <input
+                            pInputText
+                            formControlName="addressDescription"
+                            aria-describedby="productAddress-help"
+                            [placeholder]="'FORM.CUSTOMER_ADDRESS' | translate"
+                            class="app-input order-customer-address"
+                            (click)="triggerFullKeyboard('.order-customer-address')"
+                        />
+                    </app-input-error-message-handler>
+                </div>
 
-        <!-- <app-full-keyboard /> -->
-      </form>
-      <button
-        pButton
-        styleClass="app-p-btn"
-        class="mx-auto"
-        severity="secondary"
-        (click)="customerDialogVisible = false"
-      >
-        استمرار
-      </button>
-    </div>
-  </ng-template>
+                <!-- <app-full-keyboard /> -->
+            </form>
+            <button
+                pButton
+                styleClass="app-p-btn"
+                class="mx-auto"
+                severity="secondary"
+                (click)="customerDialogVisible = false"
+            >
+                استمرار
+            </button>
+        </div>
+    </ng-template>
 </p-dialog>
 
 <!-- payment info -->
 <p-dialog
-  [(visible)]="paymentDialogVisible"
-  [modal]="true"
-  [dismissableMask]="true"
-  [style]="{ width: '80%', maxWidth: '50rem' }"
-  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-white!"
-  class="addition-dialog"
-  [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
+    [(visible)]="paymentDialogVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '80%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-white!"
+    class="addition-dialog"
+    [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-  <ng-template #headless>
-    <div class="flex flex-col p-4 gap-4">
-      <button class="cursor-pointer p-1 w-fit ms-auto" (click)="paymentDialogVisible = false">
-        <i class="pi pi-times"></i>
-      </button>
-      <div id="paymentForm" class="overflow-visible grid gap-4 md:grid-cols-2">
-        <!-- paid / postponed (radio) -->
-        <div
-          class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4 border-b border-b-text-light pb-4 [&_input]:w-5 [&_input]:aspect-square"
-        >
-          <!-- paid -->
-          <div [appAllowedRoles]="[Role.Cashier, Role.Admin]" class="flex items-center gap-1">
-            <input
-              type="radio"
-              name="isPaid"
-              id="paymentInfoPaid"
-              [checked]="isPaid()"
-              (input)="isPaid.set(true)"
-              [value]="isPaid()"
-            />
-            <label for="paymentInfoPaid">{{ 'FORM.PAID' | translate }}</label>
-          </div>
-          <!-- postponed -->
-          <div class="flex items-center gap-1">
-            <input
-              type="radio"
-              name="isPaid"
-              id="paymentInfoPostponed"
-              (input)="isPaid.set(false)"
-              [value]="!isPaid()"
-              [checked]="!isPaid()"
-            />
-            <label for="paymentInfoPostponed">{{ 'FORM.POSTPONED' | translate }}</label>
-          </div>
+    <ng-template #headless>
+        <div class="flex flex-col p-4 gap-4">
+            <button class="cursor-pointer p-1 w-fit ms-auto" (click)="paymentDialogVisible = false">
+                <i class="pi pi-times"></i>
+            </button>
+            <div id="paymentForm" class="overflow-visible grid gap-4 md:grid-cols-2">
+                <!-- paid / postponed (radio) -->
+                <div
+                    class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4 border-b border-b-text-light pb-4 [&_input]:w-5 [&_input]:aspect-square"
+                >
+                    <!-- paid -->
+                    <div [appAllowedRoles]="[Role.Cashier, Role.Admin]" class="flex items-center gap-1">
+                        <input
+                            type="radio"
+                            name="isPaid"
+                            id="paymentInfoPaid"
+                            [checked]="isPaid()"
+                            (input)="isPaid.set(true)"
+                            [value]="isPaid()"
+                        />
+                        <label for="paymentInfoPaid">{{ 'FORM.PAID' | translate }}</label>
+                    </div>
+
+                    <!-- postponed -->
+                    <div class="flex items-center gap-1">
+                        <input
+                            type="radio"
+                            name="isPaid"
+                            id="paymentInfoPostponed"
+                            (input)="isPaid.set(false)"
+                            [value]="!isPaid()"
+                            [checked]="!isPaid()"
+                        />
+                        <label for="paymentInfoPostponed">{{ 'FORM.POSTPONED' | translate }}</label>
+                    </div>
+                </div>
+
+                <!-- cash -->
+                <div>
+                    <label for="cash">{{ 'FORM.CASH_PAID' | translate }}</label>
+                    <app-input-error-message-handler [fc]="orderFg.get('payingCash')">
+                        <input
+                            pInputText
+                            aria-describedby="cash-help"
+                            [placeholder]="'FORM.CASH' | translate"
+                            [formControl]="getFormControl(orderFg, 'payingCash')"
+                            appAllowNumbers
+                            [max]="net()"
+                            [disabled]="!isPaid()"
+                            [min]="0"
+                            [allowDecimal]="true"
+                            #payingCash
+                            appDecimalMask
+                            id="payingCash"
+                            type="number"
+                            appDebounce
+                            class="app-input"
+                            (click)="triggerNumbersKeyboard(payingCash)"
+                        />
+                        <p-inputgroup-addon class="flex p-0!">
+                            <button
+                                pButton
+                                class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
+                                type="button"
+                                (click)="orderFg.controls.payingCash.setValue(0)"
+                            >
+                                <i class="pi pi-arrow-down"></i>
+                            </button>
+                        </p-inputgroup-addon>
+                    </app-input-error-message-handler>
+                </div>
+
+                <!-- cash account -->
+                <div>
+                    <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
+                    <app-input-error-message-handler [fc]="orderFg.get('cashAccountId')">
+                        <ng-select
+                            class="app-select w-full"
+                            [items]="displayedCashAccounts()"
+                            [formControl]="getFormControl(orderFg, 'cashAccountId')"
+                            bindLabel="name"
+                            bindValue="id"
+                            [clearable]="false"
+                            placeholder="الكل"
+                            #cashAccountSelect
+                            appDebounce
+                            [customEvents]="[
+                                { type: 'searchEvent', value: cashAccountSelect.searchEvent },
+                                { type: 'scrollToEnd', value: cashAccountSelect.scrollToEnd },
+                            ]"
+                            (debounced)="onCashFinancialAccountsSearch($event)"
+                        />
+                    </app-input-error-message-handler>
+                </div>
+
+                <!-- network -->
+                <div>
+                    <label for="network">{{ 'FORM.NETWORK_PAID' | translate }}</label>
+                    <app-input-error-message-handler [fc]="orderFg.get('payingNetwork')">
+                        <input
+                            pInputText
+                            appAllowNumbers
+                            [allowDecimal]="true"
+                            [max]="net()"
+                            [min]="0"
+                            appDecimalMask
+                            [disabled]="!isPaid()"
+                            id="payingNetwork"
+                            type="number"
+                            aria-describedby="network-help"
+                            #payingNetwork
+                            (click)="triggerNumbersKeyboard(payingNetwork)"
+                            [formControl]="getFormControl(orderFg, 'payingNetwork')"
+                            [placeholder]="'FORM.NETWORK' | translate"
+                            class="app-input"
+                        />
+                        <p-inputgroup-addon class="flex p-0!">
+                            <button
+                                pButton
+                                class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
+                                type="button"
+                                (click)="orderFg.controls.payingNetwork.setValue(0)"
+                            >
+                                <i class="pi pi-arrow-up"></i>
+                            </button>
+                        </p-inputgroup-addon>
+                    </app-input-error-message-handler>
+                </div>
+
+                <!-- network account -->
+                <div>
+                    <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
+                    <app-input-error-message-handler [fc]="orderFg.get('networkAccountId')">
+                        <ng-select
+                            class="app-select w-full"
+                            [items]="displayedNetworkAccounts()"
+                            [formControl]="getFormControl(orderFg, 'networkAccountId')"
+                            bindLabel="name"
+                            bindValue="id"
+                            [clearable]="false"
+                            placeholder="الكل"
+                            #networkAccountSelect
+                            appDebounce
+                            [customEvents]="[
+                                { type: 'searchEvent', value: networkAccountSelect.searchEvent },
+                                { type: 'scrollToEnd', value: networkAccountSelect.scrollToEnd },
+                            ]"
+                            (debounced)="onNetworkFinancialAccountsSearch($event)"
+                        />
+                    </app-input-error-message-handler>
+                </div>
+
+                <!-- number keyboard toggle -->
+                <div class="flex justify-between items-center md:col-span-2">
+                    <button
+                        type="button"
+                        pButton
+                        class="cursor-pointer"
+                        styleClass="px-3! py-1!"
+                        severity="secondary"
+                        variant="outlined"
+                        (click)="togglePaymentNumbersKeyboard()"
+                        title="لوحة المفاتيح"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M4 6H20M4 10H20M4 14H16M4 18H12"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </button>
+
+                    <button pButton styleClass="app-p-btn" severity="secondary" (click)="paymentDialogVisible = false">
+                        استمرار
+                    </button>
+                </div>
+
+                @if (isPaymentNumbersKeyboardVisible()) {
+                    <div class="md:col-span-2">
+                        <app-numbers-keyboard />
+                    </div>
+                }
+
+                @if (isPaid()) {
+                    <!-- amount received from customer (for change calculation) -->
+                    <div class="md:col-span-2 border-t border-b-text-light pt-4 mt-2">
+                        <label for="amountReceived">المبلغ المستلم من العميل</label>
+                        <input
+                            pInputText
+                            appAllowNumbers
+                            [allowDecimal]="true"
+                            [min]="0"
+                            id="amountReceived"
+                            aria-describedby="amountReceived-help"
+                            placeholder="أدخل المبلغ المستلم"
+                            [ngModel]="amountReceived()"
+                            (ngModelChange)="amountReceived.set(+$event || 0)"
+                            [ngModelOptions]="{ standalone: true }"
+                            #amountReceivedInput
+                            appDebounce
+                            class="app-input"
+                            (click)="triggerNumbersKeyboard(amountReceivedInput)"
+                        />
+                    </div>
+
+                    <!-- change / remaining amount display -->
+                    <div class="md:col-span-2">
+                        @if (changeAmount() > 0) {
+                            <div
+                                class="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-4 py-3"
+                            >
+                                <span class="font-bold text-green-700">الباقي للعميل:</span>
+                                <span class="font-bold text-green-700 text-lg">{{ changeAmount().toFixed(2) }}</span>
+                            </div>
+                        } @else if (changeAmount() < 0) {
+                            <div
+                                class="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg px-4 py-3"
+                            >
+                                <span class="font-bold text-red-700">المبلغ المتبقي:</span>
+                                <span class="font-bold text-red-700 text-lg">{{
+                                    Math.abs(changeAmount()).toFixed(2)
+                                }}</span>
+                            </div>
+                        } @else if (amountReceived() > 0) {
+                            <div
+                                class="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-3"
+                            >
+                                <span class="font-bold text-blue-700">المبلغ بالضبط</span>
+                                <span class="font-bold text-blue-700 text-lg">0.00</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
         </div>
-
-        <!-- cash -->
-        <div>
-          <label for="cash">{{ 'FORM.CASH_PAID' | translate }}</label>
-          <app-input-error-message-handler [fc]="orderFg.get('payingCash')">
-            <input
-              pInputText
-              aria-describedby="cash-help"
-              [placeholder]="'FORM.CASH' | translate"
-              [formControl]="getFormControl(orderFg, 'payingCash')"
-              appAllowNumbers
-              [max]="net()"
-              [disabled]="!isPaid()"
-              [min]="0"
-              [allowDecimal]="true"
-              #payingCash
-              appDecimalMask
-              id="payingCash"
-              type="number"
-              appDebounce
-              class="app-input"
-              (click)="triggerNumbersKeyboard(payingCash)"
-            />
-            <p-inputgroup-addon class="flex p-0!">
-              <button
-                pButton
-                class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
-                type="button"
-                (click)="orderFg.controls.payingCash.setValue(0)"
-              >
-                <i class="pi pi-arrow-down"></i>
-              </button>
-            </p-inputgroup-addon>
-          </app-input-error-message-handler>
-        </div>
-
-        <!-- cash account -->
-        <div>
-          <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
-          <app-input-error-message-handler [fc]="orderFg.get('cashAccountId')">
-            <ng-select
-              class="app-select w-full"
-              [items]="displayedCashAccounts()"
-              [formControl]="getFormControl(orderFg, 'cashAccountId')"
-              bindLabel="name"
-              bindValue="id"
-              [clearable]="false"
-              placeholder="الكل"
-              #cashAccountSelect
-              appDebounce
-              [customEvents]="[
-                { type: 'searchEvent', value: cashAccountSelect.searchEvent },
-                { type: 'scrollToEnd', value: cashAccountSelect.scrollToEnd },
-              ]"
-              (debounced)="onCashFinancialAccountsSearch($event)"
-            />
-          </app-input-error-message-handler>
-        </div>
-
-        <!-- network -->
-        <div>
-          <label for="network">{{ 'FORM.NETWORK_PAID' | translate }}</label>
-          <app-input-error-message-handler [fc]="orderFg.get('payingNetwork')">
-            <input
-              pInputText
-              appAllowNumbers
-              [allowDecimal]="true"
-              [max]="net()"
-              [min]="0"
-              appDecimalMask
-              [disabled]="!isPaid()"
-              id="payingNetwork"
-              type="number"
-              aria-describedby="network-help"
-              #payingNetwork
-              (click)="triggerNumbersKeyboard(payingNetwork)"
-              [formControl]="getFormControl(orderFg, 'payingNetwork')"
-              [placeholder]="'FORM.NETWORK' | translate"
-              class="app-input"
-            />
-            <p-inputgroup-addon class="flex p-0!">
-              <button
-                pButton
-                class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
-                type="button"
-                (click)="orderFg.controls.payingNetwork.setValue(0)"
-              >
-                <i class="pi pi-arrow-up"></i>
-              </button>
-            </p-inputgroup-addon>
-          </app-input-error-message-handler>
-        </div>
-
-        <!-- network account -->
-        <div>
-          <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
-          <app-input-error-message-handler [fc]="orderFg.get('networkAccountId')">
-            <ng-select
-              class="app-select w-full"
-              [items]="displayedNetworkAccounts()"
-              [formControl]="getFormControl(orderFg, 'networkAccountId')"
-              bindLabel="name"
-              bindValue="id"
-              [clearable]="false"
-              placeholder="الكل"
-              #networkAccountSelect
-              appDebounce
-              [customEvents]="[
-                { type: 'searchEvent', value: networkAccountSelect.searchEvent },
-                { type: 'scrollToEnd', value: networkAccountSelect.scrollToEnd },
-              ]"
-              (debounced)="onNetworkFinancialAccountsSearch($event)"
-            />
-          </app-input-error-message-handler>
-        </div>
-
-        <!-- number keyboard toggle -->
-        <div class="flex justify-between items-center md:col-span-2">
-          <button
-            type="button"
-            pButton
-            class="cursor-pointer"
-            styleClass="px-3! py-1!"
-            severity="secondary"
-            variant="outlined"
-            (click)="togglePaymentNumbersKeyboard()"
-            title="لوحة المفاتيح"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M4 6H20M4 10H20M4 14H16M4 18H12"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </button>
-
-          <button pButton styleClass="app-p-btn" severity="secondary" (click)="paymentDialogVisible = false">
-            استمرار
-          </button>
-        </div>
-
-        @if (isPaymentNumbersKeyboardVisible()) {
-          <div class="md:col-span-2">
-            <app-numbers-keyboard />
-          </div>
-        }
-
-        @if (isPaid()) {
-          <!-- amount received from customer (for change calculation) -->
-          <div class="md:col-span-2 border-t border-b-text-light pt-4 mt-2">
-            <label for="amountReceived">المبلغ المستلم من العميل</label>
-            <input
-              pInputText
-              appAllowNumbers
-              [allowDecimal]="true"
-              [min]="0"
-              id="amountReceived"
-              aria-describedby="amountReceived-help"
-              placeholder="أدخل المبلغ المستلم"
-              [ngModel]="amountReceived()"
-              (ngModelChange)="amountReceived.set(+$event || 0)"
-              [ngModelOptions]="{ standalone: true }"
-              #amountReceivedInput
-              appDebounce
-              class="app-input"
-              (click)="triggerNumbersKeyboard(amountReceivedInput)"
-            />
-          </div>
-
-          <!-- change / remaining amount display -->
-          <div class="md:col-span-2">
-            @if (changeAmount() > 0) {
-              <div class="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-4 py-3">
-                <span class="font-bold text-green-700">الباقي للعميل:</span>
-                <span class="font-bold text-green-700 text-lg">{{ changeAmount().toFixed(2) }}</span>
-              </div>
-            } @else if (changeAmount() < 0) {
-              <div class="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-                <span class="font-bold text-red-700">المبلغ المتبقي:</span>
-                <span class="font-bold text-red-700 text-lg">{{ Math.abs(changeAmount()).toFixed(2) }}</span>
-              </div>
-            } @else if (amountReceived() > 0) {
-              <div class="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-                <span class="font-bold text-blue-700">المبلغ بالضبط</span>
-                <span class="font-bold text-blue-700 text-lg">0.00</span>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </div>
-  </ng-template>
+    </ng-template>
 </p-dialog>
 
 <!-- Delivery -->
 <p-dialog
-  [(visible)]="DeliveryDialogVisible"
-  [modal]="true"
-  [dismissableMask]="true"
-  [style]="{ width: '80%', maxWidth: '50rem' }"
-  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-text-lighter!"
-  class="addition-dialog"
-  [contentStyleClass]="`flex flex-col gap-4 ${isLoading() && 'opacity-50 cursor-wait'}`"
+    [(visible)]="DeliveryDialogVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '80%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-text-lighter!"
+    class="addition-dialog"
+    [contentStyleClass]="`flex flex-col gap-4 ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-  <ng-template #header>
-    <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">إختر الدليفري</p>
-  </ng-template>
-  <div
-    class="flex gap-2 w-full justify-center pt-4"
-    style="--p-button-primary-background: #fff; --p-button-primary-color: #1f1d2b"
-  >
-    <button
-      pButton
-      [class.text-green-500!]="!isCompanyDelivery"
-      (click)="changeDeliveryType(OrderLocationType.PersonDelivery)"
-    >
-      دليفري
-    </button>
-    <button
-      pButton
-      [class.text-green-500!]="isCompanyDelivery"
-      (click)="changeDeliveryType(OrderLocationType.CompanyDelivery)"
-    >
-      شركة
-    </button>
-  </div>
-  <div
-    class="flex-1 overflow-visible no-scrollbar"
-    appDebounce
-    #tablesScroller
-    [domEvents]="['scroll']"
-    (debounced)="onDeliveriesScroll($event, tablesScroller)"
-  >
+    <ng-template #header>
+        <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">إختر الدليفري</p>
+    </ng-template>
     <div
-      class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5 *:flex *:flex-col *:items-center *:justify-center *:border *:p-4! *:rounded-[8px] *:cursor-pointer"
-      style="--p-button-primary-background: #fff"
+        class="flex gap-2 w-full justify-center pt-4"
+        style="--p-button-primary-background: #fff; --p-button-primary-color: #1f1d2b"
     >
-      @if (isCompanyDelivery) {
-        @for (item of companyDeliveries(); track $index) {
-          <button
+        <button
             pButton
-            [class.location-active]="item.id === currentCompanyDelivery()?.id"
-            (click)="onDeliverySelected(OrderLocationType.CompanyDelivery, item)"
-          >
-            <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
-                stroke="#000000"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            <p class="text-center text-dark-bg-2 text-sm">
-              {{ item.name }}
-            </p>
-          </button>
-        } @empty {
-          <p-skeleton class="h-20" />
-          <p-skeleton class="h-20" />
-          <p-skeleton class="h-20" />
-        }
-      } @else {
-        @for (item of deliveries(); track $index) {
-          <button
+            [class.text-green-500!]="!isCompanyDelivery"
+            (click)="changeDeliveryType(OrderLocationType.PersonDelivery)"
+        >
+            دليفري
+        </button>
+        <button
             pButton
-            class="relative overflow-visible!"
-            [class.location-active]="item.id === currentDelivery()?.id"
-            (click)="onDeliverySelected(OrderLocationType.PersonDelivery, item)"
-          >
-            <span
-              class="absolute -top-2.5 -left-2.5 text-xs text-white bg-rose-600 rounded-full w-5 h-5 flex items-center justify-center"
-              >{{ item.orderNumber }}</span
-            >
-            <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
-                stroke="#000000"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            <p class="text-center text-dark-bg-2 text-sm">
-              {{ item.name }}
-            </p>
-          </button>
-        } @empty {
-          <p-skeleton class="h-20" />
-          <p-skeleton class="h-20" />
-          <p-skeleton class="h-20" />
-        }
-      }
+            [class.text-green-500!]="isCompanyDelivery"
+            (click)="changeDeliveryType(OrderLocationType.CompanyDelivery)"
+        >
+            شركة
+        </button>
     </div>
-  </div>
-  <ng-template #footer>
-    <button pButton styleClass="app-p-btn" class="mx-auto" severity="secondary" (click)="DeliveryDialogVisible = false">
-      استمرار
-    </button>
-  </ng-template>
+    <div
+        class="flex-1 overflow-visible no-scrollbar"
+        appDebounce
+        #tablesScroller
+        [domEvents]="['scroll']"
+        (debounced)="onDeliveriesScroll($event, tablesScroller)"
+    >
+        <div
+            class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5 *:flex *:flex-col *:items-center *:justify-center *:border *:p-4! *:rounded-[8px] *:cursor-pointer"
+            style="--p-button-primary-background: #fff"
+        >
+            @if (isCompanyDelivery) {
+                @for (item of companyDeliveries(); track $index) {
+                    <button
+                        pButton
+                        [class.location-active]="item.id === currentCompanyDelivery()?.id"
+                        (click)="onDeliverySelected(OrderLocationType.CompanyDelivery, item)"
+                    >
+                        <svg
+                            width="28px"
+                            height="28px"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                                stroke="#000000"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                        <p class="text-center text-dark-bg-2 text-sm">
+                            {{ item.name }}
+                        </p>
+                    </button>
+                } @empty {
+                    <p-skeleton class="h-20" />
+                    <p-skeleton class="h-20" />
+                    <p-skeleton class="h-20" />
+                }
+            } @else {
+                @for (item of deliveries(); track $index) {
+                    <button
+                        pButton
+                        class="relative overflow-visible!"
+                        [class.location-active]="item.id === currentDelivery()?.id"
+                        (click)="onDeliverySelected(OrderLocationType.PersonDelivery, item)"
+                    >
+                        <span
+                            class="absolute -top-2.5 -left-2.5 text-xs text-white bg-rose-600 rounded-full w-5 h-5 flex items-center justify-center"
+                            >{{ item.orderNumber }}</span
+                        >
+                        <svg
+                            width="28px"
+                            height="28px"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                                stroke="#000000"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                        <p class="text-center text-dark-bg-2 text-sm">
+                            {{ item.name }}
+                        </p>
+                    </button>
+                } @empty {
+                    <p-skeleton class="h-20" />
+                    <p-skeleton class="h-20" />
+                    <p-skeleton class="h-20" />
+                }
+            }
+        </div>
+    </div>
+    <ng-template #footer>
+        <button
+            pButton
+            styleClass="app-p-btn"
+            class="mx-auto"
+            severity="secondary"
+            (click)="DeliveryDialogVisible = false"
+        >
+            استمرار
+        </button>
+    </ng-template>
 </p-dialog>
 
 <!-- Order Success Dialog -->
 <app-order-success-dialog
-  [visible]="successDialogVisible()"
-  [order]="lastCreatedOrder()"
-  (hide)="onSuccessDialogHide()"
-  (print)="onSuccessDialogPrint()"
+    [visible]="successDialogVisible()"
+    [order]="lastCreatedOrder()"
+    (hide)="onSuccessDialogHide()"
+    (print)="onSuccessDialogPrint()"
 />
 
 <!-- Print Dialog -->
 <p-dialog
-  [visible]="printDialogVisible"
-  (visibleChange)="printDialogVisible = $event; !$event && onPrintDialogHide()"
-  [modal]="true"
-  [dismissableMask]="true"
-  [style]="{ width: '100%', maxWidth: '50rem' }"
-  [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-white!"
-  class="addition-dialog"
-  [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+    [visible]="printDialogVisible"
+    (visibleChange)="printDialogVisible = $event; !$event && onPrintDialogHide()"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '100%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-white!"
+    class="addition-dialog"
+    [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-  <ng-template #header>
-    <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">التحصيل</p>
-  </ng-template>
+    <ng-template #header>
+        <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">التحصيل</p>
+    </ng-template>
 
-  <!-- body -->
-  <app-printable-order-invoice [data]="printBill()" #printableOrderInvoice />
+    <!-- body -->
+    <app-printable-order-invoice [data]="printBill()" #printableOrderInvoice />
 
-  <ng-template #footer>
-    <button pButton styleClass="app-p-btn" class="mx-auto" appLoadingDisabled (click)="printOrder()">استمرار</button>
-  </ng-template>
+    <ng-template #footer>
+        <button pButton styleClass="app-p-btn" class="mx-auto" appLoadingDisabled (click)="printOrder()">
+            استمرار
+        </button>
+    </ng-template>
 </p-dialog>

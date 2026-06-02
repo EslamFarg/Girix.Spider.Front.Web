@@ -1,5 +1,4 @@
-import { Component, computed, inject, model, signal } from '@angular/core';
-import { AppModal } from '../app-modal/app-modal';
+import { Component, computed, effect, inject, model, signal } from '@angular/core';
 import { Select } from 'primeng/select';
 import { HutCard } from '../hut-card/hut-card';
 import { Debounce } from '@/directives/debounce';
@@ -11,18 +10,26 @@ import { IRoomSearchRow, RoomService } from '@/features/restaurant/services/room
 import { ITableSearchRow, TableService } from '@/features/restaurant/services/table-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
+import { BaseComponent } from '../base-component/base-component';
+import { DialogType } from '@/features/dialogs/enums';
+import { InputText } from 'primeng/inputtext';
+import { ButtonDirective } from 'primeng/button';
 
 type IChosenPlace = (IHutSearchRow | IRoomSearchRow | ITableSearchRow) & { type: OrderLocalType };
+export type ChosenLocalPlace = IChosenPlace & {
+    reservationMinutes: number;
+};
 
 @Component({
-    selector: 'app-local-place-modal',
-    imports: [AppModal, Select, HutCard, Debounce, RoomCard, TableCard,TranslatePipe,FormsModule],
-    templateUrl: './local-place-modal.html',
-    styleUrl: './local-place-modal.css',
+    selector: 'app-local-place-select',
+    imports: [Select, HutCard, Debounce, RoomCard, TableCard, TranslatePipe, FormsModule, InputText, ButtonDirective],
+    templateUrl: './local-place-select.html',
+    styleUrl: './local-place-select.css',
 })
-export class LocalPlaceModal {
+export class LocalPlaceSelect extends BaseComponent {
     OrderLocalType = OrderLocalType;
     placeType = model.required<OrderLocalType>();
+    visible = model.required<boolean>();
 
     items = signal<IHutSearchRow[] | IRoomSearchRow[] | ITableSearchRow[]>([]);
     chosenPlace = signal<IChosenPlace | null>(null);
@@ -39,13 +46,6 @@ export class LocalPlaceModal {
     tableService = inject(TableService);
 
     placeService = computed(() => {
-        this.items.set([]);
-        this.paginationInfo = {
-            pageIndex: 1,
-            totalPagesCount: 1,
-            totalRowsCount: 0,
-        };
-
         switch (this.placeType()) {
             case OrderLocalType.Hut:
                 return this.hutService;
@@ -54,6 +54,17 @@ export class LocalPlaceModal {
             case OrderLocalType.Table:
                 return this.tableService;
         }
+    });
+
+    placeServiceChangeEffect = effect(() => {
+        // const placeService = this.placeService();
+        this.items.set([]);
+        this.paginationInfo = {
+            pageIndex: 1,
+            totalPagesCount: 1,
+            totalRowsCount: 0,
+        };
+        this.searchPlaces({ pageIndex: 1 });
     });
 
     searchPlaces(dto: { searchTerm?: string; pageIndex: number }) {
@@ -88,9 +99,17 @@ export class LocalPlaceModal {
     }
 
     onSelected(item: Omit<IChosenPlace, 'type'>) {
+        if (!item.isAvailable || item.reservedTo) return;
         this.chosenPlace.set({
             ...item,
             type: this.placeType(),
+        });
+    }
+
+    closeDialog() {
+        this.dialogService.close({
+            type: DialogType.LocalPlaceSelect,
+            data: { ...this.chosenPlace(), reservationMinutes: this.reservationMinutes() } as IChosenLocalPlace,
         });
     }
 }
