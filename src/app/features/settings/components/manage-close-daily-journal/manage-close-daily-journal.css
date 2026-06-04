@@ -6,7 +6,7 @@
 }
 
 .doc-input {
-  box-shadow: 0px 0px 10px 0px #808080b2 inset;
+  /* box-shadow: 0px 0px 10px 0px #808080b2 inset; */
   background-color: transparent;
   display: flex;
   align-items: center;

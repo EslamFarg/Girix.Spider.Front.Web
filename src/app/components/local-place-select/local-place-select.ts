@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, model, signal } from '@angular/cor
 import { Select } from 'primeng/select';
 import { HutCard } from '../hut-card/hut-card';
 import { Debounce } from '@/directives/debounce';
-import { OrderLocalType } from '@/features/orders';
+import { OrderLocalType, OrderService } from '@/features/orders';
 import { RoomCard } from '../room-card/room-card';
 import { TableCard } from '../table-card/table-card';
 import { HutService, IHutSearchRow } from '@/features/restaurant/services/hut-service';
@@ -30,9 +30,10 @@ export class LocalPlaceSelect extends BaseComponent {
     OrderLocalType = OrderLocalType;
     placeType = model.required<OrderLocalType>();
     visible = model.required<boolean>();
+    orderService = inject(OrderService);
 
     items = signal<IHutSearchRow[] | IRoomSearchRow[] | ITableSearchRow[]>([]);
-    chosenPlace = signal<IChosenPlace | null>(null);
+    chosenLocalPlace = this.orderService.chosenLocalPlace;
     reservationMinutes = signal(30);
 
     paginationInfo = {
@@ -100,16 +101,21 @@ export class LocalPlaceSelect extends BaseComponent {
 
     onSelected(item: Omit<IChosenPlace, 'type'>) {
         if (!item.isAvailable || item.reservedTo) return;
-        this.chosenPlace.set({
+        this.chosenLocalPlace.set({
             ...item,
             type: this.placeType(),
+            reservationMinutes: this.isHutSelected() ? this.reservationMinutes() : 0,
         });
     }
 
     closeDialog() {
         this.dialogService.close({
             type: DialogType.LocalPlaceSelect,
-            data: { ...this.chosenPlace(), reservationMinutes: this.reservationMinutes() } as IChosenLocalPlace,
+            data: this.chosenLocalPlace(),
         });
+    }
+
+    isHutSelected() {
+        return this.placeType() === OrderLocalType.Hut;
     }
 }

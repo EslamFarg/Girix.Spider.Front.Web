@@ -26,6 +26,7 @@ export class ManageOpenDailyJournal extends BaseComponent {
   };
   fg = this.fb.group(this.initialFgValue);
 
+
   constructor() {
     super();
   }

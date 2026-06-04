@@ -1,55 +1,51 @@
 <form appLoadingDisabled class="flex flex-col gap-4" [formGroup]="fg" (ngSubmit)="onSubmitOpenDaily()">
-  <!-- الرصيد السابق -->
-  <div class="doc-input flex">
-    <label for="previousBalance" class="mb-0!">{{ 'DAILY_JOURNAL.PREVIOUS_BALANCE' | translate }}</label>
-    <input
-      pInputText
-      id="previousBalance"
-      disabled
-      class="flex-1"
-      aria-describedby="previousBalance-help"
-      placeholder="0"
-    />
-  </div>
-  <app-input-error-message-handler />
-  <!-- العهده -->
-  <div class="doc-input flex opacity-70">
-    <label for="" class="mb-0!">{{ 'DAILY_JOURNAL.CUSTODY_BALANCE' | translate }}</label>
-    <input
-      pInputText
-      id="custodyBalance"
-      formControlName="custodyBalance"
-      class="flex-1"
-      aria-describedby="custodyBalance-help"
-      placeholder=""
-    />
-  </div>
-  <app-input-error-message-handler [fc]="fg.get('custodyBalance')" />
-  <!-- ملاحظات -->
-  <div>
-    <label for="" class="text-dark-bg-1 font-medium text-sm">{{ 'DAILY_JOURNAL.NOTES' | translate }}</label>
-    <div class="doc-input flex my-1">
-      <textarea
-        rows="5"
-        cols="30"
-        pTextarea
-        class="flex-1"
-        formControlName="openingNotes"
-        id="openingNotes"
-        aria-describedby="openingNotes-help"
-        placeholder=""
-      ></textarea>
+    <!-- الرصيد السابق -->
+    <div>
+        <label>{{ 'DAILY_JOURNAL.PREVIOUS_BALANCE' | translate }}</label>
+        <app-input-error-message-handler>
+            <input pInputText id="productName" disabled aria-describedby="productName-help" [value]="0" />
+        </app-input-error-message-handler>
     </div>
-  </div>
-  <app-input-error-message-handler class="w-full" [fc]="fg.get('openingNotes')" />
 
-  <button
-    pButton
-    appLoadingDisabled
-    style="--p-button-primary-background: var(--color-dark-line)"
-    class="border-dark-line! text-white! py-1! md:px-8! w-fit ms-auto mt-4"
-    type="submit"
-  >
-    {{ 'ACTIONS.OPEN' | translate }}
-  </button>
+    <!-- العهده -->
+    <div>
+        <label>{{ 'DAILY_JOURNAL.CUSTODY_BALANCE' | translate }}</label>
+        <app-input-error-message-handler [fc]="fg.controls.custodyBalance">
+            <input
+                pInputText
+                id="custodyBalance"
+                formControlName="custodyBalance"
+                aria-describedby="custodyBalance-help"
+                placeholder=""
+            />
+        </app-input-error-message-handler>
+    </div>
+
+    <!-- ملاحظات -->
+    <div>
+        <label>{{ 'DAILY_JOURNAL.NOTES' | translate }}</label>
+        <app-input-error-message-handler [fc]="fg.controls.openingNotes">
+            <textarea
+                rows="5"
+                pTextarea
+                class="flex-1"
+                formControlName="openingNotes"
+                class="w-full"
+                id="openingNotes"
+                aria-describedby="openingNotes-help"
+                placeholder=""
+            ></textarea>
+        </app-input-error-message-handler>
+    </div>
+
+
+    <button
+        pButton
+        appLoadingDisabled
+        style="--p-button-primary-background: var(--color-dark-line)"
+        class="border-dark-line! text-white! py-1! md:px-8! w-fit ms-auto mt-4"
+        type="submit"
+    >
+        {{ 'ACTIONS.OPEN' | translate }}
+    </button>
 </form>

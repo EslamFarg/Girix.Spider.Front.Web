@@ -311,47 +311,76 @@ export class Cashier extends BaseComponent implements OnInit {
         this.searchCustomers({ pageIndex: 1, searchTerm: '' });
 
         this.orderFg.get('orderType')?.valueChanges.subscribe((orderType) => {
-            const placeRefId = this.orderFg.get('placeRefId');
-            const deliveryId = this.orderFg.get('deliveryId');
+            const { placeRefId, deliveryId, paymentType } = this.orderFg.controls;
+
             this.orderLocationType.set(orderType);
-            const paymentType = this.orderFg.controls.paymentType;
-            placeRefId?.setValidators([]);
-            deliveryId?.setValidators([]);
-            this.orderFg?.patchValue({
-                placeRefId: null,
-                deliveryId: null,
-                durationMinutes: null,
-            });
-            this.currentDelivery.set(null);
-            this.currentCompanyDelivery.set(null);
-            this.currentHut.set(null);
-            this.currentTable.set(null);
-            this.currentRoom.set(null);
-            paymentType.enable();
 
             switch (orderType) {
                 case OrderLocationType.Takeaway:
                     this.isPaid.set(true);
                     paymentType.setValue(OrderPaymentType.Paid);
                     paymentType.disable();
+                    this.orderFg?.patchValue({
+                        placeRefId: null,
+                        deliveryId: null,
+                        placeType: null,
+                        durationMinutes: null,
+                    });
+                    this.chosenLocalPlace.set(null);
+                    placeRefId?.clearValidators();
+                    deliveryId?.clearValidators();
+                    console.log('changed to takeaway and removed placeRefId validators');
                     break;
+
+                // 1. Shared logic runs first for all three types
                 case OrderLocationType.PersonDelivery:
                 case OrderLocationType.CompanyDelivery:
-                    //todo: fix delivery Id
-                    deliveryId?.setValidators([
-                        labeledRequiredValidator('يرجى اختيار الدليفري', 'you must select a delivery'),
-                    ]);
-                    break;
                 case OrderLocationType.DineIn:
-                    this.orderFg.patchValue({ placeType: OrderLocalType.Table });
-                    placeRefId!.setValidators([
-                        labeledRequiredValidator('يرجى اختيار المكان', 'you must select a place'),
-                    ]);
+                    paymentType.enable();
+                    // No break here! Execution falls through to the next matching case.
+                    console.log('orderType', orderType);
+                    // 2. Specific logic follows
+                    switch (orderType) {
+                        case OrderLocationType.PersonDelivery:
+                        case OrderLocationType.CompanyDelivery:
+                            placeRefId?.clearValidators();
+                            this.orderFg?.patchValue({
+                                placeRefId: null,
+                                placeType: null,
+                                durationMinutes: null,
+                            });
+                            this.chosenLocalPlace.set(null);
+                            deliveryId?.setValidators([
+                                labeledRequiredValidator('يرجى اختيار الدليفري', 'you must select a delivery'),
+                            ]);
 
-                    break;
+                            switch (orderType) {
+                                case OrderLocationType.PersonDelivery:
+                                    this.currentCompanyDelivery.set(null);
+                                    break;
+                                case OrderLocationType.CompanyDelivery:
+                                    this.currentDelivery.set(null);
+                                    break;
+                            }
+
+                            break;
+
+                        case OrderLocationType.DineIn:
+                            this.orderFg?.patchValue({
+                                placeType: OrderLocalType.Table,
+                                deliveryId: null,
+                                durationMinutes: null,
+                            });
+                            deliveryId?.clearValidators();
+                            placeRefId!.setValidators([
+                                labeledRequiredValidator('يرجى اختيار المكان', 'you must select a place'),
+                            ]);
+                            break;
+                    }
+                    break; // Breaks out of the main switch
             }
-            placeRefId?.updateValueAndValidity();
-            deliveryId?.updateValueAndValidity();
+            
+            this.orderFg.updateValueAndValidity();
         });
 
         // this.orderFg.setValidators;
@@ -362,9 +391,9 @@ export class Cashier extends BaseComponent implements OnInit {
     }
 
     resetData() {
-        this.searchHuts(1);
-        this.searchRooms(1);
-        this.searchTables(1);
+        // this.searchHuts(1);
+        // this.searchRooms(1);
+        // this.searchTables(1);
         this.searchDeliveries(1);
     }
 
@@ -438,6 +467,11 @@ export class Cashier extends BaseComponent implements OnInit {
         console.log(this.orderFg.value);
         if (this.orderFg.invalid) {
             console.log('invalid order');
+            Object.entries(this.orderFg.controls).forEach(([key, value]) => {
+                if (value.errors) {
+                    console.log(key, value.errors);
+                }
+            });
             this.orderFg.markAllAsTouched();
             return;
         }
@@ -519,9 +553,7 @@ export class Cashier extends BaseComponent implements OnInit {
     resetOrderForm() {
         this.orderMenuItems.set([]);
         this.currentCustomer.set(null);
-        this.currentHut.set(null);
-        this.currentRoom.set(null);
-        this.currentTable.set(null);
+        this.chosenLocalPlace.set(null);
         this.currentDelivery.set(null);
         this.currentCompanyDelivery.set(null);
         this.amountReceived.set(0);
@@ -903,8 +935,6 @@ export class Cashier extends BaseComponent implements OnInit {
             serviceFeeAfterTax = this.financialSettings().serviceFee * (1 + this.financialSettings().vat / 100);
         }
 
-        console.log('service fee after tax:', serviceFeeAfterTax);
-        console.log('location type:', this.orderLocationType());
         if (this.orderLocationType() !== OrderLocationType.DineIn) return 0;
         return serviceFeeAfterTax;
         // }
@@ -1098,39 +1128,8 @@ export class Cashier extends BaseComponent implements OnInit {
             ],
             fromDate: null,
         });
-        // .subscribe({
-        //   next: (res) => {
-        //     if (res.value.rows.length > 0) {
-        //       this.previousAccountsSearchTerm = data.searchTerm ?? '';
-        //       if (data.pageIndex == 1) {
-        //         this.customers.set(res.value.rows);
-        //       } else {
-        //         this.customers.update((prev) => prev.concat(res.value.rows));
-        //       }
-        //       this.customersSearchPaginationInfo = {
-        //         pageIndex: data.pageIndex,
-        //         totalPagesCount: res.value.paginationInfo.totalPagesCount,
-        //         totalRowsCount: res.value.paginationInfo.totalRowsCount,
-        //       };
-        //     }
-        //   },
-        // });
     }
-    // onAccountSelected(event: ITreeFinancialAccountSearchRow, isCash: boolean) {
-    //   if (!event.id) return;
 
-    //   if (isCash) {
-    //     this.currentCashAccount.set({
-    //       id: event.id,
-    //       name: event.name,
-    //     });
-    //   } else {
-    //     this.currentNetworkAccount.set({
-    //       id: event.id,
-    //       name: event.name,
-    //     });
-    //   }
-    // }
     cashAccountsSearchPaginationInfo: IPaginationInfo = {
         pageIndex: 1,
         totalRowsCount: 0,
@@ -1251,101 +1250,21 @@ export class Cashier extends BaseComponent implements OnInit {
     //
     //
     //
-    //
-    //
-    //
-    //
-    //
-    //
     //local space
     //
-    currentLocalPlace=signal<ChosenLocalPlace|null>(null);
-    onRoomSelected(room: IRoomSearchRow) {
-        if (room.isAvailable) {
-            this.currentHut.set(null);
-            this.currentTable.set(null);
-            this.currentRoom.set(room);
-            this.orderFg.patchValue({
-                placeRefId: room.id,
-                placeType: OrderLocalType.Room,
-                durationMinutes: null,
-            });
-            this.orderLocationType.set(OrderLocationType.DineIn);
-            this.activeLocalType.set(OrderLocalType.Room);
-            this.RoomDialogVisible = false;
-            this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع بنجاح' });
-        } else {
-            this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
-        }
-    }
+    chosenLocalPlace = this.orderService.chosenLocalPlace;
 
-    onHutSelected(hut: IHutSearchRow) {
-        if (hut.isAvailable) {
-            // this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
-            this.orderFg.patchValue({
-                orderType: OrderLocationType.DineIn,
-            });
-            this.orderLocationType.set(OrderLocationType.DineIn);
-            this.currentHut.set(hut);
-            // this.HutDialogVisible = false;
-        }
-    }
-
-    onTableSelected(table: ITableSearchRow) {
-        if (table.isAvailable) {
-            this.currentHut.set(null);
-            this.currentRoom.set(null);
-            this.currentTable.set(table);
-            this.orderFg.patchValue({
-                placeRefId: table.id,
-                placeType: OrderLocalType.Table,
-                durationMinutes: null,
-            });
-            this.orderLocationType.set(OrderLocationType.DineIn);
-            this.activeLocalType.set(OrderLocalType.Table);
-            this.TableDialogVisible = false;
-            this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع' });
-        } else {
-            this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'الموقع مشغول' });
-        }
-    }
-
-    submitHut() {
-        this.currentTable.set(null);
-        this.currentRoom.set(null);
-        this.orderFg.patchValue({
-            placeRefId: hut.id,
-            placeType: OrderLocalType.Hut,
-            durationMinutes: this.currentHutMinutes(),
-        });
-        this.activeLocalType.set(OrderLocalType.Hut);
-        this.HutDialogVisible = false;
-        this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الموقع بنجاح' });
-    }
-
-    onHutDurationChange(duration: SelectChangeEvent) {
-        this.currentHutMinutes.set(duration.value);
-    }
-    selectedLocalLocationLabel = computed(() => {
-        const hut = this.currentHut();
-        const table = this.currentTable();
-        const room = this.currentRoom();
-
-        if (hut) return hut.name;
-        if (table) return table.name;
-        if (room) return room.name;
-        return '-';
-    });
     activeLocalType = signal<OrderLocalType | null>(null);
-    
 
     async openLocalTypeDialog(loaclPlaceType: OrderLocalType) {
-        const ref = await this.dialogService.open({
+        await this.dialogService.open({
             type: DialogType.LocalPlaceSelect,
             inputs: { placeType: loaclPlaceType },
             onClose: (data: ChosenLocalPlace) => {
                 if (!data?.id) return;
-                this.currentLocalPlace.set(data);
+                this.chosenLocalPlace.set(data);
+                this.activeLocalType.set(loaclPlaceType);
+                this.orderLocationType.set(OrderLocationType.DineIn);
                 this.orderFg.patchValue({
                     orderType: OrderLocationType.DineIn,
                     placeType: loaclPlaceType,
@@ -1354,28 +1273,10 @@ export class Cashier extends BaseComponent implements OnInit {
                 });
             },
         });
-        // switch (type) {
-        //   case OrderLocalType.Table:
-        //     this.TableDialogVisible = true;
-        //     break;
-        //   case OrderLocalType.Room:
-        //     this.RoomDialogVisible = true;
-        //     break;
-        //   case OrderLocalType.Hut:
-        //     this.HutDialogVisible = true;
-        //     break;
-        // }
     }
 
-    //huts
-    // HutDialogVisible: boolean = false;
-
-    // hutService = inject(HutService);
-    // huts = signal<IHutSearchRow[]>([]);
-    // currentHut = signal<IHutSearchRow | null>(null);
-    // currentHutMinutes = signal(30);
     currentHutPrice = computed(() => {
-        const currentPlace = this.currentLocalPlace();
+        const currentPlace = this.chosenLocalPlace();
         if (!currentPlace) return 0;
         if (currentPlace.type != OrderLocalType.Hut) return 0;
 
@@ -1384,11 +1285,10 @@ export class Cashier extends BaseComponent implements OnInit {
         return hutHourPriceAfterVat;
     });
     hutNet = computed(() => {
+        const currentPlace = this.chosenLocalPlace();
 
-        const currentPlace = this.currentLocalPlace();
-
-        if(!currentPlace) return 0;
-        if(currentPlace.type != OrderLocalType.Hut) return 0;
+        if (!currentPlace) return 0;
+        if (currentPlace.type != OrderLocalType.Hut) return 0;
 
         const hutPricePerHour = currentPlace.pricePerHour ?? 0;
         const vat = this.financialSettings().vat;
@@ -1402,190 +1302,6 @@ export class Cashier extends BaseComponent implements OnInit {
         // }
     });
 
-    // hutPaginationInfo: {
-    //     pageIndex: number;
-    //     totalPagesCount: number;
-    //     totalRowsCount: number;
-    // } = {
-    //     pageIndex: 1,
-    //     totalPagesCount: 0,
-    //     totalRowsCount: 0,
-    // };
-
-    // searchHuts(pageIndex: number) {
-    //     this.hutService
-    //         .search({
-    //             paginationInfo: {
-    //                 pageIndex: pageIndex,
-    //                 pageSize: 40,
-    //             },
-    //             searchFilters: [
-    //                 {
-    //                     column: HutSearchEnum.Name,
-    //                     values: [''],
-    //                 },
-    //             ],
-    //             fromDate: null,
-    //         })
-    //         .subscribe({
-    //             next: (res) => {
-    //                 if (res.value.rows.length > 0) {
-    //                     if (pageIndex == 1) {
-    //                         this.huts.set(res.value.rows);
-    //                     } else {
-    //                         this.huts.update((prev) => prev.concat(res.value.rows));
-    //                     }
-    //                     this.hutPaginationInfo = {
-    //                         pageIndex,
-    //                         totalPagesCount: res.value.paginationInfo.totalPagesCount,
-    //                         totalRowsCount: res.value.paginationInfo.totalRowsCount,
-    //                     };
-    //                 }
-    //             },
-    //         });
-    // }
-
-    // onHutsScroll(event: Event, hutsScroller: HTMLElement) {
-    //     // if at bottom
-    //     if (hutsScroller.scrollTop + hutsScroller.clientHeight >= hutsScroller.scrollHeight - 1) {
-    //         this.searchHuts(this.hutPaginationInfo.pageIndex + 1);
-    //     }
-    // }
-
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //tables
-    //
-    // TableDialogVisible: boolean = false;
-
-    // tableService = inject(TableService);
-    // tables = signal<ITableSearchRow[]>([]);
-    // currentTable = signal<ITableSearchRow | null>(null);
-
-    // tablePaginationInfo: {
-    //     pageIndex: number;
-    //     totalPagesCount: number;
-    //     totalRowsCount: number;
-    // } = {
-    //     pageIndex: 1,
-    //     totalPagesCount: 0,
-    //     totalRowsCount: 0,
-    // };
-    // searchTables(pageIndex: number) {
-    //     this.tableService
-    //         .search({
-    //             paginationInfo: {
-    //                 pageIndex: pageIndex,
-    //                 pageSize: 40,
-    //             },
-    //             searchFilters: [
-    //                 {
-    //                     column: TableSearchEnum.Name,
-    //                     values: [''],
-    //                 },
-    //             ],
-    //             fromDate: null,
-    //         })
-    //         .subscribe({
-    //             next: (res) => {
-    //                 if (res.value.rows.length > 0) {
-    //                     if (pageIndex == 1) {
-    //                         this.tables.set(res.value.rows);
-    //                     } else {
-    //                         this.tables.update((prev) => prev.concat(res.value.rows));
-    //                     }
-    //                     this.tablePaginationInfo = {
-    //                         pageIndex,
-    //                         totalPagesCount: res.value.paginationInfo.totalPagesCount,
-    //                         totalRowsCount: res.value.paginationInfo.totalRowsCount,
-    //                     };
-    //                 }
-    //             },
-    //         });
-    // }
-    // onTablesScroll(event: Event, tablesScroller: HTMLElement) {
-    //     // if at bottom
-    //     if (tablesScroller.scrollTop + tablesScroller.clientHeight >= tablesScroller.scrollHeight - 1) {
-    //         this.searchTables(this.tablePaginationInfo.pageIndex + 1);
-    //     }
-    // }
-
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //rooms
-    //
-    // RoomDialogVisible: boolean = false;
-
-    // roomService = inject(RoomService);
-    // rooms = signal<IRoomSearchRow[]>([]);
-    // currentRoom = signal<IRoomSearchRow | null>(null);
-    // roomPaginationInfo: {
-    //     pageIndex: number;
-    //     totalPagesCount: number;
-    //     totalRowsCount: number;
-    // } = {
-    //     pageIndex: 1,
-    //     totalPagesCount: 0,
-    //     totalRowsCount: 0,
-    // };
-    // searchRooms(pageIndex: number) {
-    //     this.roomService
-    //         .search({
-    //             paginationInfo: {
-    //                 pageIndex: pageIndex,
-    //                 pageSize: 40,
-    //             },
-    //             searchFilters: [
-    //                 {
-    //                     column: RoomSearchEnum.Name,
-    //                     values: [''],
-    //                 },
-    //             ],
-    //             fromDate: null,
-    //         })
-    //         .subscribe({
-    //             next: (res) => {
-    //                 if (res.value.rows.length > 0) {
-    //                     if (pageIndex == 1) {
-    //                         this.rooms.set(res.value.rows);
-    //                     } else {
-    //                         this.rooms.update((prev) => prev.concat(res.value.rows));
-    //                     }
-    //                     this.roomPaginationInfo = {
-    //                         pageIndex,
-    //                         totalPagesCount: res.value.paginationInfo.totalPagesCount,
-    //                         totalRowsCount: res.value.paginationInfo.totalRowsCount,
-    //                     };
-    //                 }
-    //             },
-    //         });
-    // }
-    // onRoomsScroll(event: Event, roomsScroller: HTMLElement) {
-    //     // console.log(roomsScroller);
-    //     // if at bottom
-    //     if (roomsScroller.scrollTop + roomsScroller.clientHeight >= roomsScroller.scrollHeight - 1) {
-    //         this.searchRooms(this.roomPaginationInfo.pageIndex + 1);
-    //     }
-    // }
-
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
     //
     //
     //
@@ -1704,10 +1420,13 @@ export class Cashier extends BaseComponent implements OnInit {
     }
     onDeliverySelected(orderType: OrderLocationType, delivery?: IDeliverySearchRow | ICustomerSearchRow) {
         this.orderLocationType.set(orderType);
-        this.orderFg.patchValue(
-            { deliveryId: delivery?.id, orderType, durationMinutes: null, placeType: null, placeRefId: null },
-            { emitEvent: false },
-        );
+        this.orderFg.patchValue({
+            deliveryId: delivery?.id,
+            orderType,
+            durationMinutes: null,
+            placeType: null,
+            placeRefId: null,
+        });
         if (orderType === OrderLocationType.CompanyDelivery) {
             this.currentCompanyDelivery.set(delivery as ICustomerSearchRow);
             this.currentDelivery.set(null);
@@ -2169,3 +1888,173 @@ export class Cashier extends BaseComponent implements OnInit {
         );
     });
 }
+/*
+<!-- Hut -->
+<p-dialog
+    [(visible)]="HutDialogVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '80%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-text-lighter!"
+    class="addition-dialog"
+    [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+>
+    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الكوخ</p>
+
+    <div
+        class="flex-1 overflow-auto no-scrollbar"
+        appDebounce
+        #hutsScroller
+        [domEvents]="['scroll']"
+        (debounced)="onHutsScroll($event, hutsScroller)"
+    >
+        <div
+            class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-[90px_20px]"
+        >
+            @for (item of huts(); track $index) {
+                <app-hut-card
+                    [active]="item.id == currentHut()?.id"
+                    [data]="item"
+                    (click)="onHutSelected(item)"
+                    class="max-w-full!"
+                />
+            }
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4 border-t border-dark-line pt-4 [&_label]:mb-1 [&_label]:inline-block">
+        <!-- reservation time -->
+        <div>
+            <label for="">مدة الحجز</label>
+            <p-select
+                style="--p-select-background: #ffffff"
+                class="w-full border border-dark-line!"
+                [options]="[30, 60, 90, 120, 150, 180]"
+                [ngModel]="currentHutMinutes()"
+                (onChange)="onHutDurationChange($event)"
+            />
+        </div>
+        <!-- hut name/id -->
+        <div>
+            <label for="">رقم / اسم الكوخ</label>
+            <input
+                type="text"
+                name=""
+                class="w-full border border-dark-line!"
+                disabled
+                [value]="currentHut()?.name"
+                pInputText
+                id=""
+            />
+        </div>
+        <!-- hut price -->
+        <div>
+            <label for="">سعر الكوخ في الساعه</label>
+            <input
+                type="text"
+                name=""
+                class="w-full border border-dark-line!"
+                disabled
+                [value]="currentHutPrice().toFixed(2)"
+                pInputText
+                id=""
+            />
+        </div>
+    </div>
+
+    <ng-template #footer>
+        <div class="flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
+            <button pButton severity="secondary" class="bg-dark-bg-2" (click)="submitHut()">
+                {{ 'ACTIONS.CONTINUE' | translate }}
+            </button>
+            <button pButton severity="secondary" (click)="HutDialogVisible = false">
+                {{ 'ACTIONS.CANCEL' | translate }}
+            </button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<!-- Room -->
+<p-dialog
+    [(visible)]="RoomDialogVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '80%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-text-lighter!"
+    class="addition-dialog"
+    [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+>
+    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الغرفة</p>
+
+    <div
+        class="flex-1 overflow-auto no-scrollbar"
+        appDebounce
+        #roomsScroller
+        [domEvents]="['scroll']"
+        (debounced)="onRoomsScroll($event, roomsScroller)"
+    >
+        <div class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
+            @for (item of rooms(); track $index) {
+                <app-room-card
+                    [active]="item.id == currentRoom()?.id"
+                    [data]="item"
+                    (click)="onRoomSelected(item)"
+                    class="max-w-full"
+                />
+            }
+        </div>
+    </div>
+
+    <ng-template #footer>
+        <button pButton styleClass="app-p-btn" class="mx-auto" severity="secondary" (click)="RoomDialogVisible = false">
+            استمرار
+        </button>
+    </ng-template>
+</p-dialog>
+
+<!-- Table -->
+<p-dialog
+    [(visible)]="TableDialogVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '80%', maxWidth: '50rem' }"
+    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    styleClass="bg-text-lighter!"
+    class="addition-dialog"
+    [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+>
+    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الطاولة</p>
+    <div
+        class="flex-1 overflow-auto no-scrollbar"
+        appDebounce
+        #tablesScroller
+        [domEvents]="['scroll']"
+        (debounced)="onTablesScroll($event, tablesScroller)"
+    >
+        <div class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
+            @for (item of tables(); track $index) {
+                <app-table-card
+                    [active]="item.id == currentTable()?.id"
+                    [data]="item"
+                    (click)="onTableSelected(item)"
+                    class="max-w-full"
+                />
+            }
+        </div>
+    </div>
+
+    <ng-template #footer>
+        <button
+            pButton
+            styleClass="app-p-btn"
+            class="mx-auto"
+            severity="secondary"
+            (click)="TableDialogVisible = false"
+        >
+            استمرار
+        </button>
+    </ng-template>
+</p-dialog>
+*/

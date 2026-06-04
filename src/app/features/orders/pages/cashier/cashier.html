@@ -64,38 +64,6 @@
             }
         </div>
 
-        <!-- receipt summary -->
-        <!-- <div class="flex justify-between text-dark-line border border-text-gray rounded-[8px] p-2">
-      <ul class="flex flex-col gap-2 *:text-xs *:font-bold *:flex *:items-center *:gap-2">
-        <li>
-          <span>رقم الفاتوره:</span>
-          <span>{{ isCreateMode() ? '#####' : existingOrderBill()?.invoiceNo }}</span>
-        </li>
-        <li>
-          <span>رقم الطلب:</span>
-          <span>{{ isCreateMode() ? '#####' : existingOrderBill()?.orderNo }}</span>
-        </li>
-        <li>
-          <span>رقم الكاشير:</span>
-          <span>{{ isCreateMode() ? '#####' : '102' }}</span>
-        </li>
-      </ul>
-
-      <ul class="flex flex-col gap-2 *:text-xs *:flex *:items-center *:gap-2">
-        <li data="ltr">
-          <span>{{ (isCreateMode() ? dateNow : existingOrderBill()?.dateTime) | date: 'dd-MM-yyyy' }}</span>
-        </li>
-        <li>
-          <span class="font-bold">اسم البائع:</span>
-          <span>{{ userDetails()?.fullName }}</span>
-        </li>
-        <li>
-          <span class="font-bold">رقم الجوال:</span>
-          <span>{{ userDetails()?.phoneNumber }}</span>
-        </li>
-      </ul>
-    </div> -->
-
         <div>
             <!-- location btns -->
             <div class="flex gap-2 w-full min-h-[34px]" [class.hidden]="!isCreateMode()">
@@ -146,51 +114,33 @@
                     @if (localRadio.checked) {
                         <button
                             type="button"
-                            (click)="
-                                this.dialogService.open({
-                                    type: DialogType.LocalPlaceSelect,
-                                    inputs: { placeType: OrderLocalType.Table },
-                                })
-                            "
+                            (click)="openLocalTypeDialog(OrderLocalType.Table)"
                             class="segment-btn flex-1"
                             [class.location-active]="activeLocalType() === OrderLocalType.Table"
                         >
-                            <!-- openLocalTypeDialog()" -->
                             <span>طاوله</span>
                         </button>
                         <button
                             type="button"
-                            (click)="
-                                this.dialogService.open({
-                                    type: DialogType.LocalPlaceSelect,
-                                    inputs: { placeType: OrderLocalType.Room },
-                                })
-                            "
+                            (click)="openLocalTypeDialog(OrderLocalType.Room)"
                             class="segment-btn flex-1"
                             [class.location-active]="activeLocalType() === OrderLocalType.Room"
                         >
-                            <!-- openLocalTypeDialog(OrderLocalType.Room) -->
                             <span>غرفه</span>
                         </button>
                         <button
                             type="button"
-                            (click)="
-                                this.dialogService.open({
-                                    type: DialogType.LocalPlaceSelect,
-                                    inputs: { placeType: OrderLocalType.Hut },
-                                })
-                            "
+                            (click)="openLocalTypeDialog(OrderLocalType.Hut)"
                             class="segment-btn flex-1"
                             [class.location-active]="activeLocalType() === OrderLocalType.Hut"
                         >
-                            <!-- openLocalTypeDialog(OrderLocalType.Hut) -->
                             <span>كوخ</span>
                         </button>
 
                         <!-- info pill -->
                         <div class="info-pill">
                             <span class="inline-block max-w-20 overflow-hidden text-ellipsis">{{
-                                selectedLocalLocationLabel()
+                                this.chosenLocalPlace()?.name ?? '-'
                             }}</span>
                             @if (activeLocalType() === OrderLocalType.Hut && (orderFg.value.placeRefId ?? 0) > 0) {
                                 <span class="text-text-lighter">{{
@@ -696,174 +646,7 @@
     </ng-template>
 </p-dialog>
 
-<!-- Hut -->
-<p-dialog
-    [(visible)]="HutDialogVisible"
-    [modal]="true"
-    [dismissableMask]="true"
-    [style]="{ width: '80%', maxWidth: '50rem' }"
-    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-    styleClass="bg-text-lighter!"
-    class="addition-dialog"
-    [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
->
-    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الكوخ</p>
 
-    <div
-        class="flex-1 overflow-auto no-scrollbar"
-        appDebounce
-        #hutsScroller
-        [domEvents]="['scroll']"
-        (debounced)="onHutsScroll($event, hutsScroller)"
-    >
-        <div
-            class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-[90px_20px]"
-        >
-            @for (item of huts(); track $index) {
-                <app-hut-card
-                    [active]="item.id == currentHut()?.id"
-                    [data]="item"
-                    (click)="onHutSelected(item)"
-                    class="max-w-full!"
-                />
-            }
-        </div>
-    </div>
-
-    <div class="grid grid-cols-3 gap-4 border-t border-dark-line pt-4 [&_label]:mb-1 [&_label]:inline-block">
-        <!-- reservation time -->
-        <div>
-            <label for="">مدة الحجز</label>
-            <p-select
-                style="--p-select-background: #ffffff"
-                class="w-full border border-dark-line!"
-                [options]="[30, 60, 90, 120, 150, 180]"
-                [ngModel]="currentHutMinutes()"
-                (onChange)="onHutDurationChange($event)"
-            />
-        </div>
-        <!-- hut name/id -->
-        <div>
-            <label for="">رقم / اسم الكوخ</label>
-            <input
-                type="text"
-                name=""
-                class="w-full border border-dark-line!"
-                disabled
-                [value]="currentHut()?.name"
-                pInputText
-                id=""
-            />
-        </div>
-        <!-- hut price -->
-        <div>
-            <label for="">سعر الكوخ في الساعه</label>
-            <input
-                type="text"
-                name=""
-                class="w-full border border-dark-line!"
-                disabled
-                [value]="currentHutPrice().toFixed(2)"
-                pInputText
-                id=""
-            />
-        </div>
-    </div>
-
-    <ng-template #footer>
-        <div class="flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
-            <button pButton severity="secondary" class="bg-dark-bg-2" (click)="submitHut()">
-                {{ 'ACTIONS.CONTINUE' | translate }}
-            </button>
-            <button pButton severity="secondary" (click)="HutDialogVisible = false">
-                {{ 'ACTIONS.CANCEL' | translate }}
-            </button>
-        </div>
-    </ng-template>
-</p-dialog>
-
-<!-- Room -->
-<p-dialog
-    [(visible)]="RoomDialogVisible"
-    [modal]="true"
-    [dismissableMask]="true"
-    [style]="{ width: '80%', maxWidth: '50rem' }"
-    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-    styleClass="bg-text-lighter!"
-    class="addition-dialog"
-    [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
->
-    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الغرفة</p>
-
-    <div
-        class="flex-1 overflow-auto no-scrollbar"
-        appDebounce
-        #roomsScroller
-        [domEvents]="['scroll']"
-        (debounced)="onRoomsScroll($event, roomsScroller)"
-    >
-        <div class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
-            @for (item of rooms(); track $index) {
-                <app-room-card
-                    [active]="item.id == currentRoom()?.id"
-                    [data]="item"
-                    (click)="onRoomSelected(item)"
-                    class="max-w-full"
-                />
-            }
-        </div>
-    </div>
-
-    <ng-template #footer>
-        <button pButton styleClass="app-p-btn" class="mx-auto" severity="secondary" (click)="RoomDialogVisible = false">
-            استمرار
-        </button>
-    </ng-template>
-</p-dialog>
-
-<!-- Table -->
-<p-dialog
-    [(visible)]="TableDialogVisible"
-    [modal]="true"
-    [dismissableMask]="true"
-    [style]="{ width: '80%', maxWidth: '50rem' }"
-    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-    styleClass="bg-text-lighter!"
-    class="addition-dialog"
-    [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
->
-    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الطاولة</p>
-    <div
-        class="flex-1 overflow-auto no-scrollbar"
-        appDebounce
-        #tablesScroller
-        [domEvents]="['scroll']"
-        (debounced)="onTablesScroll($event, tablesScroller)"
-    >
-        <div class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5">
-            @for (item of tables(); track $index) {
-                <app-table-card
-                    [active]="item.id == currentTable()?.id"
-                    [data]="item"
-                    (click)="onTableSelected(item)"
-                    class="max-w-full"
-                />
-            }
-        </div>
-    </div>
-
-    <ng-template #footer>
-        <button
-            pButton
-            styleClass="app-p-btn"
-            class="mx-auto"
-            severity="secondary"
-            (click)="TableDialogVisible = false"
-        >
-            استمرار
-        </button>
-    </ng-template>
-</p-dialog>
 
 <!-- customer info -->
 <p-dialog

@@ -72,6 +72,6 @@ export class DeliveryService extends BaseSearchAndCrudService<
    */
   constructor() {
     super();
-    this.patchEndpoints({ put: 'update' });
+    this.patchEndpoints({ put: 'update',getById: '' });
   }
 }

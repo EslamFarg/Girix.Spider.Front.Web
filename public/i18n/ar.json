@@ -199,6 +199,7 @@
     "PAID": "مدفوع",
     "POSTPONED": "معلق",
     "NETWORK": "شبكة",
+    "CHEQUES":"الصناديق",
     "CASH": "كاش",
     "CASH_PAID": "المدفوعات كاش",
     "NETWORK_PAID": "المدفوعات شبكة",

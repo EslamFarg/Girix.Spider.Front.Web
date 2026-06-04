@@ -12,6 +12,8 @@ import { ManageOpenDailyJournal } from '../../components/manage-open-daily-journ
 import { ManageCloseDailyJournal } from '../../components/manage-close-daily-journal/manage-close-daily-journal';
 import { ResetShortage } from '../../components/reset-shortage/reset-shortage';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { CloseDailyJournal } from "../../components/close-daily-journal/close-daily-journal";
+import { OpenDailyJournal } from "../../components/open-daily-journal/open-daily-journal";
 
 enum ManageDailyJournalSections {
   closing = 'closing',
@@ -30,7 +32,9 @@ enum ManageDailyJournalSections {
     ManageOpenDailyJournal,
     ManageCloseDailyJournal,
     ResetShortage,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    CloseDailyJournal,
+    OpenDailyJournal
 ],
   templateUrl: './manage-daily-journal.html',
   styleUrl: './manage-daily-journal.css',

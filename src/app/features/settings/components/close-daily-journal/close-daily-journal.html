@@ -1,123 +1,120 @@
-<form class="close-daily-journal" [formGroup]="fg" appLoadingDisabled (ngSubmit)="onCloseDaily()">
-  <!-- الرصيد السابق -->
-  <div class="journal-row opacity-70 **:cursor-not-allowed!">
-    <div class="journal-field">
-      <label class="journal-label">{{ 'DAILY_JOURNAL.PREVIOUS_BALANCE' | translate }}</label>
-      <div class="doc-input">
-        <input disabled pInputText placeholder="0.0" />
-      </div>
+<form class="grid grid-cols-2 gap-4" [formGroup]="fg" appLoadingDisabled (ngSubmit)="onCloseDaily()">
+    <!-- الرصيد السابق -->
+    <div>
+        <label>{{ 'DAILY_JOURNAL.PREVIOUS_BALANCE' | translate }}</label>
+        <app-input-error-message-handler>
+            <input pInputText id="productName" disabled aria-describedby="productName-help" [value]="0" />
+        </app-input-error-message-handler>
     </div>
-    <div class="journal-field">
-      <label class="journal-label">{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
-      <div class="doc-input">
-        <input
-          disabled
-          pInputText
-          placeholder=""
-          [value]="currentUserDaily()?.value?.dailyJournalPeriods?.openingBalanceAccountName"
-        />
-      </div>
-    </div>
-  </div>
 
-  <!-- العهده -->
-  <div class="journal-row opacity-70 **:cursor-not-allowed!">
-    <div class="journal-field">
-      <label class="journal-label">{{ 'DAILY_JOURNAL.CUSTODY_BALANCE' | translate }}</label>
-      <div class="doc-input">
-        <input
-          disabled
-          pInputText
-          placeholder="0.0"
-          [value]="currentUserDaily()?.value?.dailyJournalPeriods?.custodyBalance"
-        />
-      </div>
+    <div>
+        <label>{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
+        <app-input-error-message-handler>
+            <input
+                pInputText
+                id="productName"
+                aria-describedby="productName-help"
+                disabled
+                [value]="currentUserDaily()?.value?.dailyJournalPeriods?.openingBalanceAccountName"
+            />
+        </app-input-error-message-handler>
     </div>
-    <div class="journal-field">
-      <label class="journal-label">{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
-      <div class="doc-input">
-        <input
-          disabled
-          pInputText
-          placeholder=""
-          [value]="currentUserDaily()?.value?.dailyJournalPeriods?.custodyAccountName"
-        />
-      </div>
-    </div>
-  </div>
 
-  <!-- مبلغ غلق كاش -->
-  <div class="journal-row">
-    <div class="journal-field">
-      <label class="journal-label">{{ 'DAILY_JOURNAL.CASH_CLOSING_AMOUNT' | translate }}</label>
-      <div class="doc-input">
+    <!-- العهده -->
+    <div>
+        <label>{{ 'DAILY_JOURNAL.CUSTODY_BALANCE' | translate }}</label>
+        <app-input-error-message-handler>
+            <input
+                pInputText
+                id="productName"
+                disabled
+                aria-describedby="productName-help"
+                [value]="currentUserDaily()?.value?.dailyJournalPeriods?.custodyBalance"
+            />
+        </app-input-error-message-handler>
+    </div>
+    <div>
+        <label>{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
+        <app-input-error-message-handler>
+            <input
+                pInputText
+                id="productName"
+                disabled
+                aria-describedby="productName-help"
+                [value]="currentUserDaily()?.value?.dailyJournalPeriods?.custodyAccountName"
+            />
+        </app-input-error-message-handler>
+    </div>
+
+    <!-- مبلغ غلق كاش -->
+    <div>
+        <label>{{ 'DAILY_JOURNAL.CASH_CLOSING_AMOUNT' | translate }}</label>
         <app-input-error-message-handler [fc]="fg.get('cashClosingAmount')">
-          <input
-            pInputText
-            id="cashClosingAmount"
-            formControlName="cashClosingAmount"
-            aria-describedby="cashClosingAmount-help"
-            [placeholder]="'DAILY_JOURNAL.ENTER_AMOUNT' | translate"
-          />
+            <input
+                pInputText
+                id="cashClosingAmount"
+                formControlName="cashClosingAmount"
+                [placeholder]="'DAILY_JOURNAL.ENTER_AMOUNT' | translate"
+            />
         </app-input-error-message-handler>
-      </div>
     </div>
-    <div class="journal-field opacity-70 **:cursor-not-allowed!">
-      <label class="journal-label">{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
-      <div class="doc-input">
-        <input pInputText disabled [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
-      </div>
+    <div>
+        <label>{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
+        <app-input-error-message-handler [fc]="fg.get('cashClosingAmount')">
+            <input
+                pInputText
+                id="cashClosingAmount"
+                disabled
+                [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName"
+                [placeholder]="'DAILY_JOURNAL.ENTER_AMOUNT' | translate"
+            />
+        </app-input-error-message-handler>
     </div>
-  </div>
 
-  <!-- مبلغ غلق شيكه -->
-  <div class="journal-row">
-    <div class="journal-field">
-      <label class="journal-label">{{ 'DAILY_JOURNAL.NETWORK_CLOSING_AMOUNT' | translate }}</label>
-      <div class="doc-input">
+    <!-- مبلغ غلق شيكه -->
+    <div>
+        <label>{{ 'DAILY_JOURNAL.NETWORK_CLOSING_AMOUNT' | translate }}</label>
         <app-input-error-message-handler [fc]="fg.get('networkClosingAmount')">
-          <input
-            pInputText
-            id="networkClosingAmount"
-            formControlName="networkClosingAmount"
-            aria-describedby="networkClosingAmount-help"
-            placeholder="ادخل الرصيد"
-          />
+            <input
+                pInputText
+                id="networkClosingAmount"
+                formControlName="networkClosingAmount"
+                aria-describedby="networkClosingAmount-help"
+                placeholder="ادخل الرصيد"
+            />
         </app-input-error-message-handler>
-      </div>
     </div>
-    <div class="journal-field opacity-70 **:cursor-not-allowed!">
-      <label class="journal-label">{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
-      <div class="doc-input">
-        <input pInputText disabled [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
-      </div>
+    <div>
+        <label>{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
+        <app-input-error-message-handler>
+            <input pInputText disabled [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
+        </app-input-error-message-handler>
     </div>
-  </div>
 
-  <!-- ملاحظات -->
-  <div class="journal-notes">
-    <label for="closingNotes" class="journal-label">{{ 'DAILY_JOURNAL.NOTES' | translate }}</label>
-    <div class="doc-input my-1">
-      <textarea
-        rows="5"
-        cols="30"
-        pTextarea
-        class="w-full"
-        id="closingNotes"
-        formControlName="closingNotes"
-        aria-describedby="closingNotes-help"
-        [placeholder]="'DAILY_JOURNAL.NOTES' | translate"
-      ></textarea>
+    <!-- ملاحظات -->
+    <div class="col-span-2">
+        <label for="closingNotes" class="journal-label">{{ 'DAILY_JOURNAL.NOTES' | translate }}</label>
+        <div class="doc-input my-1">
+            <textarea
+                rows="5"
+                cols="30"
+                pTextarea
+                class="w-full"
+                id="closingNotes"
+                formControlName="closingNotes"
+                aria-describedby="closingNotes-help"
+                [placeholder]="'DAILY_JOURNAL.NOTES' | translate"
+            ></textarea>
+        </div>
     </div>
-  </div>
 
-  <button
-    pButton
-    appLoadingDisabled
-    style="--p-button-primary-background: var(--color-dark-line)"
-    class="border-dark-line! text-white! py-1! md:px-8! w-fit ms-auto mt-4"
-    type="submit"
-  >
-    {{ 'ACTIONS.CLOSE' | translate }}
-  </button>
+    <button
+        pButton
+        appLoadingDisabled
+        style="--p-button-primary-background: var(--color-dark-line)"
+        class="border-dark-line! text-white! py-1! md:px-8! w-fit ms-auto mt-4 col-span-2"
+        type="submit"
+    >
+        {{ 'ACTIONS.CLOSE' | translate }}
+    </button>
 </form>

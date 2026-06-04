@@ -56,10 +56,10 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
     ]),
 
     nameEn: this.fb.control(null, [
-      Validators.required,
-      noSymbolsAllowed,
-      Validators.minLength(2),
-      Validators.maxLength(100),
+    //   Validators.required,
+    //   noSymbolsAllowed,
+    //   Validators.minLength(2),
+    //   Validators.maxLength(100),
     ]),
 
     phoneNumber: this.fb.control(null, [
@@ -68,16 +68,16 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
       onlyNumbersAllowed,
       Validators.maxLength(13),
     ]),
-    email: this.fb.control(null, [Validators.required, emailValidator]),
-    address: this.fb.control(null, [Validators.required]),
-    description: this.fb.control(null, [Validators.required]),
+    email: this.fb.control('', []),
+    address: this.fb.control('', [Validators.required]),
+    description: this.fb.control('', []),
     identityNumber: this.fb.control(null, [
       Validators.required,
       onlyNumbersAllowed,
-      Validators.minLength(14),
+      Validators.minLength(10),
       Validators.maxLength(14),
     ]),
-    images: this.fb.control([], [Validators.required]),
+    images: this.fb.control([], []),
     //update only props
     id: this.fb.control(null, []),
   };
@@ -125,12 +125,12 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
     console.log(this.deliveryFg.value);
     this.deliveryFg.patchValue({
       nameAr: this.deliveryFg.get('nameAr')?.value ?? this.deliveryFg.get('nameEn')?.value,
-      nameEn: this.deliveryFg.get('nameEn')?.value ?? this.deliveryFg.get('nameAr')?.value,
+      nameEn: this.deliveryFg.get('nameAr')?.value,
     });
-    if (!this.currentImage() || this.deliveryFg.get('images')?.value.length === 0) {
-      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن ان يكون الصورة فارغة' });
-      return;
-    }
+    // if (!this.currentImage() || this.deliveryFg.get('images')?.value.length === 0) {
+    //   this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن ان يكون الصورة فارغة' });
+    //   return;
+    // }
     // debugger;
     if (this.deliveryFg.invalid) {
       console.log('invalid form', this.deliveryFg.getRawValue());

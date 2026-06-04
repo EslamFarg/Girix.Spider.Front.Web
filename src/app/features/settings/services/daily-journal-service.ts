@@ -161,5 +161,5 @@ export class DailyJournalService extends BaseService {
       // /v1/DailyJournalPeriod/ResetTotalShortage/ByUser/{userId}
   resetShortage = (userId: number = this.currentUserId) =>
     this.http
-      .get<any>(`${this.apiUrl}/ResetTotalShortage/ByUser/${userId}`);
+      .put<any>(`${this.apiUrl}/ResetTotalShortage/ByUser/${userId}`, null);
 }

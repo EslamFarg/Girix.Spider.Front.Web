@@ -64,11 +64,11 @@
 
       <div>
         @if (!isOpening()) {
-          <app-manage-open-daily-journal />
+          <app-open-daily-journal />
         } @else if (activeSection() === ManageDailyJournalSections.deficitReduction) {
           <app-reset-shortage />
         } @else {
-          <app-manage-close-daily-journal />
+          <app-close-daily-journal />
         }
       </div>
     } @else {

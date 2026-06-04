@@ -27,6 +27,7 @@ export class DialogService extends BaseService {
         }
 
         if (!component) return;
+        console.log("open: ",data);
 
         const ref = this.dialogService.open(component, {
             modal: true,
@@ -45,8 +46,9 @@ export class DialogService extends BaseService {
         if (!ref) return;
 
         this.dialogRefs.set(data.type, ref);
-
+        
         ref.onClose.subscribe((closeData: any) => {
+            console.log("onClose: ",closeData,data.onClose);
             data.onClose?.(closeData);
         });
 
@@ -57,5 +59,5 @@ export class DialogService extends BaseService {
         return ref;
     }
 
-    close = (data: { type: DialogType; data: any }) => this.dialogRefs.get(data.type)?.close();
+    close = (data: { type: DialogType; data: any }) => this.dialogRefs.get(data.type)?.close(data.data);
 }
