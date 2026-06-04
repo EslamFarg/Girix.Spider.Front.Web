@@ -67,7 +67,7 @@ export class UserForm extends BaseComponent {
       Validators.required,
       Validators.minLength(8),
       onlyNumbersAllowed,
-      Validators.maxLength(13),
+      Validators.maxLength(14),
     ]),
     isActive: this.fb.control(true, [Validators.required]),
     email: this.fb.control(null, [Validators.required, emailValidator]),

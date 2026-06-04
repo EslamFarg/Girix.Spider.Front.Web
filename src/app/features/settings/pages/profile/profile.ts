@@ -50,9 +50,9 @@ export class Profile extends BaseComponent {
 
     phoneNumber: this.fb.control(null, [
       Validators.required,
-      Validators.minLength(8),
+      Validators.minLength(6),
       onlyNumbersAllowed,
-      Validators.maxLength(13),
+      Validators.maxLength(14),
     ]),
     isActive: this.fb.control(true, [Validators.required]),
     email: this.fb.control(null, [Validators.required, emailValidator]),

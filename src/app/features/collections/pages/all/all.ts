@@ -654,7 +654,7 @@ export class All extends BaseComponent {
     this.isInvoiceTypeChangeConfirmDialogVisible = false;
   }
 
-  phoneNumberValidators = [Validators.required, onlyNumbersAllowed, Validators.minLength(6), Validators.maxLength(16)];
+  phoneNumberValidators = [Validators.required, onlyNumbersAllowed, Validators.minLength(6), Validators.maxLength(14)];
 
   transferanceFg = this.fb.group({
     id: this.fb.control<null | number>(null, [Validators.required]),

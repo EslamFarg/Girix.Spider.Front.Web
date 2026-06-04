@@ -380,7 +380,9 @@ export class Cashier extends BaseComponent implements OnInit {
                     break; // Breaks out of the main switch
             }
             
-            this.orderFg.updateValueAndValidity();
+            Object.values(this.orderFg.controls).forEach((control) => {
+                control.updateValueAndValidity({ emitEvent: false });
+            })
         });
 
         // this.orderFg.setValidators;
@@ -391,9 +393,6 @@ export class Cashier extends BaseComponent implements OnInit {
     }
 
     resetData() {
-        // this.searchHuts(1);
-        // this.searchRooms(1);
-        // this.searchTables(1);
         this.searchDeliveries(1);
     }
 
@@ -560,6 +559,7 @@ export class Cashier extends BaseComponent implements OnInit {
         this.orderFg.patchValue({
             placeRefId: null,
             placeType: null,
+            deliveryId: null,
         });
         this.resetIdempotencyKey();
         this.orderFg.updateValueAndValidity();

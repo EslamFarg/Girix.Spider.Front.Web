@@ -60,7 +60,7 @@ export class SupplierForm extends BaseComponent implements OnInit {
       
       onlyNumbersAllowed,
       Validators.minLength(6),
-      Validators.maxLength(16),
+      Validators.maxLength(14),
     ]),
     secondaryMobileNumber: this.fb.control(null, [ onlyNumbersAllowed]),
     city: this.fb.control(null, []),

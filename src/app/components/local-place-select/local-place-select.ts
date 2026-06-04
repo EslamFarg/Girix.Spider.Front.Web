@@ -17,7 +17,7 @@ import { ButtonDirective } from 'primeng/button';
 
 type IChosenPlace = (IHutSearchRow | IRoomSearchRow | ITableSearchRow) & { type: OrderLocalType };
 export type ChosenLocalPlace = IChosenPlace & {
-    reservationMinutes: number;
+    reservationMinutes: number | null;
 };
 
 @Component({
@@ -104,7 +104,7 @@ export class LocalPlaceSelect extends BaseComponent {
         this.chosenLocalPlace.set({
             ...item,
             type: this.placeType(),
-            reservationMinutes: this.isHutSelected() ? this.reservationMinutes() : 0,
+            reservationMinutes: this.isHutSelected() ? this.reservationMinutes() : null,
         });
     }
 

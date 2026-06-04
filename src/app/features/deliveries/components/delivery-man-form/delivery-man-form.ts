@@ -64,9 +64,9 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
 
     phoneNumber: this.fb.control(null, [
       Validators.required,
-      Validators.minLength(8),
+      Validators.minLength(6),
       onlyNumbersAllowed,
-      Validators.maxLength(13),
+      Validators.maxLength(14),
     ]),
     email: this.fb.control('', []),
     address: this.fb.control('', [Validators.required]),

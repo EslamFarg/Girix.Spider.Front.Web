@@ -16,8 +16,8 @@ import { noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validat
 export class AddCustomer extends BaseComponent {
   initialFormValue = {
     id: this.fb.control<number>(0, [Validators.required]),
-    phoneNumber: this.fb.control<string>('', [Validators.required, onlyNumbersAllowed]),
-    secondaryMobileNumber: this.fb.control<string>('', [Validators.required, onlyNumbersAllowed]),
+    phoneNumber: this.fb.control<string>('', [Validators.required, onlyNumbersAllowed, Validators.minLength(6), Validators.maxLength(14)]),
+    secondaryMobileNumber: this.fb.control<string>('', [Validators.required, onlyNumbersAllowed, Validators.minLength(6), Validators.maxLength(14)]),
     district: this.fb.control<string>('', [Validators.required, noSymbolsAllowed]),
     city: this.fb.control<string>('', [Validators.required, noSymbolsAllowed]),
     street: this.fb.control<string>('', [Validators.required, noSymbolsAllowed]),

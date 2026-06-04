@@ -43,8 +43,8 @@ export class Restaurant extends BaseComponent {
     phoneNumber: this.fb.control(null, [
       Validators.required,
       onlyNumbersAllowed,
-      Validators.minLength(8),
-      Validators.maxLength(15),
+      Validators.minLength(6),
+      Validators.maxLength(14),
     ]),
     buildingNumber: this.fb.control(null, [
       Validators.required,
