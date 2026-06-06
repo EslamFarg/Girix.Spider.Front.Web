@@ -832,14 +832,15 @@
                             bindValue="id"
                             [clearable]="false"
                             placeholder="الكل"
-                            #cashAccountSelect
+                           
+                        />
+                         <!-- #cashAccountSelect
                             appDebounce
                             [customEvents]="[
                                 { type: 'searchEvent', value: cashAccountSelect.searchEvent },
                                 { type: 'scrollToEnd', value: cashAccountSelect.scrollToEnd },
                             ]"
-                            (debounced)="onCashFinancialAccountsSearch($event)"
-                        />
+                            (debounced)="onCashFinancialAccountsSearch($event)" -->
                     </app-input-error-message-handler>
                 </div>
 
@@ -889,14 +890,15 @@
                             bindValue="id"
                             [clearable]="false"
                             placeholder="الكل"
-                            #networkAccountSelect
+                            
+                        />
+                        <!-- #networkAccountSelect
                             appDebounce
                             [customEvents]="[
                                 { type: 'searchEvent', value: networkAccountSelect.searchEvent },
                                 { type: 'scrollToEnd', value: networkAccountSelect.scrollToEnd },
                             ]"
-                            (debounced)="onNetworkFinancialAccountsSearch($event)"
-                        />
+                            (debounced)="onNetworkFinancialAccountsSearch($event)" -->
                     </app-input-error-message-handler>
                 </div>
 

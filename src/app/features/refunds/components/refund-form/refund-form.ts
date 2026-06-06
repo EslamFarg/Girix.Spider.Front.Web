@@ -15,7 +15,7 @@ import { AllowNumbers } from '@/directives/allow-numbers';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { RouterLink } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { OrderPaymentType } from '@/features/orders';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { InputGroupAddon } from "primeng/inputgroupaddon";
@@ -56,7 +56,7 @@ type RefundAddonFormRowControls = ControlsOf<IRefundAddonFormRow>;
     DecimalPipe,
     ButtonDirective,
     LoadingDisabledDirective,
-    InputGroupAddon,TagModule
+    InputGroupAddon,TagModule,DatePipe
 ],
   templateUrl: './refund-form.html',
   styleUrl: './refund-form.css',

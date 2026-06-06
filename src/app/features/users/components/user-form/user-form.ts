@@ -12,17 +12,16 @@ import { emailValidator, noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/ut
 import { IUserFgControls } from '../../types/users/form';
 import { UserService } from '../../services/user-service';
 import { FinancialAccountService } from '@/features/accounts/services/financial-account-service';
-import {
-  IBankFinancialAccount,
-  ICashFinancialAccount,
-  ICustodyFinancialAccount,
-} from '@/features/accounts/types';
+ 
 import { IUserReadResponse } from '../../types/users/api';
 import { UserType } from '../../types';
 import { RouterLink } from "@angular/router";
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { IFinancialAccountSearchRow } from '@/features/accounts/types';
 // import { IusersFgControls } from '@/features/deliveries/components/users-man-form/types';
 // import { usersService } from '@/features/deliveries/services/users-service';
+
+type ICashBankCustodyAccountRow = Omit<IFinancialAccountSearchRow, 'stage'>;
 
 @Component({
   selector: 'app-user-form',
@@ -90,10 +89,10 @@ export class UserForm extends BaseComponent {
   currentUser = signal<IUserReadResponse | null>(null);
 
   //
-  cashFinancialAccounts = signal<ICashFinancialAccount[]>([]);
+  cashFinancialAccounts = signal<ICashBankCustodyAccountRow[]>([]);
   cashierFinancialAccounts = this.cashFinancialAccounts.asReadonly();
-  bankFinancialAccounts = signal<IBankFinancialAccount[]>([]);
-  custodyAccounts = signal<ICustodyFinancialAccount[]>([]);
+  bankFinancialAccounts = signal<ICashBankCustodyAccountRow[]>([]);
+  custodyAccounts = signal<ICashBankCustodyAccountRow[]>([]);
 
   userTypes = signal([
     { id: UserType.Admin, nameAr: 'Admin', nameEn: 'Admin' },

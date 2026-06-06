@@ -615,7 +615,7 @@
                 appAllowNumbers
                 appDecimalMask
                 [min]="0"
-                [max]="net()"
+                [max]="finalNet()"
                 [allowDecimal]="true"
                 #cashAmount
                 id="cashAmount"
@@ -669,7 +669,7 @@
                 appDecimalMask
                 [allowDecimal]="true"
                 [min]="0"
-                [max]="net()"
+                [max]="finalNet()"
                 id="networkAmount"
                 aria-describedby="network-help"
                 #networkAmount

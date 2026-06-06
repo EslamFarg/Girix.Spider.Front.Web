@@ -1,169 +1,206 @@
 <div class="flex justify-between">
-   @if (!isOrderPaid()) {
-    <p-tag severity="warn" class="w-max inline-block *:inline-block *:w-max"  value="فاتورة غير مدفوعة" />
-  }
-  <div
-    class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
-    style="--p-button-primary-background: transparent"
-  >
-    <button
-      pButton
-      style="--p-button-primary-background: var(--color-dark-line)"
-      class="border-dark-line! text-white! py-1! md:px-8! md:flex-none"
-      form="refundForm"
-      type="submit"
-      appLoadingDisabled
+    @if (!isOrderPaid()) {
+        <p-tag severity="warn" class="w-max inline-block *:inline-block *:w-max" value="فاتورة غير مدفوعة" />
+    }
+    <div
+        class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
+        style="--p-button-primary-background: transparent"
     >
-      @if (isCreateMode()) {
-        {{ 'ACTIONS.SAVE' | translate }}
-      } @else {
-        {{ 'ACTIONS.EDIT' | translate }}
-      }
-    </button>
-  </div>
- 
+        <button
+            pButton
+            style="--p-button-primary-background: var(--color-dark-line)"
+            class="border-dark-line! text-white! py-1! md:px-8! md:flex-none"
+            form="refundForm"
+            type="submit"
+            appLoadingDisabled
+        >
+            @if (isCreateMode()) {
+                {{ 'ACTIONS.SAVE' | translate }}
+            } @else {
+                {{ 'ACTIONS.EDIT' | translate }}
+            }
+        </button>
+    </div>
 </div>
 
 <form id="refundForm" class="mt-6 flex flex-col gap-4" [formGroup]="refundFg" (ngSubmit)="onSubmitForm()">
-  @if (isOrderPaid()) {
-
-  <!-- Payment Info -->
-  <div class="grid md:grid-cols-2 gap-4">
-    <div>
-      <label for="payingCash">المدفوع كاش</label>
-      <app-input-error-message-handler [fc]="refundFg.get('payingCash')">
-        <input
-          pInputText
-          appAllowNumbers
-          [allowDecimal]="true"
-          [max]="isOrderPaid() ? calculateRefundTotal() : 0"
-          [min]="0"
-          id="payingCash"
-          type="number"
-          formControlName="payingCash"
-          class="app-input"
-          placeholder="المدفوع كاش"
-        />
-      </app-input-error-message-handler>
-    </div>
-    <div>
-      <label for="payingNetwork">المدفوع شبكة</label>
-      <app-input-error-message-handler [fc]="refundFg.get('payingNetwork')">
-        <input
-          pInputText
-          appAllowNumbers
-          [allowDecimal]="true"
-          [max]="isOrderPaid() ? calculateRefundTotal() : 0"
-          [min]="0"
-          type="number"
-          id="payingNetwork"
-          formControlName="payingNetwork"
-          class="app-input"
-          placeholder="المدفوع شبكة"
-        />
-      </app-input-error-message-handler>
-    </div>
-  </div>
-  }
-
-  <!-- Items Table -->
-  <div class="overflow-x-auto mt-4">
-    <p>عناصر الطلب</p>
-    <table class="my-4 min-w-250 w-full main-table table-fixed">
-      <thead>
-        <tr>
-          <th class="min-w-12.5 w-12.5">#</th>
-          <th class="min-w-40">المنتج</th>
-          <th class="min-w-20">السعر</th>
-          <th class="min-w-20">الكمية المتاحة</th>
-          <th class="min-w-20">الكمية المسترجعة</th>
-          <th class="min-w-20">الإجمالي</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (item of itemRows.controls; track $index; let itemIndex = $index) {
-          <tr [style]="`--ix:${itemIndex}`">
-            <td>
-              <div>{{ itemIndex + 1 }}</div>
-            </td>
-            <td>
-              <div>{{ item.value.name }}</div>
-            </td>
-            <td>
-              <div>{{ item.value.netUnitPriceWithTax?.toFixed(2) }}</div>
-            </td>
-            <td>
-              <div>{{ item.value.originalQuantity }}</div>
-            </td>
-            <td>
-              <app-input-error-message-handler [grouped]="false" [fc]="item.controls.quantity">
-                <input
-                  pInputText
-                  appAllowNumbers
-                  [allowDecimal]="true"
-                  [min]="0"
-                  [max]="item.value.originalQuantity ?? 0"
-                  [formControl]="item.controls.quantity"
-                  class="app-input text-center"
-                  placeholder="الكمية"
-                  (input)="onItemQuantityChange(itemIndex, $event)"
-                />
-              </app-input-error-message-handler>
-            </td>
-            <td>
-              <div>{{ ((item.value.quantity ?? 0) * (item.value.netUnitPriceWithTax ?? 0)).toFixed(2) }}</div>
-            </td>
-          </tr>
-
-          <!-- Addons -->
-          @for (addon of getAddonRows(itemIndex).controls; track $index; let addonIndex = $index) {
-            <tr [style]="`--ix:${itemIndex + addonIndex + 1}`" class="bg-secondary-bg/30">
-              <td></td>
-              <td class="pr-8">
-                <div class="text-sm text-text-gray">↳ {{ addon.value.name }}</div>
-              </td>
-              <td>
-                <div class="text-sm">{{ addon.value.netUnitPriceWithTax }}</div>
-              </td>
-              <td>
-                <div class="text-sm">{{ addon.value.originalQuantity }}</div>
-              </td>
-              <td>
-                <app-input-error-message-handler [grouped]="false" [fc]="addon.controls.quantity">
-                  <input
-                    pInputText
-                    appAllowNumbers
-                    [allowDecimal]="true"
-                    [min]="0"
-                    [max]="addon.value.originalQuantity ?? 0"
-                    [formControl]="addon.controls.quantity"
-                    class="app-input text-center text-sm"
-                    placeholder="الكمية"
-                    (input)="onAddonQuantityChange(itemIndex, addonIndex, $event)"
-                  />
+    <!-- Payment Info -->
+    <div class="grid md:grid-cols-2 gap-4">
+        @if (isOrderPaid()) {
+            <!-- المدفوع كاش -->
+            <div>
+                <label for="payingCash">المدفوع كاش</label>
+                <app-input-error-message-handler [fc]="refundFg.get('payingCash')">
+                    <input
+                        pInputText
+                        appAllowNumbers
+                        [allowDecimal]="true"
+                        [max]="isOrderPaid() ? calculateRefundTotal() : 0"
+                        [min]="0"
+                        id="payingCash"
+                        type="number"
+                        formControlName="payingCash"
+                        class="app-input"
+                        placeholder="المدفوع كاش"
+                    />
                 </app-input-error-message-handler>
-              </td>
-              <td>
-                <div class="text-sm">
-                  {{ (addon.value.quantity ?? 0) * (addon.value.netUnitPriceWithTax ?? 0) | number: '1.2-2' }}
-                </div>
-              </td>
-            </tr>
-          }
-        } @empty {
-          <tr>
-            <td colspan="6">
-              <div class="py-4 text-center">لا توجد عناصر</div>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+            </div>
 
-  <!-- Summary -->
-  <div class="flex flex-col gap-2 mt-2 p-4 bg-dark-bg-2 rounded-lg">
-    <!-- <div class="flex items-center gap-4">
+            <!-- المدفوع شبكة -->
+            <div>
+                <label for="payingNetwork">المدفوع شبكة</label>
+                <app-input-error-message-handler [fc]="refundFg.get('payingNetwork')">
+                    <input
+                        pInputText
+                        appAllowNumbers
+                        [allowDecimal]="true"
+                        [max]="isOrderPaid() ? calculateRefundTotal() : 0"
+                        [min]="0"
+                        type="number"
+                        id="payingNetwork"
+                        formControlName="payingNetwork"
+                        class="app-input"
+                        placeholder="المدفوع شبكة"
+                    />
+                </app-input-error-message-handler>
+            </div>
+        }
+        <!-- التاريخ -->
+        <div>
+            <label for="payingNetwork">التاريخ</label>
+            <app-input-error-message-handler>
+                <input
+                    pInputText
+                    disabled
+                    [value]="orderData()?.dateTime | date: 'yyyy-MM-dd'"
+                    type="text"
+                    id="payingNetwork"
+                    class="app-input"
+                    placeholder="التاريخ"
+                />
+            </app-input-error-message-handler>
+        </div>
+
+        <!-- اسم العميل -->
+        <div>
+            <label for="payingNetwork">اسم العميل</label>
+            <app-input-error-message-handler>
+                <input
+                    pInputText
+                    disabled
+                    [value]="orderData()?.customer?.name"
+                    type="text"
+                    id="payingNetwork"
+                    class="app-input"
+                    placeholder="التاريخ"
+                />
+            </app-input-error-message-handler>
+        </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="overflow-x-auto mt-4">
+        <p>عناصر الطلب</p>
+        <table class="my-4 min-w-250 w-full main-table table-fixed">
+            <thead>
+                <tr>
+                    <th class="min-w-12.5 w-12.5">#</th>
+                    <th class="min-w-40">المنتج</th>
+                    <th class="min-w-20">السعر</th>
+                    <th class="min-w-20">الكمية المتاحة</th>
+                    <th class="min-w-20">الكمية المسترجعة</th>
+                    <th class="min-w-20">الإجمالي</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of itemRows.controls; track $index; let itemIndex = $index) {
+                    <tr [style]="`--ix:${itemIndex}`">
+                        <td>
+                            <div>{{ itemIndex + 1 }}</div>
+                        </td>
+                        <td>
+                            <div>{{ item.value.name }}</div>
+                        </td>
+                        <td>
+                            <div>{{ item.value.netUnitPriceWithTax?.toFixed(2) }}</div>
+                        </td>
+                        <td>
+                            <div>{{ item.value.originalQuantity }}</div>
+                        </td>
+                        <td>
+                            <app-input-error-message-handler [grouped]="false" [fc]="item.controls.quantity">
+                                <input
+                                    pInputText
+                                    appAllowNumbers
+                                    [allowDecimal]="true"
+                                    [min]="0"
+                                    [max]="item.value.originalQuantity ?? 0"
+                                    [formControl]="item.controls.quantity"
+                                    class="app-input text-center"
+                                    placeholder="الكمية"
+                                    (input)="onItemQuantityChange(itemIndex, $event)"
+                                />
+                            </app-input-error-message-handler>
+                        </td>
+                        <td>
+                            <div>
+                                {{ ((item.value.quantity ?? 0) * (item.value.netUnitPriceWithTax ?? 0)).toFixed(2) }}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Addons -->
+                    @for (addon of getAddonRows(itemIndex).controls; track $index; let addonIndex = $index) {
+                        <tr [style]="`--ix:${itemIndex + addonIndex + 1}`" class="bg-secondary-bg/30">
+                            <td></td>
+                            <td class="pr-8">
+                                <div class="text-sm text-text-gray">↳ {{ addon.value.name }}</div>
+                            </td>
+                            <td>
+                                <div class="text-sm">{{ addon.value.netUnitPriceWithTax }}</div>
+                            </td>
+                            <td>
+                                <div class="text-sm">{{ addon.value.originalQuantity }}</div>
+                            </td>
+                            <td>
+                                <app-input-error-message-handler [grouped]="false" [fc]="addon.controls.quantity">
+                                    <input
+                                        pInputText
+                                        appAllowNumbers
+                                        [allowDecimal]="true"
+                                        [min]="0"
+                                        [max]="addon.value.originalQuantity ?? 0"
+                                        [formControl]="addon.controls.quantity"
+                                        class="app-input text-center text-sm"
+                                        placeholder="الكمية"
+                                        (input)="onAddonQuantityChange(itemIndex, addonIndex, $event)"
+                                    />
+                                </app-input-error-message-handler>
+                            </td>
+                            <td>
+                                <div class="text-sm">
+                                    {{
+                                        (addon.value.quantity ?? 0) * (addon.value.netUnitPriceWithTax ?? 0)
+                                            | number: '1.2-2'
+                                    }}
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                } @empty {
+                    <tr>
+                        <td colspan="6">
+                            <div class="py-4 text-center">لا توجد عناصر</div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Summary -->
+    <div class="flex flex-col gap-2 mt-2 p-4 bg-dark-bg-2 rounded-lg">
+        <!-- <div class="flex items-center gap-4">
       <span class="text-text-lighter font-bold">إجمالي العناصر:</span>
       <span class="text-white font-bold w-20 text-left">{{ calculateItemsTotal() | number: '1.2-2' }}</span>
     </div>
@@ -173,9 +210,11 @@
         <span class="text-white font-bold w-20 text-left">{{ calculateReturnedServiceFee() | number: '1.2-2' }}</span>
       </div>
     } -->
-    <div class="flex items-center gap-4 justify-end">
-      <span class="text-text-lighter font-bold">إجمالي المرتجع:</span>
-      <span class="text-white font-bold text-lg w-20 text-left">{{ calculateRefundTotal() | number: '1.2-2' }}</span>
+        <div class="flex items-center gap-4 justify-end">
+            <span class="text-text-lighter font-bold">إجمالي المرتجع:</span>
+            <span class="text-white font-bold text-lg w-20 text-left">{{
+                calculateRefundTotal() | number: '1.2-2'
+            }}</span>
+        </div>
     </div>
-  </div>
 </form>

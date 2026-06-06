@@ -16,9 +16,6 @@ import { Textarea } from 'primeng/textarea';
 import { FinancialAccountSearchEnum, FinancialAccountService } from '../../services/financial-account-service';
 import { PaymentVoucherService } from '../../services/payment-voucher-service';
 import {
-  IBankFinancialAccount,
-  ICashFinancialAccount,
-  ICustodyFinancialAccount,
   IFinancialAccountSearchResponseValue,
   IFinancialAccountSearchRow,
   IPaymentVoucherReadResponse,
@@ -32,7 +29,7 @@ interface IAppPaymentVoucherItem {
 }
 type IAppPaymentVoucherItemControls = ControlsOf<IAppPaymentVoucherItem>;
 
-type ISelectableBankCashAccount = ICashFinancialAccount | IBankFinancialAccount | ICustodyFinancialAccount;
+type ISelectableBankCashAccount = Omit<IFinancialAccountSearchRow, 'stage'>;
 
 @Component({
   selector: 'app-collective-payment-form',

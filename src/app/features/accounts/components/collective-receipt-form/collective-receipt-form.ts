@@ -15,10 +15,7 @@ import { PaginatorState } from 'primeng/paginator';
 import { Textarea } from 'primeng/textarea';
 import { FinancialAccountSearchEnum, FinancialAccountService } from '../../services/financial-account-service';
 import { ReceiptVoucherService } from '../../services/receipt-voucher-service';
-import {
-  IBankFinancialAccount,
-  ICashFinancialAccount,
-  ICustodyFinancialAccount,
+import { 
   IFinancialAccountSearchRow,
   IReceiptVoucherReadResponse,
   ITreeFinancialAccountSearchRow,
@@ -31,7 +28,7 @@ interface IAppReceiptVoucherItem {
 }
 type IAppReceiptVoucherItemControls = ControlsOf<IAppReceiptVoucherItem>;
 
-type ISelectableBankCashAccount = ICashFinancialAccount | IBankFinancialAccount | ICustodyFinancialAccount;
+type ISelectableBankCashAccount = Omit<IFinancialAccountSearchRow, 'stage'>;
 
 @Component({
   selector: 'app-collective-receipt-form',

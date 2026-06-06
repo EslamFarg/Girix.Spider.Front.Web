@@ -1,40 +1,15 @@
 import { BalanceNature, FinalAccountType } from '@/features/accounts/services/financial-account-service';
 
 export interface ICashBankCustodyAccounts {
-  cash: ICashFinancialAccount[];
-  bank: IBankFinancialAccount[];
-  custody: ICustodyFinancialAccount[];
+  cash: Omit<IFinancialAccountSearchRow, 'stage'>[];
+  bank: Omit<IFinancialAccountSearchRow, 'stage'>[];
+  custody: Omit<IFinancialAccountSearchRow, 'stage'>[];
 }
-
-export interface ICashFinancialAccount {
+export interface IFinancialAccountSearchRow {
   id: number;
   name: string;
-  parentId: number;
-  parentName: any;
-  finNumber: string;
-  balanceNature: number;
-  finalAccountType: FinancailAccountType;
-  accountGroup: AccountGroup;
-  accountStatus: AccountStatus;
-}
-
-export interface IBankFinancialAccount {
-  id: number;
-  name: string;
-  parentId: number;
-  parentName: any;
-  finNumber: string;
-  balanceNature: number;
-  finalAccountType: FinancailAccountType;
-  accountGroup: AccountGroup;
-  accountStatus: AccountStatus;
-}
-
-export interface ICustodyFinancialAccount {
-  id: number;
-  name: string;
-  parentId: number;
-  parentName: any;
+  parentId: any;
+  stage: number;
   finNumber: string;
   balanceNature: number;
   finalAccountType: FinancailAccountType;
@@ -64,17 +39,7 @@ enum AccountStatus {
   Closed = 3, // مغلق
 }
 
-export interface IFinancialAccountSearchRow {
-  id: number;
-  name: string;
-  parentId: any;
-  stage: number;
-  finNumber: string;
-  balanceNature: number;
-  finalAccountType: FinancailAccountType;
-  accountGroup: AccountGroup;
-  accountStatus: AccountStatus;
-}
+
 export interface IFinancialAccountTreeRow {
   id: number;
   name: string;

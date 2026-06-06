@@ -158,11 +158,14 @@ export class PurchasesForm extends BaseComponent {
                     control.disable();
                 });
             }
+            
+            this.paymentType.set(value!);
         },
     });
 
     fgItemsListener = this.fg.controls.items.valueChanges.subscribe({
         next: (data) => {
+            console.log('changed');
             this.updateNet();
         },
     });
@@ -173,9 +176,15 @@ export class PurchasesForm extends BaseComponent {
     };
 
     net = signal(0);
+    paymentType=signal(OrderPaymentType.Paid)
+    finalNet = computed(() => {
+        const net = this.net();
+        const paymentType = this.paymentType();
+        return this.fg.value.paymentType == OrderPaymentType.Paid ? net : 0;
+    });
 
     cashInputSubscription = this.fg.controls.cashAmount.valueChanges.subscribe((value) => {
-        const net = this.net();
+        const net = this.finalNet();
         let futureValue = value ?? 0;
         if (futureValue > net) {
             futureValue = net;
@@ -192,7 +201,7 @@ export class PurchasesForm extends BaseComponent {
     });
 
     networkInputSubscription = this.fg.controls.networkAmount?.valueChanges.subscribe((value) => {
-        const net = this.net();
+        const net = this.finalNet();
         let futureValue = value ?? 0;
         if (futureValue > net) {
             futureValue = net;
@@ -631,6 +640,7 @@ export class PurchasesForm extends BaseComponent {
                 fg.patchValue({ total, taxAmount }, { emitEvent: false });
                 //trigger main fg value changes listener
                 this.fg.updateValueAndValidity();
+                this.updateNet();
             },
         });
         return fg;

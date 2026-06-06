@@ -186,7 +186,7 @@ label + app-input-error-message-handler .p-select,
 label + app-input-error-message-handler input  */ {
   --p-select-padding-x: 4px !important;
   --p-select-padding-y: 4px !important;
-  background-color: white !important;
+  --p-inputtext-background: white !important;
   --p-inputtext-border-color: #d3dce6;
   border-radius: 8px !important;
   width: 100% !important;

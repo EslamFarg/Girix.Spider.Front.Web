@@ -83,7 +83,7 @@ import {
     FinancialAccountSearchEnum,
     FinancialAccountService,
 } from '@/features/accounts/services/financial-account-service';
-import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
+import { IFinancialAccountSearchRow, ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { AllowedRolesDirective } from '@/directives/allowed-roles';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -286,13 +286,10 @@ export class Cashier extends BaseComponent implements OnInit {
 
         this.financialSettingsService.getSettings().subscribe((res) => this.financialSettings.set(res));
         this.resetData();
-        this.searchAccounts({
-            pageIndex: 1,
-            searchTerm: '',
-        }).subscribe({
+        this.getAccounts().subscribe({
             next: (res) => {
-                this.cashAccounts.set(res.value.rows);
-                this.networkAccounts.set(res.value.rows);
+                this.cashAccounts.set(res.cash);
+                this.networkAccounts.set(res.bank);
 
                 const userDetails = this.userDetails();
                 if (userDetails?.cashPaymentAccountId) {
@@ -379,10 +376,10 @@ export class Cashier extends BaseComponent implements OnInit {
                     }
                     break; // Breaks out of the main switch
             }
-            
+
             Object.values(this.orderFg.controls).forEach((control) => {
                 control.updateValueAndValidity({ emitEvent: false });
-            })
+            });
         });
 
         // this.orderFg.setValidators;
@@ -1079,8 +1076,8 @@ export class Cashier extends BaseComponent implements OnInit {
 
     financialAccountService = inject(FinancialAccountService);
 
-    cashAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
-    networkAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
+    cashAccounts = signal<Omit<IFinancialAccountSearchRow, 'stage'>[]>([]);
+    networkAccounts = signal<Omit<IFinancialAccountSearchRow, 'stage'>[]>([]);
 
     displayedCashAccounts = computed(() => {
         const accounts = this.cashAccounts();
@@ -1114,133 +1111,134 @@ export class Cashier extends BaseComponent implements OnInit {
         return [defaultAccount, ...accounts];
     });
 
-    searchAccounts(data: { pageIndex: number; searchTerm?: string }) {
-        return this.financialAccountService.search({
-            paginationInfo: {
-                pageIndex: data.pageIndex,
-                pageSize: 10,
-            },
-            searchFilters: [
-                {
-                    column: FinancialAccountSearchEnum.Name,
-                    values: [data.searchTerm ?? ''],
-                },
-            ],
-            fromDate: null,
-        });
+    getAccounts(data?: { pageIndex: number; searchTerm?: string }) {
+        // return this.financialAccountService.search({
+        //     paginationInfo: {
+        //         pageIndex: data.pageIndex,
+        //         pageSize: 10,
+        //     },
+        //     searchFilters: [
+        //         {
+        //             column: FinancialAccountSearchEnum.Name,
+        //             values: [data.searchTerm ?? ''],
+        //         },
+        //     ],
+        //     fromDate: null,
+        // });
+        return this.financialAccountService.getCashAndBankAccountsAndCustodyAccounts();
     }
 
-    cashAccountsSearchPaginationInfo: IPaginationInfo = {
-        pageIndex: 1,
-        totalRowsCount: 0,
-        totalPagesCount: 0,
-    };
-    networkAccountsSearchPaginationInfo: IPaginationInfo = {
-        pageIndex: 1,
-        totalRowsCount: 0,
-        totalPagesCount: 0,
-    };
+    // cashAccountsSearchPaginationInfo: IPaginationInfo = {
+    //     pageIndex: 1,
+    //     totalRowsCount: 0,
+    //     totalPagesCount: 0,
+    // };
+    // networkAccountsSearchPaginationInfo: IPaginationInfo = {
+    //     pageIndex: 1,
+    //     totalRowsCount: 0,
+    //     totalPagesCount: 0,
+    // };
 
-    previousCashAccountsSearchTerm: string = '';
-    previousNetworkAccountsSearchTerm: string = '';
+    // previousCashAccountsSearchTerm: string = '';
+    // previousNetworkAccountsSearchTerm: string = '';
 
-    onCashFinancialAccountsSearch(
-        event: IDebounceEvent<{
-            term: string;
-        }>,
-    ) {
-        let searchTerm = event?.value?.term ?? '';
-        let isNewSearchTerm = searchTerm != this.previousCashAccountsSearchTerm;
-        if (event.type === 'scrollToEnd') {
-            searchTerm = this.previousCashAccountsSearchTerm;
-        }
-        if (searchTerm && searchTerm.length > 100) return;
-        //
-        //
-        if (isNewSearchTerm) {
-            //refetch page 1
-            this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
-                next: (res) => {
-                    if (res.value.rows.length > 0) {
-                        this.previousCashAccountsSearchTerm = searchTerm;
-                        this.cashAccounts.set(res.value.rows);
-                        this.cashAccountsSearchPaginationInfo = {
-                            pageIndex: 1,
-                            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-                        };
-                    }
-                },
-            });
-        } else {
-            //refetch next page
-            this.searchAccounts({
-                pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1,
-                searchTerm,
-            }).subscribe({
-                next: (res) => {
-                    if (res.value.rows.length > 0) {
-                        this.previousCashAccountsSearchTerm = searchTerm;
-                        this.cashAccounts.update((prev) => prev.concat(res.value.rows));
-                        this.cashAccountsSearchPaginationInfo = {
-                            pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1,
-                            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-                        };
-                    }
-                },
-            });
-        }
-    }
+    // onCashFinancialAccountsSearch(
+    //     event: IDebounceEvent<{
+    //         term: string;
+    //     }>,
+    // ) {
+    //     let searchTerm = event?.value?.term ?? '';
+    //     let isNewSearchTerm = searchTerm != this.previousCashAccountsSearchTerm;
+    //     if (event.type === 'scrollToEnd') {
+    //         searchTerm = this.previousCashAccountsSearchTerm;
+    //     }
+    //     if (searchTerm && searchTerm.length > 100) return;
+    //     //
+    //     //
+    //     if (isNewSearchTerm) {
+    //         //refetch page 1
+    //         this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
+    //             next: (res) => {
+    //                 if (res.value.rows.length > 0) {
+    //                     this.previousCashAccountsSearchTerm = searchTerm;
+    //                     this.cashAccounts.set(res.value.rows);
+    //                     this.cashAccountsSearchPaginationInfo = {
+    //                         pageIndex: 1,
+    //                         totalPagesCount: res.value.paginationInfo.totalPagesCount,
+    //                         totalRowsCount: res.value.paginationInfo.totalRowsCount,
+    //                     };
+    //                 }
+    //             },
+    //         });
+    //     } else {
+    //         //refetch next page
+    //         this.searchAccounts({
+    //             pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1,
+    //             searchTerm,
+    //         }).subscribe({
+    //             next: (res) => {
+    //                 if (res.value.rows.length > 0) {
+    //                     this.previousCashAccountsSearchTerm = searchTerm;
+    //                     this.cashAccounts.update((prev) => prev.concat(res.value.rows));
+    //                     this.cashAccountsSearchPaginationInfo = {
+    //                         pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1,
+    //                         totalPagesCount: res.value.paginationInfo.totalPagesCount,
+    //                         totalRowsCount: res.value.paginationInfo.totalRowsCount,
+    //                     };
+    //                 }
+    //             },
+    //         });
+    //     }
+    // }
 
-    onNetworkFinancialAccountsSearch(
-        event: IDebounceEvent<{
-            term: string;
-        }>,
-    ) {
-        let searchTerm = event?.value?.term ?? '';
-        let isNewSearchTerm = searchTerm != this.previousNetworkAccountsSearchTerm;
-        if (event.type === 'scrollToEnd') {
-            searchTerm = this.previousNetworkAccountsSearchTerm;
-        }
-        if (searchTerm && searchTerm.length > 100) return;
-        //
-        //
-        if (isNewSearchTerm) {
-            //refetch page 1
-            this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
-                next: (res) => {
-                    if (res.value.rows.length > 0) {
-                        this.previousNetworkAccountsSearchTerm = searchTerm;
-                        this.networkAccounts.set(res.value.rows);
-                        this.networkAccountsSearchPaginationInfo = {
-                            pageIndex: 1,
-                            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-                        };
-                    }
-                },
-            });
-        } else {
-            //refetch next page
-            this.searchAccounts({
-                pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
-                searchTerm,
-            }).subscribe({
-                next: (res) => {
-                    if (res.value.rows.length > 0) {
-                        this.previousNetworkAccountsSearchTerm = searchTerm;
-                        this.networkAccounts.update((prev) => prev.concat(res.value.rows));
-                        this.networkAccountsSearchPaginationInfo = {
-                            pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
-                            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-                        };
-                    }
-                },
-            });
-        }
-    }
+    // onNetworkFinancialAccountsSearch(
+    //     event: IDebounceEvent<{
+    //         term: string;
+    //     }>,
+    // ) {
+    //     let searchTerm = event?.value?.term ?? '';
+    //     let isNewSearchTerm = searchTerm != this.previousNetworkAccountsSearchTerm;
+    //     if (event.type === 'scrollToEnd') {
+    //         searchTerm = this.previousNetworkAccountsSearchTerm;
+    //     }
+    //     if (searchTerm && searchTerm.length > 100) return;
+    //     //
+    //     //
+    //     if (isNewSearchTerm) {
+    //         //refetch page 1
+    //         this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
+    //             next: (res) => {
+    //                 if (res.value.rows.length > 0) {
+    //                     this.previousNetworkAccountsSearchTerm = searchTerm;
+    //                     this.networkAccounts.set(res.value.rows);
+    //                     this.networkAccountsSearchPaginationInfo = {
+    //                         pageIndex: 1,
+    //                         totalPagesCount: res.value.paginationInfo.totalPagesCount,
+    //                         totalRowsCount: res.value.paginationInfo.totalRowsCount,
+    //                     };
+    //                 }
+    //             },
+    //         });
+    //     } else {
+    //         //refetch next page
+    //         this.searchAccounts({
+    //             pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
+    //             searchTerm,
+    //         }).subscribe({
+    //             next: (res) => {
+    //                 if (res.value.rows.length > 0) {
+    //                     this.previousNetworkAccountsSearchTerm = searchTerm;
+    //                     this.networkAccounts.update((prev) => prev.concat(res.value.rows));
+    //                     this.networkAccountsSearchPaginationInfo = {
+    //                         pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
+    //                         totalPagesCount: res.value.paginationInfo.totalPagesCount,
+    //                         totalRowsCount: res.value.paginationInfo.totalRowsCount,
+    //                     };
+    //                 }
+    //             },
+    //         });
+    //     }
+    // }
 
     //
     //
