@@ -41,7 +41,18 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.css","node_modules/simple-keyboard/build/css/index.css"]
+            "styles": [
+              "src/styles.css",
+              "node_modules/simple-keyboard/build/css/index.css"
+            ],
+            "server": "src/main.server.ts",
+            "outputMode": "server",
+            "security": {
+              "allowedHosts": []
+            },
+            "ssr": {
+              "entry": "src/server.ts"
+            }
           },
           "configurations": {
             "production": {

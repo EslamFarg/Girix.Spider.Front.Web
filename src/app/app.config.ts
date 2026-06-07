@@ -16,6 +16,7 @@ import { provideTranslateService, provideTranslateLoader } from '@ngx-translate/
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { languageInterceptor } from './core/interceptors/language-interceptor';
 import { DialogService } from 'primeng/dynamicdialog';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -45,6 +46,6 @@ export const appConfig: ApplicationConfig = {
       }),
       fallbackLang: 'ar',
       lang: 'ar',
-    }),
+    }), provideClientHydration(withEventReplay()),
   ],
 };
