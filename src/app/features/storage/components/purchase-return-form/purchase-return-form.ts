@@ -211,7 +211,7 @@ export class PurchaseReturnForm extends BaseComponent {
         });
         break;
       case FormMode.Update:
-        this.purchaseReturnService.patch({ ...data, id: this.currentPurchaseReturn()?.id }).subscribe();
+        this.purchaseReturnService.put({ ...data, id: this.currentPurchaseReturn()?.id }).subscribe();
         break;
     }
   }

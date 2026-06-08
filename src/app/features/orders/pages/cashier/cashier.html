@@ -665,15 +665,16 @@
             <button class="cursor-pointer p-1 w-fit ms-auto" (click)="customerDialogVisible = false">
                 <i class="pi pi-times"></i>
             </button>
-            <form id="customerForm" class="overflow-visible grid gap-4 md:grid-cols-2" [formGroup]="customerFg">
+
+            <form id="customerForm" class="overflow-visible grid gap-4 md:grid-cols-2" [formGroup]="orderFg">
                 <!-- name (search) -->
                 <div>
                     <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
-                    <app-input-error-message-handler [fc]="customerFg.get('id')">
+                    <app-input-error-message-handler [fc]="orderFg.controls.customerRequest.controls.id">
                         <ng-select
                             class="app-select w-full"
                             [items]="displayedCustomers()"
-                            formControlName="id"
+                            [formControl]="orderFg.controls.customerRequest.controls.id"
                             bindLabel="name"
                             bindValue="id"
                             [clearable]="false"
@@ -694,10 +695,10 @@
                 <!-- phone -->
                 <div>
                     <label for="phoneNumber">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
-                    <app-input-error-message-handler [fc]="customerFg.get('phoneNumber')">
+                    <app-input-error-message-handler [fc]="orderFg.controls.customerRequest.controls.phoneNumber">
                         <input
                             pInputText
-                            formControlName="phoneNumber"
+                            [formControl]="orderFg.controls.customerRequest.controls.phoneNumber"
                             aria-describedby="phoneNumber-help"
                             [placeholder]="'FORM.PHONE_NUMBER' | translate"
                             #customerPhoneSearch
@@ -710,10 +711,10 @@
                 <!-- address -->
                 <div class="md:col-span-2">
                     <label for="customerAddress">{{ 'FORM.CUSTOMER_ADDRESS' | translate }}</label>
-                    <app-input-error-message-handler [fc]="customerFg.get('addressDescription')">
+                    <app-input-error-message-handler [fc]="orderFg.controls.customerRequest.controls.addressDescription">
                         <input
                             pInputText
-                            formControlName="addressDescription"
+                            [formControl]="orderFg.controls.customerRequest.controls.addressDescription"
                             aria-describedby="productAddress-help"
                             [placeholder]="'FORM.CUSTOMER_ADDRESS' | translate"
                             class="app-input order-customer-address"
@@ -724,6 +725,7 @@
 
                 <!-- <app-full-keyboard /> -->
             </form>
+            
             <button
                 pButton
                 styleClass="app-p-btn"

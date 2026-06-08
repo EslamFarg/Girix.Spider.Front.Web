@@ -1,28 +1,16 @@
-import {
-    Component,
-    computed,
-    effect,
-    ElementRef,
-    inject,
-    input,
-    OnInit,
-    signal,
-    untracked,
-    viewChild,
-} from '@angular/core';
-import { IMenuItem, IOrderMenuItem, Menu } from '../../components/menu/menu';
+import { Component, computed, effect, inject, input, OnInit, signal, viewChild } from '@angular/core';
+import { IOrderMenuItem, Menu } from '../../components/menu/menu';
 import { OrderSuccessDialog } from '../../components/order-success-dialog/order-success-dialog';
 import { ButtonModule } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { AvatarModule } from 'primeng/avatar';
 import { ImgFallback } from '@/directives/img-fallback';
-import { Button, ButtonDirective } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
-import { ProductsAndMealsService, ProductAndMealsSearchEnum, IOrderBillReadResponse } from '@/features/orders';
+import { IOrderBillReadResponse } from '@/features/orders';
 import { SkeletonModule } from 'primeng/skeleton';
 import {
-    FormArray,
     FormControl,
     Validators,
     ɵInternalFormsSharedModule,
@@ -31,29 +19,22 @@ import {
     FormsModule,
     FormGroup,
 } from '@angular/forms';
-import { IProductSearchRow, ProductSearchEnum, ProductService } from '@/features/classes/services/product-service';
-import { IMealSearchRow } from '@/features/classes/services/meal-service';
-import { GroupService, IGroupSearchRow, IGroupSearchResponseValue } from '@/features/classes/services/group-service';
+import { IProductSearchRow, ProductService } from '@/features/classes/services/product-service';
+import { GroupService, IGroupSearchRow } from '@/features/classes/services/group-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { GalleriaModule } from 'primeng/galleria';
-import { Slider, HutCard, RoomCard, TableCard, BaseComponent, FormMode, IPaginationInfo } from '@/components';
+import { Slider, BaseComponent, FormMode, IPaginationInfo } from '@/components';
 import {
     IOrderCreateCustomer,
     IOrderCreateItem,
-    IOrderCreateRequest,
     OrderPaymentType,
     OrderLocalType,
     OrderService,
     OrderLocationType,
-    IOrderReadResponse,
     IOrderCreateItemAddon,
 } from '@/features/orders/index';
 import { DatePipe } from '@angular/common';
-import { HutSearchEnum, HutService, IHutSearchRow } from '@/features/restaurant/services/hut-service';
-import { Debounce, IDebounceEvent } from '@/directives/debounce';
-import { ITableSearchRow, TableSearchEnum, TableService } from '@/features/restaurant/services/table-service';
-import { IRoomSearchRow, RoomSearchEnum, RoomService } from '@/features/restaurant/services/room-service';
-import { Carousel } from 'primeng/carousel';
+import { Debounce } from '@/directives/debounce';
 import { OrderCalculationsService } from '../../services/order-calculations-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
@@ -68,28 +49,22 @@ import {
     IFinancialSettingsResponse,
 } from '@/features/settings/services/financial-settings-service';
 import { labeledRequiredValidator, noSymbolsAllowed, onlyNumbersOrDotAllowed } from '@/yn-ng/utils/text-validators';
-import { Select, SelectChangeEvent } from 'primeng/select';
 import { KeyboardService } from '@/features/keyboard/services/keyboard-service';
-import { FullKeyboard } from '@/features/keyboard/components/full-keyboard/full-keyboard';
 import { NumbersKeyboard } from '@/features/keyboard/components/numbers-keyboard/numbers-keyboard';
 import { AmountType } from '@/core/enums';
-import { FormControlNotifier } from '@/directives/form-control-notifier';
 import {
     DeliverySearchEnum,
     DeliveryService,
     IDeliverySearchRow,
 } from '@/features/deliveries/services/delivery-service';
 import { RouterLink } from '@angular/router';
-import {
-    FinancialAccountSearchEnum,
-    FinancialAccountService,
-} from '@/features/accounts/services/financial-account-service';
+import { FinancialAccountService } from '@/features/accounts/services/financial-account-service';
 import { IFinancialAccountSearchRow, ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { AllowedRolesDirective } from '@/directives/allowed-roles';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { DecimalMask } from '@/directives/decimal-mask';
-import { ChosenLocalPlace, LocalPlaceSelect } from '@/components/local-place-select/local-place-select';
+import { ChosenLocalPlace } from '@/components/local-place-select/local-place-select';
 import { DialogType } from '@/features/dialogs/enums';
 import { ControlsOf, NullablePropsOf } from '@/yn-ng/types/helpers';
 
@@ -106,7 +81,7 @@ interface IOrderCreateFgValue {
     createAt: FormControl<string>;
     idempotencyKey: FormControl<string>;
     items: FormControl<IOrderCreateItem[]>;
-    customerRequest: FormControl<FormGroup<ControlsOf<NullablePropsOf<IOrderCreateCustomer>>> | null>;
+    customerRequest: FormGroup<ControlsOf<NullablePropsOf<IOrderCreateCustomer>>>;
     placeName: FormControl<string | null>;
     cashAccountId: FormControl<number | null>;
     networkAccountId: FormControl<number | null>;
@@ -127,25 +102,15 @@ interface IOrderCreateFgValue {
         AllowNumbers,
         ɵInternalFormsSharedModule,
         ReactiveFormsModule,
-        HutCard,
-        RoomCard,
-        TableCard,
-        DatePipe,
         Debounce,
-        Carousel,
         GalleriaModule,
         Slider,
-        DatePipe,
         TranslatePipe,
         InputErrorMessageHandler,
-        Button,
         ButtonDirective,
         NgSelectComponent,
-        Select,
         FormsModule,
-        FullKeyboard,
         NumbersKeyboard,
-        FormControlNotifier,
         SkeletonModule,
         RouterLink,
         PrintableOrderInvoice,
@@ -226,7 +191,14 @@ export class Cashier extends BaseComponent implements OnInit {
             [],
             [Validators.minLength(1), labeledRequiredValidator('يجب اختيار صنف', 'you must select an item')],
         ),
-        customerRequest: this.fb.control(null),
+        customerRequest: this.fb.group({
+            id: this.fb.control<number | null>(null, []),
+            nameAr: this.fb.control<string | null>(null, [Validators.required]),
+            nameEn: this.fb.control<string | null>(null, []),
+            phoneNumber: this.fb.control<string | null>(null, [Validators.required]),
+            secondaryMobileNumber: this.fb.control<string | null>(null),
+            addressDescription: this.fb.control<string | null>(null, [Validators.required]),
+        }),
     };
 
     registerValidators() {
@@ -398,6 +370,23 @@ export class Cashier extends BaseComponent implements OnInit {
         }
     }
 
+
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //menu
+    //
+
+    isMenuVisible: boolean = false;
+    groupsService = inject(GroupService);
+    groups = signal<IGroupSearchRow[]>([]);
+
     //
     //#region menu items change
     //
@@ -533,7 +522,6 @@ export class Cashier extends BaseComponent implements OnInit {
 
     resetOrderForm() {
         this.orderMenuItems.set([]);
-        this.currentCustomer.set(null);
         this.chosenLocalPlace.set(null);
         this.currentDelivery.set(null);
         this.currentCompanyDelivery.set(null);
@@ -543,6 +531,7 @@ export class Cashier extends BaseComponent implements OnInit {
             placeType: null,
             deliveryId: null,
         });
+        this.patchCustomerFg();
         this.resetIdempotencyKey();
         this.orderFg.updateValueAndValidity();
         this.resetData();
@@ -954,22 +943,6 @@ export class Cashier extends BaseComponent implements OnInit {
     });
 
     //#endregion
-
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //menu
-    //
-
-    isMenuVisible: boolean = false;
-    groupsService = inject(GroupService);
-    groups = signal<IGroupSearchRow[]>([]);
 
     //
     //#region keyboard
@@ -1589,14 +1562,14 @@ export class Cashier extends BaseComponent implements OnInit {
     //
 
     customerDialogVisible = false;
-    currentCustomer = signal<{
-        id: number;
-        nameAr: string;
-        nameEn: string;
-        phoneNumber: string;
-        secondaryMobileNumber: string;
-        addressDescription: string;
-    } | null>(null);
+    // currentCustomer = signal<{
+    //     id: number;
+    //     nameAr: string;
+    //     nameEn: string;
+    //     phoneNumber: string;
+    //     secondaryMobileNumber: string;
+    //     addressDescription: string;
+    // } | null>(null);
     // currentCustomerChangeEffect = effect(() => {
     //     if (this.currentCustomer()) {
     //         this.customerFg.patchValue({
@@ -1681,37 +1654,21 @@ export class Cashier extends BaseComponent implements OnInit {
             });
     }
     onCustomerSelected(event: ICustomerSearchRow) {
-        const fg = this.orderFg;
-        if (event.id) {
-            if (fg.value.customerRequest) {
-                this.currentCustomer.set({
-                    id: event.id,
-                    nameAr: event.name,
-                    nameEn: event.name,
-                    phoneNumber: event.phoneNumber,
-                    secondaryMobileNumber: event.secondaryMobileNumber,
-                    addressDescription:
-                        event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
-                });
-            } else {
-                this.orderFg.setControl("customerRequest", this.createCustomerFg(event));
-            }
-        } else {
-            this.currentCustomer.set(null);
-        }
+        this.patchCustomerFg(this.orderFg.value.customerRequest?.id ? event : undefined);
     }
-    createCustomerFg(values?: ICustomerSearchRow) {
+
+    patchCustomerFg(values?: ICustomerSearchRow) {
         const address = [values?.city, values?.district, values?.street, values?.buildingNumber]
             .filter(Boolean)
             .join(', ');
 
-        return this.fb.group<ControlsOf<NullablePropsOf<IOrderCreateCustomer>>>({
-            id: this.fb.control<number | null>(values?.id ?? null, []),
-            nameAr: this.fb.control<string | null>(values?.name ?? null, [Validators.required]),
-            nameEn: this.fb.control<string | null>(values?.name ?? null, []),
-            phoneNumber: this.fb.control<string | null>(values?.phoneNumber ?? null, [Validators.required]),
-            secondaryMobileNumber: this.fb.control<string | null>(values?.secondaryMobileNumber ?? null),
-            addressDescription: this.fb.control<string | null>(address, [Validators.required]),
+        this.orderFg.controls.customerRequest.patchValue({
+            id: values?.id,
+            nameAr: values?.name,
+            nameEn: values?.name,
+            phoneNumber: values?.phoneNumber,
+            secondaryMobileNumber: values?.secondaryMobileNumber,
+            addressDescription: address,
         });
     }
     onCustomersNameSearch(event: any, searchTerm: string = '') {

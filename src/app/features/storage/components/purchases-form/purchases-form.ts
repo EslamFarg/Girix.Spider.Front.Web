@@ -333,7 +333,7 @@ export class PurchasesForm extends BaseComponent {
                 });
                 break;
             case FormMode.Update:
-                this.purchaseService.patch({ ...data, id: this.currentPurchase()?.id }).subscribe();
+                this.purchaseService.put({ ...data, id: this.currentPurchase()?.id }).subscribe();
                 break;
         }
     }
