@@ -29,6 +29,7 @@ import {
     ReactiveFormsModule,
     ValidatorFn,
     FormsModule,
+    FormGroup,
 } from '@angular/forms';
 import { IProductSearchRow, ProductSearchEnum, ProductService } from '@/features/classes/services/product-service';
 import { IMealSearchRow } from '@/features/classes/services/meal-service';
@@ -90,6 +91,7 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { DecimalMask } from '@/directives/decimal-mask';
 import { ChosenLocalPlace, LocalPlaceSelect } from '@/components/local-place-select/local-place-select';
 import { DialogType } from '@/features/dialogs/enums';
+import { ControlsOf, NullablePropsOf } from '@/yn-ng/types/helpers';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -104,7 +106,7 @@ interface IOrderCreateFgValue {
     createAt: FormControl<string>;
     idempotencyKey: FormControl<string>;
     items: FormControl<IOrderCreateItem[]>;
-    customerRequest: FormControl<IOrderCreateCustomer | null>;
+    customerRequest: FormControl<FormGroup<ControlsOf<NullablePropsOf<IOrderCreateCustomer>>> | null>;
     placeName: FormControl<string | null>;
     cashAccountId: FormControl<number | null>;
     networkAccountId: FormControl<number | null>;
@@ -224,7 +226,7 @@ export class Cashier extends BaseComponent implements OnInit {
             [],
             [Validators.minLength(1), labeledRequiredValidator('يجب اختيار صنف', 'you must select an item')],
         ),
-        customerRequest: this.fb.control<IOrderCreateCustomer | null>(null, []),
+        customerRequest: this.fb.control(null),
     };
 
     registerValidators() {
@@ -389,10 +391,6 @@ export class Cashier extends BaseComponent implements OnInit {
         // });
     }
 
-    resetData() {
-        this.searchDeliveries(1);
-    }
-
     ngOnInit(): void {
         if (this.id()) {
             this.formMode.set(FormMode.Update);
@@ -401,22 +399,13 @@ export class Cashier extends BaseComponent implements OnInit {
     }
 
     //
-    //
-    //
-    //
-    //
-    //
-    // menu items change
+    //#region menu items change
     //
 
     onMenuItemChange(changedItem: IOrderMenuItem) {
         if (changedItem.menuItem.quantity <= 0) return;
 
         this.orderMenuItems.update((items) => items.concat(changedItem));
-    }
-
-    test() {
-        // window.electronAPI.getPrinters().then((e) => console.log(e));
     }
 
     onOrderMenuItemQuantityChange(index: number, newQuantity: number) {
@@ -442,18 +431,10 @@ export class Cashier extends BaseComponent implements OnInit {
         this.orderMenuItems.update((items) => items.filter((_, i) => i != index));
     }
 
+    //#endregion
+
     //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    // order form
+    //#region order form
     //
 
     onSubmitOrder() {
@@ -546,6 +527,10 @@ export class Cashier extends BaseComponent implements OnInit {
         });
     }
 
+    resetData() {
+        this.searchDeliveries(1);
+    }
+
     resetOrderForm() {
         this.orderMenuItems.set([]);
         this.currentCustomer.set(null);
@@ -576,16 +561,10 @@ export class Cashier extends BaseComponent implements OnInit {
         this.printOrder();
     }
 
+    //#endregion
+
     //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    // Print
+    //#region Print
     //
 
     openPrintDialog() {
@@ -862,16 +841,17 @@ export class Cashier extends BaseComponent implements OnInit {
         });
     }
 
+    onPrint() {
+        const bill = this.existingOrderBill();
+        if (!bill) return;
+        this.printBill.set(bill);
+        this.openPrintDialog();
+    }
+
+    //#endregion
+
     //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //general calculations
+    //#regiongeneral calculations
     //
 
     orderLocationType = signal<OrderLocationType | null>(OrderLocationType.Takeaway);
@@ -973,6 +953,8 @@ export class Cashier extends BaseComponent implements OnInit {
         });
     });
 
+    //#endregion
+
     //
     //
     //
@@ -984,41 +966,13 @@ export class Cashier extends BaseComponent implements OnInit {
     //
     //menu
     //
+
     isMenuVisible: boolean = false;
     groupsService = inject(GroupService);
     groups = signal<IGroupSearchRow[]>([]);
 
     //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //print
-    //
-
-    onPrint() {
-        const bill = this.existingOrderBill();
-        if (!bill) return;
-        this.printBill.set(bill);
-        this.openPrintDialog();
-    }
-
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //keyboard
+    //#region keyboard
     //
 
     keyboardService = inject(KeyboardService);
@@ -1045,17 +999,10 @@ export class Cashier extends BaseComponent implements OnInit {
         this.isPaymentNumbersKeyboardVisible.update((v) => !v);
     }
 
+    //#endregion
+
     //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //Accounts
+    //#region Accounts
     //
 
     currentCashAccount = signal<{
@@ -1240,15 +1187,10 @@ export class Cashier extends BaseComponent implements OnInit {
     //     }
     // }
 
+    //#endregion
+
     //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //local space
+    //#region local space
     //
     chosenLocalPlace = this.orderService.chosenLocalPlace;
 
@@ -1282,6 +1224,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
         return hutHourPriceAfterVat;
     });
+
     hutNet = computed(() => {
         const currentPlace = this.chosenLocalPlace();
 
@@ -1300,13 +1243,10 @@ export class Cashier extends BaseComponent implements OnInit {
         // }
     });
 
+    //#endregion
+
     //
-    //
-    //
-    //
-    //
-    //
-    // deliveries
+    //#region deliveries
     //
 
     DeliveryDialogVisible: boolean = false;
@@ -1436,18 +1376,12 @@ export class Cashier extends BaseComponent implements OnInit {
         this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الدليفري بنجاح' });
     }
 
+    //#endregion
+
     //
+    //#region additions
     //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //additions
-    //
+
     additionsDialogVisible: boolean = false;
 
     orderRecipeAdditionsResponsiveOptions = [
@@ -1598,6 +1532,7 @@ export class Cashier extends BaseComponent implements OnInit {
                 items.map((item, i) => (i == this.currentMenuItemIx() ? currentMenuItem : item)),
             );
         } else {
+            if (quantity <= 0) return;
             //add new
             this.orderMenuItems.update((orderItems) =>
                 orderItems.map((orderItem, i) =>
@@ -1647,21 +1582,12 @@ export class Cashier extends BaseComponent implements OnInit {
         });
     }
 
+    //#endregion
+
     //
+    //#region customer info
     //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //customer info
-    //
+
     customerDialogVisible = false;
     currentCustomer = signal<{
         id: number;
@@ -1671,24 +1597,24 @@ export class Cashier extends BaseComponent implements OnInit {
         secondaryMobileNumber: string;
         addressDescription: string;
     } | null>(null);
-    currentCustomerChangeEffect = effect(() => {
-        if (this.currentCustomer()) {
-            this.customerFg.patchValue({
-                id: this.currentCustomer()?.id,
-                phoneNumber: this.currentCustomer()?.phoneNumber,
-                addressDescription: this.currentCustomer()?.addressDescription,
-            });
-        } else {
-            this.customerFg.patchValue({
-                id: this.cashCustomer.id,
-                phoneNumber: this.cashCustomer.phoneNumber + '',
-                addressDescription: 'عميل نقدي',
-            });
-        }
-        this.orderFg.patchValue({
-            customerRequest: this.currentCustomer(),
-        });
-    });
+    // currentCustomerChangeEffect = effect(() => {
+    //     if (this.currentCustomer()) {
+    //         this.customerFg.patchValue({
+    //             id: this.currentCustomer()?.id,
+    //             phoneNumber: this.currentCustomer()?.phoneNumber,
+    //             addressDescription: this.currentCustomer()?.addressDescription,
+    //         });
+    //     } else {
+    //         this.customerFg.patchValue({
+    //             id: this.cashCustomer.id,
+    //             phoneNumber: this.cashCustomer.phoneNumber + '',
+    //             addressDescription: 'عميل نقدي',
+    //         });
+    //     }
+    //     this.orderFg.patchValue({
+    //         customerRequest: this.currentCustomer(),
+    //     });
+    // });
     showCustomerDialog() {
         this.customerDialogVisible = true;
     }
@@ -1699,8 +1625,8 @@ export class Cashier extends BaseComponent implements OnInit {
     }
     customerFgInitialValue = {
         id: this.fb.control<number | null>(0, []),
-        phoneNumber: this.fb.control<string | null>(null, []),
-        addressDescription: this.fb.control<string | null>(null, []),
+        phoneNumber: this.fb.control<string | null>(null, [Validators.required]),
+        addressDescription: this.fb.control<string | null>(null, [Validators.required]),
     };
 
     customerFg = this.fb.group(this.customerFgInitialValue);
@@ -1755,19 +1681,38 @@ export class Cashier extends BaseComponent implements OnInit {
             });
     }
     onCustomerSelected(event: ICustomerSearchRow) {
+        const fg = this.orderFg;
         if (event.id) {
-            this.currentCustomer.set({
-                id: event.id,
-                nameAr: event.name,
-                nameEn: event.name,
-                phoneNumber: event.phoneNumber,
-                secondaryMobileNumber: event.secondaryMobileNumber,
-                addressDescription:
-                    event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
-            });
+            if (fg.value.customerRequest) {
+                this.currentCustomer.set({
+                    id: event.id,
+                    nameAr: event.name,
+                    nameEn: event.name,
+                    phoneNumber: event.phoneNumber,
+                    secondaryMobileNumber: event.secondaryMobileNumber,
+                    addressDescription:
+                        event.city + ', ' + event.district + ', ' + event.street + ', ' + event.buildingNumber,
+                });
+            } else {
+                this.orderFg.setControl("customerRequest", this.createCustomerFg(event));
+            }
         } else {
             this.currentCustomer.set(null);
         }
+    }
+    createCustomerFg(values?: ICustomerSearchRow) {
+        const address = [values?.city, values?.district, values?.street, values?.buildingNumber]
+            .filter(Boolean)
+            .join(', ');
+
+        return this.fb.group<ControlsOf<NullablePropsOf<IOrderCreateCustomer>>>({
+            id: this.fb.control<number | null>(values?.id ?? null, []),
+            nameAr: this.fb.control<string | null>(values?.name ?? null, [Validators.required]),
+            nameEn: this.fb.control<string | null>(values?.name ?? null, []),
+            phoneNumber: this.fb.control<string | null>(values?.phoneNumber ?? null, [Validators.required]),
+            secondaryMobileNumber: this.fb.control<string | null>(values?.secondaryMobileNumber ?? null),
+            addressDescription: this.fb.control<string | null>(address, [Validators.required]),
+        });
     }
     onCustomersNameSearch(event: any, searchTerm: string = '') {
         searchTerm = searchTerm ?? '';
@@ -1781,20 +1726,10 @@ export class Cashier extends BaseComponent implements OnInit {
         }
     }
 
+    //#endregion
+
     //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //payment info
+    //#region payment info
     //
 
     paymentDialogVisible = false;
@@ -1885,6 +1820,8 @@ export class Cashier extends BaseComponent implements OnInit {
             { emitEvent: false },
         );
     });
+
+    //#endregion
 }
 /*
 <!-- Hut -->

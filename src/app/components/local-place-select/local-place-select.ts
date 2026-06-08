@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, model, signal } from '@angular/core';
+import { Component, computed, effect, inject, linkedSignal, model, signal } from '@angular/core';
 import { Select } from 'primeng/select';
 import { HutCard } from '../hut-card/hut-card';
 import { Debounce } from '@/directives/debounce';
@@ -34,6 +34,7 @@ export class LocalPlaceSelect extends BaseComponent {
 
     items = signal<IHutSearchRow[] | IRoomSearchRow[] | ITableSearchRow[]>([]);
     chosenLocalPlace = this.orderService.chosenLocalPlace;
+    tempChosenLocalPlace = linkedSignal<ChosenLocalPlace | null>(() => this.chosenLocalPlace());
     reservationMinutes = signal(30);
 
     paginationInfo = {
@@ -101,7 +102,7 @@ export class LocalPlaceSelect extends BaseComponent {
 
     onSelected(item: Omit<IChosenPlace, 'type'>) {
         if (!item.isAvailable || item.reservedTo) return;
-        this.chosenLocalPlace.set({
+        this.tempChosenLocalPlace.set({
             ...item,
             type: this.placeType(),
             reservationMinutes: this.isHutSelected() ? this.reservationMinutes() : null,
@@ -109,6 +110,7 @@ export class LocalPlaceSelect extends BaseComponent {
     }
 
     closeDialog() {
+        this.chosenLocalPlace.set(this.tempChosenLocalPlace());
         this.dialogService.close({
             type: DialogType.LocalPlaceSelect,
             data: this.chosenLocalPlace(),

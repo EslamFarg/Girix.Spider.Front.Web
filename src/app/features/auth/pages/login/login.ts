@@ -7,18 +7,19 @@ import { PasswordModule } from 'primeng/password';
 import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { SpaceTrimmer } from "@/directives/space-trimmer";
 
 @Component({
   selector: 'app-login',
-  imports: [InputErrorMessageHandler, InputTextModule, ReactiveFormsModule, PasswordModule, RouterLink, Button, LoadingDisabledDirective],
+  imports: [InputErrorMessageHandler, InputTextModule, ReactiveFormsModule, PasswordModule, RouterLink, Button, LoadingDisabledDirective, SpaceTrimmer],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login extends BaseComponent {
   isRememberLogin = true;
   initialFormValue = {
-    emailOrPhone: this.fb.control<string>('admin@admin.com', [Validators.required]),
-    password: this.fb.control<string>('12345678', [Validators.required]),
+    emailOrPhone: this.fb.control<string>('admin@admin.com', [Validators.required],),
+    password: this.fb.control<string>('12345678', [Validators.required],),
   };
 
   fg = this.fb.group(this.initialFormValue);

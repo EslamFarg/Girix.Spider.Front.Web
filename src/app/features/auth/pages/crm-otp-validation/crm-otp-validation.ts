@@ -67,7 +67,7 @@ export class CrmOtpValidation extends BaseComponent {
                 severity: 'success',
                 summary: 'تم التحقق',
                 detail: `تم تفعيل التطبيق حتي ${expiryDate.toLocaleString()}`,
-                life: 1000 * 60 * 60,
+                // life: 1000 * 60 * 60,
               });
             });
           }
