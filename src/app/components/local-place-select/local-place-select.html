@@ -26,7 +26,7 @@
             >
                 @for (item of items(); track $index) {
                     <app-hut-card
-                        [active]="item.id == chosenLocalPlace()?.id"
+                        [active]="item.id == tempChosenLocalPlace()?.id"
                         [data]="item"
                         (click)="onSelected(item)"
                         class="max-w-full!"
@@ -40,7 +40,7 @@
             >
                 @for (item of items(); track $index) {
                     <app-room-card
-                        [active]="item.id == chosenLocalPlace()?.id"
+                        [active]="item.id == tempChosenLocalPlace()?.id"
                         [data]="item"
                         (click)="onSelected(item)"
                         class="max-w-full"
@@ -54,7 +54,7 @@
             >
                 @for (item of items(); track $index) {
                     <app-table-card
-                        [active]="item.id == chosenLocalPlace()?.id"
+                        [active]="item.id == tempChosenLocalPlace()?.id"
                         [data]="item"
                         (click)="onSelected(item)"
                         class="max-w-full"

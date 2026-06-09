@@ -70,7 +70,8 @@ export class OpeningBalanceForm extends BaseComponent {
     // المرجع
     referenceNumber: this.fb.control<string | null>(null, [
       Validators.required,
-      Validators.maxLength(16),
+      Validators.minLength(2),
+      Validators.maxLength(7),
       onlyNumbersAllowed,
     ]),
     // الرقم الفاتورة

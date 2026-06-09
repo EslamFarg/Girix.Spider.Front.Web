@@ -6,7 +6,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components/base-component/base-component';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PaginatorState } from 'primeng/paginator';
+import { PaginatorState, Paginator } from 'primeng/paginator';
 import { Button, ButtonDirective } from 'primeng/button';
 import { IInventoryProductSearchRow, IInventoryReadResponse } from '../../types/api/inventory/responses';
 import { InventoryProductSearchEnum, InventoryService } from '../../services/inventory-service';
@@ -55,7 +55,8 @@ enum QuantityOptions {
     Debounce,
     AllowNumbers,
     ButtonDirective,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    Paginator
 ],
   templateUrl: './inventory-settlement-form.html',
   styleUrl: './inventory-settlement-form.css',
@@ -415,6 +416,8 @@ export class InventorySettlementForm extends BaseComponent {
       });
   }
 
+   onPageChange = (event: PaginatorState) => this.searchInventorySettlementProducts(event.page! + 1);
+
   debouncedInventoryProductsSearch(
     event: IDebounceEvent,
     searchValue: string,
@@ -428,7 +431,13 @@ export class InventorySettlementForm extends BaseComponent {
     }
   }
 
-  searchInventorySettlementProducts() {
+  inventorySettlementProductsPaginationInfo: IPaginationInfo = {
+    pageIndex: 0,
+    totalPagesCount: 0,
+    totalRowsCount: 0,
+  }
+
+  searchInventorySettlementProducts(pageIndex: number=1) {
     const quantityOption = this.inventoryBulkSearchFg.controls.quantityOption.value;
 
     const searchFilters: { column: InventoryProductSearchEnum; values: string[] }[] = [];
@@ -443,7 +452,7 @@ export class InventorySettlementForm extends BaseComponent {
     this.inventoryService
       .searchProducts({
         paginationInfo: {
-          pageIndex: 1,
+          pageIndex,
           pageSize: 10,
         },
         searchFilters,
@@ -468,6 +477,11 @@ export class InventorySettlementForm extends BaseComponent {
               ),
             ),
           );
+          this.inventorySettlementProductsPaginationInfo = {
+            pageIndex: 1,
+            totalPagesCount: res.paginationInfo.totalPagesCount,
+            totalRowsCount: res.paginationInfo.totalRowsCount,
+          }
           this.currentEditRowIndex.set(-1);
           this.lastClickedTableRowIndex.set(null);
         },

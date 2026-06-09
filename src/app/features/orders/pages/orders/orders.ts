@@ -1,6 +1,6 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
-import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, signal, viewChild } from '@angular/core';
+import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
@@ -17,18 +17,13 @@ import {
 import { DatePipe } from '@angular/common';
 import { Menu } from 'primeng/menu';
 import { Button, ButtonDirective } from 'primeng/button';
-import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
 import { PrinterService, IPrintOrderOption, AppPrinterType } from '@/features/printers';
 import { RouterLink } from '@angular/router';
 import { Dialog } from 'primeng/dialog';
 import { FormControlNotifier } from '@/directives/form-control-notifier';
 import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
-import { IPrinterSearchRow } from '@/features/printers';
-import {
-    PrinterSettingsService,
-    IPrinterSettingsReadResponse,
-} from '@/features/printers/services/printer-settings-service';
+import { PrinterSettingsService } from '@/features/printers/services/printer-settings-service';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { ListboxModule } from 'primeng/listbox';
 
@@ -48,7 +43,6 @@ import { ListboxModule } from 'primeng/listbox';
         Debounce,
         RouterLink,
         Dialog,
-        FormControlNotifier,
         PrintableOrderInvoice,
         LoadingDisabledDirective,
         ButtonDirective,

@@ -6,32 +6,41 @@ import { InputText } from 'primeng/inputtext';
 import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { ButtonModule } from 'primeng/button';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { SpaceTrimmer } from '@/directives/space-trimmer';
 @Component({
-  selector: 'app-forgot-password',
-  imports: [ReactiveFormsModule, InputErrorMessageHandler, InputText, RouterLink, ButtonModule, LoadingDisabledDirective],
-  templateUrl: './forgot-password.html',
-  styleUrl: './forgot-password.css',
+    selector: 'app-forgot-password',
+    imports: [
+        ReactiveFormsModule,
+        InputErrorMessageHandler,
+        InputText,
+        RouterLink,
+        ButtonModule,
+        LoadingDisabledDirective,
+        SpaceTrimmer,
+    ],
+    templateUrl: './forgot-password.html',
+    styleUrl: './forgot-password.css',
 })
 export class ForgotPassword extends BaseComponent {
-  initialFormValue = {
-    email: this.fb.control<string>('', [Validators.required, Validators.email]),
-  };
-  fg = this.fb.group(this.initialFormValue);
+    initialFormValue = {
+        email: this.fb.control<string>('', [Validators.required, Validators.email, Validators.pattern(/^\S*$/)]),
+    };
+    fg = this.fb.group(this.initialFormValue);
 
-  onSubmit() {
-    if (this.fg.invalid) {
-      this.fg.markAllAsTouched();
-      return;
-    }
-
-    this.authService.forgotPassword(this.fg.getRawValue().email).subscribe({
-      next: (result) => {
-        if (result === true) {
-          //strictly check for boolean response
-          this.router.navigate(['/auth/otp-verification']);
+    onSubmit() {
+        if (this.fg.invalid) {
+            this.fg.markAllAsTouched();
+            return;
         }
-      },
-    });
-  }
+
+        this.authService.forgotPassword(this.fg.getRawValue().email).subscribe({
+            next: (result) => {
+                if (result === true) {
+                    //strictly check for boolean response
+                    this.router.navigate(['/auth/otp-verification']);
+                }
+            },
+        });
+    }
 }

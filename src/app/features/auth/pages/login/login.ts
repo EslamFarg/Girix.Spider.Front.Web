@@ -18,7 +18,7 @@ import { SpaceTrimmer } from "@/directives/space-trimmer";
 export class Login extends BaseComponent {
   isRememberLogin = true;
   initialFormValue = {
-    emailOrPhone: this.fb.control<string>('admin@admin.com', [Validators.required],),
+    emailOrPhone: this.fb.control<string>('admin@admin.com', [Validators.required, Validators.pattern(/^\S*$/)],),
     password: this.fb.control<string>('12345678', [Validators.required],),
   };
 

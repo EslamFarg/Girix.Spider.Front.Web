@@ -461,7 +461,7 @@
             style="--p-button-primary-background: transparent"
         >
             @if (orderLocationType() !== OrderLocationType.CompanyDelivery) {
-                <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
+                <app-input-error-message-handler [grouped]="false" [fc]="orderFg.controls.customerRequest.controls.id">
                     <button
                         pButton
                         type="button"
@@ -997,6 +997,7 @@
 <p-dialog
     [(visible)]="DeliveryDialogVisible"
     [modal]="true"
+    [draggable]="false"
     [dismissableMask]="true"
     [style]="{ width: '80%', maxWidth: '50rem' }"
     [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
@@ -1107,7 +1108,7 @@
             }
         </div>
     </div>
-    <ng-template #footer>
+    <!-- <ng-template #footer>
         <button
             pButton
             styleClass="app-p-btn"
@@ -1117,7 +1118,7 @@
         >
             استمرار
         </button>
-    </ng-template>
+    </ng-template> -->
 </p-dialog>
 
 <!-- Order Success Dialog -->

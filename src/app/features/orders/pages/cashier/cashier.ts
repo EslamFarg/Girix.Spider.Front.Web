@@ -193,11 +193,11 @@ export class Cashier extends BaseComponent implements OnInit {
         ),
         customerRequest: this.fb.group({
             id: this.fb.control<number | null>(null, []),
-            nameAr: this.fb.control<string | null>(null, [Validators.required]),
+            nameAr: this.fb.control<string | null>(null, []),
             nameEn: this.fb.control<string | null>(null, []),
-            phoneNumber: this.fb.control<string | null>(null, [Validators.required]),
+            phoneNumber: this.fb.control<string | null>(null, []),
             secondaryMobileNumber: this.fb.control<string | null>(null),
-            addressDescription: this.fb.control<string | null>(null, [Validators.required]),
+            addressDescription: this.fb.control<string | null>(null, []),
         }),
     };
 
@@ -247,9 +247,6 @@ export class Cashier extends BaseComponent implements OnInit {
         minimumSelectiveTax: 0,
     });
 
-    /**
-     *
-     */
     constructor() {
         super();
         this.groupsService.getList(true, { pageIndex: 0, pageSize: 0 }).subscribe({
@@ -282,7 +279,8 @@ export class Cashier extends BaseComponent implements OnInit {
         this.searchCustomers({ pageIndex: 1, searchTerm: '' });
 
         this.orderFg.get('orderType')?.valueChanges.subscribe((orderType) => {
-            const { placeRefId, deliveryId, paymentType } = this.orderFg.controls;
+            const { placeRefId, deliveryId, paymentType, customerRequest } = this.orderFg.controls;
+            this.requireCustomer(false);
 
             this.orderLocationType.set(orderType);
 
@@ -300,7 +298,6 @@ export class Cashier extends BaseComponent implements OnInit {
                     this.chosenLocalPlace.set(null);
                     placeRefId?.clearValidators();
                     deliveryId?.clearValidators();
-                    console.log('changed to takeaway and removed placeRefId validators');
                     break;
 
                 // 1. Shared logic runs first for all three types
@@ -309,7 +306,7 @@ export class Cashier extends BaseComponent implements OnInit {
                 case OrderLocationType.DineIn:
                     paymentType.enable();
                     // No break here! Execution falls through to the next matching case.
-                    console.log('orderType', orderType);
+
                     // 2. Specific logic follows
                     switch (orderType) {
                         case OrderLocationType.PersonDelivery:
@@ -328,14 +325,18 @@ export class Cashier extends BaseComponent implements OnInit {
                             switch (orderType) {
                                 case OrderLocationType.PersonDelivery:
                                     this.currentCompanyDelivery.set(null);
+                                    this.requireCustomer(true);
                                     break;
                                 case OrderLocationType.CompanyDelivery:
+                                    this.isPaid.set(false);
+                                    paymentType.setValue(OrderPaymentType.Pending);
+                                    paymentType.disable();
+                                    console.log("OrderLocationType.CompanyDelivery");
                                     this.currentDelivery.set(null);
                                     break;
                             }
 
                             break;
-
                         case OrderLocationType.DineIn:
                             this.orderFg?.patchValue({
                                 placeType: OrderLocalType.Table,
@@ -369,7 +370,6 @@ export class Cashier extends BaseComponent implements OnInit {
             this.orderService.getBill(this.id()!).subscribe((order) => this.existingOrderBill.set(order));
         }
     }
-
 
     //
     //
@@ -442,9 +442,7 @@ export class Cashier extends BaseComponent implements OnInit {
             return;
         }
 
-        const values = this.orderFg.getRawValue();
-
-        switch (values.orderType) {
+        switch (this.orderFg.value.orderType) {
             case OrderLocationType.CompanyDelivery:
                 const currentCompany = this.currentCompanyDelivery();
                 this.orderFg.patchValue({
@@ -458,18 +456,28 @@ export class Cashier extends BaseComponent implements OnInit {
                         secondaryMobileNumber: currentCompany?.secondaryMobileNumber || '',
                     },
                 });
+                break;
+            case OrderLocationType.DineIn:
+                if (!this.orderFg.value.placeRefId) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'فشل',
+                        detail: 'لم يتم اختيار المكان',
+                    });
+                    return;
+                }
+                break;
         }
 
-        console.log('valid order');
+        let values: any = this.orderFg.value;
+
+        if (!this.orderFg.value?.customerRequest?.id) {
+            values = { ...this.orderFg.value, createAt: this.localDateIso, customerRequest: null };
+        }
+
         switch (this.formMode()) {
             case FormMode.Create:
-                if (this.orderFg.value.orderType == OrderLocationType.DineIn) {
-                    if (!this.orderFg.value.placeRefId) {
-                        this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم اختيار المكان' });
-                        return;
-                    }
-                }
-                this.orderService.create({ ...this.orderFg.value, createAt: this.localDateIso }).subscribe({
+                this.orderService.create(values).subscribe({
                     next: (res) => {
                         this.lastCreatedOrder.set(res);
                         this.printBill.set(res as unknown as IOrderBillReadResponse);
@@ -530,7 +538,9 @@ export class Cashier extends BaseComponent implements OnInit {
             placeRefId: null,
             placeType: null,
             deliveryId: null,
+            orderType: OrderLocationType.Takeaway,
         });
+        this.orderLocationType.set(OrderLocationType.Takeaway);
         this.patchCustomerFg();
         this.resetIdempotencyKey();
         this.orderFg.updateValueAndValidity();
@@ -548,6 +558,18 @@ export class Cashier extends BaseComponent implements OnInit {
         this.lastCreatedOrder.set(null);
         // Open the 3-options printer selection dialog
         this.printOrder();
+    }
+
+    requireCustomer(isRequired: boolean) {
+        const { phoneNumber, addressDescription, id } = this.orderFg.controls.customerRequest.controls;
+        const customerRequestControls = [phoneNumber, addressDescription, id];
+
+        this.allowCashCustomer.set(!isRequired);
+
+        customerRequestControls.forEach((control) => {
+            control.setValidators(isRequired ? [Validators.required] : []);
+            control.updateValueAndValidity();
+        });
     }
 
     //#endregion
@@ -625,16 +647,16 @@ export class Cashier extends BaseComponent implements OnInit {
         const itemRows = items
             .map((item) => {
                 let rows = `
-      <tr>
-        <td style="padding:4px 0;text-align:right;border-bottom:1px dashed #ccc;">${item.name}</td>
-        <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #ccc;">${item.qty}</td>
-      </tr>`;
+                            <tr>
+                                <td style="padding:4px 0;text-align:right;border-bottom:1px dashed #ccc;">${item.name}</td>
+                                <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #ccc;">${item.qty}</td>
+                            </tr>`;
                 for (const modifier of item.modifiers ?? []) {
                     rows += `
-      <tr>
-        <td style="padding:4px 16px 4px 4px;text-align:right;border-bottom:1px dashed #eee;color:#555;font-size:13px;">+ ${modifier.name}</td>
-        <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #eee;color:#555;font-size:13px;">${modifier.qty}</td>
-      </tr>`;
+                            <tr>
+                                <td style="padding:4px 16px 4px 4px;text-align:right;border-bottom:1px dashed #eee;color:#555;font-size:13px;">+ ${modifier.name}</td>
+                                <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #eee;color:#555;font-size:13px;">${modifier.qty}</td>
+                            </tr>`;
                 }
                 return rows;
             })
@@ -649,34 +671,34 @@ export class Cashier extends BaseComponent implements OnInit {
         }, 0);
 
         return `
-<div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:16px;max-width:300px;">
-  <div style="text-align:center;margin-bottom:8px;font-weight:bold;font-size:16px;">
-    ${title}
-  </div>
-  <div style="margin-bottom:8px;text-align:center;font-size:12px;">
-    <div>رقم الفاتورة ${bill.invoiceNo}</div>
-    <div>${new DatePipe('en-US').transform(bill.dateTime, 'dd/MM/yyyy h:mm a')}</div>
-    <div>نوع الطلب: ${bill.orderType === 1 ? 'سفري' : bill.orderType === 2 ? 'محلي' : 'توصيل'}</div>
-  </div>
-  <table style="width:100%;border-collapse:collapse;">
-    <thead>
-      <tr style="border-bottom:2px solid #000;">
-        <th style="padding:4px;text-align:right;">الصنف</th>
-        <th style="padding:4px;text-align:center;">الكمية</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${itemRows}
-      <tr style="border-top:2px solid #000;">
-        <td style="padding:4px;text-align:right;font-weight:bold;">المجموع</td>
-        <td style="padding:4px;text-align:center;font-weight:bold;">${totalQty.toFixed(2)}</td>
-      </tr>
-    </tbody>
-  </table>
-  <div style="text-align:center;margin-top:8px;font-size:12px;">
-    رقم الطلب ${bill.orderNo}
-  </div>
-</div>`;
+                <div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:16px;max-width:300px;">
+                    <div style="text-align:center;margin-bottom:8px;font-weight:bold;font-size:16px;">
+                        ${title}
+                    </div>
+                    <div style="margin-bottom:8px;text-align:center;font-size:12px;">
+                        <div>رقم الفاتورة ${bill.invoiceNo}</div>
+                        <div>${new DatePipe('en-US').transform(bill.dateTime, 'dd/MM/yyyy h:mm a')}</div>
+                        <div>نوع الطلب: ${bill.orderType === 1 ? 'سفري' : bill.orderType === 2 ? 'محلي' : 'توصيل'}</div>
+                    </div>
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead>
+                        <tr style="border-bottom:2px solid #000;">
+                            <th style="padding:4px;text-align:right;">الصنف</th>
+                            <th style="padding:4px;text-align:center;">الكمية</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        ${itemRows}
+                        <tr style="border-top:2px solid #000;">
+                            <td style="padding:4px;text-align:right;font-weight:bold;">المجموع</td>
+                            <td style="padding:4px;text-align:center;font-weight:bold;">${totalQty.toFixed(2)}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div style="text-align:center;margin-top:8px;font-size:12px;">
+                        رقم الطلب ${bill.orderNo}
+                    </div>
+                </div>`;
     }
 
     /**
@@ -686,18 +708,18 @@ export class Cashier extends BaseComponent implements OnInit {
         const itemRows = items
             .map((item) => {
                 let rows = `
-      <tr>
-        <td style="padding:4px;text-align:right;">${item.name}</td>
-        <td style="padding:4px;text-align:center;">${item.qty}</td>
-        <td style="padding:4px;text-align:left;">${item.unitPriceWithTax?.toFixed(2)}</td>
-      </tr>`;
+                            <tr>
+                                <td style="padding:4px;text-align:right;">${item.name}</td>
+                                <td style="padding:4px;text-align:center;">${item.qty}</td>
+                                <td style="padding:4px;text-align:left;">${item.unitPriceWithTax?.toFixed(2)}</td>
+                            </tr>`;
                 for (const modifier of item.modifiers ?? []) {
                     rows += `
-      <tr>
-        <td style="padding:4px 16px 4px 4px;text-align:right;color:#555;font-size:12px;">+ ${modifier.name}</td>
-        <td style="padding:4px;text-align:center;color:#555;font-size:12px;">${modifier.qty}</td>
-        <td style="padding:4px;text-align:left;color:#555;font-size:12px;">${modifier.unitPriceWithTax?.toFixed(2)}</td>
-      </tr>`;
+                            <tr>
+                                <td style="padding:4px 16px 4px 4px;text-align:right;color:#555;font-size:12px;">+ ${modifier.name}</td>
+                                <td style="padding:4px;text-align:center;color:#555;font-size:12px;">${modifier.qty}</td>
+                                <td style="padding:4px;text-align:left;color:#555;font-size:12px;">${modifier.unitPriceWithTax?.toFixed(2)}</td>
+                            </tr>`;
                 }
                 return rows;
             })
@@ -712,36 +734,36 @@ export class Cashier extends BaseComponent implements OnInit {
         }, 0);
 
         return `
-<div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:14px;max-width:300px;">
-  <div style="text-align:center;margin-bottom:8px;font-weight:bold;font-size:16px;">
-    فاتورة كاشير
-  </div>
-  <div style="margin-bottom:8px;font-size:12px;text-align:center;">
-    <div><strong>رقم الفاتورة:</strong> ${bill.invoiceNo}</div>
-    <div><strong>رقم الطلب:</strong> ${bill.orderNo}</div>
-    <div><strong>التاريخ:</strong> ${new DatePipe('en-US').transform(bill.dateTime, 'dd/MM/yyyy h:mm a')}</div>
-    <div><strong>العميل:</strong> ${bill.customer?.name ?? ''}</div>
-    <div><strong>رقم الجوال:</strong> ${bill.customer?.phone ?? ''}</div>
-    <div><strong>نوع الدفع:</strong> ${bill.paymentType ? 'مدفوع' : 'غير مدفوع'}</div>
-  </div>
-  <table style="width:100%;border-collapse:collapse;">
-    <thead>
-      <tr style="border-bottom:2px solid #000;">
-        <th style="padding:4px;text-align:right;">الصنف</th>
-        <th style="padding:4px;text-align:center;">الكمية</th>
-        <th style="padding:4px;text-align:left;">السعر</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${itemRows}
-      <tr style="border-top:2px solid #000;">
-        <td style="padding:4px;text-align:right;font-weight:bold;">المجموع</td>
-        <td></td>
-        <td style="padding:4px;text-align:left;font-weight:bold;">${totalUnitPrice.toFixed(2)}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>`;
+            <div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:14px;max-width:300px;">
+                <div style="text-align:center;margin-bottom:8px;font-weight:bold;font-size:16px;">
+                    فاتورة كاشير
+                </div>
+                <div style="margin-bottom:8px;font-size:12px;text-align:center;">
+                    <div><strong>رقم الفاتورة:</strong> ${bill.invoiceNo}</div>
+                    <div><strong>رقم الطلب:</strong> ${bill.orderNo}</div>
+                    <div><strong>التاريخ:</strong> ${new DatePipe('en-US').transform(bill.dateTime, 'dd/MM/yyyy h:mm a')}</div>
+                    <div><strong>العميل:</strong> ${bill.customer?.name ?? ''}</div>
+                    <div><strong>رقم الجوال:</strong> ${bill.customer?.phone ?? ''}</div>
+                    <div><strong>نوع الدفع:</strong> ${bill.paymentType ? 'مدفوع' : 'غير مدفوع'}</div>
+                </div>
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                    <tr style="border-bottom:2px solid #000;">
+                        <th style="padding:4px;text-align:right;">الصنف</th>
+                        <th style="padding:4px;text-align:center;">الكمية</th>
+                        <th style="padding:4px;text-align:left;">السعر</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    ${itemRows}
+                    <tr style="border-top:2px solid #000;">
+                        <td style="padding:4px;text-align:right;font-weight:bold;">المجموع</td>
+                        <td></td>
+                        <td style="padding:4px;text-align:left;font-weight:bold;">${totalUnitPrice.toFixed(2)}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>`;
     }
 
     printOrder() {
@@ -752,10 +774,10 @@ export class Cashier extends BaseComponent implements OnInit {
             next: (settings) => {
                 const options: IPrintOrderOption[] = [];
                 const baseCss = `
-          body { font-family: 'Cairo', sans-serif; }
-          table { border-collapse: collapse; width: 100%; }
-          th, td { padding: 4px; }
-        `;
+                                body { font-family: 'Cairo', sans-serif; }
+                                table { border-collapse: collapse; width: 100%; }
+                                th, td { padding: 4px; }
+                                `;
 
                 // Kitchen (programPrinter): group items by their item-level printer id
                 if (settings.programPrinter?.id) {
@@ -1562,32 +1584,7 @@ export class Cashier extends BaseComponent implements OnInit {
     //
 
     customerDialogVisible = false;
-    // currentCustomer = signal<{
-    //     id: number;
-    //     nameAr: string;
-    //     nameEn: string;
-    //     phoneNumber: string;
-    //     secondaryMobileNumber: string;
-    //     addressDescription: string;
-    // } | null>(null);
-    // currentCustomerChangeEffect = effect(() => {
-    //     if (this.currentCustomer()) {
-    //         this.customerFg.patchValue({
-    //             id: this.currentCustomer()?.id,
-    //             phoneNumber: this.currentCustomer()?.phoneNumber,
-    //             addressDescription: this.currentCustomer()?.addressDescription,
-    //         });
-    //     } else {
-    //         this.customerFg.patchValue({
-    //             id: this.cashCustomer.id,
-    //             phoneNumber: this.cashCustomer.phoneNumber + '',
-    //             addressDescription: 'عميل نقدي',
-    //         });
-    //     }
-    //     this.orderFg.patchValue({
-    //         customerRequest: this.currentCustomer(),
-    //     });
-    // });
+
     showCustomerDialog() {
         this.customerDialogVisible = true;
     }
@@ -1596,23 +1593,35 @@ export class Cashier extends BaseComponent implements OnInit {
             this.closeFullKeyboard();
         }
     }
-    customerFgInitialValue = {
-        id: this.fb.control<number | null>(0, []),
-        phoneNumber: this.fb.control<string | null>(null, [Validators.required]),
-        addressDescription: this.fb.control<string | null>(null, [Validators.required]),
-    };
-
-    customerFg = this.fb.group(this.customerFgInitialValue);
 
     customersService = inject(CustomerService);
 
     customers = signal<ICustomerSearchRow[]>([]);
-    cashCustomer = {
+    cashCustomer: ICustomerSearchRow = {
         id: 0,
         name: 'عميل نقدي',
-        phoneNumber: 0,
+        phoneNumber: '',
+        secondaryMobileNumber: '',
+        city: '',
+        district: '',
+        street: '',
+        buildingNumber: '',
+        apartment: '',
+        landmark: '',
+        postalCode: '',
+        commercialRegister: '',
+        isCompany: false,
+        numberOfFloor: 0,
+        orderNumbers: 0,
+        taxNumber: 0,
     };
-    displayedCustomers = computed(() => [this.cashCustomer, ...this.customers()]);
+    allowCashCustomer = signal(true);
+    displayedCustomers = computed(() => {
+        if (this.allowCashCustomer()) {
+            return [this.cashCustomer].concat(this.customers());
+        }
+        return this.customers();
+    });
     customersSearchPaginationInfo: IPaginationInfo = {
         pageIndex: 1,
         totalRowsCount: 0,
@@ -1653,6 +1662,7 @@ export class Cashier extends BaseComponent implements OnInit {
                 },
             });
     }
+
     onCustomerSelected(event: ICustomerSearchRow) {
         this.patchCustomerFg(this.orderFg.value.customerRequest?.id ? event : undefined);
     }
@@ -1671,6 +1681,7 @@ export class Cashier extends BaseComponent implements OnInit {
             addressDescription: address,
         });
     }
+
     onCustomersNameSearch(event: any, searchTerm: string = '') {
         searchTerm = searchTerm ?? '';
         const isNewSearchTerm = searchTerm != this.previousCustomersSearchTerm;
