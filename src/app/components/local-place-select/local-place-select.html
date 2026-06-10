@@ -88,7 +88,7 @@
                     name=""
                     class="w-full border border-dark-line!"
                     disabled
-                    [value]="chosenLocalPlace()?.name"
+                    [value]="isHutSelected() && tempChosenLocalPlace()?.name"
                     pInputText
                     id=""
                 />
@@ -102,7 +102,7 @@
                     name=""
                     class="w-full border border-dark-line!"
                     disabled
-                    [value]="chosenLocalPlace()?.pricePerHour?.toFixed(2)"
+                    [value]="isHutSelected() && tempChosenLocalPlace()?.pricePerHour?.toFixed(2)"
                     pInputText
                     id=""
                 />

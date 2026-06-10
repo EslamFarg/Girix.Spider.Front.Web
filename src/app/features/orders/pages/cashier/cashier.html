@@ -646,8 +646,6 @@
     </ng-template>
 </p-dialog>
 
-
-
 <!-- customer info -->
 <p-dialog
     [(visible)]="customerDialogVisible"
@@ -711,7 +709,9 @@
                 <!-- address -->
                 <div class="md:col-span-2">
                     <label for="customerAddress">{{ 'FORM.CUSTOMER_ADDRESS' | translate }}</label>
-                    <app-input-error-message-handler [fc]="orderFg.controls.customerRequest.controls.addressDescription">
+                    <app-input-error-message-handler
+                        [fc]="orderFg.controls.customerRequest.controls.addressDescription"
+                    >
                         <input
                             pInputText
                             [formControl]="orderFg.controls.customerRequest.controls.addressDescription"
@@ -725,8 +725,8 @@
 
                 <!-- <app-full-keyboard /> -->
             </form>
-            
-            <button
+
+            <!-- <button
                 pButton
                 styleClass="app-p-btn"
                 class="mx-auto"
@@ -734,7 +734,7 @@
                 (click)="customerDialogVisible = false"
             >
                 استمرار
-            </button>
+            </button> -->
         </div>
     </ng-template>
 </p-dialog>
@@ -764,12 +764,13 @@
                     <div [appAllowedRoles]="[Role.Cashier, Role.Admin]" class="flex items-center gap-1">
                         <input
                             type="radio"
-                            name="isPaid"
+                            name="orderPaymentType"
                             id="paymentInfoPaid"
-                            [checked]="isPaid()"
-                            (input)="isPaid.set(true)"
-                            [value]="isPaid()"
+                            [formControl]="orderFg.controls.paymentType"
+                            [value]="OrderPaymentType.Paid"
                         />
+                        <!-- [checked]="isPaid()"
+                            (input)="isPaid.set(true)"-->
                         <label for="paymentInfoPaid">{{ 'FORM.PAID' | translate }}</label>
                     </div>
 
@@ -777,12 +778,14 @@
                     <div class="flex items-center gap-1">
                         <input
                             type="radio"
-                            name="isPaid"
+                            name="orderPaymentType"
                             id="paymentInfoPostponed"
-                            (input)="isPaid.set(false)"
-                            [value]="!isPaid()"
-                            [checked]="!isPaid()"
+                            [formControl]="orderFg.controls.paymentType"
+                            [value]="OrderPaymentType.Pending"
                         />
+                        <!-- (input)="isPaid.set(false)"
+                            [value]="!isPaid()"
+                            [checked]="!isPaid()" -->
                         <label for="paymentInfoPostponed">{{ 'FORM.POSTPONED' | translate }}</label>
                     </div>
                 </div>
@@ -798,7 +801,7 @@
                             [formControl]="getFormControl(orderFg, 'payingCash')"
                             appAllowNumbers
                             [max]="net()"
-                            [disabled]="!isPaid()"
+                            [disabled]="orderFg.value.paymentType === OrderPaymentType.Pending" 
                             [min]="0"
                             [allowDecimal]="true"
                             #payingCash
@@ -834,9 +837,8 @@
                             bindValue="id"
                             [clearable]="false"
                             placeholder="الكل"
-                           
                         />
-                         <!-- #cashAccountSelect
+                        <!-- #cashAccountSelect
                             appDebounce
                             [customEvents]="[
                                 { type: 'searchEvent', value: cashAccountSelect.searchEvent },
@@ -857,7 +859,7 @@
                             [max]="net()"
                             [min]="0"
                             appDecimalMask
-                            [disabled]="!isPaid()"
+                            [disabled]="orderFg.value.paymentType === OrderPaymentType.Pending"
                             id="payingNetwork"
                             type="number"
                             aria-describedby="network-help"
@@ -892,7 +894,6 @@
                             bindValue="id"
                             [clearable]="false"
                             placeholder="الكل"
-                            
                         />
                         <!-- #networkAccountSelect
                             appDebounce
@@ -927,9 +928,9 @@
                         </svg>
                     </button>
 
-                    <button pButton styleClass="app-p-btn" severity="secondary" (click)="paymentDialogVisible = false">
+                    <!-- <button pButton styleClass="app-p-btn" severity="secondary" (click)="paymentDialogVisible = false">
                         استمرار
-                    </button>
+                    </button> -->
                 </div>
 
                 @if (isPaymentNumbersKeyboardVisible()) {
@@ -938,7 +939,7 @@
                     </div>
                 }
 
-                @if (isPaid()) {
+                @if (orderFg.value.paymentType) {
                     <!-- amount received from customer (for change calculation) -->
                     <div class="md:col-span-2 border-t border-b-text-light pt-4 mt-2">
                         <label for="amountReceived">المبلغ المستلم من العميل</label>

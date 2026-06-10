@@ -35,6 +35,8 @@ export class LocalPlaceSelect extends BaseComponent {
     items = signal<IHutSearchRow[] | IRoomSearchRow[] | ITableSearchRow[]>([]);
     chosenLocalPlace = this.orderService.chosenLocalPlace;
     tempChosenLocalPlace = linkedSignal<ChosenLocalPlace | null>(() => this.chosenLocalPlace());
+    isHutSelected=computed(() => this.tempChosenLocalPlace()?.type === OrderLocalType.Hut);
+
     reservationMinutes = signal(30);
 
     paginationInfo = {
@@ -110,6 +112,7 @@ export class LocalPlaceSelect extends BaseComponent {
     }
 
     closeDialog() {
+        if(this.tempChosenLocalPlace()?.type !== this.placeType()) return
         this.chosenLocalPlace.set(this.tempChosenLocalPlace());
         this.dialogService.close({
             type: DialogType.LocalPlaceSelect,
@@ -117,7 +120,5 @@ export class LocalPlaceSelect extends BaseComponent {
         });
     }
 
-    isHutSelected() {
-        return this.placeType() === OrderLocalType.Hut;
-    }
+
 }

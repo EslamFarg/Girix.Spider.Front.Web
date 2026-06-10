@@ -48,7 +48,13 @@ import {
     FinancialSettingsService,
     IFinancialSettingsResponse,
 } from '@/features/settings/services/financial-settings-service';
-import { labeledRequiredValidator, noSymbolsAllowed, onlyNumbersOrDotAllowed } from '@/yn-ng/utils/text-validators';
+import {
+    labeledRequiredValidator,
+    noSymbolsAllowed,
+    onlyLettersAllowed,
+    onlyNumbersAllowed,
+    onlyNumbersOrDotAllowed,
+} from '@/yn-ng/utils/text-validators';
 import { KeyboardService } from '@/features/keyboard/services/keyboard-service';
 import { NumbersKeyboard } from '@/features/keyboard/components/numbers-keyboard/numbers-keyboard';
 import { AmountType } from '@/core/enums';
@@ -67,6 +73,7 @@ import { DecimalMask } from '@/directives/decimal-mask';
 import { ChosenLocalPlace } from '@/components/local-place-select/local-place-select';
 import { DialogType } from '@/features/dialogs/enums';
 import { ControlsOf, NullablePropsOf } from '@/yn-ng/types/helpers';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -174,7 +181,7 @@ export class Cashier extends BaseComponent implements OnInit {
     });
     initialOrderFgValue: IOrderCreateFgValue = {
         orderType: this.fb.control<OrderLocationType>(OrderLocationType.Takeaway, [Validators.required]),
-        paymentType: this.fb.control<OrderPaymentType>(OrderPaymentType.Pending, [Validators.required]),
+        paymentType: this.fb.control<OrderPaymentType>(OrderPaymentType.Paid, [Validators.required]),
         placeType: this.fb.control<OrderLocalType | null>(null, []),
         placeName: this.fb.control<string | null>(null, []),
         // hut/room/table id
@@ -195,9 +202,9 @@ export class Cashier extends BaseComponent implements OnInit {
             id: this.fb.control<number | null>(null, []),
             nameAr: this.fb.control<string | null>(null, []),
             nameEn: this.fb.control<string | null>(null, []),
-            phoneNumber: this.fb.control<string | null>(null, []),
+            phoneNumber: this.fb.control<string | null>(null, [onlyNumbersAllowed, Validators.maxLength(16)]),
             secondaryMobileNumber: this.fb.control<string | null>(null),
-            addressDescription: this.fb.control<string | null>(null, []),
+            addressDescription: this.fb.control<string | null>(null, [noSymbolsAllowed, Validators.maxLength(150)]),
         }),
     };
 
@@ -278,15 +285,14 @@ export class Cashier extends BaseComponent implements OnInit {
         // this.searchAdditions(1);
         this.searchCustomers({ pageIndex: 1, searchTerm: '' });
 
-        this.orderFg.get('orderType')?.valueChanges.subscribe((orderType) => {
-            const { placeRefId, deliveryId, paymentType, customerRequest } = this.orderFg.controls;
+        this.orderTypeControl?.valueChanges.subscribe((orderType) => {
+            const { placeRefId, deliveryId, paymentType } = this.orderFg.controls;
             this.requireCustomer(false);
 
             this.orderLocationType.set(orderType);
 
             switch (orderType) {
                 case OrderLocationType.Takeaway:
-                    this.isPaid.set(true);
                     paymentType.setValue(OrderPaymentType.Paid);
                     paymentType.disable();
                     this.orderFg?.patchValue({
@@ -304,7 +310,6 @@ export class Cashier extends BaseComponent implements OnInit {
                 case OrderLocationType.PersonDelivery:
                 case OrderLocationType.CompanyDelivery:
                 case OrderLocationType.DineIn:
-                    paymentType.enable();
                     // No break here! Execution falls through to the next matching case.
 
                     // 2. Specific logic follows
@@ -326,23 +331,26 @@ export class Cashier extends BaseComponent implements OnInit {
                                 case OrderLocationType.PersonDelivery:
                                     this.currentCompanyDelivery.set(null);
                                     this.requireCustomer(true);
+                                    paymentType.enable();
+                                    console.log('OrderLocationType.PersonDelivery: paymentType.enable();');
                                     break;
                                 case OrderLocationType.CompanyDelivery:
-                                    this.isPaid.set(false);
                                     paymentType.setValue(OrderPaymentType.Pending);
                                     paymentType.disable();
-                                    console.log("OrderLocationType.CompanyDelivery");
+                                    console.log('OrderLocationType.CompanyDelivery: paymentType.disable();');
                                     this.currentDelivery.set(null);
                                     break;
                             }
 
                             break;
                         case OrderLocationType.DineIn:
+                            paymentType.enable();
                             this.orderFg?.patchValue({
                                 placeType: OrderLocalType.Table,
                                 deliveryId: null,
                                 durationMinutes: null,
                             });
+                            console.log('OrderLocationType.DineIn: paymentType.enable();');
                             deliveryId?.clearValidators();
                             placeRefId!.setValidators([
                                 labeledRequiredValidator('يرجى اختيار المكان', 'you must select a place'),
@@ -356,6 +364,8 @@ export class Cashier extends BaseComponent implements OnInit {
                 control.updateValueAndValidity({ emitEvent: false });
             });
         });
+
+        this.paymentTypeControl?.disable();
 
         // this.orderFg.setValidators;
 
@@ -425,6 +435,22 @@ export class Cashier extends BaseComponent implements OnInit {
     //
     //#region order form
     //
+
+    orderFgValue = toSignal(this.orderFg.valueChanges, { initialValue: this.orderFg.getRawValue() });
+    paymentTypeSignal = toSignal(this.paymentTypeControl.valueChanges, { initialValue: this.paymentTypeControl.value });
+
+    get orderTypeControl() {
+        return this.orderFg.controls.orderType;
+    }
+    get paymentTypeControl() {
+        return this.orderFg.controls.paymentType;
+    }
+    get payingCashControl() {
+        return this.orderFg.controls.payingCash;
+    }
+    get payingNetworkControl() {
+        return this.orderFg.controls.payingNetwork;
+    }
 
     onSubmitOrder() {
         this.orderFg.patchValue({
@@ -562,12 +588,15 @@ export class Cashier extends BaseComponent implements OnInit {
 
     requireCustomer(isRequired: boolean) {
         const { phoneNumber, addressDescription, id } = this.orderFg.controls.customerRequest.controls;
-        const customerRequestControls = [phoneNumber, addressDescription, id];
+        const customerRequestControls = { phoneNumber, addressDescription, id };
 
         this.allowCashCustomer.set(!isRequired);
 
-        customerRequestControls.forEach((control) => {
-            control.setValidators(isRequired ? [Validators.required] : []);
+        Object.entries(customerRequestControls).forEach(([key, control]) => {
+            isRequired
+                ? control.setValidators(this.customerValidators[key])
+                : control.removeValidators(this.customerValidators[key]);
+
             control.updateValueAndValidity();
         });
     }
@@ -949,10 +978,9 @@ export class Cashier extends BaseComponent implements OnInit {
     );
 
     net = computed(() => {
-        const net =
-            this.orderItemsNet() + this.hutNet() + this.serviceFee() + this.deliveryFee() - this.itemsDiscountAmount();
+        const net = this.netPreview();
 
-        return this.isPaid() ? net : 0;
+        return this.paymentTypeSignal() === OrderPaymentType.Paid ? net : 0;
     });
 
     netListener = effect(() => {
@@ -1584,6 +1612,13 @@ export class Cashier extends BaseComponent implements OnInit {
     //
 
     customerDialogVisible = false;
+    customerValidators: { [key: string]: ValidatorFn[] } = {
+        id: [Validators.required],
+        phoneNumber: [Validators.required, Validators.minLength(6)],
+        addressDescription: [Validators.required],
+    };
+
+    customerFg = this.orderFg.controls.customerRequest;
 
     showCustomerDialog() {
         this.customerDialogVisible = true;
@@ -1663,8 +1698,19 @@ export class Cashier extends BaseComponent implements OnInit {
             });
     }
 
-    onCustomerSelected(event: ICustomerSearchRow) {
-        this.patchCustomerFg(this.orderFg.value.customerRequest?.id ? event : undefined);
+    onCustomerSelected(customer: ICustomerSearchRow) {
+        const controls = [this.customerFg.controls.phoneNumber, this.customerFg.controls.addressDescription];
+
+        controls.forEach((control) => {
+            if (customer?.id) {
+                control.enable();
+            } else {
+                control.disable();
+                control.setValue(null);
+            }
+        });
+
+        if (customer?.id) this.patchCustomerFg(customer);
     }
 
     patchCustomerFg(values?: ICustomerSearchRow) {
@@ -1717,8 +1763,6 @@ export class Cashier extends BaseComponent implements OnInit {
         return null;
     }
 
-    isPaid = signal<boolean>(false);
-
     // Amount received from customer (for change calculation only)
     amountReceived = signal<number>(0);
 
@@ -1729,33 +1773,33 @@ export class Cashier extends BaseComponent implements OnInit {
         return received - total;
     });
 
-    isPaidListener = effect(() => {
+    orderPaymentTypeChangeListener = this.orderFg.controls.paymentType.valueChanges.subscribe((value) => {
         let validators: ValidatorFn[] = [];
-        const cashControl = this.orderFg.get('payingCash');
-        const networkControl = this.orderFg.get('payingNetwork');
-        this.orderFg.patchValue({
-            payingCash: 0,
-            payingNetwork: 0,
+        if (value === OrderPaymentType.Paid) validators = [Validators.required];
+        // this.orderFg.patchValue({
+        //     payingCash: 0,
+        //     payingNetwork: 0,
+        // });
+        const controls = [this.payingCashControl, this.payingNetworkControl];
+
+        controls.forEach((control) => {
+            if (value === OrderPaymentType.Paid) control?.enable();
+            else control?.disable();
+
+            control?.setValidators(validators);
         });
-        if (this.isPaid()) {
-            validators = [Validators.required];
-            cashControl?.enable();
-            networkControl?.enable();
-            this.orderFg.patchValue({
-                paymentType: OrderPaymentType.Paid,
-            });
-        } else {
-            cashControl?.disable();
-            networkControl?.disable();
-            this.orderFg.patchValue({
-                paymentType: OrderPaymentType.Pending,
-            });
-        }
-        cashControl?.setValidators(validators);
-        networkControl?.setValidators(validators);
+        // if (value === OrderPaymentType.Paid) {
+        //     this.payingCashControl?.enable();
+        //     this.payingNetworkControl?.enable();
+        // } else {
+        //     this.payingCashControl?.disable();
+        //     this.payingNetworkControl?.disable();
+        // }
+        // this.payingCashControl?.setValidators(validators);
+        // this.payingNetworkControl?.setValidators(validators);
     });
 
-    cashInputSubscription = this.orderFg.get('payingCash')?.valueChanges.subscribe((value) => {
+    cashInputSubscription = this.payingCashControl.valueChanges.subscribe((value) => {
         const net = this.net();
         let futureValue = value ?? 0;
         if (futureValue > net) {
@@ -1772,7 +1816,7 @@ export class Cashier extends BaseComponent implements OnInit {
         );
     });
 
-    networkInputSubscription = this.orderFg.get('payingNetwork')?.valueChanges.subscribe((value) => {
+    networkInputSubscription = this.payingNetworkControl?.valueChanges.subscribe((value) => {
         const net = this.net();
         let futureValue = value ?? 0;
         if (futureValue > net) {

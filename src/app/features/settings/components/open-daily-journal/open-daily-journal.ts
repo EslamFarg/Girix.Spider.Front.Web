@@ -18,7 +18,7 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 export class OpenDailyJournal extends BaseComponent {
   initialFgValue = {
     custodyBalance: this.fb.control<number>(0, [Validators.required]),
-    openingNotes: this.fb.control<string | null>(null, []),
+    openingNotes: this.fb.control<string | null>(null, [Validators.maxLength(200)]),
     dateTime: this.fb.control(this.localDateIso, [Validators.required]),
   };
   fg = this.fb.group(this.initialFgValue);
