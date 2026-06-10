@@ -1,0 +1,140 @@
+.content-sidebar{
+    position:relative;
+    
+.line{
+    position:absolute;
+    right: 19px;
+    top: 0;
+    width: 1px;
+    border-radius: 4px;
+    border-right: 1px solid var(--color-gray);
+    height: 100%;
+}
+a{
+    position:relative;
+    display: block;
+    
+    padding: 10px;
+    // background:     var(--color-secondary);
+    margin-bottom: 2px;
+    padding-right: 18px;
+    width: 86%;
+    border-radius: 12px;
+  
+
+    // margin-right: 34px;
+    margin-right: 38px;
+    margin-top: 10px;
+
+
+    &.active{
+        background:var(--color-active);
+        border: 1px solid #E8EBEC;
+    }
+    &::before{
+        content:'';
+        position:absolute;
+        // right: -px;
+            right: -18px;
+        width: 14px;
+        height: 1px;
+        top: 54%;
+        transform: translateY(-50%);
+        background-color: var(--color-gray);
+
+    }
+
+}
+  
+}
+
+
+@media (max-width:992px) {
+   .logo{
+    margin-top: 60px;
+
+    svg{
+        transform: scale(0.8);
+    }
+
+   }
+}
+
+
+svg path {
+  fill: none;
+  stroke: #2396de;
+  stroke-width: 1.5;
+  
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+
+  animation: draw 12s ease-out forwards infinite,
+             pulse 2s ease-in-out infinite alternate,
+             bigDraw 2s ease-in-out infinite alternate;
+
+  filter: drop-shadow(0 0 10px #2396de8c);
+//   transform: scale(1/);
+
+}
+
+
+text{
+    stroke: var(--color-black);
+    stroke-dashoffset: 300;
+    stroke-dasharray: 300;
+    animation: draw 12s ease-out forwards infinite,
+               pulseText 2s ease-in-out infinite alternate;
+
+    fill:none;
+
+    
+
+    tspan{
+        stroke:#2396de;
+        stroke-dashoffset: 300;
+        stroke-dasharray: 300;
+        animation: draw 12s ease-out forwards infinite,
+                   pulseText 0.5s ease-in-out infinite alternate;
+    }
+
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+    
+  }
+}
+
+@keyframes bigDraw {
+    to{
+        // transform: scale(1.1);
+    }
+    
+}
+
+
+@keyframes pulse {
+  from {
+    opacity: 0.6;
+    stroke-width: 1;
+  }
+  to {
+    opacity: 1;
+    stroke-width: 2;
+  }
+}
+
+// @keyframes pluseText {
+//   from {
+//     opacity: 0.6;
+//     stroke-width: 0.1;
+//   }
+//   to {
+//     opacity: 1;
+//     stroke-width: 0.5;
+    
+//   }
+    
+// }

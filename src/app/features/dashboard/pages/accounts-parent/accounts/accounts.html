@@ -1,0 +1,269 @@
+
+<h2 class="my-5 text-[var(--color-primary)] text-[20px] font-[700]">الحسابات</h2>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+
+    <div class="col-span-12 mb-3">
+      
+
+
+        <div class="search_input relative w-[100%] ">
+           <p-autocomplete styleClass="w-full"  [inputId]="'searchByCodeProduct'" [suggestions]="items" (completeMethod)="search($event)" [placeholder]="selectedSearch"/>
+        
+                    <div class="search_box absolute top-[40px] left-0 z-[20]
+                    shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]
+                    bg-[var(--color-white)] w-[200px]  min-h-[32px] rounded-[4px]
+                    p-2
+                    [&>*]:p-2
+                    [&>*]:hover:bg-[var(--color-primary)]
+                    [&>*]:hover:text-[var(--color-white)]
+                    [&>*]:not-last:mb-3
+                    [&>*]:text-[14px]
+                    [&>*]:rounded-[4px]
+                    [&>*]:cursor-pointer
+                    transition-all duration-200
+                    cursor-pointer
+
+                    " 
+                    [ngClass]="{'translate-y-[-20px] opacity-0 invisible':!this.showSearchBox,'opacity-100 visible':this.showSearchBox}"
+                    
+                    >
+                      <p (click)="selectFilterSearch('number')">رقم الحساب</p>
+                      <p (click)="selectFilterSearch('name')">اسم الحساب</p>
+                    </div>
+        <!-- <input type="text" class="text-[14px] w-[100%]"  placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/> -->
+        <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[7px]" >
+        
+          <button (click)="showSearchBox = !showSearchBox">
+            <svg
+              width="20"
+              height="18"
+              viewBox="0 0 20 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3.17752 0H11.8225C12.405 0 12.8875 -1.58054e-07 13.2613 0.0359987C13.6325 0.0719976 14.025 0.15171 14.3338 0.413987C14.7563 0.770119 14.9963 1.30496 15 1.86551C15.0025 2.27179 14.825 2.63692 14.6238 2.96862C14.42 3.3029 14.1238 3.70531 13.7613 4.19515L10.5238 8.58444C10.2163 9.001 10.115 9.14243 10.045 9.29285C9.97626 9.43957 9.92586 9.59466 9.89501 9.75441C9.86251 9.92155 9.86001 10.1015 9.86001 10.6312V16.0774C9.86001 16.3538 9.86001 16.6019 9.84376 16.8012C9.82626 16.9979 9.78626 17.2627 9.62251 17.4916C9.51902 17.6382 9.38541 17.7596 9.23116 17.8472C9.07691 17.9347 8.90581 17.9863 8.73001 17.9981C8.44627 18.0161 8.20627 17.8992 8.04002 17.8027C7.87377 17.7063 7.67752 17.5674 7.46377 17.4157L6.23377 16.5415L6.18127 16.5042C5.93127 16.3281 5.70627 16.1699 5.53877 15.9514C5.39192 15.7601 5.28164 15.542 5.21377 15.3085C5.13877 15.0411 5.13877 14.7595 5.13877 14.4394V10.6325C5.13877 10.1028 5.13752 9.92155 5.10502 9.75569C5.07417 9.59594 5.02377 9.44086 4.95502 9.29414C4.88502 9.14371 4.78377 9.00229 4.47627 8.58573L1.27877 4.25301L1.27127 4.24015L1.23752 4.19644C0.933854 3.80019 0.646518 3.39099 0.376276 2.96991C0.175026 2.63949 -0.0024739 2.27307 2.60942e-05 1.8668C0.00252609 1.30624 0.243776 0.771404 0.666275 0.413987C0.975025 0.152995 1.36627 0.0732832 1.73877 0.0372843C2.11252 -2.49054e-07 2.59502 0 3.17752 0ZM3.03127 4.49986L5.47127 7.80661L5.50627 7.85418C5.76627 8.20646 5.94877 8.45202 6.08002 8.73101C6.19668 8.97786 6.28085 9.23671 6.33252 9.50756C6.39002 9.81098 6.39002 10.1234 6.39002 10.5721V14.3726C6.39002 14.7968 6.39502 14.8804 6.41502 14.946C6.43668 15.0231 6.47085 15.0917 6.51752 15.1517C6.55502 15.2005 6.61127 15.2481 6.94377 15.4847L8.15127 16.3409C8.36001 16.4888 8.49751 16.5852 8.60126 16.6508C8.61001 16.5183 8.61001 16.3345 8.61001 16.0504V10.5721C8.61001 10.1221 8.61001 9.81098 8.66751 9.50756C8.72001 9.23671 8.80418 8.97786 8.92001 8.73101C9.05126 8.45202 9.23376 8.20646 9.49501 7.8529L9.52876 7.80661L11.9688 4.49986H3.03127ZM12.9163 3.21418C13.2113 2.81434 13.42 2.52249 13.5638 2.28721C13.7388 1.99922 13.7513 1.89508 13.75 1.87194C13.7503 1.78327 13.7317 1.6956 13.6954 1.61517C13.6591 1.53474 13.6061 1.4635 13.54 1.40653C13.5338 1.40138 13.4625 1.34739 13.145 1.31653C12.8363 1.28567 12.4125 1.28567 11.79 1.28567H3.21002C2.58627 1.28567 2.16377 1.28567 1.85502 1.31653C1.53752 1.34739 1.46627 1.40138 1.46002 1.40653C1.39396 1.4635 1.3409 1.53474 1.30461 1.61517C1.26832 1.6956 1.24968 1.78327 1.25002 1.87194C1.25002 1.89508 1.26127 2.00051 1.43627 2.28721C1.58002 2.52249 1.78877 2.81434 2.08377 3.21418H12.9163ZM15 7.07121C15 6.90072 15.0659 6.73721 15.1831 6.61665C15.3003 6.4961 15.4592 6.42837 15.625 6.42837H19.375C19.5408 6.42837 19.6997 6.4961 19.8169 6.61665C19.9342 6.73721 20 6.90072 20 7.07121C20 7.2417 19.9342 7.40521 19.8169 7.52576C19.6997 7.64632 19.5408 7.71404 19.375 7.71404H15.625C15.4592 7.71404 15.3003 7.64632 15.1831 7.52576C15.0659 7.40521 15 7.2417 15 7.07121ZM13.125 10.2854C13.125 10.1149 13.1909 9.95139 13.3081 9.83084C13.4253 9.71028 13.5842 9.64256 13.75 9.64256H19.375C19.5408 9.64256 19.6997 9.71028 19.8169 9.83084C19.9342 9.95139 20 10.1149 20 10.2854C20 10.4559 19.9342 10.6194 19.8169 10.7399C19.6997 10.8605 19.5408 10.9282 19.375 10.9282H13.75C13.5842 10.9282 13.4253 10.8605 13.3081 10.7399C13.1909 10.6194 13.125 10.4559 13.125 10.2854ZM12.5 13.4996C12.5 13.3291 12.5659 13.1656 12.6831 13.045C12.8003 12.9245 12.9592 12.8567 13.125 12.8567H19.375C19.5408 12.8567 19.6997 12.9245 19.8169 13.045C19.9342 13.1656 20 13.3291 20 13.4996C20 13.6701 19.9342 13.8336 19.8169 13.9541C19.6997 14.0747 19.5408 14.1424 19.375 14.1424H13.125C12.9592 14.1424 12.8003 14.0747 12.6831 13.9541C12.5659 13.8336 12.5 13.6701 12.5 13.4996ZM12.5 16.7138C12.5 16.5433 12.5659 16.3798 12.6831 16.2592C12.8003 16.1387 12.9592 16.0709 13.125 16.0709H16.25C16.4158 16.0709 16.5747 16.1387 16.6919 16.2592C16.8092 16.3798 16.875 16.5433 16.875 16.7138C16.875 16.8843 16.8092 17.0478 16.6919 17.1683C16.5747 17.2889 16.4158 17.3566 16.25 17.3566H13.125C12.9592 17.3566 12.8003 17.2889 12.6831 17.1683C12.5659 17.0478 12.5 16.8843 12.5 16.7138Z"
+                
+              />
+            </svg>
+          </button>
+         <button>
+             <svg
+            width="1"
+            height="18"
+            viewBox="0 0 1 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="1" height="18" fill="#BFD3E0" />
+          </svg>
+         </button>
+
+          <button>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.4193 17.5001C6.04702 17.5001 2.5026 13.9557 2.5026 9.58341C2.5026 5.21116 6.04702 1.66675 10.4193 1.66675C14.7915 1.66675 18.3359 5.21116 18.3359 9.58341C18.3359 13.9557 14.7915 17.5001 10.4193 17.5001Z"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M1.66927 18.3334L3.33594 16.6667"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-span-12 lg:col-span-6">
+      <form  [formGroup]="accountsForm" (ngSubmit)="onSubmit()">
+        <div class="flex items-center flex-wrap gap-3">
+            <button class="btn btn-primary" type="submit" [ngClass]="ButtonClass">{{ButtonLabel}}</button>
+            <button class="btn " type="button" (click)="resetForm()">جديد</button>
+            @if(isEditMode){
+
+              <button class="btn " type="button" (click)="showPopupDelete()">حذف</button>
+              <!-- <button class="btn " type="button" (click)="openPdf()">طباعة</button> -->
+              
+            }
+
+        </div>
+
+        <div class="box_header mt-7 py-3">
+             <div class="title">الحساب الرئيسي</div>
+             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                 <div class="col-span-12 md:col-span-6">
+        <label for="numberParent">رقم حساب الأب</label>
+        <input type="text" id="numberParent" placeholder="رقم حساب الأب" [value]="selectedAccountParent" readonly style="user-select: none; pointer-events: none;">
+      
+    </div>
+                 <div class="col-span-12 md:col-span-6 ">
+        <label for="document" (click)="nameAccountParent.focus()">اسم حساب الأب</label>
+        <ng-select [items]="parentsList" #nameAccountParent [bindLabel]="'name'"  (clear)="onClearParent()"
+  [clearable]="true" (change)="onSelectParent($event)" [bindValue]="'id'" formControlName="parentId" [placeholder]="'اسم حساب الأب'"></ng-select>
+    <app-form-error [control]="accountsForm.controls['parentId']" [errorKey]="'required'" [message]="'اسم حساب الأب مطلوب'"></app-form-error>
+    </div>
+             </div>
+
+        </div>
+        
+
+        <div class="box_header mt-7 py-3">
+             <div class="title">الحساب الفرعي</div>
+             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                 <div class="col-span-12 md:col-span-4 relative">
+        <label  >رقم حساب الابن</label>
+        <div class="refresh_input relative">
+            <input type="text" id="numberChild" placeholder="رقم " formControlName="code" readonly style="user-select: none; pointer-events: none;">
+            <div class="icon" (click)="generateCode()">
+                <i class="fa-solid fa-arrow-rotate-right"></i>
+            </div>
+            
+          </div>
+          <app-form-error [control]="accountsForm.controls['code']" [errorKey]="'required'" [message]="'رقم حساب الأبن مطلوب'"></app-form-error>
+    </div>
+                 <div class="col-span-12 md:col-span-8 ">
+        <label for="nameAccountChild" >اسم الحساب </label>
+        <input type="text" id="nameAccountChild" placeholder="الأسم" maxlength="100" formControlName="nameAr">
+        <app-form-error [control]="accountsForm.controls['nameAr']" [errorKey]="'required'" [message]="'اسم الحساب مطلوب'"></app-form-error>
+        <app-form-error [control]="accountsForm.controls['nameAr']" [errorKey]="'minlength'" [message]="'اسم الحساب يجب اكبر من 2 حرف'"></app-form-error>
+        <app-form-error [control]="accountsForm.controls['nameAr']" [errorKey]="'maxlength'" [message]="'اسم الحساب يجب اقل من 100 حرف'"></app-form-error>
+        
+    </div>
+                 <div class="col-span-12 md:col-span-4 ">
+        <label (click)="branchData.focus()" >الفرع</label>
+        <ng-select [items]="branchDataList" #branchData [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'الفرع'" formControlName="branchId"></ng-select>
+
+        <app-form-error [control]="accountsForm.controls['branchId']" [errorKey]="'required'" [message]="'الفرع مطلوب'"></app-form-error>
+    </div>
+                 <div class="col-span-12 md:col-span-4 ">
+        <label for="document" (click)="accountGroupData.focus()">مجموعه الحساب</label>
+        <ng-select [items]="accountGroup" [bindLabel]="'name'" #accountGroupData [bindValue]="'id'"  formControlName="accountGroup" [placeholder]="'مجموعه الحساب'"></ng-select>
+        <app-form-error [control]="accountsForm.controls['accountGroup']" [errorKey]="'required'" [message]="'مجموعه الحساب مطلوب'"></app-form-error>
+    </div>
+                 <div class="col-span-12 md:col-span-4 ">
+        <label for="document" (click)="accountStatusInp.focus()">حاله الحساب</label>
+        <ng-select [items]="accountStatus" #accountStatusInp [bindLabel]="'name'" [bindValue]="'id'" formControlName="accountStatus" [placeholder]="'حاله الحساب'"></ng-select>
+        <app-form-error [control]="accountsForm.controls['accountStatus']" [errorKey]="'required'" [message]="'حاله الحساب مطلوب'"></app-form-error>
+    </div>
+                 <div class="col-span-12 md:col-span-6 ">
+        <label for="document" (click)="accountNatural.focus()">طبيعه الحساب</label>
+        <ng-select [items]="accountNature" #accountNatural [bindLabel]="'name'" [bindValue]="'id'" formControlName="accountNature" [placeholder]="'طبيعه الحساب'"></ng-select>
+        <app-form-error [control]="accountsForm.controls['accountNature']" [errorKey]="'required'" [message]="'طبيعه الحساب مطلوب'"></app-form-error>
+    </div>
+                 <div class="col-span-12 md:col-span-6 ">
+        <label for="document" > الحساب الختامي</label>
+        <ng-select [items]="closedType" [bindLabel]="'name'" [bindValue]="'id'" formControlName="closingType" [placeholder]="' الحساب الختامي'"></ng-select>
+        <app-form-error [control]="accountsForm.controls['closingType']" [errorKey]="'required'" [message]="' الحساب الختامي مطلوب'"></app-form-error>
+    </div>
+                 <div class="col-span-12 md:col-span-6 ">
+        <label for="phoneNumber" > رقم الجوال</label>
+        <input type="text" id="phoneNumber" placeholder="رقم الجوال" appOnlyNumber maxlength="14"  formControlName="mobileNumber" >
+        <app-form-error [control]="accountsForm.controls['mobileNumber']" [errorKey]="'required'" [message]="'رقم الجوال مطلوب'"></app-form-error>
+<app-form-error
+  [control]="accountsForm.controls['mobileNumber']"
+  [errorKey]="'invalidEgyptPhone'"
+  [message]="'رقم الجوال المصري غير صحيح'">
+</app-form-error>
+
+<app-form-error
+  [control]="accountsForm.controls['mobileNumber']"
+  [errorKey]="'invalidSaudiPhone'"
+  [message]="'رقم الجوال السعودي غير صحيح'">
+</app-form-error>
+
+<app-form-error
+  [control]="accountsForm.controls['mobileNumber']"
+  [errorKey]="'invalidPhone'"
+  [message]="'يجب إدخال رقم مصري أو سعودي صحيح'">
+</app-form-error>
+<!-- 
+<app-form-error
+  [control]="accountsForm.controls['mobileNumber']"
+  errorKey="'invalidPhone'"
+  message="رقم الجوال غير صحيح">
+</app-form-error>
+
+<app-form-error
+  [control]="accountsForm.controls['mobileNumber']"
+  errorKey="'invalidCountry'"
+  message="الدولة غير مدعومة (مصر أو السعودية فقط)">
+</app-form-error> -->
+    </div>
+                 <div class="col-span-12 md:col-span-6 ">
+        <label for="faxNumber" > رقم الفاكس</label>
+        <input type="text" id="faxNumber" placeholder="رقم الفاكس" formControlName="fax" maxlength="20">
+        <app-form-error [control]="accountsForm.controls['fax']" [errorKey]="'required'" [message]="'رقم الفاكس مطلوب'"></app-form-error>
+        <app-form-error [control]="accountsForm.controls['fax']" [errorKey]="'minlength'" [message]="'رقم الفاكس يجب ان يكون اكبر من 6 ارقام'"></app-form-error>
+        <app-form-error [control]="accountsForm.controls['fax']" [errorKey]="'maxlength'" [message]="'رقم الفاكس يجب ان يكون اقل من 20 ارقام'"></app-form-error>
+        <app-form-error [control]="accountsForm.controls['fax']" [errorKey]="'pattern'" [message]="'رقم الفاكس غير صحيح'"></app-form-error>
+    </div>
+                 <div class="col-span-12">
+        <label for="description" > البيان</label>
+        <textarea name="" id="description" placeholder="البيان" style="height: 89px !important;" formControlName="description"></textarea>
+        <!-- <app-form-error [control]="accountsForm.controls['description']" [errorKey]="'required'" [message]="'البيان مطلوب'"></app-form-error> -->
+        <app-form-error [control]="accountsForm.controls['description']" [errorKey]="'minlength'" [message]="'البيان يجب ان يكون اكبر من 2 حرف'"></app-form-error>
+        <app-form-error [control]="accountsForm.controls['description']" [errorKey]="'maxlength'" [message]="'البيان يجب ان يكون اقل من 100 حرف'"></app-form-error>
+    </div>
+
+
+
+
+
+             </div>
+
+        </div>
+        
+
+      </form>
+    </div>
+    <div class="col-span-12 lg:col-span-6 ">
+
+        <div class="container_tree flex  justify-between p-8 bg-[var(--color-white)] sm:h-[50] lg:h-[87vh]  border-[1px] border-[var(--color-border)] rounded-lg    ">
+
+            
+ <div class="tree">
+  @for (item of treeNode; track $index) {
+    <app-tree-node [node]="item" [level]="0" (eventClicked)="getDataFromTreeById($event)"></app-tree-node>
+  }
+</div>
+
+
+<div class="refresh cursor-pointer absolute left-[31px]" (click)="refreshTree()">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="36" height="36" rx="8" fill="#0C4B68"/>
+<path d="M18 26C17.0278 26 16.1173 25.8192 15.2684 25.4575C14.4196 25.0959 13.6807 24.607 13.0518 23.9909C12.4228 23.3747 11.9237 22.6509 11.5546 21.8194C11.2874 21.2178 11.1168 20.5844 11.0427 19.9193C10.9951 19.4923 11.3484 19.1429 11.778 19.1429C12.2074 19.1429 12.549 19.4927 12.6062 19.9183C12.7614 21.0722 13.2729 22.0741 14.1407 22.9242C15.1974 23.9594 16.4839 24.4767 18 24.4762C19.5161 24.4757 20.8028 23.9583 21.8601 22.9242C22.9174 21.89 23.4455 20.6296 23.4444 19.1429C23.4434 17.6561 22.9153 16.3959 21.8601 15.3623C20.8049 14.3286 19.5182 13.811 18 13.8095C17.9573 13.8095 17.9362 13.8613 17.9667 13.8912L18.7387 14.6474C18.9319 14.8367 18.9346 15.147 18.7447 15.3396L18.5428 15.5446C18.2427 15.849 17.753 15.8533 17.4477 15.5542L15.6181 13.762C15.2178 13.3699 15.2178 12.7254 15.6181 12.3333L17.4477 10.5411C17.753 10.242 18.2427 10.2463 18.5428 10.5507L18.7447 10.7556C18.9346 10.9483 18.9319 11.2585 18.7387 11.4478L17.9667 12.2041C17.9362 12.2339 17.9573 12.2857 18 12.2857C18.9722 12.2857 19.883 12.4668 20.7323 12.829C21.5817 13.1911 22.3206 13.68 22.949 14.2956C23.5774 14.9112 24.0765 15.635 24.4462 16.467C24.8159 17.299 25.0005 18.191 25 19.1429C24.9995 20.0947 24.8149 20.9869 24.4462 21.8194C24.0776 22.6519 23.5785 23.3757 22.949 23.9909C22.3195 24.606 21.5806 25.0949 20.7323 25.4575C19.884 25.8202 18.9733 26.001 18 26Z" fill="white"/>
+</svg>
+
+</div>
+
+
+
+        </div>
+
+
+
+    </div>
+
+</div>
+
+
+<app-shared-confirm-dialog [show]="showDeleteDialog" [title]="'حذف  الحساب '" [message]="'هل أنت متأكد من حذف هذه  الحساب ؟ لا يمكن التراجع عن هذا الإجراء.'" (confirm)="deleteAccount()" (cancel)="showDeleteDialog=false"></app-shared-confirm-dialog>
+
+<!-- @if(showPdfGenerate){
+  <app-generate-pdf [componentType]="printPageAccounts"></app-generate-pdf>
+} -->
+
+<app-generate-pdf #pdf></app-generate-pdf>

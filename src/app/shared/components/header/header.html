@@ -1,0 +1,170 @@
+<div class="flex items-center justify-between
+ h-[60px] bg-[var(--color-bg)]   px-4
+
+" style="box-shadow: -5px 1px 5px rgba(9, 24, 56, 0.1)  !important;">
+
+<div class="right flex items-center gap-4">
+ 
+           <div class="icon_showSidebar  cursor-pointer transition-all transition-duration-300" [ngStyle]="{
+            'right': isSidebarOpen ? '0px' : '0px'
+           }" (click)="ShowAndHideSidebar()" [ngClass]="{'rotate-[180deg]':!isSidebarOpen}">
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path stroke="var(--color-gray)" d="M31.75 20.5V35.5H36.25C36.4489 35.5 36.6397 35.421 36.7803 35.2803C36.921 35.1397 37 34.9489 37 34.75V21.25C37 21.0511 36.921 20.8603 36.7803 20.7197C36.6397 20.579 36.4489 20.5 36.25 20.5H31.75Z" fill="white"/>
+                <path stroke="var(--color-gray)" d="M19.75 19.75H36.25C36.6478 19.75 37.0294 19.908 37.3107 20.1893C37.592 20.4706 37.75 20.8522 37.75 21.25V34.75C37.75 35.1478 37.592 35.5294 37.3107 35.8107C37.0294 36.092 36.6478 36.25 36.25 36.25H19.75C19.3522 36.25 18.9706 36.092 18.6893 35.8107C18.408 35.5294 18.25 35.1478 18.25 34.75V21.25C18.25 20.8522 18.408 20.4706 18.6893 20.1893C18.9706 19.908 19.3522 19.75 19.75 19.75ZM36.25 30.25H34.75C34.5511 30.25 34.3603 30.171 34.2197 30.0303C34.079 29.8897 34 29.6989 34 29.5C34 29.3011 34.079 29.1103 34.2197 28.9697C34.3603 28.829 34.5511 28.75 34.75 28.75H36.25V27.25H34.75C34.5511 27.25 34.3603 27.171 34.2197 27.0303C34.079 26.8897 34 26.6989 34 26.5C34 26.3011 34.079 26.1103 34.2197 25.9697C34.3603 25.829 34.5511 25.75 34.75 25.75H36.25V24.25H34.75C34.5511 24.25 34.3603 24.171 34.2197 24.0303C34.079 23.8897 34 23.6989 34 23.5C34 23.3011 34.079 23.1103 34.2197 22.9697C34.3603 22.829 34.5511 22.75 34.75 22.75H36.25V21.25H32.5V34.75H36.25V30.25ZM19.75 34.75H31V21.25H19.75V34.75Z" fill="black"/>
+        </svg>
+    </div>
+        
+        <div class="content  items-center gap-[24px] hidden md:flex">
+            <h4 class="text-[var(--color-gray)] text-[14px] font-[700]">لوحه التحكم</h4>
+            <span class="mx-[4px] text-[var(--color-gray)] block">/</span>
+            <h5 class="font-[600] text-[14px] text-[var(--color-primary)]">الداشبورد</h5>
+        </div>
+        
+    </div>
+    <div class="left flex items-center gap-4">
+       <div class="theme-toggle cursor-pointer" (click)="themeColor()">
+        <!-- <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M1.69451 10.35C1.99451 14.6416 5.63617 18.1333 9.99451 18.325C13.0695 18.4583 15.8195 17.025 17.4695 14.7666C18.1528 13.8416 17.7862 13.225 16.6445 13.4333C16.0862 13.5333 15.5112 13.575 14.9112 13.55C10.8362 13.3833 7.50284 9.97497 7.48617 5.94997C7.47784 4.86663 7.70284 3.84163 8.11117 2.9083C8.56117 1.87497 8.01951 1.3833 6.97784 1.82497C3.67784 3.21663 1.41951 6.54163 1.69451 10.35Z" stroke="#083448" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+</svg> -->
+
+@if(isDark){
+
+    <!-- <i class="fa-regular fa-sun"></i> -->
+     <i class="fa-solid fa-sun"></i>
+}@else{
+
+    <i class="fa-regular fa-moon"></i>
+}
+
+
+       </div>
+       <!-- <div class="notfication cursor-pointer" (click)="toggleNotifications()">
+
+
+<i class="fa-regular fa-bell"></i>
+       </div> -->
+
+       <div class="relative notification-drop-down">
+
+  <!-- 🔔 Icon -->
+  <div class="cursor-pointer relative" (click)="toggleNotifications()">
+    <i class="fa-regular fa-bell text-xl"></i>
+
+    <!-- Badge -->
+     @if(unreadCount){
+
+         <span 
+           class="absolute top-[-3px] right-0 bg-red-500 text-[#fff] text-xs w-3 h-3 flex items-center justify-center rounded-full">
+           {{ unreadCount }}
+         </span>
+     }
+  </div>
+
+  <!-- Dropdown -->
+   <!-- @if(isOpen){ -->
+       
+       <div 
+         class="absolute left-0  mt-3 w-[350px] bg-white bg-[var(--color-bg)] shadow shadow-[#00000026] rounded-xl overflow-hidden   z-50
+          transition-all duration-200
+          showNotification_small
+         "
+         style="top:calc(100% + 7px);"
+         [ngClass]="{'opacity-0 translate-y-[-10px] invisible':!isOpen,'opacity-100 translate-y-0 visible':isOpen}"
+         >
+     
+         <!-- Header -->
+         <div class="p-4 font-semibold border-b dark:border-gray-700 flex justify-between">
+           <span>الإشعارات</span>
+           <button class="text-sm text-[var(--color-btn)] cursor-pointer">عرض الكل</button>
+         </div>
+     
+         <!-- List -->
+         <div class="max-h-[400px] overflow-y-auto">
+     
+           <!-- Item -->
+     
+           @for(n of notifications;track $index){
+              <div
+             (click)="markAsRead(n)"
+             class="p-4 cursor-pointer flex gap-3 transition hover:bg-[var(--color-bg)]"
+             [ngClass]="{'bg-[var(--color-bg)]' : !n.isRead}">
+     
+             <!-- Icon -->
+             <div class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">
+               <i class="fa-solid fa-bell"></i>
+             </div>
+     
+             <!-- Content -->
+             <div class="flex-1">
+               <p class="font-medium text-sm">{{ n.title }}</p>
+               <p class="text-xs text-gray-500">{{ n.message }}</p>
+               <span class="text-[10px] text-gray-400">{{ n.time }}</span>
+             </div>
+     
+             <!-- Unread dot -->
+              @if(!n.isRead){
+     
+                  <div 
+                    class="w-2 h-2 bg-blue-500 rounded-full mt-2">
+                  </div>
+              }
+     
+           </div>
+     
+           <!-- Empty -->
+            @if(notifications.length === 0){
+     
+                <div 
+                  class="p-6 text-center text-gray-400">
+                  لا يوجد إشعارات
+                </div>
+            }
+           }
+          
+     
+         </div>
+     
+       </div>
+   <!-- } -->
+
+</div>
+
+
+       <div class="user-drop-down relative flex items-center gap-4 cursor-pointer" (click)="toggleUserDropDown()">
+        <img src="/images/user.avif" class="w-[40px] h-[40px] rounded-full" alt="User Image">
+        <div class="content">
+            <h3 class="title text-[14px] font-[500] text-[var(--color-primary)] ">محمد احمد محمود</h3>
+            <p class="jop text-[12px] text-[400] text-[var(--color-gray)]">الفرع الرئيسي</p>
+        </div>
+        <div class="icon">
+            <i class="fa-solid fa-angle-down text-[20px] text-[var(--color-gray)]"></i>
+        </div>
+
+        <div 
+    [ngClass]="{'translate-y-[0px] opacity-100 visible' : isShowUserDropDown }"
+        class="toggle-user-drop absolute top-[50px] overflow-hidden translate-y-[-20px] opacity-0 invisible  w-[80%] shadow-md shadow-[#09183F1A] rounded-bl-md rounded-br-md
+        transition-all duration-300 
+        bg-[var(--color-white)]
+        w-[100%]
+        ">
+            <p class="p-2 text-[var(--color-primary)]  hover:bg-[var(--color-primary)] hover:text-[var(--color-bg)]
+            flex items-center justify-between
+            ">الملف الشخصي
+                <span><i class="fa-solid fa-user"></i></span>
+            </p>
+            <p class="p-2 text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-bg)]
+            flex items-center justify-between
+       
+            ">تسجيل الخروج
+                <span class="     rotate-180"><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
+            </p>
+        </div>
+       </div>
+    </div>
+    
+ 
+</div>
+
+
+<!-- !!!!!!!!1 Notification -->
+

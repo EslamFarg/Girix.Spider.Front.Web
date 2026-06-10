@@ -1,0 +1,325 @@
+<app-page-header
+  [titleHeader]="'أمر توريد '"
+  [explorerBtn]="explorerBtn"
+  [actions]="actions"
+  (actionClicked)="handleAction($event)"
+></app-page-header>
+
+<form class="box_header">
+  <div class="title">بيانات الفاتوره</div>
+  <div class="input_group">
+    <label>بحث رقم الفاتوة</label>
+    <div class="flex items-center gap-2 relative">
+        <div class="prev">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M15.164 11.6835C15.2371 11.7729 15.2771 11.8848 15.2771 12.0003C15.2771 12.1158 15.2371 12.2277 15.164 12.317L9.67196 19.03C9.26946 19.522 9.11696 20.183 9.40596 20.7485C9.60696 21.141 9.89946 21.5985 10.308 21.999C10.723 22.4055 11.1965 22.694 11.601 22.891C12.17 23.1685 12.829 23.0135 13.3075 22.5985C16.675 19.6765 20.2765 15.7375 21.821 13.1855C22.261 12.4585 22.212 11.564 21.748 10.8525C20.084 8.30254 16.6615 4.33904 13.306 1.40254C12.8295 0.98554 12.1705 0.83054 11.601 1.10754C11.196 1.30504 10.722 1.59404 10.308 2.00004C9.89896 2.40004 9.60696 2.85804 9.40596 3.25054C9.11696 3.81654 9.26996 4.47754 9.67196 4.96904L15.164 11.6835ZM7.37696 2.47154C7.33046 1.55804 6.75796 0.84204 5.84546 0.78054C5.51538 0.759445 5.18471 0.749273 4.85396 0.75004C4.46896 0.75004 4.14096 0.76204 3.86246 0.78054C2.94996 0.84204 2.37746 1.55804 2.33096 2.47154C2.25746 3.91054 2.17546 6.70504 2.17546 12C2.17546 17.295 2.25746 20.089 2.33046 21.5285C2.37746 22.442 2.94996 23.158 3.86246 23.2195C4.14146 23.238 4.46946 23.25 4.85396 23.25C5.23846 23.25 5.56646 23.238 5.84546 23.2195C6.75796 23.158 7.33046 22.442 7.37696 21.5285C7.45046 20.089 7.53246 17.295 7.53246 12C7.53246 6.70504 7.45046 3.91054 7.37746 2.47154" fill="#1791C8"/>
+</svg>
+
+        </div>
+      <div class="search_input relative ">
+        <input type="text" class="text-[14px]" style="color:var(--color-black); font-weight:600;"/>
+        <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[10px]" >
+          <button>
+            <svg
+              width="20"
+              height="18"
+              viewBox="0 0 20 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3.17752 0H11.8225C12.405 0 12.8875 -1.58054e-07 13.2613 0.0359987C13.6325 0.0719976 14.025 0.15171 14.3338 0.413987C14.7563 0.770119 14.9963 1.30496 15 1.86551C15.0025 2.27179 14.825 2.63692 14.6238 2.96862C14.42 3.3029 14.1238 3.70531 13.7613 4.19515L10.5238 8.58444C10.2163 9.001 10.115 9.14243 10.045 9.29285C9.97626 9.43957 9.92586 9.59466 9.89501 9.75441C9.86251 9.92155 9.86001 10.1015 9.86001 10.6312V16.0774C9.86001 16.3538 9.86001 16.6019 9.84376 16.8012C9.82626 16.9979 9.78626 17.2627 9.62251 17.4916C9.51902 17.6382 9.38541 17.7596 9.23116 17.8472C9.07691 17.9347 8.90581 17.9863 8.73001 17.9981C8.44627 18.0161 8.20627 17.8992 8.04002 17.8027C7.87377 17.7063 7.67752 17.5674 7.46377 17.4157L6.23377 16.5415L6.18127 16.5042C5.93127 16.3281 5.70627 16.1699 5.53877 15.9514C5.39192 15.7601 5.28164 15.542 5.21377 15.3085C5.13877 15.0411 5.13877 14.7595 5.13877 14.4394V10.6325C5.13877 10.1028 5.13752 9.92155 5.10502 9.75569C5.07417 9.59594 5.02377 9.44086 4.95502 9.29414C4.88502 9.14371 4.78377 9.00229 4.47627 8.58573L1.27877 4.25301L1.27127 4.24015L1.23752 4.19644C0.933854 3.80019 0.646518 3.39099 0.376276 2.96991C0.175026 2.63949 -0.0024739 2.27307 2.60942e-05 1.8668C0.00252609 1.30624 0.243776 0.771404 0.666275 0.413987C0.975025 0.152995 1.36627 0.0732832 1.73877 0.0372843C2.11252 -2.49054e-07 2.59502 0 3.17752 0ZM3.03127 4.49986L5.47127 7.80661L5.50627 7.85418C5.76627 8.20646 5.94877 8.45202 6.08002 8.73101C6.19668 8.97786 6.28085 9.23671 6.33252 9.50756C6.39002 9.81098 6.39002 10.1234 6.39002 10.5721V14.3726C6.39002 14.7968 6.39502 14.8804 6.41502 14.946C6.43668 15.0231 6.47085 15.0917 6.51752 15.1517C6.55502 15.2005 6.61127 15.2481 6.94377 15.4847L8.15127 16.3409C8.36001 16.4888 8.49751 16.5852 8.60126 16.6508C8.61001 16.5183 8.61001 16.3345 8.61001 16.0504V10.5721C8.61001 10.1221 8.61001 9.81098 8.66751 9.50756C8.72001 9.23671 8.80418 8.97786 8.92001 8.73101C9.05126 8.45202 9.23376 8.20646 9.49501 7.8529L9.52876 7.80661L11.9688 4.49986H3.03127ZM12.9163 3.21418C13.2113 2.81434 13.42 2.52249 13.5638 2.28721C13.7388 1.99922 13.7513 1.89508 13.75 1.87194C13.7503 1.78327 13.7317 1.6956 13.6954 1.61517C13.6591 1.53474 13.6061 1.4635 13.54 1.40653C13.5338 1.40138 13.4625 1.34739 13.145 1.31653C12.8363 1.28567 12.4125 1.28567 11.79 1.28567H3.21002C2.58627 1.28567 2.16377 1.28567 1.85502 1.31653C1.53752 1.34739 1.46627 1.40138 1.46002 1.40653C1.39396 1.4635 1.3409 1.53474 1.30461 1.61517C1.26832 1.6956 1.24968 1.78327 1.25002 1.87194C1.25002 1.89508 1.26127 2.00051 1.43627 2.28721C1.58002 2.52249 1.78877 2.81434 2.08377 3.21418H12.9163ZM15 7.07121C15 6.90072 15.0659 6.73721 15.1831 6.61665C15.3003 6.4961 15.4592 6.42837 15.625 6.42837H19.375C19.5408 6.42837 19.6997 6.4961 19.8169 6.61665C19.9342 6.73721 20 6.90072 20 7.07121C20 7.2417 19.9342 7.40521 19.8169 7.52576C19.6997 7.64632 19.5408 7.71404 19.375 7.71404H15.625C15.4592 7.71404 15.3003 7.64632 15.1831 7.52576C15.0659 7.40521 15 7.2417 15 7.07121ZM13.125 10.2854C13.125 10.1149 13.1909 9.95139 13.3081 9.83084C13.4253 9.71028 13.5842 9.64256 13.75 9.64256H19.375C19.5408 9.64256 19.6997 9.71028 19.8169 9.83084C19.9342 9.95139 20 10.1149 20 10.2854C20 10.4559 19.9342 10.6194 19.8169 10.7399C19.6997 10.8605 19.5408 10.9282 19.375 10.9282H13.75C13.5842 10.9282 13.4253 10.8605 13.3081 10.7399C13.1909 10.6194 13.125 10.4559 13.125 10.2854ZM12.5 13.4996C12.5 13.3291 12.5659 13.1656 12.6831 13.045C12.8003 12.9245 12.9592 12.8567 13.125 12.8567H19.375C19.5408 12.8567 19.6997 12.9245 19.8169 13.045C19.9342 13.1656 20 13.3291 20 13.4996C20 13.6701 19.9342 13.8336 19.8169 13.9541C19.6997 14.0747 19.5408 14.1424 19.375 14.1424H13.125C12.9592 14.1424 12.8003 14.0747 12.6831 13.9541C12.5659 13.8336 12.5 13.6701 12.5 13.4996ZM12.5 16.7138C12.5 16.5433 12.5659 16.3798 12.6831 16.2592C12.8003 16.1387 12.9592 16.0709 13.125 16.0709H16.25C16.4158 16.0709 16.5747 16.1387 16.6919 16.2592C16.8092 16.3798 16.875 16.5433 16.875 16.7138C16.875 16.8843 16.8092 17.0478 16.6919 17.1683C16.5747 17.2889 16.4158 17.3566 16.25 17.3566H13.125C12.9592 17.3566 12.8003 17.2889 12.6831 17.1683C12.5659 17.0478 12.5 16.8843 12.5 16.7138Z"
+                
+              />
+            </svg>
+          </button>
+         <button>
+             <svg
+            width="1"
+            height="18"
+            viewBox="0 0 1 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="1" height="18" fill="#BFD3E0" />
+          </svg>
+         </button>
+
+          <button>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.4193 17.5001C6.04702 17.5001 2.5026 13.9557 2.5026 9.58341C2.5026 5.21116 6.04702 1.66675 10.4193 1.66675C14.7915 1.66675 18.3359 5.21116 18.3359 9.58341C18.3359 13.9557 14.7915 17.5001 10.4193 17.5001Z"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M1.66927 18.3334L3.33594 16.6667"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="next">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M8.83604 11.6835C8.76288 11.7729 8.72291 11.8848 8.72291 12.0003C8.72291 12.1158 8.76288 12.2277 8.83604 12.317L14.328 19.03C14.7305 19.522 14.883 20.183 14.594 20.7485C14.393 21.141 14.1005 21.5985 13.692 21.999C13.277 22.4055 12.8035 22.694 12.399 22.891C11.83 23.1685 11.171 23.0135 10.6925 22.5985C7.32504 19.6765 3.72354 15.7375 2.17904 13.1855C1.73904 12.4585 1.78804 11.564 2.25204 10.8525C3.91604 8.30254 7.33854 4.33904 10.694 1.40254C11.1705 0.98554 11.8295 0.83054 12.399 1.10754C12.804 1.30504 13.278 1.59404 13.692 2.00004C14.101 2.40004 14.393 2.85804 14.594 3.25054C14.883 3.81654 14.73 4.47754 14.328 4.96904L8.83604 11.6835ZM16.623 2.47154C16.6695 1.55804 17.242 0.84204 18.1545 0.78054C18.4846 0.759445 18.8153 0.749273 19.146 0.75004C19.531 0.75004 19.859 0.76204 20.1375 0.78054C21.05 0.84204 21.6225 1.55804 21.669 2.47154C21.7425 3.91054 21.8245 6.70504 21.8245 12C21.8245 17.295 21.7425 20.089 21.6695 21.5285C21.6225 22.442 21.05 23.158 20.1375 23.2195C19.8585 23.238 19.5305 23.25 19.146 23.25C18.7615 23.25 18.4335 23.238 18.1545 23.2195C17.242 23.158 16.6695 22.442 16.623 21.5285C16.5495 20.089 16.4675 17.295 16.4675 12C16.4675 6.70504 16.5495 3.91054 16.6225 2.47154" fill="#1791C8"/>
+</svg>
+
+      </div>
+    </div>
+  </div>
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-15 gap-[24px] my-[20px]">
+    <div class="col-span-3">
+        <label for="document" >رقم الفاتورة</label>
+        <input type="text" id="document" placeholder="رقم الفاتورة">
+    </div>
+    <div class="col-span-3">
+        <label for="reference">رقم المرجع</label>
+        <input type="text" placeholder="رقم المرجع" id="reference">
+    </div>
+    <div class="col-span-3">
+        <label for="reference">المخزن</label>
+       <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'المخزن'"></ng-select>
+    </div>
+    <div class="col-span-3">
+        <label for="reference">طريقة الدفع</label>
+       <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'طريقة الدفع'"></ng-select>
+    </div>
+
+
+     <div class="col-span-3">
+                <label for="icondisplay" class="font-bold block mb-2"> التاريخ </label>
+                <p-datepicker  [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="icondisplay" />
+            </div>
+
+  </div>
+
+
+</form>
+<form class="box_header my-[25px] relative" style="padding-top: 10px ;">
+  <div class="title">بيانات المورد</div>
+
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-15 gap-[24px] my-[20px]">
+    <div class="sm:col-span-12 md:col-span-3 relative">
+        <label for="document" >اسم المورد</label>
+        <!-- <input type="text" id="document" placeholder="رقم الفاتورة"> -->
+         <ng-select class="select_info" [items]="items" [bindLabel]="'name'"   [searchable]="true" 
+  [clearable]="true" [bindValue]="'id'" [placeholder]="'اسم المورد'"></ng-select>
+
+    
+  <!-- <ng-template ng-label-tmp let-item="item">
+    {{ item ? item.name : 'الاسم' }}
+  </ng-template> -->
+    </div>
+    <div class="sm:col-span-12 md:col-span-3">
+        <label for="phonenumber">رقم الجوال</label>
+        <input type="text" placeholder="رقم الجوال" id="phonenumber">
+    </div>
+    <div class="sm:col-span-12 md:col-span-3">
+        <label for="taxnumber">رقم الضريبي</label>
+        <input type="text" placeholder="رقم الضريبي" id="taxnumber">
+    </div>
+    <div class="sm:col-span-12 md:col-span-3">
+        <label for="togary">السجل التجاري</label>
+        <input type="text" placeholder="السجل التجاري" id="togary">
+    </div>
+ 
+    <div class="sm:col-span-12 md:col-span-3">
+        <label for="total">رصيد المورد</label>
+        <div class="relative">
+          <div class="icon absolute top-[10px] left-[10px]">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.3359 5.00008H6.66927M8.33594 8.33341H6.66927M3.33594 15.5384V6.71175C3.33594 4.33341 3.33594 3.14508 4.06844 2.40591C4.8001 1.66675 5.97927 1.66675 8.33594 1.66675H11.6693C14.0259 1.66675 15.2051 1.66675 15.9368 2.40591C16.6693 3.14425 16.6693 4.33341 16.6693 6.71175V15.5384C16.6693 16.7976 16.6693 17.4276 16.2843 17.6759C15.6551 18.0809 14.6826 17.2309 14.1934 16.9226C13.7893 16.6676 13.5876 16.5409 13.3626 16.5334C13.1209 16.5251 12.9151 16.6476 12.4784 16.9226L10.8859 17.9267C10.4559 18.1976 10.2418 18.3334 10.0026 18.3334C9.76344 18.3334 9.54927 18.1976 9.11927 17.9267L7.5276 16.9226C7.1226 16.6676 6.92094 16.5409 6.69677 16.5334C6.45427 16.5251 6.24844 16.6476 5.81177 16.9226C5.3226 17.2309 4.3501 18.0809 3.7201 17.6759C3.33594 17.4276 3.33594 16.7984 3.33594 15.5384Z" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12.0859 8.22917C11.3959 8.22917 10.8359 8.71917 10.8359 9.32333C10.8359 9.92667 11.3959 10.4167 12.0859 10.4167C12.7759 10.4167 13.3359 10.9067 13.3359 11.5108C13.3359 12.1142 12.7759 12.6042 12.0859 12.6042M12.0859 8.22917C12.6301 8.22917 13.0934 8.53333 13.2651 8.95833M12.0859 8.22917V7.5M12.0859 12.6042C11.5418 12.6042 11.0784 12.3 10.9068 11.875M12.0859 12.6042V13.3333" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+          </div>
+          <input type="text" id="total" readonly >
+
+          <div class="flex items-center absolute right-[10px] top-[10px]">
+            <!-- عليه -->
+            <div class="attic text-[#4CAF50] text-[12px] font-[400]">
+              10000
+            </div>
+            <div class="text-[12px] font-[400]">-</div>
+            <!-- له -->
+            <div class="forHim text-[#FF3D00] text-[12px] font-[400]">
+              4500
+            </div>
+           
+          </div>
+         
+          
+        </div>
+    </div>
+
+
+
+     <!-- <p-button (click)="showDialog()" label="Show" /> -->
+
+
+  </div>
+
+
+</form>
+
+
+<div class="table-responsive">
+  <table class="w-full ">
+    <thead class="bg-gray-100 ">
+      <tr class="sticky top-0">
+        <th class="p-2 text-center">م</th>
+        <th class="p-2 text-center">اسم الصنف</th>
+        <th class="p-2 text-center">الوحده</th>
+        <th class="p-2 text-center">الكميه</th>
+        <th class="p-2 text-center">سعر الشراء</th>
+        <th class="p-2 text-center">نسبة الخصم</th>
+        <th class="p-2 text-center">مبلغ الخصم</th>
+        <th class="p-2 text-center">الضريبة</th>
+        <th class="p-2 text-center">المبلغ الكلي</th>
+        <th class="p-2 text-center">الادوات</th>
+      </tr>
+    </thead>
+    <tbody>
+
+             <tr class="section_add sticky top-[37px] [&>*]:bg-[var(--color-white)] ">
+        <td class="p-2 text-center text-[var(--color-gray)] text-[14px] font-[400]">م</td>
+        <td class="p-2">
+            <ng-select [items]="[]" [bindLabel]="''" placeholder="اسم الصنف"  [bindValue]="''"></ng-select>
+        </td>
+        <td class="p-2">
+            <input type="text"  placeholder="الوحدة">
+        </td>
+        <td class="p-2">
+            <input type="text"  placeholder="العدد">
+        </td>
+        <td class="p-2">
+            <input type="text"  placeholder="المبلغ">
+        </td>
+        <td class="p-2">
+            <input type="text"  placeholder="النسبه %">
+        </td>
+        <td class="p-2">
+            <input type="text"  placeholder="المبلغ">
+        </td>
+        <td class="p-2">
+            <input type="text"  placeholder="الضريبة">
+        </td>
+        <td class="p-2">
+            <input type="text"  placeholder="----">
+        </td>
+
+        <td class="block text-center w-[100%] p-[11px]">
+            <button class="btn btn-primary">اضافه</button>
+        </td>
+  
+      </tr>
+    
+
+@for(item of tableData;track $index){
+
+    <tr >
+<td class="p-2 text-center">{{ $index + 1 }}</td>
+<td class="p-2 text-center">{{ item?.name }}</td>
+<td class="p-2 text-center">{{ item.unit }}</td>
+<td class="p-2 text-center">{{ item.qty }}</td>
+<td class="p-2 text-center">{{ item.price }}</td>
+<td class="p-2 text-center">{{ item.discountRate }}</td>
+<td class="p-2 text-center">{{ item.discount }}</td>
+<td class="p-2 text-center">{{ item.tax }}</td>
+<td class="p-2 text-center">{{ item.total }}</td>
+      <td class="p-2 w-full flex items-center justify-center gap-2">
+            <button class="update">
+                <!-- <svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="33.0001" height="25.0001" rx="2" fill="#BEE0F0"/>
+<path d="M11 8H10C9.46957 8 8.96086 8.21071 8.58579 8.58579C8.21071 8.96086 8 9.46957 8 10V19C8 19.5304 8.21071 20.0391 8.58579 20.4142C8.96086 20.7893 9.46957 21 10 21H19C19.5304 21 20.0391 20.7893 20.4142 20.4142C20.7893 20.0391 21 19.5304 21 19V18" stroke="#083448" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M20 6.00011L23 9.00011M24.385 7.58511C24.7788 7.19126 25.0001 6.65709 25.0001 6.10011C25.0001 5.54312 24.7788 5.00895 24.385 4.61511C23.9912 4.22126 23.457 4 22.9 4C22.343 4 21.8088 4.22126 21.415 4.61511L13 13.0001V16.0001H16L24.385 7.58511Z" stroke="#083448" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg> -->
+
+<i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button class="delete">
+                <!-- <svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="33" height="25" rx="2" fill="#FFE5E5"/>
+<path d="M23.5 4.5H20L19 3.5H14L13 4.5H9.5V6.5H23.5M10.5 19.5C10.5 20.0304 10.7107 20.5391 11.0858 20.9142C11.4609 21.2893 11.9696 21.5 12.5 21.5H20.5C21.0304 21.5 21.5391 21.2893 21.9142 20.9142C22.2893 20.5391 22.5 20.0304 22.5 19.5V7.5H10.5V19.5Z" fill="#FF3D00"/>
+</svg> -->
+  <i class="fa-solid fa-trash"></i>
+
+            </button>
+        </td>
+</tr>
+}
+    </tbody>
+
+    <tfoot>
+        <tr class="sticky bottom-0
+        [&>*]:text-center
+        ">
+            <td></td>
+            <td >الاجمالي</td>
+            <td></td>
+            <td>28</td>
+            <td>28</td>
+            <td>28</td>
+            <td>28</td>
+            <td>28</td>
+            <td>280000</td>
+            <td ></td>
+           
+        </tr>
+    </tfoot>
+  </table>
+</div>
+
+<form class="my-[20px]">
+  <div class="input_group mb-5">
+    <label for="notes">ملاحظات</label>
+    <textarea id="notes" placeholder="المحتوي"></textarea>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-[24px]  pb-[20px]">
+    <div class="col-span-12 md:col-span-6 relative">
+        <label for="totalamount">المجموعة الضريبية علي الكمية</label>
+        <ng-select [items]="[]" [bindLabel]="'name'"  [bindValue]="''" [placeholder]="'المجموعة الضريبية علي الكمية'"  [searchable]="true" ></ng-select>
+    
+    </div>
+    <div class="col-span-12 md:col-span-6 relative">
+        <label for="totalamountandTax">اجمالي المبلغ</label>
+        <input type="text" id="totalamountandTax" placeholder="اجمالي المبلغ" value="12340000">
+    
+    </div>
+  
+  </div>
+</form>
+
+
+<footer class="flex items-center justify-end gap-3 p-2  rounded-lg">
+
+  <div class="flex items-center justify-center w-[214px] h-[38px] bg-[var(--color-border-input)] rounded-md text-sm font-medium">
+   <h5 class="text-[#106388] text-[14px] font-[700]">  مرات الطباعة : </h5>
+   <span> 2 </span>
+  </div>
+
+  <div class="flex items-center justify-center w-[214px] h-[38px] bg-[var(--color-border-input)] rounded-md text-sm font-medium">
+    <h5 class="text-[#106388] text-[14px] font-[700]">  مرات التعديل : </h5>
+   <span> 1 </span>
+  </div>
+
+</footer>
+
+

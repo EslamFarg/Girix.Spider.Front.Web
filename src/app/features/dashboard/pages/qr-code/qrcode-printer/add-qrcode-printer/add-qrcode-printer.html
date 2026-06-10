@@ -1,0 +1,176 @@
+<app-page-header
+  [titleHeader]="'طباعه الباركود '"
+  [explorerBtn]="explorerBtn"
+
+  (actionClicked)="handleAction($event)"
+></app-page-header>
+
+<form class="box_header mb-7">
+  <div class="title">طباعة الباركود و ال QR</div>
+
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] my-[20px]">
+
+  
+    <div class="col-span-12 md:col-span-6">
+          <div class="input_group w-[100%]">
+    <label>كود الصنف</label>
+    <div class="flex items-center gap-2 relative">
+      <div class="search_input relative w-[100%]">
+        <input type="text" class="text-[14px] w-[100%]"  placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/>
+        <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[10px]" >
+   
+            
+      
+
+          <button>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.4193 17.5001C6.04702 17.5001 2.5026 13.9557 2.5026 9.58341C2.5026 5.21116 6.04702 1.66675 10.4193 1.66675C14.7915 1.66675 18.3359 5.21116 18.3359 9.58341C18.3359 13.9557 14.7915 17.5001 10.4193 17.5001Z"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M1.66927 18.3334L3.33594 16.6667"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+  
+    </div>
+  </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-6">
+        <label for="reference">اسم الصنف </label>
+        <input type="text" placeholder="اسم الصنف " style="background-color: var(--color-readonly);" readonly id="reference">
+    </div>
+
+       <div class="col-span-12 md:col-span-6">
+                <label for="icondisplay" class="font-bold block mb-2"> تاريخ الأنتاج </label>
+                <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ الأنتاج'" [showIcon]="true" inputId="icondisplay" />
+            </div>
+       <div class="col-span-12 md:col-span-6">
+                <label for="icondisplay" class="font-bold block mb-2"> تاريخ الأنتهاء </label>
+                <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ الأنتهاء'" [showIcon]="true" inputId="icondisplay" />
+            </div>
+
+   
+
+        <div class="col-span-12">
+        <label for="reference">ملاحظات</label>
+        <textarea type="text" placeholder="المحتوي" style="height:124px !important;" id="reference"></textarea>
+    </div>
+
+  
+    <div class="col-span-12">
+       <button class="btn btn-primary block mr-auto">طباعه</button>
+    </div>
+
+
+    <div class="col-span-12 md:col-span-6">
+        <div class="container-qrcode bg-[var(--color-white)] h-[268px] rounded-md flex items-center justify-center">
+            <div class="img">
+                <svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M13.332 40H19.9987V120H13.332V40ZM26.6654 40H39.9987V120H26.6654V40ZM53.332 40H59.9987V120H53.332V40ZM66.6654 40H86.6654V120H66.6654V40ZM93.332 40H99.9987V120H93.332V40ZM113.332 40H119.999V120H113.332V40ZM126.665 40H133.332V120H126.665V40ZM139.999 40H146.665V120H139.999V40Z" fill="black"/>
+</svg>
+
+            </div>
+        </div>
+
+        <button class="btn btn-primary block mr-auto mt-5">طباعة</button>
+    </div>
+
+    
+    
+    <div class="col-span-12 md:col-span-6">
+        <div class="container-qrcode bg-[var(--color-white)] h-[268px] rounded-md flex items-center justify-center">
+            <div class="img">
+           <svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M100 140H86.6667V126.667H100V140ZM86.6667 93.3333H73.3333V126.667H86.6667V93.3333ZM140 80H126.667V106.667H140V80ZM126.667 66.6667H113.333V80H126.667V66.6667ZM46.6667 80H33.3333V93.3333H46.6667V80ZM33.3333 66.6667H20V80H33.3333V66.6667ZM80 33.3333H93.3333V20H80V33.3333ZM30 30V50H50V30H30ZM60 60H20V20H60V60ZM30 110V130H50V110H30ZM60 140H20V100H60V140ZM110 30V50H130V30H110ZM140 60H100V20H140V60ZM126.667 126.667V106.667H100V120H113.333V140H140V126.667H126.667ZM113.333 80H86.6667V93.3333H113.333V80ZM86.6667 66.6667H46.6667V80H60V93.3333H73.3333V80H86.6667V66.6667ZM93.3333 60V46.6667H80V33.3333H66.6667V60H93.3333ZM45 35H35V45H45V35ZM45 115H35V125H45V115ZM125 35H115V45H125V35Z" fill="black"/>
+</svg>
+
+</div>
+</div>
+
+        <button class="btn btn-primary block mr-auto mt-5">طباعة</button>
+    </div>
+    
+</div>
+ 
+    
+
+
+</form>
+
+
+
+
+
+
+<!-- !!!!! Popup Edit Returns -->
+
+
+  <div class="card flex justify-center accountExplorer">
+
+            <p-dialog class="p-dialog-purchase-Invoice" header="" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+              
+               <div class="table-responsive">
+                <table class="w-full">
+                    <thead class="bg-gray-100 ">
+      <tr class="sticky top-0">
+        <th class="p-2 text-center">م</th>
+        <th class="p-2 text-center">البيان</th>
+        <th class="p-2 text-center">مدين</th>
+        <th class="p-2 text-center">دائن</th>
+        <th class="p-2 text-center">الرصيد</th>
+        <th class="p-2 text-center">الادوات</th>
+
+      </tr>
+    </thead>
+    <tbody>
+        @for(item of accountExlorer;track $index){
+            
+            <tr >
+              <td class="p-2 text-center">{{ item.id }}</td>
+              <td class="p-2 text-center">{{ item.note }}</td>
+              <td class="p-2 text-center">{{ item.depit }}</td>
+              <td class="p-2 text-center">{{ item.credit }}</td>
+              <td class="p-2 text-center">{{ item.total }} </td>
+              <td class="p-2 text-center " style="height:100%;" >
+    <svg width="33" height="25" viewBox="0 0 33 25" fill="none" style="margin: auto;"  (click)="showDialog()" xmlns="http://www.w3.org/2000/svg">
+<rect width="33" height="25" rx="2" fill="#FFF2E8"/>
+<g clip-path="url(#clip0_6_6556)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M16.3304 17.0571C19.4999 17.0571 22.3694 15.2893 23.9109 12.5C22.3694 9.71071 19.4999 7.94286 16.3304 7.94286C13.1608 7.94286 10.2914 9.71071 8.74979 12.5C10.2914 15.2893 13.1608 17.0571 16.3304 17.0571ZM16.3304 7C20.1081 7 23.3798 9.23771 24.9732 12.5C23.3798 15.7623 20.1081 18 16.3304 18C12.5526 18 9.28093 15.7623 7.6875 12.5C9.28093 9.23771 12.5526 7 16.3304 7ZM16.3304 14.7C16.9138 14.7 17.4734 14.4682 17.886 14.0556C18.2986 13.6431 18.5304 13.0835 18.5304 12.5C18.5304 11.9165 18.2986 11.3569 17.886 10.9444C17.4734 10.5318 16.9138 10.3 16.3304 10.3C15.7469 10.3 15.1873 10.5318 14.7747 10.9444C14.3621 11.3569 14.1304 11.9165 14.1304 12.5C14.1304 13.0835 14.3621 13.6431 14.7747 14.0556C15.1873 14.4682 15.7469 14.7 16.3304 14.7ZM16.3304 15.6429C15.4968 15.6429 14.6974 15.3117 14.108 14.7223C13.5186 14.1329 13.1875 13.3335 13.1875 12.5C13.1875 11.6665 13.5186 10.8671 14.108 10.2777C14.6974 9.68826 15.4968 9.35714 16.3304 9.35714C17.1639 9.35714 17.9633 9.68826 18.5527 10.2777C19.1421 10.8671 19.4732 11.6665 19.4732 12.5C19.4732 13.3335 19.1421 14.1329 18.5527 14.7223C17.9633 15.3117 17.1639 15.6429 16.3304 15.6429Z" fill="#1E1E1E"/>
+</g>
+<defs>
+<clipPath id="clip0_6_6556">
+<rect width="17" height="17" fill="white" transform="translate(8 4)"/>
+</clipPath>
+</defs>
+</svg>
+
+  </td>
+            </tr>
+        }
+</tbody>
+                </table>
+
+               </div>
+                
+            </p-dialog>
+        </div>

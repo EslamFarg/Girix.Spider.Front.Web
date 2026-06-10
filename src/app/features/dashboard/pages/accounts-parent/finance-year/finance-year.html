@@ -1,0 +1,52 @@
+<div class="mt-6">
+    <h2 class="text-[var(--color-primary)] text-[20px] font-[700] mb-9">فتح / إغلاق سنة مالية</h2>
+
+
+    
+<form class="box_header mb-7">
+  <div class="title">بيانات السنه الماليه</div>
+
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] my-[10px]">
+
+
+ 
+        <div class="col-span-12 md:col-span-6">
+            <label for="startDate" >تاريخ البداية</label>
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'من تاريخ'" [showIcon]="true" inputId="startDate" />
+            <!-- <input type="text" id="document" placeholder="تاريخ الاستحقاق" placeholder="0.00"> -->
+        </div>
+        <div class="col-span-12 md:col-span-6">
+            <label for="endDate" >تارخ النهاية</label>
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'الي تاريخ'" [showIcon]="true" inputId="endDate" />
+            <!-- <input type="text" id="document" placeholder="تاريخ الاصدار " placeholder="0.00"> -->
+        </div>
+        <div class="col-span-12 md:col-span-12">
+            <label for="createDate" >تاريخ بداية فتح السنة</label>
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="createDate" />
+            <!-- <input type="text" id="document" placeholder="تاريخ الاصدار " placeholder="0.00"> -->
+        </div>
+
+         
+
+        <div class="col-span-12 flex items-center gap-2">
+            <input type="checkbox" id="getAmount">
+            <label for="getAmount" style="margin-bottom:0px !important;">جلب الرصيد السابق</label>
+    </div>
+
+  
+
+  </div>
+
+
+ 
+
+
+</form> <div class="flex items-center justify-end gap-5">
+    <button class="btn btn-primary" style="padding: 0px 32px;"> إغلاق وفتح سنة مالية</button>
+    <button class="btn" style="padding: 0px 32px;">فتح سنة مالية بدون إغلاق</button>
+
+  </div>
+
+</div>

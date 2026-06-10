@@ -1,0 +1,45 @@
+{
+  "name": "spider2026",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "packageManager": "npm@10.9.2",
+  "dependencies": {
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.0",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/router": "^21.2.0",
+    "@fortawesome/fontawesome-free": "^7.2.0",
+    "@intl-tel-input/angular": "^28.0.4",
+    "@ng-select/ng-select": "^21.7.0",
+    "@primeuix/themes": "^2.0.3",
+    "@tailwindcss/cli": "^4.2.2",
+    "html2pdf": "^0.0.11",
+    "html2pdf.js": "^0.14.0",
+    "intl-tel-input": "^28.0.4",
+    "jspdf": "^4.2.1",
+    "libphonenumber-js": "^1.12.42",
+    "primeng": "^21.1.4",
+    "rxjs": "~7.8.0",
+    "tailwindcss": "^4.2.2",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.2.5",
+    "@angular/cli": "^21.2.5",
+    "@angular/compiler-cli": "^21.2.0",
+    "@tailwindcss/postcss": "^4.2.2",
+    "jsdom": "^28.0.0",
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
+  }
+}

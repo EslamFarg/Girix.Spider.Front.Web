@@ -1,0 +1,152 @@
+<div class="flex justify-between flex-wrap mb-[25px] sticky top-[60px] pt-[10px] mt-[10px] bg-[var(--color-bg)] z-1">
+    <div>
+        
+        <h2 class="text-[var(--color-primary)] text-[20px] font-[700]">المستخدمين والصلاحيات</h2>
+      <div class="flex items-center flex-wrap gap-5 my-4
+      [&>*]:w-[104px]  [&>*]:h-[32px]  
+      ">
+          <button class="btn btn-primary">حفظ</button>
+          <button class="btn">جديد</button>
+          <button class="btn">حذف</button>
+          <button class="btn">طباعه</button>
+     
+        </div>
+    </div>
+
+   <div class="explorer_button">
+    <button [routerLink]="'/users-and-permissions/users/explorer'"  class="btn btn-primary" style="width:245px !important;"> مستكشف المستخدمين  </button>
+
+   </div>
+    
+</div>
+
+
+<form class="box_header mb-7">
+  <div class="title"> بيانات المستخدمين </div>
+  <div class="input_group">
+    <div class="icons flex items-center justify-end [&>*]:w-[30px]  [&>*]:h-[30px] 
+        gap-3
+        [&>*]:bg-[var(--color-bg-icon)] 
+        [&>*]:flex 
+        [&>*]:items-center 
+        [&>*]:justify-center
+        [&>*]:rounded-md
+        text-[#137AA8]
+        [&>*]:cursor-pointer
+        ">
+     
+        <div class="icon-eye">
+            <i class="fa-regular fa-eye"></i>
+        </div>
+
+        <div class="icon-download">
+            <i class="fa-solid fa-download"></i>
+        </div>
+
+    </div>
+  
+
+
+
+  </div>
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] mb-[20px] mt-[5px]">
+
+
+
+    <div class="col-span-12 md:col-span-3">
+        <label for="username">اسم المستخدم</label>
+        <input type="text" placeholder="اسم المتسخدم" id="username">
+    </div>
+    <div class="col-span-12 md:col-span-3">
+        <label for="password">كلمه المرور</label>
+        <input type="password" placeholder="كلمه المرور" id="password">
+    </div>
+    <div class="col-span-12 md:col-span-3">
+        <label for="branch">الفرع</label>
+        <input type="text"  placeholder="الفرع" id="branch" style="background:var(--color-secondary);">
+    </div>
+   
+         <div class="col-span-12 md:col-span-3">
+          <label for="group" >المجموعة
+          </label>
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'المجموعة'"></ng-select>
+      </div>
+         <div class="col-span-12 md:col-span-3">
+          <label for="group" >الصندوق النقدي الافتراضي
+          </label>
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'الصندوق النقدي الافتراضي'"></ng-select>
+      </div>
+         <div class="col-span-12 md:col-span-3">
+          <label for="group" >الحساب البنكي الافتراضي
+          </label>
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'الحساب البنكي الافتراضي'"></ng-select>
+      </div>
+         <div class="col-span-12 md:col-span-3">
+          <label for="group" >المخزن الافتراضي
+          </label>
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'المخزن الافتراضي'"></ng-select>
+      </div>
+         <div class="col-span-12 md:col-span-3">
+          <label for="group" >صندوق المشتريات الافتراضيه
+          </label>
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'صندوق المشتريات الافتراضيه'"></ng-select>
+      </div>
+         <div class="col-span-12 md:col-span-3">
+          <label for="group" >مخزن المشتريات الافتراضيه
+          </label>
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن المشتريات الافتراضيه'"></ng-select>
+      </div>
+         <div class="col-span-12 md:col-span-3">
+          <label for="group" >مخزن الحجز الافتراضيه
+          </label>
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن الحجز الافتراضيه'"></ng-select>
+      </div>
+       
+         <div class="col-span-12 md:col-span-3">
+          <label for="group" >حساب العميل الافتراضيه
+          </label>
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'حساب العميل الافتراضيه'"></ng-select>
+      </div>
+         <div class="col-span-12 md:col-span-3">
+          <label for="group" >حاله المستخدم
+          </label>
+         <ng-select [items]="[{id:1,name:'نشط'},{id:2,name:'غير نشط'},]" [bindLabel]="''" [bindValue]="''" [placeholder]="'حاله المستخدم'"></ng-select>
+      </div>
+
+         <div class="col-span-12">
+        <label for="reference">ملاحظات</label>
+        <textarea type="text" placeholder="ملاحظات" id="reference"></textarea>
+    </div>
+
+
+    <div class="col-span-12">
+        <h2 class="text-[20px] font-[700] text-[var(--color-btn)]">Electronic Invoice</h2>
+        <h2 class="text-[14px] font-[700] text-[var(--color-btn)] my-3">ارسال الفاتورة الالكترونية</h2>
+        <div class="flex items-center gap-[10px]">
+            <input type="checkbox" name="now" id="now">
+            <label for="now" style="margin-bottom: 0px !important; color: var(--color-btn);">في الحال</label>
+
+
+        </div>
+        
+    </div>
+       
+    
+
+     
+
+  
+
+  </div>
+
+
+</form>
+
+
+
+
+
+
+

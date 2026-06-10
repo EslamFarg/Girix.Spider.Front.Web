@@ -1,0 +1,56 @@
+.node {
+  position: relative;
+//   background-color: red;
+  
+}
+
+
+// .tree {
+//     > .node{
+//         background-color: red;
+//     }
+// }
+
+
+.root-node {
+  background: #E5E5EA80;
+}
+
+.node.leaf-node {
+    // background-color: red;
+    height: 40px;
+    border: 1px solid var(--color-border-input);
+    padding: 8px;
+    h2{
+        font-size: 16px !important;
+        font-weight: 300 !important;
+    }
+    }
+
+
+
+.children.has-leaf {
+  .tree {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 20px;
+  }
+
+
+}
+
+
+.children{
+    margin-right: 30px;
+    position: relative;
+      &::after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    right: -16px;
+    width: 4px;
+    height: 100%;
+    // background-color: var(--color-border-input);
+   background-color: #EAEAEA;
+  }
+}

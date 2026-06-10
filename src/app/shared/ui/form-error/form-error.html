@@ -1,0 +1,8 @@
+@let ctrl = control();
+@if(ctrl?.invalid && ctrl?.touched){
+    @if(control()?.hasError(errorKey())){
+        <small class="text-red-500 font-bold mx-3 mt-2 block text-xs mt-1" >
+            {{message()}}
+        </small>
+    }
+}

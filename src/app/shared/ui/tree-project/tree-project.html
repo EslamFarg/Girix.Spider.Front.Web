@@ -1,0 +1,36 @@
+<div class="container-tree " >
+
+@for(parent of tree(); track $index) {
+
+    <div class="parent flex items-center gap-2 my-4" (click)="parent.expanded=!parent.expanded"
+    [class.root]="level() === 0"
+    [class.leaf]="parent.isLeaf"
+    >
+        <div class="icon text-[18px] bg-[var(--color-primary)] w-[26px] h-[25px] rounded-full text-[var(--color-bg)] flex items-center justify-center">
+               <div class="margin-right: -1px;" >
+                 {{parent.expanded && parent.children?.length > 0 ? "-" : "+"}}
+               </div>                
+        </div>
+        <div class="heading flex items-center justify-between w-[100%]">
+           <h2 class="title text-[14px] font-[700] text-[var(--color-primary)]">
+          {{parent.label}}
+        </h2> 
+
+          @if(parent.isLeaf){
+            <div class="flex items-center gap-[10px]">
+                <button class="w-[25px] h-[19px] bg-[#E8EFF4]  text-[#1B6392] flex items-center justify-center rounded-[2px]"><i class="fa-solid fa-pen-to-square"></i></button>
+                 <button class="w-[25px] h-[19px] bg-[#FFE5E5] text-[#FF3D00] flex items-center justify-center"><i class="fa-solid fa-trash"></i></button>
+            </div>
+
+          }
+        </div>
+    </div>
+
+     @if (parent.expanded && parent.children?.length) {
+      <div class="children pl-6">
+        <app-tree-project [tree]="parent.children" [level]="level() + 1"></app-tree-project>
+      </div>
+    }
+}
+    <!-- <app-tree-node [node]="tree" [level]="0"></app-tree-node> -->
+</div>

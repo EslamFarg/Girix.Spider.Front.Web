@@ -1,0 +1,14 @@
+:host ::ng-deep .p-autocomplete {
+  width: 100%;
+}
+
+:host ::ng-deep .p-inputtext {
+  width: 100%;
+}
+:host ::ng-deep .iti__dropdown-content{
+    min-height: 183px !important;
+    height: 183px !important;
+}
+:host ::ng-deep .iti--allow-dropdown{
+    width: 100% !important;
+}

@@ -1,0 +1,155 @@
+<div class="flex items-center justify-between my-5">
+      <div>
+    <h2 class="text-[var(--color-primary)] sm:text-[14px] md:text-[20px] font-[700]">صرف الرواتب</h2>
+  </div>
+  <div class="flex items-center gap-3">
+      <div class="icon_search cursor-pointer" (click)="showDialog()">
+      <svg
+        width="40"
+        height="37"
+        viewBox="0 0 40 37"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect
+          width="40"
+          height="37.0006"
+          rx="8"
+          fill="white"
+          style="fill: white !important; stroke: none !important"
+        />
+        <path
+          style="fill: #1791c8 !important; stroke: none !important"
+          d="M11.813 8H22.187C22.886 8 23.465 8 23.9135 8.042C24.359 8.084 24.83 8.177 25.2005 8.483C25.7075 8.8985 25.9955 9.5225 26 10.1765C26.003 10.6505 25.79 11.0765 25.5485 11.4635C25.304 11.8535 24.9485 12.323 24.5135 12.8945L20.6285 18.0155C20.2595 18.5015 20.138 18.6665 20.054 18.842C19.9715 19.0132 19.911 19.1941 19.874 19.3805C19.835 19.5755 19.832 19.7855 19.832 20.4035V26.7575C19.832 27.08 19.832 27.3695 19.8125 27.602C19.7915 27.8315 19.7435 28.1405 19.547 28.4075C19.4228 28.5786 19.2625 28.7202 19.0774 28.8223C18.8923 28.9245 18.687 28.9846 18.476 28.9985C18.1355 29.0195 17.8475 28.883 17.648 28.7705C17.4485 28.658 17.213 28.496 16.9565 28.319L15.4805 27.299L15.4175 27.2555C15.1175 27.05 14.8475 26.8655 14.6465 26.6105C14.4703 26.3874 14.338 26.1329 14.2565 25.8605C14.1665 25.5485 14.1665 25.22 14.1665 24.8465V20.405C14.1665 19.787 14.165 19.5755 14.126 19.382C14.089 19.1956 14.0285 19.0147 13.946 18.8435C13.862 18.668 13.7405 18.503 13.3715 18.017L9.53453 12.962L9.52553 12.947L9.48503 12.896C9.12063 12.4337 8.77582 11.9563 8.45153 11.465C8.21003 11.0795 7.99703 10.652 8.00003 10.178C8.00303 9.524 8.29253 8.9 8.79953 8.483C9.17003 8.1785 9.63953 8.0855 10.0865 8.0435C10.535 8 11.114 8 11.813 8ZM11.6375 13.25L14.5655 17.108L14.6075 17.1635C14.9195 17.5745 15.1385 17.861 15.296 18.1865C15.436 18.4745 15.537 18.7765 15.599 19.0925C15.668 19.4465 15.668 19.811 15.668 20.3345V24.7685C15.668 25.2635 15.674 25.361 15.698 25.4375C15.724 25.5275 15.765 25.6075 15.821 25.6775C15.866 25.7345 15.9335 25.79 16.3325 26.066L17.7815 27.065C18.032 27.2375 18.197 27.35 18.3215 27.4265C18.332 27.272 18.332 27.0575 18.332 26.726V20.3345C18.332 19.8095 18.332 19.4465 18.401 19.0925C18.464 18.7765 18.565 18.4745 18.704 18.1865C18.8615 17.861 19.0805 17.5745 19.394 17.162L19.4345 17.108L22.3625 13.25H11.6375ZM23.4995 11.75C23.8535 11.2835 24.104 10.943 24.2765 10.6685C24.4865 10.3325 24.5015 10.211 24.5 10.184C24.5004 10.0805 24.4781 9.97826 24.4345 9.88442C24.391 9.79058 24.3273 9.70747 24.248 9.641C24.2405 9.635 24.155 9.572 23.774 9.536C23.4035 9.5 22.895 9.5 22.148 9.5H11.852C11.1035 9.5 10.5965 9.5 10.226 9.536C9.84503 9.572 9.75953 9.635 9.75203 9.641C9.67276 9.70747 9.60909 9.79058 9.56553 9.88442C9.52198 9.97826 9.49962 10.0805 9.50003 10.184C9.50003 10.211 9.51353 10.334 9.72353 10.6685C9.89603 10.943 10.1465 11.2835 10.5005 11.75H23.4995ZM26 16.25C26 16.0511 26.079 15.8603 26.2197 15.7197C26.3603 15.579 26.5511 15.5 26.75 15.5H31.25C31.4489 15.5 31.6397 15.579 31.7803 15.7197C31.921 15.8603 32 16.0511 32 16.25C32 16.4489 31.921 16.6397 31.7803 16.7803C31.6397 16.921 31.4489 17 31.25 17H26.75C26.5511 17 26.3603 16.921 26.2197 16.7803C26.079 16.6397 26 16.4489 26 16.25ZM23.75 20C23.75 19.8011 23.829 19.6103 23.9697 19.4697C24.1103 19.329 24.3011 19.25 24.5 19.25H31.25C31.4489 19.25 31.6397 19.329 31.7803 19.4697C31.921 19.6103 32 19.8011 32 20C32 20.1989 31.921 20.3897 31.7803 20.5303C31.6397 20.671 31.4489 20.75 31.25 20.75H24.5C24.3011 20.75 24.1103 20.671 23.9697 20.5303C23.829 20.3897 23.75 20.1989 23.75 20ZM23 23.75C23 23.5511 23.079 23.3603 23.2197 23.2196C23.3603 23.079 23.5511 23 23.75 23H31.25C31.4489 23 31.6397 23.079 31.7803 23.2196C31.921 23.3603 32 23.5511 32 23.75C32 23.9489 31.921 24.1397 31.7803 24.2803C31.6397 24.421 31.4489 24.5 31.25 24.5H23.75C23.5511 24.5 23.3603 24.421 23.2197 24.2803C23.079 24.1397 23 23.9489 23 23.75ZM23 27.5C23 27.3011 23.079 27.1103 23.2197 26.9696C23.3603 26.829 23.5511 26.75 23.75 26.75H27.5C27.6989 26.75 27.8897 26.829 28.0303 26.9696C28.171 27.1103 28.25 27.3011 28.25 27.5C28.25 27.6989 28.171 27.8897 28.0303 28.0303C27.8897 28.171 27.6989 28.25 27.5 28.25H23.75C23.5511 28.25 23.3603 28.171 23.2197 28.0303C23.079 27.8897 23 27.6989 23 27.5Z"
+          fill="#1791C8"
+        />
+      </svg>
+    </div>
+    <button class="btn btn-primary">صرف</button>
+  </div>
+</div>
+
+<form class="grid grid-cols-1 md:grid-cols-12 gap-4 my-5 mb-[30px] ">
+    <div class="col-span-6">
+        <label for="">اسم القسم </label>
+        <ng-select [items]="[]" [bindLabel]="'name'" [bindValue]="'name'" [placeholder]="'اسم القسم'"></ng-select>
+
+    </div>
+    <div class="col-span-6">
+        <label for="">اسم الموظف </label>
+        <div class="flex items-center gap-5">
+            <ng-select class="flex-1" [items]="[]" [bindLabel]="'name'" [bindValue]="'name'" [placeholder]="'اسم الموظف'"></ng-select>
+            <button class="btn btn-primary">أضافة</button>
+        </div>
+
+    </div>
+
+
+</form>
+
+<div class="table-responsive table_explorer">
+  <table class="w-full ">
+    <thead class="bg-gray-100 ">
+      <tr class="sticky top-0 z-[10]">
+        <th class="p-2 text-center">م</th>
+        <th class="p-2 text-center">الرقم الوظيفي</th>
+        <th class="p-2 text-center">اسم الموظف</th>
+        <th class="p-2 text-center">الراتب الاساسي </th>
+        <th class="p-2 text-center">البدلات</th>
+        <th class="p-2 text-center">راتب البدلات</th>
+        <th class="p-2 text-center">التاخيرات</th>
+        <th class="p-2 text-center">الغياب</th>
+        <th class="p-2 text-center">الوقت الاضافي</th>
+        <th class="p-2 text-center">الاجازات</th>
+        <th class="p-2 text-center">البونص</th>
+        <th class="p-2 text-center">مكافاءات</th>
+        <th class="p-2 text-center">صافي المكافاءات</th>
+        <th class="p-2 text-center">جزاءات</th>
+        <th class="p-2 text-center">صافي الجزاءات</th>
+        <th class="p-2 text-center">السلفيات</th>
+        <th class="p-2 text-center">صافي الراتب</th>
+        <th class=""> 
+             
+       
+            <p-toggleswitch [(ngModel)]="checked" style="--p-toggleswitch-checked-background:var(--color-btn);
+            --p-toggleswitch-hover-background:var(--color-btn);
+          --p-toggleswitch-handle-color:red;
+            " />
+        
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+  
+
+@for(item of itemsTable;track $index){
+
+    <tr >
+<td class="p-2 text-center">{{ $index + 1 }}</td>
+<td class="p-2 text-center">9876543</td>
+<td class="p-2 text-center">محمد</td>
+<td class="p-2 text-center">30000</td>
+<td class="p-2 text-center">3</td>
+<td class="p-2 text-center">800.0</td>
+<td class="p-2 text-center">4ساعات</td>
+<td class="p-2 text-center">1</td>
+<td class="p-2 text-center">5ساعات</td>
+<td class="p-2 text-center">1</td>
+<td class="p-2 text-center">5ساعات</td>
+<td class="p-2 text-center">2</td>
+<td class="p-2 text-center">500+</td>
+<td class="p-2 text-center">3</td>
+<td class="p-2 text-center">200.00</td>
+<td class="p-2 text-center">4</td>
+<td class="p-2 text-center">1000</td>
+
+       <td class="p-2 w-full flex items-center justify-center gap-2">
+       <input type="checkbox" checked disabled>
+        </td>
+</tr>
+}@empty{
+    <tr class="h-[420px]">
+      <td colspan="7">
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+          
+          <!-- SVG -->
+          <div class="mb-4 opacity-70">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+              <path d="M3 7h18M5 7v13h14V7M9 3h6v4H9V3z" stroke="#9CA3AF" stroke-width="1.5"/>
+            </svg>
+          </div>
+
+          <!-- Title -->
+          <h3 class="text-lg font-bold text-gray-700 mb-2">
+            لا توجد بيانات
+          </h3>
+
+          <!-- Description -->
+          <p class="text-sm text-gray-500 mb-4">
+            لم يتم العثور على أي نتائج، يمكنك إضافة بيانات جديدة أو تعديل الفلاتر
+          </p>
+
+          <!-- Actions -->
+          <!-- <div class="flex gap-3">
+            <button class="px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-sm">
+              إضافة جديد
+            </button> -->
+
+            <!-- <button class="px-4 py-2 rounded-lg border text-sm text-gray-600">
+              إعادة تعيين الفلاتر
+            </button> -->
+          <!-- </div> -->
+
+        </div>
+      </td>
+    </tr>
+
+}
+    </tbody>
+
+  </table>
+</div>
+
+   <div class="card flex justify-center mt-4">
+            <p-paginator (onPageChange)="onPageChange($event)" [showFirstLastIcon]="false" [first]="first" [rows]="rows" [totalRecords]="120" [rowsPerPageOptions]="[10, 25, 50,100,250]" />
+      </div>

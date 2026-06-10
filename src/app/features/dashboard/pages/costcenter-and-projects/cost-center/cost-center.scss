@@ -1,0 +1,7 @@
+.tree{
+    max-height: 460px;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+        width: 0px;
+    }
+}

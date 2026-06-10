@@ -1,0 +1,14 @@
+.body_content{
+    @media (max-width:992px) {
+
+        width: 100%;
+    }
+}
+
+aside{
+    &::-webkit-scrollbar{
+        width: 0px !important;
+    }
+}
+
+

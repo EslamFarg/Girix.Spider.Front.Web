@@ -1,0 +1,277 @@
+<app-page-header
+  [titleHeader]="' مرتجع متعدد'"
+  [explorerBtn]="explorerBtn"
+  [actions]="actions"
+  (actionClicked)="handleAction($event)"
+></app-page-header>
+
+<form class="box_header">
+  <div class="title">بيانات الفاتوره</div>
+  <div class="input_group">
+    <label>بحث برقم المرتجع</label>
+    <div class="flex items-center gap-2 relative">
+      <!-- الفلتر هنا 
+      بحث برقم الفاتوره 
+      ورقم المرتجع 
+      
+      -->
+        <div class="prev">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M15.164 11.6835C15.2371 11.7729 15.2771 11.8848 15.2771 12.0003C15.2771 12.1158 15.2371 12.2277 15.164 12.317L9.67196 19.03C9.26946 19.522 9.11696 20.183 9.40596 20.7485C9.60696 21.141 9.89946 21.5985 10.308 21.999C10.723 22.4055 11.1965 22.694 11.601 22.891C12.17 23.1685 12.829 23.0135 13.3075 22.5985C16.675 19.6765 20.2765 15.7375 21.821 13.1855C22.261 12.4585 22.212 11.564 21.748 10.8525C20.084 8.30254 16.6615 4.33904 13.306 1.40254C12.8295 0.98554 12.1705 0.83054 11.601 1.10754C11.196 1.30504 10.722 1.59404 10.308 2.00004C9.89896 2.40004 9.60696 2.85804 9.40596 3.25054C9.11696 3.81654 9.26996 4.47754 9.67196 4.96904L15.164 11.6835ZM7.37696 2.47154C7.33046 1.55804 6.75796 0.84204 5.84546 0.78054C5.51538 0.759445 5.18471 0.749273 4.85396 0.75004C4.46896 0.75004 4.14096 0.76204 3.86246 0.78054C2.94996 0.84204 2.37746 1.55804 2.33096 2.47154C2.25746 3.91054 2.17546 6.70504 2.17546 12C2.17546 17.295 2.25746 20.089 2.33046 21.5285C2.37746 22.442 2.94996 23.158 3.86246 23.2195C4.14146 23.238 4.46946 23.25 4.85396 23.25C5.23846 23.25 5.56646 23.238 5.84546 23.2195C6.75796 23.158 7.33046 22.442 7.37696 21.5285C7.45046 20.089 7.53246 17.295 7.53246 12C7.53246 6.70504 7.45046 3.91054 7.37746 2.47154" fill="#1791C8"/>
+</svg>
+
+        </div>
+      <div class="search_input relative ">
+        <input type="text" class="text-[14px]" style="color:var(--color-black); font-weight:600;" placeholder="بحث برقم المرتجع "/>
+        <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[10px]" >
+          
+
+          <button>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.4193 17.5001C6.04702 17.5001 2.5026 13.9557 2.5026 9.58341C2.5026 5.21116 6.04702 1.66675 10.4193 1.66675C14.7915 1.66675 18.3359 5.21116 18.3359 9.58341C18.3359 13.9557 14.7915 17.5001 10.4193 17.5001Z"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M1.66927 18.3334L3.33594 16.6667"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="next">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M8.83604 11.6835C8.76288 11.7729 8.72291 11.8848 8.72291 12.0003C8.72291 12.1158 8.76288 12.2277 8.83604 12.317L14.328 19.03C14.7305 19.522 14.883 20.183 14.594 20.7485C14.393 21.141 14.1005 21.5985 13.692 21.999C13.277 22.4055 12.8035 22.694 12.399 22.891C11.83 23.1685 11.171 23.0135 10.6925 22.5985C7.32504 19.6765 3.72354 15.7375 2.17904 13.1855C1.73904 12.4585 1.78804 11.564 2.25204 10.8525C3.91604 8.30254 7.33854 4.33904 10.694 1.40254C11.1705 0.98554 11.8295 0.83054 12.399 1.10754C12.804 1.30504 13.278 1.59404 13.692 2.00004C14.101 2.40004 14.393 2.85804 14.594 3.25054C14.883 3.81654 14.73 4.47754 14.328 4.96904L8.83604 11.6835ZM16.623 2.47154C16.6695 1.55804 17.242 0.84204 18.1545 0.78054C18.4846 0.759445 18.8153 0.749273 19.146 0.75004C19.531 0.75004 19.859 0.76204 20.1375 0.78054C21.05 0.84204 21.6225 1.55804 21.669 2.47154C21.7425 3.91054 21.8245 6.70504 21.8245 12C21.8245 17.295 21.7425 20.089 21.6695 21.5285C21.6225 22.442 21.05 23.158 20.1375 23.2195C19.8585 23.238 19.5305 23.25 19.146 23.25C18.7615 23.25 18.4335 23.238 18.1545 23.2195C17.242 23.158 16.6695 22.442 16.623 21.5285C16.5495 20.089 16.4675 17.295 16.4675 12C16.4675 6.70504 16.5495 3.91054 16.6225 2.47154" fill="#1791C8"/>
+</svg>
+
+      </div>
+    </div>
+  </div>
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] my-[20px] readonly_data">
+    <div class="col-span-12 md:col-span-4">
+        <label for="document" >رقم الفاتورة : </label>
+        <input type="text" id="document" placeholder="رقم الفاتورة"  >
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="reference">تاريخ الفاتورة : </label>
+        <input type="text" placeholder="تاريخ الفاتورة" id="reference"  >
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="reference">المخزن : </label>
+        <input type="text" placeholder="المخزن" style="padding-right:55px;" id="reference"  >
+    </div>
+    <div class="col-span-12 md:col-span-3">
+        <label for="reference">طريقة الدفع : </label>
+        <input type="text" placeholder="طريقة الدفع"  id="reference"  >
+    </div>
+    <div class="col-span-12 md:col-span-3">
+        <label for="reference">اجمالي الكمية : </label>
+        <input type="text" placeholder="اجمالي الكمية" style="padding-right:100px" id="reference"  >
+    </div>
+    <div class="col-span-12 md:col-span-3">
+        <label for="reference">اجمالي المبلغ : </label>
+        <input type="text" placeholder="اجمالي المبلغ" style="padding-right:95px;" id="reference"  >
+    </div>
+    <div class="col-span-12 md:col-span-3">
+        <label for="reference">نوع الضريبه : </label>
+        <input type="text" placeholder="نوع الضريبه" id="reference" style="padding-right:85px;" >
+    </div>
+   
+
+
+     <div class="col-span-12 md:col-span-4">
+                <label for="icondisplay" class="font-bold block mb-2 exipition_label"> التاريخ </label>
+                <p-datepicker  [iconDisplay]="'input'" [placeholder]="'التاريخ'"  [showIcon]="true" inputId="icondisplay" />
+            </div>
+     <div class="col-span-12 md:col-span-4"> 
+                <label for="invoiceNumber"  class="font-bold block mb-2 exipition_label"> رقم الفاتورة </label>
+                <input type="text" placeholder="رقم الفاتورة" class="exipition_input" id="invoiceNumber">
+            </div>
+     <div class="col-span-12 md:col-span-4"> 
+                <label for="voucherNumber"  class="font-bold block mb-2 exipition_label"> رقم السند </label>
+                <input type="text" placeholder="رقم السند" class="exipition_input" id="voucherNumber">
+            </div>
+
+  </div>
+
+
+</form>
+<form class="box_header my-[25px] relative " style="padding-top: 10px ;">
+  <div class="title">بيانات العميل</div>
+
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] my-[20px] ">
+  
+    <div class="col-span-6 md:col-span-4">
+        <label for="phonenumber" >اسم العميل   </label>
+        <!-- <input type="text" placeholder="اسم المورد" id="phonenumber"> -->
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'اسم العميل'"></ng-select>
+    </div>
+    <div class="col-span-6 md:col-span-4">
+        <label for="phonenumber" >رقم الجوال   </label>
+        <input type="text" placeholder="رقم الجوال" id="phonenumber">
+    </div>
+    <div class="col-span-6 md:col-span-4">
+        <label for="addressNumber" >عنوان العميل</label>
+        <input type="text" placeholder="عنوان العميل" id="addressNumber">
+    </div>
+   
+   
+
+
+
+
+
+
+  </div>
+
+
+</form>
+
+<div class="grid grid-cols-1 md:grid-cols-12 gap-[24px] mb-[10px]">
+    <div class="col-span-12 relative">
+        <label for="">رقم الفاتورة</label>
+        <input type="text" style="padding-left:97px;" placeholder="رقم الفاتورة">
+        <div class="absolute top-[45%] left-0">
+
+              <button class="btn btn-primary" style="height: 37px; width:110px; border-radius:8px 0px 0px 8px">إضافة</button>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+  <table class="w-full ">
+    <thead class="bg-gray-100 ">
+      <tr class="sticky top-0">
+        <th class="p-2 text-center">م</th>
+        <th class="p-2 text-center">رقم الفاتوره</th>
+        <th class="p-2 text-center">الاصناف المرتجعه</th>
+        <th class="p-2 text-center">المبلغ المرتجع</th>
+        <th class="p-2 text-center">الادوات</th>
+
+      </tr>
+    </thead>
+    <tbody>
+@for(item of returnsData;track $index){
+
+    <tr >
+  <td class="p-2 text-center">{{ item.id }}</td>
+  <td class="p-2 text-center">{{ item.invoiceNumber }}</td>
+  <td class="p-2 text-center">{{ item.items }}</td>
+  <td class="p-2 text-center">{{ item.amount }}</td>
+
+  <td class="p-2 text-center flex items-center justify-center" >
+    <svg width="33" height="25" viewBox="0 0 33 25" fill="none" (click)="showDialog()" xmlns="http://www.w3.org/2000/svg">
+<rect width="33" height="25" rx="2" fill="#FFF2E8"/>
+<g clip-path="url(#clip0_6_6556)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M16.3304 17.0571C19.4999 17.0571 22.3694 15.2893 23.9109 12.5C22.3694 9.71071 19.4999 7.94286 16.3304 7.94286C13.1608 7.94286 10.2914 9.71071 8.74979 12.5C10.2914 15.2893 13.1608 17.0571 16.3304 17.0571ZM16.3304 7C20.1081 7 23.3798 9.23771 24.9732 12.5C23.3798 15.7623 20.1081 18 16.3304 18C12.5526 18 9.28093 15.7623 7.6875 12.5C9.28093 9.23771 12.5526 7 16.3304 7ZM16.3304 14.7C16.9138 14.7 17.4734 14.4682 17.886 14.0556C18.2986 13.6431 18.5304 13.0835 18.5304 12.5C18.5304 11.9165 18.2986 11.3569 17.886 10.9444C17.4734 10.5318 16.9138 10.3 16.3304 10.3C15.7469 10.3 15.1873 10.5318 14.7747 10.9444C14.3621 11.3569 14.1304 11.9165 14.1304 12.5C14.1304 13.0835 14.3621 13.6431 14.7747 14.0556C15.1873 14.4682 15.7469 14.7 16.3304 14.7ZM16.3304 15.6429C15.4968 15.6429 14.6974 15.3117 14.108 14.7223C13.5186 14.1329 13.1875 13.3335 13.1875 12.5C13.1875 11.6665 13.5186 10.8671 14.108 10.2777C14.6974 9.68826 15.4968 9.35714 16.3304 9.35714C17.1639 9.35714 17.9633 9.68826 18.5527 10.2777C19.1421 10.8671 19.4732 11.6665 19.4732 12.5C19.4732 13.3335 19.1421 14.1329 18.5527 14.7223C17.9633 15.3117 17.1639 15.6429 16.3304 15.6429Z" fill="#1E1E1E"/>
+</g>
+<defs>
+<clipPath id="clip0_6_6556">
+<rect width="17" height="17" fill="white" transform="translate(8 4)"/>
+</clipPath>
+</defs>
+</svg>
+
+  </td>
+</tr>
+}
+    </tbody>
+
+    <tfoot>
+        <tr class="sticky bottom-0
+        [&>*]:text-center
+        ">
+            <td></td>
+            <td >الاجمالي</td>
+            <td>28</td>
+            <td>2800</td>
+            <td></td>
+           
+        </tr>
+    </tfoot>
+  </table>
+</div>
+
+<form class="my-[20px]">
+  <div class="input_group mb-5">
+    <label for="notes">ملاحظات</label>
+    <textarea id="notes" placeholder="المحتوي"></textarea>
+  </div>
+
+</form>
+
+
+<footer class="flex items-center justify-end gap-3 p-2  rounded-lg">
+
+  <div class="flex items-center justify-center w-[214px] h-[38px] bg-[var(--color-border-input)] rounded-md text-sm font-medium">
+   <h5 class="text-[#106388] text-[14px] font-[700]">  مرات الطباعة : </h5>
+   <span> 2 </span>
+  </div>
+
+  <div class="flex items-center justify-center w-[214px] h-[38px] bg-[var(--color-border-input)] rounded-md text-sm font-medium">
+    <h5 class="text-[#106388] text-[14px] font-[700]">  مرات التعديل : </h5>
+   <span> 1 </span>
+  </div>
+
+</footer>
+
+
+
+<!-- !!!!! Popup Edit Returns -->
+
+
+  <div class="card flex justify-center">
+
+            <p-dialog class="p-dialog-purchase-Invoice" header="" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+              
+               <div class="table-responsive">
+                <table class="w-full">
+                    <thead class="bg-gray-100 ">
+      <tr class="sticky top-0">
+        <th class="p-2 text-center">م</th>
+        <th class="p-2 text-center">اسم الصنف</th>
+        <th class="p-2 text-center">الوحدة</th>
+        <th class="p-2 text-center">الكمية</th>
+        <th class="p-2 text-center">المرتجع</th>
+        <th class="p-2 text-center">مبلغ المرتجع</th>
+
+      </tr>
+    </thead>
+    <tbody>
+        @for(item of itemsData;track $index){
+            
+            <tr >
+              <td class="p-2 text-center">{{ item.id }}</td>
+              <td class="p-2 text-center">{{ item.name }}</td>
+              <td class="p-2 text-center">{{ item.unit }}</td>
+              <td class="p-2 text-center">{{ item.quantity }}</td>
+              <td class="p-2 text-center">
+                <input type="text" placeholder="عدد" class="text-center">
+              </td>
+              <td class="p-2 text-center">{{ item.amount }} جنيه</td>
+            </tr>
+        }
+</tbody>
+                </table>
+
+               </div>
+                
+            </p-dialog>
+        </div>

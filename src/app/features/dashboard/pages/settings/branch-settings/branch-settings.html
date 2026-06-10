@@ -1,0 +1,242 @@
+<h2 class="text-[var(--color-primary)] text-[20px] font-[700] my-6 mb-8 ">اعدادات الفرع</h2>
+
+<form class="box_header mb-7">
+  
+
+    <div class="flex justify-between items-center px-[10px] gap-[10px] mb-7  mx-auto w-[385px] h-[56px]  bg-[var(--color-gray-tabs)] rounded-[12px]">
+        <button type="button" (click)="currentTemplate = 'main'" class="text-[var(--color-black)]  p-[5px] rounded-[8px] cursor-pointer shadow shadow-[0px 3px 2px #000] text-[16px] font-[700] min-w-[178px] h-[40px] " [ngClass]="{'bg-[var(--color-white)]':currentTemplate == 'main'}">البيانات الأساسية للفرع</button>
+        <button type="button" (click)="currentTemplate = 'finance'" class="text-[var(--color-black)] p-[5px] rounded-[8px] cursor-pointer shadow shadow-[0px 3px 2px #000]  text-[16px] font-[700] min-w-[178px] h-[40px]"  [ngClass]="{'bg-[var(--color-white)]':currentTemplate == 'finance'}">الإعدادات المالية</button>
+    </div>
+
+
+
+  <ng-template #mainData>
+   
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] mt-[10px] mb-[20px]">
+
+
+    <div class="col-span-12 md:col-span-4">
+        <label for="city">المدينة</label>
+        <input type="text" placeholder="المدينة" id="city">
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="hay">الحي</label>
+        <input type="text" placeholder="الحي" id="hay">
+    </div>
+    <div class="col-span-12 md:col-span-2">
+        <label for="country">البلد</label>
+        <input type="text" placeholder="البلد" id="country">
+    </div>
+    <div class="col-span-12 md:col-span-2">
+        <label for="street">الشارع</label>
+        <input type="text" placeholder="الشارع" id="street">
+    </div>
+   
+    <div class="col-span-12 md:col-span-4">
+        <label for="address">العنوان بالتفصيل</label>
+        <input type="text" placeholder="العنوان بالتفصيل" id="address">
+    </div>
+   
+    <div class="col-span-12 md:col-span-4">
+        <label for="inventory">مخزن المشتريات</label>
+        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن المشتريات'"></ng-select>
+    </div>
+   
+    <div class="col-span-12 md:col-span-2">
+        <label for="buildingNumber">رقم المبني</label>
+        <input type="text" placeholder="رقم المبني" id="buildingNumber">
+    </div>
+    <div class="col-span-12 md:col-span-2">
+        <label for="phoneNumber">رقم الجوال</label>
+        <input type="text" placeholder="رقم الجوال" id="phoneNumber">
+    </div>
+   
+    <div class="col-span-12 md:col-span-4">
+        <label for="zipCode">الرمز البريدي</label>
+        <input type="text" placeholder="الرمز البريدي" id="zipCode">
+    </div>
+   
+    <div class="col-span-12 md:col-span-4">
+        <label for="faxNumber">رقم الفاكس</label>
+        <input type="text" placeholder="رقم الفاكس" id="faxNumber">
+    </div>
+   
+    <div class="col-span-12 md:col-span-4">
+        <label for="telephoneNumber">رقم الهاتف</label>
+        <input type="text" placeholder="رقم الهاتف" id="telephoneNumber">
+    </div>
+   
+    <div class="col-span-12 md:col-span-4">
+        <label for="namePrinted">الاسم علي الطابعه</label>
+        <input type="text" placeholder="الاسم علي الطابعه" id="namePrinted">
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="zipCode">الرمز البريدي</label>
+        <input type="text" placeholder="الرمز البريدي" id="zipCode">
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="email">الأيميل</label>
+        <input type="text" placeholder="الأيميل" id="email">
+    </div>
+   
+      <div class="col-span-12 md:col-span-4">
+        <label for="inventoryDefault">مخزن المشتريات الإفتراضي</label>
+        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن المشتريات الإفتراضي'"></ng-select>
+    </div>
+      <div class="col-span-12 md:col-span-4">
+        <label for="inventoryDefault">مركز التكلفه الافتراضي</label>
+        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مركز التكلفه الافتراضي'"></ng-select>
+    </div>
+      <div class="col-span-12 md:col-span-4">
+        <label for="inventoryDefault">مخزن المبيعات الإفتراضي</label>
+        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن المبيعات الإفتراضي'"></ng-select>
+    </div>
+      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+        <input type="checkbox" id="alerts" checked>
+        <label for="alerts" style="margin-bottom:0px;">تفعيل التنبيهات</label>
+    </div>
+      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+        <input type="checkbox" id="items" checked>
+        <label for="items" style="margin-bottom:0px;">تفعيل أصناف الميزانيه بالوزن</label>
+    </div>
+      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+        <input type="checkbox" id="activation" checked>
+        <label for="activation" style="margin-bottom:0px;">تفعيل الحد الائتماني وحد التنبيه للعميل</label>
+    </div>
+      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+        <input type="checkbox" id="Tecrar" checked>
+        <label for="Tecrar" style="margin-bottom:0px;">تكرار الرقم الضريبي</label>
+    </div>
+
+      
+
+    <div class="btns col-span-12 flex items-center  justify-end gap-[12px]">
+        <button class="btn btn-primary">حفظ</button>
+
+    </div>
+  
+
+  </div>
+
+  </ng-template>
+  
+  <ng-template #FinanceSettings>
+    
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] mt-[10px] mb-[20px]">
+
+
+    <div class="col-span-12 md:col-span-4">
+        <label for="city">العملة</label>
+        <ng-select [items]="[]" [bindLabel]="'name'" [bindValue]="'name'" [placeholder]="'العملة'"></ng-select>
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="ashry">الكسور العشريه ( كميات )</label>
+        <input type="text" placeholder="الكسور العشريه " id="ashry">
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="casrAshryprice">الكسور العشرية ( أسعار )</label>
+        <input type="text" placeholder="الكسور العشرية" id="casrAshryprice">
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="referances">المرجع</label>
+        <input type="text" placeholder="المرجع" id="referances">
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="nameSales">اسم البائع</label>
+        <input type="text" placeholder="اسم البائع" id="nameSales">
+    </div>
+   
+    <div class="col-span-12 md:col-span-4">
+        <label for="address">الرصيد الدائن حتي </label>
+        <p-datePicker [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="icondisplay" />
+        <!-- <input type="text" placeholder="الرصيد الدائن حتي " id="address"> -->
+    </div>
+   
+   <div class="col-span-12 md:col-span-4">
+        <label for="inventoryDefault">مخزن المشتريات الإفتراضي</label>
+        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن المشتريات الإفتراضي'"></ng-select>
+    </div>
+      <div class="col-span-12 md:col-span-4">
+        <label for="inventoryDefault">مركز التكلفه الافتراضي</label>
+        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مركز التكلفه الافتراضي'"></ng-select>
+    </div>
+      <div class="col-span-12 md:col-span-4">
+        <label for="inventoryDefault">مخزن المبيعات الإفتراضي</label>
+        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن المبيعات الإفتراضي'"></ng-select>
+    </div>
+      <div class="col-span-12 md:col-span-4">
+        <label for="inventoryDefault">مخزن الحجز الإفتراضي</label>
+        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن الحجز '"></ng-select>
+    </div>
+   
+    <div class="col-span-12 md:col-span-4">
+        <label for="buildingNumber">الحد الأدني للضريبة الإنتقائية </label>
+        <input type="text" placeholder="الحد الأدني للضريبة الإنتقائية " id="buildingNumber">
+    </div>
+
+      <div class="col-span-12 md:col-span-4">
+        <label for="inventoryDefault">طريقة استخدام ضريبة القيمة المضافة</label>
+        <ng-select [items]="[
+        {
+        id:1,
+        name:'سعر شامل ضريبة القيمة المضافة'
+        },
+        {
+        id:2,
+        name:'سعر غير شامل ضريبة القيمة المضافة'
+        }
+        ]" [bindLabel]="''" [bindValue]="''" [placeholder]="'القيمة المضافة '"></ng-select>
+    </div>
+
+    
+      <div class="col-span-12 md:col-span-4">
+        <label for="statics">الاحصائيات</label>
+        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'الاحصائيات '"></ng-select>
+    </div>
+      <div class="col-span-12 md:col-span-4">
+        <label for="showCustomers">اظهار العملاء والموردين للفروع</label>
+        <ng-select [items]="showCustomersData" [bindLabel]="'name'" [bindValue]="'name'" [placeholder]="'أظهار العملاء والموردين  '"></ng-select>
+    </div>
+      <div class="col-span-12 md:col-span-4">
+        <label for="mezan">معدل الميزان</label>
+        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'أظهار العملاء والموردين  '"></ng-select>
+    </div>
+
+   
+   
+    
+      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+        <input type="checkbox" id="alerts" checked>
+        <label for="alerts" style="margin-bottom:0px;">تفعيل التنبيهات</label>
+    </div>
+      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+        <input type="checkbox" id="items" checked>
+        <label for="items" style="margin-bottom:0px;">تفعيل أصناف الميزانيه بالوزن</label>
+    </div>
+      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+        <input type="checkbox" id="activation" checked>
+        <label for="activation" style="margin-bottom:0px;">تفعيل الحد الائتماني وحد التنبيه للعميل</label>
+    </div>
+      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+        <input type="checkbox" id="Tecrar" checked>
+        <label for="Tecrar" style="margin-bottom:0px;">تكرار الرقم الضريبي</label>
+    </div>
+
+      
+
+    <div class="btns col-span-12 flex items-center  justify-end gap-[12px]">
+        <button class="btn btn-primary">حفظ</button>
+
+    </div>
+  
+
+  </div>
+  </ng-template>
+  
+
+  <ng-container *ngTemplateOutlet="currentTemplate == 'main' ? mainData : FinanceSettings"></ng-container>
+  
+
+</form>
+
+

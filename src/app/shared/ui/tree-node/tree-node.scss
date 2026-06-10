@@ -1,0 +1,34 @@
+
+
+.tree__children {
+  position: relative;
+  
+}
+
+.tree__children::before {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #BEE0F0;
+}
+
+
+
+
+.tree__node {
+  position: relative;
+  margin: 2px 0px;
+}
+
+.tree__node.has-line::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 18px;
+  width: 12px;
+  height: 2px;
+  background-color: #BEE0F0;
+}

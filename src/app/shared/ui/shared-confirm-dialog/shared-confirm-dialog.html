@@ -1,0 +1,55 @@
+<div
+[ngClass]="'opacity-0 invisible  ' + (this.show() ? 'opacity-100 visible' : '')"
+class="fixed inset-0 bg-[#000]/60 backdrop-blur-sm flex items-center justify-center z-50
+ transition duration-400 ease-in-out
+">
+
+  <!-- Modal -->
+  <div class="bg-[#0f172a] w-[90%] md:w-[420px] rounded-2xl p-6 shadow-2xl border border-white/10 animate-fadeIn">
+
+    <!-- Icon -->
+    <div class="flex justify-center mb-4">
+      <div class="w-14 h-14 flex items-center justify-center rounded-full bg-red-500/10">
+        <i class="fa-solid fa-trash text-red-500 text-xl"></i>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <h2 class="text-center text-lg font-bold text-white mb-2" style="color:white;">
+  {{title()}}
+    </h2>
+
+    <!-- Description -->
+    <p class="text-center text-gray-400 text-sm mb-6">
+      <!-- هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء. -->
+       {{message()}}
+    </p>
+
+    <!-- Actions -->
+    <div class="flex gap-3">
+      <button
+        class="flex-1 py-2 rounded-lg bg-gray-600 hover:bg-gray-700 transition text-[#fff]
+        cursor-pointer"
+        (click)="onCancel()"
+     
+      >
+        إلغاء
+      </button>
+
+      <button
+        class="flex-1 py-2 rounded-lg bg-red-600 hover:bg-red-700 transition text-[#fff] flex items-center justify-center gap-2
+        cursor-pointer
+        "
+        (click)="onConfirm()"
+     
+      >
+        <!-- @if(isDeleting){ -->
+          <span class="loader-small"></span>
+        <!-- } @else { -->
+          <span>حذف</span>
+        <!-- } -->
+      </button>
+    </div>
+
+  </div>
+</div>

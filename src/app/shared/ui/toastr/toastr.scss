@@ -1,0 +1,35 @@
+.toaster {
+  position: fixed;
+  top: 15px;
+  left: 30px;
+  min-width: 250px;
+  max-width: 450px;
+  padding: 16px 20px 16px 50px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
+  z-index: 2000000000000000000000000000000000000000000000;
+  opacity: 0;
+  transition: all 0.4s ease;
+  transform: translateY(-30px);
+  font-size: 15px;
+  text-align: right;
+  visibility: hidden;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-size: 22px;
+}
+.toaster.active {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+.toaster.success {
+  background-color: #28a745;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="white" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M13.485 1.929l-7.072 7.072-3.536-3.535-1.414 1.414 4.95 4.95 8.485-8.486-1.413-1.414z"/></svg>');
+}
+.toaster.error {
+  background-color: #dc3545;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="white" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 12.5A5.5 5.5 0 1 1 8 2.5a5.5 5.5 0 0 1 0 11zm.5-8h-1v4h1V5.5zm0 5h-1v1h1v-1z"/></svg>');
+}/*# sourceMappingURL=toastr.component.css.map */

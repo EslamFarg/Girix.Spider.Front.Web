@@ -1,0 +1,78 @@
+svg{
+    width: 100%;
+    height: 100vh;
+}
+
+
+.container_auth{
+    width: 100%;
+    height: 100vh;
+    .right{
+        background-color: #44B5E74D;
+        width: 50%;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+        .spider_top{
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            svg{
+                width: 200px;
+                height: 200px;
+            }
+        }
+        .spider_bottom{
+            position: absolute;
+            left: 0px;
+            bottom: 0px;
+            svg{
+                width: 200px;
+                height: 200px;
+            }
+        }
+    }
+
+    .left{
+        background-color: #ebf5fa;
+        background-color: 50%;
+        height: 100vh;
+    }
+}
+
+
+form{
+    label{
+        font-size: 16px;
+        font-weight: 500;
+        color: #101728;
+    }
+    input[type='text'],input[type='password']{
+        height: 50px !important;
+    }
+}
+
+
+.logo{
+    // width: 100%;
+    // height: 100vh;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+
+    img{
+        width: 180px;
+        // height: 100px;
+    }
+    // transform: translate(-50%,-50%);
+}
+
+
+form{
+    @media (max-width:768px) {
+        width: 95%;
+        // padding: 15px;
+        // margin: 0 autozz;
+        
+    }
+}

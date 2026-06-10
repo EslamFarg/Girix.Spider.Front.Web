@@ -1,0 +1,279 @@
+
+<div class="flex justify-between flex-wrap mb-[5px] sticky top-[60px] pt-[10px] mt-[10px] bg-[var(--color-bg)] z-1">
+    <div>
+        
+        <h2 class="text-[var(--color-primary)] text-[20px] font-[700]">الصلاحيات</h2>
+      <div class="flex items-center flex-wrap gap-5 my-4
+      [&>*]:w-[104px]  [&>*]:h-[32px]  
+      ">
+          <button class="btn btn-primary">حفظ</button>
+          <button class="btn">جديد</button>
+          <button class="btn">حذف</button>
+          <button class="btn">طباعه</button>
+     
+        </div>
+    </div>
+    
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-12 gap-[24px]">
+    <div class="col-span-6 box_header container_tree">
+        <app-tree-permissions [tree]="permissionsTree"></app-tree-permissions>
+    </div>
+
+    <div class="col-span-12 md:col-span-6 box_header container_permissions">
+        <div class="roles-panel">
+
+  <!-- Header -->
+  <div class="roles-header">
+ <div class="flex items-center justify-between">
+     
+     <div class="groups-select">
+      <h2 class="text-[var(--color-btn)] text-[20px] font-[700]">المجموعات</h2>
+    </div>
+    <button class="btn btn-primary">حفظ</button>
+ </div>
+
+ <div class="w-[100%] my-3 relative">
+    <ng-select [items]="[]" style="width:92%;" [bindLabel]="'name'" [bindValue]="'name'" [placeholder]="'اسم المجموعه'"></ng-select>
+    <button type="button" (click)="this.visibleGroup=!this.visibleGroup" class="btn btn-primary absolute left-0 top-0" style="min-width:46px; border-radius: 8px 0px 0px 8px;" ><i class="fa-solid fa-plus"></i></button>
+ </div>
+
+
+ <p class="w-[100%] h-[1.5px] bg-[var(--color-border-input)]" ></p>
+
+   <div class="container_actions my-3 flex items-center justify-between">
+    <h3 class="text-[var(--color-btn)] text-[20px] font-[700]">Role Preview</h3>
+     <div class="actions flex items-center gap-x-[10px]">
+         <button class="btn">Select ALL</button>
+         <button class="btn">Clear</button>
+    </div>
+   </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="role-preview h-[70px] bg-[var(--custom-color-gray)] shadow shadow-[0px_0px_2px_rgba(0,0,0,0.25)] rounded-[4px]">
+    <div class="stats flex items-center justify-between h-[100%] gap-[20px] px-[20px] 
+    [&>*]:text-center
+    [&>*>p]:text-[var(--color-btn)]
+    [&>*>p]:font-[700]
+    [&>*>span]:text-[var(--color-primary)]
+    [&>*>span]:font-[700]
+    
+
+    
+    ">
+      <div> 
+        <p>الصلاحيات</p>
+        <span>180</span>
+      </div>
+
+      <div>
+        <p>الصفحات</p>
+        <span>45</span>
+      </div>
+
+      <div>
+        <p>Sidebar</p>
+        <span>13</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sections -->
+  <div class="roles-sections my-5">
+
+    <div class="section shadow shadow-[0px_0px_5px_var(--color-border-input)] rounded-[4px]">
+      <div class="section-header flex items-center justify-between
+      bg-[var(--custom-color-gray)] h-[40px] px-4">
+          <h4 class="text-[16px] text-[var(--color-btn)] font-[700]">لوحة التحكم</h4>
+     <div class="left flex gap-5">
+             
+         <span class="text-[var(--color-btn)] bg-[#c5d1e3] px-2 rounded-[4px]">  الصفحات : 1</span>
+         <span class="text-[var(--color-white)] bg-[var(--color-btn)] px-2 rounded-[4px]">  الصلاحيات : 1</span>
+        <!-- <span class="badge green">2 : الصلاحيات</span> -->
+     </div>
+      </div>
+
+      <div class="section-body p-3 mb-5">
+       
+
+        <div class="tags p-3 border-[1px] border-[var(--color-border-input)]">
+             <div class="heading flex items-center gap-[5px]">
+                <div class="icon">
+                    <i class="fa-solid fa-apple-whole"></i>
+                </div>
+                <h2 class="text-[var(--color-primary)]">لوحة التحكم</h2>
+             </div>
+         <div class="flex items-center gap-[10px]
+            [&>*]:text-[var(--color-primary)]
+            [&>*]:bg-[var(--custom-color-gray)]
+            [&>*]:px-[10px]
+            [&>*]:py-[5px]
+            [&>*]:mt-[10px]
+            [&>*]:rounded-[4px]
+            [&>*]:text-[14px]
+            [&>*]:font-[700]
+         ">
+             <span>إحصائيات الطلبات</span>
+             <span>إحصائيات الصفحة الرئيسية</span>
+         </div>
+        </div>
+      </div>
+    </div>
+    <div class="section shadow shadow-[0px_0px_5px_var(--color-border-input)] rounded-[4px]">
+      <div class="section-header flex items-center justify-between
+      bg-[var(--custom-color-gray)] h-[40px] px-4">
+          <h4 class="text-[16px] text-[var(--color-btn)] font-[700]">لوحة التحكم</h4>
+     <div class="left flex gap-5">
+             
+         <span class="text-[var(--color-btn)] bg-[#c5d1e3] px-2 rounded-[4px]">  الصفحات : 1</span>
+         <span class="text-[var(--color-white)] bg-[var(--color-btn)] px-2 rounded-[4px]">  الصلاحيات : 1</span>
+        <!-- <span class="badge green">2 : الصلاحيات</span> -->
+     </div>
+      </div>
+
+      <div class="section-body p-3">
+       
+
+        <div class="tags p-3 border-[1px] border-[var(--color-border-input)]">
+             <div class="heading flex items-center gap-[5px]">
+                <div class="icon">
+                    <i class="fa-solid fa-apple-whole"></i>
+                </div>
+                <h2 class="text-[var(--color-primary)]">لوحة التحكم</h2>
+             </div>
+         <div class="flex items-center gap-[10px]
+            [&>*]:text-[var(--color-primary)]
+            [&>*]:bg-[var(--custom-color-gray)]
+            [&>*]:px-[10px]
+            [&>*]:py-[5px]
+            [&>*]:mt-[10px]
+            [&>*]:rounded-[4px]
+            [&>*]:text-[14px]
+            [&>*]:font-[700]
+         ">
+             <span>إحصائيات الطلبات</span>
+             <span>إحصائيات الصفحة الرئيسية</span>
+         </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+    </div>
+
+</div>
+
+
+
+<!--!!!!! Add Value -->
+
+<div class="card flex justify-center filter_search_popup_explorer filter_search_popup_reject filter_search_popup_receive">
+  <p-dialog header="المجموعات" [modal]="true" [(visible)]="visibleGroup" class="w-[507px]">
+    <!-- <span class="p-text-secondary block mb-8">/'.;</span> -->
+
+    <form class="pt-4 pb-2">
+      <div
+        class="grid grid-cols-1 md:grid-cols-12 gap-x-[24px] gap-y-[10px]  "
+      >
+       
+
+      <div class="col-span-12">
+        <label for="val">اسم المجموعه</label>
+        <div class="flex items-center gap-[15px]">
+            <input name="" id="val" placeholder="أدخل اسم المجموعه"/>
+            <button class="btn btn-primary " >اضافه</button>
+        </div>
+      </div>
+
+
+       
+
+
+
+      <div class="col-span-12 mt-5">
+        
+<div class="table-responsive table_explorer">
+  <table class="w-full ">
+    <thead class="bg-gray-100 ">
+      <tr class="sticky top-0">
+        <th class="p-2 text-center">م</th>
+        <th class="p-2 text-center">اسم المجموعه</th>
+        <th class="p-2 text-center">الادوات</th>
+      </tr>
+    </thead>
+    <tbody>
+  
+
+@for(item of [1,2,3,4,5,6,7];track $index){
+
+    <tr >
+<td class="p-2 text-center">{{ $index + 1 }}</td>
+<td class="p-2 text-center">مجموعة 1</td>
+
+       <td class="p-2 w-full flex items-center justify-center gap-2">
+            <button class="update">
+<i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button class="delete">
+
+  <i class="fa-solid fa-trash"></i>
+
+            </button>
+        </td>
+</tr>
+}@empty{
+    <tr class="h-[420px]">
+      <td colspan="7">
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+          
+          <!-- SVG -->
+          <div class="mb-4 opacity-70">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+              <path d="M3 7h18M5 7v13h14V7M9 3h6v4H9V3z" stroke="#9CA3AF" stroke-width="1.5"/>
+            </svg>
+          </div>
+
+          <!-- Title -->
+          <h3 class="text-lg font-bold text-gray-700 mb-2">
+            لا توجد بيانات
+          </h3>
+
+          <!-- Description -->
+          <p class="text-sm text-gray-500 mb-4">
+            لم يتم العثور على أي نتائج، يمكنك إضافة بيانات جديدة أو تعديل الفلاتر
+          </p>
+
+          <!-- Actions -->
+          <!-- <div class="flex gap-3">
+            <button class="px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-sm">
+              إضافة جديد
+            </button> -->
+
+            <!-- <button class="px-4 py-2 rounded-lg border text-sm text-gray-600">
+              إعادة تعيين الفلاتر
+            </button> -->
+          <!-- </div> -->
+
+        </div>
+      </td>
+    </tr>
+
+}
+    </tbody>
+
+  </table>
+</div>
+      </div>
+
+      </div>
+
+
+     
+    </form>
+  </p-dialog>
+</div>
+

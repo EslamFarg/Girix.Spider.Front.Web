@@ -1,0 +1,66 @@
+<div class="tree">
+
+@for(parent of tree(); track $index; let last = $last) {
+
+  <div 
+    class="node flex items-center gap-[20px] mb-5"
+    [class.last-node]="last"
+    [class.leaf-node]="!parent.children?.length"
+    [class.root-node]="level() === 0"
+    (click)="parent.children?.length && (parent.isExpanded = !parent.isExpanded)"
+  >
+
+    <!-- icon يظهر بس لو فيه children -->
+    @if(parent.children?.length){
+      <div class="icon w-[40px] h-[40px] bg-[#C5D1E3]
+      text-[var(--color-primary)]
+      flex items-center justify-center rounded-[4px]">
+
+        @if(parent.isExpanded){
+          <i class="fa-solid fa-minus"></i>
+        } @else {
+          <i class="fa-solid fa-plus"></i>
+        }
+
+      </div>
+    }
+
+    <!-- content -->
+    
+    <!-- checkbox للـ leaf فقط -->
+    @if(!parent.children?.length){
+          <div class="flex items-center gap-[10px]">
+        <input 
+          type="checkbox"
+          class="w-5 h-5 accent-blue-500"
+          (click)="$event.stopPropagation()"
+          [id]="$index"
+        >
+        <label [for]="$index" style="margin-bottom:0 !important;" class="title_head text-[20px] font-[800]">
+        {{parent.label}}
+      </label>
+    </div>
+      }@else {
+          <h2 class="title_head "
+          [ngClass]="{'font-[600] text-[20px]': level() > 0, 'text-[20px] font-[800]': level() === 0}"
+   
+          >
+        {{parent.label}}
+      </h2>
+      }
+
+    
+
+    </div>
+
+
+  <!-- children -->
+  @if (parent.isExpanded && parent.children?.length) {
+    <div class="children pl-6" [class.has-leaf]="parent.children?.some(c => !c.children?.length)">
+      <app-tree-permissions [tree]="parent.children" [level]="level() + 1"></app-tree-permissions>
+    </div>
+  }
+
+}
+
+</div>

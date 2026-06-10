@@ -1,0 +1,112 @@
+<div class="flex justify-between flex-wrap mb-[25px] sticky top-[60px] pt-[10px] mt-[10px] bg-[var(--color-bg)] z-1">
+    <div>
+        
+        <h2 class="text-[var(--color-primary)] text-[20px] font-[700]">المستخدمين والصلاحيات</h2>
+      <div class="flex items-center flex-wrap gap-5 my-4
+      [&>*]:w-[104px]  [&>*]:h-[32px]  
+      ">
+          <button class="btn btn-primary">حفظ</button>
+          <button class="btn">جديد</button>
+          <button class="btn">حذف</button>
+          <button class="btn">طباعه</button>
+     
+        </div>
+    </div>
+
+   <div class="explorer_button">
+    <button [routerLink]="'/users-and-permissions/users-and-permissions/explorer'"  class="btn btn-primary" style="width:245px !important;">  مستكشف الصلاحيات   </button>
+
+   </div>
+    
+</div>
+
+
+<form class="box_header mb-7">
+  <div class="title"> المستخدمين والصلاحيات </div>
+
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] mb-[20px] mt-[5px]">
+
+
+
+
+   
+         <div class="col-span-12 md:col-span-4">
+          <label for="branch" >الفرع
+          </label>
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'الفرع الرئيسي'"></ng-select>
+      </div>
+         <div class="col-span-12 md:col-span-4">
+          <label for="group" >المجموعه
+          </label>
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'المجموعه'"></ng-select>
+      </div>
+         <div class="col-span-12 md:col-span-4">
+          <label for="group" >تحديد سعر البيع
+          </label>
+         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'تحديد سعر البيع'"></ng-select>
+      </div>
+         <div class="col-span-12 md:col-span-4">
+            <div class="flex items-center gap-[10px]">
+            <input type="checkbox" name="now" id="now" checked>
+            <label for="now" style="margin-bottom: 0px !important; ">إظهار سعر بيع جمله </label>
+
+
+        </div>
+            <div class="flex items-center gap-[10px] mt-5">
+            <input type="checkbox" name="now" id="now" checked>
+            <label for="now" style="margin-bottom: 0px !important; ">إظهار سعر الربح  </label>
+
+
+        </div>
+      </div>
+         <div class="col-span-12 md:col-span-4">
+            <div class="flex items-center gap-[10px]">
+            <input type="checkbox" name="now" id="now" checked>
+            <label for="now" style="margin-bottom: 0px !important; ">إظهار سعر بيع جمله الجمله </label>
+
+
+        </div>
+            <div class="flex items-center gap-[10px] mt-5">
+            <input type="checkbox" name="now" id="now" checked>
+            <label for="now" style="margin-bottom: 0px !important; ">إظهار سعر متوسط التكلفه  </label>
+
+
+        </div>
+      </div>
+         <div class="col-span-12 md:col-span-4">
+            <div class="flex items-center gap-[10px]">
+            <input type="checkbox" name="now" id="now" checked>
+            <label for="now" style="margin-bottom: 0px !important; ">إظهار سعر بيع شراء  </label>
+
+
+        </div>
+            <div class="flex items-center gap-[10px] mt-5">
+            <input type="checkbox" name="now" id="now" checked>
+            <label for="now" style="margin-bottom: 0px !important; ">البيع بكميه اقل من المتاح  </label>
+
+
+        </div>
+      </div>
+
+
+
+       
+    
+
+     
+
+  
+
+  </div>
+
+
+</form>
+
+
+
+
+
+
+

@@ -1,0 +1,39 @@
+<div class="flex" >
+
+<aside
+  [ngClass]="{
+    'translate-x-[100%] ': !showSidebar,
+    ' translate-x-0  ': showSidebar
+  }"
+class="w-[256px] h-[100vh] bg-[var(--color-bg)]  px-4
+transition-all duration-300
+fixed top-0 right-0
+overflow-y-scroll
+z-20
+" style="box-shadow: var(--color-shadow);">
+  <app-sidebar class="fixed"></app-sidebar>
+</aside>
+
+
+<div class="body_content" style=" margin-right:auto;"   [ngClass]="{
+    'w-full': !showSidebar,
+    'lg:w-[calc(100%-256px)]': showSidebar
+  }"
+  
+  >
+  
+  <header style="position: sticky;
+    top: 0;
+    z-index: 30;" >
+  <app-header  (isShowSidebar)="ShowAndHideSidebar($event)"></app-header>
+</header>
+<router-outlet></router-outlet>
+</div>
+
+
+</div>
+
+<!-- <app-loading></app-loading> -->
+
+
+

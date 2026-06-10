@@ -1,0 +1,39 @@
+.scrollbar-hide-groups{
+    &::-webkit-scrollbar {
+        // display: none;
+        height: 5px ;
+    }
+}
+
+.table-responsive table tr th, .table-responsive table tr td {
+    min-width: 34px !important;
+
+}
+
+
+.table-responsive{
+    // height: 200px;
+        height: 282px;
+}
+
+.scrolling_invoice{
+    &::-webkit-scrollbar {
+        width: 0px;
+    }
+}
+
+@media (max-width:768px) {
+    .left_query{
+        height: 650px;
+    }
+
+    
+    .add{
+        right: 30%;
+    }
+
+    .minus{
+        left: 30%;
+    }
+}
+

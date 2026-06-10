@@ -1,0 +1,347 @@
+<div class="flex justify-between flex-wrap mb-[25px] sticky top-[60px] pt-[10px] mt-[10px] bg-[var(--color-bg)] z-1">
+    <div>
+        
+        <h2 class="text-[var(--color-primary)] text-[20px] font-[700]">الموظفين</h2>
+      <div class="flex items-center flex-wrap gap-5 my-4
+      [&>*]:w-[104px]  [&>*]:h-[32px]  
+      ">
+          <button class="btn btn-primary">حفظ</button>
+          <button class="btn">جديد</button>
+          <button class="btn">حذف</button>
+          <button class="btn">طباعه</button>
+        </div>
+    </div>
+
+   <div class="explorer_button">
+    <button [routerLink]="'/hr/employees/explorer'"  class="btn btn-primary" style="width:245px !important;">مستكشف  الموظفين </button>
+
+   </div>
+    
+</div>
+
+
+<form class="box_header mb-7">
+  <div class="title"> بيانات الموظف</div>
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] mt-[10px] mb-[20px]">
+
+    <div class="col-span-12 md:col-span-4">
+  
+        <label for="numberEsal">رقم الموظف</label>
+        <div class="flex items-center gap-2">
+      
+        <input type="text" id="numberEsal" placeholder="رقم الموظف">
+       
+        </div>
+    </div>
+    <div class="col-span-12 md:col-span-8">
+          <div class="input_group w-[100%]">
+    <label>بحث رقم الموظف</label>
+    <div class="flex items-center gap-2 relative">
+      <div class="search_input relative w-[100%]">
+        <input type="text" class="text-[14px] w-[100%]"  placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/>
+        <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[7px]" >
+     
+ 
+
+          <button>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.4193 17.5001C6.04702 17.5001 2.5026 13.9557 2.5026 9.58341C2.5026 5.21116 6.04702 1.66675 10.4193 1.66675C14.7915 1.66675 18.3359 5.21116 18.3359 9.58341C18.3359 13.9557 14.7915 17.5001 10.4193 17.5001Z"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M1.66927 18.3334L3.33594 16.6667"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+  
+    </div>
+  </div>
+    </div>
+  </div>
+
+
+  <div class="flex gap-4 items-center mb-[20px]">
+    <div class="image">
+        <svg width="130" height="130" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="1" y="1" width="128" height="128" rx="17" fill="white" stroke="#C3C2D9" stroke-width="2" stroke-dasharray="10 10"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M55.5038 53.6202C56.4289 53.0708 57.5164 52.7776 58.6289 52.7776C59.3432 52.7776 59.9222 53.2923 59.9222 53.9272C59.9222 54.5621 59.3432 55.0768 58.6289 55.0768C58.028 55.0768 57.4405 55.2352 56.9409 55.532C56.4412 55.8288 56.0518 56.2506 55.8218 56.7441C55.5918 57.2376 55.5317 57.7806 55.6489 58.3045C55.7661 58.8285 56.0555 59.3097 56.4804 59.6874C56.9054 60.0651 57.4468 60.3224 58.0361 60.4266C58.6255 60.5308 59.2365 60.4773 59.7917 60.2729C60.3468 60.0685 60.8214 59.7223 61.1552 59.2781C61.4891 58.834 61.6673 58.3118 61.6673 57.7776C61.6673 57.1427 62.2463 56.628 62.9606 56.628C63.6749 56.628 64.2539 57.1427 64.2539 57.7776C64.2539 58.7666 63.924 59.7333 63.3059 60.5555C62.6878 61.3778 61.8093 62.0186 60.7815 62.3971C59.7537 62.7755 58.6227 62.8745 57.5315 62.6816C56.4404 62.4887 55.4381 62.0125 54.6514 61.3132C53.8648 60.6139 53.329 59.723 53.112 58.7531C52.8949 57.7832 53.0063 56.7778 53.4321 55.8642C53.8578 54.9506 54.5788 54.1697 55.5038 53.6202Z" fill="#C3C2D9"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M86.7253 59.4443C87.4293 59.4443 88 59.9622 88 60.601V70.286C88 75.2405 86.9219 79.0096 84.1799 81.5117C81.4361 84.0153 77.3009 85.0002 71.8675 85.0002H59.1325C53.7008 85.0002 49.5657 84.0157 46.8215 81.5124C44.079 79.0105 43 75.2415 43 70.286V66.392C43 65.7532 43.5707 65.2353 44.2747 65.2353C44.9787 65.2353 45.5494 65.7532 45.5494 66.392V70.286C45.5494 75.0156 46.5948 78.0253 48.629 79.881C50.6615 81.7351 53.9554 82.6869 59.1325 82.6869H71.8675C77.0463 82.6869 80.3401 81.7347 82.3721 79.8805C84.4059 78.0247 85.4506 75.015 85.4506 70.286V60.601C85.4506 59.9622 86.0213 59.4443 86.7253 59.4443Z" fill="#C3C2D9"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M46.8746 48.417C49.6553 45.9647 53.8454 45 59.3533 45H67.9645C68.6745 45 69.25 45.5076 69.25 46.1337C69.25 46.7598 68.6745 47.2674 67.9645 47.2674H59.3533C54.099 47.2674 50.7552 48.2012 48.6926 50.0203C46.6299 51.8394 45.571 54.7883 45.571 59.422C45.571 60.0482 44.9955 60.5557 44.2855 60.5557C43.5755 60.5557 43 60.0482 43 59.422C43 54.5646 44.0939 50.8693 46.8746 48.417Z" fill="#C3C2D9"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M71.7539 51.6661C71.7539 51.0524 72.353 50.5549 73.0919 50.5549H85.4159C86.1549 50.5549 86.7539 51.0524 86.7539 51.6661C86.7539 52.2797 86.1549 52.7772 85.4159 52.7772H73.0919C72.353 52.7772 71.7539 52.2797 71.7539 51.6661Z" fill="#C3C2D9"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M79.2461 45C79.9364 45 80.4961 45.5325 80.4961 46.1894V57.1441C80.4961 57.801 79.9364 58.3335 79.2461 58.3335C78.5557 58.3335 77.9961 57.801 77.9961 57.1441V46.1894C77.9961 45.5325 78.5557 45 79.2461 45Z" fill="#C3C2D9"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M78.0581 66.8606L69.2115 73.6679L69.188 73.6855C68.1125 74.4737 66.763 74.9047 65.3702 74.9047C63.9775 74.9047 62.628 74.4737 61.5525 73.6855C61.5409 73.677 61.5294 73.6683 61.5182 73.6595L60.8353 73.122C60.2634 72.7119 59.561 72.4722 58.8274 72.4374C58.0894 72.4023 57.3578 72.5764 56.7378 72.9345L46.2426 79.2487C45.6568 79.6012 44.8611 79.4638 44.4655 78.942C44.0698 78.4201 44.224 77.7114 44.8098 77.3589L55.3313 71.0289C56.408 70.4034 57.6802 70.0992 58.9638 70.1602C60.2474 70.2212 61.476 70.6443 62.4718 71.3683C62.4848 71.3777 62.4975 71.3873 62.51 71.3971L63.195 71.9362C63.8096 72.3812 64.5777 72.6243 65.3702 72.6243C66.1649 72.6243 66.9351 72.3798 67.5506 71.9325L76.3973 65.1252L76.4208 65.1076C77.4963 64.3194 78.8458 63.8884 80.2385 63.8884C81.6313 63.8884 82.9807 64.3194 84.0563 65.1076L84.0798 65.1253L87.5528 67.7979C88.0878 68.2096 88.1468 68.9296 87.6847 69.4061C87.2226 69.8827 86.4143 69.9352 85.8793 69.5236L82.4189 66.8606C81.8033 66.4133 81.0332 66.1688 80.2385 66.1688C79.4438 66.1688 78.6737 66.4133 78.0581 66.8606Z" fill="#C3C2D9"/>
+</svg>
+
+    </div>
+
+
+    <div class=" flex-1 grid grid-col-1 md:grid-cols-15 gap-[24px] gap-y-[20px]">
+        <div class="col-span-3">
+            <label for="jopNum" >الرقم الوظيفي</label>
+            <input type="text" id="JobNum" placeholder="الرقم الوظيفي">
+        </div>
+        <div class="col-span-4">
+            <label for="baseNum" >الرقم الاساسي</label>
+            <input type="text" id="baseNum" placeholder="الرقم الاساسي">
+        </div>
+        <div class="col-span-4">
+            <label for="badal" >البدلات</label>
+            <input type="text" id="badal" placeholder="البدلات">
+        </div>
+        <div class="col-span-4">
+            <label for="salary" >الرواتب</label>
+            <input type="text" id="salary" placeholder="الرواتب">
+        </div>
+
+        <div class="col-span-3">
+             <label for="section" >القسم</label>
+           <ng-select [items]="[]" [bindLabel]="'name'" [bindValue]="'name'" [placeholder]="'أختر'"></ng-select>
+        </div>
+        <div class="col-span-4">
+             <label for="arabicName" >الأسم العربي</label>
+            <input type="text" name="arabicName" id="arabicName" placeholder="الأسم العربي">
+        </div>
+        <div class="col-span-4">
+             <label for="englishName" >english name</label>
+            <input type="text" name="arabicName" id="englishName" placeholder="english name">
+        </div>
+            <div class="col-span-4">
+             <label for="phoneNumber" >رقم الجوال</label>
+            <input type="text" name="phoneNumber" id="phoneNumber" placeholder="رقم الجوال">
+        </div>
+         
+    </div>
+
+  </div>
+
+
+</form>
+<form class="box_header mb-7" [formGroup]="formAttachment">
+  <div class="title"> بيانات اضافيه </div>
+
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-16 gap-[24px] my-[8px] mb-[20px]">
+
+
+       
+
+    <div class="col-span-12 md:col-span-4">
+        <label for="idNumber" >رقم الهويه / الاقامه</label>
+        <input type="text" id="idNumber" placeholder="رقم الهويه / الاقامه" >
+    </div>
+    <div class="col-span-12 md:col-span-4">
+      <app-input-attachment [label]="'مرفق الهويه / الاقامه'"
+      formControlName="attachment"
+      ></app-input-attachment>
+    </div>
+     <div class="col-span-12 md:col-span-4">
+            <label for="addDate" >التاريخ</label>
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="addDate" />
+            <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
+        </div>
+         <div class="col-span-12 md:col-span-4">
+      <app-input-attachment [label]="'مرفق التامين الطبي'"
+    
+      ></app-input-attachment>
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="document" >رقم الصرافه</label>
+        <input type="text" id="document" numMar placeholder="رقم الصرافه">
+    </div>
+    
+      <div class="col-span-12 md:col-span-4">
+      <app-input-attachment [label]="'مرفق الصرافه'"
+    
+      ></app-input-attachment>
+    </div>
+
+     <div class="col-span-12 md:col-span-4">
+        <label for="numMar" >رقم الجواز</label>
+        <input type="text" id="numMar" placeholder="رقم الجواز">
+    </div>
+
+      <div class="col-span-12 md:col-span-4">
+      <app-input-attachment [label]="'مرفق الجواز'"
+    
+      ></app-input-attachment>
+    </div>
+
+    <div class="col-span-12 md:col-span-4">
+        <label for="numBor" >رقم الحدود</label>
+        <input type="text" id="numBor" placeholder="رقم الحدود">
+    </div>
+
+      <div class="col-span-12 md:col-span-4">
+      <app-input-attachment [label]="'مرفق الحدود'"
+    
+      ></app-input-attachment>
+    </div>
+
+    
+    <div class="col-span-12 md:col-span-4">
+        <label for="Nationality" >الجنسية</label>
+        <input type="text" id="Nationality" placeholder="الجنسية">
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="work" >المهنه</label>
+        <input type="text" id="work" placeholder="المهنه">
+    </div>
+
+      <div class="col-span-12 md:col-span-4">
+            <label for="Birth" >تاريخ الميلاد</label>
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ الميلاد'" [showIcon]="true" inputId="Birth" />
+            <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
+        </div>
+
+      <div class="col-span-12 md:col-span-4">
+            <label for="live" >تاريخ مباشره العمل</label>
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ مباشره العمل'" [showIcon]="true" inputId="live" />
+            <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
+        </div>
+
+      <div class="col-span-12 md:col-span-4">
+            <label for="Replay" >تاريخ العوده من الاجازه</label>
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ العوده من الاجازه'" [showIcon]="true" inputId="Replay" />
+            <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
+        </div>
+
+      <div class="col-span-12 md:col-span-4">
+            <label for="endContract" >تاريخ إنهاء العقد</label>
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ إنهاء العقد'" [showIcon]="true" inputId="endContract" />
+            <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
+        </div>
+
+        
+            <div class="col-span-12 md:col-span-4">
+      <app-input-attachment [label]="'مرفق انهاء العقد'"
+    
+      ></app-input-attachment>
+    </div>
+        <div class="col-span-12 md:col-span-12">
+        <label for="address" >العنوان</label>
+        <input type="text" id="address" placeholder="العنوان">
+    </div>
+
+
+
+
+
+  
+  
+
+      
+
+  
+
+  </div>
+
+
+</form>
+
+
+
+
+
+
+<!-- !!!!! Popup Edit Returns -->
+
+
+  <div class="card flex justify-center accountExplorer">
+
+            <p-dialog class="p-dialog-purchase-Invoice" header="" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+              
+               <div class="table-responsive">
+                <table class="w-full">
+                    <thead class="bg-gray-100 ">
+      <tr class="sticky top-0">
+        <th class="p-2 text-center">م</th>
+        <th class="p-2 text-center">البيان</th>
+        <th class="p-2 text-center">مدين</th>
+        <th class="p-2 text-center">دائن</th>
+        <th class="p-2 text-center">الرصيد</th>
+        <th class="p-2 text-center">الادوات</th>
+
+      </tr>
+    </thead>
+    <tbody>
+        @for(item of accountExlorer;track $index){
+            
+            <tr >
+              <td class="p-2 text-center">{{ item.id }}</td>
+              <td class="p-2 text-center">{{ item.note }}</td>
+              <td class="p-2 text-center">{{ item.depit }}</td>
+              <td class="p-2 text-center">{{ item.credit }}</td>
+              <td class="p-2 text-center">{{ item.total }} </td>
+              <td class="p-2 text-center " style="height:100%;" >
+    <svg width="33" height="25" viewBox="0 0 33 25" fill="none" style="margin: auto;"  (click)="showDialog()" xmlns="http://www.w3.org/2000/svg">
+<rect width="33" height="25" rx="2" fill="#FFF2E8"/>
+<g clip-path="url(#clip0_6_6556)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M16.3304 17.0571C19.4999 17.0571 22.3694 15.2893 23.9109 12.5C22.3694 9.71071 19.4999 7.94286 16.3304 7.94286C13.1608 7.94286 10.2914 9.71071 8.74979 12.5C10.2914 15.2893 13.1608 17.0571 16.3304 17.0571ZM16.3304 7C20.1081 7 23.3798 9.23771 24.9732 12.5C23.3798 15.7623 20.1081 18 16.3304 18C12.5526 18 9.28093 15.7623 7.6875 12.5C9.28093 9.23771 12.5526 7 16.3304 7ZM16.3304 14.7C16.9138 14.7 17.4734 14.4682 17.886 14.0556C18.2986 13.6431 18.5304 13.0835 18.5304 12.5C18.5304 11.9165 18.2986 11.3569 17.886 10.9444C17.4734 10.5318 16.9138 10.3 16.3304 10.3C15.7469 10.3 15.1873 10.5318 14.7747 10.9444C14.3621 11.3569 14.1304 11.9165 14.1304 12.5C14.1304 13.0835 14.3621 13.6431 14.7747 14.0556C15.1873 14.4682 15.7469 14.7 16.3304 14.7ZM16.3304 15.6429C15.4968 15.6429 14.6974 15.3117 14.108 14.7223C13.5186 14.1329 13.1875 13.3335 13.1875 12.5C13.1875 11.6665 13.5186 10.8671 14.108 10.2777C14.6974 9.68826 15.4968 9.35714 16.3304 9.35714C17.1639 9.35714 17.9633 9.68826 18.5527 10.2777C19.1421 10.8671 19.4732 11.6665 19.4732 12.5C19.4732 13.3335 19.1421 14.1329 18.5527 14.7223C17.9633 15.3117 17.1639 15.6429 16.3304 15.6429Z" fill="#1E1E1E"/>
+</g>
+<defs>
+<clipPath id="clip0_6_6556">
+<rect width="17" height="17" fill="white" transform="translate(8 4)"/>
+</clipPath>
+</defs>
+</svg>
+
+  </td>
+            </tr>
+        }
+</tbody>
+                </table>
+
+               </div>
+                
+            </p-dialog>
+        </div>
+
+
+
+<div class="card flex justify-center filter_search_popup_explorer filter_search_popup_reject">
+  <p-dialog header="تأكيد الرفض" [modal]="true" [(visible)]="visibleReject" [style]="{ width: '25rem' }">
+    <!-- <span class="p-text-secondary block mb-8">/'.;</span> -->
+
+    <form class="p-4 pb-2">
+      <div
+        class="grid grid-cols-1 md:grid-cols-12 gap-x-[24px] gap-y-[5px]  "
+      >
+       
+
+      <div class="col-span-12">
+        <label for="">سبب الرفض</label>
+        <textarea name="" id="" placeholder="أدخل سبب الرفض"></textarea>
+      </div>
+
+
+
+      <div class="col-span-12">
+        <button class="btn btn-primary mr-auto block">تأكيد</button>
+      </div>
+
+      </div>
+
+
+     
+    </form>
+  </p-dialog>
+</div>

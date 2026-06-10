@@ -1,0 +1,15 @@
+input{
+    height: 32px ;
+}
+
+.search_box{
+    &::after{
+        content: '';
+        position: absolute;
+        left: 54px;
+        top: -15px;
+        border-style: solid;
+        border-color: transparent transparent var(--color-white) transparent;
+        border-width: 8px ;
+    }
+}

@@ -1,0 +1,82 @@
+<app-page-header-search [titleHeading]="'مستكشف القيد اليومي '" [addButton]="dataAddButton" [filteringData]="filteringData"></app-page-header-search>
+
+<div class="table-responsive table_explorer">
+  <table class="w-full ">
+    <thead class="bg-gray-100 ">
+      <tr class="sticky top-0">
+        <th class="p-2 text-center">م</th>
+        <th class="p-2 text-center">رقم القيد</th>
+        <th class="p-2 text-center">رقم الحساب</th>
+        <th class="p-2 text-center">مدين</th>
+        <th class="p-2 text-center">دائن</th>
+        <th class="p-2 text-center">الادوات</th>
+      </tr>
+    </thead>
+    <tbody>
+  
+
+@for(item of itemsTable;track $index){
+
+    <tr >
+<td class="p-2 text-center">{{ $index + 1 }}</td>
+<td class="p-2 text-center">9876543</td>
+<td class="p-2 text-center">80001630115</td>
+<td class="p-2 text-center">10000</td>
+<td class="p-2 text-center">10000</td>
+       <td class="p-2 w-full flex items-center justify-center gap-2">
+            <button class="update">
+<i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button class="delete">
+
+  <i class="fa-solid fa-trash"></i>
+
+            </button>
+        </td>
+</tr>
+}@empty{
+    <tr class="h-[420px]">
+      <td colspan="7">
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+          
+          <!-- SVG -->
+          <div class="mb-4 opacity-70">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+              <path d="M3 7h18M5 7v13h14V7M9 3h6v4H9V3z" stroke="#9CA3AF" stroke-width="1.5"/>
+            </svg>
+          </div>
+
+          <!-- Title -->
+          <h3 class="text-lg font-bold text-gray-700 mb-2">
+            لا توجد بيانات
+          </h3>
+
+          <!-- Description -->
+          <p class="text-sm text-gray-500 mb-4">
+            لم يتم العثور على أي نتائج، يمكنك إضافة بيانات جديدة أو تعديل الفلاتر
+          </p>
+
+          <!-- Actions -->
+          <!-- <div class="flex gap-3">
+            <button class="px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-sm">
+              إضافة جديد
+            </button> -->
+
+            <!-- <button class="px-4 py-2 rounded-lg border text-sm text-gray-600">
+              إعادة تعيين الفلاتر
+            </button> -->
+          <!-- </div> -->
+
+        </div>
+      </td>
+    </tr>
+
+}
+    </tbody>
+
+  </table>
+</div>
+
+   <div class="card flex justify-center mt-4">
+            <p-paginator (onPageChange)="onPageChange($event)" [showFirstLastIcon]="false" [first]="first" [rows]="rows" [totalRecords]="120" [rowsPerPageOptions]="[10, 25, 50,100,250]" />
+      </div>

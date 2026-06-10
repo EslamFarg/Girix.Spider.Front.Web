@@ -1,0 +1,23 @@
+.scrollbar-hide-groups{
+    &::-webkit-scrollbar {
+        // display: none;
+        height: 5px ;
+    }
+}
+
+.table-responsive table tr th, .table-responsive table tr td {
+    min-width: 100px !important;
+
+}
+
+
+.table-responsive{
+    // height: 200px;
+        height: 282px;
+}
+
+.scrolling_invoice{
+    &::-webkit-scrollbar {
+        width: 0px;
+    }
+}

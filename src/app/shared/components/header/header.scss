@@ -1,0 +1,28 @@
+.icon_showSidebar{
+    @media (max-width:1200px) {
+        // z-index: 10000;
+       position: absolute;
+    right: 200px;
+    z-index: 1000;
+
+        
+        
+    }
+}
+
+.content{
+     @media (min-width:768px) and (max-width:1200px) {
+        margin-right: 38px;
+        
+        
+    }
+}
+
+
+.showNotification_small{
+    @media (max-width:768px) {
+        left: none;
+        right: 0;
+        width: 240px;
+    }
+}

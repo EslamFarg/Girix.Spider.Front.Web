@@ -1,0 +1,21 @@
+.container_tree{
+    height: calc(100vh - 210px);
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+        width: 0px;
+    }
+}
+
+
+
+.container_permissions{
+    height: calc(100vh - 210px);
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+        width: 0px;
+    }
+}
+.table_explorer {
+    height: 384px;
+    max-height:280px;
+}
