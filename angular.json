@@ -28,7 +28,9 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets",
+              "favicon.ico"
             ],
             "styles": [
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",

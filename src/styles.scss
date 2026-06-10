@@ -1,9 +1,19 @@
 /* You can add global styles to this file, and also import other style files */
 /* Theme */
+// @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
+// @use "@ng-select/ng-select/themes/default.theme.css";
+// @use "tailwindcss";
+// @use "../public/styles/responsive";
+// @import "intl-tel-input/build/css/intlTelInput.css";
+
+@use "tailwindcss";
+@use "../public/styles/responsive";
+@use "@ng-select/ng-select/themes/default.theme.css";
+
+/* 2. بعدها imports */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
-@import "@ng-select/ng-select/themes/default.theme.css";
-@import "tailwindcss";
-@import "../public/styles/responsive";
+@import "intl-tel-input/build/css/intlTelInput.css";
+
 
 
 // :root{
@@ -1092,3 +1102,15 @@ p-autocomplete{
         box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
     }
 }
+
+.iti__flag {
+  background-image: url("/assets/flags.png");
+}
+/* minimal styles only */
+.iti {
+  width: 100%;
+}
+
+
+
+// sadsadasd
