@@ -12,7 +12,6 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { BaseComponent } from '../base-component/base-component';
 import { DialogType } from '@/features/dialogs/enums';
-import { InputText } from 'primeng/inputtext';
 import { ButtonDirective } from 'primeng/button';
 
 type IChosenPlace = (IHutSearchRow | IRoomSearchRow | ITableSearchRow) & { type: OrderLocalType };
@@ -22,7 +21,7 @@ export type ChosenLocalPlace = IChosenPlace & {
 
 @Component({
     selector: 'app-local-place-select',
-    imports: [Select, HutCard, Debounce, RoomCard, TableCard, TranslatePipe, FormsModule, InputText, ButtonDirective],
+    imports: [Select, HutCard, Debounce, RoomCard, TableCard, TranslatePipe, FormsModule, ButtonDirective],
     templateUrl: './local-place-select.html',
     styleUrl: './local-place-select.css',
 })
@@ -36,6 +35,14 @@ export class LocalPlaceSelect extends BaseComponent {
     chosenLocalPlace = this.orderService.chosenLocalPlace;
     tempChosenLocalPlace = linkedSignal<ChosenLocalPlace | null>(() => this.chosenLocalPlace());
     isHutSelected=computed(() => this.tempChosenLocalPlace()?.type === OrderLocalType.Hut);
+
+    placeTypeLabel = computed(() => {
+        switch (this.placeType()) {
+            case OrderLocalType.Hut: return 'اختر الكوخ';
+            case OrderLocalType.Room: return 'اختر الغرفة';
+            case OrderLocalType.Table: return 'اختر الطاولة';
+        }
+    });
 
     reservationMinutes = signal(30);
 

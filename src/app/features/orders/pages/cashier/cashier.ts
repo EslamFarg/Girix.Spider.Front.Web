@@ -1464,53 +1464,10 @@ export class Cashier extends BaseComponent implements OnInit {
         totalPagesCount: 0,
         totalRowsCount: 0,
     };
-    // searchAdditions(pageIndex: number) {
-    //   this.productService
-    //     .getAdditions({
-    //       dto: {
-    //         paginationInfo: {
-    //           pageIndex: pageIndex,
-    //           pageSize: 20,
-    //         },
-    //       },
-    //       isAddition: true,
-    //     })
-    //     .subscribe({
-    //       next: (res) => {
-    //         if (res.rows.length > 0) {
-    //           this.additionProducts.update((prev) => prev.concat(res.rows));
-    //           this.additionPaginationInfo = {
-    //             pageIndex,
-    //             totalPagesCount: res.paginationInfo.totalPagesCount,
-    //             totalRowsCount: res.paginationInfo.totalRowsCount,
-    //           };
-    //         }
-    //       },
-    //     });
-    // }
-    // onAdditionsScroll(event: Event) {
-    //   const menuContainer = event.target as HTMLElement;
-
-    //   // if at bottom
-    //   if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
-    //     this.searchAdditions(this.additionPaginationInfo.pageIndex + 1);
-    //   }
-    // }
-
-    // addAddition(item: IProductSearchRow, quantity: number) {
-    //   const futureQuantity =
-    //     this.orderMenuItems()[this.currentMenuItemIx()].additions.find((addition) => addition.product.id === item.id)!
-    //       .quantity + quantity;
-
-    //   this.updateAdditionQuantity(item, futureQuantity);
-    // }
-
-    // removeAddition(item: IProductSearchRow, quantity: number) {
-    //   this.updateAdditionQuantity(item, futureQuantity > 1000 ? 1000 : futureQuantity);
-    // }
 
     addAdditionQuantity(addition: IProductSearchRow, quantity: number | null) {
         const currentMenuItem = this.orderMenuItems()[this.currentMenuItemIx()];
+        console.log('add existingAddition', addition, quantity);
 
         const existingAddition = currentMenuItem.additions.find(
             (existingAddition) => existingAddition.product.id === addition.id,
@@ -1538,6 +1495,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
         if (existingAddition) {
             //adding quantity
+
             const futureQuantity = existingAddition.quantity + quantity;
 
             if (futureQuantity <= 0) {
@@ -1547,7 +1505,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
             currentMenuItem.additions.forEach((existingAddition) => {
                 if (existingAddition.product.id === addition.id) {
-                    existingAddition.quantity = futureQuantity > 1000 ? 1000 : futureQuantity;
+                    existingAddition.quantity = futureQuantity > 100 ? 100 : futureQuantity;
                 }
             });
 
@@ -1557,6 +1515,7 @@ export class Cashier extends BaseComponent implements OnInit {
         } else {
             if (quantity <= 0) return;
             //add new
+            console.log('new addition', addition);
             this.orderMenuItems.update((orderItems) =>
                 orderItems.map((orderItem, i) =>
                     i == this.currentMenuItemIx()
@@ -1564,7 +1523,7 @@ export class Cashier extends BaseComponent implements OnInit {
                               ...orderItem,
                               additions: orderItem.additions.concat({
                                   product: addition,
-                                  quantity: quantity > 1000 ? 1000 : quantity,
+                                  quantity: quantity > 100 ? 100 : quantity,
                               }),
                           }
                         : orderItem,
@@ -1588,6 +1547,19 @@ export class Cashier extends BaseComponent implements OnInit {
         // }
     }
 
+    updateAdditionQuantity(addition: IProductSearchRow, quantity: number) {
+        const currentMenuItem = this.orderMenuItems()[this.currentMenuItemIx()];
+        const existingAddition = currentMenuItem.additions.find(
+            (existingAddition) => existingAddition.product.id === addition.id,
+        );
+        if (existingAddition) {
+            existingAddition.quantity = quantity;
+            this.orderMenuItems.update((items) =>
+                items.map((item, i) => (i == this.currentMenuItemIx() ? currentMenuItem : item)),
+            );
+        }
+    }
+
     getProductAdditions(product: IProductSearchRow, currentMenuItemIx: number) {
         this.productService.getAdditions(product.id).subscribe({
             next: (products) => {
@@ -1603,6 +1575,13 @@ export class Cashier extends BaseComponent implements OnInit {
                 this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يوجد اضافات للمنتج' });
             },
         });
+    }
+
+    getOrderItemAdditionQuantity(additionId:number) {
+        const orderItem = this.orderMenuItems()[this.currentMenuItemIx()];
+        console.log('orderItem', orderItem);
+        const existingAddition = orderItem.additions.find((addition) => addition.product.id == additionId);
+        return existingAddition ? existingAddition.quantity : 0;
     }
 
     //#endregion
@@ -1776,10 +1755,7 @@ export class Cashier extends BaseComponent implements OnInit {
     orderPaymentTypeChangeListener = this.orderFg.controls.paymentType.valueChanges.subscribe((value) => {
         let validators: ValidatorFn[] = [];
         if (value === OrderPaymentType.Paid) validators = [Validators.required];
-        // this.orderFg.patchValue({
-        //     payingCash: 0,
-        //     payingNetwork: 0,
-        // });
+
         const controls = [this.payingCashControl, this.payingNetworkControl];
 
         controls.forEach((control) => {
@@ -1788,29 +1764,18 @@ export class Cashier extends BaseComponent implements OnInit {
 
             control?.setValidators(validators);
         });
-        // if (value === OrderPaymentType.Paid) {
-        //     this.payingCashControl?.enable();
-        //     this.payingNetworkControl?.enable();
-        // } else {
-        //     this.payingCashControl?.disable();
-        //     this.payingNetworkControl?.disable();
-        // }
-        // this.payingCashControl?.setValidators(validators);
-        // this.payingNetworkControl?.setValidators(validators);
     });
 
     cashInputSubscription = this.payingCashControl.valueChanges.subscribe((value) => {
         const net = this.net();
         let futureValue = +(value ?? 0);
-        if (futureValue > net) {
-            futureValue = net;
-        } else if (futureValue < 0) {
-            futureValue = 0;
-        }
+
+        if (futureValue > net) futureValue = net;
+        else if (futureValue < 0) futureValue = 0;
+
         this.orderFg.patchValue(
             {
-                payingNetwork: +(net - futureValue).toFixed(2),
-                payingCash: +futureValue.toFixed(2),
+                payingNetwork: net - futureValue,
             },
             { emitEvent: false },
         );
@@ -1819,15 +1784,13 @@ export class Cashier extends BaseComponent implements OnInit {
     networkInputSubscription = this.payingNetworkControl?.valueChanges.subscribe((value) => {
         const net = this.net();
         let futureValue = +(value ?? 0);
-        if (futureValue > net) {
-            futureValue = net;
-        } else if (futureValue < 0) {
-            futureValue = 0;
-        }
+
+        if (futureValue > net) futureValue = net;
+        else if (futureValue < 0) futureValue = 0;
+
         this.orderFg.patchValue(
             {
-                payingCash: +(net - futureValue).toFixed(2),
-                payingNetwork: +futureValue.toFixed(2),
+                payingCash: net - futureValue,
             },
             { emitEvent: false },
         );

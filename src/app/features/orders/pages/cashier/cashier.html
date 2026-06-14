@@ -508,6 +508,7 @@
     </form>
 </div>
 
+<!-- menu -->
 <p-drawer
     [(visible)]="isMenuVisible"
     header=""
@@ -538,18 +539,12 @@
     class="addition-dialog"
     [contentStyleClass]="`no-scrollbar flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-    <!-- <ng-template #header >
-    <div class="inline-flex items-center justify-center gap-2">
-      <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
-      <span class="font-bold whitespace-nowrap">Amy Elsner</span>
-    </div>
-  </ng-template> -->
 
     <p class="font-bold text-center text-dark-bg-2 text-lg">الاضافات</p>
 
     <div class="flex-1 overflow-auto no-scrollbar" appDebounce [domEvents]="['scroll']" #additionsScroller>
         <div class="grid grid-cols-4 gap-2">
-            @for (item of additionProducts(); track $index) {
+            @for (item of additionProducts(); track item.id) {
                 <div
                     class="border-2 border-text-light rounded-[10px] flex flex-col gap-2 items-center justify-between p-2"
                 >
@@ -567,7 +562,7 @@
                     <div class="w-full flex items-center justify-center gap-4">
                         <!-- add -->
                         <button
-                            (click)="addAdditionQuantity(item, +additionQuantity.value)"
+                            (click)="addAdditionQuantity(item, 1)"
                             type="button"
                             pButton
                             class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
@@ -584,13 +579,14 @@
                             appAllowNumbers
                             type="number"
                             [min]="1"
-                            [max]="1000"
-                            [defaultValue]="1"
+                            [max]="100"
+                            (change)="updateAdditionQuantity(item, +additionQuantity.value)"
+                            [defaultValue]="getOrderItemAdditionQuantity(item.id)"
                             class="font-bold text-dark-line w-full flex-1 text-center outline-none no-input-spinner"
                         />
                         <!-- remove -->
                         <button
-                            (click)="addAdditionQuantity(item, -additionQuantity.value)"
+                            (click)="addAdditionQuantity(item, -1)"
                             type="button"
                             pButton
                             class="p-1.5! border-0! leading-none rounded flex items-center justify-center cursor-pointer"
@@ -608,42 +604,6 @@
             }
         </div>
     </div>
-
-    <ng-template #footer>
-        <app-slider
-            [template]="additionTemplate"
-            [items]="orderMenuItems()[currentMenuItemIx()].additions"
-            [config]="{ itemWidth: 80 }"
-        />
-
-        <ng-template #additionTemplate let-addition>
-            <div class="w-20 py-4" [title]="addition.product.name">
-                <div
-                    class="border relative border-text-light rounded-md px-1 py-2 overflow-visible! flex flex-col gap-1 items-center justify-center"
-                >
-                    <i
-                        (click)="addAdditionQuantity(addition.product, null)"
-                        class="pi pi-times-circle absolute text-lg! top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all hover:scale-115 hover:text-red-600"
-                    ></i>
-                    <img
-                        [src]="baseUrl + addition.product?.images[0]?.fullPath"
-                        appImgFallback
-                        alt=""
-                        class="rounded-md w-full aspect-square object-cover"
-                    />
-                    <span
-                        class="py-0.5 px-1 text-[10px] w-full font-bold overflow-hidden text-ellipsis whitespace-nowrap"
-                        >{{ addition.product.name }}</span
-                    >
-                    <div
-                        class="flex items-center justify-center border rounded-sm p-0.5 bg-text-lighter h-fit text-green-500 font-bold text-[14px] leading-none absolute -bottom-2.5 left-1/2 -translate-x-1/2"
-                    >
-                        <span class="h-fit">{{ addition.quantity }}</span>
-                    </div>
-                </div>
-            </div>
-        </ng-template>
-    </ng-template>
 </p-dialog>
 
 <!-- customer info -->
@@ -797,6 +757,7 @@
                             aria-describedby="cash-help"
                             [placeholder]="'FORM.CASH' | translate"
                             appAllowNumbers
+                            appDecimalMask
                             [allowDecimal]="true"
                             [formControl]="orderFg.controls.payingCash"
                             [max]="net()"
@@ -804,7 +765,7 @@
                             [min]="0"
                             #payingCash
                             id="payingCash"
-                            inputmode="decimal"
+                            type="number"
                             class="app-input"
                         />
                         <p-inputgroup-addon class="flex p-0!">
@@ -812,7 +773,7 @@
                                 pButton
                                 class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
                                 type="button"
-                                (click)="orderFg.controls.payingCash.setValue(0)"
+                                (click)="orderFg.controls.payingCash.setValue(orderFg.value.payingNetwork||0)"
                             >
                                 <i class="pi pi-arrow-down"></i>
                             </button>
@@ -850,6 +811,7 @@
                         <input
                             pInputText
                             appAllowNumbers
+                            appDecimalMask
                             [allowDecimal]="true"
                             [max]="net()"
                             [min]="0"
@@ -867,7 +829,7 @@
                                 pButton
                                 class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
                                 type="button"
-                                (click)="orderFg.controls.payingNetwork.setValue(0)"
+                                (click)="orderFg.controls.payingNetwork.setValue(orderFg.value.payingCash||0)"
                             >
                                 <i class="pi pi-arrow-up"></i>
                             </button>

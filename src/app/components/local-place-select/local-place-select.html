@@ -1,117 +1,97 @@
-<p class="font-bold text-center text-dark-bg-2 text-lg">
-    @switch (placeType()) {
-        @case (OrderLocalType.Hut) {
-            اختر الكوخ
-        }
-        @case (OrderLocalType.Room) {
-            اختر الغرفة
-        }
-        @case (OrderLocalType.Table) {
-            اختر الطاولة
-        }
-    }
-</p>
+<!-- Compact layout: Header + Grid + Selected info bar at bottom -->
+<div class="flex flex-col h-full gap-3">
+    <!-- Top bar: Title + Selected info + Continue -->
+    <div
+        class="sticky top-0 z-20 flex items-center gap-3 pb-2 border-b border-dark-line bg-white/95 backdrop-blur-sm shrink-0"
+    >
+        <!-- Title -->
+        <h2 class="font-bold text-dark-bg-2 text-lg shrink-0">
+            {{ placeTypeLabel() }}
+        </h2>
 
-<div
-    class="flex-1 overflow-auto no-scrollbar"
-    appDebounce
-    #scroller
-    [domEvents]="['scroll']"
-    (debounced)="onScroll($event, scroller)"
->
-    @switch (placeType()) {
-        @case (OrderLocalType.Hut) {
-            <div
-                class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-[90px_20px]"
-            >
-                @for (item of items(); track $index) {
-                    <app-hut-card
-                        [active]="item.id == tempChosenLocalPlace()?.id"
-                        [data]="item"
-                        (click)="onSelected(item)"
-                        class="max-w-full!"
-                    />
-                }
-            </div>
-        }
-        @case (OrderLocalType.Room) {
-            <div
-                class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5"
-            >
-                @for (item of items(); track $index) {
-                    <app-room-card
-                        [active]="item.id == tempChosenLocalPlace()?.id"
-                        [data]="item"
-                        (click)="onSelected(item)"
-                        class="max-w-full"
-                    />
-                }
-            </div>
-        }
-        @case (OrderLocalType.Table) {
-            <div
-                class="h-fit grid mt-10 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5"
-            >
-                @for (item of items(); track $index) {
-                    <app-table-card
-                        [active]="item.id == tempChosenLocalPlace()?.id"
-                        [data]="item"
-                        (click)="onSelected(item)"
-                        class="max-w-full"
-                    />
-                }
-            </div>
-        }
-    }
-</div>
+        <!-- Results count -->
+        <span class="text-xs text-gray-500 shrink-0"> ({{ items().length }}) </span>
 
-@switch (placeType()) {
-    @case (OrderLocalType.Hut) {
-        <div class="grid grid-cols-3 gap-4 border-t border-dark-line pt-4 [&_label]:mb-1 [&_label]:inline-block">
-            <!-- reservation time -->
-            <div>
-                <label for="">مدة الحجز</label>
-                <p-select
-                    style="--p-select-background: #ffffff"
-                    class="w-full border border-dark-line!"
-                    [options]="[30, 60, 90, 120, 150, 180]"
-                    [ngModel]="reservationMinutes()"
-                />
-                <!-- (onChange)="onHutDurationChange($event)" -->
-            </div>
+        <!-- Selected place chip (only when selected) -->
+        @if (tempChosenLocalPlace(); as selected) {
+            <!-- <div class="flex items-center gap-3 bg-white/60 backdrop-blur-sm rounded-lg border border-dark-line/60 px-3 py-1.5 "> -->
+            <!-- <span class="text-xs text-gray-500">المختار:</span> -->
+            <!-- <span class="font-bold text-dark-bg-2 text-sm">{{ selected.name }}</span> -->
 
-            <!-- hut name/id -->
-            <div>
-                <label for="">رقم / اسم الكوخ</label>
-                <input
-                    type="text"
-                    name=""
-                    class="w-full border border-dark-line!"
-                    disabled
-                    [value]="isHutSelected() && tempChosenLocalPlace()?.name"
-                    pInputText
-                    id=""
-                />
-            </div>
+            @if (selected.type === OrderLocalType.Hut) {
+                <div class="flex items-center gap-3 flex-1 justify-center">
+                    <div class="border-dark-line/60">
+                        <span class="text-xs text-gray-500">سعر الساعة: </span>
+                        <span class="font-semibold text-sm text-dark-bg-2">{{
+                            selected.pricePerHour?.toFixed(2) ?? '--'
+                        }}</span>
+                    </div>
+                    <div class="flex items-center gap-2 border-r border-r-dark-line/30 pr-4">
+                        <p-select [options]="[30, 60, 90, 120, 150, 180]" [ngModel]="reservationMinutes()" />
+                        <span class="text-xs text-gray-500">دقيقة</span>
+                    </div>
+                </div>
+            }
+            <!-- </div> -->
+        }
 
-            <!-- hut price -->
-            <div>
-                <label for="">سعر الكوخ في الساعه</label>
-                <input
-                    type="text"
-                    name=""
-                    class="w-full border border-dark-line!"
-                    disabled
-                    [value]="isHutSelected() && tempChosenLocalPlace()?.pricePerHour?.toFixed(2)"
-                    pInputText
-                    id=""
-                />
-            </div>
-        </div>
-    }
-}
-<div class="mt-5 flex justify-center items-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
-    <button pButton severity="secondary" (click)="closeDialog()">
-        {{ 'ACTIONS.CONTINUE' | translate }}
-    </button>
+        <!-- Continue Button -->
+        <button pButton class="app-p-btn py-1.5! px-6!" (click)="closeDialog()">
+            {{ 'ACTIONS.CONTINUE' | translate }}
+        </button>
+    </div>
+
+    <!-- Scrollable Grid -->
+    <div
+        class="flex-1 overflow-auto no-scrollbar rounded-lg border border-dark-line/40 p-4"
+        appDebounce
+        #scroller
+        [domEvents]="['scroll']"
+        (debounced)="onScroll($event, scroller)"
+    >
+        @switch (placeType()) {
+            @case (OrderLocalType.Hut) {
+                <div
+                    class="h-fit grid pt-8 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-[90px_20px]"
+                >
+                    @for (item of items(); track $index) {
+                        <app-hut-card
+                            [active]="item.id == tempChosenLocalPlace()?.id"
+                            [data]="item"
+                            (click)="onSelected(item)"
+                            class="max-w-full!"
+                        />
+                    }
+                </div>
+            }
+            @case (OrderLocalType.Room) {
+                <div
+                    class="h-fit grid items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5"
+                >
+                    @for (item of items(); track $index) {
+                        <app-room-card
+                            [active]="item.id == tempChosenLocalPlace()?.id"
+                            [data]="item"
+                            (click)="onSelected(item)"
+                            class="max-w-full"
+                        />
+                    }
+                </div>
+            }
+            @case (OrderLocalType.Table) {
+                <div
+                    class="h-fit grid items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5"
+                >
+                    @for (item of items(); track $index) {
+                        <app-table-card
+                            [active]="item.id == tempChosenLocalPlace()?.id"
+                            [data]="item"
+                            (click)="onSelected(item)"
+                            class="max-w-full"
+                        />
+                    }
+                </div>
+            }
+        }
+    </div>
 </div>
