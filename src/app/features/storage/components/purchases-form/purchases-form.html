@@ -224,7 +224,7 @@
     <!-- supplier name -->
     <div>
         <label for="productPrice">اسم المورد</label>
-        <app-input-error-message-handler [fc]="fg.get('supplierName')">
+        <app-input-error-message-handler [fc]="fg.controls.supplierName">
             <input
                 type="text"
                 pInputText
@@ -239,7 +239,7 @@
     <!-- supplier phone -->
     <div>
         <label for="productPrice">رقم الجوال</label>
-        <app-input-error-message-handler [fc]="fg.get('supplierPhoneNumber')">
+        <app-input-error-message-handler [fc]="fg.controls.supplierPhoneNumber">
             <input
                 type="text"
                 pInputText
@@ -255,7 +255,7 @@
     <!-- supplier tax number -->
     <div>
         <label for="productPrice">الرقم الضريبي</label>
-        <app-input-error-message-handler [fc]="fg.get('supplierTaxNumber')">
+        <app-input-error-message-handler [fc]="fg.controls.supplierTaxNumber">
             <input
                 type="text"
                 pInputText

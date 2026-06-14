@@ -295,8 +295,6 @@ export class PurchasesForm extends BaseComponent {
     onSubmitPurchase() {
         if (this.fg.invalid) {
             this.fg.markAllAsTouched();
-            console.log('invalid');
-            console.log(this.fg.getRawValue());
             return;
         }
 

@@ -55,7 +55,7 @@ export class OpeningBalances extends BaseComponent {
       value: OpeningBalanceSearchEnum.InvoiceNumber,
     },
     {
-      label: 'رقم المرجع',
+      label: 'الرقم الدفتري',
       value: OpeningBalanceSearchEnum.ReferenceNumber,
     },
   ]);
