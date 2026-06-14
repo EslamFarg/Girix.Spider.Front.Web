@@ -446,7 +446,7 @@
                         class="flex text-xs col-span-2 mt-1 pt-1 font-bold justify-between items-center border-t border-text-light text-dark-bg-2"
                     >
                         <span>الصافي</span>
-                        <span>{{ netPreview().toFixed(2) }}</span>
+                        <span>{{ initialNet().toFixed(2) }}</span>
                     </div>
                 </div>
             </div>
@@ -493,9 +493,9 @@
                     بيانات الدفع
                 </button>
             </app-input-error-message-handler>
-            <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
+            <!-- <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
                 <button
-                    (click)="toggleNumbersKeyboard()"
+                    /* (click)="toggleNumbersKeyboard()" */
                     type="button"
                     pButton
                     class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
@@ -503,7 +503,7 @@
                 >
                     لوحه المفاتيح
                 </button>
-            </app-input-error-message-handler>
+            </app-input-error-message-handler> -->
         </div>
     </form>
 </div>
@@ -651,7 +651,6 @@
     [(visible)]="customerDialogVisible"
     [modal]="true"
     [dismissableMask]="true"
-    (onHide)="closeFullKeyboard()"
     [style]="{ width: '80%', maxWidth: '50rem' }"
     [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
     styleClass="bg-white!"
@@ -718,7 +717,6 @@
                             aria-describedby="productAddress-help"
                             [placeholder]="'FORM.CUSTOMER_ADDRESS' | translate"
                             class="app-input order-customer-address"
-                            (click)="triggerFullKeyboard('.order-customer-address')"
                         />
                     </app-input-error-message-handler>
                 </div>
@@ -793,24 +791,21 @@
                 <!-- cash -->
                 <div>
                     <label for="cash">{{ 'FORM.CASH_PAID' | translate }}</label>
-                    <app-input-error-message-handler [fc]="orderFg.get('payingCash')">
+                    <app-input-error-message-handler [fc]="orderFg.controls.payingCash">
                         <input
                             pInputText
                             aria-describedby="cash-help"
                             [placeholder]="'FORM.CASH' | translate"
-                            [formControl]="getFormControl(orderFg, 'payingCash')"
                             appAllowNumbers
-                            [max]="net()"
-                            [disabled]="orderFg.value.paymentType === OrderPaymentType.Pending" 
-                            [min]="0"
                             [allowDecimal]="true"
+                            [formControl]="orderFg.controls.payingCash"
+                            [max]="net()"
+                            [disabled]="orderFg.value.paymentType === OrderPaymentType.Pending"
+                            [min]="0"
                             #payingCash
-                            appDecimalMask
                             id="payingCash"
-                            type="number"
-                            appDebounce
+                            inputmode="decimal"
                             class="app-input"
-                            (click)="triggerNumbersKeyboard(payingCash)"
                         />
                         <p-inputgroup-addon class="flex p-0!">
                             <button
@@ -851,21 +846,19 @@
                 <!-- network -->
                 <div>
                     <label for="network">{{ 'FORM.NETWORK_PAID' | translate }}</label>
-                    <app-input-error-message-handler [fc]="orderFg.get('payingNetwork')">
+                    <app-input-error-message-handler [fc]="orderFg.controls.payingNetwork">
                         <input
                             pInputText
                             appAllowNumbers
                             [allowDecimal]="true"
                             [max]="net()"
                             [min]="0"
-                            appDecimalMask
                             [disabled]="orderFg.value.paymentType === OrderPaymentType.Pending"
                             id="payingNetwork"
                             type="number"
                             aria-describedby="network-help"
                             #payingNetwork
-                            (click)="triggerNumbersKeyboard(payingNetwork)"
-                            [formControl]="getFormControl(orderFg, 'payingNetwork')"
+                            [formControl]="orderFg.controls.payingNetwork"
                             [placeholder]="'FORM.NETWORK' | translate"
                             class="app-input"
                         />
@@ -906,7 +899,7 @@
                 </div>
 
                 <!-- number keyboard toggle -->
-                <div class="flex justify-between items-center md:col-span-2">
+                <!-- <div class="flex justify-between items-center md:col-span-2">
                     <button
                         type="button"
                         pButton
@@ -914,7 +907,6 @@
                         styleClass="px-3! py-1!"
                         severity="secondary"
                         variant="outlined"
-                        (click)="togglePaymentNumbersKeyboard()"
                         title="لوحة المفاتيح"
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -928,16 +920,16 @@
                         </svg>
                     </button>
 
-                    <!-- <button pButton styleClass="app-p-btn" severity="secondary" (click)="paymentDialogVisible = false">
+                    <button pButton styleClass="app-p-btn" severity="secondary" (click)="paymentDialogVisible = false">
                         استمرار
-                    </button> -->
-                </div>
+                    </button>
+                </div> -->
 
-                @if (isPaymentNumbersKeyboardVisible()) {
+                <!-- @if (isPaymentNumbersKeyboardVisible()) {
                     <div class="md:col-span-2">
                         <app-numbers-keyboard />
                     </div>
-                }
+                } -->
 
                 @if (orderFg.value.paymentType) {
                     <!-- amount received from customer (for change calculation) -->
@@ -957,7 +949,6 @@
                             #amountReceivedInput
                             appDebounce
                             class="app-input"
-                            (click)="triggerNumbersKeyboard(amountReceivedInput)"
                         />
                     </div>
 

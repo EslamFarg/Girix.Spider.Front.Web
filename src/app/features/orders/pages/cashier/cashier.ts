@@ -972,13 +972,13 @@ export class Cashier extends BaseComponent implements OnInit {
         return this.orderMenuItems().reduce((total, item) => total + this.getMenuItemNetValue(item), 0);
     });
 
-    netPreview = computed(
+    initialNet = computed(
         () =>
             this.orderItemsNet() + this.hutNet() + this.serviceFee() + this.deliveryFee() - this.itemsDiscountAmount(),
     );
 
     net = computed(() => {
-        const net = this.netPreview();
+        const net = this.initialNet();
 
         return this.paymentTypeSignal() === OrderPaymentType.Paid ? net : 0;
     });
@@ -987,7 +987,7 @@ export class Cashier extends BaseComponent implements OnInit {
         let net = this.net();
 
         this.orderFg.patchValue({
-            payingCash: net,
+            payingCash: +net.toFixed(2),
             payingNetwork: 0,
         });
     });
@@ -998,29 +998,29 @@ export class Cashier extends BaseComponent implements OnInit {
     //#region keyboard
     //
 
-    keyboardService = inject(KeyboardService);
-    closeFullKeyboard = this.keyboardService.closeFullKeyboard;
-    toggleNumbersKeyboard = () => {
-        if (this.keyboardService.isNumbersKeyboardVisible()) {
-            this.closeNumbersKeyboard();
-        } else {
-            this.keyboardService.openNumbersKeyboard();
-        }
-    };
-    triggerFullKeyboard(inputClassSelector: string) {
-        this.keyboardService.triggerFullKeyboard(inputClassSelector, 'full-keyboard');
-    }
-    closeNumbersKeyboard = this.keyboardService.closeNumbersKeyboard;
+    // keyboardService = inject(KeyboardService);
+    // closeFullKeyboard = this.keyboardService.closeFullKeyboard;
+    // toggleNumbersKeyboard = () => {
+    //     if (this.keyboardService.isNumbersKeyboardVisible()) {
+    //         this.closeNumbersKeyboard();
+    //     } else {
+    //         this.keyboardService.openNumbersKeyboard();
+    //     }
+    // };
+    // triggerFullKeyboard(inputClassSelector: string) {
+    //     this.keyboardService.triggerFullKeyboard(inputClassSelector, 'full-keyboard');
+    // }
+    // closeNumbersKeyboard = this.keyboardService.closeNumbersKeyboard;
 
-    triggerNumbersKeyboard(input: HTMLInputElement) {
-        this.keyboardService.triggerNumbersKeyboard(input);
-    }
+    // triggerNumbersKeyboard(input: HTMLInputElement) {
+    //     this.keyboardService.triggerNumbersKeyboard(input);
+    // }
 
-    // Local numbers keyboard visibility for payment dialog
-    isPaymentNumbersKeyboardVisible = signal(false);
-    togglePaymentNumbersKeyboard() {
-        this.isPaymentNumbersKeyboardVisible.update((v) => !v);
-    }
+    // // Local numbers keyboard visibility for payment dialog
+    // isPaymentNumbersKeyboardVisible = signal(false);
+    // togglePaymentNumbersKeyboard() {
+    //     this.isPaymentNumbersKeyboardVisible.update((v) => !v);
+    // }
 
     //#endregion
 
@@ -1623,11 +1623,11 @@ export class Cashier extends BaseComponent implements OnInit {
     showCustomerDialog() {
         this.customerDialogVisible = true;
     }
-    onCustomerInfoDialogVisibilityChange(visible: boolean) {
-        if (!visible) {
-            this.closeFullKeyboard();
-        }
-    }
+    // onCustomerInfoDialogVisibilityChange(visible: boolean) {
+    //     if (!visible) {
+    //         this.closeFullKeyboard();
+    //     }
+    // }
 
     customersService = inject(CustomerService);
 
@@ -1801,7 +1801,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
     cashInputSubscription = this.payingCashControl.valueChanges.subscribe((value) => {
         const net = this.net();
-        let futureValue = value ?? 0;
+        let futureValue = +(value ?? 0);
         if (futureValue > net) {
             futureValue = net;
         } else if (futureValue < 0) {
@@ -1809,8 +1809,8 @@ export class Cashier extends BaseComponent implements OnInit {
         }
         this.orderFg.patchValue(
             {
-                payingNetwork: net - futureValue,
-                payingCash: futureValue,
+                payingNetwork: +(net - futureValue).toFixed(2),
+                payingCash: +futureValue.toFixed(2),
             },
             { emitEvent: false },
         );
@@ -1818,7 +1818,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
     networkInputSubscription = this.payingNetworkControl?.valueChanges.subscribe((value) => {
         const net = this.net();
-        let futureValue = value ?? 0;
+        let futureValue = +(value ?? 0);
         if (futureValue > net) {
             futureValue = net;
         } else if (futureValue < 0) {
@@ -1826,8 +1826,8 @@ export class Cashier extends BaseComponent implements OnInit {
         }
         this.orderFg.patchValue(
             {
-                payingCash: net - futureValue,
-                payingNetwork: futureValue,
+                payingCash: +(net - futureValue).toFixed(2),
+                payingNetwork: +futureValue.toFixed(2),
             },
             { emitEvent: false },
         );

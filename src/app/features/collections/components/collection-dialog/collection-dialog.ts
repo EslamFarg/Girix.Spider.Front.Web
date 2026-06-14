@@ -25,6 +25,7 @@ import { SpaceTypeEnum } from '@/features/replacements/services/replacements-ser
 import { OrderCollectionCalculationsService } from '../../services/order-collection-calculations-service';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { InputGroupAddon } from "primeng/inputgroupaddon";
+import { DecimalMask } from "@/directives/decimal-mask";
 
 @Component({
   selector: 'app-collection-dialog',
@@ -43,7 +44,8 @@ import { InputGroupAddon } from "primeng/inputgroupaddon";
     Debounce,
     ButtonDirective,
     LoadingDisabledDirective,
-    InputGroupAddon
+    InputGroupAddon,
+    DecimalMask
 ],
   templateUrl: './collection-dialog.html',
   styleUrl: './collection-dialog.css',

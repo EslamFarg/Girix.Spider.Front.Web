@@ -47,6 +47,7 @@
             [formControl]="getFormControl(paymentFg, 'cashPaymentAmount')"
             appAllowNumbers
             [max]="net()"
+            appDecimalMask
             [min]="0"
             [allowDecimal]="true"
             #cashPaymentAmount
