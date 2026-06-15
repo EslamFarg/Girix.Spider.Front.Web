@@ -15,6 +15,7 @@ import { Debounce } from '@/directives/debounce';
 import { ICustomerSearchRow } from '../../services/customer-types';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-customers',
@@ -29,7 +30,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     RouterLink,
     Debounce,
     TranslatePipe,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    TooltipModule
 ],
   templateUrl: './customers.html',
   styleUrl: './customers.css',

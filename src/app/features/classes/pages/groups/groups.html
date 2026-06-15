@@ -25,7 +25,9 @@
             />
           </p-inputgroup-addon> -->
         <p-inputgroup-addon>
+          <button type="submit" class="flex cursor-pointer" pTooltip="بحث">
           <i class="pi pi-search"></i>
+          </button>
         </p-inputgroup-addon>
       </app-input-error-message-handler>
     </div>
@@ -72,7 +74,7 @@
           </td>
           <td>
             <div class="actions">
-              <a type="button" class="edit" [routerLink]="`/classes/groups/${item.id}/edit`">
+              <a type="button" class="edit" [routerLink]="`/classes/groups/${item.id}/edit`" pTooltip="تعديل">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"
@@ -90,7 +92,7 @@
                   />
                 </svg>
               </a>
-              <button appLoadingDisabled (click)="deleteGroup(item.id, $event)" type="button" class="delete">
+              <button appLoadingDisabled (click)="deleteGroup(item.id, $event)" type="button" class="delete" pTooltip="حذف">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"

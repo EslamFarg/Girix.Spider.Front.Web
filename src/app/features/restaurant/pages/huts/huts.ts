@@ -15,22 +15,21 @@ import { omitKeys } from '@/yn-ng/utils/helpers';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-huts',
   imports: [
-    Button,
     ReactiveFormsModule,
-    InputGroupAddon,
     InputErrorMessageHandler,
-    Select,
     InputTextModule,
     SectionWrapper,
     Paginator,
     AllowNumbers,
     ButtonDirective,
     Debounce,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    TooltipModule
 ],
   templateUrl: './huts.html',
   styleUrl: './huts.css',

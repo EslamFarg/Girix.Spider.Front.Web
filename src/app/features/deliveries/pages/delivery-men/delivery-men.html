@@ -22,7 +22,7 @@
                         [placeholder]="'ACTIONS.SEARCH' | translate"
                     />
                     <p-inputgroup-addon class="relative">
-                        <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+                        <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)" pTooltip="تصفية"></i>
                         <p-menu
                             dir="rtl"
                             [class]="`*:top-full! *:left-0! `"
@@ -38,12 +38,13 @@
                                     optionValue="value"
                                     optionLabel="label"
                                     class="w-full md:w-56"
+                                    (onChange)="filterMenu.hide()"
                                 />
                             </ng-template>
                         </p-menu>
                     </p-inputgroup-addon>
                     <p-inputgroup-addon>
-                        <button class="flex cursor-pointer" type="submit">
+                        <button class="flex cursor-pointer" type="submit" pTooltip="بحث">
                             <i class="pi pi-search"></i>
                         </button>
                     </p-inputgroup-addon>
@@ -87,7 +88,7 @@
                         </td>
                         <td>
                             <div class="actions">
-                                <a [routerLink]="`/classes/deliveries/${item.id}/edit`" class="edit">
+                                <a [routerLink]="`/classes/deliveries/${item.id}/edit`" class="edit" pTooltip="تعديل">
                                     <svg
                                         width="16"
                                         height="16"
@@ -116,6 +117,7 @@
                                     type="button"
                                     (click)="deleteDelivery(item.id, $event)"
                                     class="delete"
+                                    pTooltip="حذف"
                                 >
                                     <svg
                                         width="15"

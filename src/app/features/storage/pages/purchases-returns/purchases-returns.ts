@@ -7,7 +7,6 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { Menu } from 'primeng/menu';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { Select } from 'primeng/select';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
@@ -17,13 +16,13 @@ import { PurchaseReturnSearchEnum, PurchaseReturnService } from '../../services/
 import { IPurchaseReturnSearchRow } from '../../types/api/purchase-return/responses';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-purchases-returns',
   imports: [
     InputErrorMessageHandler,
     InputGroupAddon,
-    Select,
     Paginator,
     ReactiveFormsModule,
     InputTextModule,
@@ -34,7 +33,8 @@ import { Listbox } from "primeng/listbox";
     TranslatePipe,
     RouterLink,
     LoadingDisabledDirective,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
   templateUrl: './purchases-returns.html',
   styleUrl: './purchases-returns.css',

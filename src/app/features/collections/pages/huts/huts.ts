@@ -12,6 +12,7 @@ import { HutCard } from '@/components/hut-card/hut-card';
 import { IHutReadResponse, HutSearchEnum, HutService, IHutSearchRow } from '@/features/restaurant/services/hut-service';
 import { MenuItem } from 'primeng/api';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-huts',
@@ -24,7 +25,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     ReactiveFormsModule,
     InputText,
     HutCard,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    TooltipModule
 ],
   templateUrl: './huts.html',
   styleUrl: './huts.css',

@@ -7,21 +7,18 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { InputText } from 'primeng/inputtext';
-import { Select } from 'primeng/select';
-import { Dialog } from 'primeng/dialog';
-import { Button } from 'primeng/button';
 import {
   DeliverySearchEnum,
   DeliveryService,
   IDeliverySearchRow,
 } from '@/features/deliveries/services/delivery-service';
-import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
 import { OrderLocationType } from '@/features/orders';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-deliveries',
@@ -32,15 +29,13 @@ import { Listbox } from "primeng/listbox";
     Paginator,
     ReactiveFormsModule,
     InputText,
-    Select,
-    Dialog,
-    Button,
     ReactiveFormsModule,
     Debounce,
     Menu,
     TranslatePipe,
     LoadingDisabledDirective,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
   templateUrl: './deliveries.html',
   styleUrl: './deliveries.css',

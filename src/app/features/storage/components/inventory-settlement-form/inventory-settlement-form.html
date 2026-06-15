@@ -37,7 +37,7 @@
                         #settlementSearchInput
                     />
                     <p-inputgroup-addon class="p-0! cursor-pointer">
-                        <button type="submit" form="searchSettlementForm" class="flex cursor-pointer">
+                        <button type="submit" form="searchSettlementForm" class="flex cursor-pointer" pTooltip="بحث">
                             <svg
                                 width="24"
                                 height="24"
@@ -169,7 +169,7 @@
                 type="button"
                 pButton
                 appLoadingDisabled
-                class="flex-1 md:flex-none app-p-btn py-1! md:px-8!"
+                class="ms-auto md:flex-none app-p-btn py-1! md:px-8! md:col-span-2 lg:col-span-4 w-fit"
                 (click)="searchInventorySettlementProducts()"
             >
                 بحث

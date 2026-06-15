@@ -16,7 +16,7 @@
                 [placeholder]="'ACTIONS.SEARCH' | translate"
             />
             <p-inputgroup-addon class="relative">
-                <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+                <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)" pTooltip="بحث"></i>
                 <p-menu
                     dir="rtl"
                     [class]="`*:top-full! *:left-0! `"
@@ -32,12 +32,15 @@
                             optionValue="value"
                             optionLabel="label"
                             class="w-full md:w-56"
+                            (onChange)="filterMenu.hide()"
                         />
                     </ng-template>
                 </p-menu>
             </p-inputgroup-addon>
             <p-inputgroup-addon>
+                <button pButton type="submit" class="border-0! cursor-pointer" pTooltip="بحث">
                 <i class="pi pi-search"></i>
+                </button>
             </p-inputgroup-addon>
         </app-input-error-message-handler>
     </div>
@@ -79,7 +82,7 @@
                 </td>
                 <td>
                     <div class="actions">
-                        <a [routerLink]="['/accounts/journals', item.id, 'edit']" class="edit">
+                        <a [routerLink]="['/accounts/journals', item.id, 'edit']" class="edit" pTooltip="تعديل">
                             <svg
                                 width="16"
                                 height="16"
@@ -103,7 +106,7 @@
                                 />
                             </svg>
                         </a>
-                        <button type="button" class="delete" (click)="deleteJournal(item.id, $event)">
+                        <button type="button" class="delete" (click)="deleteJournal(item.id, $event)" pTooltip="حذف">
                             <svg
                                 width="15"
                                 height="16"

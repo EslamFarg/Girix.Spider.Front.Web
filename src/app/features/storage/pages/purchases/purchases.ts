@@ -17,13 +17,13 @@ import { PurchaseSearchEnum, PurchaseService } from '../../services/purchase-ser
 import { IPurchaseSearchRow } from '../../types/api/purchases/responses';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-purchases',
   imports: [
     InputErrorMessageHandler,
     InputGroupAddon,
-    Select,
     Paginator,
     ReactiveFormsModule,
     InputTextModule,
@@ -34,7 +34,8 @@ import { Listbox } from "primeng/listbox";
     TranslatePipe,
     RouterLink,
     LoadingDisabledDirective,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
   templateUrl: './purchases.html',
   styleUrl: './purchases.css',

@@ -14,21 +14,20 @@ import { omitKeys } from '@/yn-ng/utils/helpers';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-tables',
   imports: [
-    Button,
     InputErrorMessageHandler,
-    InputGroupAddon,
-    Select,
     ReactiveFormsModule,
     InputTextModule,
     SectionWrapper,
     Paginator,
     ButtonDirective,
     Debounce,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    TooltipModule
 ],
   templateUrl: './tables.html',
   styleUrl: './tables.css',

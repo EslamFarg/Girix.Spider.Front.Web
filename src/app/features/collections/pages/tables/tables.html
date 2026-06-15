@@ -4,7 +4,7 @@
     <app-input-error-message-handler [fc]="searchFg.get('searchTerm')">
       <input class="w-full bg-transparent! h-8!" pInputText type="text" formControlName="searchTerm" placeholder="بحث" />
       <p-inputgroup-addon class="p-0!">
-        <button type="submit" class="flex cursor-pointer">
+        <button type="submit" class="flex cursor-pointer" pTooltip="بحث">
             <i class="pi pi-search"></i>
           </button>
       </p-inputgroup-addon>

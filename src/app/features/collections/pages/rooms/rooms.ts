@@ -17,6 +17,7 @@ import {
 } from '@/features/restaurant/services/room-service';
 import { MenuItem } from 'primeng/api';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-rooms',
@@ -28,7 +29,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     ReactiveFormsModule,
     InputText,
     RoomCard,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    TooltipModule
 ],
   templateUrl: './rooms.html',
   styleUrl: './rooms.css',

@@ -57,6 +57,7 @@ import { Message } from 'primeng/message';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Menu } from "primeng/menu";
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-all',
@@ -86,7 +87,8 @@ import { Listbox } from "primeng/listbox";
     LoadingDisabledDirective,
     Menu,
     PrintableOrderInvoice,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
   templateUrl: './all.html',
   styleUrl: './all.css',

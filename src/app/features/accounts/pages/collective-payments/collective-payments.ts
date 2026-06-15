@@ -1,4 +1,4 @@
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -7,7 +7,6 @@ import { BaseComponent, IPaginationInfo } from '@/components/base-component/base
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { Debounce } from '@/directives/debounce';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { MenuItem } from 'primeng/api';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputText } from 'primeng/inputtext';
 import { Menu } from 'primeng/menu';
@@ -17,6 +16,7 @@ import { IPaymentVoucherSearchRow } from '../../types';
 import { ButtonDirective } from "primeng/button";
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-collective-payments',
@@ -29,13 +29,13 @@ import { Listbox } from "primeng/listbox";
     AllowNumbers,
     Debounce,
     DatePipe,
-    CurrencyPipe,
     TranslatePipe,
     Menu,
     RouterLink,
     ButtonDirective,
     LoadingDisabledDirective,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
   templateUrl: './collective-payments.html',
   styleUrl: './collective-payments.css',

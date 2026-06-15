@@ -169,7 +169,7 @@
                         placeholder="بحث"
                     />
                     <p-inputgroup-addon class="relative">
-                        <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+                        <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)" pTooltip="تصفيه"></i>
                         <p-menu
                             dir="rtl"
                             [class]="`*:top-full! *:left-0! `"
@@ -185,12 +185,13 @@
                                     optionValue="value"
                                     optionLabel="label"
                                     class="w-full md:w-56"
+                                    (onChange)="filterMenu.hide()"
                                 />
                             </ng-template>
                         </p-menu>
                     </p-inputgroup-addon>
                     <p-inputgroup-addon>
-                        <button pButton type="submit" class="border-0! cursor-pointer">
+                        <button pButton type="submit" class="border-0! cursor-pointer" pTooltip="بحث">
                             <i class="pi pi-search"></i>
                         </button>
                     </p-inputgroup-addon>

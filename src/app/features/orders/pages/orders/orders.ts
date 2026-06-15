@@ -26,6 +26,7 @@ import { PrintableOrderInvoice } from '@/features/orders/components/printable-or
 import { PrinterSettingsService } from '@/features/printers/services/printer-settings-service';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { ListboxModule } from 'primeng/listbox';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-orders',
@@ -47,6 +48,7 @@ import { ListboxModule } from 'primeng/listbox';
         LoadingDisabledDirective,
         ButtonDirective,
         ListboxModule,
+        TooltipModule
     ],
     templateUrl: './orders.html',
     styleUrl: './orders.css',

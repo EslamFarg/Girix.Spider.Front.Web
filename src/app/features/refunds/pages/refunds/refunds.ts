@@ -16,6 +16,7 @@ import { RouterLink } from '@angular/router';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { ButtonDirective } from 'primeng/button';
 import { Listbox } from 'primeng/listbox';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     imports: [
@@ -33,6 +34,7 @@ import { Listbox } from 'primeng/listbox';
         LoadingDisabledDirective,
         ButtonDirective,
         Listbox,
+        TooltipModule
     ],
     templateUrl: './refunds.html',
     styleUrl: './refunds.css',

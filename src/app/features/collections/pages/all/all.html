@@ -15,7 +15,7 @@
 
                     <p-inputgroup-addon >
                         <div class="relative flex items-center justify-center">
-                            <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+                            <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)" pTooltip="تصفية"></i>
                             <p-menu
                                 dir="rtl"
                                 [class]="`*:top-full! *:left-0! `"
@@ -31,6 +31,7 @@
                                         optionValue="value"
                                         optionLabel="label"
                                         class="w-full md:w-56"
+                                        (onChange)="filterMenu.hide()"
                                     />
                                 </ng-template>
                             </p-menu>
@@ -160,7 +161,7 @@
                         <td>
                             <div class="actions">
                                 <!-- print -->
-                                <button appLoadingDisabled type="button" class="print"
+                                <button appLoadingDisabled type="button" class="print" pTooltip="طباعه"
                                     (click)="openOrderDialog(order.id)">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
@@ -170,7 +171,7 @@
                                     </svg>
                                 </button>
                                 <!-- collect -->
-                                <button appLoadingDisabled type="button" [disabled]="order.isCollected" (click)="
+                                <button appLoadingDisabled type="button" [disabled]="order.isCollected" pTooltip="تحصيل" (click)="
                       openCollectionDialog({
                         orderId: order.id,
                         isCollected: order.isCollected,
@@ -221,7 +222,7 @@
                                     </svg>
                                 </button>
                                 <!-- change location type -->
-                                <button appLoadingDisabled (click)="openInvoiceTypeChangeDialog(order)" type="button"
+                                <button appLoadingDisabled (click)="openInvoiceTypeChangeDialog(order)" type="button" pTooltip="تحويل"
                                     class="edit bg-text-light!">
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
@@ -231,7 +232,7 @@
                                             stroke-linejoin="round" />
                                     </svg>
                                 </button>
-                                <button appLoadingDisabled type="button" class="delete"
+                                <button appLoadingDisabled type="button" class="delete" pTooltip="حذف"
                                     (click)="deleteOrder(order, $event)">
                                     <svg width="15" height="16" viewBox="0 0 15 16" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">

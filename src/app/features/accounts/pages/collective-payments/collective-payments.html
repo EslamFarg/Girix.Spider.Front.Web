@@ -21,7 +21,7 @@
                 placeholder="بحث"
             />
             <p-inputgroup-addon class="relative">
-                <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+                <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)" pTooltip="تصفيه"></i>
                 <p-menu
                     dir="rtl"
                     [class]="`*:top-full! *:left-0! `"
@@ -37,6 +37,7 @@
                             optionValue="value"
                             optionLabel="label"
                             class="w-full md:w-56"
+                            (onChange)="filterMenu.hide()"
                         />
                     </ng-template>
                 </p-menu>
@@ -95,7 +96,7 @@
                 />
               </svg>
             </button> -->
-                        <a [routerLink]="['/accounts/collective-payments', collectivePayment.id, 'edit']">
+                        <a [routerLink]="['/accounts/collective-payments', collectivePayment.id, 'edit']" pTooltip="تعديل">
                             <svg
                                 width="16"
                                 height="16"
@@ -123,6 +124,7 @@
                             type="button"
                             class="delete"
                             (click)="deleteCollectivePayment(collectivePayment.id, $event)"
+                            pTooltip="حذف"
                         >
                             <svg
                                 width="15"

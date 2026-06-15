@@ -78,7 +78,7 @@
         placeholder="بحث برقم الفاتوره/المرتجع"
       />
       <p-inputgroup-addon class="p-0! cursor-pointer relative">
-        <button appLoadingDisabled type="button" form="searchVoucherForm" class="flex cursor-pointer" (click)="filterMenu.toggle($event)">
+        <button appLoadingDisabled type="button" form="searchVoucherForm" class="flex cursor-pointer" (click)="filterMenu.toggle($event)" pTooltip="نوع البحث">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               opacity="0.4"
@@ -120,7 +120,7 @@
         />
       </p-inputgroup-addon>
       <p-inputgroup-addon class="p-0! cursor-pointer">
-        <button type="submit" form="searchVoucherForm" class="flex cursor-pointer">
+        <button type="submit" form="searchVoucherForm" class="flex cursor-pointer" pTooltip="بحث">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <ellipse cx="10.5992" cy="10.6532" rx="8.59922" ry="8.65324" fill="#E0E6E9" />
             <path

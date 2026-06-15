@@ -9,13 +9,13 @@ import { SelectModule } from 'primeng/select';
 import { ImgFallback } from '@/directives/img-fallback';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { MenuItem } from 'primeng/api';
 import { IProductSearchRow, ProductSearchEnum, ProductService } from '../../services/product-service';
 import { Debounce } from '@/directives/debounce';
 import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-products',
@@ -28,13 +28,13 @@ import { Listbox } from "primeng/listbox";
     PaginatorModule,
     ImgFallback,
     RouterLink,
-    RouterLinkActive,
     SectionWrapper,
     Debounce,
     Menu,
     TranslatePipe,
     LoadingDisabledDirective,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
   templateUrl: './products.html',
   styleUrl: './products.css',

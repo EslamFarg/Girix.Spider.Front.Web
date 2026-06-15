@@ -1,10 +1,8 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { Button, ButtonDirective } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { Select } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Paginator, PaginatorState } from 'primeng/paginator';
@@ -14,21 +12,20 @@ import { omitKeys } from '@/yn-ng/utils/helpers';
 import { Debounce } from '@/directives/debounce';
 import { MenuItem } from 'primeng/api';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-rooms',
   imports: [
-    Button,
     ReactiveFormsModule,
     InputErrorMessageHandler,
-    InputGroupAddon,
-    Select,
     InputTextModule,
     SectionWrapper,
     Paginator,
     ButtonDirective,
     Debounce,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    TooltipModule
 ],
   templateUrl: './rooms.html',
   styleUrl: './rooms.css',
