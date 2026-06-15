@@ -392,8 +392,17 @@ export class Header extends BaseComponent implements AfterViewInit {
     isShowingMenu = signal(true);
 
     reUpdateActiveLink() {
-        const parentRoute = this.getParent(this.router.url) ?? this.router.url;
-        const el = document.getElementById(`header-link-wrapper-${parentRoute}`);
+        const parentRoute = this.getParent(this.router.url);
+        const isKnownRoute = parentRoute !== undefined || this.isParent(this.router.url);
+        
+        // Don't change anything for routes not in the nav tree
+        if (!isKnownRoute) {
+            return;
+        }
+        
+        const effectiveParent = parentRoute ?? this.router.url;
+        const el = document.getElementById(`header-link-wrapper-${effectiveParent}`);
+        
         if (!el) {
             // Fallback: update signals directly when element not in DOM yet
             const isParent = this.isParent(this.router.url);
@@ -402,30 +411,37 @@ export class Header extends BaseComponent implements AfterViewInit {
                 this.prevActiveLink.set(this.router.url);
                 this.isShowingMenu.set(true);
             } else {
-                this.activeLink.set(parentRoute);
+                this.activeLink.set(effectiveParent);
                 this.prevActiveLink.set(this.router.url);
                 this.isShowingMenu.set(false);
             }
             return;
         }
+        
         // Use requestAnimationFrame instead of setTimeout for reliable DOM readiness
         requestAnimationFrame(() => {
             // First: set parent as active to establish context
-            this.toggleActiveLink({ routerLink: parentRoute, isLink: true }, el);
+            this.toggleActiveLink({ routerLink: effectiveParent, isLink: true }, el);
             // Then: if current URL is a child, update to show children without nav movement
-            if (this.router.url !== parentRoute) {
+            if (this.router.url !== effectiveParent) {
                 this.toggleActiveLink({ routerLink: this.router.url, skipNavMove: true }, el);
             }
         });
     }
 
     ngAfterViewInit(): void {
-        const parentRoute = this.getParent(this.router.url) ?? this.router.url;
-        const el = document.getElementById(`header-link-wrapper-${parentRoute}`);
-        if (el) {
-            this.toggleActiveLink({ routerLink: parentRoute, isLink: true }, el);
-            this.toggleActiveLink({ routerLink: this.router.url }, el);
+        const parentRoute = this.getParent(this.router.url);
+        const isKnownRoute = parentRoute !== undefined || this.isParent(this.router.url);
+        
+        if (isKnownRoute) {
+            const effectiveParent = parentRoute ?? this.router.url;
+            const el = document.getElementById(`header-link-wrapper-${effectiveParent}`);
+            if (el) {
+                this.toggleActiveLink({ routerLink: effectiveParent, isLink: true }, el);
+                this.toggleActiveLink({ routerLink: this.router.url }, el);
+            }
         }
+        
         this.reUpdateActiveLink();
     }
 
