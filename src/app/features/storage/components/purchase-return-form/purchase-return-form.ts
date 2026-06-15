@@ -561,4 +561,11 @@ export class PurchaseReturnForm extends BaseComponent {
       });
     }
   }
+     onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.fg.reset();
+    }else{
+      this.router.navigateByUrl('/storage/purchases-returns/add');
+    }
+  }
 }

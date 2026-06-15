@@ -612,4 +612,11 @@ export class ProductForm extends BaseComponent implements OnInit {
   //
   //#endregion
   //
+     onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.productFg.reset();
+    }else{
+      this.router.navigateByUrl('/classes/products/add');
+    }
+  }
   }

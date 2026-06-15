@@ -156,4 +156,11 @@ export class CustomerForm extends BaseComponent implements OnInit {
         break;
     }
   }
+     onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.customerFg.reset();
+    }else{
+      this.router.navigateByUrl('/accounts/customers/add');
+    }
+  }
 }

@@ -127,11 +127,7 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
       nameAr: this.deliveryFg.get('nameAr')?.value ?? this.deliveryFg.get('nameEn')?.value,
       nameEn: this.deliveryFg.get('nameAr')?.value,
     });
-    // if (!this.currentImage() || this.deliveryFg.get('images')?.value.length === 0) {
-    //   this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يمكن ان يكون الصورة فارغة' });
-    //   return;
-    // }
-    // debugger;
+   
     if (this.deliveryFg.invalid) {
       console.log('invalid form', this.deliveryFg.getRawValue());
       this.deliveryFg.markAllAsTouched();
@@ -150,7 +146,6 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
       }
     });
 
-    // console.log(formData);
 
     switch (this.formMode()) {
       case FormMode.Create:
@@ -177,6 +172,13 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
           },
         });
         break;
+    }
+  }
+   onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.deliveryFg.reset();
+    }else{
+      this.router.navigateByUrl('/classes/deliveries/add');
     }
   }
   //
@@ -220,4 +222,5 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
   onDeleteImage() {
     this.currentImage.set(null);
   }
+ 
 }

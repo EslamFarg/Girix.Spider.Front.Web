@@ -27,7 +27,6 @@ import { AllowNumbers } from "@/directives/allow-numbers";
 @Component({
   selector: 'app-meal-form',
   imports: [
-    Button,
     InputErrorMessageHandler,
     InputText,
     SelectModule,
@@ -44,7 +43,6 @@ import { AllowNumbers } from "@/directives/allow-numbers";
     ReactiveFormsModule,
     TranslatePipe,
     ImgOnly,
-    RouterLink,
     LoadingDisabledDirective,
     AllowNumbers
 ],
@@ -448,5 +446,12 @@ export class MealForm extends BaseComponent implements OnInit {
   };
   getSelectedProductById(id: number) {
     return this.selectedProducts.find((p) => p.id === id);
+  }
+     onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.mealFg.reset();
+    }else{
+      this.router.navigateByUrl('/classes/meals/add');
+    }
   }
 }

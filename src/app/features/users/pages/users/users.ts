@@ -17,16 +17,14 @@ import { IUserRowResponse } from '../../types/users/api';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { Listbox } from 'primeng/listbox';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-users',
     imports: [
         Paginator,
-        UsersNav,
-        SectionWrapper,
         InputErrorMessageHandler,
         InputGroupAddon,
-        Select,
         ReactiveFormsModule,
         InputText,
         Debounce,
@@ -35,6 +33,7 @@ import { Listbox } from 'primeng/listbox';
         TranslatePipe,
         LoadingDisabledDirective,
         Listbox,
+        TooltipModule
     ],
     templateUrl: './users.html',
     styleUrl: './users.css',

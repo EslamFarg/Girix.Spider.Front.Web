@@ -88,7 +88,7 @@
           </div>
           <!-- bluetooth printer search -->
           @if (fg.value.type === PrinterType.Bluetooth) {
-            <button appLoadingDisabled type="button" class="flex cursor-pointer items-center gap-2" (click)="getLocalBluetoothPrinters()">
+            <button appLoadingDisabled type="button" class="flex cursor-pointer items-center gap-2" (click)="getLocalBluetoothPrinters()" pTooltip="البحث عن طابعات">
               <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   opacity="0.5"
@@ -140,10 +140,10 @@
               </td>
               <td>
                 <div class="actions">
-                  <button appLoadingDisabled type="button" class="test" (click)="testConnection(item)" title="اختبار الاتصال">
+                  <button appLoadingDisabled type="button" class="test" (click)="testConnection(item)" pTooltip="اختبار الاتصال">
                     <i class="pi pi-wifi"></i>
                   </button>
-                  <button appLoadingDisabled type="button" class="edit" (click)="editPrinter(item)">
+                  <button appLoadingDisabled type="button" class="edit" (click)="editPrinter(item)" pTooltip="تعديل">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
                         opacity="0.4"
@@ -161,7 +161,7 @@
                       />
                     </svg>
                   </button>
-                  <button appLoadingDisabled type="button" class="delete" (click)="deletePrinter(item.id, $event)">
+                  <button appLoadingDisabled type="button" class="delete" (click)="deletePrinter(item.id, $event)" pTooltip="حذف">
                     <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
                         opacity="0.4"

@@ -20,11 +20,12 @@ import { InputText } from 'primeng/inputtext';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 
-interface IAppDefaultAccountItem {
-  id: number | null;
-  refFinancalId: number | null;
-}
 type IAppDefaultAccountItemControls = ControlsOf<IFixedFinancialAccountPatchRow>;
+interface IDefaultAccountRow {
+  account: IFixedFinancialAccountRow;
+  formGroup: FormGroup<IAppDefaultAccountItemControls>;
+}
+
 @Component({
   selector: 'app-default-accounts',
   imports: [SectionWrapper, InputErrorMessageHandler, Select, Button, ReactiveFormsModule, InputText, TranslatePipe, LoadingDisabledDirective],
@@ -35,28 +36,23 @@ export class DefaultAccounts extends BaseComponent {
   fixedFinancialAccountService = inject(FixedFinancialAccountService);
   financialAccountService = inject(FinancialAccountService);
 
-  defaultAccounts = signal<IFixedFinancialAccountRow[]>([]);
+  defaultAccountRows = signal<IDefaultAccountRow[]>([]);
   allAccounts = signal<IFinancialAccountSearchRow[]>([]);
 
-  formArray = this.fb.array<FormGroup<IAppDefaultAccountItemControls>>([]);
   changedDefaultAccounts: IFixedFinancialAccountPatchRow[] = [];
-  /**
-   *
-   */
-  constructor() {
-    super();
 
+  ngOnInit() {
     this.fixedFinancialAccountService.getAll().subscribe({
       next: (res) => {
-        this.defaultAccounts.set(res.rows);
-        res.rows.forEach((item) => {
-          this.formArray.push(
-            this.fb.group<IAppDefaultAccountItemControls>({
+        this.defaultAccountRows.set(
+          res.rows.map((item) => ({
+            account: item,
+            formGroup: this.fb.group<IAppDefaultAccountItemControls>({
               id: this.fb.control(item.id, [Validators.required]),
               refFinancalId: this.fb.control(item.refFinancalId, [Validators.required]),
             }),
-          );
-        });
+          })),
+        );
       },
     });
 

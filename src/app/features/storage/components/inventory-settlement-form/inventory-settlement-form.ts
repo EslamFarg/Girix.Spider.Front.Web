@@ -513,4 +513,11 @@ export class InventorySettlementForm extends BaseComponent {
   }
 
   onInventoryProductPageChange = (event: PaginatorState) => this.searchInventoryProducts(event.page! + 1);
+     onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.fg.reset();
+    }else{
+      this.router.navigateByUrl('/storage/inventory/add');
+    }
+  }
 }
