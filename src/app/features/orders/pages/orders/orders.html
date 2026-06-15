@@ -32,7 +32,7 @@
 
                     <p-inputgroup-addon>
                         <div class="relative flex items-center justify-center">
-                            <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+                            <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)" pTooltip="تصفية"></i>
 
                             <p-menu
                                 dir="rtl"
@@ -49,6 +49,7 @@
                                         optionValue="value"
                                         optionLabel="label"
                                         class="w-full md:w-56"
+                                        (onChange)="filterMenu.hide()"
                                     />
                                 </ng-template>
                             </p-menu>
@@ -143,6 +144,7 @@
                                         type="button"
                                         class="print"
                                         (click)="openOrderDialog(order.id)"
+                                        pTooltip="طباعه"
                                     >
                                         <svg
                                             width="16"
@@ -158,14 +160,14 @@
                                         </svg>
                                     </button>
                                     <!-- edit -->
-                                    <a class="view" [routerLink]="`/${order.id}/edit`">
+                                    <a class="view" [routerLink]="`/${order.id}/edit`" pTooltip="تعديل">
                                         <i class="pi pi-cart-plus"></i>
                                     </a>
                                     <!-- refund -->
                                     <a
                                         class="view"
                                         [routerLink]="['/invoices/refunds/add']"
-                                        [queryParams]="{ orderId: order.id }"
+                                        [queryParams]="{ orderId: order.id }" pTooltip="استرجاع"
                                     >
                                         <i class="pi pi-replay"></i>
                                     </a>
@@ -174,7 +176,7 @@
                                         appLoadingDisabled
                                         type="button"
                                         class="delete"
-                                        (click)="deleteOrder(order.id, $event)"
+                                        (click)="deleteOrder(order.id, $event)" pTooltip="حذف"
                                     >
                                         <svg
                                             width="15"

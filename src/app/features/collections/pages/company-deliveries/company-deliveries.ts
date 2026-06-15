@@ -3,12 +3,10 @@ import { CustomerSearchEnum, CustomerService } from '@/features/customers/servic
 import { ICustomerSearchRow } from '@/features/customers/services/customer-types';
 import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorState, Paginator } from 'primeng/paginator';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputErrorMessageHandler } from '@/yn-ng';
-import { Select } from 'primeng/select';
 import { Debounce } from '@/directives/debounce';
 import { InputText } from 'primeng/inputtext';
 import { CollectionsService } from '../../services/collections-service';
@@ -17,24 +15,24 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Menu } from "primeng/menu";
 import { Listbox } from "primeng/listbox";
 import { ButtonDirective } from "primeng/button";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-company-deliveries',
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     Paginator,
     TranslatePipe,
     InputGroupAddon,
     InputErrorMessageHandler,
-    Select,
     Debounce,
     SectionWrapper,
     InputText,
     LoadingDisabledDirective,
     Menu,
     Listbox,
-    ButtonDirective
+    ButtonDirective,
+    TooltipModule
 ],
   templateUrl: './company-deliveries.html',
   styleUrl: './company-deliveries.css',

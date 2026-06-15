@@ -23,7 +23,7 @@
                 <i class="pi pi-filter"></i>
             </p-inputgroup-addon> -->
             <p-inputgroup-addon class="relative">
-                <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+                <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)" pTooltip="تصفيه"></i>
                 <p-menu
                                 dir="rtl"
                                 [class]="`*:top-full! *:left-0! `"
@@ -39,6 +39,7 @@
                                         optionValue="value"
                                         optionLabel="label"
                                         class="w-full md:w-56"
+                                        (onChange)="filterMenu.hide()"
                                     />
                                 </ng-template>
                             </p-menu>
@@ -100,7 +101,7 @@
                 />
               </svg>
             </button> -->
-                        <a [routerLink]="['/accounts/collective-receipts', receiptVoucher.id, 'edit']" class="edit">
+                        <a [routerLink]="['/accounts/collective-receipts', receiptVoucher.id, 'edit']" class="edit" pTooltip="تعديل">
                             <svg
                                 width="16"
                                 height="16"
@@ -124,7 +125,7 @@
                                 />
                             </svg>
                         </a>
-                        <button type="button" class="delete" (click)="deleteReceiptVoucher(receiptVoucher.id, $event)">
+                        <button type="button" class="delete" (click)="deleteReceiptVoucher(receiptVoucher.id, $event)" pTooltip="حذف">
                             <svg
                                 width="15"
                                 height="16"

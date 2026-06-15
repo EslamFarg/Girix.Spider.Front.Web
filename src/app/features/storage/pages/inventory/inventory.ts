@@ -2,7 +2,6 @@ import { BaseComponent, IPaginationInfo, SectionWrapper } from '@/components';
 import { Component, inject, signal } from '@angular/core';
 import { InventorySettlementSearchEnum, InventoryService } from '../../services/inventory-service';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { MenuItem } from 'primeng/api';
 import { IInventorySettlementSearchRow } from '../../types/api/inventory/responses';
 import { PaginatorState, Paginator } from 'primeng/paginator';
 import { RouterLink } from '@angular/router';
@@ -15,6 +14,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { InputText } from 'primeng/inputtext';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-inventory',
@@ -31,7 +31,8 @@ import { Listbox } from "primeng/listbox";
     TranslatePipe,
     InputText,
     LoadingDisabledDirective,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',

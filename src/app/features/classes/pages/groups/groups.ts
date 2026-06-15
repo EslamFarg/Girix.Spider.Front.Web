@@ -14,6 +14,7 @@ import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { TooltipModule } from 'primeng/tooltip';
 @Component({
   selector: 'app-groups',
   imports: [
@@ -25,10 +26,10 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     PaginatorModule,
     SectionWrapper,
     Debounce,
-    Menu,
     TranslatePipe,
     RouterLink,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    TooltipModule
 ],
   templateUrl: './groups.html',
   styleUrl: './groups.css',

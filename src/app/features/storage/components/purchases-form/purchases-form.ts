@@ -27,7 +27,6 @@ import { SupplierService } from '../../services/supplier-service';
 import { ISupplierReadResponse } from '../../types/api/supplier/responses';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { DecimalMask } from '@/directives/decimal-mask';
-import { ImgOnly } from '@/directives/img-only';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import {
     FinancialAccountSearchEnum,
@@ -37,7 +36,7 @@ import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
-import { date } from '@primeuix/themes/aura/datepicker';
+import { TooltipModule } from 'primeng/tooltip';
 
 interface IAppPurchaseItem {
     menuItemsId: number | null;
@@ -66,11 +65,11 @@ type IAppPurchaseItemControls = ControlsOf<IAppPurchaseItem>;
         Debounce,
         AllowNumbers,
         DecimalMask,
-        ImgOnly,
         NgSelectComponent,
         TranslatePipe,
         RouterLink,
         LoadingDisabledDirective,
+        TooltipModule
     ],
     templateUrl: './purchases-form.html',
     styleUrl: './purchases-form.css',

@@ -3,25 +3,22 @@ import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { InputText } from 'primeng/inputtext';
 import { SupplierSearchEnum, SupplierService } from '../../services/supplier-service';
-import { noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
-import { omitKeys } from '@/yn-ng/utils/helpers';
 import { RouterLink } from '@angular/router';
 import { Debounce } from '@/directives/debounce';
 import { ISupplierSearchRow } from '../../services/supplier-types';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-suppliers',
   imports: [
     Select,
     InputErrorMessageHandler,
-    SectionWrapper,
     InputGroupAddon,
     ReactiveFormsModule,
     Paginator,
@@ -30,6 +27,7 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
     Debounce,
     TranslatePipe,
     LoadingDisabledDirective,
+    TooltipModule
   ],
   templateUrl: './suppliers.html',
   styleUrl: './suppliers.css',

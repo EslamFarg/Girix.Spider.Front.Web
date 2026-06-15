@@ -1,13 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { Select } from 'primeng/select';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { MenuItem } from 'primeng/api';
 import { OpeningBalanceSearchEnum, OpeningBalanceService } from '../../services/opening-balance-service';
 import { IOpeningBalanceSearchRow } from '../../types/api/opening-balances/responses';
 import { DatePipe } from '@angular/common';
@@ -17,13 +15,13 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from "@angular/router";
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-opening-balances',
   imports: [
     InputGroupAddon,
     InputErrorMessageHandler,
-    Select,
     Paginator,
     ReactiveFormsModule,
     InputTextModule,
@@ -34,7 +32,8 @@ import { Listbox } from "primeng/listbox";
     TranslatePipe,
     RouterLink,
     LoadingDisabledDirective,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
   templateUrl: './opening-balances.html',
   styleUrl: './opening-balances.css',

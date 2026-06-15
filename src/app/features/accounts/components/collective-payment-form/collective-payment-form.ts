@@ -6,7 +6,7 @@ import { ControlsOf } from '@/yn-ng/types/helpers';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { NgSelectComponent, NgItemLabelDirective, NgLabelTemplateDirective } from '@ng-select/ng-select';
+import { NgSelectComponent } from '@ng-select/ng-select';
 import { ButtonDirective } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -16,11 +16,11 @@ import { Textarea } from 'primeng/textarea';
 import { FinancialAccountSearchEnum, FinancialAccountService } from '../../services/financial-account-service';
 import { PaymentVoucherService } from '../../services/payment-voucher-service';
 import {
-  IFinancialAccountSearchResponseValue,
   IFinancialAccountSearchRow,
   IPaymentVoucherReadResponse,
   ITreeFinancialAccountSearchRow,
 } from '../../types';
+import { TooltipModule } from 'primeng/tooltip';
 
 interface IAppPaymentVoucherItem {
   finincalAccountId: number | null;
@@ -45,8 +45,7 @@ type ISelectableBankCashAccount = Omit<IFinancialAccountSearchRow, 'stage'>;
     AllowNumbers,
     ButtonDirective,
     RouterLink,
-    NgItemLabelDirective,
-    NgLabelTemplateDirective,
+    TooltipModule
   ],
   templateUrl: './collective-payment-form.html',
   styleUrl: './collective-payment-form.css',

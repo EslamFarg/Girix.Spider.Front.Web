@@ -3,7 +3,6 @@ import { DeliveriesNav } from '../../components/deliveries-nav/deliveries-nav';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { Select } from 'primeng/select';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
@@ -16,6 +15,7 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-delivery-men',
@@ -24,7 +24,6 @@ import { Listbox } from "primeng/listbox";
     SectionWrapper,
     InputErrorMessageHandler,
     InputGroupAddon,
-    Select,
     Paginator,
     ReactiveFormsModule,
     InputText,
@@ -33,7 +32,8 @@ import { Listbox } from "primeng/listbox";
     RouterLink,
     TranslatePipe,
     LoadingDisabledDirective,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
   templateUrl: './delivery-men.html',
   styleUrl: './delivery-men.css',

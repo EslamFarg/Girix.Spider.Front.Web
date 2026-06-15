@@ -1,6 +1,6 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, computed, inject, signal } from '@angular/core';
-import { FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
@@ -11,12 +11,13 @@ import { IOrderSearchRow, OrderLocationType, OrderSearchEnum, OrderService } fro
 import { Debounce } from '@/directives/debounce';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-import { Button, ButtonDirective } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { DeliveryService, IDeliverySearchRow } from '@/features/deliveries/services/delivery-service';
 import { CheckboxModule } from 'primeng/checkbox';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-assign-to-delivery',
@@ -31,12 +32,12 @@ import { Listbox } from "primeng/listbox";
     SectionWrapper,
     Debounce,
     Menu,
-    Button,
     Dialog,
     CheckboxModule,
     LoadingDisabledDirective,
     ButtonDirective,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
   templateUrl: './assign-to-delivery.html',
   styleUrl: './assign-to-delivery.css',

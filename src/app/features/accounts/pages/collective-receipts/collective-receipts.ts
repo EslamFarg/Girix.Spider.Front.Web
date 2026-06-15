@@ -1,9 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { CollectiveReceiptForm } from '../../components/collective-receipt-form/collective-receipt-form';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { Select } from 'primeng/select';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
@@ -12,33 +9,31 @@ import { ReceiptVoucherSearchEnum, ReceiptVoucherService } from '../../services/
 import { IReceiptVoucherSearchRow } from '../../types';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { Debounce } from '@/directives/debounce';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
-import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-collective-receipts',
     imports: [
-    SectionWrapper,
     ReactiveFormsModule,
     InputErrorMessageHandler,
     InputGroupAddon,
-    Select,
     Paginator,
     InputText,
     AllowNumbers,
     Debounce,
     DatePipe,
-    CurrencyPipe,
     TranslatePipe,
     Menu,
     RouterLink,
     ButtonDirective,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
     templateUrl: './collective-receipts.html',
     styleUrl: './collective-receipts.css',

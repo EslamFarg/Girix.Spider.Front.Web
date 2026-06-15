@@ -24,6 +24,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { RouterLink } from '@angular/router';
+import { TooltipModule } from 'primeng/tooltip';
 
 interface IAppJournalItem {
   finincalAccountId: number | null;
@@ -36,19 +37,18 @@ type IAppJournalItemControls = ControlsOf<IAppJournalItem>;
 @Component({
   selector: 'app-journal-form',
   imports: [
-    Button,
     InputErrorMessageHandler,
     Textarea,
     InputTextModule,
     DatePickerModule,
     InputGroupAddon,
-    SectionWrapper,
     ReactiveFormsModule,
     Debounce,
     NgSelectComponent,
     AllowNumbers,
     ButtonDirective,
     RouterLink,
+    TooltipModule
   ],
   templateUrl: './journal-form.html',
   styleUrl: './journal-form.css',

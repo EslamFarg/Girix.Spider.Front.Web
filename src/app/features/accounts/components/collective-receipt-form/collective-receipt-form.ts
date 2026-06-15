@@ -6,7 +6,7 @@ import { ControlsOf } from '@/yn-ng/types/helpers';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { NgSelectComponent, NgItemLabelDirective, NgLabelTemplateDirective } from '@ng-select/ng-select';
+import { NgSelectComponent } from '@ng-select/ng-select';
 import { ButtonDirective } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -20,6 +20,7 @@ import {
   IReceiptVoucherReadResponse,
   ITreeFinancialAccountSearchRow,
 } from '../../types';
+import { TooltipModule } from 'primeng/tooltip';
 
 interface IAppReceiptVoucherItem {
   finincalAccountId: number | null;
@@ -44,8 +45,7 @@ type ISelectableBankCashAccount = Omit<IFinancialAccountSearchRow, 'stage'>;
     AllowNumbers,
     ButtonDirective,
     RouterLink,
-    NgItemLabelDirective,
-    NgLabelTemplateDirective
+    TooltipModule
 ],
   templateUrl: './collective-receipt-form.html',
   styleUrl: './collective-receipt-form.css',

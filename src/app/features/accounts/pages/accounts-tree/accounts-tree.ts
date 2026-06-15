@@ -5,7 +5,7 @@ import { MenuItem, TreeNode } from 'primeng/api';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
-import { BaseComponent, FormMode, IPaginationInfo } from '@/components/base-component/base-component';
+import { BaseComponent, FormMode } from '@/components/base-component/base-component';
 import {
     AccountGroup,
     AccountStatus,
@@ -15,14 +15,13 @@ import {
     FinancialAccountService,
 } from '../../services/financial-account-service';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { PaginatorState } from 'primeng/paginator';
 import { IFinancialAccountSearchRow, IFinancialAccountTreeRow } from '../../types';
 import { Select } from 'primeng/select';
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { Debounce, IDebounceEvent } from '@/directives/debounce';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Menu } from 'primeng/menu';
 import { Listbox } from 'primeng/listbox';
+import { Tooltip } from "primeng/tooltip";
 
 interface IOption<T> {
     label: string;
@@ -36,19 +35,19 @@ type AccountRow = AccountTreeRow | AccountOptionRow;
 @Component({
     selector: 'app-accounts-tree',
     imports: [
-        SectionWrapper,
-        TreeModule,
-        InputErrorMessageHandler,
-        Select,
-        Button,
-        InputText,
-        ReactiveFormsModule,
-        Debounce,
-        NgSelectComponent,
-        InputGroupAddon,
-        Menu,
-        Listbox,
-    ],
+    SectionWrapper,
+    TreeModule,
+    InputErrorMessageHandler,
+    Select,
+    Button,
+    InputText,
+    ReactiveFormsModule,
+    NgSelectComponent,
+    InputGroupAddon,
+    Menu,
+    Listbox,
+    Tooltip
+],
     templateUrl: './accounts-tree.html',
     styleUrl: './accounts-tree.css',
 })

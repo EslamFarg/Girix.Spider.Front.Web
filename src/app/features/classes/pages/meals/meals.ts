@@ -8,13 +8,13 @@ import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { IMealSearchRow, MealSearchEnum, MealService } from '../../services/meal-service';
-import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { ImgFallback } from '@/directives/img-fallback';
 import { Debounce } from '@/directives/debounce';
 import { RouterLink } from "@angular/router";
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-meals',
@@ -31,7 +31,8 @@ import { Listbox } from "primeng/listbox";
     Debounce,
     RouterLink,
     LoadingDisabledDirective,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
   templateUrl: './meals.html',
   styleUrl: './meals.css',

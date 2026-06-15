@@ -19,7 +19,7 @@
                     [placeholder]="'ACTIONS.SEARCH' | translate"
                 />
                 <p-inputgroup-addon class="relative">
-                    <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
+                    <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)" pTooltip="بحث"></i>
                     <p-menu
                         dir="rtl"
                         [class]="`*:top-full! *:left-0! `"
@@ -35,12 +35,13 @@
                                 optionValue="value"
                                 optionLabel="label"
                                 class="w-full md:w-56"
+                                (onChange)="filterMenu.hide()"
                             />
                         </ng-template>
                     </p-menu>
                 </p-inputgroup-addon>
                 <p-inputgroup-addon>
-                    <button type="submit" class="flex cursor-pointer">
+                    <button type="submit" class="flex cursor-pointer" pTooltip="بحث">
                         <i class="pi pi-search"></i>
                     </button>
                 </p-inputgroup-addon>
@@ -84,7 +85,7 @@
                     </td>
                     <td>
                         <div class="actions">
-                            <a [routerLink]="`/storage/inventory/${item.id}/edit`" class="edit">
+                            <a [routerLink]="`/storage/inventory/${item.id}/edit`" class="edit" pTooltip="تعديل">
                                 <svg
                                     width="16"
                                     height="16"
@@ -113,6 +114,7 @@
                                 type="button"
                                 class="delete"
                                 (click)="deleteInventory(item.id, $event)"
+                                pTooltip="حذف"
                             >
                                 <svg
                                     width="15"

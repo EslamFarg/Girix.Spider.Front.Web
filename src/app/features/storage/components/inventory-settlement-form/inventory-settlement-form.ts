@@ -17,6 +17,7 @@ import { tap } from 'rxjs';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { onlyNumbersAllowed, onlyNumbersOrDotAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { TooltipModule } from 'primeng/tooltip';
 
  
  
@@ -56,7 +57,8 @@ enum QuantityOptions {
     AllowNumbers,
     ButtonDirective,
     LoadingDisabledDirective,
-    Paginator
+    Paginator,
+    TooltipModule
 ],
   templateUrl: './inventory-settlement-form.html',
   styleUrl: './inventory-settlement-form.css',

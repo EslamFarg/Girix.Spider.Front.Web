@@ -6,7 +6,6 @@ import { InputErrorMessageHandler } from '@/yn-ng';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputText } from 'primeng/inputtext';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
@@ -14,6 +13,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { JournalEntrySearchEnum, JournalEntryService } from '../../services/journal-entry-service';
 import { IJournalEntrySearchRow } from '../../types';
 import { Listbox } from "primeng/listbox";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-journals',
@@ -23,16 +23,15 @@ import { Listbox } from "primeng/listbox";
     Paginator,
     RouterLink,
     DatePipe,
-    DecimalPipe,
     Debounce,
     ReactiveFormsModule,
-    SectionWrapper,
     InputErrorMessageHandler,
     InputGroupAddon,
     Menu,
     TranslatePipe,
     InputText,
-    Listbox
+    Listbox,
+    TooltipModule
 ],
 })
 export class Journals extends BaseComponent {

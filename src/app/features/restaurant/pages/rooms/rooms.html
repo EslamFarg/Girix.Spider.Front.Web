@@ -65,7 +65,7 @@
           <td><div>{{ item.name }}</div></td>
           <td>
             <div class="actions">
-              <button appLoadingDisabled type="button" class="edit" (click)="fetchAndBindTableData(item.id)">
+              <button appLoadingDisabled type="button" class="edit" (click)="fetchAndBindTableData(item.id)" pTooltip="تعديل">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"
@@ -83,7 +83,7 @@
                   />
                 </svg>
               </button>
-              <button appLoadingDisabled type="button" class="delete" (click)="deleteRoom(item.id, $event)">
+              <button appLoadingDisabled type="button" class="delete" (click)="deleteRoom(item.id, $event)" pTooltip="حذف">
                 <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     opacity="0.4"

@@ -1,5 +1,5 @@
-import { Component, computed, effect, inject, input, Signal, signal } from '@angular/core';
-import { Button, ButtonDirective } from 'primeng/button';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { DatePicker } from 'primeng/datepicker';
@@ -7,20 +7,15 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components';
-import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PurchaseService } from '../../services/purchase-service';
 import { IPurchaseReadResponse } from '../../types/api/purchases/responses';
-import { IProductSearchRow, IProductUnit, ProductSearchEnum, ProductService } from '@/features/classes';
+import { IProductSearchRow} from '@/features/classes';
 import { IDebounceEvent, Debounce } from '@/directives/debounce';
-import { PaginatorState } from 'primeng/paginator';
-import { UnitService } from '@/features/classes/services/unit-service';
-import { mustIncludeLetters, noSymbolsAllowed, onlyNumbersAllowed, onlyNumbersOrDotAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
+import { noSymbolsAllowed, onlyNumbersOrDotAllowed } from '@/yn-ng';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { OrderPaymentType } from '@/features/orders';
-import { SupplierService } from '../../services/supplier-service';
-import { ISupplierReadResponse } from '../../types/api/supplier/responses';
 import { AllowNumbers } from '@/directives/allow-numbers';
-import { ImgOnly } from '@/directives/img-only';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import {
   FinancialAccountSearchEnum,
@@ -34,6 +29,7 @@ import { IPurchaseReturnReadResponse } from '../../types/api/purchase-return/res
 import { Menu } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { TooltipModule } from 'primeng/tooltip';
 
 interface IAppPurchaseReturnItem {
   menuItemsId: number | null;
@@ -50,7 +46,6 @@ enum FilterOption {
 @Component({
   selector: 'app-purchase-return-form',
   imports: [
-    Button,
     InputErrorMessageHandler,
     InputGroupAddon,
     DatePicker,
@@ -61,12 +56,12 @@ enum FilterOption {
     ReactiveFormsModule,
     Debounce,
     AllowNumbers,
-    ImgOnly,
     NgSelectComponent,
     TranslatePipe,
     RouterLink,
     Menu,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    TooltipModule
 ],
   templateUrl: './purchase-return-form.html',
   styleUrl: './purchase-return-form.css',
