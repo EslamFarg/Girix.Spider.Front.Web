@@ -8,37 +8,36 @@ import { QrCodeComponent } from 'ng-qrcode';
 import { BaseComponent } from '@/components';
 import { CryptoJsService } from '../../services/crypto-js-service';
 import BaseService from '@/core/services/BaseService';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
-  selector: 'app-qr',
-  imports: [SectionWrapper, InputErrorMessageHandler, InputGroupAddon, InputText, Button, QrCodeComponent],
-  templateUrl: './qr.html',
-  styleUrl: './qr.css',
+    selector: 'app-qr',
+    imports: [SectionWrapper, InputErrorMessageHandler, InputGroupAddon, InputText, QrCodeComponent, TooltipModule],
+    templateUrl: './qr.html',
+    styleUrl: './qr.css',
 })
 export class Qr extends BaseComponent {
-  cryptoService = inject(CryptoJsService);
+    cryptoService = inject(CryptoJsService);
 
-  backendApiUrl = BaseService.getResolvedApiBaseUrl().replace('/v1', '');
+    backendApiUrl = BaseService.getResolvedApiBaseUrl().replace('/v1', '');
 
-  encryptedValue: string = '';
+    encryptedValue: string = '';
 
-  ngAfterViewInit() {
-    const activationCode = this.authService.get<string>('activationToken');
-    const expireDate = this.authService.get<string>('expireDate');
-    const crmEmail = this.authService.get<string>('crmEmail');
-    const value = JSON.stringify({
-      link: this.backendApiUrl ?? '',
-      expiryDate: expireDate ?? '',
-      cloudIdActivation: activationCode ?? '',
-      email: crmEmail ?? '',
-    });
-    console.log(value);
-    this.encryptedValue = this.cryptoService.encrypt(value);
-  }
+    ngAfterViewInit() {
+        const activationCode = this.authService.get<string>('activationToken');
+        const expireDate = this.authService.get<string>('expireDate');
+        const crmEmail = this.authService.get<string>('crmEmail');
+        const value = JSON.stringify({
+            link: this.backendApiUrl ?? '',
+            expiryDate: expireDate ?? '',
+            cloudIdActivation: activationCode ?? '',
+            email: crmEmail ?? '',
+        });
+        this.encryptedValue = this.cryptoService.encrypt(value);
+    }
 
-  copyUrl() {
-    navigator.clipboard.writeText(this.backendApiUrl ?? '');
-    console.log(this.backendApiUrl);
-    this.messageService.add({ severity: 'success', summary: 'تم نسخ الرابط', detail: '' });
-  }
+    copyUrl() {
+        navigator.clipboard.writeText(this.backendApiUrl ?? '');
+        this.messageService.add({ severity: 'success', summary: 'تم نسخ الرابط', detail: '' });
+    }
 }
