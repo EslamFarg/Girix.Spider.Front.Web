@@ -59,8 +59,9 @@
                         <th>رقم الفاتوره</th>
                         <th>وقت الطلب</th>
                         <th>اسم العميل</th>
-                        <th>التحصيل</th>
-                        <th>حاله الفاتوره</th>
+                        <!-- <th>التحصيل</th>
+                        <th>حاله الفاتوره</th> -->
+                        <th>السداد</th>
                         <th>نوع الفاتوره</th>
                         <th>المبلغ</th>
                         <th>الأدوات</th>
@@ -82,6 +83,34 @@
                             <div>{{ order.customerName }}</div>
                         </td>
                         <td>
+                            <div class="flex items-center justify-center gap-2">
+                                @if (order.isCollected) {
+                            <div class="status active mx-0!">
+                                <span></span>
+                                <span>نقدى</span>
+                            </div>
+                            } @else {
+                            <div class="status in-active mx-0!">
+                                <span></span>
+                                <span>آجل</span>
+                            </div>
+                            }
+                            <!-- <span>/</span> -->
+                            @if (order.paymentType == OrderPaymentType.Paid) {
+                            <div class="status active mx-0!">
+                                <span></span>
+                                <span>مغلق</span>
+                            </div>
+                            } @else {
+                            <div class="status in-active mx-0!">
+                                <span></span>
+                                <span>مفتوح</span>
+                            </div>
+                            }
+                            </div>
+                            
+                        </td>
+                        <!-- <td>
                             @if (order.isCollected) {
                             <div class="status active">
                                 <span></span>
@@ -106,7 +135,7 @@
                                 <span>معلق</span>
                             </div>
                             }
-                        </td>
+                        </td> -->
                         <td>
                             <div>
                                 @switch (order.orderType) {
