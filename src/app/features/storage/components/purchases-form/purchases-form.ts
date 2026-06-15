@@ -900,4 +900,11 @@ export class PurchasesForm extends BaseComponent {
             });
         }
     }
+       onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.fg.reset();
+    }else{
+      this.router.navigateByUrl('/storage/purchases/add');
+    }
+  }
 }

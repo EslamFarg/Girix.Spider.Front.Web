@@ -398,18 +398,15 @@
                 >
                     حفظ
                 </button>
-                @switch (currentFormMode()) {
-                    @case (FormMode.Update) {
                         <a
                             pButton
                             appLoadingDisabled
                             class="app-p-btn py-1! flex-1 md:flex-none md:px-8!"
                             variant="outlined"
+                            (click)="onResetForm()"
                         >
                             جديد
                         </a>
-                    }
-                }
             </div>
         </div>
     </app-section-wrapper>

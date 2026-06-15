@@ -3,7 +3,6 @@ import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
 import { QrCodeComponent } from 'ng-qrcode';
 import { BaseComponent } from '@/components';
 import { CryptoJsService } from '../../services/crypto-js-service';
@@ -23,7 +22,7 @@ export class Qr extends BaseComponent {
 
     encryptedValue: string = '';
 
-    ngAfterViewInit() {
+    ngOnInit() {
         const activationCode = this.authService.get<string>('activationToken');
         const expireDate = this.authService.get<string>('expireDate');
         const crmEmail = this.authService.get<string>('crmEmail');

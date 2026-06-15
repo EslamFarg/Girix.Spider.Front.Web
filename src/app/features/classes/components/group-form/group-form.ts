@@ -288,4 +288,11 @@ export class GroupForm extends BaseComponent implements OnInit {
       this.searchPrinters(1, searchValue);
     }
   }
+     onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.groupFg.reset();
+    }else{
+      this.router.navigateByUrl('/classes/groups/add');
+    }
+  }
 }

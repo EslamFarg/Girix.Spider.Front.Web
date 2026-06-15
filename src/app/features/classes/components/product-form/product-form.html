@@ -16,16 +16,15 @@
       {{ 'ACTIONS.EDIT' | translate }}
     }
   </button>
-  @if (formMode() === FormMode.Update) {
     <a
-      routerLink="/classes/products/add"
+      (click)="onResetForm()"
       pButton
       class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
       variant="outlined"
     >
       {{ 'ACTIONS.NEW' | translate }}
     </a>
-  }
+
 </div>
 
 <form id="productForm" class="mt-6" [formGroup]="productFg" (ngSubmit)="onSubmitForm()">

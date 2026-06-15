@@ -16,9 +16,8 @@
       تعديل
     }
   </button>
-  @if (formMode() === FormMode.Update) {
     <a
-      routerLink="/classes/meals/add"
+      (click)="onResetForm()"
       pButton
       appLoadingDisabled
       class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
@@ -26,7 +25,7 @@
     >
       جديد
     </a>
-  }
+
 </div>
 
 <form [formGroup]="mealFg" id="mealForm" class="mt-6" (ngSubmit)="onSubmitForm()">

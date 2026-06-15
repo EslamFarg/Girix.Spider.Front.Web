@@ -12,6 +12,7 @@ import { Dialog } from 'primeng/dialog';
 import { IBluetoothPrinter } from '@/app';
 import { onlyNumbersAllowed } from '@/yn-ng';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { Tooltip } from "primeng/tooltip";
 
 @Component({
   selector: 'app-add-printer',
@@ -26,7 +27,8 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
     Dialog,
     ButtonDirective,
     LoadingDisabledDirective,
-  ],
+    Tooltip
+],
   templateUrl: './add-printer.html',
   styleUrl: './add-printer.css',
 })

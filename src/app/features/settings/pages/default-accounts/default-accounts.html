@@ -1,17 +1,17 @@
 <div class="overflow-auto custom-scroll h-full">
   <app-section-wrapper class="p-4" styleClass="flex flex-col gap-6 py-6!">
-    @for (item of formArray.controls; track $index) {
+    @for (item of defaultAccountRows(); track item.account.id) {
       <div class="grid md:grid-cols-2 gap-4 border-b md:border-b-0 border-dark-line/20 pb-6 md:pb-0">
         <app-input-error-message-handler>
-          <input pInputText type="text" [value]="defaultAccounts()[$index].name" [disabled]="true" />
+          <input pInputText type="text" [value]="item.account.name" [disabled]="true" />
         </app-input-error-message-handler>
         <app-input-error-message-handler>
           <p-select
             [options]="allAccounts()"
-            [formControl]="item.controls.refFinancalId"
+            [formControl]="item.formGroup.controls.refFinancalId"
             optionValue="id"
             [filter]="true"
-            (onChange)="onFgChange(item)"
+            (onChange)="onFgChange(item.formGroup)"
             optionLabel="name"
             placeholder="الحساب المقابل..."
             class="w-full! *:text-dark-line! border-dark-line!"

@@ -432,4 +432,11 @@ export class OpeningBalanceForm extends BaseComponent {
       return this.units.get(productId)!;
     }
   }
+     onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.fg.reset();
+    }else{
+      this.router.navigateByUrl('/storage/opening-balances/add');
+    }
+  }
 }
