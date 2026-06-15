@@ -452,11 +452,48 @@ export class Cashier extends BaseComponent implements OnInit {
         return this.orderFg.controls.payingNetwork;
     }
 
-    onSubmitOrder() {
-        this.orderFg.patchValue({
-            items: this.orderCreateItems(),
-        });
-        console.log(this.orderFg.value);
+    onInitialOrderSubmit() {
+        if (this.orderCreateItems().length === 0) {
+            this.orderFg.markAllAsTouched();
+            this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب اختيار اصناف' });
+            return;
+        }
+
+        switch (this.formMode()) {
+            case FormMode.Create:
+                this.orderFg.patchValue({
+                    items: this.orderCreateItems(),
+                });
+                break;
+            case FormMode.Update:
+                this.orderService
+                    .addItems({
+                        id: this.existingOrderBill()!.id,
+                        items: this.orderCreateItems(),
+                        dateTime: this.localDateIso,
+                    })
+                    .subscribe({
+                        next: (res) => {
+                            this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم تعديل الطلب' });
+                            this.resetOrderForm();
+                            this.router.navigate(['/']);
+                        },
+                        error: (err) => {
+                            console.log(err);
+                            this.messageService.add({
+                                severity: 'error',
+                                summary: 'فشل',
+                                detail: 'لم يتم تعديل الطلب',
+                            });
+                            this.resetIdempotencyKey();
+                        },
+                    });
+        }
+
+        
+    }
+
+    onFinalOrderSubmit() {
         if (this.orderFg.invalid) {
             console.log('invalid order');
             Object.entries(this.orderFg.controls).forEach(([key, value]) => {
@@ -518,28 +555,6 @@ export class Cashier extends BaseComponent implements OnInit {
                 });
                 break;
             case FormMode.Update:
-                this.orderService
-                    .addItems({
-                        id: this.existingOrderBill()!.id,
-                        items: this.orderCreateItems(),
-                        dateTime: this.localDateIso,
-                    })
-                    .subscribe({
-                        next: (res) => {
-                            this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم تعديل الطلب' });
-                            this.resetOrderForm();
-                            this.router.navigate(['/']);
-                        },
-                        error: (err) => {
-                            console.log(err);
-                            this.messageService.add({
-                                severity: 'error',
-                                summary: 'فشل',
-                                detail: 'لم يتم تعديل الطلب',
-                            });
-                            this.resetIdempotencyKey();
-                        },
-                    });
                 break;
         }
     }
@@ -1577,7 +1592,7 @@ export class Cashier extends BaseComponent implements OnInit {
         });
     }
 
-    getOrderItemAdditionQuantity(additionId:number) {
+    getOrderItemAdditionQuantity(additionId: number) {
         const orderItem = this.orderMenuItems()[this.currentMenuItemIx()];
         console.log('orderItem', orderItem);
         const existingAddition = orderItem.additions.find((addition) => addition.product.id == additionId);
