@@ -130,9 +130,6 @@ export class CollectivePayments extends BaseComponent {
           },
         });
       },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'إلغاء', detail: 'تم إلغاء الحذف' });
-      },
     });
   }
 }

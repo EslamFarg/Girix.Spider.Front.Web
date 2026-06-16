@@ -19,8 +19,7 @@
 
   <!-- items grid -->
   <div
-    class="grid gap-4 sm:grid-cols-3 sm:gap-[1rem_2rem] md:grid-cols-4 md:gap-[2rem_4rem] lg:grid-cols-5 lg:gap-[3rem_6rem] xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8"
-    style="row-gap: 4rem; column-gap: 7rem"
+    class="grid gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 my-4 mt-8"
   >
     @for (room of rooms(); track $index) {
       <app-room-card
@@ -35,11 +34,11 @@
     }
   </div>
 
-  <p-paginator
+  <!-- <p-paginator
     (onPageChange)="onPageChange($event)"
     [first]="getCurrentRowsIx(1)"
     [showFirstLastIcon]="false"
     [rows]="10"
     [totalRecords]="roomsPaginationInfo().totalRowsCount"
-  />
+  /> -->
 </app-section-wrapper>

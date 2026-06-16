@@ -86,7 +86,7 @@ export class BaseComponent {
   }
 
   getRowNumber = (index: number, pageNumber: number) => index + 1 + (pageNumber - 1) * 10;
-  getCurrentRowsIx = (pageIndex: number) => (pageIndex - 1) * 10;
+  getCurrentRowsIx = (pageIndex: number , pageSize:number = 10) => (pageIndex - 1) * pageSize;
 
   getPreviousLocalDateIso(days: number) {
     const date = new Date();
@@ -133,4 +133,5 @@ export class BaseComponent {
   getFormControl(form: FormGroup, controlName: string) {
     return form.controls[controlName] as FormControl;
   }
+  
 }

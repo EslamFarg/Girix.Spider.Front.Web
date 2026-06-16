@@ -1,5 +1,17 @@
 <!-- actions -->
 <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 mb-4">
+    @if (formMode() === FormMode.Update) {
+        <button
+            appLoadingDisabled
+            type="button"
+            pButton
+            severity="danger"
+            class="text-white! py-1! md:px-8! md:flex-none"
+            (click)="deletePurchase(routeId, $event)"
+        >
+            حذف
+        </button>
+    }
     <button
         appLoadingDisabled
         type="submit"

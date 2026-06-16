@@ -62,6 +62,9 @@
                                 (onChange)="toggleSelectAll()" />
                         </th>
                         <th>رقم الطلب</th>
+                        <th>تاريخ الفاتورة</th>
+                        <th>الاجمالى</th>
+                        <th>اسم العميل</th>
                         <th>العنوان</th>
                         <th>رقم الجوال</th>
                     </tr>
@@ -75,6 +78,15 @@
                         </td>
                         <td>
                             <div>{{ order.orderNumber }}</div>
+                        </td>
+                        <td>
+                            <div>{{ order.createdAt | date: 'dd/MM/yyyy' }}</div>
+                        </td>
+                        <td>
+                            <div>{{ order.netOrder }}</div>
+                        </td>
+                        <td>
+                            <div>{{ order.customerName || '-' }}</div>
                         </td>
                         <td>
                             <div>{{ order.customerAdress || '-' }}</div>

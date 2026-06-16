@@ -13,7 +13,7 @@
 
   <!-- items grid -->
   <div
-    class="grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-7 md:grid-cols-4 md:gap-9 xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8"
+    class="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 my-4 mt-8"
   >
     @for (table of tables(); track $index) {
       <app-table-card (click)="openCollectionDialog({
@@ -23,11 +23,11 @@
     }
   </div>
 
-  <p-paginator
+  <!-- <p-paginator
     (onPageChange)="onPageChange($event)"
-    [first]="getCurrentRowsIx(1)"
+    [first]="getCurrentRowsIx(1 , 18)"
     [showFirstLastIcon]="false"
-    [rows]="10"
+    [rows]="18"
     [totalRecords]="tablesPaginationInfo().totalRowsCount"
-  />
+  /> -->
 </app-section-wrapper>

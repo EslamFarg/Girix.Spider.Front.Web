@@ -389,6 +389,18 @@
                 [totalRecords]="inventorySettlementProductsPaginationInfo.totalRowsCount"
             />
             <div class="overflow-auto custom-scroll flex items-center justify-end gap-2 mb-4">
+                @if (formMode() === FormMode.Update) {
+                    <button
+                        appLoadingDisabled
+                        type="button"
+                        pButton
+                        severity="danger"
+                        class="text-white! py-1! md:px-8! md:flex-none"
+                        (click)="deleteInventory(routeId, $event)"
+                    >
+                        حذف
+                    </button>
+                }
                 <button
                     type="button"
                     pButton
@@ -398,15 +410,15 @@
                 >
                     حفظ
                 </button>
-                        <a
-                            pButton
-                            appLoadingDisabled
-                            class="app-p-btn py-1! flex-1 md:flex-none md:px-8!"
-                            variant="outlined"
-                            (click)="onResetForm()"
-                        >
-                            جديد
-                        </a>
+                <a
+                    pButton
+                    appLoadingDisabled
+                    class="app-p-btn py-1! flex-1 md:flex-none md:px-8!"
+                    variant="outlined"
+                    (click)="onResetForm()"
+                >
+                    جديد
+                </a>
             </div>
         </div>
     </app-section-wrapper>

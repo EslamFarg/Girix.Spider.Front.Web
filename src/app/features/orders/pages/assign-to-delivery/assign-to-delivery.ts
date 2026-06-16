@@ -18,6 +18,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { Listbox } from "primeng/listbox";
 import { TooltipModule } from 'primeng/tooltip';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-assign-to-delivery',
@@ -37,7 +38,8 @@ import { TooltipModule } from 'primeng/tooltip';
     LoadingDisabledDirective,
     ButtonDirective,
     Listbox,
-    TooltipModule
+    TooltipModule,
+    DatePipe
 ],
   templateUrl: './assign-to-delivery.html',
   styleUrl: './assign-to-delivery.css',

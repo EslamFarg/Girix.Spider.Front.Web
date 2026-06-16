@@ -34,7 +34,6 @@ import { TooltipModule } from 'primeng/tooltip';
 export class Tables extends BaseComponent {
   collectionsService = inject(CollectionsService);
   openCollectionDialog = this.collectionsService.openCollectionDialog;
-
   ngAfterViewInit() {
     // this.countDownEles().forEach((ele) => {
     // ele.begin();
@@ -116,7 +115,7 @@ export class Tables extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 10,
+          pageSize: 0,
         },
         searchFilters: [
           {
@@ -140,5 +139,7 @@ export class Tables extends BaseComponent {
 
   onSearchSubmit = () => this.searchFg.valid && this.searchTables(1);
 
-  onPageChange = (event: PaginatorState) => this.searchTables(event.page! + 1);
+  onPageChange = (event: PaginatorState) => {
+    this.searchTables(event.page! + 1);
+  } 
 }

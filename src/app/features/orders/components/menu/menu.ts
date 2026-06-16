@@ -18,6 +18,7 @@ import { RouterLink } from '@angular/router';
 import { GalleriaModule } from 'primeng/galleria';
 import { Dialog } from 'primeng/dialog';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { Tooltip } from "primeng/tooltip";
 
 export interface IMenuItem {
   id: string;
@@ -53,7 +54,8 @@ export interface IOrderMenuItem {
     GalleriaModule,
     Dialog,
     LoadingDisabledDirective,
-  ],
+    Tooltip
+],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
 })

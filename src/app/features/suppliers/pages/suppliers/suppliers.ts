@@ -125,9 +125,7 @@ export class Suppliers extends BaseComponent {
           },
         });
       },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
-      },
+      
     });
   }
 }

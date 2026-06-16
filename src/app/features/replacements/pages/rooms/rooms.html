@@ -11,7 +11,7 @@
         placeholder="بحث"
       />
       <p-inputgroup-addon class="p-0!">
-        <button type="submit" class="flex cursor-pointer">
+        <button type="submit" class="flex cursor-pointer" pTooltip="بحث">
             <i class="pi pi-search"></i>
           </button>
       </p-inputgroup-addon>
@@ -20,7 +20,7 @@
 
   <!-- items grid -->
   <div
-    class="grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-7 md:grid-cols-4 md:gap-9 xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8"
+    class="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 my-4 mt-8"
   >
     @for (item of rooms(); track `${item.id}-${item.isAvailable}`) {
       <app-room-card
@@ -35,11 +35,11 @@
     }
   </div>
 
-  <p-paginator
+  <!-- <p-paginator
     (onPageChange)="onPageChange($event)"
-    [first]="getCurrentRowsIx(roomsPaginationInfo.pageIndex)"
-    [rows]="10"
+    [first]="getCurrentRowsIx(roomsPaginationInfo.pageIndex , 18)"
+    [rows]="18"
     [showFirstLastIcon]="false"
     [totalRecords]="roomsPaginationInfo.totalRowsCount"
-  />
+  /> -->
 </app-section-wrapper>

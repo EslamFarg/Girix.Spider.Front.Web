@@ -14,27 +14,27 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { Menu } from 'primeng/menu';
 import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
-import { Listbox } from "primeng/listbox";
+import { Listbox } from 'primeng/listbox';
 import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-collective-receipts',
     imports: [
-    ReactiveFormsModule,
-    InputErrorMessageHandler,
-    InputGroupAddon,
-    Paginator,
-    InputText,
-    AllowNumbers,
-    Debounce,
-    DatePipe,
-    TranslatePipe,
-    Menu,
-    RouterLink,
-    ButtonDirective,
-    Listbox,
-    TooltipModule
-],
+        ReactiveFormsModule,
+        InputErrorMessageHandler,
+        InputGroupAddon,
+        Paginator,
+        InputText,
+        AllowNumbers,
+        Debounce,
+        DatePipe,
+        TranslatePipe,
+        Menu,
+        RouterLink,
+        ButtonDirective,
+        Listbox,
+        TooltipModule,
+    ],
     templateUrl: './collective-receipts.html',
     styleUrl: './collective-receipts.css',
 })
@@ -128,9 +128,6 @@ export class CollectiveReceipts extends BaseComponent {
                         this.searchReceiptVouchers(1);
                     },
                 });
-            },
-            reject: () => {
-                this.messageService.add({ severity: 'error', summary: 'إلغاء', detail: 'تم إلغاء الحذف' });
             },
         });
     }

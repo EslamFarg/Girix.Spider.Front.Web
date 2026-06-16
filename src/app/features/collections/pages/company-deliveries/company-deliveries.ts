@@ -106,7 +106,7 @@ export class CompanyDeliveries extends BaseComponent implements OnInit, OnDestro
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 10,
+          pageSize: 0,
         },
         searchFilters: searchFilters,
         fromDate: null,

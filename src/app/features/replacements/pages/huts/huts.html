@@ -11,6 +11,7 @@
         placeholder="بحث"
       />
       <p-inputgroup-addon class="p-0!">
+        <button type="submit" class="flex cursor-pointer" pTooltip="بحث">
         <svg
           (click)="onSearchSubmit()"
           width="20"
@@ -34,13 +35,14 @@
             stroke-linejoin="round"
           />
         </svg>
+        </button>
       </p-inputgroup-addon>
     </app-input-error-message-handler>
   </form>
 
   <!-- items grid -->
   <div
-    class="grid grid-cols-2 gap-[6rem_1.5rem] sm:grid-cols-3 sm:gap-[7rem_2rem] md:grid-cols-4 md:gap-[7rem_2rem] lg:grid-cols-5 lg:gap-[7rem_3rem] xl:grid-cols-6 xl:gap-[7rem_4rem] my-4"
+    class="grid grid-cols-2 gap-[8rem_2rem] sm:grid-cols-3  md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 my-4"
   >
     @for (item of huts(); track item.id) {
       <app-hut-card
@@ -52,11 +54,11 @@
     }
   </div>
 
-  <p-paginator
+  <!-- <p-paginator
     (onPageChange)="onPageChange($event)"
     [showFirstLastIcon]="false"
     [first]="getCurrentRowsIx(hutsPaginationInfo.pageIndex)"
-    [rows]="10"
+    [rows]="12"
     [totalRecords]="hutsPaginationInfo.totalRowsCount"
-  />
+  /> -->
 </app-section-wrapper>

@@ -2,6 +2,18 @@
   class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
   style="--p-button-primary-background: transparent"
 >
+@if (formMode() === FormMode.Update) {
+            <button
+                appLoadingDisabled
+                type="button"
+                pButton
+                severity="danger"
+                class="text-white! py-1! md:px-8! md:flex-none"
+                (click)="deleteGroup(id(), $event)"
+            >
+                حذف
+            </button>
+        }
   <button
     pButton
     style="--p-button-primary-background: var(--color-dark-line)"

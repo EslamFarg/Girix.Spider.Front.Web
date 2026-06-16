@@ -102,23 +102,15 @@ export class Products extends BaseComponent {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message:
-        '\u0647\u0644 \u0627\u0646\u062a \u0645\u062a\u0627\u0654\u0643\u062f \u0645\u0646 \u062d\u0630\u0641 \u0627\u0644\u0645\u0646\u062a\u062c',
-      header: '\u062d\u0630\u0641 \u0627\u0644\u0645\u0646\u062a\u062c',
+        'هل انت متأكد من حذف المنتج',
+      header: 'حذف المنتج',
       icon: 'pi pi-info-circle',
       rejectLabel: '\u0627\u0644\u063a\u0627\u0621',
       rejectButtonProps: { label: '\u0627\u0644\u063a\u0627\u0621', severity: 'secondary', outlined: true },
       acceptButtonProps: { label: '\u062d\u0630\u0641', severity: 'danger' },
       accept: () => {
         this.productService.delete(id).subscribe({ next: () => this.searchProducts(1) });
-      },
-      reject: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: '\u0627\u0644\u063a\u0627\u0621',
-          detail:
-            '\u0644\u0642\u062f \u0642\u0645\u062a \u0628\u0627\u0644\u063a\u0627\u0621 \u0627\u0644\u062d\u0630\u0641',
-        });
-      },
+      }
     });
   }
 }

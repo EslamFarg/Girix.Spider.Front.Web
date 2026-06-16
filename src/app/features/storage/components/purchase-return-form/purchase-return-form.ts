@@ -568,4 +568,30 @@ export class PurchaseReturnForm extends BaseComponent {
       this.router.navigateByUrl('/storage/purchases-returns/add');
     }
   }
+    deletePurchaseReturn(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف مرتجع المشتريات',
+      header: 'حذف مرتجع المشتريات',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+      accept: () => {
+        this.purchaseReturnService.delete(id).subscribe({
+          next: () => {
+            this.router.navigateByUrl('/storage/purchases-returns/add');
+          },
+        });
+      },
+      
+    });
+  }
 }

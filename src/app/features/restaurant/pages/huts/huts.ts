@@ -155,7 +155,7 @@ export class Huts extends BaseComponent {
       },
 
       accept: () => this.hutService.delete(id).subscribe({ next: () => this.searchHuts(1) }),
-      reject: () => this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' }),
+      
     });
   }
 

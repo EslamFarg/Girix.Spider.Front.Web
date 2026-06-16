@@ -454,4 +454,32 @@ export class MealForm extends BaseComponent implements OnInit {
       this.router.navigateByUrl('/classes/meals/add');
     }
   }
+
+  deleteMeal(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف الوجبة',
+      header: 'حذف الوجبة',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.mealService.delete(id).subscribe({
+          next: () => {
+            this.router.navigateByUrl('/classes/meals/add');
+          },
+        });
+      },
+      
+    });
+  }
 }

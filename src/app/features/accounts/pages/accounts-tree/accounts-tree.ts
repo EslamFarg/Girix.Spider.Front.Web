@@ -292,9 +292,6 @@ export class AccountsTree extends BaseComponent {
                     },
                 });
             },
-            reject: () => {
-                this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'تم الغاء الحذف' });
-            },
         });
     }
 

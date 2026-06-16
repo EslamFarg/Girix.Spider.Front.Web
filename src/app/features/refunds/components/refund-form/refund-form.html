@@ -6,10 +6,23 @@
         class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
         style="--p-button-primary-background: transparent"
     >
+        @if (!isCreateMode()) {
+            <button
+                appLoadingDisabled
+                type="button"
+                pButton
+                severity="danger"
+                class="text-white! py-1! md:px-8! md:flex-none"
+                (click)="deleteRefund(refundId(), $event)"
+            >
+                حذف
+            </button>
+        }
+
         <button
             pButton
             style="--p-button-primary-background: var(--color-dark-line)"
-            class="border-dark-line! text-white! py-1! md:px-8! md:flex-none"
+            class="border-dark-line! text-white! py-1! md:px-8! md:flex-none hover:text-black!"
             form="refundForm"
             type="submit"
             appLoadingDisabled
@@ -113,7 +126,7 @@
                 </tr>
             </thead>
             <tbody>
-                @for (item of itemRows.controls; track $index; let itemIndex = $index) {
+                @for (item of filteredItems; track $index; let itemIndex = $index) {
                     <tr [style]="`--ix:${itemIndex}`">
                         <td>
                             <div>{{ itemIndex + 1 }}</div>

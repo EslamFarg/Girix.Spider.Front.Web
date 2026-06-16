@@ -6,6 +6,18 @@
     class="p-4 h-full overflow-auto custom-scroll"
 >
     <div class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2 mb-4">
+      @if (formMode() === FormMode.Update) {
+        <button
+            appLoadingDisabled
+            type="button"
+            pButton
+            severity="danger"
+            class="text-white! py-1! md:px-8! md:flex-none"
+            (click)="deleteReceiptVoucher(routeId, $event)"
+        >
+            حذف
+        </button>
+    }
         <button type="submit" form="collectiveReceiptForm" pButton class="flex-1 md:flex-none app-p-btn py-1! md:px-8!">
             حفظ
         </button>

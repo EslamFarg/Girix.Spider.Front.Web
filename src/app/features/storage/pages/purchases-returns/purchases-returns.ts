@@ -142,9 +142,7 @@ export class PurchasesReturns extends BaseComponent {
           },
         });
       },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
-      },
+      
     });
   }
 }

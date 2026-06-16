@@ -162,4 +162,30 @@ export class CustomerForm extends BaseComponent implements OnInit {
             this.router.navigateByUrl('/accounts/customers/add');
         }
     }
+    deleteCustomer(id: number, event: Event) {
+        this.confirmationService.confirm({
+            target: event.target as EventTarget,
+            message: 'هل انت متاكد من حذف العميل',
+            header: 'حذف العميل',
+            icon: 'pi pi-info-circle',
+            rejectLabel: 'الغاء',
+            rejectButtonProps: {
+                label: 'الغاء',
+                severity: 'secondary',
+                outlined: true,
+            },
+            acceptButtonProps: {
+                label: 'حذف',
+                severity: 'danger',
+            },
+
+            accept: () => {
+                this.customerService.delete(id).subscribe({
+                    next: () => {
+                        this.router.navigateByUrl('/accounts/customers/add');
+                    },
+                });
+            },
+        });
+    }
 }

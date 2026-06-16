@@ -174,7 +174,7 @@ export class Rooms extends BaseComponent {
       },
 
       accept: () => this.roomService.delete(id).subscribe({ next: () => this.searchRooms(1) }),
-      reject: () => this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' }),
+      
     });
   }
 }

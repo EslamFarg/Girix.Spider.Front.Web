@@ -907,4 +907,30 @@ export class PurchasesForm extends BaseComponent {
       this.router.navigateByUrl('/storage/purchases/add');
     }
   }
+   deletePurchase(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل انت متاكد من حذف فاتورة الشراء',
+      header: 'حذف فاتورة الشراء',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'الغاء',
+      rejectButtonProps: {
+        label: 'الغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+      accept: () => {
+        this.purchaseService.delete(id).subscribe({
+          next: () => {
+            this.router.navigateByUrl('/storage/purchases/add');
+          },
+        });
+      },
+      
+    });
+  }
 }

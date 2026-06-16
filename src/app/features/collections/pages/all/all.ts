@@ -541,7 +541,7 @@ export class All extends BaseComponent {
       },
 
       accept: () => this.orderService.delete(order.id).subscribe({ next: () => this.searchOrders(1) }),
-      reject: () => this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' }),
+      
     });
   }
 

@@ -150,9 +150,6 @@ export class AddPrinter extends BaseComponent {
           },
         });
       },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'إلغاء', detail: 'تم إلغاء الحذف' });
-      },
     });
   }
 

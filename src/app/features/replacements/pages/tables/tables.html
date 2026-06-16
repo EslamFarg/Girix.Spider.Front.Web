@@ -11,7 +11,7 @@
         placeholder="بحث"
       />
       <p-inputgroup-addon class="p-0!">
-        <button type="submit" class="flex cursor-pointer">
+        <button type="submit" class="flex cursor-pointer" pTooltip="بحث">
             <i class="pi pi-search"></i>
           </button>
       </p-inputgroup-addon>
@@ -20,18 +20,18 @@
 
   <!-- items grid -->
   <div
-    class="grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-7 md:grid-cols-4 md:gap-9 xl:grid-cols-6 xl:gap-[4rem_7rem] my-4 mt-8"
+    class="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 my-4 mt-8"
   >
     @for (item of tables(); track $index) {
       <app-table-card (click)="openDialog({ data: item, localSpaceType: localSpaceTypeEnum.Table })" [data]="item" />
     }
   </div>
 
-  <p-paginator
+  <!-- <p-paginator
     (onPageChange)="onPageChange($event)"
-    [first]="getCurrentRowsIx(tablesPaginationInfo.pageIndex)"
+    [first]="getCurrentRowsIx(tablesPaginationInfo.pageIndex , 16)"
     [showFirstLastIcon]="false"
-    [rows]="10"
+    [rows]="16"
     [totalRecords]="tablesPaginationInfo.totalRowsCount"
-  />
+  /> -->
 </app-section-wrapper>

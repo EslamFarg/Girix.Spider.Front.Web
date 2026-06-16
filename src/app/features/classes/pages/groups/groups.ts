@@ -119,7 +119,7 @@ export class Groups extends BaseComponent {
       },
 
       accept: () => this.groupService.delete(id).subscribe({ next: () => this.searchGroups(1) }),
-      reject: () => this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' }),
+      
     });
   }
 }

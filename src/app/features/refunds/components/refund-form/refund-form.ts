@@ -8,17 +8,15 @@ import {
   IRefundResponse,
 } from '../../services/refund-types/response';
 import { FormArray, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Button, ButtonDirective } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ControlsOf } from '@/yn-ng/types/helpers';
-import { RouterLink } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { OrderPaymentType } from '@/features/orders';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
-import { InputGroupAddon } from "primeng/inputgroupaddon";
 import { TagModule } from 'primeng/tag';
 import { onlyNumbersOrDotAllowed } from '@/yn-ng';
 interface IRefundItemFormRow {
@@ -45,18 +43,16 @@ type RefundAddonFormRowControls = ControlsOf<IRefundAddonFormRow>;
 @Component({
   selector: 'app-refund-form',
   imports: [
-    Button,
     InputTextModule,
     InputErrorMessageHandler,
     AllowNumbers,
     TranslatePipe,
     ReactiveFormsModule,
     FormsModule,
-    RouterLink,
     DecimalPipe,
     ButtonDirective,
     LoadingDisabledDirective,
-    InputGroupAddon,TagModule,DatePipe
+    TagModule,DatePipe
 ],
   templateUrl: './refund-form.html',
   styleUrl: './refund-form.css',
@@ -145,6 +141,9 @@ export class RefundForm extends BaseComponent implements OnInit {
       }
     }
   }
+
+  filteredItems=this.itemRows.controls.filter((item) => (item.value?.quantity??0) > 0);
+
 
   patchFormFromOrder(order: IOrderLatestUpdateResponse) {
     const itemsArray = this.fb.array<FormGroup<RefundItemFormRowControls>>(
@@ -385,4 +384,24 @@ export class RefundForm extends BaseComponent implements OnInit {
       });
     }
   }
+
+  deleteRefund(id: number, event: Event) {
+        this.confirmationService.confirm({
+            target: event.target as EventTarget,
+            message: 'هل انت متاكد من حذف المرتجع؟',
+            header: 'حذف المرتجع',
+            icon: 'pi pi-info-circle',
+            rejectLabel: 'الغاء',
+            rejectButtonProps: {
+                label: 'الغاء',
+                severity: 'secondary',
+                outlined: true,
+            },
+            acceptButtonProps: {
+                label: 'حذف',
+                severity: 'danger',
+            },
+            accept: () => this.refundService.delete(id).subscribe({ next: () => this.router.navigate(['/invoices/refunds']) }),
+        });
+    }
 }

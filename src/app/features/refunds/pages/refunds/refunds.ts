@@ -134,8 +134,6 @@ export class Refunds extends BaseComponent {
                 severity: 'danger',
             },
             accept: () => this.refundService.delete(id).subscribe({ next: () => this.searchRefunds(1) }),
-            reject: () =>
-                this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' }),
         });
     }
 

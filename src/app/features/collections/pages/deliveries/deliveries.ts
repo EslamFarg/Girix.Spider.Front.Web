@@ -110,7 +110,7 @@ export class Deliveries extends BaseComponent implements OnInit, OnDestroy {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 10,
+          pageSize: 0,
         },
         searchFilters: [
           {
@@ -160,9 +160,7 @@ export class Deliveries extends BaseComponent implements OnInit, OnDestroy {
           },
         });
       },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
-      },
+      
     });
   }
   //

@@ -333,5 +333,30 @@ export class CollectiveReceiptForm extends BaseComponent {
       this.router.navigateByUrl('/accounts/collective-receipts/add');
     }
   }
+   deleteReceiptVoucher(id: number, event: Event) {
+        this.confirmationService.confirm({
+            target: event.target as EventTarget,
+            message: 'هل أنت متأكد من حذف القيد؟',
+            header: 'حذف القيد',
+            icon: 'pi pi-info-circle',
+            rejectLabel: 'إلغاء',
+            rejectButtonProps: {
+                label: 'إلغاء',
+                severity: 'secondary',
+                outlined: true,
+            },
+            acceptButtonProps: {
+                label: 'حذف',
+                severity: 'danger',
+            },
+            accept: () => {
+                this.receiptVoucherService.delete(id).subscribe({
+                    next: () => {
+                        this.router.navigateByUrl('/accounts/collective-receipts/add');
+                    },
+                });
+            },
+        });
+    }
 }
  

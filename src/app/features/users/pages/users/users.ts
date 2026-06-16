@@ -33,7 +33,7 @@ import { TooltipModule } from 'primeng/tooltip';
         TranslatePipe,
         LoadingDisabledDirective,
         Listbox,
-        TooltipModule
+        TooltipModule,
     ],
     templateUrl: './users.html',
     styleUrl: './users.css',
@@ -138,9 +138,6 @@ export class Users extends BaseComponent {
                         this.searchUsers(1);
                     },
                 });
-            },
-            reject: () => {
-                this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
             },
         });
     }

@@ -186,4 +186,30 @@ export class UserForm extends BaseComponent {
       this.router.navigateByUrl('/settings/users/add');
     }
   }
+   deleteUser(id: number, event: Event) {
+        this.confirmationService.confirm({
+            target: event.target as EventTarget,
+            message: 'هل انت متاكد من حذف المستخدم',
+            header: 'حذف المستخدم',
+            icon: 'pi pi-info-circle',
+            rejectLabel: 'الغاء',
+            rejectButtonProps: {
+                label: 'الغاء',
+                severity: 'secondary',
+                outlined: true,
+            },
+            acceptButtonProps: {
+                label: 'حذف',
+                severity: 'danger',
+            },
+
+            accept: () => {
+                this.usersService.delete(id).subscribe({
+                    next: () => {
+                      this.router.navigateByUrl('/settings/users/add');
+                    },
+                });
+            },
+        });
+    }
 }

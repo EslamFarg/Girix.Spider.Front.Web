@@ -123,9 +123,6 @@ export class Journals extends BaseComponent {
           },
         });
       },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'إلغاء', detail: 'تم إلغاء الحذف' });
-      },
     });
   }
 }

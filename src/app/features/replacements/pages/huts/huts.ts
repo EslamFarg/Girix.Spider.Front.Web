@@ -7,15 +7,13 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { ReplacementsService, SpaceTypeEnum } from '../../services/replacements-service';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdown';
+import { CountdownConfig, CountdownEvent } from 'ngx-countdown';
 import { HutCard } from '@/components/hut-card/hut-card';
-import { date } from '@primeuix/themes/aura/datepicker';
 import { HutSearchEnum, HutService, IHutReadResponse, IHutSearchRow } from '@/features/restaurant/services/hut-service';
-import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { MenuItem } from 'primeng/api';
-import { omitKeys } from '@/yn-ng/utils/helpers';
 import { OrderService } from '@/features/orders';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { Tooltip } from "primeng/tooltip";
 @Component({
   selector: 'app-huts',
   imports: [
@@ -25,9 +23,9 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
     InputGroupAddon,
     ReactiveFormsModule,
     Paginator,
-    CountdownComponent,
     HutCard,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
+    Tooltip
 ],
   templateUrl: './huts.html',
   styleUrl: './huts.css',
@@ -119,7 +117,7 @@ export class Huts extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 10,
+          pageSize: 0,
         },
         searchFilters: [
           {

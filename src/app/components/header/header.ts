@@ -580,9 +580,6 @@ export class Header extends BaseComponent implements AfterViewInit {
                 });
                 this.authService.logout();
             },
-            reject: () => {
-                this.messageService.add({ severity: 'error', summary: 'تم الالغاء', detail: 'لقد قمت بالغاء الخروج' });
-            },
         });
     }
 }

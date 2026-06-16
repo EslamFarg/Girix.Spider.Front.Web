@@ -131,7 +131,7 @@ export class Rooms extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 10,
+          pageSize: 0,
         },
         searchFilters: [
           {

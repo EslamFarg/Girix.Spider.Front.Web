@@ -19,7 +19,7 @@
   
   <!-- items grid -->
   <div
-    class="grid grid-cols-2 gap-[6rem_1.5rem] sm:grid-cols-3 sm:gap-[7rem_2rem] md:grid-cols-4 md:gap-[7rem_2rem] lg:grid-cols-5 lg:gap-[7rem_3rem] xl:grid-cols-6 xl:gap-[7rem_4rem] my-4"
+    class="grid grid-cols-2 gap-[8rem_2rem] sm:grid-cols-3  md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 my-4"
   >
     @for (hut of huts(); track $index) {
       <app-hut-card
@@ -36,11 +36,11 @@
     }
   </div>
 
-  <p-paginator
+  <!-- <p-paginator
     (onPageChange)="onPageChange($event)"
     [first]="getCurrentRowsIx(1)"
     [showFirstLastIcon]="false"
     [rows]="10"
     [totalRecords]="hutsPaginationInfo().totalRowsCount"
-  />
+  /> -->
 </app-section-wrapper>

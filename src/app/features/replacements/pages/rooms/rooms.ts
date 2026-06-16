@@ -10,144 +10,147 @@ import { ReplacementsService, SpaceTypeEnum } from '../../services/replacements-
 import { RoomCard } from '@/components/room-card/room-card';
 import { CountdownConfig, CountdownEvent } from 'ngx-countdown';
 import {
-  IRoomReadResponse,
-  IRoomSearchRow,
-  RoomSearchEnum,
-  RoomService,
+    IRoomReadResponse,
+    IRoomSearchRow,
+    RoomSearchEnum,
+    RoomService,
 } from '@/features/restaurant/services/room-service';
 import { MenuItem } from 'primeng/api';
 import { OrderService } from '@/features/orders';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
-import { Debounce } from "@/directives/debounce";
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { Debounce } from '@/directives/debounce';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
-  selector: 'app-rooms',
-  imports: [
-    SectionWrapper,
-    InputErrorMessageHandler,
-    InputGroupAddon,
-    ReactiveFormsModule,
-    InputTextModule,
-    Paginator,
-    RoomCard,
-    LoadingDisabledDirective,
-    Debounce
-],
-  templateUrl: './rooms.html',
-  styleUrl: './rooms.css',
+    selector: 'app-rooms',
+    imports: [
+        SectionWrapper,
+        InputErrorMessageHandler,
+        InputGroupAddon,
+        ReactiveFormsModule,
+        InputTextModule,
+        Paginator,
+        RoomCard,
+        LoadingDisabledDirective,
+        Debounce,
+        Tooltip,
+    ],
+    templateUrl: './rooms.html',
+    styleUrl: './rooms.css',
 })
 export class Rooms extends BaseComponent {
-  getFutureDate() {
-    const date = new Date(this.dateNow);
-    date.setDate(date.getDate() + 1);
-    return date.toISOString();
-  }
-  getPastDate() {
-    const date = new Date(this.dateNow);
-    date.setDate(date.getDate() - 1);
-    return date.toISOString();
-  }
+    getFutureDate() {
+        const date = new Date(this.dateNow);
+        date.setDate(date.getDate() + 1);
+        return date.toISOString();
+    }
+    getPastDate() {
+        const date = new Date(this.dateNow);
+        date.setDate(date.getDate() - 1);
+        return date.toISOString();
+    }
 
-  replacementsService = inject(ReplacementsService);
-  openDialog = this.replacementsService.openDialog;
+    replacementsService = inject(ReplacementsService);
+    openDialog = this.replacementsService.openDialog;
 
-  //countdown
-  // countDownEles = viewChildren<CountdownComponent>('countdown');
-  countdownConfig: CountdownConfig = { format: 'hh:mm:ss', leftTime: 60 * 60 * 2 };
-  handleCountdownEvent(event: CountdownEvent) {}
+    //countdown
+    // countDownEles = viewChildren<CountdownComponent>('countdown');
+    countdownConfig: CountdownConfig = { format: 'hh:mm:ss', leftTime: 60 * 60 * 2 };
+    handleCountdownEvent(event: CountdownEvent) {}
 
-  ngAfterViewInit() {
-    // this.countDownEles().forEach((ele) => {
-    // ele.begin();
-    // });
-  }
+    ngAfterViewInit() {
+        // this.countDownEles().forEach((ele) => {
+        // ele.begin();
+        // });
+    }
 
-  currentItem: IRoomReadResponse | null = null;
+    currentItem: IRoomReadResponse | null = null;
 
-  initialSearchFormValue = {
-    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
-    searchEnum: this.fb.control<RoomSearchEnum>(RoomSearchEnum.Name, [Validators.required]),
-    fromDate: this.fb.control<string | null>(null, []),
-    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
-  };
+    initialSearchFormValue = {
+        searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
+        searchEnum: this.fb.control<RoomSearchEnum>(RoomSearchEnum.Name, [Validators.required]),
+        fromDate: this.fb.control<string | null>(null, []),
+        toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
+    };
 
-  searchFg = this.fb.group(this.initialSearchFormValue);
+    searchFg = this.fb.group(this.initialSearchFormValue);
 
-  roomService = inject(RoomService);
+    roomService = inject(RoomService);
 
-  resetRoomForm = () => (this.currentItem = null);
+    resetRoomForm = () => (this.currentItem = null);
+    fetchAndBindTableData(tableId: number) {
+        return this.roomService.getById(tableId).subscribe({
+            next: (res) => {
+                this.currentItem = res;
+            },
+        });
+    }
 
-  fetchAndBindTableData(tableId: number) {
-    return this.roomService.getById(tableId).subscribe({
-      next: (res) => {
-        this.currentItem = res;
-      },
-    });
-  }
-
-  filterMenuItems = signal<MenuItem[]>([
-    {
-      label: 'الاسم',
-      command: (event) => this.searchFg.patchValue({ searchEnum: RoomSearchEnum.Name }),
-    },
-    {
-      label: 'متاح',
-      command: (event) => this.searchFg.patchValue({ searchEnum: RoomSearchEnum.IsAvaliable }),
-    },
-  ]);
-
-  orderService = inject(OrderService);
-
-  constructor() {
-    super();
-    this.orderService.localPlaceChange.subscribe(() => this.searchRooms(1));
-    this.searchRooms(1);
-  }
-
-  periodOptions = [
-    { label: 'الكل', value: null },
-    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
-    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
-    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
-    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
-  ];
-
-  rooms = signal<IRoomSearchRow[]>([]);
-  roomsPaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
-    totalPagesCount: 0,
-    totalRowsCount: 0,
-  };
-  searchRooms(pageIndex: number) {
-    this.roomService
-      .search({
-        paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 10,
+    filterMenuItems = signal<MenuItem[]>([
+        {
+            label: 'الاسم',
+            command: (event) => this.searchFg.patchValue({ searchEnum: RoomSearchEnum.Name }),
         },
-        searchFilters: [
-          {
-            column: this.searchFg.getRawValue().searchEnum,
-            values: [this.searchFg.getRawValue().searchTerm],
-          },
-        ],
-        fromDate: this.searchFg.getRawValue().fromDate,
-      })
-      .subscribe({
-        next: (res) => {
-          this.rooms.set([]);
-          this.rooms.set(res.value.rows);
-
-          this.roomsPaginationInfo = {
-            pageIndex,
-            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
+        {
+            label: 'متاح',
+            command: (event) => this.searchFg.patchValue({ searchEnum: RoomSearchEnum.IsAvaliable }),
         },
-      });
-  }
+    ]);
 
-  onSearchSubmit = () => this.searchFg.valid && this.searchRooms(1);
+    orderService = inject(OrderService);
 
-  onPageChange = (event: PaginatorState) => this.searchRooms(event.page! + 1);
+    constructor() {
+        super();
+        this.orderService.localPlaceChange.subscribe(() => this.searchRooms(1));
+        this.searchRooms(1);
+    }
+
+    periodOptions = [
+        { label: 'الكل', value: null },
+        { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
+        { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
+        { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
+        { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
+    ];
+
+    rooms = signal<IRoomSearchRow[]>([]);
+    roomsPaginationInfo: IPaginationInfo = {
+        pageIndex: 1,
+        totalPagesCount: 0,
+        totalRowsCount: 0,
+    };
+    searchRooms(pageIndex: number) {
+        this.roomService
+            .search({
+                paginationInfo: {
+                    pageIndex: pageIndex,
+                    pageSize: 0,
+                },
+                searchFilters: [
+                    {
+                        column: this.searchFg.getRawValue().searchEnum,
+                        values: [this.searchFg.getRawValue().searchTerm],
+                    },
+                ],
+                fromDate: this.searchFg.getRawValue().fromDate,
+            })
+            .subscribe({
+                next: (res) => {
+                    this.rooms.set([]);
+                    this.rooms.set(res.value.rows);
+
+                    this.roomsPaginationInfo = {
+                        pageIndex,
+                        totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                        totalRowsCount: res.value.paginationInfo.totalRowsCount,
+                    };
+                },
+            });
+    }
+
+    onSearchSubmit = () => this.searchFg.valid && this.searchRooms(1);
+
+    onPageChange = (event: PaginatorState) => {
+      this.searchRooms(event.page! + 1);
+    }
 }

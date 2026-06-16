@@ -113,8 +113,8 @@ export class Inventory extends BaseComponent {
   deleteInventory(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف المنتج',
-      header: 'حذف المنتج',
+      message: 'هل انت متاكد من حذف التسوية',
+      header: 'حذف التسوية',
       icon: 'pi pi-info-circle',
       rejectLabel: 'الغاء',
       rejectButtonProps: {
@@ -134,9 +134,7 @@ export class Inventory extends BaseComponent {
           },
         });
       },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
-      },
+      
     });
   }
 }

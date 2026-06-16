@@ -337,4 +337,29 @@ export class CollectivePaymentForm extends BaseComponent {
       this.router.navigateByUrl('/accounts/collective-payments/add');
     }
   }
+    deleteCollectivePayment(id: number, event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل أنت متأكد من حذف القيد؟',
+      header: 'حذف القيد',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'إلغاء',
+      rejectButtonProps: {
+        label: 'إلغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+      accept: () => {
+        this.paymentVoucherService.delete(id).subscribe({
+          next: () => {
+            this.router.navigateByUrl('/accounts/collective-payments/add');
+          },
+        });
+      },
+    });
+  }
 }

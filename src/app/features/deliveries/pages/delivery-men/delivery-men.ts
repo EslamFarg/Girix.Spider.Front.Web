@@ -115,8 +115,8 @@ export class DeliveryMen extends BaseComponent {
   deleteDelivery(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف المنتج',
-      header: 'حذف المنتج',
+      message: 'هل انت متاكد من حذف الديلفرى',
+      header: 'حذف الديلفرى',
       icon: 'pi pi-info-circle',
       rejectLabel: 'الغاء',
       rejectButtonProps: {
@@ -136,9 +136,7 @@ export class DeliveryMen extends BaseComponent {
           },
         });
       },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'الغاء', detail: 'لقد قمت بالغاء الحذف' });
-      },
+      
     });
   }
 }
