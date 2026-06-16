@@ -1,0 +1,120 @@
+/* ─── Journal lines scroll container ────────────────────────────── */
+/* max-height = dark thead (~52 px) + sticky entry row (~44 px)      */
+/*            + 7 data rows × ~44 px = 404 px  → 420 px with buffer  */
+/* Internal scrollbar appears automatically once rows exceed ~7.      */
+/* The form itself remains natural-flow so ≤7 rows fit without scroll */
+
+.journal-grid-wrapper {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 420px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+/* ─── Dark sticky header ─────────────────────────────────────────── */
+
+.journal-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background-color: var(--color-dark-bg-2);
+}
+
+/* ─── Sticky entry (add) row — always below header ──────────────── */
+
+.journal-entry-row {
+  position: sticky;
+  top: 52px;          /* matches thead rendered height */
+  z-index: 2;
+}
+
+.journal-entry-row,
+.journal-entry-row td {
+  background-color: #eef6ff !important;
+  border-top: 1px solid #bfdbfe !important;
+  border-bottom: 2px solid #93c5fd !important;
+}
+
+/* ─── Column header: label stacked above running total ──────────── */
+
+.journal-col-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.journal-col-total {
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Balance indicator inside الأدوات header ───────────────────── */
+
+.journal-balance-ok {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #16a34a;
+  white-space: nowrap;
+}
+
+.journal-balance-err {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #ef4444;
+  white-space: nowrap;
+}
+
+/* ─── Add-row indicator cell (+) ───────────────────────────────── */
+
+.journal-add-indicator {
+  font-weight: 700;
+  text-align: center;
+  font-size: 1rem;
+  user-select: none;
+  opacity: 0.6;
+}
+
+/* ─── Column widths (البيان >> الحساب > المدين/الدائن >> الأدوات) ── */
+/* #=3  الحساب=22  المدين=11  الدائن=11  البيان=46  الأدوات=7 → 100% */
+
+.journal-table th:nth-child(1),
+.journal-table td:nth-child(1) {
+  width: 3%;
+  min-width: 28px;
+}
+
+.journal-table th:nth-child(2),
+.journal-table td:nth-child(2) {
+  width: 22%;
+  min-width: 150px;
+}
+
+.journal-table th:nth-child(3),
+.journal-table td:nth-child(3) {
+  width: 11%;
+  min-width: 80px;
+}
+
+.journal-table th:nth-child(4),
+.journal-table td:nth-child(4) {
+  width: 11%;
+  min-width: 80px;
+}
+
+.journal-table th:nth-child(5),
+.journal-table td:nth-child(5) {
+  width: 46%;
+  min-width: 160px;
+}
+
+.journal-table th:nth-child(6),
+.journal-table td:nth-child(6) {
+  width: 7%;
+  min-width: 44px;
+}

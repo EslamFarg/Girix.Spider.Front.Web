@@ -2,6 +2,7 @@ export * from './enums/index';
 
 export * from './interfaces/responses';
 
+export * from './services/A4PrintService';
 export * from './services/BaseCrudService';
 export * from './services/BaseSearchAndCrudService';
 export * from './services/BaseService';

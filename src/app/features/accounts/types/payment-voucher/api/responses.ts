@@ -3,9 +3,10 @@ export interface IPaymentVoucherSearchRow {
   voucherNo: string;
   voucherDate: string;
   creditAccountId: number;
-  creditAccountName: string;
+  creditAccountName: string | null;
   totalAmount: number;
   payee: string;
+  notes?: string | null;
 }
 
 export interface IPaymentVoucherSearchResponse {

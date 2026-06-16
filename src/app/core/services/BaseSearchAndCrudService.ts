@@ -34,13 +34,22 @@ export interface IBaseSearchResponse<T> {
   };
 }
 
+export enum SortDirection {
+  Asc  = 'Asc',
+  Desc = 'Desc',
+}
+
 export interface ISearchCriteria<SearchEnum> {
   paginationInfo: Partial<{ pageIndex: number; pageSize: number }>;
   searchFilters: { column: SearchEnum; values: string[] }[];
   fromDate: string | null; //start | past
-  toDate?: string| null; //end;
+  toDate?: string | null; //end
   removeDateFilter?: boolean;
   searchEndpoint?: string;
+  /** Column name to sort by (e.g. 'Id', 'CreatedAt'). Sent to backend when provided. */
+  sortBy?: string;
+  /** Sort direction. Defaults to Asc when sortBy is supplied but direction is omitted. */
+  sortDirection?: SortDirection;
 }
 
 export class BaseSearchAndCrudService<
@@ -92,6 +101,11 @@ export class BaseSearchAndCrudService<
       })),
       fromDate: criteriaDto?.fromDate ?? null,
       toDate,
+      // Sort intent — backend respects these when the handler supports it
+      ...(criteriaDto.sortBy && {
+        sortBy:        criteriaDto.sortBy,
+        sortDirection: criteriaDto.sortDirection ?? SortDirection.Asc,
+      }),
     };
 
     // if (criteriaDto.removeDateFilter) {
