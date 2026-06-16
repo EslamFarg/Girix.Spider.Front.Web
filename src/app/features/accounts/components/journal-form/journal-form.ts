@@ -451,4 +451,11 @@ export class JournalForm extends BaseComponent {
     this.lastClickedTableRowIndex.set(this.fg.value.items!.length - 1);
     this.setUpNewJournalDetailsRowFg();
   }
+    onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.fg.reset();
+    }else{
+      this.router.navigateByUrl('/accounts/journals/add');
+    }
+  }
 }

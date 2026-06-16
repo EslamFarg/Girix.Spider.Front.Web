@@ -17,150 +17,149 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 @Component({
-  selector: 'app-customer-form',
-  imports: [
-    Button,
-    Carousel,
-    InputErrorMessageHandler,
-    Select,
-    InputText,
-    Textarea,
-    TranslatePipe,
-    ButtonDirective,
-    ReactiveFormsModule,
-    RouterLink,
-    LoadingDisabledDirective,
-    AllowNumbers,
-    ToggleSwitchModule
-  ],
-  templateUrl: './customer-form.html',
-  styleUrl: './customer-form.css',
+    selector: 'app-customer-form',
+    imports: [
+        Button,
+        Carousel,
+        InputErrorMessageHandler,
+        Select,
+        InputText,
+        Textarea,
+        TranslatePipe,
+        ButtonDirective,
+        ReactiveFormsModule,
+        RouterLink,
+        LoadingDisabledDirective,
+        AllowNumbers,
+        ToggleSwitchModule,
+    ],
+    templateUrl: './customer-form.html',
+    styleUrl: './customer-form.css',
 })
 export class CustomerForm extends BaseComponent implements OnInit {
-  //
-  //
-  //inputs
-  //
+    //
+    //
+    //inputs
+    //
 
-  formMode = computed(() => {
-    if (this.currentCustomer()) return FormMode.Update;
-    return this.initialFormMode();
-  });
-  id = input.required<number | null>();
-
-  //
-  //
-  //state
-  //
-
-  initialCustomerFgValue: ICustomerFgControls = {
-    id: this.fb.control(null, []),
-    nameAr: this.fb.control(null, [Validators.required, noSymbolsAllowed]),
-    nameEn: this.fb.control(null, [ noSymbolsAllowed]),
-    phoneNumber: this.fb.control(null, [
-      // ,
-      onlyNumbersAllowed,
-      // Validators.minLength(6),
-      Validators.maxLength(14),
-    ]),
-    secondaryMobileNumber: this.fb.control(null, [
-      // Validators.required,
-      onlyNumbersAllowed,
-      // Validators.minLength(6),
-      Validators.maxLength(14),
-    ]),
-    city: this.fb.control(null, []),
-    district: this.fb.control(null, []),
-    street: this.fb.control(null, []),
-    buildingNumber: this.fb.control(null, [ onlyNumbersAllowed]),
-    apartment: this.fb.control(null, [ onlyNumbersAllowed]),
-    landmark: this.fb.control(null, []),
-    postalCode: this.fb.control(null, [ onlyNumbersAllowed]),
-    commercialRegister: this.fb.control(null, [
-      // ,
-      onlyNumbersAllowed,
-      // Validators.minLength(10),
-      Validators.maxLength(10),
-    ]),
-    //ends and starts with  3
-    taxNumber: this.fb.control(null, [
-      
-      // Validators.minLength(15),
-      Validators.maxLength(15),
-      onlyNumbersAllowed,
-      Validators.pattern(/^3.*3$/),
-    ]),
-    numberOfFloor: this.fb.control(null, [ onlyNumbersAllowed]),
-    isCompany: this.fb.control(false, []),
-    consumeInventory: this.fb.control(true, []),
-  };
-
-  customerFg = this.fb.group(this.initialCustomerFgValue);
-
-  //services
-  customerService = inject(CustomerService);
-  currentCustomer = signal<ICustomerReadResponse | null>(null);
-
-  /**
-   *
-   */
-
-  //
-  //
-  //
-  //
-  ngOnInit(): void {
-    switch (this.formMode()) {
-      case FormMode.Create:
-        break;
-      case FormMode.Update:
-        //fetch
-        this.customerService.getById(this.id()!).subscribe((Customer) => {
-          this.currentCustomer.set(Customer);
-          //-> bind data
-          console.log('customer', Customer);
-          this.customerFg.patchValue({ ...Customer, nameAr: Customer.name, nameEn: Customer.name });
-        });
-        break;
-    }
-  }
-
-  onSubmitForm() {
-    this.customerFg.patchValue({
-      nameEn: this.customerFg.value.nameAr?.trim(),
-      landmark: this.customerFg.value.numberOfFloor,
+    formMode = computed(() => {
+        if (this.currentCustomer()) return FormMode.Update;
+        return this.initialFormMode();
     });
+    id = input.required<number | null>();
 
-    console.log(this.customerFg.value);
-    if (this.customerFg.invalid) {
-      this.customerFg.markAllAsTouched();
-      return;
+    //
+    //
+    //state
+    //
+
+    initialCustomerFgValue: ICustomerFgControls = {
+        id: this.fb.control(null, []),
+        nameAr: this.fb.control(null, [Validators.required, noSymbolsAllowed]),
+        nameEn: this.fb.control(null, [noSymbolsAllowed]),
+        phoneNumber: this.fb.control(null, [
+            // ,
+            onlyNumbersAllowed,
+            // Validators.minLength(6),
+            Validators.maxLength(14),
+        ]),
+        secondaryMobileNumber: this.fb.control(null, [
+            // Validators.required,
+            onlyNumbersAllowed,
+            // Validators.minLength(6),
+            Validators.maxLength(14),
+        ]),
+        city: this.fb.control(null, []),
+        district: this.fb.control(null, []),
+        street: this.fb.control(null, []),
+        buildingNumber: this.fb.control(null, [onlyNumbersAllowed]),
+        apartment: this.fb.control(null, [onlyNumbersAllowed]),
+        landmark: this.fb.control(null, []),
+        postalCode: this.fb.control(null, [onlyNumbersAllowed]),
+        commercialRegister: this.fb.control(null, [
+            // ,
+            onlyNumbersAllowed,
+            // Validators.minLength(10),
+            Validators.maxLength(10),
+        ]),
+        //ends and starts with  3
+        taxNumber: this.fb.control(null, [
+            // Validators.minLength(15),
+            Validators.maxLength(15),
+            onlyNumbersAllowed,
+            Validators.pattern(/^3.*3$/),
+        ]),
+        numberOfFloor: this.fb.control(null, [onlyNumbersAllowed]),
+        isCompany: this.fb.control(false, []),
+        consumeInventory: this.fb.control(true, []),
+    };
+
+    customerFg = this.fb.group(this.initialCustomerFgValue);
+
+    //services
+    customerService = inject(CustomerService);
+    currentCustomer = signal<ICustomerReadResponse | null>(null);
+
+    /**
+     *
+     */
+
+    //
+    //
+    //
+    //
+    ngOnInit(): void {
+        switch (this.formMode()) {
+            case FormMode.Create:
+                break;
+            case FormMode.Update:
+                //fetch
+                this.customerService.getById(this.id()!).subscribe((Customer) => {
+                    this.currentCustomer.set(Customer);
+                    //-> bind data
+                    console.log('customer', Customer);
+                    this.customerFg.patchValue({ ...Customer, nameAr: Customer.name, nameEn: Customer.name });
+                });
+                break;
+        }
     }
 
-    // let dto={}
-
-    switch (this.formMode()) {
-      case FormMode.Create:
-        this.customerService.create(this.customerFg.value).subscribe({
-          next: (res) => {
-            this.router.navigate(['/customers']);
-          },
+    onSubmitForm() {
+        this.customerFg.patchValue({
+            nameEn: this.customerFg.value.nameAr?.trim(),
+            landmark: this.customerFg.value.numberOfFloor,
         });
-        break;
-      case FormMode.Update:
-        this.customerService.put({ ...this.customerFg.value, id: Number(this.id()) }).subscribe({
-          next: (res) => {
-            this.router.navigate(['/customers']);
-          },
-        });
-        break;
+
+        console.log(this.customerFg.value);
+        if (this.customerFg.invalid) {
+            this.customerFg.markAllAsTouched();
+            return;
+        }
+
+        // let dto={}
+
+        switch (this.formMode()) {
+            case FormMode.Create:
+                this.customerService.create(this.customerFg.value).subscribe({
+                    next: (res) => {
+                        this.router.navigate(['/customers']);
+                    },
+                });
+                break;
+            case FormMode.Update:
+                this.customerService.put({ ...this.customerFg.value, id: Number(this.id()) }).subscribe({
+                    next: (res) => {
+                        this.router.navigate(['/customers']);
+                    },
+                });
+                break;
+        }
     }
-  }
-     onResetForm() {
-    if(this.formMode() === FormMode.Create){
-      this.customerFg.reset();
-    }else{
-      this.router.navigateByUrl('/accounts/customers/add');
+    onResetForm() {
+        if (this.formMode() === FormMode.Create) {
+            this.customerFg.reset();
+        } else {
+            this.router.navigateByUrl('/accounts/customers/add');
+        }
     }
-  }
 }

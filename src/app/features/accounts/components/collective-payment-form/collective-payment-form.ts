@@ -330,4 +330,11 @@ export class CollectivePaymentForm extends BaseComponent {
   onPaymentVoucherDetailsItemAccountChange(fg: FormGroup<IAppPaymentVoucherItemControls>, itemId: number) {
     fg.controls.finincalAccountId.setValue(itemId);
   }
+    onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.fg.reset();
+    }else{
+      this.router.navigateByUrl('/accounts/collective-payments/add');
+    }
+  }
 }

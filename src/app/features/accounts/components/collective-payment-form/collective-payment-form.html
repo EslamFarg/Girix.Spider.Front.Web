@@ -9,18 +9,14 @@
     <button type="submit" form="collectivePaymentForm" pButton class="flex-1 md:flex-none app-p-btn py-1! md:px-8!">
       حفظ
     </button>
-    @switch (formMode()) {
-      @case (FormMode.Update) {
         <a
           pButton
-          routerLink="/accounts/collective-payments/add"
+          (click)="onResetForm()"
           class="app-p-btn py-1! flex-1 md:flex-none md:px-8!"
           variant="outlined"
         >
           جديد
         </a>
-      }
-    }
   </div>
 
   <div class="grid md:grid-cols-4 gap-4 flex-1 my-4">

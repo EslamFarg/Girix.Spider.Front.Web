@@ -326,5 +326,12 @@ export class CollectiveReceiptForm extends BaseComponent {
   onReceiptVoucherDetailsItemAccountChange(fg: FormGroup<IAppReceiptVoucherItemControls>, itemId: number) {
     fg.controls.finincalAccountId.setValue(itemId);
   }
+    onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.fg.reset();
+    }else{
+      this.router.navigateByUrl('/accounts/collective-receipts/add');
+    }
+  }
 }
  

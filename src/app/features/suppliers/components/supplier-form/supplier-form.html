@@ -15,7 +15,7 @@
       {{ 'ACTIONS.EDIT' | translate }}
     }
   </button>
-  <button appLoadingDisabled pButton [routerLink]="'/suppliers/add'" class="border-dark-line! text-dark-line!" variant="outlined">
+  <button appLoadingDisabled pButton (click)="onResetForm()" class="border-dark-line! text-dark-line!" variant="outlined">
     {{ 'ACTIONS.NEW' | translate }}
   </button>
 </div>

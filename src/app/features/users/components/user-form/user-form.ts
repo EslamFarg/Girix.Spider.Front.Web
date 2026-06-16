@@ -179,4 +179,11 @@ export class UserForm extends BaseComponent {
         break;
     }
   }
+    onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.userFg.reset();
+    }else{
+      this.router.navigateByUrl('/settings/users/add');
+    }
+  }
 }

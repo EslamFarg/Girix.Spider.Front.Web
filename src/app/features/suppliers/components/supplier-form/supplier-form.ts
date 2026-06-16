@@ -148,4 +148,11 @@ export class SupplierForm extends BaseComponent implements OnInit {
         break;
     }
   }
+    onResetForm() {
+    if(this.formMode() === FormMode.Create){
+      this.supplierFg.reset();
+    }else{
+      this.router.navigateByUrl('/accounts/suppliers/add');
+    }
+  }
 }
