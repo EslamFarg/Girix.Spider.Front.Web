@@ -1,8 +1,9 @@
+<!-- ── Search bar ─────────────────────────────────────────────────── -->
 <form
     #form
     [formGroup]="fg"
     appDebounce
-    [domEvents]="['submit']"
+    [domEvents]="['input', 'submit']"
     (debounced)="onSubmit()"
     class="flex h-fit items-start gap-2 w-full"
 >
@@ -13,29 +14,40 @@
                 pInputText
                 type="text"
                 formControlName="searchTerm"
-                [placeholder]="'ACTIONS.SEARCH' | translate"
+                [placeholder]="searchPlaceholder()"
             />
-            <p-inputgroup-addon class="relative">
+
+            <!-- Filter icon + active filter badge -->
+            <p-inputgroup-addon class="relative gap-2 px-3!">
+                @if (activeFilterLabel()) {
+                    <span class="text-xs font-semibold opacity-60 whitespace-nowrap">
+                        {{ activeFilterLabel() }}
+                    </span>
+                    <span class="opacity-20 select-none">|</span>
+                }
                 <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
                 <p-menu
                     dir="rtl"
-                    [class]="`*:top-full! *:left-0! `"
+                    [class]="`*:top-full! *:left-0!`"
                     #filterMenu
                     [popup]="true"
                     [style]="{ insetInlineEnd: '100%' }"
                     styleClass="[&>.p-menu-list]:hidden!"
                 >
                     <ng-template #start>
+                        <!-- onChange auto-closes the menu on selection -->
                         <p-listbox
                             [options]="filterMenuItems"
                             formControlName="searchEnum"
                             optionValue="value"
                             optionLabel="label"
                             class="w-full md:w-56"
+                            (onChange)="onFilterSelect(filterMenu)"
                         />
                     </ng-template>
                 </p-menu>
             </p-inputgroup-addon>
+
             <p-inputgroup-addon>
                 <i class="pi pi-search"></i>
             </p-inputgroup-addon>
@@ -43,40 +55,52 @@
     </div>
 </form>
 
-<table class="my-4 w-full main-table">
+<!-- ── Journals table ─────────────────────────────────────────────── -->
+<table class="my-4 w-full main-table journals-table table-fixed">
     <thead>
         <tr>
             <th>#</th>
-            <th>الرقم الدفتري</th>
+            <th>رقم القيد</th>
             <th>التاريخ</th>
+            <th>الرقم الدفتري</th>
             <th>المرجع</th>
-            <th>المدين</th>
-            <th>الدائن</th>
+            <th>إجمالي المدين</th>
+            <th>إجمالي الدائن</th>
             <th>الأدوات</th>
         </tr>
     </thead>
     <tbody>
         @for (item of journals(); track item.id) {
             <tr [style]="`--ix:${$index}`">
+                <!-- # row number -->
                 <td>
                     <div>{{ getRowNumber($index, journalsPaginationInfo.pageIndex) }}</div>
                 </td>
+                <!-- رقم القيد — journal ID -->
                 <td>
-                    <div>{{ item.voucherNo }}</div>
+                    <div>{{ item.id }}</div>
                 </td>
+                <!-- التاريخ -->
                 <td>
-                    <div>{{ item.voucherDate | date }}</div>
+                    <div>{{ item.voucherDate | date: 'dd/MM/yyyy' }}</div>
                 </td>
+                <!-- الرقم الدفتري -->
+                <td>
+                    <div>{{ item.voucherNo || '-' }}</div>
+                </td>
+                <!-- المرجع -->
                 <td>
                     <div>{{ item.refNumber || '-' }}</div>
                 </td>
-
+                <!-- إجمالي المدين -->
                 <td>
-                    <div>{{ item?.totalDebit?.toFixed(2) }}</div>
+                    <div>{{ item.totalDebit?.toFixed(2) }}</div>
                 </td>
+                <!-- إجمالي الدائن -->
                 <td>
-                    <div>{{ item?.totalCredit?.toFixed(2) }}</div>
+                    <div>{{ item.totalCredit?.toFixed(2) }}</div>
                 </td>
+                <!-- الأدوات -->
                 <td>
                     <div class="actions">
                         <a [routerLink]="['/accounts/journals', item.id, 'edit']" class="edit">
@@ -129,6 +153,7 @@
     </tbody>
 </table>
 
+<!-- ── Pagination ─────────────────────────────────────────────────── -->
 <p-paginator
     (onPageChange)="onPageChange($event)"
     [first]="getCurrentRowsIx(journalsPaginationInfo.pageIndex)"

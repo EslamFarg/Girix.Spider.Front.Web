@@ -1,0 +1,106 @@
+/* ─── Payment lines scroll container ────────────────────────────
+   Mirrors receipt-form.css exactly.
+   max-height = dark thead (~52 px) + sticky entry row (~44 px)
+              + 7 data rows × ~44 px ≈ 420 px with buffer.
+   Internal scroll appears automatically once rows exceed ~7.
+   ────────────────────────────────────────────────────────────── */
+
+.payment-grid-wrapper {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 420px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+/* ─── Dark sticky header ──────────────────────────────────────── */
+
+.payment-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background-color: var(--color-dark-bg-2);
+}
+
+/* ─── Sticky entry (add) row — always below header ───────────── */
+
+.payment-entry-row {
+  position: sticky;
+  top: 52px;          /* matches thead rendered height */
+  z-index: 2;
+}
+
+.payment-entry-row,
+.payment-entry-row td {
+  background-color: #eef6ff !important;
+  border-top: 1px solid #bfdbfe !important;
+  border-bottom: 2px solid #93c5fd !important;
+}
+
+/* ─── Add-row indicator (+) ───────────────────────────────────── */
+
+.payment-add-indicator {
+  font-weight: 700;
+  text-align: center;
+  font-size: 1rem;
+  user-select: none;
+  opacity: 0.6;
+}
+
+/* ─── Column header: label stacked above running total ────────── */
+
+.payment-col-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.payment-col-total {
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Column widths (6 columns)
+   #=3  الحساب=22  تفعيل الضريبة=8  الإجمالي بالضريبة=20  البيان=40  الأدوات=7  → 100%
+   ────────────────────────────────────────────────────────────── */
+
+.payment-table th:nth-child(1),
+.payment-table td:nth-child(1) {
+  width: 3%;
+  min-width: 28px;
+}
+
+.payment-table th:nth-child(2),
+.payment-table td:nth-child(2) {
+  width: 22%;
+  min-width: 150px;
+}
+
+.payment-table th:nth-child(3),
+.payment-table td:nth-child(3) {
+  width: 8%;
+  min-width: 70px;
+}
+
+.payment-table th:nth-child(4),
+.payment-table td:nth-child(4) {
+  width: 20%;
+  min-width: 100px;
+}
+
+.payment-table th:nth-child(5),
+.payment-table td:nth-child(5) {
+  width: 40%;
+  min-width: 140px;
+}
+
+.payment-table th:nth-child(6),
+.payment-table td:nth-child(6) {
+  width: 7%;
+  min-width: 60px;
+}

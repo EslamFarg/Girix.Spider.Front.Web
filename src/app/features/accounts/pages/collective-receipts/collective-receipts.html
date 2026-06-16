@@ -1,80 +1,77 @@
-<!-- search -->
-<div class="flex h-fit items-start gap-2 w-full">
-    <form
-        #form
-        [formGroup]="fg"
-        appDebounce
-        appLoadingDisabled
-        id="collectiveReceiptsForm"
-        [domEvents]="['submit']"
-        (debounced)="onSubmit()"
-        class="flex-1"
-    >
+<!-- ── Search bar ─────────────────────────────────────────────────── -->
+<form
+    #form
+    [formGroup]="fg"
+    appDebounce
+    [domEvents]="['input', 'submit']"
+    (debounced)="onSubmit()"
+    class="flex h-fit items-start gap-2 w-full"
+>
+    <div class="flex-1">
         <app-input-error-message-handler [fc]="fg.get('searchTerm')">
             <input
-                class="w-full bg-transparent! no-input-spinner"
-                type="text"
+                class="w-full bg-transparent!"
                 pInputText
-                appAllowNumbers
+                type="text"
                 formControlName="searchTerm"
-                placeholder="بحث"
+                [placeholder]="searchPlaceholder()"
             />
-            <!-- <p-inputgroup-addon>
-                <i class="pi pi-filter"></i>
-            </p-inputgroup-addon> -->
-            <p-inputgroup-addon class="relative">
+
+            <!-- Filter icon + active filter badge -->
+            <p-inputgroup-addon class="relative gap-2 px-3!">
+                @if (activeFilterLabel()) {
+                    <span class="text-xs font-semibold opacity-60 whitespace-nowrap">
+                        {{ activeFilterLabel() }}
+                    </span>
+                    <span class="opacity-20 select-none">|</span>
+                }
                 <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"></i>
                 <p-menu
-                                dir="rtl"
-                                [class]="`*:top-full! *:left-0! `"
-                                #filterMenu
-                                [popup]="true"
-                                [style]="{ insetInlineEnd: '100%' }"
-                                styleClass="[&>.p-menu-list]:hidden!"
-                            >
-                                <ng-template #start>
-                                    <p-listbox
-                                        [options]="filterMenuItems"
-                                        formControlName="searchEnum"
-                                        optionValue="value"
-                                        optionLabel="label"
-                                        class="w-full md:w-56"
-                                    />
-                                </ng-template>
-                            </p-menu>
-                
-            </p-inputgroup-addon>
-            <p-inputgroup-addon>
-                <button
-                    pButton
-                    class="cursor-pointer flex gap-3 px-4 h-full py-0! app-p-btn rounded-e-md!"
-                    type="submit"
-                    form="collectiveReceiptsForm"
+                    dir="rtl"
+                    [class]="`*:top-full! *:left-0!`"
+                    #filterMenu
+                    [popup]="true"
+                    [style]="{ insetInlineEnd: '100%' }"
+                    styleClass="[&>.p-menu-list]:hidden!"
                 >
-                    <span>بحث</span>
-                    <i class="pi pi-search"></i>
-                </button>
+                    <ng-template #start>
+                        <!-- onChange auto-closes menu on selection -->
+                        <p-listbox
+                            [options]="filterMenuItems"
+                            formControlName="searchEnum"
+                            optionValue="value"
+                            optionLabel="label"
+                            class="w-full md:w-56"
+                            (onChange)="onFilterSelect(filterMenu)"
+                        />
+                    </ng-template>
+                </p-menu>
+            </p-inputgroup-addon>
+
+            <p-inputgroup-addon>
+                <i class="pi pi-search"></i>
             </p-inputgroup-addon>
         </app-input-error-message-handler>
-    </form>
+    </div>
+</form>
 
-    <!-- <p-select [options]="periodOptions" optionLabel="label" placeholder="الكل" class="h-fit w-40" /> -->
-</div>
-
-<table class="my-4 w-full main-table">
+<!-- ── Receipts table ─────────────────────────────────────────────── -->
+<table class="my-4 w-full main-table receipts-table table-fixed">
     <thead>
-        <tr class="">
+        <tr>
             <th>#</th>
-            <th>{{ 'FORM.VOUCHER_NUMBER' | translate }}</th>
-            <th>{{ 'FORM.DATE' | translate }}</th>
-            <th>{{ 'FORM.LEDGER_NUMBER' | translate }}</th>
-            <th>{{ 'FORM.AMOUNT' | translate }}</th>
-            <th>{{ 'ACTIONS.TOOLS' | translate }}</th>
+            <th>رقم السند</th>
+            <th>التاريخ</th>
+            <th>الرقم الدفتري</th>
+            <th>الصندوق / البنك</th>
+            <th>البيان</th>
+            <th>الإجمالي</th>
+            <th>الأدوات</th>
         </tr>
     </thead>
     <tbody>
-        @for (receiptVoucher of receiptVouchers(); track $index) {
-            <tr class="" [style]="`--ix:${$index}`">
+        @for (receiptVoucher of receiptVouchers(); track receiptVoucher.id) {
+            <tr [style]="`--ix:${$index}`">
                 <td>
                     <div>{{ getRowNumber($index, receiptVouchersPaginationInfo.pageIndex) }}</div>
                 </td>
@@ -85,21 +82,19 @@
                     <div>{{ receiptVoucher.voucherDate | date: 'dd/MM/yyyy' }}</div>
                 </td>
                 <td>
-                    <div>{{ receiptVoucher.voucherNo }}</div>
+                    <div>{{ receiptVoucher.voucherNo || '-' }}</div>
                 </td>
                 <td>
-                    <div>{{ receiptVoucher?.totalAmount?.toFixed(2) }}</div>
+                    <div>{{ receiptVoucher.debitAccountName || '-' }}</div>
+                </td>
+                <td>
+                    <div [title]="receiptVoucher.notes ?? ''">{{ receiptVoucher.notes || '-' }}</div>
+                </td>
+                <td>
+                    <div>{{ receiptVoucher.totalAmount?.toFixed(2) }}</div>
                 </td>
                 <td>
                     <div class="actions">
-                        <!-- <button type="button" class="print">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M12.75 3.5H3.3125C2.8318 3.5 2.37078 3.69096 2.03087 4.03087C1.69096 4.37078 1.5 4.8318 1.5 5.3125V10.25C1.5 10.7141 1.68437 11.1592 2.01256 11.4874C2.34075 11.8156 2.78587 12 3.25 12H3.5V13.24C3.5 13.5742 3.63275 13.8947 3.86905 14.131C4.10534 14.3673 4.42583 14.5 4.76 14.5H11.24C11.5742 14.5 11.8947 14.3673 12.131 14.131C12.3673 13.8947 12.5 13.5742 12.5 13.24V12H12.75C13.2141 12 13.6592 11.8156 13.9874 11.4874C14.3156 11.1592 14.5 10.7141 14.5 10.25V5.25C14.5 4.78587 14.3156 4.34075 13.9874 4.01256C13.6592 3.68437 13.2141 3.5 12.75 3.5ZM11.5 13.24C11.4998 13.3089 11.4723 13.3749 11.4236 13.4236C11.3749 13.4723 11.3089 13.4998 11.24 13.5H4.76C4.69112 13.4998 4.62513 13.4723 4.57643 13.4236C4.52772 13.3749 4.50025 13.3089 4.5 13.24V8.26C4.50025 8.19112 4.52772 8.12513 4.57643 8.07643C4.62513 8.02772 4.69112 8.00025 4.76 8H11.24C11.3089 8.00025 11.3749 8.02772 11.4236 8.07643C11.4723 8.12513 11.4998 8.19112 11.5 8.26V13.24ZM12.3125 6.4975C12.1595 6.5098 12.0065 6.47487 11.874 6.39743C11.7415 6.32 11.6359 6.20379 11.5716 6.06447C11.5072 5.92516 11.4871 5.76946 11.514 5.61837C11.541 5.46729 11.6136 5.3281 11.7221 5.21958C11.8306 5.11107 11.9698 5.03845 12.1209 5.01154C12.272 4.98462 12.4277 5.0047 12.567 5.06907C12.7063 5.13343 12.8225 5.23898 12.8999 5.37148C12.9774 5.50397 13.0123 5.65703 13 5.81C12.9857 5.98758 12.9087 6.15427 12.7827 6.28024C12.6568 6.40621 12.4901 6.48323 12.3125 6.4975ZM10.75 1.5H5.25C4.82938 1.50063 4.42301 1.65249 4.10506 1.92787C3.78711 2.20324 3.57879 2.58378 3.51813 3H12.4819C12.4212 2.58378 12.2129 2.20324 11.8949 1.92787C11.577 1.65249 11.1706 1.50063 10.75 1.5Z"
-                  fill="#1F1D2B"
-                />
-              </svg>
-            </button> -->
                         <a [routerLink]="['/accounts/collective-receipts', receiptVoucher.id, 'edit']" class="edit">
                             <svg
                                 width="16"
@@ -150,6 +145,7 @@
     </tbody>
 </table>
 
+<!-- ── Pagination ─────────────────────────────────────────────────── -->
 <p-paginator
     (onPageChange)="onPageChange($event)"
     [first]="getCurrentRowsIx(receiptVouchersPaginationInfo.pageIndex)"

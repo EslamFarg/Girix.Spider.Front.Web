@@ -1,11 +1,13 @@
 import { BaseComponent, FormMode, IPaginationInfo, SectionWrapper } from '@/components';
 import { Debounce, IDebounceEvent } from '@/directives/debounce';
 import { Component, computed, inject, input, signal } from '@angular/core';
-import { Validators, FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Validators, FormGroup, FormControl, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { PaginatorState } from 'primeng/paginator';
 import { FinancialAccountService, FinancialAccountSearchEnum } from '../../services/financial-account-service';
 import { JournalEntryService } from '../../services/journal-entry-service';
 import { ITreeFinancialAccountSearchRow, IJournalEntryReadResponse, IFinancialAccountSearchRow } from '../../types';
+import { A4PrintService } from '@/core';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import {
   InputErrorMessageHandler,
@@ -23,7 +25,6 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { ControlsOf } from '@/yn-ng/types/helpers';
-import { RouterLink } from '@angular/router';
 
 interface IAppJournalItem {
   finincalAccountId: number | null;
@@ -48,7 +49,6 @@ type IAppJournalItemControls = ControlsOf<IAppJournalItem>;
     NgSelectComponent,
     AllowNumbers,
     ButtonDirective,
-    RouterLink,
   ],
   templateUrl: './journal-form.html',
   styleUrl: './journal-form.css',
@@ -58,6 +58,7 @@ export class JournalForm extends BaseComponent {
 
   currentJournal = signal<IJournalEntryReadResponse | null>(null);
   journalEntryService = inject(JournalEntryService);
+  a4PrintService = inject(A4PrintService);
   formMode = computed(() => {
     if (this.currentJournal()) return FormMode.Update;
     return this.initialFormMode();
@@ -99,6 +100,27 @@ export class JournalForm extends BaseComponent {
   };
   fg = this.fb.group(this.initialFormValue);
 
+  private _formChange = toSignal(this.fg.valueChanges, { initialValue: null });
+
+  totalDebit = computed(() => {
+    this._formChange();
+    return this.fg.controls.items.controls.reduce((sum, ctrl) => sum + (Number(ctrl.value.debtorAmount) || 0), 0);
+  });
+
+  totalCredit = computed(() => {
+    this._formChange();
+    return this.fg.controls.items.controls.reduce((sum, ctrl) => sum + (Number(ctrl.value.creditorAmount) || 0), 0);
+  });
+
+  isBalanced = computed((): boolean | null => {
+    this._formChange();
+    const items = this.fg.controls.items.controls;
+    if (items.length === 0) return null;
+    return Math.abs(this.totalDebit() - this.totalCredit()) < 0.001;
+  });
+
+  balanceDifference = computed(() => Math.abs(this.totalDebit() - this.totalCredit()));
+
   //
   //
   //
@@ -113,6 +135,13 @@ export class JournalForm extends BaseComponent {
     super();
     this.searchFinancialAccounts(0);
     this.setUpNewJournalDetailsRowFg();
+
+    // Date field must never be empty — restore to today if user clears it
+    this.fg.controls.voucherDate.valueChanges.subscribe((value) => {
+      if (!value) {
+        this.fg.controls.voucherDate.setValue(new Date(), { emitEvent: false });
+      }
+    });
   }
   //
   //
@@ -166,8 +195,8 @@ export class JournalForm extends BaseComponent {
     }
 
     //check if debtor sum == creditor sum
-    const creditorSum = creditorEntries.reduce((a, b) => a + (b.creditorAmount ?? 0), 0);
-    const debtorSum = debtorEntries.reduce((a, b) => a + (b.debtorAmount ?? 0), 0);
+    const creditorSum = creditorEntries.reduce((a, b) => a + (Number(b.creditorAmount) || 0), 0);
+    const debtorSum = debtorEntries.reduce((a, b) => a + (Number(b.debtorAmount) || 0), 0);
 
     if (creditorSum != debtorSum) {
       this.fg.markAllAsTouched();
@@ -200,8 +229,8 @@ export class JournalForm extends BaseComponent {
     switch (this.formMode()) {
       case FormMode.Create:
         this.journalEntryService.create(data).subscribe({
-          next: (data) => {
-            this.onResetJournal();
+          next: () => {
+            this.onNewJournal();
           },
         });
         break;
@@ -212,8 +241,8 @@ export class JournalForm extends BaseComponent {
             ...data,
           })
           .subscribe({
-            next: (data) => {
-              this.onResetJournal();
+            next: () => {
+              this.onNewJournal();
             },
           });
         break;
@@ -224,6 +253,43 @@ export class JournalForm extends BaseComponent {
     this.fg.reset();
     this.fg.setControl('items', this.fb.array<FormGroup<IAppJournalItemControls>>([]));
     this.currentJournal.set(null);
+  }
+
+  onNewJournal() {
+    this.onResetJournal();
+    this.router.navigate(['/accounts/journals/add']);
+  }
+
+  deleteJournal(event: Event) {
+    const journal = this.currentJournal();
+    if (!journal) return;
+
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل أنت متأكد من حذف القيد؟',
+      header: 'حذف القيد',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'إلغاء',
+      rejectButtonProps: {
+        label: 'إلغاء',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'حذف',
+        severity: 'danger',
+      },
+      accept: () => {
+        this.journalEntryService.delete(journal.id).subscribe({
+          next: () => {
+            this.router.navigate(['/accounts/journals/add']);
+          },
+        });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'إلغاء', detail: 'تم إلغاء الحذف' });
+      },
+    });
   }
 
   //
@@ -367,18 +433,22 @@ export class JournalForm extends BaseComponent {
 
   lastClickedTableRowIndex = signal<number | null>(null);
 
-  currentEditRowIndex = signal<number>(-1);
-
-  editJournalDetailRow(rowIndex: number) {
-    this.lastClickedTableRowIndex.set(rowIndex + 1);
-    this.currentEditRowIndex.set(rowIndex);
-  }
-  isRowEditable(rowIndex: number) {
-    return this.currentEditRowIndex() === rowIndex;
-  }
   delteJournalDetailRow(rowIndex: number) {
     this.fg.controls.items.removeAt(rowIndex);
-    this.currentEditRowIndex.set(-1);
+  }
+
+  /**
+   * Strip leading zeros and cap to 2 decimal places.
+   * Examples: "00005.55" → 5.55 | "010" → 10 | "0.25" → 0.25
+   * Uses emitEvent:false to avoid triggering the mutual-zero subscriptions.
+   */
+  normalizeAmount(control: AbstractControl) {
+    const num = parseFloat(String(control.value ?? 0));
+    if (isNaN(num) || num < 0) {
+      control.setValue(0, { emitEvent: false });
+      return;
+    }
+    control.setValue(parseFloat(num.toFixed(2)), { emitEvent: false });
   }
   //
   //
@@ -425,6 +495,9 @@ export class JournalForm extends BaseComponent {
   }
 
   submitNewJournalDetailsItem() {
+    this.normalizeAmount(this.newJournalDetailsItemFg.controls.debtorAmount);
+    this.normalizeAmount(this.newJournalDetailsItemFg.controls.creditorAmount);
+
     if (this.newJournalDetailsItemFg.invalid) {
       this.newJournalDetailsItemFg.markAllAsTouched();
       //log errors
@@ -450,5 +523,137 @@ export class JournalForm extends BaseComponent {
 
     this.lastClickedTableRowIndex.set(this.fg.value.items!.length - 1);
     this.setUpNewJournalDetailsRowFg();
+  }
+
+  printJournal() {
+    const journal = this.currentJournal();
+    if (!journal) return;
+
+    const fmt = (dateStr: string) => {
+      const d = new Date(dateStr);
+      return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+    };
+    const money = (v: number) => v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const isBalanced = Math.abs(journal.totalDebit - journal.totalCredit) < 0.001;
+
+    // Combine debit then credit lines, tag each with side label
+    const allLines = [
+      ...journal.debitLines.map(l => ({ ...l, side: 'مدين' })),
+      ...journal.creditLines.map(l => ({ ...l, side: 'دائن' })),
+    ];
+
+    const lineRows = allLines.map((line, i) => `
+      <tr>
+        <td class="num">${i + 1}</td>
+        <td>${line.finincalAccountName ?? '-'}</td>
+        <td>${line.notes ?? '-'}</td>
+        <td class="num">${line.side === 'مدين' ? money(line.totalAmount) : '-'}</td>
+        <td class="num">${line.side === 'دائن' ? money(line.totalAmount) : '-'}</td>
+      </tr>`).join('');
+
+    const html = `
+      <!-- ── Header ── -->
+      <div class="doc-header">
+        <div class="doc-logo">🏛️</div>
+        <div class="doc-company">
+          <div class="doc-company-name">Rest House</div>
+          <div class="doc-company-sub">نظام إدارة المطاعم والحسابات</div>
+        </div>
+        <div class="doc-title-box">سند قيد يومية</div>
+      </div>
+
+      <!-- ── Meta fields ── -->
+      <div class="meta-grid">
+        <div class="meta-field">
+          <span class="meta-label">رقم القيد:</span>
+          <span class="meta-value">${journal.id}</span>
+        </div>
+        <div class="meta-field">
+          <span class="meta-label">الرقم الدفتري:</span>
+          <span class="meta-value">${journal.voucherNo ?? '-'}</span>
+        </div>
+        <div class="meta-field">
+          <span class="meta-label">التاريخ:</span>
+          <span class="meta-value">${fmt(journal.voucherDate)}</span>
+        </div>
+        <div class="meta-field">
+          <span class="meta-label">المرجع:</span>
+          <span class="meta-value">${journal.refNumber ?? '-'}</span>
+        </div>
+      </div>
+
+      <!-- ── General statement ── -->
+      ${journal.notes ? `
+      <div class="statement-banner mb-2">
+        <span class="meta-label">البيان العام: </span>
+        <span>${journal.notes}</span>
+      </div>` : ''}
+
+      <!-- ── Lines table ── -->
+      <table class="lines-table">
+        <thead>
+          <tr>
+            <th style="width:4%">#</th>
+            <th style="width:28%">الحساب</th>
+            <th style="width:36%">البيان</th>
+            <th style="width:16%">مدين</th>
+            <th style="width:16%">دائن</th>
+          </tr>
+        </thead>
+        <tbody>${lineRows}</tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="bold">الإجمالي</td>
+            <td class="num bold">${money(journal.totalDebit)}</td>
+            <td class="num bold">${money(journal.totalCredit)}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- ── Totals / balance ── -->
+      <div class="totals-box">
+        <div class="total-item">
+          <span class="total-label">إجمالي المدين</span>
+          <span class="total-value">${money(journal.totalDebit)}</span>
+        </div>
+        <div class="total-item">
+          <span class="total-label">إجمالي الدائن</span>
+          <span class="total-value">${money(journal.totalCredit)}</span>
+        </div>
+        <div class="total-item">
+          <span class="total-label">الحالة</span>
+          <span class="${isBalanced ? 'balance-ok' : 'balance-err'}" style="font-size:11pt;font-weight:bold">
+            ${isBalanced ? '✓ متوازن' : '✗ غير متوازن'}
+          </span>
+        </div>
+      </div>
+
+      <!-- ── Signature footer ── -->
+      <div class="sig-footer">
+        <div class="sig-row">
+          <div class="sig-box">
+            <span class="sig-title">المحاسب</span>
+            <div class="sig-line"></div>
+            <span class="sig-name">التوقيع / الاسم</span>
+          </div>
+          <div class="sig-box">
+            <span class="sig-title">المراجع</span>
+            <div class="sig-line"></div>
+            <span class="sig-name">التوقيع / الاسم</span>
+          </div>
+          <div class="sig-box">
+            <span class="sig-title">مدير الحسابات</span>
+            <div class="sig-line"></div>
+            <span class="sig-name">التوقيع / الاسم</span>
+          </div>
+          <div class="sig-box">
+            <span class="sig-title">اعتماد الإدارة</span>
+            <div class="sig-line"></div>
+            <span class="sig-name">التوقيع / الختم</span>
+          </div>
+        </div>
+      </div>`;
+
+    this.a4PrintService.print(html);
   }
 }

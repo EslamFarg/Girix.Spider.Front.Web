@@ -1,0 +1,105 @@
+/* ─── Receipt lines scroll container ────────────────────────────
+   max-height = dark thead (~52 px) + sticky entry row (~44 px)
+              + 7 data rows × ~44 px ≈ 420 px with buffer.
+   Internal scroll appears automatically once rows exceed ~7.
+   ────────────────────────────────────────────────────────────── */
+
+.receipt-grid-wrapper {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 420px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+/* ─── Dark sticky header ──────────────────────────────────────── */
+
+.receipt-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background-color: var(--color-dark-bg-2);
+}
+
+/* ─── Sticky entry (add) row — always below header ───────────── */
+
+.receipt-entry-row {
+  position: sticky;
+  top: 52px;          /* matches thead rendered height */
+  z-index: 2;
+}
+
+.receipt-entry-row,
+.receipt-entry-row td {
+  background-color: #eef6ff !important;
+  border-top: 1px solid #bfdbfe !important;
+  border-bottom: 2px solid #93c5fd !important;
+}
+
+/* ─── Add-row indicator (+) ───────────────────────────────────── */
+
+.receipt-add-indicator {
+  font-weight: 700;
+  text-align: center;
+  font-size: 1rem;
+  user-select: none;
+  opacity: 0.6;
+}
+
+/* ─── Column header: label stacked above running total ────────── */
+
+.receipt-col-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.receipt-col-total {
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Column widths (6 columns)
+   #=3  الحساب=22  تفعيل الضريبة=8  الإجمالي بالضريبة=20  البيان=40  الأدوات=7  → 100%
+   ────────────────────────────────────────────────────────────── */
+
+.receipt-table th:nth-child(1),
+.receipt-table td:nth-child(1) {
+  width: 3%;
+  min-width: 28px;
+}
+
+.receipt-table th:nth-child(2),
+.receipt-table td:nth-child(2) {
+  width: 22%;
+  min-width: 150px;
+}
+
+.receipt-table th:nth-child(3),
+.receipt-table td:nth-child(3) {
+  width: 8%;
+  min-width: 70px;
+}
+
+.receipt-table th:nth-child(4),
+.receipt-table td:nth-child(4) {
+  width: 20%;
+  min-width: 100px;
+}
+
+.receipt-table th:nth-child(5),
+.receipt-table td:nth-child(5) {
+  width: 40%;
+  min-width: 140px;
+}
+
+.receipt-table th:nth-child(6),
+.receipt-table td:nth-child(6) {
+  width: 7%;
+  min-width: 60px;
+}

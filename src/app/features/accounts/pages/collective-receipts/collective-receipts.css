@@ -1,0 +1,36 @@
+/* ── Receipts explorer — column proportions (table-fixed layout) ──
+   # = 4   رقم السند = 10   التاريخ = 14   الرقم الدفتري = 12
+   الصندوق/البنك = 20   البيان = 22   الإجمالي = 10   الأدوات = 8
+   Total = 100 %
+   ─────────────────────────────────────────────────────────────── */
+
+.receipts-table th:nth-child(1),
+.receipts-table td:nth-child(1) { width: 4%; }    /* #                */
+
+.receipts-table th:nth-child(2),
+.receipts-table td:nth-child(2) { width: 10%; }   /* رقم السند        */
+
+.receipts-table th:nth-child(3),
+.receipts-table td:nth-child(3) { width: 14%; }   /* التاريخ          */
+
+.receipts-table th:nth-child(4),
+.receipts-table td:nth-child(4) { width: 12%; }   /* الرقم الدفتري    */
+
+.receipts-table th:nth-child(5),
+.receipts-table td:nth-child(5) { width: 20%; }   /* الصندوق / البنك  */
+
+.receipts-table th:nth-child(6),
+.receipts-table td:nth-child(6) { width: 22%; }   /* البيان           */
+
+.receipts-table th:nth-child(7),
+.receipts-table td:nth-child(7) { width: 10%; }   /* الإجمالي         */
+
+.receipts-table th:nth-child(8),
+.receipts-table td:nth-child(8) { width: 8%; }    /* الأدوات          */
+
+/* Prevent overflow in narrow cells */
+.receipts-table td div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

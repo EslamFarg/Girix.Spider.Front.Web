@@ -4,7 +4,8 @@ import { Debounce, IDebounceEvent } from '@/directives/debounce';
 import { InputErrorMessageHandler, onlyNumbersOrDotAllowed } from '@/yn-ng';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { Component, computed, inject, input, signal } from '@angular/core';
-import { ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AbstractControl, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { NgSelectComponent, NgItemLabelDirective, NgLabelTemplateDirective } from '@ng-select/ng-select';
 import { ButtonDirective } from 'primeng/button';
@@ -13,9 +14,10 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorState } from 'primeng/paginator';
 import { Textarea } from 'primeng/textarea';
+import { A4PrintService } from '@/core';
 import { FinancialAccountSearchEnum, FinancialAccountService } from '../../services/financial-account-service';
 import { ReceiptVoucherService } from '../../services/receipt-voucher-service';
-import { 
+import {
   IFinancialAccountSearchRow,
   IReceiptVoucherReadResponse,
   ITreeFinancialAccountSearchRow,
@@ -25,6 +27,7 @@ interface IAppReceiptVoucherItem {
   finincalAccountId: number | null;
   isHasTax: boolean;
   totalAmount: number;
+  notes: string | null;
 }
 type IAppReceiptVoucherItemControls = ControlsOf<IAppReceiptVoucherItem>;
 
@@ -45,8 +48,8 @@ type ISelectableBankCashAccount = Omit<IFinancialAccountSearchRow, 'stage'>;
     ButtonDirective,
     RouterLink,
     NgItemLabelDirective,
-    NgLabelTemplateDirective
-],
+    NgLabelTemplateDirective,
+  ],
   templateUrl: './collective-receipt-form.html',
   styleUrl: './collective-receipt-form.css',
 })
@@ -55,6 +58,7 @@ export class CollectiveReceiptForm extends BaseComponent {
   FinancialAccountSearchEnum = FinancialAccountSearchEnum;
   currentReceiptVoucher = signal<IReceiptVoucherReadResponse | null>(null);
   receiptVoucherService = inject(ReceiptVoucherService);
+  a4PrintService = inject(A4PrintService);
   formMode = computed(() => {
     if (this.currentReceiptVoucher()) return FormMode.Update;
     return this.initialFormMode();
@@ -72,11 +76,29 @@ export class CollectiveReceiptForm extends BaseComponent {
   };
   fg = this.fb.group(this.initialFormValue);
 
+  private _formChange = toSignal(this.fg.valueChanges, { initialValue: null });
+
+  /** Sum of all line totalAmount values — updates instantly on add/edit/delete */
+  totalWithTax = computed(() => {
+    this._formChange();
+    return this.fg.controls.items.controls.reduce(
+      (sum, ctrl) => sum + (Number(ctrl.value.totalAmount) || 0),
+      0,
+    );
+  });
+
   constructor() {
     super();
     this.searchFinancialAccounts(0);
     this.getCashAndBankAccountsAndCustodyAccounts();
     this.setUpNewReceiptVoucherDetailsRowFg();
+
+    // Date must never become empty — restore today if cleared
+    this.fg.controls.voucherDate.valueChanges.subscribe((value) => {
+      if (!value) {
+        this.fg.controls.voucherDate.setValue(new Date(), { emitEvent: false });
+      }
+    });
   }
 
   ngOnInit() {
@@ -100,7 +122,7 @@ export class CollectiveReceiptForm extends BaseComponent {
     }
 
     const voucherItems = this.fg.controls.items.getRawValue();
-    const totalAmount = voucherItems.reduce((sum, item) => sum + +(item?.totalAmount ?? 0), 0);
+    const totalAmount = voucherItems.reduce((sum, item) => sum + (Number(item?.totalAmount) || 0), 0);
 
     if (voucherItems.length === 0 || totalAmount <= 0) {
       this.fg.markAllAsTouched();
@@ -131,7 +153,7 @@ export class CollectiveReceiptForm extends BaseComponent {
       case FormMode.Create:
         this.receiptVoucherService.create(data).subscribe({
           next: () => {
-            this.onResetReceiptVoucher();
+            this.onNewReceiptVoucher();
           },
         });
         break;
@@ -143,6 +165,7 @@ export class CollectiveReceiptForm extends BaseComponent {
           })
           .subscribe({
             next: () => {
+              this.onNewReceiptVoucher();
             },
           });
         break;
@@ -151,12 +174,44 @@ export class CollectiveReceiptForm extends BaseComponent {
 
   onResetReceiptVoucher() {
     this.fg.reset();
+    this.fg.controls.voucherDate.setValue(new Date());
     this.fg.setControl('items', this.fb.array<FormGroup<IAppReceiptVoucherItemControls>>([]));
     this.currentReceiptVoucher.set(null);
-    this.currentEditRowIndex.set(-1);
     this.lastClickedTableRowIndex.set(null);
     this.setUpNewReceiptVoucherDetailsRowFg();
   }
+
+  /** Reset the form and navigate to the Add route — same pattern as onNewJournal() */
+  onNewReceiptVoucher() {
+    this.onResetReceiptVoucher();
+    this.router.navigate(['/accounts/collective-receipts/add']);
+  }
+
+  deleteReceiptVoucher(event: Event) {
+    const receipt = this.currentReceiptVoucher();
+    if (!receipt) return;
+
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'هل أنت متأكد من حذف السند؟',
+      header: 'حذف السند',
+      icon: 'pi pi-info-circle',
+      rejectButtonProps: { label: 'إلغاء', severity: 'secondary', outlined: true },
+      acceptButtonProps: { label: 'حذف', severity: 'danger' },
+      accept: () => {
+        this.receiptVoucherService.delete(receipt.id).subscribe({
+          next: () => {
+            this.router.navigate(['/accounts/collective-receipts/add']);
+          },
+        });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'إلغاء', detail: 'تم إلغاء الحذف' });
+      },
+    });
+  }
+
+  // ── Bank / Cash accounts ──────────────────────────────────────────
 
   bankCashAccounts = signal<ISelectableBankCashAccount[]>([]);
 
@@ -168,10 +223,14 @@ export class CollectiveReceiptForm extends BaseComponent {
     });
   }
 
+  // ── Financial accounts search ─────────────────────────────────────
+
   _financialAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
-  financialAccounts = computed(() => this._financialAccounts().filter(a=>a.stage>=3).map(a=>({
-    ...a,label:`${a.name} - ${a.finNumber}`,
-  })));
+  financialAccounts = computed(() =>
+    this._financialAccounts()
+      .filter((a) => a.stage >= 3)
+      .map((a) => ({ ...a, label: `${a.name} - ${a.finNumber}` })),
+  );
   financialAccountService = inject(FinancialAccountService);
   financialAccountsPaginationInfo: IPaginationInfo = {
     pageIndex: 0,
@@ -201,6 +260,7 @@ export class CollectiveReceiptForm extends BaseComponent {
                 finincalAccountId: item.finincalAccountId,
                 isHasTax: item.isHasTax,
                 totalAmount: item.totalAmount,
+                notes: null,
               }),
             ),
           ),
@@ -216,41 +276,24 @@ export class CollectiveReceiptForm extends BaseComponent {
   ) {
     this.financialAccountService
       .search({
-        paginationInfo: {
-          pageIndex,
-          pageSize: 0,
-        },
-        searchFilters: [
-          {
-            column: searchEnum,
-            values: [searchValue],
-          },
-        ],
+        paginationInfo: { pageIndex, pageSize: 0 },
+        searchFilters: [{ column: searchEnum, values: [searchValue] }],
         fromDate: null,
       })
       .subscribe({
         next: (res) => {
-          // if (pageIndex === 1) {
-            this._financialAccounts.set(res.value.rows);
-          // } else {
-          //   this.financialAccounts.update((pre) => [...pre, ...res.value.rows]);
-          // }
-          // this.financialAccountsPaginationInfo = {
-          //   pageIndex,
-          //   totalPagesCount: res.value.paginationInfo.totalPagesCount,
-          //   totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          // };
+          this._financialAccounts.set(res.value.rows);
         },
       });
   }
 
   filterFinancialAccounts(term: string, item: IFinancialAccountSearchRow) {
-      return (
-        item.name.toLowerCase().includes(term.toLowerCase()) ||
-        item.finNumber.toLowerCase().includes(term.toLowerCase()) ||
-        String(item.id).includes(term.toLowerCase())
-      );
-    }
+    return (
+      item.name.toLowerCase().includes(term.toLowerCase()) ||
+      item.finNumber.toLowerCase().includes(term.toLowerCase()) ||
+      String(item.id).includes(term.toLowerCase())
+    );
+  }
 
   debouncedFinancialAccountsSearch(
     event: IDebounceEvent,
@@ -267,25 +310,28 @@ export class CollectiveReceiptForm extends BaseComponent {
   }
 
   onSubmit = () => this.fg.valid && this.searchFinancialAccounts(1);
-
   onPageChange = (event: PaginatorState) => this.searchFinancialAccounts(event.page! + 1);
 
+  // ── Row state ─────────────────────────────────────────────────────
+
   lastClickedTableRowIndex = signal<number | null>(null);
-  currentEditRowIndex = signal<number>(-1);
-
-  editReceiptVoucherDetailRow(rowIndex: number) {
-    this.lastClickedTableRowIndex.set(rowIndex + 1);
-    this.currentEditRowIndex.set(rowIndex);
-  }
-
-  isRowEditable(rowIndex: number) {
-    return this.currentEditRowIndex() === rowIndex;
-  }
 
   deleteReceiptVoucherDetailRow(rowIndex: number) {
     this.fg.controls.items.removeAt(rowIndex);
-    this.currentEditRowIndex.set(-1);
   }
+
+  // ── Amount normalization (strip leading zeros, cap 2 decimal places) ──
+
+  normalizeAmount(control: AbstractControl) {
+    const num = parseFloat(String(control.value ?? 0));
+    if (isNaN(num) || num < 0) {
+      control.setValue(0, { emitEvent: false });
+      return;
+    }
+    control.setValue(parseFloat(num.toFixed(2)), { emitEvent: false });
+  }
+
+  // ── New-row form group ────────────────────────────────────────────
 
   newReceiptVoucherDetailsItemFg!: FormGroup<IAppReceiptVoucherItemControls>;
 
@@ -293,25 +339,36 @@ export class CollectiveReceiptForm extends BaseComponent {
     return this.fb.group<IAppReceiptVoucherItemControls>({
       finincalAccountId: this.fb.control<number | null>(data?.finincalAccountId ?? null, [Validators.required]),
       isHasTax: this.fb.control<boolean>(data?.isHasTax ?? false, []),
-      totalAmount: this.fb.control<number>(data?.totalAmount ?? 0, [Validators.required, Validators.min(0),onlyNumbersOrDotAllowed]),
+      totalAmount: this.fb.control<number>(data?.totalAmount ?? 0, [
+        Validators.required,
+        Validators.min(0),
+        onlyNumbersOrDotAllowed,
+      ]),
+      notes: this.fb.control<string | null>(data?.notes ?? null, [Validators.maxLength(1000)]),
     });
   }
 
   setUpNewReceiptVoucherDetailsRowFg() {
     if (this.newReceiptVoucherDetailsItemFg) {
       this.newReceiptVoucherDetailsItemFg.reset();
-      this.newReceiptVoucherDetailsItemFg.patchValue({
-        isHasTax: false,
-        totalAmount: 0,
-      });
+      this.newReceiptVoucherDetailsItemFg.patchValue({ isHasTax: false, totalAmount: 0 });
     } else {
       this.newReceiptVoucherDetailsItemFg = this.createNewReceiptVoucherDetailsItemFg();
     }
   }
 
   submitNewReceiptVoucherDetailsItem() {
+    // Normalize amounts before validation
+    this.normalizeAmount(this.newReceiptVoucherDetailsItemFg.controls.totalAmount);
+
     if (this.newReceiptVoucherDetailsItemFg.invalid) {
       this.newReceiptVoucherDetailsItemFg.markAllAsTouched();
+      return;
+    }
+
+    if ((this.newReceiptVoucherDetailsItemFg.value.totalAmount ?? 0) <= 0) {
+      this.newReceiptVoucherDetailsItemFg.markAllAsTouched();
+      this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب إدخال مبلغ أكبر من صفر' });
       return;
     }
 
@@ -326,5 +383,110 @@ export class CollectiveReceiptForm extends BaseComponent {
   onReceiptVoucherDetailsItemAccountChange(fg: FormGroup<IAppReceiptVoucherItemControls>, itemId: number) {
     fg.controls.finincalAccountId.setValue(itemId);
   }
+
+  // ── Print ─────────────────────────────────────────────────────────
+
+  printReceiptVoucher() {
+    const receipt = this.currentReceiptVoucher();
+    if (!receipt) return;
+
+    const fmt = (dateStr: string) => {
+      const d = new Date(dateStr);
+      return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+    };
+    const money = (v: number) => v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    const lineRows = receipt.lines.map((line, i) => `
+      <tr>
+        <td class="num">${i + 1}</td>
+        <td>${line.finincalAccountName ?? '-'}</td>
+        <td class="num">${line.isHasTax ? '✓' : '-'}</td>
+        <td class="num">${money(line.totalAmount)}</td>
+      </tr>`).join('');
+
+    const html = `
+      <!-- ── Header ── -->
+      <div class="doc-header">
+        <div class="doc-logo">🏛️</div>
+        <div class="doc-company">
+          <div class="doc-company-name">Rest House</div>
+          <div class="doc-company-sub">نظام إدارة المطاعم والحسابات</div>
+        </div>
+        <div class="doc-title-box">سند قبض مجمع</div>
+      </div>
+
+      <!-- ── Meta fields ── -->
+      <div class="meta-grid cols-3">
+        <div class="meta-field">
+          <span class="meta-label">رقم السند:</span>
+          <span class="meta-value">${receipt.id}</span>
+        </div>
+        <div class="meta-field">
+          <span class="meta-label">الرقم الدفتري:</span>
+          <span class="meta-value">${receipt.voucherNo ?? '-'}</span>
+        </div>
+        <div class="meta-field">
+          <span class="meta-label">التاريخ:</span>
+          <span class="meta-value">${fmt(receipt.voucherDate)}</span>
+        </div>
+        <div class="meta-field" style="grid-column: 1 / -1">
+          <span class="meta-label">البنك / الصندوق:</span>
+          <span class="meta-value">${receipt.debitAccountName ?? '-'}</span>
+        </div>
+      </div>
+
+      <!-- ── Main statement ── -->
+      <div class="statement-banner mb-2">
+        <span>تم استلام مبلغ وقدره: </span>
+        <span class="amount-words">${money(receipt.totalAmount)} ريال</span>
+        ${receipt.notes ? `<span> — ${receipt.notes}</span>` : ''}
+      </div>
+
+      <!-- ── Lines table ── -->
+      <table class="lines-table">
+        <thead>
+          <tr>
+            <th style="width:5%">#</th>
+            <th style="width:45%">الحساب</th>
+            <th style="width:15%">ضريبة</th>
+            <th style="width:35%">المبلغ</th>
+          </tr>
+        </thead>
+        <tbody>${lineRows}</tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="bold">إجمالي السند</td>
+            <td class="num bold">${money(receipt.totalAmount)}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- ── Signature footer ── -->
+      <div class="sig-footer">
+        <div class="sig-row">
+          <div class="sig-box">
+            <span class="sig-title">المستلم</span>
+            <div class="sig-line"></div>
+            <span class="sig-name">التوقيع / الاسم</span>
+          </div>
+          <div class="sig-box">
+            <span class="sig-title">المحاسب</span>
+            <div class="sig-line"></div>
+            <span class="sig-name">التوقيع / الاسم</span>
+          </div>
+          <div class="sig-box">
+            <span class="sig-title">مدير الحسابات</span>
+            <div class="sig-line"></div>
+            <span class="sig-name">التوقيع / الاسم</span>
+          </div>
+          <div class="sig-box">
+            <span class="sig-title">الختم</span>
+            <div class="sig-line"></div>
+            <span class="sig-name">ختم الشركة</span>
+          </div>
+        </div>
+      </div>`;
+
+    this.a4PrintService.print(html);
+  }
 }
- 
