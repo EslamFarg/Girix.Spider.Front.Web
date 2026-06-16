@@ -182,6 +182,8 @@ export interface IOrderSearchRow {
   isCollected: boolean;
   payingCash: number;
   payingNetwork: number;
+  placeRefName: string;
+  deliveryName: string;
 }
 
 //search response
