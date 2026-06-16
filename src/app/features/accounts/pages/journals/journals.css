@@ -1,0 +1,35 @@
+/* ──────────────────────────────────────────────────────────────────
+   Journal Explorer — column proportions (table-fixed layout)
+   Total must equal 100 %
+   ────────────────────────────────────────────────────────────────── */
+
+.journals-table th:nth-child(1),
+.journals-table td:nth-child(1) { width: 4%; }   /* #             */
+
+.journals-table th:nth-child(2),
+.journals-table td:nth-child(2) { width: 12%; }  /* رقم القيد     */
+
+.journals-table th:nth-child(3),
+.journals-table td:nth-child(3) { width: 18%; }  /* التاريخ       */
+
+.journals-table th:nth-child(4),
+.journals-table td:nth-child(4) { width: 15%; }  /* الرقم الدفتري */
+
+.journals-table th:nth-child(5),
+.journals-table td:nth-child(5) { width: 15%; }  /* المرجع        */
+
+.journals-table th:nth-child(6),
+.journals-table td:nth-child(6) { width: 14%; }  /* إجمالي المدين */
+
+.journals-table th:nth-child(7),
+.journals-table td:nth-child(7) { width: 14%; }  /* إجمالي الدائن */
+
+.journals-table th:nth-child(8),
+.journals-table td:nth-child(8) { width: 8%; }   /* الأدوات       */
+
+/* Prevent text overflow in narrow cells */
+.journals-table td div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

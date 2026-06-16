@@ -1,10 +1,12 @@
- export interface IReceiptVoucherSearchRow {
+export interface IReceiptVoucherSearchRow {
   id: number;
   voucherNo: string;
   voucherDate: string;
   debitAccountId: number;
-  debitAccountName: any;
+  debitAccountName: string | null;
   totalAmount: number;
+  /** Voucher-level notes — present once backend includes it in the search response */
+  notes?: string | null;
 }
 
 export interface IReceiptVoucherSearchResponse {
