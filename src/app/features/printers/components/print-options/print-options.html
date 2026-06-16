@@ -1,0 +1,43 @@
+<div [class]="'h-fit flex flex-col items-center justify-center gap-3 '+styleClass()" >
+    @for (printer of printerItems(); track printer.id) {
+        <label
+            class="flex items-center w-full justify-center max-w-[250px] gap-2 border border-text-gray rounded px-4 py-2 cursor-pointer"
+            [for]="`printer-${printer.id}-${printer.ipAddressOrMacAddress}-${$index}`"
+        >
+
+            <input
+                [id]="`printer-${printer.id}-${printer.ipAddressOrMacAddress}-${$index}`"
+                type="checkbox"
+                [defaultChecked]="selectedPrinters().find((p) => p.appPrinterType === printer.appPrinterType)"
+                [value]="printer"
+                (change)="onPrinterSelect(printer)"
+            />
+
+            <p class="overflow-hidden text-ellipsis whitespace-nowrap w-full">
+                @switch (printer.appPrinterType) {
+                    @case (appPrinterType.captionOrderPrinter) {
+                        <span>طابعة كابتن اوردر</span>
+                    }
+                    @case (appPrinterType.cashierPrinter) {
+                        <span>طابعة كاشير</span>
+                    }
+                    @case (appPrinterType.programPrinter) {
+                        <span>طابعة المطبخ</span>
+                    }
+                }
+            </p>
+
+            <div class="text-xs border border-gray-400 px-1 shadow rounded">
+                @switch (printer.type) {
+                    @case (PrinterType.Bluetooth) {
+                        <span class="text-cyan-600">Bluetooth</span>
+                    }
+                    @case (PrinterType.Network) {
+                        <span class="text-green-600">Network</span>
+                    }
+                }
+            </div>
+
+        </label>
+    }
+</div>

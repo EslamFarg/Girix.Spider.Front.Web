@@ -74,6 +74,7 @@ import { ChosenLocalPlace } from '@/components/local-place-select/local-place-se
 import { DialogType } from '@/features/dialogs/enums';
 import { ControlsOf, NullablePropsOf } from '@/yn-ng/types/helpers';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { PrintOptions } from '@/features/printers/components/print-options/print-options';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -125,6 +126,7 @@ interface IOrderCreateFgValue {
         LoadingDisabledDirective,
         InputGroupAddon,
         DecimalMask,
+        PrintOptions,
     ],
     templateUrl: './cashier.html',
     styleUrl: './cashier.css',
@@ -155,8 +157,6 @@ export class Cashier extends BaseComponent implements OnInit {
     orderService = inject(OrderService);
     financialSettingsService = inject(FinancialSettingsService);
     existingOrderBill = signal<IOrderBillReadResponse | null>(null);
-    lastCreatedOrder = signal<any | null>(null);
-    successDialogVisible = signal(false);
 
     // Print dialog
     printService = inject(PrinterService);
@@ -366,7 +366,7 @@ export class Cashier extends BaseComponent implements OnInit {
         });
 
         this.paymentTypeControl?.disable();
-
+        this.printerSettingsService.getSettings().subscribe();
         // this.orderFg.setValidators;
 
         // this.orderFg.get('placeType')?.valueChanges.subscribe((placeType) => {
@@ -464,6 +464,7 @@ export class Cashier extends BaseComponent implements OnInit {
                 this.orderFg.patchValue({
                     items: this.orderCreateItems(),
                 });
+                this.orderConfirmationDialogVisible = true;
                 break;
             case FormMode.Update:
                 this.orderService
@@ -489,8 +490,6 @@ export class Cashier extends BaseComponent implements OnInit {
                         },
                     });
         }
-
-        
     }
 
     onFinalOrderSubmit() {
@@ -542,13 +541,11 @@ export class Cashier extends BaseComponent implements OnInit {
             case FormMode.Create:
                 this.orderService.create(values).subscribe({
                     next: (res) => {
-                        this.lastCreatedOrder.set(res);
                         this.printBill.set(res as unknown as IOrderBillReadResponse);
+                        this.printOrder();
                         this.resetOrderForm();
-                        this.successDialogVisible.set(true);
                     },
                     error: (err) => {
-                        console.log(err);
                         this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم انشاء الطلب' });
                         this.resetIdempotencyKey();
                     },
@@ -588,19 +585,6 @@ export class Cashier extends BaseComponent implements OnInit {
         this.resetData();
     }
 
-    onSuccessDialogHide() {
-        this.successDialogVisible.set(false);
-        this.lastCreatedOrder.set(null);
-        this.resetOrderForm();
-    }
-
-    onSuccessDialogPrint() {
-        this.successDialogVisible.set(false);
-        this.lastCreatedOrder.set(null);
-        // Open the 3-options printer selection dialog
-        this.printOrder();
-    }
-
     requireCustomer(isRequired: boolean) {
         const { phoneNumber, addressDescription, id } = this.orderFg.controls.customerRequest.controls;
         const customerRequestControls = { phoneNumber, addressDescription, id };
@@ -622,14 +606,6 @@ export class Cashier extends BaseComponent implements OnInit {
     //#region Print
     //
 
-    openPrintDialog() {
-        this.printDialogVisible = true;
-    }
-
-    onPrintDialogHide() {
-        this.printDialogVisible = false;
-        this.printBill.set(null);
-    }
 
     /**
      * Groups items and their modifiers by printer id.
@@ -811,97 +787,100 @@ export class Cashier extends BaseComponent implements OnInit {
     }
 
     printOrder() {
-        const bill = this.printBill();
-        if (!bill) return;
-
-        this.printerSettingsService.getSettings().subscribe({
-            next: (settings) => {
-                const options: IPrintOrderOption[] = [];
-                const baseCss = `
-                                body { font-family: 'Cairo', sans-serif; }
-                                table { border-collapse: collapse; width: 100%; }
-                                th, td { padding: 4px; }
-                                `;
-
-                // Kitchen (programPrinter): group items by their item-level printer id
-                if (settings.programPrinter?.id) {
-                    const kitchenGroups = this.groupItemsByPrinter(bill);
-                    for (const [, group] of kitchenGroups) {
-                        options.push({
-                            printer: {
-                                id: group.printer.id,
-                                name: group.printer.name,
-                                ipAddressOrMacAddress: group.printer.ipAddressOrMacAddress,
-                                port: group.printer.port,
-                                type: group.printer.type,
-                                comPort: (group.printer as any).comPort ?? 0,
-                                appPrinterType: AppPrinterType.programPrinter,
-                            },
-                            html: this.generateSimplifiedReceiptHtml(bill, group.items, 'فاتورة المطبخ'),
-                            css: baseCss,
-                        });
-                    }
-                }
-
-                // Captain (captionOrderPrinter): full receipt, simplified format
-                if (settings.captionOrderPrinter?.id) {
-                    options.push({
-                        printer: {
-                            id: settings.captionOrderPrinter.id,
-                            name: settings.captionOrderPrinter.name,
-                            ipAddressOrMacAddress: settings.captionOrderPrinter.ipAddressOrMacAddress,
-                            port: settings.captionOrderPrinter.port,
-                            type: settings.captionOrderPrinter.type,
-                            comPort: settings.captionOrderPrinter.comPort ?? 0,
-                            appPrinterType: AppPrinterType.captionOrderPrinter,
-                        },
-                        html: this.generateSimplifiedReceiptHtml(bill, bill.items, 'أمر كابتن'),
-                        css: baseCss,
-                    });
-                }
-
-                // Cashier (cashierPrinter): full receipt, full format with prices
-                if (settings.cashierPrinter?.id) {
-                    options.push({
-                        printer: {
-                            id: settings.cashierPrinter.id,
-                            name: settings.cashierPrinter.name,
-                            ipAddressOrMacAddress: settings.cashierPrinter.ipAddressOrMacAddress,
-                            port: settings.cashierPrinter.port,
-                            type: settings.cashierPrinter.type,
-                            comPort: settings.cashierPrinter.comPort ?? 0,
-                            appPrinterType: AppPrinterType.cashierPrinter,
-                        },
-                        html: this.generateCashierReceiptHtml(bill, bill.items),
-                        css: baseCss,
-                    });
-                }
-
-                if (options.length === 0) {
-                    this.printService.openPrinterDialog({
-                        css: this.printableOrderInvoice()?.styles ?? '',
-                        html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
-                    });
-                    return;
-                }
-
-                this.printService.openPrinterDialogWithJobs(options);
-            },
-            error: () => {
-                this.printService.openPrinterDialog({
-                    css: this.printableOrderInvoice()?.styles ?? '',
-                    html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
-                });
-            },
-        });
-    }
-
-    onPrint() {
         const bill = this.existingOrderBill();
         if (!bill) return;
         this.printBill.set(bill);
-        this.openPrintDialog();
+
+        const settings = this.printerSettingsService.printerSettings();
+        if (!settings) return;
+        const options: IPrintOrderOption[] = [];
+        const baseCss = `
+                        body { font-family: 'Cairo', sans-serif; }
+                        table { border-collapse: collapse; width: 100%; }
+                        th, td { padding: 4px; }
+                        `;
+
+        // Kitchen (programPrinter): group items by their item-level printer id
+        if (settings.programPrinter?.id) {
+            const kitchenGroups = this.groupItemsByPrinter(bill);
+            for (const [, group] of kitchenGroups) {
+                options.push({
+                    printer: {
+                        id: group.printer.id,
+                        name: group.printer.name,
+                        ipAddressOrMacAddress: group.printer.ipAddressOrMacAddress,
+                        port: group.printer.port,
+                        type: group.printer.type,
+                        comPort: (group.printer as any).comPort ?? 0,
+                        appPrinterType: AppPrinterType.programPrinter,
+                    },
+                    html: this.generateSimplifiedReceiptHtml(bill, group.items, 'فاتورة المطبخ'),
+                    css: baseCss,
+                });
+            }
+        }
+
+        // Captain (captionOrderPrinter): full receipt, simplified format
+        if (settings.captionOrderPrinter?.id) {
+            options.push({
+                printer: {
+                    id: settings.captionOrderPrinter.id,
+                    name: settings.captionOrderPrinter.name,
+                    ipAddressOrMacAddress: settings.captionOrderPrinter.ipAddressOrMacAddress,
+                    port: settings.captionOrderPrinter.port,
+                    type: settings.captionOrderPrinter.type,
+                    comPort: settings.captionOrderPrinter.comPort ?? 0,
+                    appPrinterType: AppPrinterType.captionOrderPrinter,
+                },
+                html: this.generateSimplifiedReceiptHtml(bill, bill.items, 'أمر كابتن'),
+                css: baseCss,
+            });
+        }
+
+        // Cashier (cashierPrinter): full receipt, full format with prices
+        if (settings.cashierPrinter?.id) {
+            options.push({
+                printer: {
+                    id: settings.cashierPrinter.id,
+                    name: settings.cashierPrinter.name,
+                    ipAddressOrMacAddress: settings.cashierPrinter.ipAddressOrMacAddress,
+                    port: settings.cashierPrinter.port,
+                    type: settings.cashierPrinter.type,
+                    comPort: settings.cashierPrinter.comPort ?? 0,
+                    appPrinterType: AppPrinterType.cashierPrinter,
+                },
+                html: this.generateCashierReceiptHtml(bill, bill.items),
+                css: baseCss,
+            });
+        }
+
+        if (options.length === 0) {
+            this.printService.openPrinterDialog({
+                css: this.printableOrderInvoice()?.styles ?? '',
+                html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
+            });
+            return;
+        }
+
+        this.printService.openPrinterDialogWithJobs(options);
+
+        // this.printerSettingsService.getSettings().subscribe({
+        //     next: (settings) => {},
+        //     error: () => {
+        //         this.printService.openPrinterDialog({
+        //             css: this.printableOrderInvoice()?.styles ?? '',
+        //             html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
+        //         });
+        //     },
+        // });
+
     }
+
+    // onPrint() {
+    //     if (!bill) return;
+    //     this.printBill.set(bill);
+    //     this.openPrintDialog();
+    // }
 
     //#endregion
 
@@ -1605,7 +1584,7 @@ export class Cashier extends BaseComponent implements OnInit {
     //#region customer info
     //
 
-    customerDialogVisible = false;
+    orderConfirmationDialogVisible = false;
     customerValidators: { [key: string]: ValidatorFn[] } = {
         id: [Validators.required],
         phoneNumber: [Validators.required, Validators.minLength(6)],
@@ -1615,7 +1594,7 @@ export class Cashier extends BaseComponent implements OnInit {
     customerFg = this.orderFg.controls.customerRequest;
 
     showCustomerDialog() {
-        this.customerDialogVisible = true;
+        this.orderConfirmationDialogVisible = true;
     }
     // onCustomerInfoDialogVisibilityChange(visible: boolean) {
     //     if (!visible) {
