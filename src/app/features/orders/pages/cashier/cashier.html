@@ -50,18 +50,6 @@
             >
                 {{ 'ACTIONS.NEW' | translate }}
             </a>
-            @if (existingOrderBill()) {
-                <button
-                    (click)="onPrint()"
-                    type="button"
-                    appLoadingDisabled
-                    pButton
-                    class="app-p-btn py-1! md:flex-none md:px-8!"
-                    variant="outlined"
-                >
-                    {{ 'ACTIONS.PRINT' | translate }}
-                </button>
-            }
         </div>
 
         <div>
@@ -453,58 +441,7 @@
 
             <div class="flex items-center justify-end gap-2 mt-2"></div>
         </div>
-
-        <!-- options -->
-        <div
-            [class.hidden]="!isCreateMode()"
-            class="flex gap-2 location-btns *:flex-1 w-full justify-end mt-auto"
-            style="--p-button-primary-background: transparent"
-        >
-            @if (orderLocationType() !== OrderLocationType.CompanyDelivery) {
-                <app-input-error-message-handler [grouped]="false" [fc]="orderFg.controls.customerRequest.controls.id">
-                    <button
-                        pButton
-                        type="button"
-                        class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
-                        variant="outlined"
-                        (click)="showCustomerDialog()"
-                    >
-                        بيانات العميل
-                    </button>
-                </app-input-error-message-handler>
-            }
-
-            <app-input-error-message-handler
-                [grouped]="false"
-                [fc]="
-                    orderFg.controls.cashAccountId.invalid
-                        ? orderFg.controls.cashAccountId
-                        : orderFg.controls.networkAccountId
-                "
-            >
-                <!-- [fc]="getPaymentInvalidControl()" -->
-                <button
-                    class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
-                    pButton
-                    type="button"
-                    variant="outlined"
-                    (click)="showPaymentDialog()"
-                >
-                    بيانات الدفع
-                </button>
-            </app-input-error-message-handler>
-            <!-- <app-input-error-message-handler [grouped]="false" [fc]="orderFg.get('customerRequest')">
-                <button
-                    /* (click)="toggleNumbersKeyboard()" */
-                    type="button"
-                    pButton
-                    class="text-dark-line! py-2 lg:py-1! rounded-[8px]! font-bold! w-full border-text-light! text-xs! sm:text-sm! md:text-base!"
-                    variant="outlined"
-                >
-                    لوحه المفاتيح
-                </button>
-            </app-input-error-message-handler> -->
-        </div>
+ 
     </form>
 </div>
 
@@ -605,9 +542,9 @@
     </div>
 </p-dialog>
 
-<!-- customer info -->
+<!-- order final submittion -->
 <p-dialog
-    [(visible)]="customerDialogVisible"
+    [(visible)]="orderConfirmationDialogVisible"
     [modal]="true"
     [dismissableMask]="true"
     [style]="{ width: '80%', maxWidth: '50rem' }"
@@ -618,11 +555,11 @@
 >
     <ng-template #headless>
         <div class="flex flex-col p-4 gap-4">
-            <button class="cursor-pointer p-1 w-fit ms-auto" (click)="customerDialogVisible = false">
+            <button class="cursor-pointer p-1 w-fit ms-auto" (click)="orderConfirmationDialogVisible = false">
                 <i class="pi pi-times"></i>
             </button>
 
-            <form id="customerForm" class="overflow-visible grid gap-4 md:grid-cols-2" [formGroup]="orderFg">
+            <form id="orderFinalSubmission" (ngSubmit)="onFinalOrderSubmit()" class="overflow-visible grid gap-4 md:grid-cols-2" [formGroup]="orderFg">
                 <!-- name (search) -->
                 <div>
                     <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
@@ -680,9 +617,11 @@
                     </app-input-error-message-handler>
                 </div>
 
+                <hr class="md:col-span-2  border-text-light/30 my-4! block">
+
                 <!-- paid / postponed (radio) -->
                 <div
-                    class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4 border-b border-b-text-light pb-4 [&_input]:w-5 [&_input]:aspect-square"
+                    class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4  [&_input]:w-5 [&_input]:aspect-square"
                 >
                     <!-- paid -->
                     <div [appAllowedRoles]="[Role.Cashier, Role.Admin]" class="flex items-center gap-1">
@@ -856,17 +795,22 @@
                         }
                     </div>
                 }
+
+                <hr class="md:col-span-2  border-text-light/30 my-4! block">
+
+                <app-print-options class="md:col-span-2 " styleClass="flex-row" />
             </form>
 
-            <!-- <button
+            <button
                 pButton
                 styleClass="app-p-btn"
                 class="mx-auto"
+                type="submit"
+                form="orderFinalSubmission"
                 severity="secondary"
-                (click)="customerDialogVisible = false"
             >
-                استمرار
-            </button> -->
+                حفظ
+            </button>
         </div>
     </ng-template>
 </p-dialog>
@@ -1017,38 +961,4 @@
             استمرار
         </button>
     </ng-template> -->
-</p-dialog>
-
-<!-- Order Success Dialog -->
-<app-order-success-dialog
-    [visible]="successDialogVisible()"
-    [order]="lastCreatedOrder()"
-    (hide)="onSuccessDialogHide()"
-    (print)="onSuccessDialogPrint()"
-/>
-
-<!-- Print Dialog -->
-<p-dialog
-    [visible]="printDialogVisible"
-    (visibleChange)="printDialogVisible = $event; !$event && onPrintDialogHide()"
-    [modal]="true"
-    [dismissableMask]="true"
-    [style]="{ width: '100%', maxWidth: '50rem' }"
-    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-    styleClass="bg-white!"
-    class="addition-dialog"
-    [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
->
-    <ng-template #header>
-        <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">التحصيل</p>
-    </ng-template>
-
-    <!-- body -->
-    <app-printable-order-invoice [data]="printBill()" #printableOrderInvoice />
-
-    <ng-template #footer>
-        <button pButton styleClass="app-p-btn" class="mx-auto" appLoadingDisabled (click)="printOrder()">
-            استمرار
-        </button>
-    </ng-template>
 </p-dialog>

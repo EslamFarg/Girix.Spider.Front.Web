@@ -10,6 +10,7 @@ import { KeyboardService } from './features/keyboard/services/keyboard-service';
 import { PrintDialog } from './features/printers/components/print-dialog/print-dialog';
 import { PrinterType } from './features/printers';
 import { AuthService } from './features/auth/services/auth-service';
+import { PrinterSettingsService } from './features/printers/services/printer-settings-service';
 
 export interface IElectronPrinter {
   id: number;
@@ -80,7 +81,7 @@ export class App {
   authService = inject(AuthService);
   isAuthenticated = this.authService.isAuthenticated;
   isElectron = signal(typeof window !== 'undefined' && !!window.electronAPI);
-  constructor() {
+  constructor(printerSettingsService: PrinterSettingsService) {
     
     if (this.isElectron()) {
       document.body.classList.add('electron');
@@ -108,6 +109,7 @@ export class App {
       }
     });
     
+    printerSettingsService.getSettings().subscribe();
     //go to replacements
     // this.router.navigate(['replacements/huts']);
   }
