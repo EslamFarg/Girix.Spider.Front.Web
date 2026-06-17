@@ -1,3 +1,4 @@
+import { ReceiptTemplateService } from '@/features/orders/services/receipt-template-service';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
@@ -21,7 +22,7 @@ import {
   OrderPaymentType,
 } from '@/features/orders';
 import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
-import { PrinterService, IPrintOrderOption, AppPrinterType } from '@/features/printers';
+import { PrinterService, IPrintJob, AppPrinterType } from '@/features/printers';
 import { PrinterSettingsService } from '@/features/printers/services/printer-settings-service';
 import { MenuItem } from 'primeng/api';
 import { DatePipe } from '@angular/common';
@@ -94,6 +95,7 @@ import { TooltipModule } from 'primeng/tooltip';
   styleUrl: './all.css',
 })
 export class All extends BaseComponent {
+  receiptTemplateService = inject(ReceiptTemplateService);
   OrderLocationType = OrderLocationType;
   OrderLocalType = OrderLocalType;
   OrderPaymentType=OrderPaymentType;
@@ -126,36 +128,46 @@ export class All extends BaseComponent {
   }
 
   /**
-   * Groups items and their modifiers by printer id.
+   * Groups items and their modifiers by category/group id.
+   * Each group gets printed as a separate kitchen receipt.
    */
-  private groupItemsByPrinter(bill: IOrderBillReadResponse): Map<number, { printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }> {
-    const groups = new Map<number, { printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }>();
+  private groupItemsByCategory(
+    bill: IOrderBillReadResponse,
+    defaultPrinter: IOrderBillReadResponse['items'][0]['printer'] | null,
+  ): Map<number, { name: string; printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }> {
+    const groups = new Map<number, { name: string; printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }>();
 
     for (const item of bill.items) {
-      const itemPrinterId = item.printer?.id;
-      if (itemPrinterId != null) {
-        if (!groups.has(itemPrinterId)) {
-          groups.set(itemPrinterId, { printer: item.printer, items: [] });
+      // Use item's category, or fall back to default printer's category (group 0)
+      const categoryId = item.categoryId ?? 0;
+      const categoryName = item.categoryName ?? (defaultPrinter?.name ?? 'مطبخ');
+      const itemPrinter = item.printer ?? defaultPrinter;
+      
+      if (itemPrinter != null) {
+        if (!groups.has(categoryId)) {
+          groups.set(categoryId, { name: categoryName, printer: itemPrinter, items: [] });
         }
-        groups.get(itemPrinterId)!.items.push(item);
+        groups.get(categoryId)!.items.push(item);
       }
 
+      // Group modifiers by their own printers (with fallback) but same category
       for (const modifier of item.modifiers ?? []) {
-        const modPrinterId = modifier.printer?.id;
-        if (modPrinterId != null) {
-          if (!groups.has(modPrinterId)) {
-            groups.set(modPrinterId, {
+        const modPrinter = modifier.printer ?? defaultPrinter;
+        if (modPrinter != null) {
+          if (!groups.has(categoryId)) {
+            groups.set(categoryId, {
+              name: categoryName,
               printer: {
-                id: modifier.printer.id,
-                name: modifier.printer.name,
-                ipAddressOrMacAddress: modifier.printer.ipAddressOrMacAddress,
-                port: modifier.printer.port,
-                type: modifier.printer.type,
+                id: modPrinter.id,
+                name: modPrinter.name,
+                ipAddressOrMacAddress: modPrinter.ipAddressOrMacAddress,
+                port: modPrinter.port,
+                type: modPrinter.type,
               },
               items: [],
             });
           }
-          groups.get(modPrinterId)!.items.push({
+          groups.get(categoryId)!.items.push({
             ...item,
             name: `+ ${modifier.name}`,
             qty: modifier.qty,
@@ -169,154 +181,19 @@ export class All extends BaseComponent {
     return groups;
   }
 
-  /**
-   * Generates a simplified kitchen/captain receipt HTML (no prices).
-   */
-  private generateSimplifiedReceiptHtml(
-    bill: IOrderBillReadResponse,
-    items: IOrderBillReadResponse['items'],
-    title: string
-  ): string {
-    const itemRows = items
-      .map((item) => {
-        let rows = `
-      <tr>
-        <td style="padding:4px 0;text-align:right;border-bottom:1px dashed #ccc;">${item.name}</td>
-        <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #ccc;">${item.qty}</td>
-      </tr>`;
-        for (const modifier of item.modifiers ?? []) {
-          rows += `
-      <tr>
-        <td style="padding:4px 16px 4px 4px;text-align:right;border-bottom:1px dashed #eee;color:#555;font-size:13px;">+ ${modifier.name}</td>
-        <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #eee;color:#555;font-size:13px;">${modifier.qty}</td>
-      </tr>`;
-        }
-        return rows;
-      })
-      .join('');
-
-    const totalQty = items.reduce((sum, item) => {
-      let qty = item.qty;
-      for (const modifier of item.modifiers ?? []) {
-        qty += modifier.qty;
-      }
-      return sum + qty;
-    }, 0);
-
-    return `
-<div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:14px;max-width:300px;">
-  <div style="text-align:center;margin-bottom:8px;font-weight:bold;font-size:16px;">
-    ${title}
-  </div>
-  <div style="margin-bottom:8px;text-align:center;font-size:12px;">
-    <div>رقم الفاتورة ${bill.invoiceNo}</div>
-    <div>${new DatePipe('en-US').transform(bill.dateTime, 'dd/MM/yyyy h:mm a')}</div>
-    <div>نوع الطلب: ${bill.orderType === 1 ? 'سفري' : bill.orderType === 2 ? 'محلي' : 'توصيل'}</div>
-  </div>
-  <table style="width:100%;border-collapse:collapse;">
-    <thead>
-      <tr style="border-bottom:2px solid #000;">
-        <th style="padding:4px;text-align:right;">الصنف</th>
-        <th style="padding:4px;text-align:center;">الكمية</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${itemRows}
-      <tr style="border-top:2px solid #000;">
-        <td style="padding:4px;text-align:right;font-weight:bold;">المجموع</td>
-        <td style="padding:4px;text-align:center;font-weight:bold;">${totalQty.toFixed(2)}</td>
-      </tr>
-    </tbody>
-  </table>
-  <div style="text-align:center;margin-top:8px;font-size:12px;">
-    رقم الطلب ${bill.orderNo}
-  </div>
-</div>`;
-  }
-
-  /**
-   * Generates a full cashier-style receipt HTML for a group of items.
-   */
-  private generateCashierReceiptHtml(bill: IOrderBillReadResponse, items: IOrderBillReadResponse['items']): string {
-    const itemRows = items
-      .map((item) => {
-        let rows = `
-      <tr>
-        <td style="padding:4px;text-align:right;">${item.name}</td>
-        <td style="padding:4px;text-align:center;">${item.qty}</td>
-        <td style="padding:4px;text-align:left;">${item.unitPriceWithTax?.toFixed(2)}</td>
-      </tr>`;
-        for (const modifier of item.modifiers ?? []) {
-          rows += `
-      <tr>
-        <td style="padding:4px 16px 4px 4px;text-align:right;color:#555;font-size:12px;">+ ${modifier.name}</td>
-        <td style="padding:4px;text-align:center;color:#555;font-size:12px;">${modifier.qty}</td>
-        <td style="padding:4px;text-align:left;color:#555;font-size:12px;">${modifier.unitPriceWithTax?.toFixed(2)}</td>
-      </tr>`;
-        }
-        return rows;
-      })
-      .join('');
-
-    const totalUnitPrice = items.reduce((sum, item) => {
-      let itemTotal = (item.unitPriceWithTax ?? 0) * item.qty;
-      for (const modifier of item.modifiers ?? []) {
-        itemTotal += (modifier.unitPriceWithTax ?? 0) * modifier.qty;
-      }
-      return sum + itemTotal;
-    }, 0);
-
-    return `
-<div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:14px;max-width:300px;">
-  <div style="text-align:center;margin-bottom:8px;font-weight:bold;font-size:16px;">
-    فاتورة كاشير
-  </div>
-  <div style="margin-bottom:8px;font-size:12px;text-align:center;">
-    <div><strong>رقم الفاتورة:</strong> ${bill.invoiceNo}</div>
-    <div><strong>رقم الطلب:</strong> ${bill.orderNo}</div>
-    <div><strong>التاريخ:</strong> ${new DatePipe('en-US').transform(bill.dateTime, 'dd/MM/yyyy h:mm a')}</div>
-    <div><strong>العميل:</strong> ${bill.customer?.name ?? ''}</div>
-    <div><strong>رقم الجوال:</strong> ${bill.customer?.phone ?? ''}</div>
-    <div><strong>نوع الدفع:</strong> ${bill.paymentType ? 'مدفوع' : 'غير مدفوع'}</div>
-  </div>
-  <table style="width:100%;border-collapse:collapse;">
-    <thead>
-      <tr style="border-bottom:2px solid #000;">
-        <th style="padding:4px;text-align:right;">الصنف</th>
-        <th style="padding:4px;text-align:center;">الكمية</th>
-        <th style="padding:4px;text-align:left;">السعر</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${itemRows}
-      <tr style="border-top:2px solid #000;">
-        <td style="padding:4px;text-align:right;font-weight:bold;">المجموع</td>
-        <td></td>
-        <td style="padding:4px;text-align:left;font-weight:bold;">${totalUnitPrice.toFixed(2)}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>`;
-  }
-
   printOrder() {
     const bill = this.currentOrderBill();
     if (!bill) return;
 
     this.printerSettingsService.getSettings().subscribe({
       next: (settings) => {
-        const options: IPrintOrderOption[] = [];
-        const baseCss = `
-          body { font-family: 'Cairo', sans-serif; }
-          table { border-collapse: collapse; width: 100%; }
-          th, td { padding: 4px; }
-        `;
+        const jobs: IPrintJob[] = [];
 
         // Kitchen (programPrinter)
         if (settings.programPrinter?.id) {
-          const kitchenGroups = this.groupItemsByPrinter(bill);
+          const kitchenGroups = this.groupItemsByCategory(bill, settings.programPrinter);
           for (const [, group] of kitchenGroups) {
-            options.push({
+            jobs.push({
               printer: {
                 id: group.printer.id,
                 name: group.printer.name,
@@ -326,15 +203,15 @@ export class All extends BaseComponent {
                 comPort: (group.printer as any).comPort ?? 0,
                 appPrinterType: AppPrinterType.programPrinter,
               },
-              html: this.generateSimplifiedReceiptHtml(bill, group.items, 'فاتورة المطبخ'),
-              css: baseCss,
+              html: this.receiptTemplateService.generateKitchenReceiptHtml(bill, group.items, group.name).html,
+              css: this.receiptTemplateService.generateKitchenReceiptHtml(bill, group.items, group.name).css,
             });
           }
         }
 
         // Captain (captionOrderPrinter)
         if (settings.captionOrderPrinter?.id) {
-          options.push({
+          jobs.push({
             printer: {
               id: settings.captionOrderPrinter.id,
               name: settings.captionOrderPrinter.name,
@@ -344,14 +221,14 @@ export class All extends BaseComponent {
               comPort: settings.captionOrderPrinter.comPort ?? 0,
               appPrinterType: AppPrinterType.captionOrderPrinter,
             },
-            html: this.generateSimplifiedReceiptHtml(bill, bill.items, 'أمر كابتن'),
-            css: baseCss,
+            html: this.receiptTemplateService.generateCaptainReceiptHtml(bill, bill.items).html,
+            css: this.receiptTemplateService.generateCaptainReceiptHtml(bill, bill.items).css,
           });
         }
 
         // Cashier (cashierPrinter)
         if (settings.cashierPrinter?.id) {
-          options.push({
+          jobs.push({
             printer: {
               id: settings.cashierPrinter.id,
               name: settings.cashierPrinter.name,
@@ -361,26 +238,28 @@ export class All extends BaseComponent {
               comPort: settings.cashierPrinter.comPort ?? 0,
               appPrinterType: AppPrinterType.cashierPrinter,
             },
-            html: this.generateCashierReceiptHtml(bill, bill.items),
-            css: baseCss,
+            html: this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items).html,
+            css: this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items).css,
           });
         }
 
-        if (options.length === 0) {
-          this.printService.openPrinterDialog({
-            css: this.printableOrderInvoice()?.styles ?? '',
+        if (jobs.length === 0) {
+          this.printService.printNow([{
+            printer: { id: 0, name: 'Default', ipAddressOrMacAddress: '', port: 0, type: 0, comPort: 0, appPrinterType: AppPrinterType.cashierPrinter },
             html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
-          });
+            css: this.printableOrderInvoice()?.styles ?? '',
+          }]);
           return;
         }
 
-        this.printService.openPrinterDialogWithJobs(options);
+        this.printService.openPrinterDialogWithJobs(jobs);
       },
       error: () => {
-        this.printService.openPrinterDialog({
-          css: this.printableOrderInvoice()?.styles ?? '',
+        this.printService.printNow([{
+          printer: { id: 0, name: 'Default', ipAddressOrMacAddress: '', port: 0, type: 0, comPort: 0, appPrinterType: AppPrinterType.cashierPrinter },
           html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
-        });
+          css: this.printableOrderInvoice()?.styles ?? '',
+        }]);
       },
     });
   }

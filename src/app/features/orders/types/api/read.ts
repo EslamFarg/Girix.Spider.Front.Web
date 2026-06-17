@@ -102,6 +102,8 @@ export interface IOrderBillReadResponse {
     netUnitPrice: number;
     unitPriceWithTax: number;
     netUnitPriceWithTax: number;
+    categoryId: number | null;
+    categoryName: string | null;
     printer: {
       id: number;
       name: string;

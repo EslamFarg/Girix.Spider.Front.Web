@@ -1,3 +1,4 @@
+import { ReceiptTemplateService } from '../../services/receipt-template-service';
 import { Component, computed, effect, inject, input, OnInit, signal, viewChild } from '@angular/core';
 import { IOrderMenuItem, Menu } from '../../components/menu/menu';
 import { OrderSuccessDialog } from '../../components/order-success-dialog/order-success-dialog';
@@ -19,7 +20,7 @@ import {
     FormsModule,
     FormGroup,
 } from '@angular/forms';
-import { IProductSearchRow, ProductService } from '@/features/classes/services/product-service';
+import { IProductSearchRow, ProductService, ProductSearchEnum } from '@/features/classes/services/product-service';
 import { GroupService, IGroupSearchRow } from '@/features/classes/services/group-service';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { GalleriaModule } from 'primeng/galleria';
@@ -41,7 +42,7 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { ICustomerSearchRow } from '@/features/customers/services/customer-types';
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { PrinterService, IPrintOrderOption, AppPrinterType } from '@/features/printers';
+import { PrinterService, IPrintJob, AppPrinterType } from '@/features/printers';
 import { PrinterSettingsService } from '@/features/printers/services/printer-settings-service';
 import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
 import {
@@ -132,6 +133,7 @@ interface IOrderCreateFgValue {
     styleUrl: './cashier.css',
 })
 export class Cashier extends BaseComponent implements OnInit {
+    receiptTemplateService = inject(ReceiptTemplateService);
     //
     //
     // enums
@@ -162,7 +164,7 @@ export class Cashier extends BaseComponent implements OnInit {
     printService = inject(PrinterService);
     printerSettingsService = inject(PrinterSettingsService);
     printDialogVisible = false;
-    printBill = signal<IOrderBillReadResponse | null>(null);
+    // printBill = signal<IOrderBillReadResponse | null>(null);
     printableOrderInvoice = viewChild<PrintableOrderInvoice>('printableOrderInvoice');
 
     orderCreateItems = computed<IOrderCreateItem[]>(() => {
@@ -541,9 +543,10 @@ export class Cashier extends BaseComponent implements OnInit {
             case FormMode.Create:
                 this.orderService.create(values).subscribe({
                     next: (res) => {
-                        this.printBill.set(res as unknown as IOrderBillReadResponse);
+                        this.existingOrderBill.set(res as unknown as IOrderBillReadResponse);
                         this.printOrder();
                         this.resetOrderForm();
+                        this.orderConfirmationDialogVisible = false;
                     },
                     error: (err) => {
                         this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم انشاء الطلب' });
@@ -608,41 +611,131 @@ export class Cashier extends BaseComponent implements OnInit {
 
 
     /**
-     * Groups items and their modifiers by printer id.
+     * Builds category mapping for order items.
+     * Fetches product categories from API to get proper group IDs.
+     * Falls back to printer id if category API fails.
      */
-    private groupItemsByPrinter(
+    private async buildCategoryMap(bill: IOrderBillReadResponse): Promise<Map<number, { categoryId: number; categoryName: string; printer: any }>> {
+        const categoryMap = new Map<number, { categoryId: number; categoryName: string; printer: any }>();
+        
+        // Check if items already have categoryId from backend
+        const hasCategoryData = bill.items.some(item => item.categoryId != null);
+        if (hasCategoryData) {
+            for (const item of bill.items) {
+                categoryMap.set(item.id, { 
+                    categoryId: item.categoryId ?? 0, 
+                    categoryName: item.categoryName ?? 'مطبخ',
+                    printer: item.printer
+                });
+            }
+            return categoryMap;
+        }
+
+        // Collect unique menuItemIds to fetch their categories
+        const menuItemIds = [...new Set(bill.items.map(item => item.menuItemId).filter(id => id != null))];
+        
+        // Fetch product categories from API
+        const productCategoryMap = new Map<number, { categoryId: number; categoryName: string }>();
+        
+        if (menuItemIds.length > 0) {
+            try {
+                // Search products by their IDs to get category info
+                const response = await this.productService.search({
+                    paginationInfo: { pageIndex: 1, pageSize: menuItemIds.length },
+                    searchFilters: [{
+                        column: ProductSearchEnum.Id,
+                        values: menuItemIds.map(id => id.toString())
+                    }],
+                    fromDate: null,
+                }).toPromise();
+                
+                if (response?.value?.menuItems?.rows) {
+                    for (const product of response.value.menuItems.rows) {
+                        if (product.categoryId) {
+                            productCategoryMap.set(product.id, {
+                                categoryId: product.categoryId,
+                                categoryName: product.categoryName ?? 'مطبخ'
+                            });
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('[DEBUG] Failed to fetch product categories:', e);
+            }
+        }
+
+        // Build category map using fetched categories or fallback to printer id
+        for (const item of bill.items) {
+            const productCategory = item.menuItemId ? productCategoryMap.get(item.menuItemId) : null;
+            
+            if (productCategory) {
+                // Use product category for grouping
+                categoryMap.set(item.id, {
+                    categoryId: productCategory.categoryId,
+                    categoryName: productCategory.categoryName,
+                    printer: item.printer
+                });
+            } else {
+                // Fallback to printer id as proxy for group
+                const printerId = item.printer?.id ?? 0;
+                const printerName = item.printer?.name ?? 'مطبخ';
+                
+                categoryMap.set(item.id, {
+                    categoryId: printerId,
+                    categoryName: printerName,
+                    printer: item.printer
+                });
+            }
+        }
+
+        return categoryMap;
+    }
+
+    /**
+     * Groups items and their modifiers by category/group id.
+     * Each group gets printed as a separate kitchen receipt.
+     * If an item has no category, it falls back to the default printer's category.
+     */
+    private groupItemsByCategory(
         bill: IOrderBillReadResponse,
-    ): Map<number, { printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }> {
+        categoryMap: Map<number, { categoryId: number; categoryName: string; printer: any }>,
+        defaultPrinter: IOrderBillReadResponse['items'][0]['printer'] | null,
+    ): Map<number, { name: string; printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }> {
         const groups = new Map<
             number,
-            { printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }
+            { name: string; printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }
         >();
 
         for (const item of bill.items) {
-            const itemPrinterId = item.printer?.id;
-            if (itemPrinterId != null) {
-                if (!groups.has(itemPrinterId)) {
-                    groups.set(itemPrinterId, { printer: item.printer, items: [] });
+            const mapped = categoryMap.get(item.id);
+            const categoryId = mapped?.categoryId ?? item.categoryId ?? 0;
+            const categoryName = mapped?.categoryName ?? item.categoryName ?? (defaultPrinter?.name ?? 'مطبخ');
+            const itemPrinter = mapped?.printer ?? item.printer ?? defaultPrinter;
+            
+            if (itemPrinter != null) {
+                if (!groups.has(categoryId)) {
+                    groups.set(categoryId, { name: categoryName, printer: itemPrinter, items: [] });
                 }
-                groups.get(itemPrinterId)!.items.push(item);
+                groups.get(categoryId)!.items.push(item);
             }
 
             for (const modifier of item.modifiers ?? []) {
-                const modPrinterId = modifier.printer?.id;
-                if (modPrinterId != null) {
-                    if (!groups.has(modPrinterId)) {
-                        groups.set(modPrinterId, {
+                const modPrinter = modifier.printer ?? defaultPrinter;
+                if (modPrinter != null) {
+                    if (!groups.has(categoryId)) {
+                        groups.set(categoryId, {
+                            name: categoryName,
                             printer: {
-                                id: modifier.printer.id,
-                                name: modifier.printer.name,
-                                ipAddressOrMacAddress: modifier.printer.ipAddressOrMacAddress,
-                                port: modifier.printer.port,
-                                type: modifier.printer.type,
+                                id: modPrinter.id,
+                                name: modPrinter.name,
+                                ipAddressOrMacAddress: modPrinter.ipAddressOrMacAddress,
+                                port: modPrinter.port,
+                                type: modPrinter.type,
                             },
                             items: [],
                         });
                     }
-                    groups.get(modPrinterId)!.items.push({
+                    groups.get(categoryId)!.items.push({
                         ...item,
                         name: `+ ${modifier.name}`,
                         qty: modifier.qty,
@@ -653,158 +746,57 @@ export class Cashier extends BaseComponent implements OnInit {
             }
         }
 
+        // DEBUG: log grouping results
+        console.log('[DEBUG groupItemsByCategory] Total items:', bill.items.length);
+        console.log('[DEBUG groupItemsByCategory] Groups created:', groups.size);
+        console.log('[DEBUG groupItemsByCategory] Items detail:');
+        for (const item of bill.items) {
+            const mapped = categoryMap.get(item.id);
+            console.log(`  Item ${item.id}: ${item.name} (qty=${item.qty})`);
+            console.log(`    - menuItemId=${item.menuItemId}, mealId=${item.mealId}`);
+            console.log(`    - item.printer.id=${item.printer?.id ?? 'NULL'}, item.printer.name=${item.printer?.name ?? 'NULL'}`);
+            console.log(`    - mapped.categoryId=${mapped?.categoryId ?? 'NULL'}, mapped.categoryName=${mapped?.categoryName ?? 'NULL'}`);
+        }
+        for (const [id, group] of groups) {
+            console.log(`  Group ${id} (${group.name}): ${group.items.length} items`);
+            for (const item of group.items) {
+                console.log(`    - ${item.name} (qty=${item.qty})`);
+            }
+        }
+
         return groups;
     }
 
-    /**
-     * Generates a simplified kitchen/captain receipt HTML (no prices, just items + qty).
-     */
-    private generateSimplifiedReceiptHtml(
-        bill: IOrderBillReadResponse,
-        items: IOrderBillReadResponse['items'],
-        title: string,
-    ): string {
-        const itemRows = items
-            .map((item) => {
-                let rows = `
-                            <tr>
-                                <td style="padding:4px 0;text-align:right;border-bottom:1px dashed #ccc;">${item.name}</td>
-                                <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #ccc;">${item.qty}</td>
-                            </tr>`;
-                for (const modifier of item.modifiers ?? []) {
-                    rows += `
-                            <tr>
-                                <td style="padding:4px 16px 4px 4px;text-align:right;border-bottom:1px dashed #eee;color:#555;font-size:13px;">+ ${modifier.name}</td>
-                                <td style="padding:4px 0;text-align:center;border-bottom:1px dashed #eee;color:#555;font-size:13px;">${modifier.qty}</td>
-                            </tr>`;
-                }
-                return rows;
-            })
-            .join('');
-
-        const totalQty = items.reduce((sum, item) => {
-            let qty = item.qty;
-            for (const modifier of item.modifiers ?? []) {
-                qty += modifier.qty;
-            }
-            return sum + qty;
-        }, 0);
-
-        return `
-                <div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:16px;max-width:300px;">
-                    <div style="text-align:center;margin-bottom:8px;font-weight:bold;font-size:16px;">
-                        ${title}
-                    </div>
-                    <div style="margin-bottom:8px;text-align:center;font-size:12px;">
-                        <div>رقم الفاتورة ${bill.invoiceNo}</div>
-                        <div>${new DatePipe('en-US').transform(bill.dateTime, 'dd/MM/yyyy h:mm a')}</div>
-                        <div>نوع الطلب: ${bill.orderType === 1 ? 'سفري' : bill.orderType === 2 ? 'محلي' : 'توصيل'}</div>
-                    </div>
-                    <table style="width:100%;border-collapse:collapse;">
-                        <thead>
-                        <tr style="border-bottom:2px solid #000;">
-                            <th style="padding:4px;text-align:right;">الصنف</th>
-                            <th style="padding:4px;text-align:center;">الكمية</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        ${itemRows}
-                        <tr style="border-top:2px solid #000;">
-                            <td style="padding:4px;text-align:right;font-weight:bold;">المجموع</td>
-                            <td style="padding:4px;text-align:center;font-weight:bold;">${totalQty.toFixed(2)}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <div style="text-align:center;margin-top:8px;font-size:12px;">
-                        رقم الطلب ${bill.orderNo}
-                    </div>
-                </div>`;
-    }
-
-    /**
-     * Generates a full cashier-style receipt HTML for a group of items.
-     */
-    private generateCashierReceiptHtml(bill: IOrderBillReadResponse, items: IOrderBillReadResponse['items']): string {
-        const itemRows = items
-            .map((item) => {
-                let rows = `
-                            <tr>
-                                <td style="padding:4px;text-align:right;">${item.name}</td>
-                                <td style="padding:4px;text-align:center;">${item.qty}</td>
-                                <td style="padding:4px;text-align:left;">${item.unitPriceWithTax?.toFixed(2)}</td>
-                            </tr>`;
-                for (const modifier of item.modifiers ?? []) {
-                    rows += `
-                            <tr>
-                                <td style="padding:4px 16px 4px 4px;text-align:right;color:#555;font-size:12px;">+ ${modifier.name}</td>
-                                <td style="padding:4px;text-align:center;color:#555;font-size:12px;">${modifier.qty}</td>
-                                <td style="padding:4px;text-align:left;color:#555;font-size:12px;">${modifier.unitPriceWithTax?.toFixed(2)}</td>
-                            </tr>`;
-                }
-                return rows;
-            })
-            .join('');
-
-        const totalUnitPrice = items.reduce((sum, item) => {
-            let itemTotal = (item.unitPriceWithTax ?? 0) * item.qty;
-            for (const modifier of item.modifiers ?? []) {
-                itemTotal += (modifier.unitPriceWithTax ?? 0) * modifier.qty;
-            }
-            return sum + itemTotal;
-        }, 0);
-
-        return `
-            <div style="direction:rtl;padding:8px;font-family:'Cairo',sans-serif;font-size:14px;max-width:300px;">
-                <div style="text-align:center;margin-bottom:8px;font-weight:bold;font-size:16px;">
-                    فاتورة كاشير
-                </div>
-                <div style="margin-bottom:8px;font-size:12px;text-align:center;">
-                    <div><strong>رقم الفاتورة:</strong> ${bill.invoiceNo}</div>
-                    <div><strong>رقم الطلب:</strong> ${bill.orderNo}</div>
-                    <div><strong>التاريخ:</strong> ${new DatePipe('en-US').transform(bill.dateTime, 'dd/MM/yyyy h:mm a')}</div>
-                    <div><strong>العميل:</strong> ${bill.customer?.name ?? ''}</div>
-                    <div><strong>رقم الجوال:</strong> ${bill.customer?.phone ?? ''}</div>
-                    <div><strong>نوع الدفع:</strong> ${bill.paymentType ? 'مدفوع' : 'غير مدفوع'}</div>
-                </div>
-                <table style="width:100%;border-collapse:collapse;">
-                    <thead>
-                    <tr style="border-bottom:2px solid #000;">
-                        <th style="padding:4px;text-align:right;">الصنف</th>
-                        <th style="padding:4px;text-align:center;">الكمية</th>
-                        <th style="padding:4px;text-align:left;">السعر</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    ${itemRows}
-                    <tr style="border-top:2px solid #000;">
-                        <td style="padding:4px;text-align:right;font-weight:bold;">المجموع</td>
-                        <td></td>
-                        <td style="padding:4px;text-align:left;font-weight:bold;">${totalUnitPrice.toFixed(2)}</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>`;
-    }
-
-    printOrder() {
+    async printOrder() {
         const bill = this.existingOrderBill();
         if (!bill) return;
-        this.printBill.set(bill);
 
         const settings = this.printerSettingsService.printerSettings();
         if (!settings) return;
-        const options: IPrintOrderOption[] = [];
-        const baseCss = `
-                        body { font-family: 'Cairo', sans-serif; }
-                        table { border-collapse: collapse; width: 100%; }
-                        th, td { padding: 4px; }
-                        `;
 
-        // Kitchen (programPrinter): group items by their item-level printer id
-        if (settings.programPrinter?.id) {
-            const kitchenGroups = this.groupItemsByPrinter(bill);
+        // Build category mapping from items (fetches product categories from API)
+        const categoryMap = await this.buildCategoryMap(bill);
+
+        // Check which printer roles the user has selected (from dialog/previous selection)
+        // If nothing selected, default to all configured roles for silent printing
+        const selectedPrinters = this.printService.selectedPrinters();
+        console.log('[DEBUG printOrder] selectedPrinters:', selectedPrinters.map(p => ({ id: p.id, name: p.name, type: p.type, appPrinterType: p.appPrinterType })));
+        const selectedTypes = new Set(
+            selectedPrinters.length > 0 
+                ? selectedPrinters.map((p) => p.appPrinterType)
+                : [AppPrinterType.programPrinter, AppPrinterType.captionOrderPrinter, AppPrinterType.cashierPrinter]
+        );
+        console.log('[DEBUG printOrder] selectedTypes:', Array.from(selectedTypes));
+        console.log('[DEBUG printOrder] settings:', { programPrinter: settings.programPrinter?.id, captionOrderPrinter: settings.captionOrderPrinter?.id, cashierPrinter: settings.cashierPrinter?.id });
+
+        const jobs: IPrintJob[] = [];
+
+        // Kitchen (programPrinter): group items by their category/group id
+        // Only include if user selected programPrinter role
+        if (selectedTypes.has(AppPrinterType.programPrinter) && settings.programPrinter?.id) {
+            const kitchenGroups = this.groupItemsByCategory(bill, categoryMap, settings.programPrinter);
             for (const [, group] of kitchenGroups) {
-                options.push({
+                jobs.push({
                     printer: {
                         id: group.printer.id,
                         name: group.printer.name,
@@ -814,15 +806,16 @@ export class Cashier extends BaseComponent implements OnInit {
                         comPort: (group.printer as any).comPort ?? 0,
                         appPrinterType: AppPrinterType.programPrinter,
                     },
-                    html: this.generateSimplifiedReceiptHtml(bill, group.items, 'فاتورة المطبخ'),
-                    css: baseCss,
+                    html: this.receiptTemplateService.generateKitchenReceiptHtml(bill, group.items, group.name).html,
+                    css: this.receiptTemplateService.generateKitchenReceiptHtml(bill, group.items, group.name).css,
                 });
             }
         }
 
         // Captain (captionOrderPrinter): full receipt, simplified format
-        if (settings.captionOrderPrinter?.id) {
-            options.push({
+        // Only include if user selected captionOrderPrinter role
+        if (selectedTypes.has(AppPrinterType.captionOrderPrinter) && settings.captionOrderPrinter?.id) {
+            jobs.push({
                 printer: {
                     id: settings.captionOrderPrinter.id,
                     name: settings.captionOrderPrinter.name,
@@ -832,14 +825,15 @@ export class Cashier extends BaseComponent implements OnInit {
                     comPort: settings.captionOrderPrinter.comPort ?? 0,
                     appPrinterType: AppPrinterType.captionOrderPrinter,
                 },
-                html: this.generateSimplifiedReceiptHtml(bill, bill.items, 'أمر كابتن'),
-                css: baseCss,
+                html: this.receiptTemplateService.generateCaptainReceiptHtml(bill, bill.items).html,
+                css: this.receiptTemplateService.generateCaptainReceiptHtml(bill, bill.items).css,
             });
         }
 
         // Cashier (cashierPrinter): full receipt, full format with prices
-        if (settings.cashierPrinter?.id) {
-            options.push({
+        // Only include if user selected cashierPrinter role
+        if (selectedTypes.has(AppPrinterType.cashierPrinter) && settings.cashierPrinter?.id) {
+            jobs.push({
                 printer: {
                     id: settings.cashierPrinter.id,
                     name: settings.cashierPrinter.name,
@@ -849,30 +843,24 @@ export class Cashier extends BaseComponent implements OnInit {
                     comPort: settings.cashierPrinter.comPort ?? 0,
                     appPrinterType: AppPrinterType.cashierPrinter,
                 },
-                html: this.generateCashierReceiptHtml(bill, bill.items),
-                css: baseCss,
+                html: this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items).html,
+                css: this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items).css,
             });
         }
 
-        if (options.length === 0) {
-            this.printService.openPrinterDialog({
-                css: this.printableOrderInvoice()?.styles ?? '',
-                html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
-            });
-            return;
+        console.log('[DEBUG printOrder] Total jobs created:', jobs.length);
+        for (const job of jobs) {
+            console.log(`  Job: printer=${job.printer.name} (id=${job.printer.id}, type=${job.printer.type}), html length=${job.html.length}`);
         }
 
-        this.printService.openPrinterDialogWithJobs(options);
-
-        // this.printerSettingsService.getSettings().subscribe({
-        //     next: (settings) => {},
-        //     error: () => {
-        //         this.printService.openPrinterDialog({
-        //             css: this.printableOrderInvoice()?.styles ?? '',
-        //             html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
-        //         });
-        //     },
-        // });
+        // If there are multiple kitchen printer groups, open dialog to let user select which ones
+        const kitchenJobs = jobs.filter(j => j.printer.appPrinterType === AppPrinterType.programPrinter);
+        const hasMultipleKitchenPrinters = kitchenJobs.length > 1 && 
+            new Set(kitchenJobs.map(j => j.printer.id)).size > 1;
+        
+        // In cashier page: always print silently (no dialog)
+        // The print options in the final submission dialog already let user select which roles to print
+        this.printService.printNow(jobs);
 
     }
 
@@ -1446,6 +1434,7 @@ export class Cashier extends BaseComponent implements OnInit {
         },
     ];
     productService = inject(ProductService);
+    groupService = inject(GroupService);
     currentMenuItemIx = signal(0);
     currentMenuItemAdditions = computed(() => this.orderMenuItems()[this.currentMenuItemIx()].additions);
     additionProducts = signal<IProductSearchRow[]>([]);

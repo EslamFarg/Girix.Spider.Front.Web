@@ -2,7 +2,7 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { Dialog } from 'primeng/dialog';
 import { ButtonDirective } from 'primeng/button';
 import { KeyValuePipe } from '@angular/common';
-import { PrinterService, IPrintOrderOption } from '@/features/printers';
+import { PrinterService, IPrintJob as IPrintJobImport } from '@/features/printers';
 import { IPrinterSearchRow } from '@/features/printers/types/printer-api';
 
 interface IOrderSuccessItem {

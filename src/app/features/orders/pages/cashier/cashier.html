@@ -554,7 +554,7 @@
     [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
     <ng-template #headless>
-        <div class="flex flex-col p-4 gap-4">
+        <div class="flex flex-col p-4 gap-4 h-full overflow-auto">
             <button class="cursor-pointer p-1 w-fit ms-auto" (click)="orderConfirmationDialogVisible = false">
                 <i class="pi pi-times"></i>
             </button>
