@@ -66,7 +66,7 @@ export class Suppliers extends BaseComponent {
     let searchFilters: any[] = [
       {
         values: [fgRawValue.searchTerm],
-        column: SupplierSearchEnum.Name,
+        column: fgRawValue.searchEnum,
       },
     ];
 

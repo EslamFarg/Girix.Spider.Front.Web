@@ -8,30 +8,32 @@ import { Textarea } from 'primeng/textarea';
 import { BaseComponent, FormMode } from '@/components/base-component/base-component';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
+import { noSymbolsAllowed, onlyLettersAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
 import { ISupplierFgControls } from './types';
 import { SupplierService } from '../../services/supplier-service';
 import { ISupplierReadResponse } from '../../services/supplier-types';
 import { RouterLink } from '@angular/router';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { AllowNumbers } from '@/directives/allow-numbers';
+import { SpaceTrimmer } from "@/directives/space-trimmer";
 
 @Component({
     selector: 'app-supplier-form',
     imports: [
-        Button,
-        Carousel,
-        InputErrorMessageHandler,
-        Select,
-        InputText,
-        Textarea,
-        TranslatePipe,
-        ButtonDirective,
-        ReactiveFormsModule,
-        RouterLink,
-        LoadingDisabledDirective,
-        AllowNumbers,
-    ],
+    Button,
+    Carousel,
+    InputErrorMessageHandler,
+    Select,
+    InputText,
+    Textarea,
+    TranslatePipe,
+    ButtonDirective,
+    ReactiveFormsModule,
+    RouterLink,
+    LoadingDisabledDirective,
+    AllowNumbers,
+    SpaceTrimmer
+],
     templateUrl: './supplier-form.html',
     styleUrl: './supplier-form.css',
 })
@@ -54,16 +56,16 @@ export class SupplierForm extends BaseComponent implements OnInit {
 
     initialSupplierFgValue: ISupplierFgControls = {
         id: this.fb.control(null, []),
-        nameAr: this.fb.control(null, [Validators.required, noSymbolsAllowed]),
-        nameEn: this.fb.control(null, [noSymbolsAllowed]),
+        nameAr: this.fb.control(null, [Validators.required, onlyLettersAllowed]),
+        nameEn: this.fb.control(null, [onlyLettersAllowed]),
         phoneNumber: this.fb.control(null, [onlyNumbersAllowed, Validators.minLength(6), Validators.maxLength(14)]),
         secondaryMobileNumber: this.fb.control(null, [onlyNumbersAllowed]),
-        city: this.fb.control(null, []),
-        district: this.fb.control(null, []),
-        street: this.fb.control(null, []),
+        city: this.fb.control(null, [Validators.maxLength(100)]),
+        district: this.fb.control(null, [Validators.maxLength(100)]),
+        street: this.fb.control(null, [Validators.maxLength(100)]),
         buildingNumber: this.fb.control(null, [onlyNumbersAllowed]),
         apartment: this.fb.control(null, [onlyNumbersAllowed]),
-        landmark: this.fb.control(null, []),
+        landmark: this.fb.control(null, [Validators.maxLength(100)]),
         postalCode: this.fb.control(null, [onlyNumbersAllowed]),
         commercialRegister: this.fb.control(null, [
             onlyNumbersAllowed,

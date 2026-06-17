@@ -1,34 +1,25 @@
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
-import { Button, ButtonDirective } from 'primeng/button';
-import { Carousel } from 'primeng/carousel';
+import { ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { Select } from 'primeng/select';
 import { InputText } from 'primeng/inputtext';
-import { Textarea } from 'primeng/textarea';
 import { BaseComponent, FormMode } from '@/components/base-component/base-component';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { noSymbolsAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
+import { onlyLettersAllowed, onlyNumbersAllowed } from '@/yn-ng/utils/text-validators';
 import { ICustomerFgControls } from './types';
 import { CustomerService } from '../../services/customer-service';
 import { ICustomerReadResponse } from '../../services/customer-types';
-import { RouterLink } from '@angular/router';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 @Component({
     selector: 'app-customer-form',
     imports: [
-        Button,
-        Carousel,
         InputErrorMessageHandler,
-        Select,
         InputText,
-        Textarea,
         TranslatePipe,
         ButtonDirective,
         ReactiveFormsModule,
-        RouterLink,
         LoadingDisabledDirective,
         AllowNumbers,
         ToggleSwitchModule,
@@ -55,8 +46,8 @@ export class CustomerForm extends BaseComponent implements OnInit {
 
     initialCustomerFgValue: ICustomerFgControls = {
         id: this.fb.control(null, []),
-        nameAr: this.fb.control(null, [Validators.required, noSymbolsAllowed]),
-        nameEn: this.fb.control(null, [noSymbolsAllowed]),
+        nameAr: this.fb.control(null, [Validators.required, onlyLettersAllowed ]),
+        nameEn: this.fb.control(null, [onlyLettersAllowed]),
         phoneNumber: this.fb.control(null, [
             // ,
             onlyNumbersAllowed,
@@ -69,13 +60,13 @@ export class CustomerForm extends BaseComponent implements OnInit {
             // Validators.minLength(6),
             Validators.maxLength(14),
         ]),
-        city: this.fb.control(null, []),
-        district: this.fb.control(null, []),
-        street: this.fb.control(null, []),
-        buildingNumber: this.fb.control(null, [onlyNumbersAllowed]),
-        apartment: this.fb.control(null, [onlyNumbersAllowed]),
-        landmark: this.fb.control(null, []),
-        postalCode: this.fb.control(null, [onlyNumbersAllowed]),
+        city: this.fb.control(null, [Validators.maxLength(100)]),
+        district: this.fb.control(null, [Validators.maxLength(100)]),
+        street: this.fb.control(null, [Validators.maxLength(100)]),
+        buildingNumber: this.fb.control(null, [onlyNumbersAllowed , Validators.maxLength(100)]),
+        apartment: this.fb.control(null, [onlyNumbersAllowed , Validators.maxLength(100)]),
+        landmark: this.fb.control(null, [Validators.maxLength(100)]),
+        postalCode: this.fb.control(null, [onlyNumbersAllowed , Validators.maxLength(100)]),
         commercialRegister: this.fb.control(null, [
             // ,
             onlyNumbersAllowed,
@@ -84,12 +75,12 @@ export class CustomerForm extends BaseComponent implements OnInit {
         ]),
         //ends and starts with  3
         taxNumber: this.fb.control(null, [
-            // Validators.minLength(15),
+            Validators.minLength(15),
             Validators.maxLength(15),
             onlyNumbersAllowed,
             Validators.pattern(/^3.*3$/),
         ]),
-        numberOfFloor: this.fb.control(null, [onlyNumbersAllowed]),
+        numberOfFloor: this.fb.control(null, [onlyNumbersAllowed , Validators.maxLength(100)]),
         isCompany: this.fb.control(false, []),
         consumeInventory: this.fb.control(true, []),
     };
@@ -109,16 +100,45 @@ export class CustomerForm extends BaseComponent implements OnInit {
     //
     //
     ngOnInit(): void {
+        this.customerFg.get('isCompany')?.valueChanges.subscribe((isCompany) => {
+            const phoneNumber = this.customerFg.get('phoneNumber');
+            const commercialRegister = this.customerFg.get('commercialRegister');
+            const taxNumber = this.customerFg.get('taxNumber');
+
+            if (isCompany) {
+                phoneNumber?.setValidators([Validators.required, onlyNumbersAllowed, Validators.maxLength(14)]);
+                commercialRegister?.setValidators([Validators.required, onlyNumbersAllowed, Validators.maxLength(10)]);
+                taxNumber?.setValidators([
+                    Validators.required,
+                    Validators.minLength(15),
+                    Validators.maxLength(15),
+                    onlyNumbersAllowed,
+                    Validators.pattern(/^3.*3$/),
+                ]);
+            } else {
+                phoneNumber?.setValidators([onlyNumbersAllowed, Validators.maxLength(14)]);
+                commercialRegister?.clearValidators();
+                commercialRegister?.setValidators([onlyNumbersAllowed, Validators.maxLength(10)]);
+                taxNumber?.clearValidators();
+                taxNumber?.setValidators([Validators.maxLength(15), onlyNumbersAllowed, Validators.pattern(/^3.*3$/)]);
+            }
+
+            phoneNumber?.updateValueAndValidity();
+            commercialRegister?.updateValueAndValidity();
+            taxNumber?.updateValueAndValidity();
+        });
+
         switch (this.formMode()) {
             case FormMode.Create:
                 break;
             case FormMode.Update:
-                //fetch
                 this.customerService.getById(this.id()!).subscribe((Customer) => {
                     this.currentCustomer.set(Customer);
-                    //-> bind data
-                    console.log('customer', Customer);
-                    this.customerFg.patchValue({ ...Customer, nameAr: Customer.name, nameEn: Customer.name });
+                    this.customerFg.patchValue({
+                        ...Customer,
+                        nameAr: Customer.name,
+                        nameEn: Customer.name,
+                    });
                 });
                 break;
         }
@@ -129,8 +149,7 @@ export class CustomerForm extends BaseComponent implements OnInit {
             nameEn: this.customerFg.value.nameAr?.trim(),
             landmark: this.customerFg.value.numberOfFloor,
         });
-
-        console.log(this.customerFg.value);
+        this.customerFg.updateValueAndValidity();
         if (this.customerFg.invalid) {
             this.customerFg.markAllAsTouched();
             return;
@@ -142,14 +161,14 @@ export class CustomerForm extends BaseComponent implements OnInit {
             case FormMode.Create:
                 this.customerService.create(this.customerFg.value).subscribe({
                     next: (res) => {
-                        this.router.navigate(['/customers']);
+                        this.router.navigate(['/accounts/customers']);
                     },
                 });
                 break;
             case FormMode.Update:
                 this.customerService.put({ ...this.customerFg.value, id: Number(this.id()) }).subscribe({
                     next: (res) => {
-                        this.router.navigate(['/customers']);
+                        this.router.navigate(['/accounts/customers']);
                     },
                 });
                 break;
