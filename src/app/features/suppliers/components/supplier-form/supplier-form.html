@@ -48,6 +48,8 @@
                 aria-describedby="supplierName-help"
                 [placeholder]="'FORM.SUPPLIER_NAME' | translate"
                 formControlName="nameAr"
+                appSpaceTrimmer
+                [maxSpaces]="1"
             />
         </app-input-error-message-handler>
     </div>

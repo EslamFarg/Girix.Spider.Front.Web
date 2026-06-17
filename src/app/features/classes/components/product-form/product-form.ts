@@ -236,10 +236,16 @@ export class ProductForm extends BaseComponent implements OnInit {
             ...this.productFg.getRawValue(),
         };
 
-        if (this.productFg.invalid) {
-            console.log('invalid');
-            console.log(product);
+        if (this.productFg.invalid || this.productFg.controls.menuItemUnits.length === 0) {
             this.productFg.markAllAsTouched();
+            if (this.productFg.controls.menuItemUnits.length === 0) {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'خطأ',
+                    detail: 'يجب إضافة وحدة واحدة على الأقل',
+                });
+                this.productFg.controls.menuItemUnits.markAsTouched();
+            }
             return;
         }
 
@@ -277,7 +283,12 @@ export class ProductForm extends BaseComponent implements OnInit {
             ? this.productService.create(formData)
             : this.productService.patch(formData)
         ).subscribe({
-            next: (res) => console.log(res),
+            next: (res) => {
+                if (this.formMode() === FormMode.Create) {
+                    this.onResetForm();
+                }
+                console.log(res);
+            },
         });
     }
 
@@ -619,6 +630,19 @@ export class ProductForm extends BaseComponent implements OnInit {
     onResetForm() {
         if (this.formMode() === FormMode.Create) {
             this.productFg.reset();
+            // clear unit rows
+            this.productUnitRows.clear();
+            // Clear images
+            this.newImages.set([]);
+            this.existingImages.set([]);
+            this.currentImage.set(null);
+
+            this.productFg.patchValue({
+                allImages: [],
+                images: [],
+                imagesAdd: [],
+                listIdsOfDeleteImages: [],
+            });
         } else {
             this.router.navigateByUrl('/classes/products/add');
         }

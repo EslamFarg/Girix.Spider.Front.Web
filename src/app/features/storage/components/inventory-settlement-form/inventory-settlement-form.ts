@@ -134,10 +134,18 @@ export class InventorySettlementForm extends BaseComponent {
   //
 
   onSubmitInventory() {
+     if (this.fg.controls.items.length === 0) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'خطأ',
+      detail: 'يجب إضافة صنف واحد على الأقل',
+    });
+    this.fg.controls.items.markAsTouched();
+    return;
+  }
     if (this.fg.invalid) {
       this.fg.markAllAsTouched();
-      console.log('invalid');
-      console.log(this.fg.getRawValue());
+      
       return;
     }
 
