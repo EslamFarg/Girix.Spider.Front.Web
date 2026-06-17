@@ -71,7 +71,7 @@ export class Customers extends BaseComponent {
     let searchFilters: any[] = [
       {
         values: [fgRawValue.searchTerm],
-        column: CustomerSearchEnum.Name,
+        column: fgRawValue.searchEnum,
       },
     ];
 

@@ -141,16 +141,20 @@
                             <div>
                                 @switch (order.orderType) {
                                 @case (OrderLocationType.DineIn) {
-                                محلي
+                                <!-- محلي -->
+                                 {{order.placeRefName}}
                                 }
                                 @case (OrderLocationType.PersonDelivery) {
-                                توصيل
+                                <!-- توصيل -->
+                                 {{order.deliveryName}}
                                 }
                                 @case (OrderLocationType.CompanyDelivery) {
-                                توصيل
+                                <!-- توصيل -->
+                                 {{order.deliveryName}}
                                 }
                                 @case (OrderLocationType.Takeaway) {
-                                سفري
+                                <!-- سفري -->
+                                 لا يوجد
                                 }
                                 }
                             </div>

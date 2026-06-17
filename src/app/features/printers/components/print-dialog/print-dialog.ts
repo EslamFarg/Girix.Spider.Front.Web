@@ -1,7 +1,7 @@
 import { BaseComponent } from '@/components';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Dialog } from 'primeng/dialog';
-import { IPrinterSearchRow, PrinterType, PrinterSearchEnum, PrinterService, AppPrinterType } from '../..';
+import { IPrintJob, PrinterService, AppPrinterType, PrinterType, PrinterSearchEnum, IPrinterSearchRow } from '../..';
 import { ButtonDirective } from 'primeng/button';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -27,9 +27,5 @@ export class PrintDialog extends BaseComponent {
   appPrinterType = AppPrinterType;
   closePrinterDialog = this.printerService.closePrinterDialog;
 
- 
-
-
-
-  print = this.printerService.print;
+  confirmDialogPrint = this.printerService.confirmDialogPrint;
 }

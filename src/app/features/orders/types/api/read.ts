@@ -102,6 +102,8 @@ export interface IOrderBillReadResponse {
     netUnitPrice: number;
     unitPriceWithTax: number;
     netUnitPriceWithTax: number;
+    categoryId: number | null;
+    categoryName: string | null;
     printer: {
       id: number;
       name: string;
@@ -182,6 +184,8 @@ export interface IOrderSearchRow {
   isCollected: boolean;
   payingCash: number;
   payingNetwork: number;
+  placeRefName: string;
+  deliveryName: string;
 }
 
 //search response

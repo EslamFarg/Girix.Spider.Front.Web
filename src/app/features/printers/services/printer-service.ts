@@ -1,13 +1,10 @@
 import { IElectonPrintOptions, IElectronPrintJob, IElectronPrinter } from '@/app';
-import { BaseCrudService } from '@/core/services/BaseCrudService';
 import { BaseSearchAndCrudService, SearchColumEnum } from '@/core/services/BaseSearchAndCrudService';
-import BaseService from '@/core/services/BaseService';
 import { Injectable, signal } from '@angular/core';
 import {
     IPrinterCreateRequest,
     IPrinterReadResponse,
     IPrinterSearchResponseValue,
-    IPrinterSearchRow,
     IPrinterUpdateRequest,
 } from '../types/printer-api';
 import { AppPrinterType, IAppPrinter } from '../types/printer-app';
@@ -16,13 +13,7 @@ export enum PrinterSearchEnum {
     Name = SearchColumEnum.Name,
 }
 
-export interface IAppPrintOptions {
-    html: string;
-    css: string;
-}
-
-/** Combined print option where each entry has its own printer + html + css */
-export interface IPrintOrderOption {
+export interface IPrintJob {
     printer: IAppPrinter;
     html: string;
     css: string;
@@ -39,14 +30,16 @@ export class PrinterService extends BaseSearchAndCrudService<
     IPrinterReadResponse
 > {
     override apiRoute = 'Printer';
-    isPrinterDialogVisible = signal(false);
-    printOptions: IAppPrintOptions | null = null;
-    /** When set, contains pre-grouped print jobs (one per printer) */
-    printJobsQueue: IPrintOrderOption[] | null = null;
 
-    /**
-     *
-     */
+    // ─── Dialog state ───
+    isPrinterDialogVisible = signal(false);
+
+    // ─── Selection state ───
+    selectedPrinters = signal<IAppPrinter[]>([]);
+
+    // ─── Print queue ───
+    private _printQueue: IPrintJob[] = [];
+
     constructor() {
         super();
         this.patchEndpoints({
@@ -55,73 +48,125 @@ export class PrinterService extends BaseSearchAndCrudService<
         });
     }
 
-    openPrinterDialog(opts: IAppPrintOptions) {
-        this.printOptions = opts;
-        this.printJobsQueue = null;
-        this.isPrinterDialogVisible.set(true);
+    // ─────────────────────────────────────────────
+    // Queue API
+    // ─────────────────────────────────────────────
+
+    /** Add jobs to the internal queue (does NOT print yet). */
+    queuePrintRequest(jobs: IPrintJob[]): void {
+        this._printQueue.push(...jobs);
     }
 
-    openPrinterDialogWithJobs(jobs: IPrintOrderOption[]) {
-        this.printOptions = null;
-        this.printJobsQueue = jobs;
+    /** Clear the queue without printing. */
+    clearQueue(): void {
+        this._printQueue = [];
+    }
+
+    /** Get a copy of the current queue. */
+    getQueue(): IPrintJob[] {
+        return [...this._printQueue];
+    }
+
+    /** Print queued jobs immediately, optionally filtering by selected printers. */
+    printQueue(): void {
+        if (this._printQueue.length === 0) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'تنبيه',
+                detail: 'لا توجد مهام في قائمة الانتظار',
+            });
+            return;
+        }
+        this._executePrint(this._printQueue);
+        this._printQueue = [];
+    }
+
+    /** Skip the queue and print immediately. Clears the queue first. */
+    printNow(jobs: IPrintJob[]): void {
+        this._printQueue = [];
+        this._executePrint(jobs);
+    }
+
+    // ─────────────────────────────────────────────
+    // Dialog helpers
+    // ─────────────────────────────────────────────
+
+    openPrinterDialogWithJobs(jobs: IPrintJob[]) {
+        this._printQueue = jobs;
         this.isPrinterDialogVisible.set(true);
     }
 
     closePrinterDialog() {
         this.isPrinterDialogVisible.set(false);
-        this.printOptions = null;
-        this.printJobsQueue = null;
+        this._printQueue = [];
     }
 
-    printOrder(options: IPrintOrderOption[]) {
-        if (options.length === 0) return;
+    // ─────────────────────────────────────────────
+    // Printer selection
+    // ─────────────────────────────────────────────
 
- 
+    onPrinterSelect(printer: IAppPrinter) {
+        const exists = this.selectedPrinters().find((p) => p.appPrinterType === printer.appPrinterType);
+        if (exists) {
+            this.selectedPrinters.set(
+                this.selectedPrinters().filter((p) => p.appPrinterType !== printer.appPrinterType)
+            );
+        } else {
+            this.selectedPrinters.set([...this.selectedPrinters(), printer]);
+        }
+    }
 
-        this.loadingService.addLoading();
+    // ─────────────────────────────────────────────
+    // Legacy compatibility: print from dialog
+    // ─────────────────────────────────────────────
 
-        const jobs: IElectronPrintJob[] = options.map((opt) => ({
-            printer: {
-                id: opt.printer.id,
-                type: opt.printer.type,
-                ipAddressOrMacAddress: opt.printer.ipAddressOrMacAddress,
-                port: opt.printer.port,
-                name: opt.printer.name,
-            },
-            html: opt.html,
-            css: opt.css,
-        }));
+    /** Called by dialog when user confirms. Filters queue by selected printers. */
+    confirmDialogPrint(): void {
+        if (this.selectedPrinters().length === 0) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'خطأ',
+                detail: 'يجب تحديد طابعة',
+            });
+            return;
+        }
 
-        const electronPrintOpts: IElectonPrintOptions = { jobs };
-
-        window.electronAPI
-            .print(electronPrintOpts)
-            .then((results) => {
-                const errors = (results ?? []).filter(Boolean);
-                errors.forEach((failMsg) => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'خطأ',
-                        detail: failMsg,
-                    });
-                });
-                if (errors.length === 0) {
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'نجاح',
-                        detail: 'تم الطباعة بنجاح',
-                    });
+        // Filter jobs: for kitchen printers, match by specific printer id
+        // for captain/cashier, match by appPrinterType
+        const filtered = this._printQueue.filter((job) => {
+            return this.selectedPrinters().some((selected) => {
+                if (job.printer.appPrinterType === AppPrinterType.programPrinter) {
+                    // Kitchen: match by specific printer id
+                    return selected.id === job.printer.id && selected.appPrinterType === AppPrinterType.programPrinter;
+                } else {
+                    // Captain/Cashier: match by appPrinterType
+                    return selected.appPrinterType === job.printer.appPrinterType;
                 }
-            })
-            .catch((e) => console.log(e))
-            .finally(() => this.loadingService.removeLoading());
+            });
+        });
+
+        if (filtered.length === 0) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'خطأ',
+                detail: 'لا توجد عناصر مطابقة للطابعات المحددة',
+            });
+            this.closePrinterDialog();
+            return;
+        }
+
+        this._executePrint(filtered);
+        this.closePrinterDialog();
     }
+
+    // ─────────────────────────────────────────────
+    // Electron API helpers
+    // ─────────────────────────────────────────────
 
     async getLocalBluetoothPrinters() {
         this.loadingService.addLoading();
         try {
-            const e = await window.electronAPI.getBluetoothPrinters();
-            return e;
+            return await window.electronAPI.getBluetoothPrinters();
         } finally {
             this.loadingService.removeLoading();
         }
@@ -131,19 +176,12 @@ export class PrinterService extends BaseSearchAndCrudService<
         this.loadingService.addLoading();
         try {
             const result = await window.electronAPI.testPrinterConnection(printer);
-            if (result.success) {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'نجاح',
-                    detail: result.message,
-                });
-            } else {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'خطأ',
-                    detail: result.message,
-                });
-            }
+            const severity = result.success ? 'success' : 'error';
+            this.messageService.add({
+                severity,
+                summary: result.success ? 'نجاح' : 'خطأ',
+                detail: result.message,
+            });
             return result;
         } catch (e) {
             const msg = e instanceof Error ? e.message : 'Unknown error';
@@ -158,71 +196,74 @@ export class PrinterService extends BaseSearchAndCrudService<
         }
     }
 
+    // ─────────────────────────────────────────────
+    // Private
+    // ─────────────────────────────────────────────
 
+    private _executePrint(jobs: IPrintJob[], showLoading = false) {
+        if (jobs.length === 0) return;
 
-    selectedPrinters = signal<IAppPrinter[]>([]);
+        if (showLoading) this.loadingService.addLoading();
 
-    onPrinterSelect(printer: IAppPrinter) {
-        const existingPrinter = this.selectedPrinters().find((p) => p.id === printer.id);
-        if (existingPrinter) {
-            const filteredPrinters = this.selectedPrinters().filter((p) => p.appPrinterType !== printer.appPrinterType);
-            this.selectedPrinters.set(filteredPrinters);
-        } else {
-            this.selectedPrinters.set([...this.selectedPrinters(), printer]);
-        }
-    }
+        const electronJobs: IElectronPrintJob[] = jobs.map((job) => ({
+            printer: {
+                id: job.printer.id,
+                type: job.printer.type,
+                ipAddressOrMacAddress: job.printer.ipAddressOrMacAddress,
+                port: job.printer.port,
+                name: job.printer.name,
+                comPort: (job.printer as any).comPort,
+            },
+            html: job.html,
+            css: job.css,
+        }));
 
-    print() {
-        if (this.selectedPrinters().length === 0) {
-            this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب تحديد طابعة' });
-            return;
-        }
+        const opts: IElectonPrintOptions = { jobs: electronJobs };
 
-        console.log('--- PrintDialog.print ---');
-        console.log(
-            'Selected printers:',
-            this.selectedPrinters().map((p) => ({ type: p.appPrinterType, name: p.name, id: p.id })),
-        );
+        window.electronAPI
+            .print(opts)
+            .then((results) => {
+                const errors = (results ?? []).filter(Boolean);
+                
+                // If there were failures, collect failed jobs and open dialog for retry
+                if (errors.length > 0) {
+                    // Map errors back to original jobs (same index order)
+                    const failedJobs: IPrintJob[] = [];
+                    errors.forEach((errMsg, index) => {
+                        if (index < jobs.length) {
+                            failedJobs.push(jobs[index]);
+                        }
+                    });
 
-        // If pre-grouped print jobs are queued, filter by selected printer types
-        const queuedJobs = this.printJobsQueue;
-        if (queuedJobs && queuedJobs.length > 0) {
-            console.log(`Queued jobs: ${queuedJobs.length}`);
-            queuedJobs.forEach((j, i) =>
-                console.log(
-                    `  Queued ${i}: type=${j.printer.appPrinterType}, printer=${j.printer.name} (id=${j.printer.id})`,
-                ),
-            );
+                    // Show error toast for each failed print
+                    errors.forEach((failMsg) => {
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'خطأ',
+                            detail: failMsg,
+                        });
+                    });
 
-            const selectedTypes = new Set(this.selectedPrinters().map((p) => p.appPrinterType));
-            console.log('Selected types:', [...selectedTypes]);
-
-            const filteredOptions = queuedJobs.filter((job) => selectedTypes.has(job.printer.appPrinterType));
-            console.log(`Filtered options: ${filteredOptions.length}`);
-            filteredOptions.forEach((j, i) => console.log(`  Filtered ${i}: type=${j.printer.appPrinterType}`));
-
-            if (filteredOptions.length > 0) {
-                this.printOrder(filteredOptions);
-            } else {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'خطأ',
-                    detail: 'لا توجد عناصر مطابقة للطابعات المحددة',
-                });
-            }
-            this.closePrinterDialog();
-            return;
-        }
-
-        // Fallback: legacy single-HTML print to all selected printers
-        const opts = this.printOptions;
-        if (opts) {
-            const printOptions = this.selectedPrinters().map((p) => ({
-                printer: p,
-                html: opts.html,
-                css: opts.css,
-            }));
-            this.printOrder(printOptions);
-        }
+                    // Open dialog with failed jobs so user can retry/select different printers
+                    if (failedJobs.length > 0) {
+                        this.openPrinterDialogWithJobs(failedJobs);
+                    }
+                } else {
+                    // All prints succeeded
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'نجاح',
+                        detail: 'تم الطباعة بنجاح',
+                    });
+                }
+            })
+            .catch((e) => {
+                console.error(e);
+                // On complete failure, open dialog with all jobs
+                this.openPrinterDialogWithJobs(jobs);
+            })
+            .finally(() => {
+                if (showLoading) this.loadingService.removeLoading();
+            });
     }
 }
