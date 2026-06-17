@@ -1,0 +1,187 @@
+/* ─── TOP AREA: three equal columns ──────────────────────────────────────── */
+/*
+  direction: rtl is set EXPLICITLY here (not inherited) so the grid column
+  order is guaranteed regardless of Tailwind preflight or parent overrides.
+  In RTL:  column-1 (HTML 1st) = visual RIGHT  → العمليات والمالية
+           column-2 (HTML 2nd) = visual CENTER  → بيانات المورد
+           column-3 (HTML 3rd) = visual LEFT    → بيانات الفاتورة
+*/
+.purchases-top-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  direction: rtl;
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* Restore RTL on each panel so inner content is unaffected */
+.purchases-top-area > .pi-panel {
+  direction: rtl;
+}
+
+/*
+  Visual order (direction: rtl → order:1 = RIGHT, order:3 = LEFT):
+    RIGHT  → بيانات الفاتورة  (order 1)
+    CENTER → بيانات المورد    (order 2)
+    LEFT   → العمليات والمالية (order 3)
+*/
+.pi-block-invoice    { order: 1; }
+.pi-block-supplier   { order: 2; }
+.pi-block-operations { order: 3; }
+
+@media (max-width: 900px) {
+  .purchases-top-area {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── ERP Panel component ──────────────────────────────────────────────────── */
+
+.pi-panel {
+  border: 1px solid var(--p-content-border-color, #e2e8f0);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pi-panel-header {
+  background-color: var(--color-dark-bg-2);
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.pi-panel-body {
+  padding: 6px 8px;
+}
+
+/* ─── Button stack inside left financial panel ─────────────────────────────── */
+
+.pi-btn-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* ─── Purchases grid: fills all remaining height (flex-1 + min-h-0 via TW) ── */
+
+.purchases-grid-wrapper {
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 220px;   /* never collapse below 220 px on very small viewports */
+  border-radius: 6px;
+}
+
+/* ─── Dark sticky header ─────────────────────────────────────────────────── */
+
+.purchases-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background-color: var(--color-dark-bg-2);
+}
+
+/* ─── Sticky entry (add) row — always below header ──────────────────────── */
+
+.purchases-entry-row {
+  position: sticky;
+  top: 52px;
+  z-index: 2;
+}
+
+.purchases-entry-row,
+.purchases-entry-row td {
+  background-color: #eef6ff !important;
+  border-top: 1px solid #bfdbfe !important;
+  border-bottom: 2px solid #93c5fd !important;
+}
+
+/* ─── Add-row indicator (+) ─────────────────────────────────────────────── */
+
+.purchases-add-indicator {
+  font-weight: 700;
+  text-align: center;
+  font-size: 1rem;
+  user-select: none;
+  opacity: 0.6;
+}
+
+/* ─── Column header: label stacked above running total ──────────────────── */
+
+.purchases-col-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.purchases-col-total {
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Column widths ─────────────────────────────────────────────────────────
+   col1 #=3%  col2 المنتج=22%  col3 الوحدة=10%  col4 الكمية=9%
+   col5 سعر الشراء=12%  col6 سعر البيع=10%  col7 الضريبة=10%
+   col8 الإجمالي=18%  col9 الأدوات=6%   Total = 100%
+   ────────────────────────────────────────────────────────────────────────── */
+
+.purchases-table th:nth-child(1),
+.purchases-table td:nth-child(1) {
+  width: 3%;
+  min-width: 28px;
+}
+
+.purchases-table th:nth-child(2),
+.purchases-table td:nth-child(2) {
+  width: 22%;
+  min-width: 110px;
+}
+
+.purchases-table th:nth-child(3),
+.purchases-table td:nth-child(3) {
+  width: 10%;
+  min-width: 70px;
+}
+
+.purchases-table th:nth-child(4),
+.purchases-table td:nth-child(4) {
+  width: 9%;
+  min-width: 64px;
+}
+
+.purchases-table th:nth-child(5),
+.purchases-table td:nth-child(5) {
+  width: 12%;
+  min-width: 76px;
+}
+
+/* سعر البيع — new read-only column */
+.purchases-table th:nth-child(6),
+.purchases-table td:nth-child(6) {
+  width: 10%;
+  min-width: 68px;
+}
+
+.purchases-table th:nth-child(7),
+.purchases-table td:nth-child(7) {
+  width: 10%;
+  min-width: 68px;
+}
+
+.purchases-table th:nth-child(8),
+.purchases-table td:nth-child(8) {
+  width: 18%;
+  min-width: 80px;
+}
+
+.purchases-table th:nth-child(9),
+.purchases-table td:nth-child(9) {
+  width: 6%;
+  min-width: 44px;
+}

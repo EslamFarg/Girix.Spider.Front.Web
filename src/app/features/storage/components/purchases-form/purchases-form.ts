@@ -1,4 +1,18 @@
-import { Component, computed, effect, inject, input, Signal, signal } from '@angular/core';
+import {
+    AbstractControl,
+    FormGroup,
+    ReactiveFormsModule,
+    Validators,
+} from '@angular/forms';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    Signal,
+    signal,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -7,36 +21,35 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components';
-import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { PurchaseService } from '../../services/purchase-service';
 import { IPurchaseReadResponse } from '../../types/api/purchases/responses';
 import { IProductSearchRow, IProductUnit, ProductSearchEnum, ProductService } from '@/features/classes';
 import { IDebounceEvent, Debounce } from '@/directives/debounce';
-import { PaginatorState } from 'primeng/paginator';
 import { UnitService } from '@/features/classes/services/unit-service';
 import {
-    mustIncludeLetters,
     noSymbolsAllowed,
-    onlyNumbersAllowed,
     onlyNumbersOrDotAllowed,
     onlyNumbersOrEnLettersAllowed,
 } from '@/yn-ng';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { OrderPaymentType } from '@/features/orders';
-import { SupplierService } from '../../services/supplier-service';
-import { ISupplierReadResponse } from '../../types/api/supplier/responses';
+import { SupplierService, SupplierSearchEnum } from '../../services/supplier-service';
+import { ISupplierSearchRow } from '../../types/api/supplier/responses';
 import { AllowNumbers } from '@/directives/allow-numbers';
-import { DecimalMask } from '@/directives/decimal-mask';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import {
     FinancialAccountSearchEnum,
     FinancialAccountService,
 } from '@/features/accounts/services/financial-account-service';
 import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
+import {
+    FixedFinancialAccountService,
+    FixedFinancialAccountRefId,
+} from '@/features/settings/services/fixed-financial-account-service';
 import { TranslatePipe } from '@ngx-translate/core';
-import { RouterLink } from '@angular/router';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { TooltipModule } from 'primeng/tooltip';
+import { A4PrintService } from '@/core';
 
 interface IAppPurchaseItem {
     menuItemsId: number | null;
@@ -64,19 +77,19 @@ type IAppPurchaseItemControls = ControlsOf<IAppPurchaseItem>;
         ReactiveFormsModule,
         Debounce,
         AllowNumbers,
-        DecimalMask,
         NgSelectComponent,
         TranslatePipe,
-        RouterLink,
         LoadingDisabledDirective,
-        TooltipModule
+        TooltipModule,
     ],
     templateUrl: './purchases-form.html',
     styleUrl: './purchases-form.css',
 })
 export class PurchasesForm extends BaseComponent {
     PaymentType = OrderPaymentType;
-    //
+
+    // ── Core state ────────────────────────────────────────────────────────────
+
     currentPurchase = signal<IPurchaseReadResponse | null>(null);
     purchaseService = inject(PurchaseService);
     id = input<number | null>(null);
@@ -86,41 +99,24 @@ export class PurchasesForm extends BaseComponent {
         return this.initialFormMode();
     });
 
+    // ── Form definition ───────────────────────────────────────────────────────
+
     initialFormValue = {
-        // المرجع
         referenceNumber: this.fb.control<string | null>(null, [
-            //   Validators.required,
             Validators.maxLength(16),
             onlyNumbersOrEnLettersAllowed,
         ]),
-        // الرقم الفاتورة
         invoiceNumber: this.fb.control<string | null>({ value: null, disabled: true }, []),
         paymentType: this.fb.control<number | null>(OrderPaymentType.Paid, [Validators.required]),
         invoiceDate: this.fb.control<Date | string | null>(new Date(), [Validators.required]),
         notes: this.fb.control<string | null>(null, [Validators.maxLength(1000)]),
         items: this.fb.array<FormGroup<IAppPurchaseItemControls>>([], [Validators.required, Validators.minLength(1)]),
-        //
         supplierId: this.fb.control<number | null>(null, [Validators.required]),
         supplierName: this.fb.control<string | null>({ value: null, disabled: true }, [
-            Validators.required,
-            Validators.minLength(2),
             Validators.maxLength(100),
-            noSymbolsAllowed,
-            mustIncludeLetters,
         ]),
-        supplierPhoneNumber: this.fb.control<string | null>({ value: null, disabled: true }, [
-            Validators.required,
-            Validators.minLength(6),
-            Validators.maxLength(16),
-            onlyNumbersAllowed,
-        ]),
-        supplierTaxNumber: this.fb.control<string | null>({ value: null, disabled: true }, [
-            Validators.required,
-            onlyNumbersAllowed,
-            Validators.minLength(6),
-            Validators.maxLength(16),
-        ]),
-        //
+        supplierPhoneNumber: this.fb.control<string | null>(null, []),
+        supplierTaxNumber: this.fb.control<string | null>(null, []),
         cashAmount: this.fb.control<number | null>(null, [
             Validators.required,
             Validators.min(0),
@@ -133,9 +129,10 @@ export class PurchasesForm extends BaseComponent {
         ]),
         cashAccountId: this.fb.control<number | null>(null, [Validators.required]),
         networkAccountId: this.fb.control<number | null>(null, [Validators.required]),
-        //
     };
     fg = this.fb.group(this.initialFormValue);
+
+    // ── Payment type listener ─────────────────────────────────────────────────
 
     isPaidListener = this.fg.controls.paymentType.valueChanges.subscribe({
         next: (value) => {
@@ -145,106 +142,98 @@ export class PurchasesForm extends BaseComponent {
                 this.fg.controls.cashAccountId,
                 this.fg.controls.networkAccountId,
             ];
-
             if (value == OrderPaymentType.Paid) {
-                controls.forEach((control) => {
-                    control.setValue(null);
-                    control.enable();
-                });
+                controls.forEach((c) => { c.setValue(null); c.enable(); });
+                // Re-apply defaults for new invoices after controls are cleared & enabled
+                if (this.formMode() === FormMode.Create) {
+                    setTimeout(() => this._applyDefaultAccountsToForm());
+                }
             } else {
-                controls.forEach((control) => {
-                    control.setValue(null);
-                    control.disable();
-                });
+                controls.forEach((c) => { c.setValue(null); c.disable(); });
             }
-            
             this.paymentType.set(value!);
         },
     });
 
-    fgItemsListener = this.fg.controls.items.valueChanges.subscribe({
-        next: (data) => {
-            console.log('changed');
-            this.updateNet();
-        },
-    });
+    // ── Reactive totals ───────────────────────────────────────────────────────
 
-    updateNet = () => {
-        const total = this.fg.controls.items.value?.reduce((acc, item) => acc + (item.total ?? 0), 0);
-        this.net.set(+(total ?? 0));
-    };
+    private _itemsChange = toSignal(this.fg.controls.items.valueChanges, { initialValue: null });
 
     net = signal(0);
-    paymentType=signal(OrderPaymentType.Paid)
-    finalNet = computed(() => {
-        const net = this.net();
-        const paymentType = this.paymentType();
-        return this.fg.value.paymentType == OrderPaymentType.Paid ? net : 0;
+    paymentType = signal(OrderPaymentType.Paid);
+
+    updateNet = () => {
+        const total = this.fg.controls.items.value?.reduce((acc, item) => acc + (item.total ?? 0), 0) ?? 0;
+        this.net.set(+total);
+    };
+
+    totalQuantity = computed(() => {
+        this._itemsChange();
+        return this.fg.controls.items.controls.reduce(
+            (sum, ctrl) => sum + (Number(ctrl.value.quantity) || 0),
+            0,
+        );
     });
+
+    totalTax = computed(() => {
+        this._itemsChange();
+        return this.fg.controls.items.controls.reduce(
+            (sum, ctrl) =>
+                sum + (Number(ctrl.value.taxAmount) || 0) * (Number(ctrl.value.quantity) || 0),
+            0,
+        );
+    });
+
+    finalNet = computed(() =>
+        this.fg.value.paymentType === OrderPaymentType.Paid ? this.net() : 0,
+    );
+
+    // ── Cash / network amount cross-update ────────────────────────────────────
 
     cashInputSubscription = this.fg.controls.cashAmount.valueChanges.subscribe((value) => {
         const net = this.finalNet();
-        let futureValue = value ?? 0;
-        if (futureValue > net) {
-            futureValue = net;
-        } else if (futureValue < 0) {
-            futureValue = 0;
-        }
-        this.fg.patchValue(
-            {
-                networkAmount: net - futureValue,
-                cashAmount: futureValue,
-            },
-            { emitEvent: false },
-        );
+        let v = value ?? 0;
+        if (v > net) v = net;
+        if (v < 0) v = 0;
+        this.fg.patchValue({ networkAmount: net - v, cashAmount: v }, { emitEvent: false });
     });
 
-    networkInputSubscription = this.fg.controls.networkAmount?.valueChanges.subscribe((value) => {
+    networkInputSubscription = this.fg.controls.networkAmount.valueChanges.subscribe((value) => {
         const net = this.finalNet();
-        let futureValue = value ?? 0;
-        if (futureValue > net) {
-            futureValue = net;
-        } else if (futureValue < 0) {
-            futureValue = 0;
-        }
-        this.fg.patchValue(
-            {
-                cashAmount: net - futureValue,
-                networkAmount: futureValue,
-            },
-            { emitEvent: false },
-        );
+        let v = value ?? 0;
+        if (v > net) v = net;
+        if (v < 0) v = 0;
+        this.fg.patchValue({ cashAmount: net - v, networkAmount: v }, { emitEvent: false });
     });
 
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    /**
-     *
-     */
+    // ── Constructor ───────────────────────────────────────────────────────────
+
     constructor() {
         super();
         this.searchProducts(1);
         this.setUpNewPurchaseDetailRowFg();
-        this.searchAccounts({
-            pageIndex: 1,
-            searchTerm: '',
-        }).subscribe({
+        this.searchAccounts({ pageIndex: 1, searchTerm: '' }).subscribe({
             next: (res) => {
                 this.cashAccounts.set(res.value.rows);
                 this.networkAccounts.set(res.value.rows);
             },
         });
+
+        // Phase 3 — Date must never be empty: restore current date if cleared
+        this.fg.controls.invoiceDate.valueChanges.subscribe((value) => {
+            if (!value) {
+                this.fg.controls.invoiceDate.setValue(new Date(), { emitEvent: false });
+            }
+        });
     }
+
+    // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     ngOnInit() {
         const purchaseId = this.id();
         switch (this.formMode()) {
             case FormMode.Create:
+                this._loadDefaultAccounts();
                 break;
             case FormMode.Update:
                 this.purchaseService.getById(purchaseId!).subscribe({
@@ -254,11 +243,9 @@ export class PurchasesForm extends BaseComponent {
                             ...data,
                             invoiceDate: new Date(data.invoiceDate),
                         });
+                        this._setCurrentSupplierFromPurchase(data);
                         this.currentProducts.set(
-                            data.items.map((item) => ({
-                                id: item.menuItemsId,
-                                name: item.menuItemName,
-                            })),
+                            data.items.map((item) => ({ id: item.menuItemsId, name: item.menuItemName })),
                         );
                         this.fg.setControl(
                             'items',
@@ -266,9 +253,15 @@ export class PurchasesForm extends BaseComponent {
                                 data.items.map((item) => {
                                     this.getProductUnits(item.menuItemsId);
                                     return this.createItemFg({
-                                        ...item,
-                                        taxAmount: item.taxAmount / item.quantity,
-                                    } as any);
+                                        menuItemsId: item.menuItemsId,
+                                        unitId: item.unitId,
+                                        quantity: item.quantity,
+                                        purchasePrice: item.purchasePrice,
+                                        salePrice: item.salePrice,
+                                        taxAmount: item.quantity > 0 ? item.taxAmount / item.quantity : 0,
+                                        taxPercentage: -1,
+                                        total: null,
+                                    });
                                 }),
                             ),
                         );
@@ -278,37 +271,26 @@ export class PurchasesForm extends BaseComponent {
                 break;
         }
     }
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
+
+    // ── Submit ────────────────────────────────────────────────────────────────
 
     onSubmitPurchase() {
         if (this.fg.invalid) {
             this.fg.markAllAsTouched();
             return;
         }
-
-        if (!this.currentSupplier() && FormMode.Create === this.formMode()) {
-            return this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب اختيار المورد' });
+        if (!this.fg.value.supplierId) {
+            this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب اختيار المورد' });
+            return;
+        }
+        if (this.fg.controls.items.length === 0) {
+            this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب إضافة صنف واحد على الأقل' });
+            return;
         }
 
-        // if (this.currentSupplier()!.id !== this.fg.value.supplierId) {
-        //   return this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'المورد غير متطابق' });
-        // }
         const fgValue = this.fg.getRawValue();
-        console.log(this.fg.getRawValue());
-        //collect data to send
-        let data = {
-            ...this.fg.getRawValue(),
+        const data = {
+            ...fgValue,
             cashAmount: +(fgValue.cashAmount || 0).toFixed(2),
             networkAmount: +(fgValue.networkAmount || 0).toFixed(2),
             invoiceDate: this.UtcToLocalIso((fgValue.invoiceDate as Date)!.toISOString()),
@@ -316,7 +298,7 @@ export class PurchasesForm extends BaseComponent {
                 ...item,
                 quantity: +item.quantity,
                 taxAmount: +(item.taxAmount * item.quantity).toFixed(2),
-                salePrice: +item.salePrice.toFixed(2),
+                salePrice: +(item.salePrice ?? item.purchasePrice + item.taxAmount).toFixed(2),
                 purchasePrice: +item.purchasePrice.toFixed(2),
             })),
         };
@@ -324,9 +306,7 @@ export class PurchasesForm extends BaseComponent {
         switch (this.formMode()) {
             case FormMode.Create:
                 this.purchaseService.create(data).subscribe({
-                    next: (data) => {
-                        this.router.navigate(['/storage/purchases']);
-                    },
+                    next: () => { this.router.navigate(['/storage/purchases']); },
                 });
                 break;
             case FormMode.Update:
@@ -335,163 +315,186 @@ export class PurchasesForm extends BaseComponent {
         }
     }
 
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //lookup by invoice number for update
-    //
-
-    findPurchaseInvoiceByNumber(invoiceNumber: string) {
-        return this.purchaseService.getByInvoiceNumber(invoiceNumber);
-    }
+    // ── Invoice search by number ──────────────────────────────────────────────
 
     debouncedFindPurchaseInvoiceByNumber(event: any, invoiceNumber: string) {
-        console.log(event);
         if (!invoiceNumber) return;
-
-        this.findPurchaseInvoiceByNumber(invoiceNumber).subscribe({
+        this.purchaseService.getByInvoiceNumber(invoiceNumber).subscribe({
             next: (data) => {
                 this.currentPurchase.set(data);
-                this.fg.patchValue({
-                    ...data,
-                    invoiceDate: new Date(data.invoiceDate),
-                });
+                this.fg.patchValue({ ...data, invoiceDate: new Date(data.invoiceDate) });
+                this._setCurrentSupplierFromPurchase(data);
                 this.currentProducts.set(
-                    data.items.map((item) => ({
-                        id: item.menuItemsId,
-                        name: item.menuItemName,
-                    })),
+                    data.items.map((item) => ({ id: item.menuItemsId, name: item.menuItemName })),
                 );
                 this.fg.setControl(
                     'items',
                     this.fb.array(
                         data.items.map((item) => {
                             this.getProductUnits(item.menuItemsId);
-                            return this.createItemFg(item as any);
+                            return this.createItemFg({
+                                menuItemsId: item.menuItemsId,
+                                unitId: item.unitId,
+                                quantity: item.quantity,
+                                purchasePrice: item.purchasePrice,
+                                salePrice: item.salePrice,
+                                taxAmount: item.taxAmount,
+                                taxPercentage: -1,
+                                total: null,
+                            });
                         }),
                     ),
                 );
+                this.updateNet();
             },
         });
     }
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
+
+    private _setCurrentSupplierFromPurchase(data: IPurchaseReadResponse) {
+        this.currentSupplier.set({
+            id: data.supplierId,
+            name: data.supplierName,
+            phoneNumber: data.supplierPhoneNumber,
+            taxNumber: data.supplierTaxNumber,
+            secondaryMobileNumber: '',
+            city: '',
+            district: '',
+            street: '',
+            buildingNumber: '',
+            apartment: '',
+            landmark: '',
+            postalCode: '',
+            commercialRegister: '',
+            numberOfFloor: 0,
+            financiallyAccountId: 0,
+        });
+    }
+
+    // ── Supplier search (Phase 4 & 5) ─────────────────────────────────────────
 
     supplierService = inject(SupplierService);
+    currentSupplier = signal<ISupplierSearchRow | null>(null);
 
-    currentSupplier = signal<ISupplierReadResponse | null>(null);
+    suppliersByCode = signal<ISupplierSearchRow[]>([]);
+    suppliersByName = signal<ISupplierSearchRow[]>([]);
+    private _suppliersCodePage = 1;
+    private _suppliersNamePage = 1;
+    private _suppliersCodeTerm = '';
+    private _suppliersNameTerm = '';
 
-    findSupplierByNumber(event: any, supplierId: number) {
-        if (!supplierId) return;
+    displayedSuppliersByCode = computed(() => {
+        const list = this.suppliersByCode();
+        const current = this.currentSupplier();
+        const result: (ISupplierSearchRow & { codeLabel: string })[] = list.map((s) => ({
+            ...s,
+            codeLabel: `${s.id} - ${s.name}`,
+        }));
+        if (current && !result.some((s) => s.id === current.id)) {
+            result.unshift({ ...current, codeLabel: `${current.id} - ${current.name}` });
+        }
+        return result;
+    });
 
-        this.supplierService.getById(supplierId).subscribe({
-            next: (data) => {
-                const { supplierName, supplierPhoneNumber, supplierTaxNumber } = this.fg.controls;
-                [supplierName, supplierPhoneNumber, supplierTaxNumber].forEach((control) => control.enable());
+    displayedSuppliersByName = computed(() => {
+        const list = this.suppliersByName();
+        const current = this.currentSupplier();
+        if (current && !list.some((s) => s.id === current.id)) {
+            return [current, ...list];
+        }
+        return list;
+    });
 
-                this.currentSupplier.set(data);
-                this.fg.patchValue({
-                    supplierId: data.id,
-                    supplierName: data.name,
-                    supplierPhoneNumber: data.phoneNumber,
-                    supplierTaxNumber: data.taxNumber,
-                });
-            },
-        });
+    searchSuppliers(
+        pageIndex: number,
+        searchTerm: string,
+        searchEnum: SupplierSearchEnum,
+    ) {
+        this.supplierService
+            .search({
+                paginationInfo: { pageIndex, pageSize: 10 },
+                searchFilters: [{ column: searchEnum, values: [searchTerm] }],
+                fromDate: null,
+            })
+            .subscribe({
+                next: (res) => {
+                    const rows = res.value.rows;
+                    if (searchEnum === SupplierSearchEnum.Id) {
+                        if (pageIndex === 1) this.suppliersByCode.set(rows);
+                        else this.suppliersByCode.update((p) => [...p, ...rows]);
+                        this._suppliersCodePage = pageIndex;
+                    } else {
+                        if (pageIndex === 1) this.suppliersByName.set(rows);
+                        else this.suppliersByName.update((p) => [...p, ...rows]);
+                        this._suppliersNamePage = pageIndex;
+                    }
+                },
+            });
     }
 
-    onSupplierSearchKeyDown(event: KeyboardEvent, formElement: HTMLFormElement) {
-        if (event.key === 'Enter') {
-            formElement.requestSubmit();
+    onSupplierCodeSearch(event: IDebounceEvent, searchTerm: string) {
+        if (event.type === 'scrollToEnd') {
+            this.searchSuppliers(this._suppliersCodePage + 1, this._suppliersCodeTerm, SupplierSearchEnum.Id);
+        } else {
+            this._suppliersCodeTerm = searchTerm ?? '';
+            this.searchSuppliers(1, this._suppliersCodeTerm, SupplierSearchEnum.Id);
         }
     }
 
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    // products
-    //
+    onSupplierNameSearch(event: IDebounceEvent, searchTerm: string) {
+        if (event.type === 'scrollToEnd') {
+            this.searchSuppliers(this._suppliersNamePage + 1, this._suppliersNameTerm, SupplierSearchEnum.Name);
+        } else {
+            this._suppliersNameTerm = searchTerm ?? '';
+            this.searchSuppliers(1, this._suppliersNameTerm, SupplierSearchEnum.Name);
+        }
+    }
+
+    onSupplierSelected(supplier: ISupplierSearchRow) {
+        if (!supplier) return;
+        this.currentSupplier.set(supplier);
+        this.fg.patchValue({
+            supplierName: supplier.name,
+            supplierPhoneNumber: supplier.phoneNumber,
+            supplierTaxNumber: supplier.taxNumber,
+        });
+    }
+
+    // ── Products ──────────────────────────────────────────────────────────────
 
     products = signal<IProductSearchRow[]>([]);
     currentProducts = signal<Partial<IProductSearchRow>[]>([]);
     productService = inject(ProductService);
+
     displayedProducts = computed(() => {
         const current = this.currentProducts();
         const products = this.products();
-
         if (!current.length) return products;
-
         const currentMap = new Map(current.map((a) => [a.id, a]));
-
-        // Replace matching ones, keep the rest
         const merged = products.map((p) => (currentMap.has(p.id) ? { ...p, ...currentMap.get(p.id)! } : p));
-
-        // Inject ones not present in current page
         const missing = current.filter((c) => !products.some((p) => p.id === c.id));
-
-        // Usually best UX: current selections first
         return [...missing, ...merged];
     });
-    productsPaginationInfo: IPaginationInfo = {
-        pageIndex: 0,
-        totalPagesCount: 0,
-        totalRowsCount: 0,
-    };
-    previousProductSearchValue = '';
+
+    productsPaginationInfo: IPaginationInfo = { pageIndex: 0, totalPagesCount: 0, totalRowsCount: 0 };
     ProductSearchEnum = ProductSearchEnum;
-    searchProducts(
-        pageIndex: number,
-        searchValue: string = '',
-        searchEnum: ProductSearchEnum = ProductSearchEnum.Name,
-    ) {
+
+    searchProducts(pageIndex: number, searchValue = '') {
         this.productService
             .search({
-                paginationInfo: {
-                    pageIndex: pageIndex,
-                    pageSize: 20,
-                },
+                paginationInfo: { pageIndex, pageSize: 20 },
                 searchFilters: [
-                    {
-                        column: ProductSearchEnum.Name,
-                        values: [searchValue],
-                    },
-                    {
-                        column: ProductSearchEnum.Id,
-                        values: [searchValue],
-                    },
+                    { column: ProductSearchEnum.Name, values: [searchValue] },
+                    { column: ProductSearchEnum.Id, values: [searchValue] },
                 ],
                 fromDate: null,
                 removeDateFilter: true,
             })
             .subscribe({
                 next: (res) => {
-                    if (res.value.menuItems.rows.length > 0) {
-                        if (pageIndex === 1) {
-                            this.products.set(res.value.menuItems.rows);
-                        } else {
-                            this.products.update((prev) => prev.concat(res.value.menuItems.rows));
-                        }
+                    const rows = res.value.menuItems.rows;
+                    if (rows.length > 0) {
+                        if (pageIndex === 1) this.products.set(rows);
+                        else this.products.update((prev) => prev.concat(rows));
                         this.productsPaginationInfo = {
                             pageIndex,
                             totalPagesCount: res.value.menuItems.paginationInfo.totalPagesCount,
@@ -503,8 +506,6 @@ export class PurchasesForm extends BaseComponent {
     }
 
     debouncedProductsSearch(event: IDebounceEvent, searchValue: string) {
-        console.log(event);
-
         if (event.type === 'scrollToEnd') {
             this.searchProducts(this.productsPaginationInfo.pageIndex + 1);
         } else {
@@ -512,34 +513,15 @@ export class PurchasesForm extends BaseComponent {
         }
     }
 
-    onSubmitProductSearch = () => this.fg.valid && this.searchProducts(1);
-
-    onProductPageChange = (event: PaginatorState) => this.searchProducts(event.page! + 1);
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    // units
-    //
+    // ── Units ─────────────────────────────────────────────────────────────────
 
     units = new Map<number, Signal<IProductUnit[]>>();
     unitService = inject(UnitService);
 
-    unitsPaginationInfo: IPaginationInfo = {
-        pageIndex: 0,
-        totalPagesCount: 0,
-        totalRowsCount: 0,
-    };
-    previousUnitSearchValue = '';
-
-    getProductUnits(productId: number, fg: FormGroup<IAppPurchaseItemControls> = this.newPurchaseItemRowFg) {
-        console.log('getProductUnits', productId);
+    getProductUnits(
+        productId: number,
+        fg: FormGroup<IAppPurchaseItemControls> = this.newPurchaseItemRowFg,
+    ) {
         if (!this.units.has(productId)) {
             const unitsSignal = signal<IProductUnit[]>([]);
             this.units.set(productId, unitsSignal);
@@ -549,93 +531,74 @@ export class PurchasesForm extends BaseComponent {
                     fg.patchValue({ unitId: res[0]?.unitId });
                 },
             });
-            console.log('unitsSignal', unitsSignal);
             return unitsSignal;
-        } else {
-            return this.units.get(productId)!;
         }
+        return this.units.get(productId)!;
     }
 
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
+    // ── Table row management ──────────────────────────────────────────────────
 
     lastClickedTableRowIndex = signal<number | null>(null);
 
-    currentEditRowIndex = signal<number>(-1);
-
-    editPurchaseRow(rowIndex: number) {
-        this.lastClickedTableRowIndex.set(rowIndex + 1);
-        this.currentEditRowIndex.set(rowIndex);
-    }
-    isRowEditable(rowIndex: number) {
-        return this.currentEditRowIndex() === rowIndex;
-    }
     deltePurchaseRow(rowIndex: number) {
         this.fg.controls.items.removeAt(rowIndex);
-        this.currentEditRowIndex.set(-1);
+        this.updateNet();
     }
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
+
+    /** Strip leading zeros and cap to 2 decimal places on blur. */
+    normalizeAmount(control: AbstractControl) {
+        const num = parseFloat(String(control.value ?? 0));
+        if (isNaN(num) || num < 0) {
+            control.setValue(0, { emitEvent: false });
+            return;
+        }
+        control.setValue(parseFloat(num.toFixed(2)), { emitEvent: false });
+    }
+
+    // ── Item form group ───────────────────────────────────────────────────────
+
     newPurchaseItemRowFg!: FormGroup<IAppPurchaseItemControls>;
 
-    createItemFg(data?: IAppPurchaseItem) {
+    /**
+     * Total = (purchasePrice + taxAmount) × quantity.
+     * taxAmount is always directly editable — no percentage override.
+     */
+    calculateItemTotal(data?: Partial<IAppPurchaseItem>) {
+        const purchasePrice = data?.purchasePrice ?? 0;
+        const taxAmount = data?.taxAmount ?? 0;
+        const quantity = data?.quantity ?? 0;
+        const total = (purchasePrice + taxAmount) * quantity;
+        return { total };
+    }
+
+    createItemFg(data?: Partial<IAppPurchaseItem>) {
         const fg = this.fb.group<IAppPurchaseItemControls>({
             menuItemsId: this.fb.control<number | null>(data?.menuItemsId ?? null, [Validators.required]),
             unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
-            quantity: this.fb.control<number | null>(data?.quantity ?? null, [Validators.required, Validators.min(1)]),
+            quantity: this.fb.control<number | null>(data?.quantity ?? null, [
+                Validators.required,
+                Validators.min(0.01),
+            ]),
             purchasePrice: this.fb.control<number | null>(data?.purchasePrice ?? null, [
                 Validators.required,
-                Validators.min(1),
+                Validators.min(0.01),
             ]),
             salePrice: this.fb.control<number | null>(data?.salePrice ?? null, [
                 Validators.required,
-                Validators.min(1),
+                Validators.min(0),
             ]),
-            total: this.fb.control<number | null>(this.calculateItemTotal(data).total ?? null, []),
-            taxAmount: this.fb.control<number | null>(data?.taxAmount ?? null, [
+            total: this.fb.control<number | null>(this.calculateItemTotal(data).total, []),
+            taxAmount: this.fb.control<number | null>(data?.taxAmount ?? 0, [
                 Validators.required,
                 Validators.min(0),
             ]),
             taxPercentage: this.fb.control<number | null>(data?.taxPercentage ?? -1, []),
         });
+
         fg.valueChanges.subscribe({
             next: (values) => {
-                const { total, taxAmount } = this.calculateItemTotal(values);
-                fg.patchValue({ total, taxAmount }, { emitEvent: false });
-                //trigger main fg value changes listener
+                const { total } = this.calculateItemTotal(values);
+                fg.patchValue({ total }, { emitEvent: false });
                 this.fg.updateValueAndValidity();
                 this.updateNet();
             },
@@ -643,22 +606,9 @@ export class PurchasesForm extends BaseComponent {
         return fg;
     }
 
-    calculateItemTotal(data?: Partial<IAppPurchaseItem>) {
-        const taxPercentage = data?.taxPercentage === -1 ? 0 : (data?.taxPercentage ?? 0);
-        const applyTaxAmountDirectly = taxPercentage === 0;
-        const purchasePrice = data?.purchasePrice ?? 0;
-        const priceWithTax = applyTaxAmountDirectly
-            ? purchasePrice + (data?.taxAmount ?? 0)
-            : purchasePrice * (1 + taxPercentage / 100);
-        const quantity = data?.quantity ?? 0;
-        const taxAmount = priceWithTax - purchasePrice;
-        const total = priceWithTax * quantity;
-        return { total, taxAmount };
-    }
-
     setUpNewPurchaseDetailRowFg() {
         if (this.newPurchaseItemRowFg) {
-            this.newPurchaseItemRowFg.reset();
+            this.newPurchaseItemRowFg.reset({ taxAmount: 0, taxPercentage: -1 });
         } else {
             this.newPurchaseItemRowFg = this.createItemFg();
         }
@@ -667,157 +617,92 @@ export class PurchasesForm extends BaseComponent {
     addNewPurchaseItem() {
         if (this.newPurchaseItemRowFg.invalid) {
             this.newPurchaseItemRowFg.markAllAsTouched();
-            //log errors
-            Object.entries(this.newPurchaseItemRowFg.controls!).forEach(([key, value]) => {
-                if (value.errors) {
-                    console.log(key, value.errors);
-                }
-            });
             return;
         }
 
-        const _fgValue = this.newPurchaseItemRowFg.value;
-        const fgValue = { ..._fgValue };
+        const fgValue = { ...this.newPurchaseItemRowFg.value };
+        this.fg.controls.items.push(this.createItemFg(fgValue as IAppPurchaseItem));
 
-        this.fg.controls.items!.push(this.createItemFg(fgValue as IAppPurchaseItem));
-
-        const currentProduct = this.products().find((product) => product.id === fgValue.menuItemsId)!;
-
-        this.currentProducts.update((pre) => [
-            ...pre.filter((product) => product.id !== fgValue.menuItemsId),
-            currentProduct,
-        ]);
+        const currentProduct = this.products().find((p) => p.id === fgValue.menuItemsId);
+        if (currentProduct) {
+            this.currentProducts.update((pre) => [
+                ...pre.filter((p) => p.id !== fgValue.menuItemsId),
+                currentProduct,
+            ]);
+        }
 
         this.lastClickedTableRowIndex.set(this.fg.value.items!.length - 1);
         this.setUpNewPurchaseDetailRowFg();
     }
 
-    log(any: any = null) {
-        console.log('log', any);
-
-        console.log(this.fg.value);
-    }
-
     onItemChange(item: IProductSearchRow, fg: FormGroup<IAppPurchaseItemControls>) {
-        const purchasePrice = item.costPrice / (1 + item.tax / 100);
-        const { total, taxAmount } = this.calculateItemTotal({
-            quantity: 1,
-            salePrice: +item.priceWithTax,
-            purchasePrice: +purchasePrice,
-            taxAmount: +(item.costPrice - purchasePrice),
-            taxPercentage: item.tax,
-        });
+        const purchasePrice = item.costPrice > 0 ? item.costPrice / (1 + item.tax / 100) : 0;
+        const taxAmount = item.costPrice - purchasePrice;
+        const { total } = this.calculateItemTotal({ quantity: 1, purchasePrice, taxAmount });
         fg.patchValue({
             unitId: null,
             menuItemsId: item.id,
             quantity: 1,
             salePrice: +item.priceWithTax,
-            purchasePrice: +purchasePrice,
-            taxAmount,
+            purchasePrice: +purchasePrice.toFixed(2),
+            taxAmount: +taxAmount.toFixed(2),
             taxPercentage: item.tax,
-            total,
+            total: +total.toFixed(2),
         });
         this.getProductUnits(item.id, fg);
     }
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //Accounts / paid state
-    //
 
-    currentCashAccount = signal<{
-        id: number;
-        name: string;
-    } | null>(null);
-    currentNetworkAccount = signal<{
-        id: number;
-        name: string;
-    } | null>(null);
-
-    cashAccountSearchFg = this.fb.group({
-        searchTerm: this.fb.control('', [Validators.maxLength(100), noSymbolsAllowed, Validators.minLength(1)]),
-    });
-    networkAccountSearchFg = this.fb.group({
-        searchTerm: this.fb.control('', [Validators.maxLength(100), noSymbolsAllowed, Validators.minLength(1)]),
-    });
+    // ── Accounts / payment section ────────────────────────────────────────────
 
     financialAccountService = inject(FinancialAccountService);
+    fixedFinancialAccountService = inject(FixedFinancialAccountService);
 
     cashAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
     networkAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
 
-    displayedCashAccounts = computed(() => [...this.cashAccounts()]);
-    displayedNetworkAccounts = computed(() => [...this.networkAccounts()]);
+    /** Full account objects fetched from default-accounts settings (Create mode only). */
+    defaultCashAccount = signal<ITreeFinancialAccountSearchRow | null>(null);
+    defaultNetworkAccount = signal<ITreeFinancialAccountSearchRow | null>(null);
+
+    /**
+     * Always include the default account object at the head of the list so the
+     * ng-select dropdown can render its name even if it wasn't in the first page
+     * of the initial search.
+     */
+    displayedCashAccounts = computed(() => {
+        const list = this.cashAccounts();
+        const def = this.defaultCashAccount();
+        if (!def || list.some(a => a.id === def.id)) return list;
+        return [def, ...list];
+    });
+    displayedNetworkAccounts = computed(() => {
+        const list = this.networkAccounts();
+        const def = this.defaultNetworkAccount();
+        if (!def || list.some(a => a.id === def.id)) return list;
+        return [def, ...list];
+    });
+
+    cashAccountsSearchPaginationInfo: IPaginationInfo = { pageIndex: 1, totalRowsCount: 0, totalPagesCount: 0 };
+    networkAccountsSearchPaginationInfo: IPaginationInfo = { pageIndex: 1, totalRowsCount: 0, totalPagesCount: 0 };
+    previousCashAccountsSearchTerm = '';
+    previousNetworkAccountsSearchTerm = '';
 
     searchAccounts(data: { pageIndex: number; searchTerm?: string }) {
         return this.financialAccountService.search({
-            paginationInfo: {
-                pageIndex: data.pageIndex,
-                pageSize: 10,
-            },
+            paginationInfo: { pageIndex: data.pageIndex, pageSize: 10 },
             searchFilters: [
-                {
-                    column: FinancialAccountSearchEnum.Name,
-                    values: [data.searchTerm ?? ''],
-                },
+                { column: FinancialAccountSearchEnum.Name, values: [data.searchTerm ?? ''] },
             ],
             fromDate: null,
         });
-        // .subscribe({
-        //   next: (res) => {
-        //     if (res.value.rows.length > 0) {
-        //       this.previousAccountsSearchTerm = data.searchTerm ?? '';
-        //       if (data.pageIndex == 1) {
-        //         this.customers.set(res.value.rows);
-        //       } else {
-        //         this.customers.update((prev) => prev.concat(res.value.rows));
-        //       }
-        //       this.customersSearchPaginationInfo = {
-        //         pageIndex: data.pageIndex,
-        //         totalPagesCount: res.value.paginationInfo.totalPagesCount,
-        //         totalRowsCount: res.value.paginationInfo.totalRowsCount,
-        //       };
-        //     }
-        //   },
-        // });
     }
 
-    cashAccountsSearchPaginationInfo: IPaginationInfo = {
-        pageIndex: 1,
-        totalRowsCount: 0,
-        totalPagesCount: 0,
-    };
-    networkAccountsSearchPaginationInfo: IPaginationInfo = {
-        pageIndex: 1,
-        totalRowsCount: 0,
-        totalPagesCount: 0,
-    };
-
-    previousCashAccountsSearchTerm: string = '';
-    previousNetworkAccountsSearchTerm: string = '';
-
-    onCashFinancialAccountsSearch(
-        event: IDebounceEvent<{
-            term: string;
-        }>,
-    ) {
+    onCashFinancialAccountsSearch(event: IDebounceEvent<{ term: string }>) {
         let searchTerm = event?.value?.term ?? '';
-        let isNewSearchTerm = searchTerm != this.previousCashAccountsSearchTerm;
-        if (event.type === 'scrollToEnd') {
-            searchTerm = this.previousCashAccountsSearchTerm;
-        }
-        if (searchTerm && searchTerm.length > 100) return;
-        //
-        //
-        if (isNewSearchTerm) {
-            //refetch page 1
+        const isNew = searchTerm !== this.previousCashAccountsSearchTerm;
+        if (event.type === 'scrollToEnd') searchTerm = this.previousCashAccountsSearchTerm;
+        if (searchTerm.length > 100) return;
+        if (isNew) {
             this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
                 next: (res) => {
                     if (res.value.rows.length > 0) {
@@ -832,15 +717,13 @@ export class PurchasesForm extends BaseComponent {
                 },
             });
         } else {
-            //refetch next page
             this.searchAccounts({
                 pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1,
                 searchTerm,
             }).subscribe({
                 next: (res) => {
                     if (res.value.rows.length > 0) {
-                        this.previousCashAccountsSearchTerm = searchTerm;
-                        this.cashAccounts.update((prev) => prev.concat(res.value.rows));
+                        this.cashAccounts.update((p) => p.concat(res.value.rows));
                         this.cashAccountsSearchPaginationInfo = {
                             pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1,
                             totalPagesCount: res.value.paginationInfo.totalPagesCount,
@@ -852,21 +735,12 @@ export class PurchasesForm extends BaseComponent {
         }
     }
 
-    onNetworkFinancialAccountsSearch(
-        event: IDebounceEvent<{
-            term: string;
-        }>,
-    ) {
+    onNetworkFinancialAccountsSearch(event: IDebounceEvent<{ term: string }>) {
         let searchTerm = event?.value?.term ?? '';
-        let isNewSearchTerm = searchTerm != this.previousNetworkAccountsSearchTerm;
-        if (event.type === 'scrollToEnd') {
-            searchTerm = this.previousNetworkAccountsSearchTerm;
-        }
-        if (searchTerm && searchTerm.length > 100) return;
-        //
-        //
-        if (isNewSearchTerm) {
-            //refetch page 1
+        const isNew = searchTerm !== this.previousNetworkAccountsSearchTerm;
+        if (event.type === 'scrollToEnd') searchTerm = this.previousNetworkAccountsSearchTerm;
+        if (searchTerm.length > 100) return;
+        if (isNew) {
             this.searchAccounts({ pageIndex: 1, searchTerm }).subscribe({
                 next: (res) => {
                     if (res.value.rows.length > 0) {
@@ -881,15 +755,13 @@ export class PurchasesForm extends BaseComponent {
                 },
             });
         } else {
-            //refetch next page
             this.searchAccounts({
                 pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
                 searchTerm,
             }).subscribe({
                 next: (res) => {
                     if (res.value.rows.length > 0) {
-                        this.previousNetworkAccountsSearchTerm = searchTerm;
-                        this.networkAccounts.update((prev) => prev.concat(res.value.rows));
+                        this.networkAccounts.update((p) => p.concat(res.value.rows));
                         this.networkAccountsSearchPaginationInfo = {
                             pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
                             totalPagesCount: res.value.paginationInfo.totalPagesCount,
@@ -900,37 +772,243 @@ export class PurchasesForm extends BaseComponent {
             });
         }
     }
-       onResetForm() {
-    if(this.formMode() === FormMode.Create){
-      this.fg.reset();
-    }else{
-      this.router.navigateByUrl('/storage/purchases/add');
-    }
-  }
-   deletePurchase(id: number, event: Event) {
-    this.confirmationService.confirm({
-      target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف فاتورة الشراء',
-      header: 'حذف فاتورة الشراء',
-      icon: 'pi pi-info-circle',
-      rejectLabel: 'الغاء',
-      rejectButtonProps: {
-        label: 'الغاء',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'حذف',
-        severity: 'danger',
-      },
-      accept: () => {
-        this.purchaseService.delete(id).subscribe({
-          next: () => {
-            this.router.navigateByUrl('/storage/purchases/add');
-          },
+
+    // ── Default accounts (Settings → Default Accounts) ───────────────────────
+
+    /**
+     * Fetches the global default accounts and pre-fills cashAccountId /
+     * networkAccountId on a NEW purchase invoice.
+     * Edit mode is intentionally skipped — saved values must not be overwritten.
+     */
+    private _loadDefaultAccounts() {
+        this.fixedFinancialAccountService.getAll().subscribe({
+            next: (res) => {
+                const cashRow    = res.rows.find(r => r.refId === FixedFinancialAccountRefId.CashPayment);
+                const networkRow = res.rows.find(r => r.refId === FixedFinancialAccountRefId.NetworkPayment);
+
+                const fetchAndStore = (
+                    accountId: number,
+                    setter: (acc: ITreeFinancialAccountSearchRow) => void,
+                ) => {
+                    this.financialAccountService.search({
+                        paginationInfo: { pageIndex: 1, pageSize: 1 },
+                        searchFilters: [{ column: FinancialAccountSearchEnum.Id, values: [accountId.toString()] }],
+                        fromDate: null,
+                    }).subscribe({
+                        next: (r) => {
+                            const acc = r.value.rows[0];
+                            if (acc) {
+                                setter(acc);
+                                this._applyDefaultAccountsToForm();
+                            }
+                        },
+                    });
+                };
+
+                if (cashRow && cashRow.refFinancalId > 0) {
+                    fetchAndStore(cashRow.refFinancalId, acc => this.defaultCashAccount.set(acc));
+                }
+                if (networkRow && networkRow.refFinancalId > 0) {
+                    fetchAndStore(networkRow.refFinancalId, acc => this.defaultNetworkAccount.set(acc));
+                }
+            },
         });
-      },
-      
-    });
-  }
+    }
+
+    /**
+     * Patches cashAccountId / networkAccountId with the loaded defaults.
+     * Only runs in Create mode and only when the control is currently empty
+     * (preserves manual user overrides).
+     */
+    private _applyDefaultAccountsToForm() {
+        if (this.formMode() !== FormMode.Create) return;
+        const cashAcc    = this.defaultCashAccount();
+        const networkAcc = this.defaultNetworkAccount();
+        if (cashAcc    && !this.fg.controls.cashAccountId.value)    { this.fg.controls.cashAccountId.setValue(cashAcc.id); }
+        if (networkAcc && !this.fg.controls.networkAccountId.value) { this.fg.controls.networkAccountId.setValue(networkAcc.id); }
+    }
+
+    // ── Form reset / new invoice ──────────────────────────────────────────────
+
+    onResetForm() {
+        if (this.formMode() === FormMode.Create) {
+            this.fg.reset({ invoiceDate: new Date(), paymentType: OrderPaymentType.Paid });
+            this.fg.setControl('items', this.fb.array<FormGroup<IAppPurchaseItemControls>>([]));
+            this.currentSupplier.set(null);
+            this.currentPurchase.set(null);
+            this.net.set(0);
+            this.setUpNewPurchaseDetailRowFg();
+        } else {
+            this.router.navigateByUrl('/storage/purchases/add');
+        }
+    }
+
+    // ── Print Purchase Invoice (A4 / browser print dialog) ───────────────────
+
+    a4PrintService = inject(A4PrintService);
+
+    printPurchaseInvoice() {
+        const invoice = this.currentPurchase();
+        if (!invoice) return;
+
+        const fmt = (dateStr: string) => {
+            const d = new Date(dateStr);
+            return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+        };
+        const money = (v: number) => (+v || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        const paymentLabel = invoice.paymentType === 1 ? 'مدفوع' : 'معلق';
+
+        const itemRows = invoice.items.map((item, i) => `
+          <tr>
+            <td class="num">${i + 1}</td>
+            <td>${item.menuItemName ?? '-'}</td>
+            <td class="num">${item.unitName ?? '-'}</td>
+            <td class="num">${item.quantity}</td>
+            <td class="num">${money(item.purchasePrice)}</td>
+            <td class="num">${money(item.taxAmount)}</td>
+            <td class="num">${money(item.lineTotal)}</td>
+          </tr>`).join('');
+
+        const paymentRows = invoice.paymentType === 1 ? `
+          <div class="total-item">
+            <span class="total-label">نقدي</span>
+            <span class="total-value">${money(invoice.cashAmount)}</span>
+          </div>
+          <div class="total-item">
+            <span class="total-label">شبكة</span>
+            <span class="total-value">${money(invoice.networkAmount)}</span>
+          </div>` : '';
+
+        const html = `
+          <div class="doc-header">
+            <div class="doc-logo">🛒</div>
+            <div class="doc-company">
+              <div class="doc-company-name">Rest House</div>
+              <div class="doc-company-sub">نظام إدارة المطاعم والحسابات</div>
+            </div>
+            <div class="doc-title-box">فاتورة شراء</div>
+          </div>
+
+          <div class="meta-grid">
+            <div class="meta-field">
+              <span class="meta-label">رقم الفاتورة:</span>
+              <span class="meta-value">${invoice.invoiceNumber ?? '-'}</span>
+            </div>
+            <div class="meta-field">
+              <span class="meta-label">التاريخ:</span>
+              <span class="meta-value">${fmt(invoice.invoiceDate)}</span>
+            </div>
+            <div class="meta-field">
+              <span class="meta-label">نوع الدفع:</span>
+              <span class="meta-value">${paymentLabel}</span>
+            </div>
+            <div class="meta-field">
+              <span class="meta-label">الرقم الدفتري:</span>
+              <span class="meta-value">${invoice.referenceNumber ?? '-'}</span>
+            </div>
+            <div class="meta-field">
+              <span class="meta-label">المورد:</span>
+              <span class="meta-value">${invoice.supplierName ?? '-'}</span>
+            </div>
+            <div class="meta-field">
+              <span class="meta-label">رقم الجوال:</span>
+              <span class="meta-value">${invoice.supplierPhoneNumber ?? '-'}</span>
+            </div>
+            <div class="meta-field">
+              <span class="meta-label">الرقم الضريبي:</span>
+              <span class="meta-value">${invoice.supplierTaxNumber ?? '-'}</span>
+            </div>
+          </div>
+
+          ${invoice.statement ? `
+          <div class="statement-banner mb-2">
+            <span class="meta-label">البيان: </span>
+            <span>${invoice.statement}</span>
+          </div>` : ''}
+
+          <table class="lines-table">
+            <thead>
+              <tr>
+                <th style="width:4%">#</th>
+                <th style="width:30%">المنتج</th>
+                <th style="width:10%">الوحدة</th>
+                <th style="width:10%">الكمية</th>
+                <th style="width:14%">سعر الشراء</th>
+                <th style="width:12%">الضريبة</th>
+                <th style="width:20%">الإجمالي</th>
+              </tr>
+            </thead>
+            <tbody>${itemRows}</tbody>
+            <tfoot>
+              <tr>
+                <td colspan="5" class="bold">الإجمالي</td>
+                <td class="num bold">${money(invoice.taxAmount)}</td>
+                <td class="num bold">${money(invoice.totalAmount)}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <div class="totals-box">
+            <div class="total-item">
+              <span class="total-label">المبلغ قبل الضريبة</span>
+              <span class="total-value">${money(invoice.subTotal)}</span>
+            </div>
+            <div class="total-item">
+              <span class="total-label">إجمالي الضريبة</span>
+              <span class="total-value">${money(invoice.taxAmount)}</span>
+            </div>
+            <div class="total-item">
+              <span class="total-label">الإجمالي الكلي</span>
+              <span class="total-value">${money(invoice.totalAmount)}</span>
+            </div>
+            ${paymentRows}
+          </div>
+
+          <div class="sig-footer">
+            <div class="sig-row">
+              <div class="sig-box">
+                <span class="sig-title">المستلم</span>
+                <div class="sig-line"></div>
+                <span class="sig-name">التوقيع / الاسم</span>
+              </div>
+              <div class="sig-box">
+                <span class="sig-title">المورد</span>
+                <div class="sig-line"></div>
+                <span class="sig-name">التوقيع / الختم</span>
+              </div>
+              <div class="sig-box">
+                <span class="sig-title">المحاسب</span>
+                <div class="sig-line"></div>
+                <span class="sig-name">التوقيع / الاسم</span>
+              </div>
+              <div class="sig-box">
+                <span class="sig-title">اعتماد الإدارة</span>
+                <div class="sig-line"></div>
+                <span class="sig-name">التوقيع / الختم</span>
+              </div>
+            </div>
+          </div>`;
+
+        this.a4PrintService.print(html);
+    }
+
+    // ── Delete invoice ────────────────────────────────────────────────────────
+
+    deletePurchase(id: number, event: Event) {
+        this.confirmationService.confirm({
+            target: event.target as EventTarget,
+            message: 'هل أنت متأكد من حذف فاتورة الشراء؟',
+            header: 'حذف فاتورة الشراء',
+            icon: 'pi pi-info-circle',
+            rejectLabel: 'إلغاء',
+            rejectButtonProps: { label: 'إلغاء', severity: 'secondary', outlined: true },
+            acceptButtonProps: { label: 'حذف', severity: 'danger' },
+            accept: () => {
+                this.purchaseService.delete(id).subscribe({
+                    next: () => { this.router.navigateByUrl('/storage/purchases/add'); },
+                });
+            },
+        });
+    }
 }

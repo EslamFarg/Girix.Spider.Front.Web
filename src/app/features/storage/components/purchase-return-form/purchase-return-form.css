@@ -1,0 +1,176 @@
+/* ─── TOP AREA: three equal columns ──────────────────────────────────────── */
+/*
+  direction: rtl is set EXPLICITLY here so the column order is guaranteed
+  regardless of Tailwind preflight or parent overrides.
+  In RTL:  column-1 (HTML 1st) = visual RIGHT  → العمليات والمالية
+           column-2 (HTML 2nd) = visual CENTER  → بيانات المورد
+           column-3 (HTML 3rd) = visual LEFT    → بيانات المرتجع
+*/
+.pr-top-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  direction: rtl;
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* Restore RTL on each panel so inner content is unaffected */
+.pr-top-area > .pi-panel {
+  direction: rtl;
+}
+
+/*
+  Visual order (direction: rtl → order:1 = RIGHT, order:3 = LEFT):
+    RIGHT  → بيانات المرتجع  (order 1)
+    CENTER → بيانات المورد   (order 2)
+    LEFT   → العمليات والمالية (order 3)
+*/
+.pr-block-invoice    { order: 1; }
+.pr-block-supplier   { order: 2; }
+.pr-block-operations { order: 3; }
+
+@media (max-width: 900px) {
+  .pr-top-area {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── ERP Panel component ──────────────────────────────────────────────────── */
+
+.pi-panel {
+  border: 1px solid var(--p-content-border-color, #e2e8f0);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pi-panel-header {
+  background-color: var(--color-dark-bg-2);
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.pi-panel-body {
+  padding: 6px 8px;
+}
+
+/* ─── Items grid: fills all remaining height (flex-1 + min-h-0 via TW) ────── */
+
+.pr-grid-wrapper {
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 220px;
+  border-radius: 6px;
+}
+
+/* ─── Dark sticky header ─────────────────────────────────────────────────── */
+
+.pr-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background-color: var(--color-dark-bg-2);
+}
+
+/* ─── Column header: label stacked above running total ──────────────────── */
+
+.pr-col-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.pr-col-total {
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Read-only cell display ─────────────────────────────────────────────── */
+
+.pr-cell-text {
+  padding: 2px 4px;
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Column widths ─────────────────────────────────────────────────────────
+   col1  # = 3%                Total = 100%
+   col2  المنتج = 18%
+   col3  الوحدة = 8%
+   col4  الكمية = 7%
+   col5  الكمية المرتجعة = 9%
+   col6  سعر الشراء = 11%
+   col7  سعر البيع = 11%
+   col8  الضريبة = 9%
+   col9  المجموع = 18%
+   col10 الأدوات = 6%
+   ────────────────────────────────────────────────────────────────────────── */
+
+.pr-table th:nth-child(1),
+.pr-table td:nth-child(1) {
+  width: 3%;
+  min-width: 28px;
+}
+
+.pr-table th:nth-child(2),
+.pr-table td:nth-child(2) {
+  width: 18%;
+  min-width: 100px;
+}
+
+.pr-table th:nth-child(3),
+.pr-table td:nth-child(3) {
+  width: 8%;
+  min-width: 60px;
+}
+
+.pr-table th:nth-child(4),
+.pr-table td:nth-child(4) {
+  width: 7%;
+  min-width: 54px;
+}
+
+.pr-table th:nth-child(5),
+.pr-table td:nth-child(5) {
+  width: 9%;
+  min-width: 70px;
+}
+
+.pr-table th:nth-child(6),
+.pr-table td:nth-child(6) {
+  width: 11%;
+  min-width: 72px;
+}
+
+.pr-table th:nth-child(7),
+.pr-table td:nth-child(7) {
+  width: 11%;
+  min-width: 72px;
+}
+
+.pr-table th:nth-child(8),
+.pr-table td:nth-child(8) {
+  width: 9%;
+  min-width: 64px;
+}
+
+.pr-table th:nth-child(9),
+.pr-table td:nth-child(9) {
+  width: 18%;
+  min-width: 80px;
+}
+
+.pr-table th:nth-child(10),
+.pr-table td:nth-child(10) {
+  width: 6%;
+  min-width: 44px;
+}
