@@ -297,10 +297,7 @@ export class All extends BaseComponent {
     super();
     this.financialSettingsService.getSettings().subscribe((res) => this.financialSettings.set(res));
     this.searchOrders(1);
-    this.searchHuts(1);
-    this.searchRooms(1);
-    this.searchTables(1);
-    this.searchDeliveries(1);
+    this.updatePlace();
     this.searchAccounts({
       pageIndex: 1,
       searchTerm: '',
@@ -353,12 +350,16 @@ export class All extends BaseComponent {
       const lastId = this.collectionsService.lastCollectedId();
       if (lastId != null) {
         this.searchOrders(1);
-        this.searchHuts(1);
-        this.searchRooms(1);
-        this.searchTables(1);
-        this.searchDeliveries(1);
+        this.updatePlace();
       }
     });
+  }
+
+  updatePlace(){
+    this.searchHuts(1);
+    this.searchRooms(1);
+    this.searchTables(1);
+    this.searchDeliveries(false);
   }
 
   periodOptions = [
@@ -659,6 +660,7 @@ export class All extends BaseComponent {
         }
       },
     });
+    this.updatePlace();
   }
 
   //#endregion
@@ -1340,7 +1342,7 @@ export class All extends BaseComponent {
       orderType: isCompany ? OrderLocationType.CompanyDelivery : OrderLocationType.PersonDelivery,
       deliveryId: null,
     });
-    this.searchDeliveries(1, isCompany);
+    this.searchDeliveries( isCompany);
   }
 
   deliveryPaginationInfo: {
@@ -1352,13 +1354,13 @@ export class All extends BaseComponent {
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
-  searchDeliveries(pageIndex: number, isCompany: boolean = false) {
+  searchDeliveries(isCompany: boolean = false) {
     if (isCompany) {
       this.customersService
         .search({
           paginationInfo: {
-            pageIndex: pageIndex,
-            pageSize: 20,
+            pageIndex: 0,
+            pageSize: 0,
           },
           searchFilters: [
             {
@@ -1371,17 +1373,10 @@ export class All extends BaseComponent {
         .subscribe({
           next: (res) => {
             if (res.value.rows.length > 0) {
-              if (pageIndex == 1) {
                 this.companyDeliveries.set(res.value.rows);
-              } else {
-                this.companyDeliveries.update((prev) => prev.concat(res.value.rows));
-              }
 
-              this.deliveryPaginationInfo = {
-                pageIndex,
-                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-              };
+
+
             }
           },
         });
@@ -1389,8 +1384,8 @@ export class All extends BaseComponent {
       this.deliveryService
         .search({
           paginationInfo: {
-            pageIndex: pageIndex,
-            pageSize: 20,
+            pageIndex: 0,
+            pageSize: 0,
           },
           searchFilters: [
             {
@@ -1403,27 +1398,20 @@ export class All extends BaseComponent {
         .subscribe({
           next: (res) => {
             if (res.value.rows.length > 0) {
-              if (pageIndex == 1) {
                 this.deliveries.set(res.value.rows);
-              } else {
-                this.deliveries.update((prev) => prev.concat(res.value.rows));
-              }
-              this.deliveryPaginationInfo = {
-                pageIndex,
-                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-              };
+
+
             }
           },
         });
     }
   }
-  onDeliveriesScroll(event: Event, deliveriesScroller: HTMLElement) {
-    // if at bottom
-    if (deliveriesScroller.scrollTop + deliveriesScroller.clientHeight >= deliveriesScroller.scrollHeight - 1) {
-      this.searchDeliveries(this.deliveryPaginationInfo.pageIndex + 1);
-    }
-  }
+  // onDeliveriesScroll(event: Event, deliveriesScroller: HTMLElement) {
+  //   // if at bottom
+  //   if (deliveriesScroller.scrollTop + deliveriesScroller.clientHeight >= deliveriesScroller.scrollHeight - 1) {
+  //     this.searchDeliveries(this.deliveryPaginationInfo.pageIndex + 1);
+  //   }
+  // }
   onDeliverySelected(deliveryId: number) {
     // if (delivery.isAvailable) {
     this.transferanceFg.patchValue({ deliveryId });
