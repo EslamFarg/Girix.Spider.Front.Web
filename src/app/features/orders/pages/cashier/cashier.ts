@@ -44,6 +44,7 @@ import { CustomerSearchEnum, CustomerService } from '@/features/customers/servic
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { PrinterService, IPrintJob, AppPrinterType } from '@/features/printers';
 import { PrinterSettingsService } from '@/features/printers/services/printer-settings-service';
+import { PrintOptions } from '@/features/printers/components/print-options/print-options';
 import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
 import {
     FinancialSettingsService,
@@ -75,7 +76,7 @@ import { ChosenLocalPlace } from '@/components/local-place-select/local-place-se
 import { DialogType } from '@/features/dialogs/enums';
 import { ControlsOf, NullablePropsOf } from '@/yn-ng/types/helpers';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { PrintOptions } from '@/features/printers/components/print-options/print-options';
+import { RestaurantInfoService } from '@/features/settings/services/restaurant-info-service';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -163,7 +164,8 @@ export class Cashier extends BaseComponent implements OnInit {
     // Print dialog
     printService = inject(PrinterService);
     printerSettingsService = inject(PrinterSettingsService);
-    printDialogVisible = false;
+    restaurantInfoService = inject(RestaurantInfoService);
+    restaurantName = signal<string>('فاتورة كاشير');
     // printBill = signal<IOrderBillReadResponse | null>(null);
     printableOrderInvoice = viewChild<PrintableOrderInvoice>('printableOrderInvoice');
 
@@ -285,7 +287,14 @@ export class Cashier extends BaseComponent implements OnInit {
             },
         });
         // this.searchAdditions(1);
-        this.searchCustomers({ pageIndex: 1, searchTerm: '' });
+        this.restaurantInfoService.getSettings().subscribe({
+            next: (res) => {
+                this.restaurantName.set(res.nameAr ?? 'فاتورة كاشير');
+            },
+            error: () => {
+                this.restaurantName.set('فاتورة كاشير');
+            }
+        });
 
         this.orderTypeControl?.valueChanges.subscribe((orderType) => {
             const { placeRefId, deliveryId, paymentType } = this.orderFg.controls;
@@ -582,7 +591,8 @@ export class Cashier extends BaseComponent implements OnInit {
         this.currentDelivery.set(null);
         this.currentCompanyDelivery.set(null);
         this.amountReceived.set(0);
-        this.printService.selectedPrinters.set([]);
+        // Keep selected printers so they persist across orders
+        // this.printService.selectedPrinters.set([]);
         this.setSelectedCustomer(this.cashCustomer);
         this.orderFg.patchValue({
             placeRefId: null,
@@ -608,6 +618,14 @@ export class Cashier extends BaseComponent implements OnInit {
         }
 
         this.patchCustomerFg(selectedCustomer);
+
+        // Auto-select first cash account for non-cash customers if no account selected yet
+        if (!isCashCustomer && !this.orderFg.controls.cashAccountId.value) {
+            const firstCashAccount = this.cashAccounts()[0];
+            if (firstCashAccount) {
+                this.orderFg.patchValue({ cashAccountId: firstCashAccount.id }, { emitEvent: false });
+            }
+        }
     }
 
     requireCustomer(isRequired: boolean) {
@@ -827,11 +845,11 @@ export class Cashier extends BaseComponent implements OnInit {
                         ipAddressOrMacAddress: group.printer.ipAddressOrMacAddress,
                         port: group.printer.port,
                         type: group.printer.type,
-                        comPort: (group.printer as any).comPort ?? 0,
+                        comPort: (group.printer as any).comPort,
                         appPrinterType: AppPrinterType.programPrinter,
                     },
-                    html: this.receiptTemplateService.generateKitchenReceiptHtml(bill, group.items, group.name).html,
-                    css: this.receiptTemplateService.generateKitchenReceiptHtml(bill, group.items, group.name).css,
+                    html: this.receiptTemplateService.generateKitchenReceiptHtml(bill, group.items, group.name, this.restaurantName()).html,
+                    css: this.receiptTemplateService.generateKitchenReceiptHtml(bill, group.items, group.name, this.restaurantName()).css,
                 });
             }
         }
@@ -846,11 +864,11 @@ export class Cashier extends BaseComponent implements OnInit {
                     ipAddressOrMacAddress: settings.captionOrderPrinter.ipAddressOrMacAddress,
                     port: settings.captionOrderPrinter.port,
                     type: settings.captionOrderPrinter.type,
-                    comPort: settings.captionOrderPrinter.comPort ?? 0,
+                    comPort: settings.captionOrderPrinter.comPort,
                     appPrinterType: AppPrinterType.captionOrderPrinter,
                 },
-                html: this.receiptTemplateService.generateCaptainReceiptHtml(bill, bill.items).html,
-                css: this.receiptTemplateService.generateCaptainReceiptHtml(bill, bill.items).css,
+                html: this.receiptTemplateService.generateCaptainReceiptHtml(bill, bill.items, this.restaurantName()).html,
+                css: this.receiptTemplateService.generateCaptainReceiptHtml(bill, bill.items, this.restaurantName()).css,
             });
         }
 
@@ -864,11 +882,11 @@ export class Cashier extends BaseComponent implements OnInit {
                     ipAddressOrMacAddress: settings.cashierPrinter.ipAddressOrMacAddress,
                     port: settings.cashierPrinter.port,
                     type: settings.cashierPrinter.type,
-                    comPort: settings.cashierPrinter.comPort ?? 0,
+                    comPort: settings.cashierPrinter.comPort,
                     appPrinterType: AppPrinterType.cashierPrinter,
                 },
-                html: this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items).html,
-                css: this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items).css,
+                html: this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items, this.restaurantName()).html,
+                css: this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items, this.restaurantName()).css,
             });
         }
 

@@ -98,10 +98,12 @@ export class GroupForm extends BaseComponent implements OnInit {
                             nameAr: group.name,
                             nameEn: group.name,
                         });
-                        this.currentImage.set({
-                            ...group.attachment[0],
-                            fullPath: this.baseUrl + group.attachment[0].fullPath,
-                        });
+                        if (group.attachment.length > 0) {
+                            this.currentImage.set({
+                                ...group.attachment[0],
+                                fullPath: this.baseUrl + group.attachment[0]?.fullPath,
+                            });
+                        }
                         this.currentPrinter.set({
                             id: group.printerId,
                             name: group.printerName,

@@ -16,7 +16,7 @@ export interface IPrintOptionItem {
     ipAddressOrMacAddress: string;
     port: number;
     appPrinterType: AppPrinterType;
-    comPort?: number;
+    comPort?: string | number | null;
     isKitchenGroup?: boolean; // true if this is a specific kitchen printer group
 }
 
@@ -71,7 +71,7 @@ export class PrintOptions extends BaseComponent {
                 ipAddressOrMacAddress: settings.programPrinter.ipAddressOrMacAddress,
                 port: settings.programPrinter.port,
                 appPrinterType: AppPrinterType.programPrinter,
-                comPort: settings.programPrinter.comPort ?? 0,
+                comPort: settings.programPrinter.comPort,
             });
         }
 
@@ -83,7 +83,7 @@ export class PrintOptions extends BaseComponent {
                 ipAddressOrMacAddress: settings.captionOrderPrinter.ipAddressOrMacAddress,
                 port: settings.captionOrderPrinter.port,
                 appPrinterType: AppPrinterType.captionOrderPrinter,
-                comPort: settings.captionOrderPrinter.comPort ?? 0,
+                comPort: settings.captionOrderPrinter.comPort,
             });
         }
 
@@ -95,7 +95,7 @@ export class PrintOptions extends BaseComponent {
                 ipAddressOrMacAddress: settings.cashierPrinter.ipAddressOrMacAddress,
                 port: settings.cashierPrinter.port,
                 appPrinterType: AppPrinterType.cashierPrinter,
-                comPort: settings.cashierPrinter.comPort ?? 0,
+                comPort: settings.cashierPrinter.comPort,
             });
         }
 
@@ -129,7 +129,7 @@ export class PrintOptions extends BaseComponent {
                         ipAddressOrMacAddress: job.printer.ipAddressOrMacAddress,
                         port: job.printer.port,
                         appPrinterType: AppPrinterType.programPrinter,
-                        comPort: (job.printer as any).comPort ?? 0,
+                        comPort: (job.printer as any).comPort,
                         isKitchenGroup: true,
                     });
                 }
@@ -144,7 +144,7 @@ export class PrintOptions extends BaseComponent {
                     ipAddressOrMacAddress: settings.programPrinter?.ipAddressOrMacAddress ?? kitchenJobs[0]!.printer.ipAddressOrMacAddress,
                     port: settings.programPrinter?.port ?? kitchenJobs[0]!.printer.port,
                     appPrinterType: AppPrinterType.programPrinter,
-                    comPort: settings.programPrinter?.comPort ?? 0,
+                    comPort: settings.programPrinter?.comPort,
                 });
             }
         }
@@ -160,7 +160,7 @@ export class PrintOptions extends BaseComponent {
                     ipAddressOrMacAddress: settings.captionOrderPrinter.ipAddressOrMacAddress,
                     port: settings.captionOrderPrinter.port,
                     appPrinterType: AppPrinterType.captionOrderPrinter,
-                    comPort: settings.captionOrderPrinter.comPort ?? 0,
+                    comPort: settings.captionOrderPrinter.comPort,
                 });
             }
         }
@@ -176,7 +176,7 @@ export class PrintOptions extends BaseComponent {
                     ipAddressOrMacAddress: settings.cashierPrinter.ipAddressOrMacAddress,
                     port: settings.cashierPrinter.port,
                     appPrinterType: AppPrinterType.cashierPrinter,
-                    comPort: settings.cashierPrinter.comPort ?? 0,
+                    comPort: settings.cashierPrinter.comPort,
                 });
             }
         }

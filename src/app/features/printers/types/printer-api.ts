@@ -2,7 +2,7 @@ export interface IPrinterCreateRequest {
   name: string;
   ipAddressOrMacAddress: string;
   port: number;
-  comPort: number;
+  comPort: string | number | null;
   type: number;
 }
 
@@ -10,7 +10,7 @@ export interface IPrinterUpdateRequest {
   id: number;
   name: string;
   ipAddressOrMacAddress: string;
-  comPort: number;
+  comPort: string | number | null;
   port: number;
   type: number;
 }
@@ -24,7 +24,7 @@ export interface IPrinterReadResponse {
   id: number;
   name: string;
   ipAddressOrMacAddress: string;
-  comPort: number;
+  comPort: string | number | null;
   port: number;
   type: PrinterType;
 }
@@ -35,7 +35,7 @@ export interface IPrinterSearchRow {
   id: number;
   name: string;
   ipAddressOrMacAddress: string;
-  comPort: number;
+  comPort: string | number | null;
   port: number;
   type: number;
 }

@@ -504,7 +504,7 @@
                 </tr>
 
                 <!-- ── Saved rows — inline editable, delete only ──────────────────── -->
-                @for (item of fg.controls.items.controls; track $index) {
+                @for (item of fg.controls.items.controls; track ((item?.value?.menuItemsId ?? '')+'') + item?.value?.unitId) {
                     <tr
                         [class.last-clicked-table-row]="lastClickedTableRowIndex() === $index"
                         (click)="lastClickedTableRowIndex.set($index)"

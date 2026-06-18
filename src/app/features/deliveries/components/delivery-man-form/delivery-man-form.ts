@@ -162,9 +162,9 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
                 if (this.currentImage()?.file) {
                     formData.delete('images');
                     formData.append('imagesAdd', this.currentImage()!.file!);
-                    this.currentDelivery()!.attachment.forEach((image) => {
-                        formData.append('listIdsOfDeleteImages', image.id.toString());
-                    });
+                    // this.currentDelivery()!.attachment.forEach((image) => {
+                    //     formData.append('listIdsOfDeleteImages', image.id.toString());
+                    // });
                 }
                 this.deliveryService.put(formData).subscribe({
                     next: () => {
@@ -226,5 +226,8 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
     }
     onDeleteImage() {
         this.currentImage.set(null);
+        this.deliveryFg.patchValue({
+            ListIdsOfDeleteImages: [this.currentImage()?.id],
+        });
     }
 }
