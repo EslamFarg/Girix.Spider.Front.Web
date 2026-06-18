@@ -69,14 +69,14 @@ export class SupplierForm extends BaseComponent implements OnInit {
         postalCode: this.fb.control(null, [onlyNumbersAllowed]),
         commercialRegister: this.fb.control(null, [
             onlyNumbersAllowed,
-            // Validators.minLength(10),
+            Validators.minLength(10),
             Validators.maxLength(10),
         ]),
         taxNumber: this.fb.control(null, [
-            // Validators.minLength(15),
+            Validators.minLength(15),
             Validators.maxLength(15),
             onlyNumbersAllowed,
-            // Validators.pattern(/^3.*3$/),
+            Validators.pattern(/^3.*3$/),
         ]),
         numberOfFloor: this.fb.control(null, [onlyNumbersAllowed]),
         isCompany: this.fb.control(false, []),

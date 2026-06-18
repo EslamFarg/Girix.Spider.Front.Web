@@ -18,4 +18,5 @@ export interface ICustomerFgControls {
   numberOfFloor: FormControl<number | null>
   isCompany: FormControl<boolean | null>
   consumeInventory: FormControl<boolean | null>
+  customerCode: FormControl<number | null>
 }

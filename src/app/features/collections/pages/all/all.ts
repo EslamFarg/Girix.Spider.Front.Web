@@ -182,16 +182,20 @@ export class All extends BaseComponent {
   }
 
   printOrder() {
+    console.log('[DEBUG printOrder] called');
     const bill = this.currentOrderBill();
+    console.log('[DEBUG printOrder] bill:', bill ? 'set' : 'null');
     if (!bill) return;
 
     this.printerSettingsService.getSettings().subscribe({
       next: (settings) => {
+        console.log('[DEBUG printOrder] settings:', settings);
         const jobs: IPrintJob[] = [];
 
         // Kitchen (programPrinter)
         if (settings.programPrinter?.id) {
           const kitchenGroups = this.groupItemsByCategory(bill, settings.programPrinter);
+          console.log('[DEBUG printOrder] kitchenGroups:', kitchenGroups.size);
           for (const [, group] of kitchenGroups) {
             jobs.push({
               printer: {
@@ -243,7 +247,11 @@ export class All extends BaseComponent {
           });
         }
 
+        console.log('[DEBUG printOrder] jobs built:', jobs.length);
+        jobs.forEach((j, i) => console.log(`  Job ${i}:`, j.printer.name, 'type:', j.printer.appPrinterType, 'id:', j.printer.id));
+
         if (jobs.length === 0) {
+          console.log('[DEBUG printOrder] no jobs, fallback print');
           this.printService.printNow([{
             printer: { id: 0, name: 'Default', ipAddressOrMacAddress: '', port: 0, type: 0, comPort: 0, appPrinterType: AppPrinterType.cashierPrinter },
             html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
@@ -252,9 +260,11 @@ export class All extends BaseComponent {
           return;
         }
 
+        console.log('[DEBUG printOrder] opening printer dialog');
         this.printService.openPrinterDialogWithJobs(jobs);
       },
-      error: () => {
+      error: (err) => {
+        console.log('[DEBUG printOrder] getSettings error:', err);
         this.printService.printNow([{
           printer: { id: 0, name: 'Default', ipAddressOrMacAddress: '', port: 0, type: 0, comPort: 0, appPrinterType: AppPrinterType.cashierPrinter },
           html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',

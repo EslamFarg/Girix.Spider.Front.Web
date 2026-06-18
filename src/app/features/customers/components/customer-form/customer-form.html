@@ -65,6 +65,19 @@
         </app-input-error-message-handler>
     </div>
     <div class="md:col-span-2">
+        <label for="customerCode">كود العميل</label>
+        <app-input-error-message-handler [fc]="customerFg.get('customerCode')">
+            <input
+                pInputText
+                id="customerCode"
+                appAllowNumbers
+                formControlName="customerCode"
+                aria-describedby="customerCode-help"
+                placeholder="كود العميل"
+            />
+        </app-input-error-message-handler>
+    </div>
+    <div class="md:col-span-2">
         <label for="additional-phoneNumber">{{ 'FORM.SECONDARY_PHONE_NUMBER' | translate }}</label>
         <app-input-error-message-handler [fc]="customerFg.get('secondaryMobileNumber')">
             <input
