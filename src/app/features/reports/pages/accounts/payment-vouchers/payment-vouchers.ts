@@ -1,23 +1,23 @@
-import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Paginator, PaginatorState } from 'primeng/paginator';
+import { PaginatorState } from 'primeng/paginator';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { TooltipModule } from 'primeng/tooltip';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { ReportPrintView, IReportColumn, IReportFilter } from '../../../components/report-print-view/report-print-view';
 import { ReportsService } from '../../../services/reports-service';
-import { IVoucherReportRow } from '../../../types/api/reports-types';
+import { IVoucherReportRow, IPaginatedReportResponse } from '../../../types/api/reports-types';
 
 @Component({
-  selector: 'app-payment-vouchers',
-  imports: [SectionWrapper, ReactiveFormsModule, DatePipe, Paginator, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule],
+  selector: 'app-payment-vouchers-report',
+  imports: [SectionWrapper, ReactiveFormsModule, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule, ReportPrintView],
   templateUrl: './payment-vouchers.html',
   styleUrl: './payment-vouchers.css',
 })
-export class PaymentVouchers extends BaseComponent {
+export class PaymentVouchersReport extends BaseComponent {
   reportsService = inject(ReportsService);
 
   fg = this.fb.group({
@@ -26,7 +26,17 @@ export class PaymentVouchers extends BaseComponent {
     searchTerm: this.fb.control<string>(''),
   });
 
+  columns: IReportColumn[] = [
+    { key: 'voucherNumber', label: 'رقم السند' },
+    { key: 'date', label: 'التاريخ', type: 'date' },
+    { key: 'partyName', label: 'المستفيد' },
+    { key: 'description', label: 'البيان' },
+    { key: 'amount', label: 'المبلغ', type: 'currency', total: true },
+    { key: 'paymentMethod', label: 'طريقة الدفع' },
+  ];
+
   rows = signal<IVoucherReportRow[]>([]);
+  lastSearchFilters = signal<IReportFilter[]>([]);
   paginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
   constructor() {
@@ -36,8 +46,13 @@ export class PaymentVouchers extends BaseComponent {
 
   search(pageIndex: number) {
     const v = this.fg.getRawValue();
+    this.lastSearchFilters.set([
+      { label: 'من تاريخ', value: v.fromDate },
+      { label: 'إلى تاريخ', value: v.toDate },
+      { label: 'بحث', value: v.searchTerm || null },
+    ]);
     this.reportsService.getPaymentVouchers({ ...v, pageIndex, pageSize: 10 }).subscribe({
-      next: (res) => {
+      next: (res: IPaginatedReportResponse<IVoucherReportRow>) => {
         this.rows.set(res.data);
         this.paginationInfo = { pageIndex, totalPagesCount: res.paginationInfo.totalPagesCount, totalRowsCount: res.paginationInfo.totalRowsCount };
       },

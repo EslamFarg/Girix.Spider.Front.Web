@@ -1,0 +1,130 @@
+<div class="report-wrapper">
+
+  <!-- Action bar — hidden when printing -->
+  <div class="no-print rp-action-bar">
+    <button
+      type="button"
+      (click)="print()"
+      pTooltip="طباعة التقرير"
+      class="rp-print-btn"
+    >
+      <i class="pi pi-print"></i>
+      <span>طباعة</span>
+    </button>
+    @if (isLoading()) {
+      <span class="rp-loading-text">جاري التحميل...</span>
+    }
+    <span class="rp-total-text">
+      إجمالي السجلات: {{ paginationInfo().totalRowsCount }}
+    </span>
+  </div>
+
+  <!-- ═══════════ PRINTABLE AREA ═══════════ -->
+  <div class="report-print-area" dir="rtl">
+
+    <!-- Report Header -->
+    <div class="rp-header">
+      <div class="rp-header-left">
+        <span class="rp-logo-icon">🍽</span>
+        <div>
+          <div class="rp-company-name">مطعم ريست هاوس</div>
+          <div class="rp-company-sub">نظام إدارة المطاعم</div>
+        </div>
+      </div>
+      <div class="rp-header-right">
+        <div class="rp-report-title">{{ title() }}</div>
+        <div class="rp-print-date">تاريخ الطباعة: {{ printDate | date:'yyyy/MM/dd  HH:mm' }}</div>
+      </div>
+    </div>
+
+    <!-- Filters Summary -->
+    @if (activeFilters().length) {
+      <div class="rp-filters">
+        <span class="rp-filters-label">فلاتر التقرير:</span>
+        @for (f of activeFilters(); track $index) {
+          <span class="rp-filter-chip">
+            <span class="rp-filter-key">{{ f.label }}:</span>
+            <span class="rp-filter-val">{{ f.value }}</span>
+          </span>
+          @if (!$last) {
+            <span class="rp-filter-sep">|</span>
+          }
+        }
+      </div>
+    }
+
+    <!-- Data Table -->
+    <table class="rp-table">
+      <thead>
+        <tr>
+          <th class="rp-th rp-num-col">#</th>
+          @for (col of columns(); track col.key) {
+            <th class="rp-th">{{ col.label }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track $index) {
+          <tr [class.rp-row-alt]="$index % 2 === 1">
+            <td class="rp-td rp-num-col">{{ getRowNumber($index, paginationInfo().pageIndex) }}</td>
+            @for (col of columns(); track col.key) {
+              <td class="rp-td">
+                @if (col.type === 'date') {
+                  {{ row[col.key] | date:'yyyy/MM/dd' }}
+                } @else if (col.type === 'currency') {
+                  {{ row[col.key] != null ? row[col.key].toFixed(2) : '' }}
+                } @else {
+                  {{ row[col.key] ?? '' }}
+                }
+              </td>
+            }
+          </tr>
+        }
+        @empty {
+          <tr>
+            <td [attr.colspan]="columns().length + 1" class="rp-empty-row no-print">
+              لا توجد بيانات
+            </td>
+          </tr>
+        }
+      </tbody>
+      @if (computedTotals()) {
+        <tfoot>
+          <tr class="rp-totals-row">
+            <td class="rp-td rp-totals-label">الإجمالي</td>
+            @for (col of columns(); track col.key) {
+              <td class="rp-td">
+                @if (col.total && computedTotals()![col.key] != null) {
+                  {{ computedTotals()![col.key].toFixed(2) }}
+                }
+              </td>
+            }
+          </tr>
+        </tfoot>
+      }
+    </table>
+
+    <!-- Report Footer -->
+    <div class="rp-footer">
+      <div class="rp-signature">
+        <span>توقيع المسؤول: ______________________________</span>
+      </div>
+      <div class="rp-signature">
+        <span>التاريخ: __________ / __________ / __________</span>
+      </div>
+    </div>
+
+  </div>
+  <!-- ═══════════ END PRINTABLE AREA ═══════════ -->
+
+  <!-- Paginator — hidden when printing -->
+  <div class="no-print">
+    <p-paginator
+      (onPageChange)="onPageChange($event)"
+      [first]="getCurrentRowsIx(paginationInfo().pageIndex)"
+      [rows]="10"
+      [totalRecords]="paginationInfo().totalRowsCount"
+    />
+  </div>
+
+</div>

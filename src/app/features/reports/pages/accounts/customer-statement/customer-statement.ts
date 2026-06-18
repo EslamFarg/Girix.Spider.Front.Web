@@ -1,19 +1,19 @@
-import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Paginator, PaginatorState } from 'primeng/paginator';
+import { PaginatorState } from 'primeng/paginator';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { TooltipModule } from 'primeng/tooltip';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { ReportPrintView, IReportColumn, IReportFilter } from '../../../components/report-print-view/report-print-view';
 import { ReportsService } from '../../../services/reports-service';
 import { IAccountStatementRow } from '../../../types/api/reports-types';
 
 @Component({
   selector: 'app-customer-statement',
-  imports: [SectionWrapper, ReactiveFormsModule, DatePipe, Paginator, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule],
+  imports: [SectionWrapper, ReactiveFormsModule, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule, ReportPrintView],
   templateUrl: './customer-statement.html',
   styleUrl: './customer-statement.css',
 })
@@ -27,7 +27,17 @@ export class CustomerStatement extends BaseComponent {
     customerId: this.fb.control<number | null>(null),
   });
 
+  columns: IReportColumn[] = [
+    { key: 'date', label: 'التاريخ', type: 'date' },
+    { key: 'description', label: 'البيان' },
+    { key: 'referenceNumber', label: 'المرجع' },
+    { key: 'debit', label: 'مدين', type: 'currency', total: true },
+    { key: 'credit', label: 'دائن', type: 'currency', total: true },
+    { key: 'balance', label: 'الرصيد', type: 'currency' },
+  ];
+
   rows = signal<IAccountStatementRow[]>([]);
+  lastSearchFilters = signal<IReportFilter[]>([]);
   paginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
   constructor() {
@@ -37,6 +47,11 @@ export class CustomerStatement extends BaseComponent {
 
   search(pageIndex: number) {
     const v = this.fg.getRawValue();
+    this.lastSearchFilters.set([
+      { label: 'من تاريخ', value: v.fromDate },
+      { label: 'إلى تاريخ', value: v.toDate },
+      { label: 'بحث', value: v.searchTerm || null },
+    ]);
     this.reportsService.getCustomerStatement({ ...v, pageIndex, pageSize: 10 }).subscribe({
       next: (res) => {
         this.rows.set(res.data);

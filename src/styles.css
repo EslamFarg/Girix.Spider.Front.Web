@@ -66,6 +66,21 @@ body {
 .temp-hidden{
   display: none !important;
 }
+
+/* ── Print utilities ── */
+@media print {
+  app-header,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    overflow: visible !important;
+  }
+  html, body {
+    overflow: visible !important;
+    height: auto !important;
+  }
+}
 .glow-pulse {
   box-shadow: 0 0 10px 2px rgba(0, 255, 255, 0.5);
   animation: pulse-glow 2s infinite ease-in-out;
