@@ -25,7 +25,7 @@ export class InventoryItemMovementActual extends BaseComponent {
     toDate: this.fb.control<string | null>(null),
     searchTerm: this.fb.control<string>(''),
     warehouseId: this.fb.control<number | null>(null),
-    itemId: this.fb.control<number | null>(null),
+    itemId: this.fb.control<number | null>(0),
   });
 
   columns: IReportColumn[] = [

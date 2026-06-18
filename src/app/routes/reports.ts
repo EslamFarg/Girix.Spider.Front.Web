@@ -33,6 +33,7 @@ import { AccountMovement } from '@/features/reports/pages/accounts/movement/move
 import { ReceiptVouchersReport } from '@/features/reports/pages/accounts/receipt-vouchers/receipt-vouchers';
 import { PaymentVouchersReport } from '@/features/reports/pages/accounts/payment-vouchers/payment-vouchers';
 import { GeneralJournal } from '@/features/reports/pages/accounts/general-journal/general-journal';
+import { CategoryProfit } from '@/features/reports/pages/accounts/category-profit/category-profit';
 
 export default [
   { path: 'customers', component: Customers },
@@ -75,4 +76,5 @@ export default [
   { path: 'ReceiptVouchersReport', component: ReceiptVouchersReport },
   { path: 'PaymentVouchersReport', component: PaymentVouchersReport },
   { path: 'GeneralJournal', component: GeneralJournal },
+  { path: 'CategoryProfit', component: CategoryProfit },
 ] satisfies Route[];

@@ -24,7 +24,7 @@ export class PurchasesListReport extends BaseComponent {
     fromDate: this.fb.control<string | null>(null),
     toDate: this.fb.control<string | null>(null),
     searchTerm: this.fb.control<string>(''),
-    supplierId: this.fb.control<number | null>(null),
+    supplierId: this.fb.control<number | null>(0),
   });
 
   columns: IReportColumn[] = [

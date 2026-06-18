@@ -27,10 +27,10 @@ export class InventoryByItems extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'itemCode', label: 'كود الصنف' },
-    { key: 'itemName', label: 'اسم الصنف' },
-    { key: 'unit', label: 'الوحدة' },
-    { key: 'warehouseName', label: 'المستودع' },
+    { key: 'itemId', label: 'كود الصنف' },
+    { key: 'itemNameAr', label: 'اسم الصنف' },
+    { key: 'unitNameAr', label: 'الوحدة' },
+    { key: 'categoryNameAr', label: 'المستودع' },
     { key: 'quantity', label: 'الكمية', type: 'number' },
   ];
 

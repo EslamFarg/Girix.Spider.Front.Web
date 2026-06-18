@@ -26,10 +26,12 @@ export class SalesDelivery extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'deliveryName', label: 'الدليفري' },
-    { key: 'ordersCount', label: 'عدد الطلبات', type: 'number' },
-    { key: 'totalAmount', label: 'الإجمالي', type: 'currency', total: true },
-    { key: 'netAmount', label: 'الصافي', type: 'currency', total: true },
+    { key: 'orderId', label: 'رقم الطلب' },
+    { key: 'orderNumber', label: 'رقم الفاتورة', type: 'number' },
+    { key: 'createdAt', label: 'التاريخ', type: 'date' },
+    { key: 'totalSales', label: 'المبيعات', type: 'currency', total: true },
+    { key: 'totalCost', label: 'التكلفة', type: 'currency', total: true },
+    { key: 'profit', label: 'الربح', type: 'currency', total: true },
   ];
 
   rows = signal<ISalesDeliveryRow[]>([]);

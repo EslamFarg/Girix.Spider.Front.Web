@@ -24,16 +24,15 @@ export class FinancialStatement extends BaseComponent {
     fromDate: this.fb.control<string | null>(null),
     toDate: this.fb.control<string | null>(null),
     searchTerm: this.fb.control<string>(''),
-    accountId: this.fb.control<number | null>(null),
+    accountId: this.fb.control<number | null>(0),
   });
 
   columns: IReportColumn[] = [
-    { key: 'date', label: 'التاريخ', type: 'date' },
-    { key: 'description', label: 'البيان' },
-    { key: 'referenceNumber', label: 'المرجع' },
-    { key: 'debit', label: 'مدين', type: 'currency', total: true },
-    { key: 'credit', label: 'دائن', type: 'currency', total: true },
-    { key: 'balance', label: 'الرصيد', type: 'currency' },
+    { key: 'itemId', label: 'كود الصنف' },
+    { key: 'itemNameAr', label: 'اسم الصنف' },
+    { key: 'totalSales', label: 'اجمالي المبيعات', type: 'currency', total: true },
+    { key: 'totalCost', label: 'اجمالي التكلفة', type: 'currency', total: true },
+    { key: 'profit', label: 'الربح', type: 'currency' , total: true },
   ];
 
   rows = signal<IAccountStatementRow[]>([]);
