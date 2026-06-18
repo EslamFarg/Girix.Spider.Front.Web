@@ -524,6 +524,9 @@ export class InventorySettlementForm extends BaseComponent {
      onResetForm() {
     if(this.formMode() === FormMode.Create){
       this.fg.reset();
+      // clear unit rows
+      this.fg.controls.items.clear();
+      this.inventoryBulkSearchFg.controls.quantityOption.setValue(QuantityOptions.All);
     }else{
       this.router.navigateByUrl('/storage/inventory/add');
     }

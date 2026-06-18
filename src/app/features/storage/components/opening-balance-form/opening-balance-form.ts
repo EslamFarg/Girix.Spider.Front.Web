@@ -435,6 +435,8 @@ export class OpeningBalanceForm extends BaseComponent {
      onResetForm() {
     if(this.formMode() === FormMode.Create){
       this.fg.reset();
+      // clear unit rows
+      this.fg.controls.items.clear();
     }else{
       this.router.navigateByUrl('/storage/opening-balances/add');
     }
