@@ -30,7 +30,7 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class ReportsService extends BaseService {
-  override apiRoute = 'Report';
+  override apiRoute = 'Reports';
 
   // ── Inventory ───────────────────────────────────────────────────────────────
   // TODO: confirm exact endpoint names with backend team
