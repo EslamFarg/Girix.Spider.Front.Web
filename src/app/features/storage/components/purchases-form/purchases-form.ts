@@ -42,10 +42,6 @@ import {
     FinancialAccountService,
 } from '@/features/accounts/services/financial-account-service';
 import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
-import {
-    FixedFinancialAccountService,
-    FixedFinancialAccountRefId,
-} from '@/features/settings/services/fixed-financial-account-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { TooltipModule } from 'primeng/tooltip';
@@ -212,12 +208,37 @@ export class PurchasesForm extends BaseComponent {
         super();
         this.searchProducts(1);
         this.setUpNewPurchaseDetailRowFg();
-        this.searchAccounts({ pageIndex: 1, searchTerm: '' }).subscribe({
+        this.financialAccountService.getCashAndBankAccountsAndCustodyAccounts().subscribe({
             next: (res) => {
-                this.cashAccounts.set(res.value.rows);
-                this.networkAccounts.set(res.value.rows);
+                this.cashAccounts.set(res.cash);
+                this.networkAccounts.set(res.bank);
+
+                const userDetails = this.userDetails();
+                if (userDetails?.cashPaymentAccountId) {
+                    this.fg.patchValue({
+                        cashAccountId: userDetails.cashPaymentAccountId,
+                    });
+                }
+                if (userDetails?.bankPaymentAccountId) {
+                    this.fg.patchValue({
+                        networkAccountId: userDetails.bankPaymentAccountId,
+                    });
+                }
             },
         });
+
+        // Load all suppliers initially so the dropdown is pre-populated
+        this.supplierService
+            .search({
+                paginationInfo: { pageIndex: 1, pageSize: 0 },
+                searchFilters: [{ column: SupplierSearchEnum.Name, values: [''] }],
+                fromDate: null,
+            })
+            .subscribe({
+                next: (res) => {
+                    this.suppliersByName.set(res.value.rows);
+                },
+            });
 
         // Phase 3 — Date must never be empty: restore current date if cleared
         this.fg.controls.invoiceDate.valueChanges.subscribe((value) => {
@@ -233,7 +254,6 @@ export class PurchasesForm extends BaseComponent {
         const purchaseId = this.id();
         switch (this.formMode()) {
             case FormMode.Create:
-                this._loadDefaultAccounts();
                 break;
             case FormMode.Update:
                 this.purchaseService.getById(purchaseId!).subscribe({
@@ -655,31 +675,38 @@ export class PurchasesForm extends BaseComponent {
     // ── Accounts / payment section ────────────────────────────────────────────
 
     financialAccountService = inject(FinancialAccountService);
-    fixedFinancialAccountService = inject(FixedFinancialAccountService);
+    userDetails = this.authService.userDetails;
 
-    cashAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
-    networkAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
+    cashAccounts = signal<Omit<ITreeFinancialAccountSearchRow, 'stage'>[]>([]);
+    networkAccounts = signal<Omit<ITreeFinancialAccountSearchRow, 'stage'>[]>([]);
 
-    /** Full account objects fetched from default-accounts settings (Create mode only). */
-    defaultCashAccount = signal<ITreeFinancialAccountSearchRow | null>(null);
-    defaultNetworkAccount = signal<ITreeFinancialAccountSearchRow | null>(null);
-
-    /**
-     * Always include the default account object at the head of the list so the
-     * ng-select dropdown can render its name even if it wasn't in the first page
-     * of the initial search.
-     */
     displayedCashAccounts = computed(() => {
-        const list = this.cashAccounts();
-        const def = this.defaultCashAccount();
-        if (!def || list.some(a => a.id === def.id)) return list;
-        return [def, ...list];
+        const accounts = this.cashAccounts();
+        const userDetails = this.userDetails();
+        const defaultAccount: ITreeFinancialAccountSearchRow | null = userDetails?.cashPaymentAccountId
+            ? ({
+                  id: userDetails.cashPaymentAccountId,
+                  name: userDetails.cashPaymentAccountName ?? '',
+              } as ITreeFinancialAccountSearchRow)
+            : null;
+        if (!defaultAccount) return [...accounts];
+        const hasDefault = accounts.some((a) => a.id === defaultAccount.id);
+        if (hasDefault) return [...accounts];
+        return [defaultAccount, ...accounts];
     });
     displayedNetworkAccounts = computed(() => {
-        const list = this.networkAccounts();
-        const def = this.defaultNetworkAccount();
-        if (!def || list.some(a => a.id === def.id)) return list;
-        return [def, ...list];
+        const accounts = this.networkAccounts();
+        const userDetails = this.userDetails();
+        const defaultAccount: ITreeFinancialAccountSearchRow | null = userDetails?.bankPaymentAccountId
+            ? ({
+                  id: userDetails.bankPaymentAccountId,
+                  name: userDetails.bankPaymentAccountName ?? '',
+              } as ITreeFinancialAccountSearchRow)
+            : null;
+        if (!defaultAccount) return [...accounts];
+        const hasDefault = accounts.some((a) => a.id === defaultAccount.id);
+        if (hasDefault) return [...accounts];
+        return [defaultAccount, ...accounts];
     });
 
     cashAccountsSearchPaginationInfo: IPaginationInfo = { pageIndex: 1, totalRowsCount: 0, totalPagesCount: 0 };
@@ -773,59 +800,22 @@ export class PurchasesForm extends BaseComponent {
         }
     }
 
-    // ── Default accounts (Settings → Default Accounts) ───────────────────────
+    // ── Default accounts (user-based defaults) ───────────────────────────────
 
     /**
-     * Fetches the global default accounts and pre-fills cashAccountId /
-     * networkAccountId on a NEW purchase invoice.
-     * Edit mode is intentionally skipped — saved values must not be overwritten.
-     */
-    private _loadDefaultAccounts() {
-        this.fixedFinancialAccountService.getAll().subscribe({
-            next: (res) => {
-                const cashRow    = res.rows.find(r => r.refId === FixedFinancialAccountRefId.CashPayment);
-                const networkRow = res.rows.find(r => r.refId === FixedFinancialAccountRefId.NetworkPayment);
-
-                const fetchAndStore = (
-                    accountId: number,
-                    setter: (acc: ITreeFinancialAccountSearchRow) => void,
-                ) => {
-                    this.financialAccountService.search({
-                        paginationInfo: { pageIndex: 1, pageSize: 1 },
-                        searchFilters: [{ column: FinancialAccountSearchEnum.Id, values: [accountId.toString()] }],
-                        fromDate: null,
-                    }).subscribe({
-                        next: (r) => {
-                            const acc = r.value.rows[0];
-                            if (acc) {
-                                setter(acc);
-                                this._applyDefaultAccountsToForm();
-                            }
-                        },
-                    });
-                };
-
-                if (cashRow && cashRow.refFinancalId > 0) {
-                    fetchAndStore(cashRow.refFinancalId, acc => this.defaultCashAccount.set(acc));
-                }
-                if (networkRow && networkRow.refFinancalId > 0) {
-                    fetchAndStore(networkRow.refFinancalId, acc => this.defaultNetworkAccount.set(acc));
-                }
-            },
-        });
-    }
-
-    /**
-     * Patches cashAccountId / networkAccountId with the loaded defaults.
+     * Patches cashAccountId / networkAccountId with the user's default accounts.
      * Only runs in Create mode and only when the control is currently empty
      * (preserves manual user overrides).
      */
     private _applyDefaultAccountsToForm() {
         if (this.formMode() !== FormMode.Create) return;
-        const cashAcc    = this.defaultCashAccount();
-        const networkAcc = this.defaultNetworkAccount();
-        if (cashAcc    && !this.fg.controls.cashAccountId.value)    { this.fg.controls.cashAccountId.setValue(cashAcc.id); }
-        if (networkAcc && !this.fg.controls.networkAccountId.value) { this.fg.controls.networkAccountId.setValue(networkAcc.id); }
+        const userDetails = this.userDetails();
+        if (userDetails?.cashPaymentAccountId && !this.fg.controls.cashAccountId.value) {
+            this.fg.controls.cashAccountId.setValue(userDetails.cashPaymentAccountId);
+        }
+        if (userDetails?.bankPaymentAccountId && !this.fg.controls.networkAccountId.value) {
+            this.fg.controls.networkAccountId.setValue(userDetails.bankPaymentAccountId);
+        }
     }
 
     // ── Form reset / new invoice ──────────────────────────────────────────────
