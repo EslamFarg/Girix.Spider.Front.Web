@@ -28,10 +28,12 @@ export class AccountGroupBalance extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
+    { key: 'accountGroup', label: 'كود المجموعة' },
     { key: 'groupName', label: 'المجموعة' },
-    { key: 'debitBalance', label: 'الرصيد المدين', type: 'currency', total: true },
-    { key: 'creditBalance', label: 'الرصيد الدائن', type: 'currency', total: true },
-    { key: 'netBalance', label: 'الصافي', type: 'currency' },
+    { key: 'periodDebit', label: 'الرصيد المدين', type: 'currency', total: true },
+    { key: 'periodCredit', label: 'الرصيد الدائن', type: 'currency', total: true },
+    { key: 'openingBalance', label: 'البدء', type: 'currency' , total: true},
+    { key: 'closingBalance', label: 'النهاية', type: 'currency' , total: true},
   ];
 
   rows = signal<IAccountGroupBalanceRow[]>([]);

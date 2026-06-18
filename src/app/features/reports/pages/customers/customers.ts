@@ -27,10 +27,10 @@ export class CustomersReport extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'customerName', label: 'اسم العميل' },
+    { key: 'nameAr', label: 'اسم العميل' },
     { key: 'phoneNumber', label: 'رقم الجوال' },
-    { key: 'address', label: 'العنوان' },
-    { key: 'balance', label: 'الرصيد', type: 'currency', total: true },
+    { key: 'taxNumber', label: 'الرقم الضريبي' },
+    { key: 'financiallyAccountId', label: 'كود الحساب المالي' },
   ];
 
   rows = signal<ICustomersReportRow[]>([]);

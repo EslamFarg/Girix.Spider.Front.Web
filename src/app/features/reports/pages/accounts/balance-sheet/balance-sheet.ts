@@ -23,15 +23,21 @@ export class BalanceSheet extends BaseComponent {
   fg = this.fb.group({
     fromDate: this.fb.control<string | null>(null),
     toDate: this.fb.control<string | null>(null),
+    accountId: this.fb.control<number>(0),
+    customerId: this.fb.control<number>(0),
+    supplierId: this.fb.control<number>(0),
+    itemId: this.fb.control<number>(0),
+    categoryId: this.fb.control<number>(0),
+    userId: this.fb.control<number>(0),
+    paymentType: this.fb.control<number>(0),
     searchTerm: this.fb.control<string>(''),
   });
 
   columns: IReportColumn[] = [
-    { key: 'accountCode', label: 'كود الحساب' },
-    { key: 'accountName', label: 'اسم الحساب' },
-    { key: 'debitBalance', label: 'الرصيد المدين', type: 'currency', total: true },
-    { key: 'creditBalance', label: 'الرصيد الدائن', type: 'currency', total: true },
-    { key: 'netBalance', label: 'الصافي', type: 'currency' },
+    { key: 'accountId', label: 'كود الحساب' },
+    { key: 'accountNameAr', label: 'اسم الحساب' },
+    { key: 'stage', label: 'المرحلة', type: 'currency', total: true },
+    { key: 'balance', label: 'الرصيد', type: 'currency', total: true },
   ];
 
   rows = signal<IAccountBalanceRow[]>([]);
@@ -46,11 +52,19 @@ export class BalanceSheet extends BaseComponent {
   search(pageIndex: number) {
     const v = this.fg.getRawValue();
     this.lastSearchFilters.set([
-      { label: 'من تاريخ', value: v.fromDate },
+     { label: 'من تاريخ', value: v.fromDate },
       { label: 'إلى تاريخ', value: v.toDate },
-      { label: 'بحث', value: v.searchTerm || null },
+      { label: 'رقم الحساب', value: v.accountId },
+      { label: 'رقم العميل', value: v.customerId },
+      { label: 'رقم المورد', value: v.supplierId },
+      { label: 'رقم المنتج', value: v.itemId },
+      { label: 'رقم المجموعة', value: v.categoryId },
+      { label: 'رقم المستخدم', value: v.userId },
+      { label: 'نوع الدفع', value: v.paymentType },
+      
     ]);
-    this.reportsService.getBalanceSheet({ ...v, pageIndex, pageSize: 10 }).subscribe({
+    const pageNumber = pageIndex ;
+    this.reportsService.getBalanceSheet({ ...v, pageNumber, pageSize: 10 }).subscribe({
       next: (res) => {
         this.rows.set(res.data);
         this.paginationInfo = { pageIndex, totalPagesCount: res.paginationInfo.totalPagesCount, totalRowsCount: res.paginationInfo.totalRowsCount };

@@ -27,11 +27,13 @@ export class MiniDailyJournal extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'journalNumber', label: 'رقم القيد' },
-    { key: 'date', label: 'التاريخ', type: 'date' },
-    { key: 'description', label: 'البيان' },
-    { key: 'debit', label: 'مدين', type: 'currency', total: true },
-    { key: 'credit', label: 'دائن', type: 'currency', total: true },
+    { key: 'userNameAr', label: 'اسم المستخدم' },
+    { key: 'openStartDate', label: 'تاريخ الافتتاح', type: 'date' },
+    { key: 'endEndDate', label: 'تاريخ الاغلاق', type: 'date' },
+    { key: 'openingBalance', label: 'البدء' },
+    { key: 'cashClosingAmount', label: 'كمية نقد الاغلاق', type: 'currency', total: true },
+    { key: 'networkClosingAmount', label: ' كمية شبكة الاغلاق', type: 'currency', total: true },
+    { key: 'totalShortage', label: ' النقص', type: 'currency', total: true },
   ];
 
   rows = signal<IMiniDailyJournalRow[]>([]);

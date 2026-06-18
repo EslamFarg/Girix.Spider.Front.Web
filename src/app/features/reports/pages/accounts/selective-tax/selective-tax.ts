@@ -27,11 +27,11 @@ export class SelectiveTaxReport extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'invoiceNumber', label: 'رقم الفاتورة' },
-    { key: 'date', label: 'التاريخ', type: 'date' },
-    { key: 'partyName', label: 'الطرف' },
+    { key: 'referenceNumber', label: 'المرجع ' },
+    { key: 'tranDate', label: 'التاريخ', type: 'date' },
+    { key: 'sourceType', label: 'نوع المعاملة' },
     { key: 'selectiveTaxAmount', label: 'الضريبة الانتقائية', type: 'currency', total: true },
-    { key: 'tobaccoFeesAmount', label: 'رسوم التبغ', type: 'currency', total: true },
+    { key: 'taxableAmount', label: 'القيمة المضافة', type: 'currency', total: true },
   ];
 
   rows = signal<ISelectiveTaxReportRow[]>([]);

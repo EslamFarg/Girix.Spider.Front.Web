@@ -29,10 +29,9 @@ export class PurchaseReturnsList extends BaseComponent {
 
   columns: IReportColumn[] = [
     { key: 'returnNumber', label: 'رقم المرتجع' },
-    { key: 'date', label: 'التاريخ', type: 'date' },
+    { key: 'returnDate', label: 'التاريخ', type: 'date' },
     { key: 'supplierName', label: 'المورد' },
     { key: 'totalAmount', label: 'الإجمالي', type: 'currency', total: true },
-    { key: 'notes', label: 'الملاحظات' },
   ];
 
   rows = signal<IPurchaseReturnReportRow[]>([]);

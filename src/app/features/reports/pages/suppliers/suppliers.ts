@@ -27,10 +27,10 @@ export class SuppliersReport extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'supplierName', label: 'اسم المورد' },
+    { key: 'nameAr', label: 'اسم المورد' },
     { key: 'phoneNumber', label: 'رقم الجوال' },
-    { key: 'address', label: 'العنوان' },
-    { key: 'balance', label: 'الرصيد', type: 'currency', total: true },
+    { key: 'taxNumber', label: 'الرقم الضريبي' },
+    { key: 'financiallyAccountId', label: 'الحساب المالي' },
   ];
 
   rows = signal<ISuppliersReportRow[]>([]);

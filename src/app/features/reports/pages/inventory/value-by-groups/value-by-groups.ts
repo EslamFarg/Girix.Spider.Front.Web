@@ -27,8 +27,9 @@ export class InventoryValueByGroups extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'groupName', label: 'المجموعة' },
-    { key: 'itemsCount', label: 'عدد الأصناف', type: 'number' },
+    { key: 'categoryId', label: 'كود المجموعة' },
+    { key: 'categoryNameAr', label: 'المجموعة' },
+    { key: 'totalQuantity', label: 'الكمية', type: 'number' },
     { key: 'totalValue', label: 'القيمة الإجمالية', type: 'currency', total: true },
   ];
 

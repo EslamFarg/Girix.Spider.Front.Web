@@ -29,12 +29,12 @@ export class PurchasesListReport extends BaseComponent {
 
   columns: IReportColumn[] = [
     { key: 'invoiceNumber', label: 'رقم الفاتورة' },
-    { key: 'referenceNumber', label: 'الرقم الدفتري' },
-    { key: 'date', label: 'التاريخ', type: 'date' },
+    { key: 'invoiceDate', label: 'التاريخ', type: 'date' },
     { key: 'supplierName', label: 'المورد' },
+    { key: 'cashAmount', label: 'الكاش' },
+    { key: 'networkAmount', label: 'الشبكة', type: 'currency', total: true },
     { key: 'totalAmount', label: 'الإجمالي', type: 'currency', total: true },
     { key: 'taxAmount', label: 'الضريبة', type: 'currency' },
-    { key: 'netAmount', label: 'الصافي', type: 'currency', total: true },
   ];
 
   rows = signal<IPurchaseReportRow[]>([]);

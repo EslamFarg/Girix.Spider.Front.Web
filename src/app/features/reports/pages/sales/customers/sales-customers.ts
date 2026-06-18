@@ -27,11 +27,11 @@ export class SalesCustomers extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'customerName', label: 'العميل' },
-    { key: 'invoicesCount', label: 'عدد الفواتير', type: 'number' },
-    { key: 'totalAmount', label: 'إجمالي المبيعات', type: 'currency', total: true },
-    { key: 'returnsAmount', label: 'إجمالي المرتجعات', type: 'currency' },
-    { key: 'netAmount', label: 'الصافي', type: 'currency', total: true },
+    { key: 'userNameAr', label: 'العميل' },
+    { key: 'ordersCount', label: 'عدد الفواتير', type: 'number' },
+    { key: 'totalSales', label: 'إجمالي المبيعات', type: 'currency', total: true },
+    { key: 'totalCash', label: 'إجمالي الكاش', type: 'currency' },
+    { key: 'totalNetwork', label: 'إجمالي الشبكة', type: 'currency', total: true },
   ];
 
   rows = signal<ISalesCustomerRow[]>([]);

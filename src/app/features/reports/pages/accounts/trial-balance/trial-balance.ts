@@ -27,10 +27,12 @@ export class TrialBalance extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'accountCode', label: 'كود الحساب' },
-    { key: 'accountName', label: 'اسم الحساب' },
-    { key: 'debitBalance', label: 'الرصيد المدين', type: 'currency', total: true },
-    { key: 'creditBalance', label: 'الرصيد الدائن', type: 'currency', total: true },
+    { key: 'accountId', label: 'كود الحساب' },
+    { key: 'finNumber', label: 'رقم الحساب', type: 'number' },
+    { key: 'accountNameAr', label: 'اسم الحساب' },
+    { key: 'totalDebit', label: 'الرصيد المدين', type: 'currency', total: true },
+    { key: 'totalCredit', label: 'الرصيد الدائن', type: 'currency', total: true },
+    { key: 'balance', label: 'الرصيد', type: 'currency', total: true },
   ];
 
   rows = signal<ITrialBalanceRow[]>([]);

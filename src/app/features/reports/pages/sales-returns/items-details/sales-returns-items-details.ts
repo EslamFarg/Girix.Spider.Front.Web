@@ -27,11 +27,10 @@ export class SalesReturnsItemsDetails extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'returnNumber', label: 'رقم المرتجع' },
-    { key: 'date', label: 'التاريخ', type: 'date' },
-    { key: 'itemName', label: 'الصنف' },
+    { key: 'orderReturnId', label: 'رقم المرتجع' },
+    { key: 'createdAt', label: 'التاريخ', type: 'date' },
+    { key: 'itemNameAr', label: 'الصنف' },
     { key: 'quantity', label: 'الكمية', type: 'number' },
-    { key: 'unitPrice', label: 'سعر الوحدة', type: 'currency' },
     { key: 'totalPrice', label: 'الإجمالي', type: 'currency', total: true },
   ];
 

@@ -291,7 +291,7 @@ export class ReportsService extends BaseService {
     );
   }
 
-  getBalanceSheet(criteria: IReportSearchCriteria) {
+  getBalanceSheet(criteria: any) {
     return this.http.post<IPaginatedReportResponse<IAccountBalanceRow>>(
       `${this.apiUrl}/BalanceSheet`,
       criteria,
@@ -299,7 +299,7 @@ export class ReportsService extends BaseService {
   }
 
   getIncomeStatement(criteria: IReportSearchCriteria) {
-    return this.http.post<IPaginatedReportResponse<IIncomeStatementRow>>(
+    return this.http.post<any>(
       `${this.apiUrl}/IncomeStatement`,
       criteria,
     );
@@ -320,7 +320,7 @@ export class ReportsService extends BaseService {
   }
 
   getDailyTransaction(criteria: IReportSearchCriteria) {
-    return this.http.post<IPaginatedReportResponse<IDailyTransactionRow>>(
+    return this.http.post<any>(
       `${this.apiUrl}/DailyTransaction`,
       criteria,
     );

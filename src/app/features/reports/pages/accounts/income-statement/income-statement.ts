@@ -26,8 +26,8 @@ export class IncomeStatement extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'accountCode', label: 'كود الحساب' },
-    { key: 'accountName', label: 'اسم الحساب' },
+    { key: 'accountId', label: 'كود الحساب' },
+    { key: 'accountNameAr', label: 'اسم الحساب' },
     { key: 'amount', label: 'المبلغ', type: 'currency', total: true },
   ];
 

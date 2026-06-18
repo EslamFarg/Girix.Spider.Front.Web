@@ -28,11 +28,11 @@ export class GroupedTrialBalance extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
+    { key: 'accountGroup', label: 'كود المجموعة' },
     { key: 'groupName', label: 'المجموعة' },
-    { key: 'accountCode', label: 'كود الحساب' },
-    { key: 'accountName', label: 'اسم الحساب' },
-    { key: 'debitBalance', label: 'الرصيد المدين', type: 'currency', total: true },
-    { key: 'creditBalance', label: 'الرصيد الدائن', type: 'currency', total: true },
+    { key: 'totalDebit', label: 'الرصيد المدين', type: 'currency', total: true },
+    { key: 'totalCredit', label: 'الرصيد الدائن', type: 'currency', total: true },
+    { key: 'balance', label: 'الرصيد' , type: 'currency', total: true },
   ];
 
   rows = signal<IGroupedTrialBalanceRow[]>([]);
