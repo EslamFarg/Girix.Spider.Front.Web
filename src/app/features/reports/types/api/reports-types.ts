@@ -1,5 +1,5 @@
 export interface IPaginatedReportResponse<T> {
-  rows: T[];
+  data: T[];
   paginationInfo: {
     totalRowsCount: number;
     totalPagesCount: number;

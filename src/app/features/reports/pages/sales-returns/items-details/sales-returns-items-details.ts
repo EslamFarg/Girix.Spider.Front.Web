@@ -38,7 +38,7 @@ export class SalesReturnsItemsDetails extends BaseComponent {
     const v = this.fg.getRawValue();
     this.reportsService.getSalesReturnsItemsDetails({ ...v, pageIndex, pageSize: 10 }).subscribe({
       next: (res) => {
-        this.rows.set(res.rows);
+        this.rows.set(res.data);
         this.paginationInfo = { pageIndex, totalPagesCount: res.paginationInfo.totalPagesCount, totalRowsCount: res.paginationInfo.totalRowsCount };
       },
     });
