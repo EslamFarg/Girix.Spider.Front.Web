@@ -261,7 +261,7 @@ export class CollectiveReceiptForm extends BaseComponent {
                 finincalAccountId: item.finincalAccountId,
                 isHasTax: item.isHasTax,
                 totalAmount: item.totalAmount,
-                notes: null,
+                notes: item.notes,
               }),
             ),
           ),

@@ -33,5 +33,6 @@ export interface IReceiptVoucherReadResponse {
     finincalAccountName: string;
     isHasTax: boolean;
     totalAmount: number;
+    notes: string;
   }>;
 }

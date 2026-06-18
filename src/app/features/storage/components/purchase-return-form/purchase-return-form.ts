@@ -1,17 +1,5 @@
-import {
-    AbstractControl,
-    FormGroup,
-    ReactiveFormsModule,
-    Validators,
-} from '@angular/forms';
-import {
-    Component,
-    computed,
-    effect,
-    inject,
-    input,
-    signal,
-} from '@angular/core';
+import { AbstractControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
@@ -111,21 +99,32 @@ export class PurchaseReturnForm extends BaseComponent {
 
     initialFormValue = {
         referenceNumber: this.fb.control<string | null>(null, [Validators.maxLength(16)]),
-        invoiceNumber:   this.fb.control<string | null>({ value: null, disabled: true }, []),
-        returnNumber:    this.fb.control<string | null>({ value: null, disabled: true }, []),
+        invoiceNumber: this.fb.control<string | null>({ value: null, disabled: true }, []),
+        returnNumber: this.fb.control<string | null>({ value: null, disabled: true }, []),
         purchaseInvoiceId: this.fb.control<number | null>(null, []),
-        paymentType:  this.fb.control<number | null>(OrderPaymentType.Paid, [Validators.required]),
-        returnDate:   this.fb.control<Date | string | null>(new Date(), [Validators.required]),
-        reason:       this.fb.control<string | null>(null, [Validators.maxLength(1000)]),
-        items: this.fb.array<FormGroup<IAppPurchaseReturnItemControls>>([], [Validators.required, Validators.minLength(1)]),
-        cashAmount:      this.fb.control<number | null>(null, [Validators.required, Validators.min(0), onlyNumbersOrDotAllowed]),
-        networkAmount:   this.fb.control<number | null>(null, [Validators.required, Validators.min(0), onlyNumbersOrDotAllowed]),
-        cashAccountId:   this.fb.control<number | null>(null, [Validators.required]),
+        paymentType: this.fb.control<number | null>(OrderPaymentType.Paid, [Validators.required]),
+        returnDate: this.fb.control<Date | string | null>(new Date(), [Validators.required]),
+        reason: this.fb.control<string | null>(null, [Validators.maxLength(1000)]),
+        items: this.fb.array<FormGroup<IAppPurchaseReturnItemControls>>(
+            [],
+            [Validators.required, Validators.minLength(1)],
+        ),
+        cashAmount: this.fb.control<number | null>(null, [
+            Validators.required,
+            Validators.min(0),
+            onlyNumbersOrDotAllowed,
+        ]),
+        networkAmount: this.fb.control<number | null>(null, [
+            Validators.required,
+            Validators.min(0),
+            onlyNumbersOrDotAllowed,
+        ]),
+        cashAccountId: this.fb.control<number | null>(null, [Validators.required]),
         networkAccountId: this.fb.control<number | null>(null, [Validators.required]),
-        supplierId:          this.fb.control<number | null>(null, []),
-        supplierName:        this.fb.control<string | null>({ value: null, disabled: true }, [Validators.maxLength(100)]),
+        supplierId: this.fb.control<number | null>(null, []),
+        supplierName: this.fb.control<string | null>({ value: null, disabled: true }, [Validators.maxLength(100)]),
         supplierPhoneNumber: this.fb.control<string | null>(null, []),
-        supplierTaxNumber:   this.fb.control<string | null>(null, []),
+        supplierTaxNumber: this.fb.control<string | null>(null, []),
     };
     fg = this.fb.group(this.initialFormValue);
 
@@ -142,12 +141,18 @@ export class PurchaseReturnForm extends BaseComponent {
                 this.fg.controls.networkAccountId,
             ];
             if (value == OrderPaymentType.Paid) {
-                controls.forEach(c => { c.setValue(null); c.enable(); });
+                controls.forEach((c) => {
+                    c.setValue(null);
+                    c.enable();
+                });
                 if (this.formMode() === FormMode.Create) {
                     setTimeout(() => this._applyDefaultAccountsToForm());
                 }
             } else {
-                controls.forEach(c => { c.setValue(null); c.disable(); });
+                controls.forEach((c) => {
+                    c.setValue(null);
+                    c.disable();
+                });
             }
             this.paymentType.set(value!);
         },
@@ -159,8 +164,7 @@ export class PurchaseReturnForm extends BaseComponent {
 
     totalReturnedQuantity = computed(() => {
         this._itemsChange();
-        return this.fg.controls.items.controls.reduce(
-            (sum, ctrl) => sum + (Number(ctrl.value.quantity) || 0), 0);
+        return this.fg.controls.items.controls.reduce((sum, ctrl) => sum + (Number(ctrl.value.quantity) || 0), 0);
     });
 
     totalTax = computed(() => {
@@ -192,7 +196,7 @@ export class PurchaseReturnForm extends BaseComponent {
         });
 
         // Phase 7 — date must never be empty
-        this.fg.controls.returnDate.valueChanges.subscribe(value => {
+        this.fg.controls.returnDate.valueChanges.subscribe((value) => {
             if (!value) {
                 this.fg.controls.returnDate.setValue(new Date(), { emitEvent: false });
             }
@@ -221,12 +225,14 @@ export class PurchaseReturnForm extends BaseComponent {
                         this.fg.setControl(
                             'items',
                             this.fb.array(
-                                data.items.map(item => this.createItemFg({
-                                    menuItemsId: item.menuItemsId,
-                                    unitId: item.unitId,
-                                    quantity: item.quantity,
-                                    purchaseInvoiceItemId: item.purchaseInvoiceItemId,
-                                })),
+                                data.items.map((item) =>
+                                    this.createItemFg({
+                                        menuItemsId: item.menuItemsId,
+                                        unitId: item.unitId,
+                                        quantity: item.quantity,
+                                        purchaseInvoiceItemId: item.purchaseInvoiceItemId,
+                                    }),
+                                ),
                             ),
                         );
                     },
@@ -245,7 +251,7 @@ export class PurchaseReturnForm extends BaseComponent {
 
         const data = {
             ...this.fg.getRawValue(),
-            cashAmount:    +(this.fg.value.cashAmount    || 0).toFixed(2),
+            cashAmount: +(this.fg.value.cashAmount || 0).toFixed(2),
             networkAmount: +(this.fg.value.networkAmount || 0).toFixed(2),
             returnDate: this.UtcToLocalIso((this.fg.value.returnDate as Date)!.toISOString()),
         };
@@ -253,7 +259,9 @@ export class PurchaseReturnForm extends BaseComponent {
         switch (this.formMode()) {
             case FormMode.Create:
                 this.purchaseReturnService.create(data).subscribe({
-                    next: () => { this.router.navigate(['/storage/purchases']); },
+                    next: () => {
+                        this.router.navigate(['/storage/purchases']);
+                    },
                 });
                 break;
             case FormMode.Update:
@@ -269,11 +277,15 @@ export class PurchaseReturnForm extends BaseComponent {
     filterMenuItems = signal<MenuItem[]>([
         {
             label: 'فاتورة مشتريات',
-            command: () => { this.currentFilterOption = FilterOption.Purchase; },
+            command: () => {
+                this.currentFilterOption = FilterOption.Purchase;
+            },
         },
         {
             label: 'مرتجع مشتريات',
-            command: () => { this.currentFilterOption = FilterOption.PurchaseReturn; },
+            command: () => {
+                this.currentFilterOption = FilterOption.PurchaseReturn;
+            },
         },
     ]);
 
@@ -297,12 +309,14 @@ export class PurchaseReturnForm extends BaseComponent {
                         this.fg.setControl(
                             'items',
                             this.fb.array(
-                                data.items.map(item => this.createItemFg({
-                                    menuItemsId: item.menuItemsId,
-                                    quantity: item.quantity,
-                                    purchaseInvoiceItemId: item.id,
-                                    unitId: item.unitId,
-                                })),
+                                data.items.map((item) =>
+                                    this.createItemFg({
+                                        menuItemsId: item.menuItemsId,
+                                        quantity: item.quantity,
+                                        purchaseInvoiceItemId: item.id,
+                                        unitId: item.unitId,
+                                    }),
+                                ),
                             ),
                         );
                     },
@@ -326,12 +340,14 @@ export class PurchaseReturnForm extends BaseComponent {
                         this.fg.setControl(
                             'items',
                             this.fb.array(
-                                data.items.map(item => this.createItemFg({
-                                    menuItemsId: item.menuItemsId,
-                                    quantity: item.quantity,
-                                    purchaseInvoiceItemId: item.purchaseInvoiceItemId,
-                                    unitId: item.unitId,
-                                })),
+                                data.items.map((item) =>
+                                    this.createItemFg({
+                                        menuItemsId: item.menuItemsId,
+                                        quantity: item.quantity,
+                                        purchaseInvoiceItemId: item.purchaseInvoiceItemId,
+                                        unitId: item.unitId,
+                                    }),
+                                ),
                             ),
                         );
                     },
@@ -342,22 +358,45 @@ export class PurchaseReturnForm extends BaseComponent {
 
     private _setCurrentSupplierFromPurchase(data: IPurchaseReadResponse) {
         this.currentSupplier.set({
-            id: data.supplierId, name: data.supplierName,
-            phoneNumber: data.supplierPhoneNumber, taxNumber: data.supplierTaxNumber,
-            secondaryMobileNumber: '', city: '', district: '', street: '',
-            buildingNumber: '', apartment: '', landmark: '', postalCode: '',
-            commercialRegister: '', numberOfFloor: 0, financiallyAccountId: 0,
+            id: data.supplierId,
+            name: data.supplierName,
+            phoneNumber: data.supplierPhoneNumber,
+            taxNumber: data.supplierTaxNumber,
+            secondaryMobileNumber: '',
+            city: '',
+            district: '',
+            street: '',
+            buildingNumber: '',
+            apartment: '',
+            landmark: '',
+            postalCode: '',
+            commercialRegister: '',
+            numberOfFloor: 0,
+            financiallyAccountId: 0,
         });
-        this.fg.patchValue({ supplierPhoneNumber: data.supplierPhoneNumber, supplierTaxNumber: data.supplierTaxNumber });
+        this.fg.patchValue({
+            supplierPhoneNumber: data.supplierPhoneNumber,
+            supplierTaxNumber: data.supplierTaxNumber,
+        });
     }
 
     private _setCurrentSupplierFromReturn(data: IPurchaseReturnReadResponse) {
         this.currentSupplier.set({
-            id: data.supplierId, name: data.supplierName,
-            phoneNumber: data.supplierPhoneNumber, taxNumber: data.supplierTaxNumber,
-            secondaryMobileNumber: '', city: '', district: '', street: '',
-            buildingNumber: '', apartment: '', landmark: '', postalCode: '',
-            commercialRegister: '', numberOfFloor: 0, financiallyAccountId: 0,
+            id: data.supplierId,
+            name: data.supplierName,
+            phoneNumber: data.supplierPhoneNumber,
+            taxNumber: data.supplierTaxNumber,
+            secondaryMobileNumber: '',
+            city: '',
+            district: '',
+            street: '',
+            buildingNumber: '',
+            apartment: '',
+            landmark: '',
+            postalCode: '',
+            commercialRegister: '',
+            numberOfFloor: 0,
+            financiallyAccountId: 0,
         });
     }
 
@@ -372,22 +411,24 @@ export class PurchaseReturnForm extends BaseComponent {
     displayedSuppliersByName = computed(() => {
         const list = this.suppliersByName();
         const current = this.currentSupplier();
-        if (current && !list.some(s => s.id === current.id)) return [current, ...list];
+        if (current && !list.some((s) => s.id === current.id)) return [current, ...list];
         return list;
     });
 
     searchSuppliers(pageIndex: number, searchTerm: string) {
-        this.supplierService.search({
-            paginationInfo: { pageIndex, pageSize: 10 },
-            searchFilters: [{ column: SupplierSearchEnum.Name, values: [searchTerm] }],
-            fromDate: null,
-        }).subscribe({
-            next: (res) => {
-                if (pageIndex === 1) this.suppliersByName.set(res.value.rows);
-                else this.suppliersByName.update(p => [...p, ...res.value.rows]);
-                this._suppliersNamePage = pageIndex;
-            },
-        });
+        this.supplierService
+            .search({
+                paginationInfo: { pageIndex, pageSize: 10 },
+                searchFilters: [{ column: SupplierSearchEnum.Name, values: [searchTerm] }],
+                fromDate: null,
+            })
+            .subscribe({
+                next: (res) => {
+                    if (pageIndex === 1) this.suppliersByName.set(res.value.rows);
+                    else this.suppliersByName.update((p) => [...p, ...res.value.rows]);
+                    this._suppliersNamePage = pageIndex;
+                },
+            });
     }
 
     onSupplierNameSearch(event: IDebounceEvent, searchTerm: string) {
@@ -416,14 +457,16 @@ export class PurchaseReturnForm extends BaseComponent {
         const maxQty = data?.quantity ?? null;
         return this.fb.group<IAppPurchaseReturnItemControls>({
             menuItemsId: this.fb.control<number | null>(data?.menuItemsId ?? null, [Validators.required]),
-            unitId:      this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
+            unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
             quantity: this.fb.control<number | null>(data?.quantity ?? null, [
                 Validators.required,
                 Validators.min(0.01),
                 onlyNumbersOrDotAllowed,
                 ...(maxQty != null ? [Validators.max(maxQty)] : []),
             ]),
-            purchaseInvoiceItemId: this.fb.control<number | null>(data?.purchaseInvoiceItemId ?? null, [Validators.required]),
+            purchaseInvoiceItemId: this.fb.control<number | null>(data?.purchaseInvoiceItemId ?? null, [
+                Validators.required,
+            ]),
         });
     }
 
@@ -433,7 +476,10 @@ export class PurchaseReturnForm extends BaseComponent {
 
     normalizeAmount(control: AbstractControl) {
         const num = parseFloat(String(control.value ?? 0));
-        if (isNaN(num) || num < 0) { control.setValue(0, { emitEvent: false }); return; }
+        if (isNaN(num) || num < 0) {
+            control.setValue(0, { emitEvent: false });
+            return;
+        }
         control.setValue(parseFloat(num.toFixed(2)), { emitEvent: false });
     }
 
@@ -442,28 +488,28 @@ export class PurchaseReturnForm extends BaseComponent {
     financialAccountService = inject(FinancialAccountService);
     fixedFinancialAccountService = inject(FixedFinancialAccountService);
 
-    cashAccounts    = signal<ITreeFinancialAccountSearchRow[]>([]);
+    cashAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
     networkAccounts = signal<ITreeFinancialAccountSearchRow[]>([]);
 
-    defaultCashAccount    = signal<ITreeFinancialAccountSearchRow | null>(null);
+    defaultCashAccount = signal<ITreeFinancialAccountSearchRow | null>(null);
     defaultNetworkAccount = signal<ITreeFinancialAccountSearchRow | null>(null);
 
     displayedCashAccounts = computed(() => {
         const list = this.cashAccounts();
-        const def  = this.defaultCashAccount();
-        if (!def || list.some(a => a.id === def.id)) return list;
+        const def = this.defaultCashAccount();
+        if (!def || list.some((a) => a.id === def.id)) return list;
         return [def, ...list];
     });
     displayedNetworkAccounts = computed(() => {
         const list = this.networkAccounts();
-        const def  = this.defaultNetworkAccount();
-        if (!def || list.some(a => a.id === def.id)) return list;
+        const def = this.defaultNetworkAccount();
+        if (!def || list.some((a) => a.id === def.id)) return list;
         return [def, ...list];
     });
 
-    cashAccountsSearchPaginationInfo: IPaginationInfo    = { pageIndex: 1, totalRowsCount: 0, totalPagesCount: 0 };
+    cashAccountsSearchPaginationInfo: IPaginationInfo = { pageIndex: 1, totalRowsCount: 0, totalPagesCount: 0 };
     networkAccountsSearchPaginationInfo: IPaginationInfo = { pageIndex: 1, totalRowsCount: 0, totalPagesCount: 0 };
-    previousCashAccountsSearchTerm    = '';
+    previousCashAccountsSearchTerm = '';
     previousNetworkAccountsSearchTerm = '';
 
     searchAccounts(data: { pageIndex: number; searchTerm?: string }) {
@@ -485,16 +531,27 @@ export class PurchaseReturnForm extends BaseComponent {
                     if (res.value.rows.length > 0) {
                         this.previousCashAccountsSearchTerm = searchTerm;
                         this.cashAccounts.set(res.value.rows);
-                        this.cashAccountsSearchPaginationInfo = { pageIndex: 1, totalPagesCount: res.value.paginationInfo.totalPagesCount, totalRowsCount: res.value.paginationInfo.totalRowsCount };
+                        this.cashAccountsSearchPaginationInfo = {
+                            pageIndex: 1,
+                            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+                        };
                     }
                 },
             });
         } else {
-            this.searchAccounts({ pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
+            this.searchAccounts({
+                pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1,
+                searchTerm,
+            }).subscribe({
                 next: (res) => {
                     if (res.value.rows.length > 0) {
-                        this.cashAccounts.update(p => p.concat(res.value.rows));
-                        this.cashAccountsSearchPaginationInfo = { pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1, totalPagesCount: res.value.paginationInfo.totalPagesCount, totalRowsCount: res.value.paginationInfo.totalRowsCount };
+                        this.cashAccounts.update((p) => p.concat(res.value.rows));
+                        this.cashAccountsSearchPaginationInfo = {
+                            pageIndex: this.cashAccountsSearchPaginationInfo.pageIndex + 1,
+                            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+                        };
                     }
                 },
             });
@@ -512,16 +569,27 @@ export class PurchaseReturnForm extends BaseComponent {
                     if (res.value.rows.length > 0) {
                         this.previousNetworkAccountsSearchTerm = searchTerm;
                         this.networkAccounts.set(res.value.rows);
-                        this.networkAccountsSearchPaginationInfo = { pageIndex: 1, totalPagesCount: res.value.paginationInfo.totalPagesCount, totalRowsCount: res.value.paginationInfo.totalRowsCount };
+                        this.networkAccountsSearchPaginationInfo = {
+                            pageIndex: 1,
+                            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+                        };
                     }
                 },
             });
         } else {
-            this.searchAccounts({ pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1, searchTerm }).subscribe({
+            this.searchAccounts({
+                pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
+                searchTerm,
+            }).subscribe({
                 next: (res) => {
                     if (res.value.rows.length > 0) {
-                        this.networkAccounts.update(p => p.concat(res.value.rows));
-                        this.networkAccountsSearchPaginationInfo = { pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1, totalPagesCount: res.value.paginationInfo.totalPagesCount, totalRowsCount: res.value.paginationInfo.totalRowsCount };
+                        this.networkAccounts.update((p) => p.concat(res.value.rows));
+                        this.networkAccountsSearchPaginationInfo = {
+                            pageIndex: this.networkAccountsSearchPaginationInfo.pageIndex + 1,
+                            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+                        };
                     }
                 },
             });
@@ -533,8 +601,8 @@ export class PurchaseReturnForm extends BaseComponent {
     private _loadDefaultAccounts() {
         this.fixedFinancialAccountService.getAll().subscribe({
             next: (res) => {
-                const cashRow    = res.rows.find(r => r.refId === FixedFinancialAccountRefId.CashPayment);
-                const networkRow = res.rows.find(r => r.refId === FixedFinancialAccountRefId.NetworkPayment);
+                const cashRow = res.rows.find((r) => r.refId === FixedFinancialAccountRefId.CashPayment);
+                const networkRow = res.rows.find((r) => r.refId === FixedFinancialAccountRefId.NetworkPayment);
 
                 if (cashRow && cashRow.refFinancalId > 0) {
                     this._fetchAndSetAccount(cashRow.refFinancalId, 'cash');
@@ -548,31 +616,37 @@ export class PurchaseReturnForm extends BaseComponent {
 
     private _fetchAndSetAccount(accountId: number, type: 'cash' | 'network') {
         if (!accountId) return;
-        this.financialAccountService.search({
-            paginationInfo: { pageIndex: 1, pageSize: 1 },
-            searchFilters: [{ column: FinancialAccountSearchEnum.Id, values: [accountId.toString()] }],
-            fromDate: null,
-        }).subscribe({
-            next: (r) => {
-                const acc = r.value.rows[0];
-                if (!acc) return;
-                if (type === 'cash') {
-                    this.defaultCashAccount.set(acc);
-                    this._applyDefaultAccountsToForm();
-                } else {
-                    this.defaultNetworkAccount.set(acc);
-                    this._applyDefaultAccountsToForm();
-                }
-            },
-        });
+        this.financialAccountService
+            .search({
+                paginationInfo: { pageIndex: 1, pageSize: 1 },
+                searchFilters: [{ column: FinancialAccountSearchEnum.Id, values: [accountId.toString()] }],
+                fromDate: null,
+            })
+            .subscribe({
+                next: (r) => {
+                    const acc = r.value.rows[0];
+                    if (!acc) return;
+                    if (type === 'cash') {
+                        this.defaultCashAccount.set(acc);
+                        this._applyDefaultAccountsToForm();
+                    } else {
+                        this.defaultNetworkAccount.set(acc);
+                        this._applyDefaultAccountsToForm();
+                    }
+                },
+            });
     }
 
     private _applyDefaultAccountsToForm() {
         if (this.formMode() !== FormMode.Create) return;
-        const cashAcc    = this.defaultCashAccount();
+        const cashAcc = this.defaultCashAccount();
         const networkAcc = this.defaultNetworkAccount();
-        if (cashAcc    && !this.fg.controls.cashAccountId.value)    { this.fg.controls.cashAccountId.setValue(cashAcc.id); }
-        if (networkAcc && !this.fg.controls.networkAccountId.value) { this.fg.controls.networkAccountId.setValue(networkAcc.id); }
+        if (cashAcc && !this.fg.controls.cashAccountId.value) {
+            this.fg.controls.cashAccountId.setValue(cashAcc.id);
+        }
+        if (networkAcc && !this.fg.controls.networkAccountId.value) {
+            this.fg.controls.networkAccountId.setValue(networkAcc.id);
+        }
     }
 
     // ── Form reset / new return ───────────────────────────────────────────────
@@ -602,7 +676,9 @@ export class PurchaseReturnForm extends BaseComponent {
             acceptButtonProps: { label: 'حذف', severity: 'danger' },
             accept: () => {
                 this.purchaseReturnService.delete(id).subscribe({
-                    next: () => { this.router.navigateByUrl('/storage/purchases-returns/add'); },
+                    next: () => {
+                        this.router.navigateByUrl('/storage/purchases-returns/add');
+                    },
                 });
             },
         });
@@ -616,12 +692,17 @@ export class PurchaseReturnForm extends BaseComponent {
         const ret = this.currentPurchaseReturn();
         if (!ret) return;
 
-        const fmt   = (s: string) => { const d = new Date(s); return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; };
-        const money = (v: number) => (+v||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        const fmt = (s: string) => {
+            const d = new Date(s);
+            return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+        };
+        const money = (v: number) => (+v || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-        const paymentLabel = ret.paymentType === 1 ? 'مدفوع' : 'معلق';
+        const paymentLabel = ret.paymentType === 1 ? 'نقدي' : 'آجل';
 
-        const itemRows = ret.items.map((item, i) => `
+        const itemRows = ret.items
+            .map(
+                (item, i) => `
           <tr>
             <td class="num">${i + 1}</td>
             <td>${item.menuItemName ?? '-'}</td>
@@ -631,11 +712,16 @@ export class PurchaseReturnForm extends BaseComponent {
             <td class="num">${money(item.salePrice)}</td>
             <td class="num">${money(item.taxAmount)}</td>
             <td class="num">${money(item.lineTotal)}</td>
-          </tr>`).join('');
+          </tr>`,
+            )
+            .join('');
 
-        const paymentRows = ret.paymentType === 1 ? `
+        const paymentRows =
+            ret.paymentType === 1
+                ? `
           <div class="total-item"><span class="total-label">نقدي</span><span class="total-value">${money(ret.cashAmount)}</span></div>
-          <div class="total-item"><span class="total-label">شبكة</span><span class="total-value">${money(ret.networkAmount)}</span></div>` : '';
+          <div class="total-item"><span class="total-label">شبكة</span><span class="total-value">${money(ret.networkAmount)}</span></div>`
+                : '';
 
         const html = `
           <div class="doc-header">

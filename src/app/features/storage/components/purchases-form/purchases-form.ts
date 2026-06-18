@@ -807,7 +807,7 @@ export class PurchasesForm extends BaseComponent {
         };
         const money = (v: number) => (+v || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-        const paymentLabel = invoice.paymentType === 1 ? 'مدفوع' : 'معلق';
+        const paymentLabel = invoice.paymentType === 1 ? 'نقدي' : 'آجل';
 
         const itemRows = invoice.items.map((item, i) => `
           <tr>

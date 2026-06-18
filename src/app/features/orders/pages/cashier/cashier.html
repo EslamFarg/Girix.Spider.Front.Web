@@ -19,7 +19,7 @@
         >
             <button
                 pButton
-                type="button"
+                type="button" 
                 (click)="isMenuVisible = true"
                 class="app-p-btn py-1! m1d:flex-none md:px-2! xl:hid1den! me-auto"
                 variant="outlined"
@@ -475,6 +475,7 @@
     styleClass="bg-text-lighter!"
     class="addition-dialog"
     [contentStyleClass]="`no-scrollbar flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
+    (onHide)="closeAdditionsDialog()"
 >
     <p class="font-bold text-center text-dark-bg-2 text-lg">الاضافات</p>
 
@@ -517,7 +518,7 @@
                             [min]="1"
                             [max]="100"
                             (change)="updateAdditionQuantity(item, +additionQuantity.value)"
-                            [defaultValue]="getOrderItemAdditionQuantity(item.id)"
+                            [value]="getOrderItemAdditionQuantity(item.id)"
                             class="font-bold text-dark-line w-full flex-1 text-center outline-none no-input-spinner"
                         />
                         <!-- remove -->

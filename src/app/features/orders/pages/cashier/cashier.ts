@@ -463,9 +463,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
         switch (this.formMode()) {
             case FormMode.Create:
-                this.orderFg.patchValue({
-                    items: this.orderCreateItems(),
-                });
+                this.printService.selectedPrinters.set([]);
                 this.orderConfirmationDialogVisible = true;
                 break;
             case FormMode.Update:
@@ -581,6 +579,7 @@ export class Cashier extends BaseComponent implements OnInit {
         this.currentDelivery.set(null);
         this.currentCompanyDelivery.set(null);
         this.amountReceived.set(0);
+        this.printService.selectedPrinters.set([]);
         this.setSelectedCustomer(this.cashCustomer);
         this.orderFg.patchValue({
             placeRefId: null,
@@ -797,15 +796,19 @@ export class Cashier extends BaseComponent implements OnInit {
         // Build category mapping from items (fetches product categories from API)
         const categoryMap = await this.buildCategoryMap(bill);
 
-        // Check which printer roles the user has selected (from dialog/previous selection)
-        // If nothing selected, default to all configured roles for silent printing
+        // Check which printer roles the user has selected in the cashier confirmation dialog.
         const selectedPrinters = this.printService.selectedPrinters();
         console.log('[DEBUG printOrder] selectedPrinters:', selectedPrinters.map(p => ({ id: p.id, name: p.name, type: p.type, appPrinterType: p.appPrinterType })));
-        const selectedTypes = new Set(
-            selectedPrinters.length > 0 
-                ? selectedPrinters.map((p) => p.appPrinterType)
-                : [AppPrinterType.programPrinter, AppPrinterType.captionOrderPrinter, AppPrinterType.cashierPrinter]
-        );
+        if (selectedPrinters.length === 0) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'تنبيه',
+                detail: 'لم يتم اختيار أي طابعة',
+            });
+            return;
+        }
+
+        const selectedTypes = new Set(selectedPrinters.map((p) => p.appPrinterType));
         console.log('[DEBUG printOrder] selectedTypes:', Array.from(selectedTypes));
         console.log('[DEBUG printOrder] settings:', { programPrinter: settings.programPrinter?.id, captionOrderPrinter: settings.captionOrderPrinter?.id, cashierPrinter: settings.cashierPrinter?.id });
 
@@ -1455,8 +1458,13 @@ export class Cashier extends BaseComponent implements OnInit {
     ];
     productService = inject(ProductService);
     groupService = inject(GroupService);
-    currentMenuItemIx = signal(0);
-    currentMenuItemAdditions = computed(() => this.orderMenuItems()[this.currentMenuItemIx()].additions);
+    currentMenuItemIx = signal<number | null>(null);
+    currentMenuItem = computed(() => {
+        const currentIndex = this.currentMenuItemIx();
+        if (currentIndex == null) return null;
+        return this.orderMenuItems()[currentIndex] ?? null;
+    });
+    currentMenuItemAdditions = computed(() => this.currentMenuItem()?.additions ?? []);
     additionProducts = signal<IProductSearchRow[]>([]);
     additionPaginationInfo: {
         pageIndex: number;
@@ -1469,8 +1477,9 @@ export class Cashier extends BaseComponent implements OnInit {
     };
 
     addAdditionQuantity(addition: IProductSearchRow, quantity: number | null) {
-        const currentMenuItem = this.orderMenuItems()[this.currentMenuItemIx()];
-        console.log('add existingAddition', addition, quantity);
+        const currentIndex = this.currentMenuItemIx();
+        const currentMenuItem = this.currentMenuItem();
+        if (currentIndex == null || !currentMenuItem) return;
 
         const existingAddition = currentMenuItem.additions.find(
             (existingAddition) => existingAddition.product.id === addition.id,
@@ -1479,7 +1488,7 @@ export class Cashier extends BaseComponent implements OnInit {
         const deleteAddition = () =>
             this.orderMenuItems.update((orderItems) =>
                 orderItems.map((orderItem, i) =>
-                    i == this.currentMenuItemIx()
+                    i == currentIndex
                         ? {
                               ...orderItem,
                               additions: orderItem.additions.filter(
@@ -1497,8 +1506,6 @@ export class Cashier extends BaseComponent implements OnInit {
         }
 
         if (existingAddition) {
-            //adding quantity
-
             const futureQuantity = existingAddition.quantity + quantity;
 
             if (futureQuantity <= 0) {
@@ -1506,22 +1513,20 @@ export class Cashier extends BaseComponent implements OnInit {
                 return;
             }
 
-            currentMenuItem.additions.forEach((existingAddition) => {
-                if (existingAddition.product.id === addition.id) {
-                    existingAddition.quantity = futureQuantity > 100 ? 100 : futureQuantity;
-                }
-            });
+            const nextAdditions = currentMenuItem.additions.map((existingAddition) =>
+                existingAddition.product.id === addition.id
+                    ? { ...existingAddition, quantity: futureQuantity > 100 ? 100 : futureQuantity }
+                    : existingAddition,
+            );
 
             this.orderMenuItems.update((items) =>
-                items.map((item, i) => (i == this.currentMenuItemIx() ? currentMenuItem : item)),
+                items.map((item, i) => (i == currentIndex ? { ...currentMenuItem, additions: nextAdditions } : item)),
             );
         } else {
             if (quantity <= 0) return;
-            //add new
-            console.log('new addition', addition);
             this.orderMenuItems.update((orderItems) =>
                 orderItems.map((orderItem, i) =>
-                    i == this.currentMenuItemIx()
+                    i == currentIndex
                         ? {
                               ...orderItem,
                               additions: orderItem.additions.concat({
@@ -1551,19 +1556,30 @@ export class Cashier extends BaseComponent implements OnInit {
     }
 
     updateAdditionQuantity(addition: IProductSearchRow, quantity: number) {
-        const currentMenuItem = this.orderMenuItems()[this.currentMenuItemIx()];
+        const currentIndex = this.currentMenuItemIx();
+        const currentMenuItem = this.currentMenuItem();
+        if (currentIndex == null || !currentMenuItem) return;
         const existingAddition = currentMenuItem.additions.find(
             (existingAddition) => existingAddition.product.id === addition.id,
         );
         if (existingAddition) {
-            existingAddition.quantity = quantity;
             this.orderMenuItems.update((items) =>
-                items.map((item, i) => (i == this.currentMenuItemIx() ? currentMenuItem : item)),
+                items.map((item, i) =>
+                    i == currentIndex
+                        ? {
+                              ...currentMenuItem,
+                              additions: currentMenuItem.additions.map((existing) =>
+                                  existing.product.id === addition.id ? { ...existing, quantity } : existing,
+                              ),
+                          }
+                        : item,
+                ),
             );
         }
     }
 
     getProductAdditions(product: IProductSearchRow, currentMenuItemIx: number) {
+        this.currentMenuItemIx.set(currentMenuItemIx);
         this.productService.getAdditions(product.id).subscribe({
             next: (products) => {
                 if (products?.length > 0) {
@@ -1581,10 +1597,16 @@ export class Cashier extends BaseComponent implements OnInit {
     }
 
     getOrderItemAdditionQuantity(additionId: number) {
-        const orderItem = this.orderMenuItems()[this.currentMenuItemIx()];
-        console.log('orderItem', orderItem);
+        const orderItem = this.currentMenuItem();
+        if (!orderItem) return 0;
         const existingAddition = orderItem.additions.find((addition) => addition.product.id == additionId);
         return existingAddition ? existingAddition.quantity : 0;
+    }
+
+    closeAdditionsDialog() {
+        this.additionsDialogVisible = false;
+        this.additionProducts.set([]);
+        this.currentMenuItemIx.set(null);
     }
 
     //#endregion
