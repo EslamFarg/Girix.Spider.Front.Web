@@ -135,8 +135,10 @@ export class PrintOptions extends BaseComponent {
                 }
             } else {
                 // Single kitchen printer - show as "Kitchen Printer"
+                // Use the job's actual printer ID so it matches the queue job's printer.id
+                // but keep the settings name for familiarity
                 items.push({
-                    id: settings.programPrinter?.id ?? kitchenJobs[0]!.printer.id,
+                    id: kitchenJobs[0]!.printer.id,
                     name: settings.programPrinter?.name ?? kitchenJobs[0]!.printer.name,
                     type: settings.programPrinter?.type ?? kitchenJobs[0]!.printer.type,
                     ipAddressOrMacAddress: settings.programPrinter?.ipAddressOrMacAddress ?? kitchenJobs[0]!.printer.ipAddressOrMacAddress,

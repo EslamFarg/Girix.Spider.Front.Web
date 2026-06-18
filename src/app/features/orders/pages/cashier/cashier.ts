@@ -582,7 +582,7 @@ export class Cashier extends BaseComponent implements OnInit {
             orderType: OrderLocationType.Takeaway,
         });
         this.orderLocationType.set(OrderLocationType.Takeaway);
-        this.patchCustomerFg();
+        this.patchCustomerFg(this.cashCustomer);
         this.resetIdempotencyKey();
         this.orderFg.updateValueAndValidity();
         this.resetData();
@@ -1676,16 +1676,17 @@ export class Cashier extends BaseComponent implements OnInit {
     }
 
     patchCustomerFg(values?: ICustomerSearchRow) {
-        const address = [values?.city, values?.district, values?.street, values?.buildingNumber]
+        const customer = values ?? this.cashCustomer;
+        const address = [customer?.city, customer?.district, customer?.street, customer?.buildingNumber]
             .filter(Boolean)
             .join(', ');
 
         this.orderFg.controls.customerRequest.patchValue({
-            id: values?.id,
-            nameAr: values?.name,
-            nameEn: values?.name,
-            phoneNumber: values?.phoneNumber,
-            secondaryMobileNumber: values?.secondaryMobileNumber,
+            id: customer?.id ?? 0,
+            nameAr: customer?.name ?? 'عميل نقدي',
+            nameEn: customer?.name ?? 'عميل نقدي',
+            phoneNumber: customer?.phoneNumber ?? '',
+            secondaryMobileNumber: customer?.secondaryMobileNumber ?? '',
             addressDescription: address,
         });
     }

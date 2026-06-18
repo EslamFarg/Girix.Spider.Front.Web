@@ -35,5 +35,10 @@ export class SupplierService extends BaseSearchAndCrudService<
     });
   }
 
+
+  getCashSupplierByAccount(){
+    return this.http.get<ISupplierReadResponse>(`${this.apiRoute}/GetCashSupplierByAccount`);
+  }
+
  
 }

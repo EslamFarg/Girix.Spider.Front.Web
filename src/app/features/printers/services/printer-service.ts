@@ -122,7 +122,11 @@ export class PrinterService extends BaseSearchAndCrudService<
 
     /** Called by dialog when user confirms. Filters queue by selected printers. */
     confirmDialogPrint(): void {
+        console.log('[DEBUG confirmDialogPrint] called');
+        console.log('[DEBUG confirmDialogPrint] selectedPrinters:', this.selectedPrinters());
+        console.log('[DEBUG confirmDialogPrint] queue:', this._printQueue);
         if (this.selectedPrinters().length === 0) {
+            console.log('[DEBUG confirmDialogPrint] no printers selected');
             this.messageService.add({
                 severity: 'error',
                 summary: 'خطأ',
@@ -145,7 +149,11 @@ export class PrinterService extends BaseSearchAndCrudService<
             });
         });
 
+        console.log('[DEBUG confirmDialogPrint] filtered jobs:', filtered.length);
+        filtered.forEach((j, i) => console.log(`  Filtered job ${i}:`, j.printer.name, 'type:', j.printer.appPrinterType, 'id:', j.printer.id));
+
         if (filtered.length === 0) {
+            console.log('[DEBUG confirmDialogPrint] no matching jobs');
             this.messageService.add({
                 severity: 'error',
                 summary: 'خطأ',
@@ -155,6 +163,7 @@ export class PrinterService extends BaseSearchAndCrudService<
             return;
         }
 
+        console.log('[DEBUG confirmDialogPrint] executing print');
         this._executePrint(filtered);
         this.closePrinterDialog();
     }
@@ -225,29 +234,17 @@ export class PrinterService extends BaseSearchAndCrudService<
             .then((results) => {
                 const errors = (results ?? []).filter(Boolean);
                 
-                // If there were failures, collect failed jobs and open dialog for retry
+                // If there were failures, show error toasts silently (no modal reopening)
                 if (errors.length > 0) {
-                    // Map errors back to original jobs (same index order)
-                    const failedJobs: IPrintJob[] = [];
-                    errors.forEach((errMsg, index) => {
-                        if (index < jobs.length) {
-                            failedJobs.push(jobs[index]);
-                        }
-                    });
-
-                    // Show error toast for each failed print
-                    errors.forEach((failMsg) => {
+                    // Deduplicate identical error messages so each unique error shows once
+                    const uniqueErrors = [...new Set(errors)];
+                    uniqueErrors.forEach((failMsg) => {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'خطأ',
                             detail: failMsg,
                         });
                     });
-
-                    // Open dialog with failed jobs so user can retry/select different printers
-                    if (failedJobs.length > 0) {
-                        this.openPrinterDialogWithJobs(failedJobs);
-                    }
                 } else {
                     // All prints succeeded
                     this.messageService.add({
@@ -259,8 +256,12 @@ export class PrinterService extends BaseSearchAndCrudService<
             })
             .catch((e) => {
                 console.error(e);
-                // On complete failure, open dialog with all jobs
-                this.openPrinterDialogWithJobs(jobs);
+                // Silent fail: show toast but do not reopen the printer dialog
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'خطأ',
+                    detail: e?.message ?? 'فشل الطباعة',
+                });
             })
             .finally(() => {
                 if (showLoading) this.loadingService.removeLoading();

@@ -81,7 +81,7 @@ export class App {
   authService = inject(AuthService);
   isAuthenticated = this.authService.isAuthenticated;
   isElectron = signal(typeof window !== 'undefined' && !!window.electronAPI);
-  constructor(printerSettingsService: PrinterSettingsService) {
+  constructor() {
     
     if (this.isElectron()) {
       document.body.classList.add('electron');
@@ -109,7 +109,6 @@ export class App {
       }
     });
     
-    printerSettingsService.getSettings().subscribe();
     //go to replacements
     // this.router.navigate(['replacements/huts']);
   }

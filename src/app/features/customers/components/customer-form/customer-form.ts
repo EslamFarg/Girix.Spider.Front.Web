@@ -46,31 +46,31 @@ export class CustomerForm extends BaseComponent implements OnInit {
 
     initialCustomerFgValue: ICustomerFgControls = {
         id: this.fb.control(null, []),
-        nameAr: this.fb.control(null, [Validators.required, onlyLettersAllowed ]),
+        nameAr: this.fb.control(null, [Validators.required, onlyLettersAllowed]),
         nameEn: this.fb.control(null, [onlyLettersAllowed]),
         phoneNumber: this.fb.control(null, [
             // ,
             onlyNumbersAllowed,
-            // Validators.minLength(6),
+            Validators.minLength(6),
             Validators.maxLength(14),
         ]),
         secondaryMobileNumber: this.fb.control(null, [
             // Validators.required,
             onlyNumbersAllowed,
-            // Validators.minLength(6),
+            Validators.minLength(6),
             Validators.maxLength(14),
         ]),
         city: this.fb.control(null, [Validators.maxLength(100)]),
         district: this.fb.control(null, [Validators.maxLength(100)]),
         street: this.fb.control(null, [Validators.maxLength(100)]),
-        buildingNumber: this.fb.control(null, [onlyNumbersAllowed , Validators.maxLength(100)]),
-        apartment: this.fb.control(null, [onlyNumbersAllowed , Validators.maxLength(100)]),
+        buildingNumber: this.fb.control(null, [onlyNumbersAllowed, Validators.maxLength(100)]),
+        apartment: this.fb.control(null, [onlyNumbersAllowed, Validators.maxLength(100)]),
         landmark: this.fb.control(null, [Validators.maxLength(100)]),
-        postalCode: this.fb.control(null, [onlyNumbersAllowed , Validators.maxLength(100)]),
+        postalCode: this.fb.control(null, [onlyNumbersAllowed, Validators.maxLength(100)]),
         commercialRegister: this.fb.control(null, [
             // ,
             onlyNumbersAllowed,
-            // Validators.minLength(10),
+            Validators.minLength(10),
             Validators.maxLength(10),
         ]),
         //ends and starts with  3
@@ -80,7 +80,16 @@ export class CustomerForm extends BaseComponent implements OnInit {
             onlyNumbersAllowed,
             Validators.pattern(/^3.*3$/),
         ]),
-        numberOfFloor: this.fb.control(null, [onlyNumbersAllowed , Validators.maxLength(100)]),
+        customerCode: this.fb.control({
+            value: null,
+            disabled: true,
+        }, [
+            Validators.required,
+            onlyNumbersAllowed,
+            Validators.minLength(1),
+            Validators.maxLength(10),
+        ]),
+        numberOfFloor: this.fb.control(null, [onlyNumbersAllowed, Validators.maxLength(100)]),
         isCompany: this.fb.control(false, []),
         consumeInventory: this.fb.control(true, []),
     };
