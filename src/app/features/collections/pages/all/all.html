@@ -13,35 +13,23 @@
                         placeholder="بحث" />
 
 
-                    <p-inputgroup-addon >
+                    <p-inputgroup-addon>
                         <div class="relative flex items-center justify-center">
-                            <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)" pTooltip="تصفية"></i>
-                            <p-menu
-                                dir="rtl"
-                                [class]="`*:top-full! *:left-0! `"
-                                #filterMenu
-                                [popup]="true"
-                                [style]="{ insetInlineEnd: '100%' }"
-                                styleClass="[&>.p-menu-list]:hidden!"
-                            >
+                            <i class="pi pi-filter cursor-pointer" (click)="filterMenu.toggle($event)"
+                                pTooltip="تصفية"></i>
+                            <p-menu dir="rtl" [class]="`*:top-full! *:left-0! `" #filterMenu [popup]="true"
+                                [style]="{ insetInlineEnd: '100%' }" styleClass="[&>.p-menu-list]:hidden!">
                                 <ng-template #start>
-                                    <p-listbox
-                                        [options]="filterMenuItems()"
-                                        formControlName="searchEnum"
-                                        optionValue="value"
-                                        optionLabel="label"
-                                        class="w-full md:w-56"
-                                        (onChange)="filterMenu.hide()"
-                                    />
+                                    <p-listbox [options]="filterMenuItems()" formControlName="searchEnum"
+                                        optionValue="value" optionLabel="label" class="w-full md:w-56"
+                                        (onChange)="filterMenu.hide()" />
                                 </ng-template>
                             </p-menu>
                         </div>
                     </p-inputgroup-addon>
 
                     <p-inputgroup-addon>
-                        <button 
-                        pButton 
-                        class="cursor-pointer flex gap-3 px-4 h-full py-0! app-p-btn rounded-e-md!"
+                        <button pButton class="cursor-pointer flex gap-3 px-4 h-full py-0! app-p-btn rounded-e-md!"
                             type="submit">
                             <span>بحث</span>
                             <i class="pi pi-search"></i>
@@ -86,30 +74,30 @@
                         <td>
                             <div class="flex items-center justify-center gap-2">
                                 @if (order.isCollected) {
-                            <div class="status active mx-0!">
-                                <span></span>
-                                <span>نقدى</span>
+                                <div class="status active mx-0!">
+                                    <span></span>
+                                    <span>نقدى</span>
+                                </div>
+                                } @else {
+                                <div class="status in-active mx-0!">
+                                    <span></span>
+                                    <span>آجل</span>
+                                </div>
+                                }
+                                <!-- <span>/</span> -->
+                                @if (order.paymentType == OrderPaymentType.Paid) {
+                                <div class="status active mx-0!">
+                                    <span></span>
+                                    <span>مغلق</span>
+                                </div>
+                                } @else {
+                                <div class="status in-active mx-0!">
+                                    <span></span>
+                                    <span>مفتوح</span>
+                                </div>
+                                }
                             </div>
-                            } @else {
-                            <div class="status in-active mx-0!">
-                                <span></span>
-                                <span>آجل</span>
-                            </div>
-                            }
-                            <!-- <span>/</span> -->
-                            @if (order.paymentType == OrderPaymentType.Paid) {
-                            <div class="status active mx-0!">
-                                <span></span>
-                                <span>مغلق</span>
-                            </div>
-                            } @else {
-                            <div class="status in-active mx-0!">
-                                <span></span>
-                                <span>مفتوح</span>
-                            </div>
-                            }
-                            </div>
-                            
+
                         </td>
                         <!-- <td>
                             @if (order.isCollected) {
@@ -142,19 +130,19 @@
                                 @switch (order.orderType) {
                                 @case (OrderLocationType.DineIn) {
                                 <!-- محلي -->
-                                 {{order.placeRefName}}
+                                {{order.placeRefName}}
                                 }
                                 @case (OrderLocationType.PersonDelivery) {
                                 <!-- توصيل -->
-                                 {{order.deliveryName}}
+                                {{order.deliveryName}}
                                 }
                                 @case (OrderLocationType.CompanyDelivery) {
                                 <!-- توصيل -->
-                                 {{order.deliveryName}}
+                                {{order.deliveryName}}
                                 }
                                 @case (OrderLocationType.Takeaway) {
                                 <!-- سفري -->
-                                 لا يوجد
+                                لا يوجد
                                 }
                                 }
                             </div>
@@ -175,7 +163,8 @@
                                     </svg>
                                 </button>
                                 <!-- collect -->
-                                <button appLoadingDisabled type="button" [disabled]="order.isCollected" pTooltip="تحصيل" (click)="
+                                <button appLoadingDisabled type="button" [disabled]="order.isCollected" pTooltip="تحصيل"
+                                    (click)="
                       openCollectionDialog({
                         orderId: order.id,
                         isCollected: order.isCollected,
@@ -226,8 +215,8 @@
                                     </svg>
                                 </button>
                                 <!-- change location type -->
-                                <button appLoadingDisabled (click)="openInvoiceTypeChangeDialog(order)" type="button" pTooltip="تحويل"
-                                    class="edit bg-text-light!">
+                                <button appLoadingDisabled (click)="openInvoiceTypeChangeDialog(order)" type="button"
+                                    pTooltip="تحويل" class="edit bg-text-light!">
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <path
@@ -292,14 +281,17 @@
 
     <form [formGroup]="transferanceFg" class="flex flex-col gap-4 py-4">
         @if (isConfirmTransference) {
-        @if ( toBePaidToClient() > 0) {
-        <p-message severity="info">يوجد مستحقات للعميل بقيمة {{ toBePaidToClient() }}</p-message>
-        }@else if (toBePaidToClient() < 0) { <p-message severity="warn">العميل لم يسدد المبلغ الكامل. متبقي {{
-            toBePaidToClient() * -1 }}</p-message>
-            }@else {
+            @if ( toBePaidToClient() > 0) {
+            <p-message severity="info">يوجد مستحقات للعميل بقيمة {{ toBePaidToClient() }}</p-message>
+            }
+            @else if (toBePaidToClient() < 0) { 
+                <p-message severity="warn">العميل لم يسدد المبلغ الكامل. متبقي {{ toBePaidToClient() * -1 }}</p-message>
+            }
+            @else {
             <p-message severity="info">لا يوجد مستحقات للعميل</p-message>
             }
-            }@else {
+        }
+        @else {
             <div class="text-dark-bg-2 font-medium text-sm grid grid-cols-2 gap-4">
                 <!-- current type -->
                 <div>
@@ -338,8 +330,8 @@
                             [formControl]="transferanceFg.controls.customerRequest.controls.id" bindLabel="name"
                             bindValue="id" [clearable]="false" placeholder="الكل" #customerSelect appDebounce
                             [customEvents]="[
-                  { type: 'searchEvent', value: customerSelect.searchEvent },
-                  { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
+                { type: 'searchEvent', value: customerSelect.searchEvent },
+                { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
                 ]" (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
                             (change)="onCustomerSelected($event)" />
                     </app-input-error-message-handler>
@@ -368,255 +360,135 @@
                     </app-input-error-message-handler>
                 </div>
 
-                <!-- paid / postponed (radio) -->
-                <!-- <div
-            class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4 border-b border-b-text-light pb-4 [&_input]:w-5 [&_input]:aspect-square"
-          >
-            <div class="flex items-center gap-1">
-              <input
-                type="radio"
-                name="isPaid"
-                id="paymentInfoPaid"
-                [defaultChecked]="true"
-                (input)="isPaid.set(true)"
-                [value]="true"
-              />
-              <label for="paymentInfoPaid">{{ 'FORM.PAID' | translate }}</label>
-            </div>
-            <div class="flex items-center gap-1">
-              <input
-                type="radio"
-                name="isPaid"
-                id="paymentInfoPostponed"
-                (input)="isPaid.set(false)"
-                [value]="false"
-              />
-              <label for="paymentInfoPostponed">{{ 'FORM.POSTPONED' | translate }}</label>
-            </div>
-          </div> -->
-
-                <!-- cash -->
-                <!-- <div>
-            <label for="cash">{{ 'FORM.CASH_PAID' | translate }}</label>
-            <app-input-error-message-handler [fc]="transferanceFg.controls.payingCash">
-              <input
-                pInputText
-                aria-describedby="cash-help"
-                [placeholder]="'FORM.CASH' | translate"
-                formControlName="payingCash"
-                appAllowNumbers
-                [max]="transferenceCost()"
-                [disabled]="!isPaid()"
-                [min]="0"
-                [allowDecimal]="true"
-                #payingCash
-                id="payingCash"
-                appDebounce
-                class="app-input"
-                (click)="triggerNumbersKeyboard(payingCash)"
-              />
-            </app-input-error-message-handler>
-          </div> -->
-
-                <!-- cash account -->
-                <!-- <div>
-            <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
-            <app-input-error-message-handler [fc]="transferanceFg.controls.cashAccountId">
-              <ng-select
-                class="app-select w-full"
-                [items]="displayedCashAccounts()"
-                [formControl]="transferanceFg.controls.cashAccountId"
-                bindLabel="name"
-                bindValue="id"
-                [clearable]="false"
-                placeholder="الكل"
-                #cashAccountSelect
-                appDebounce
-                [customEvents]="[
-                  { type: 'searchEvent', value: cashAccountSelect.searchEvent },
-                  { type: 'scrollToEnd', value: cashAccountSelect.scrollToEnd },
-                ]"
-                (debounced)="onCashFinancialAccountsSearch($event)"
-              />
-            </app-input-error-message-handler>
-          </div> -->
-
-                <!-- network -->
-                <!-- <div>
-            <label for="network">{{ 'FORM.NETWORK_PAID' | translate }}</label>
-            <app-input-error-message-handler [fc]="transferanceFg.controls.payingNetwork">
-              <input
-                pInputText
-                appAllowNumbers
-                [allowDecimal]="true"
-                [max]="transferenceCost()"
-                [min]="0"
-                [disabled]="!isPaid()"
-                id="payingNetwork"
-                aria-describedby="network-help"
-                #payingNetwork
-                formControlName="payingNetwork"
-                [placeholder]="'FORM.NETWORK' | translate"
-                class="app-input"
-                (click)="triggerNumbersKeyboard(payingNetwork)"
-              />
-            </app-input-error-message-handler>
-          </div> -->
-
-                <!-- network account -->
-                <!-- <div>
-            <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
-            <app-input-error-message-handler [fc]="transferanceFg.controls.networkAccountId">
-              <ng-select
-                class="app-select w-full"
-                [items]="displayedNetworkAccounts()"
-                [formControl]="transferanceFg.controls.networkAccountId"
-                bindLabel="name"
-                bindValue="id"
-                [clearable]="false"
-                placeholder="الكل"
-                #networkAccountSelect
-                appDebounce
-                [customEvents]="[
-                  { type: 'searchEvent', value: networkAccountSelect.searchEvent },
-                  { type: 'scrollToEnd', value: networkAccountSelect.scrollToEnd },
-                ]"
-                (debounced)="onNetworkFinancialAccountsSearch($event)"
-              />
-            </app-input-error-message-handler>
-          </div> -->
             </div>
 
             <!-- locations -->
             @switch (transferanceFg.value.orderType) {
-            <!-- dine in -->
-            @case (OrderLocationType.DineIn) {
-            <!-- <div> -->
-            @switch (transferanceFg.value.placeType) {
-            <!-- hut -->
-            @case (OrderLocalType.Hut) {
-            <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الكوخ</p>
+                <!-- dine in -->
+                @case (OrderLocationType.DineIn) {
+                    @switch (transferanceFg.value.placeType) {
+                        <!-- hut -->
+                        @case (OrderLocalType.Hut) {
+                        <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الكوخ</p>
 
-            <div class="flex-1 overflow-auto no-scrollbar" appDebounce #hutsScroller [domEvents]="['scroll']"
-                (debounced)="onHutsScroll($event, hutsScroller)">
-                <div class="h-fit grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-[90px_20px]">
-                    @for (item of huts(); track $index) {
-                    <app-hut-card [data]="item" (click)="onHutSelected(item)" class="max-w-[250px]" />
-                    }
-                </div>
-            </div>
+                        <div class="flex-1 overflow-auto no-scrollbar" appDebounce #hutsScroller [domEvents]="['scroll']"
+                            (debounced)="onHutsScroll($event, hutsScroller)">
+                            <div class="h-fit grid mt-20 grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-[90px_20px]">
+                                @for (item of huts(); track $index) {
+                                <app-hut-card [data]="item" (click)="onHutSelected(item)" class="max-w-[250px]" />
+                                }
+                            </div>
+                        </div>
 
-            <div class="grid grid-cols-3 gap-4 border-t border-dark-line pt-4 [&_label]:mb-1 [&_label]:inline-block">
-                <!-- reservation time -->
-                <div>
-                    <label for="">مدة الحجز</label>
-                    <p-select style="--p-select-background: #ffffff" class="w-full border border-dark-line!"
-                        [options]="[30, 60, 90, 120, 150, 180]" formControlName="durationMinutes"
-                        (onChange)="onHutDurationChange($event)" />
-                </div>
-                <!-- hut name/id -->
-                <div>
-                    <label for="">رقم / اسم الكوخ</label>
-                    <input type="text" name="" class="w-full border border-dark-line!" disabled
-                        [value]="currentHut()?.name" pInputText id="" />
-                </div>
-                <!-- hut price -->
-                <div>
-                    <label for="">سعر الكوخ في الساعه</label>
-                    <input type="text" name="" class="w-full border border-dark-line!" disabled
-                        [value]="currentHutPrice().toFixed(2)" pInputText id="" />
-                </div>
-            </div>
-            }
-            <!-- room -->
-            @case (OrderLocalType.Room) {
-            <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الغرفة</p>
+                        <div class="grid grid-cols-3 gap-4 border-t border-dark-line pt-4 [&_label]:mb-1 [&_label]:inline-block">
+                            <!-- reservation time -->
+                            <div>
+                                <label for="">مدة الحجز</label>
+                                <p-select style="--p-select-background: #ffffff" class="w-full border border-dark-line!"
+                                    [options]="[30, 60, 90, 120, 150, 180]" formControlName="durationMinutes"
+                                    (onChange)="onHutDurationChange($event)" />
+                            </div>
+                            <!-- hut name/id -->
+                            <div>
+                                <label for="">رقم / اسم الكوخ</label>
+                                <input type="text" name="" class="w-full border border-dark-line!" disabled
+                                    [value]="currentHut()?.name" pInputText id="" />
+                            </div>
+                            <!-- hut price -->
+                            <div>
+                                <label for="">سعر الكوخ في الساعه</label>
+                                <input type="text" name="" class="w-full border border-dark-line!" disabled
+                                    [value]="currentHutPrice().toFixed(2)" pInputText id="" />
+                            </div>
+                        </div>
+                        }
+                        <!-- room -->
+                        @case (OrderLocalType.Room) {
+                        <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الغرفة</p>
 
-            <div class="flex-1 overflow-auto no-scrollbar" appDebounce #roomsScroller [domEvents]="['scroll']"
-                (debounced)="onRoomsScroll($event, roomsScroller)">
-                <div class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5">
-                    @for (item of rooms(); track $index) {
-                    <app-room-card [data]="item" (click)="onRoomSelected(item)" class="max-w-[250px]" />
+                        <div class="flex-1 overflow-auto no-scrollbar" appDebounce #roomsScroller [domEvents]="['scroll']"
+                            (debounced)="onRoomsScroll($event, roomsScroller)">
+                            <div class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5">
+                                @for (item of rooms(); track $index) {
+                                <app-room-card [data]="item" (click)="onRoomSelected(item)" class="max-w-[250px]" />
+                                }
+                            </div>
+                        </div>
+                        }
+                        <!-- table -->
+                        @case (OrderLocalType.Table) {
+                        <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الطاولة</p>
+                        <div class="flex-1 overflow-auto no-scrollbar" appDebounce #tablesScroller [domEvents]="['scroll']"
+                            (debounced)="onTablesScroll($event, tablesScroller)">
+                            <div class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5">
+                                @for (item of tables(); track $index) {
+                                <app-table-card [data]="item" (click)="onTableSelected(item)" class="max-w-[250px]" />
+                                }
+                            </div>
+                        </div>
+                        }
                     }
-                </div>
-            </div>
+                }
+                <!-- company/person delivery -->
+                @case (OrderLocationType.CompanyDelivery)
+                @case (OrderLocationType.PersonDelivery) {
+                    <div class="flex gap-2 w-full justify-center pt-4"
+                        style="--p-button-primary-background: #fff; --p-button-primary-color: #1f1d2b">
+                        <button pButton [class.text-green-500!]="!isCompanyDelivery" (click)="changeDeliveryType(false)">
+                            دليفري
+                        </button>
+                        <button pButton [class.text-green-500!]="isCompanyDelivery"
+                            (click)="changeDeliveryType(true)">شركة</button>
+                    </div>
+                    <div class="flex-1 overflow-visible no-scrollbar" appDebounce #tablesScroller >
+                        <div class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5 *:flex *:flex-col *:items-center *:justify-center *:border *:p-4! *:rounded-[14px] *:cursor-pointer"
+                            style="--p-button-primary-background: #fff">
+                            @if (isCompanyDelivery) {
+                                @for (item of companyDeliveries(); track $index) {
+                                <button pButton (click)="onDeliverySelected(item.id)">
+                                    <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                                            stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <p class="text-center text-dark-bg-2 text-sm">
+                                        {{ item.name }}
+                                    </p>
+                                </button>
+                                } @empty {
+                                <p-skeleton class="h-20" />
+                                <p-skeleton class="h-20" />
+                                <p-skeleton class="h-20" />
+                                }
+                            } 
+                            @else {
+                                @for (item of deliveries(); track $index) {
+                                <button pButton class="relative overflow-visible!" (click)="onDeliverySelected(item.id)">
+                                    <span
+                                        class="absolute -top-2.5 -left-2.5 text-xs text-white bg-rose-600 rounded-full w-5 h-5 flex items-center justify-center">{{
+                                        item.orderNumber }}</span>
+                                    <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                                            stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <p class="text-center text-dark-bg-2 text-sm">
+                                        {{ item.name }}
+                                    </p>
+                                </button>
+                                } @empty {
+                                <p-skeleton class="h-20" />
+                                <p-skeleton class="h-20" />
+                                <p-skeleton class="h-20" />
+                                }
+                            }
+                        </div>
+                    </div>
+                }
             }
-            <!-- table -->
-            @case (OrderLocalType.Table) {
-            <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الطاولة</p>
-            <div class="flex-1 overflow-auto no-scrollbar" appDebounce #tablesScroller [domEvents]="['scroll']"
-                (debounced)="onTablesScroll($event, tablesScroller)">
-                <div class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5">
-                    @for (item of tables(); track $index) {
-                    <app-table-card [data]="item" (click)="onTableSelected(item)" class="max-w-[250px]" />
-                    }
-                </div>
-            </div>
-            }
-            }
-            <!-- </div> -->
-            }
-
-            <!-- company/person delivery -->
-            @case (OrderLocationType.CompanyDelivery)
-            @case (OrderLocationType.PersonDelivery) {
-            <div class="flex gap-2 w-full justify-center pt-4"
-                style="--p-button-primary-background: #fff; --p-button-primary-color: #1f1d2b">
-                <button pButton [class.text-green-500!]="!isCompanyDelivery" (click)="changeDeliveryType(false)">
-                    دليفري
-                </button>
-                <button pButton [class.text-green-500!]="isCompanyDelivery"
-                    (click)="changeDeliveryType(true)">شركة</button>
-            </div>
-            <div class="flex-1 overflow-visible no-scrollbar" appDebounce #tablesScroller [domEvents]="['scroll']"
-                (debounced)="onDeliveriesScroll($event, tablesScroller)">
-                <div class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5 *:flex *:flex-col *:items-center *:justify-center *:border *:p-4! *:rounded-[14px] *:cursor-pointer"
-                    style="--p-button-primary-background: #fff">
-                    @if (isCompanyDelivery) {
-                    @for (item of companyDeliveries(); track $index) {
-                    <button pButton (click)="onDeliverySelected(item.id)">
-                        <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
-                                stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <p class="text-center text-dark-bg-2 text-sm">
-                            {{ item.name }}
-                        </p>
-                    </button>
-                    } @empty {
-                    <p-skeleton class="h-20" />
-                    <p-skeleton class="h-20" />
-                    <p-skeleton class="h-20" />
-                    }
-                    } @else {
-                    @for (item of deliveries(); track $index) {
-                    <button pButton class="relative overflow-visible!" (click)="onDeliverySelected(item.id)">
-                        <span
-                            class="absolute -top-2.5 -left-2.5 text-xs text-white bg-rose-600 rounded-full w-5 h-5 flex items-center justify-center">{{
-                            item.orderNumber }}</span>
-                        <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
-                                stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <p class="text-center text-dark-bg-2 text-sm">
-                            {{ item.name }}
-                        </p>
-                    </button>
-                    } @empty {
-                    <p-skeleton class="h-20" />
-                    <p-skeleton class="h-20" />
-                    <p-skeleton class="h-20" />
-                    }
-                    }
-                </div>
-            </div>
-            }
-            }
-            }
+        }
 
 
     </form>
