@@ -11,39 +11,39 @@
   color: rgb(var(--color));
 }
 
+.hut-body {
+  gap: 6px;
+}
+
+/* Default: roof zone collapses — roof overlaps body top as before */
+.hut-roof-zone {
+  position: relative;
+  height: 0;
+  overflow: visible;
+}
+
 /*
-  Hut switch screen (تبديل الأكواخ) — ~85% scale from ~165px baseline.
-  Body: 140 × 92px (110/72 aspect) | Roof: ~93px (4/6 of body width)
+  Hut switch screen (تبديل الأكواخ) — self-contained card: roof + body (name + timer).
 */
 :host(.hut-switch-card) {
+  --hut-base-width: 165px;
+  --hut-scale: 0.92;
+  --hut-roof-zone: 54px;
+
   display: block;
-  width: 140px;
+  width: var(--hut-base-width);
+  zoom: var(--hut-scale);
   flex-shrink: 0;
+  box-sizing: content-box;
 }
 
-:host(.hut-switch-card) .hut-body {
-  width: 100%;
-  aspect-ratio: 110 / 72;
-  border-radius: 0.875rem;
-}
-
-:host(.hut-switch-card) .hut-roof {
-  width: 66.666667%;
-  left: 50%;
-  transform: rotate(45deg) translate(-50%, calc(-50% + 4px));
-  border-radius: 0.75rem;
-  box-shadow: -3px -3px 5px 0px rgba(var(--color), 0.5) !important;
-}
-
-:host(.hut-switch-card) .hut-card-label {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+:host(.hut-switch-card) .hut-roof-zone {
+  height: var(--hut-roof-zone);
+  overflow: visible;
 }
 
 :host(.hut-switch-card) .hut-timer {
-  font-size: 0.8125rem;
-  line-height: 1.125rem;
-  margin-top: 2px;
+  margin: 0;
 }
 
 .hut-available {
@@ -61,13 +61,11 @@
 
 .hut-reserved {
   --color: 255, 56, 60;
-  /* border-color: var(--color); */
 
   color: rgb(var(--color));
 }
 
 .hut-on-hold {
   --color: 255, 141, 40;
-  /* border-color: rgb(var(--color)) */
   color: rgb(var(--color));
 }

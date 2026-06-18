@@ -95,7 +95,7 @@
         }
         <!--  -->
         @case (SpaceTypeEnum.Hut) {
-          <div class="hut-switch-picker flex flex-wrap my-4 gap-3 w-full justify-center pt-11 pb-2 relative z-1">
+          <div class="hut-switch-picker flex flex-wrap my-4 w-full justify-center pt-11 pb-2 relative z-1">
             @for (hut of huts(); track $index) {
               <app-hut-card
                 class="hut-switch-card"

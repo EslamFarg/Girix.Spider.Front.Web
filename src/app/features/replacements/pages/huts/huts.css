@@ -1,9 +1,16 @@
 .hut-switch-grid {
+  --hut-base-width: 165px;
+  --hut-scale: 0.92;
+  --hut-slot-width: calc(var(--hut-base-width) * var(--hut-scale));
+  --hut-search-clearance: 24px;
+  --hut-row-gap: 8px;
+
   display: grid;
-  grid-template-columns: repeat(auto-fill, 140px);
+  grid-template-columns: repeat(auto-fill, var(--hut-slot-width));
+  grid-auto-rows: min-content;
   column-gap: 12px;
-  row-gap: 16px;
+  row-gap: var(--hut-row-gap);
   justify-content: center;
-  padding-top: 48px;
-  margin-top: 1rem;
+  align-items: start;
+  margin-top: var(--hut-search-clearance);
 }

@@ -112,16 +112,14 @@ export class ReceiptTemplateService {
                 <!-- Items Table -->
                 <table style="width:100%;border-collapse:collapse;margin-bottom:10px;table-layout:fixed;">
                     <colgroup>
-                        <col style="width:160px;">
+                        <col style="width:200px;">
                         <col style="width:50px;">
-                        <col style="width:64px;">
-                        <col style="width:64px;">
+                        <col style="width:88px;">
                     </colgroup>
                     <thead>
                         <tr style="border-bottom:2px solid #000;">
                             <th style="padding:4px 2px;text-align:right;font-size:18px;">الصنف</th>
                             <th style="padding:4px 2px;text-align:center;font-size:18px;">الكمية</th>
-                            <th style="padding:4px 2px;text-align:center;font-size:18px;">السعر</th>
                             <th style="padding:4px 2px;text-align:left;font-size:18px;">الإجمالي</th>
                         </tr>
                     </thead>
@@ -136,15 +134,15 @@ export class ReceiptTemplateService {
                 <!-- Totals -->
                 <div style="margin-bottom:12px;">
                     <div style="text-align:center;font-weight:bold;margin-bottom:8px;font-size:24px;border-bottom:1px solid #ccc;padding-bottom:4px;">الملخص</div>
-                    ${this.infoRow('الإجمالي:', (bill.summary?.totalUnitPrice ?? 0).toFixed(2))}
-                    ${this.infoRow('الخصم:', (bill.summary?.discountAmount ?? 0).toFixed(2))}
-                    ${this.infoRow('نسبة الخصم:', (bill.summary?.discountPercentage ?? 0).toFixed(2) + '%')}
-                    ${this.infoRow('رسوم الخدمة:', (bill.summary?.serviceFee ?? 0).toFixed(2))}
-                    ${this.infoRow('ضريبة الخدمة:', (bill.summary?.systemServiceFee ?? 0).toFixed(2))}
-                    ${this.infoRow('ضريبة القيمة المضافة:', (bill.summary?.vatAmount ?? 0).toFixed(2))}
-                    ${this.infoRow('الضريبة الانتقائية:', (bill.summary?.totalSelectiveTax ?? 0).toFixed(2))}
-                    ${this.infoRow('سعر المكان:', (bill.summary?.priceForPlace ?? 0).toFixed(2))}
-                    ${this.infoRow('مدة الحجز:', (bill.summary?.durationMinutes ?? 0) + ' دقيقة')}
+                    ${this.infoRowIfNonZero('الإجمالي:', (bill.summary?.totalUnitPrice ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('الخصم:', (bill.summary?.discountAmount ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('نسبة الخصم:', (bill.summary?.discountPercentage ?? 0).toFixed(2) + '%')}
+                    ${this.infoRowIfNonZero('رسوم الخدمة:', (bill.summary?.serviceFee ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('ضريبة الخدمة:', (bill.summary?.systemServiceFee ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('ضريبة القيمة المضافة:', (bill.summary?.vatAmount ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('الضريبة الانتقائية:', (bill.summary?.totalSelectiveTax ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('سعر المكان:', (bill.summary?.priceForPlace ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('مدة الحجز:', (bill.summary?.durationMinutes ?? 0) + ' دقيقة')}
                     <div style="display:flex;justify-content:space-between;margin-top:8px;border-top:3px solid #000;padding-top:8px;">
                         <span style="font-size:26px;font-weight:bold;">الصافي:</span>
                         <span style="font-size:26px;font-weight:bold;">${(bill.summary?.totalNet ?? 0).toFixed(2)}</span>
@@ -156,9 +154,9 @@ export class ReceiptTemplateService {
                 <div style="border-top:2px dashed #000;margin:10px 0;"></div>
                 <div style="margin-bottom:12px;">
                     <div style="text-align:center;font-weight:bold;margin-bottom:8px;font-size:24px;border-bottom:1px solid #ccc;padding-bottom:4px;">تفاصيل الدفع</div>
-                    ${this.infoRow('نقدي:', (bill.payments?.payingCash ?? 0).toFixed(2))}
-                    ${this.infoRow('شبكة:', (bill.payments?.payingNetwork ?? 0).toFixed(2))}
-                    ${this.infoRow('المتبقي:', (bill.payments?.remaining ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('نقدي:', (bill.payments?.payingCash ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('شبكة:', (bill.payments?.payingNetwork ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('المتبقي:', (bill.payments?.remaining ?? 0).toFixed(2))}
                 </div>` : ''}
 
                 <!-- To Be Paid -->
@@ -166,9 +164,9 @@ export class ReceiptTemplateService {
                 <div style="border-top:2px dashed #000;margin:10px 0;"></div>
                 <div style="margin-bottom:12px;">
                     <div style="text-align:center;font-weight:bold;margin-bottom:8px;font-size:24px;border-bottom:1px solid #ccc;padding-bottom:4px;">المطلوب سداده</div>
-                    ${this.infoRow('قبل الطلب:', (bill.toBePaid?.beforeNetOrder ?? 0).toFixed(2))}
-                    ${this.infoRow('بعد الطلب:', (bill.toBePaid?.afterNetOrder ?? 0).toFixed(2))}
-                    ${this.infoRow('المبلغ:', (bill.toBePaid?.amount ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('قبل الطلب:', (bill.toBePaid?.beforeNetOrder ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('بعد الطلب:', (bill.toBePaid?.afterNetOrder ?? 0).toFixed(2))}
+                    ${this.infoRowIfNonZero('المبلغ:', (bill.toBePaid?.amount ?? 0).toFixed(2))}
                 </div>` : ''}
 
                 <!-- Footer -->
@@ -183,6 +181,12 @@ export class ReceiptTemplateService {
     // ─────────────────────────────────────────────
     // Private helpers
     // ─────────────────────────────────────────────
+
+    private infoRowIfNonZero(label: string, value: string | number): string {
+        const numValue = typeof value === 'string' ? parseFloat(value) : value;
+        if (!numValue || numValue === 0) return '';
+        return this.infoRow(label, value);
+    }
 
     private infoRow(label: string, value: string | number): string {
         return `
@@ -271,18 +275,16 @@ export class ReceiptTemplateService {
                 const itemTotal = (item.unitPriceWithTax ?? 0) * item.qty;
                 let rows = `
                     <tr>
-                        <td style="padding:4px 2px;text-align:right;border-bottom:1px dashed #ccc;font-size:18px;word-break:break-all;">${this.formatItemName(item.name, 14)}</td>
+                        <td style="padding:4px 2px;text-align:right;border-bottom:1px dashed #ccc;font-size:18px;word-break:break-all;">${this.formatItemName(item.name, 18)}</td>
                         <td style="padding:4px 2px;text-align:center;border-bottom:1px dashed #ccc;font-size:18px;white-space:nowrap;">${item.qty}</td>
-                        <td style="padding:4px 2px;text-align:center;border-bottom:1px dashed #ccc;font-size:18px;white-space:nowrap;">${item.unitPriceWithTax?.toFixed(2) ?? '0.00'}</td>
                         <td style="padding:4px 2px;text-align:left;border-bottom:1px dashed #ccc;font-size:18px;white-space:nowrap;">${itemTotal.toFixed(2)}</td>
                     </tr>`;
                 for (const modifier of item.modifiers ?? []) {
                     const modTotal = (modifier.unitPriceWithTax ?? 0) * modifier.qty;
                     rows += `
                     <tr>
-                        <td style="padding:4px 2px 4px 8px;text-align:right;border-bottom:1px dashed #eee;color:#555;font-size:16px;word-break:break-all;">+ ${this.formatItemName(modifier.name, 14)}</td>
+                        <td style="padding:4px 2px 4px 8px;text-align:right;border-bottom:1px dashed #eee;color:#555;font-size:16px;word-break:break-all;">+ ${this.formatItemName(modifier.name, 18)}</td>
                         <td style="padding:4px 2px;text-align:center;border-bottom:1px dashed #eee;color:#555;font-size:16px;white-space:nowrap;">${modifier.qty}</td>
-                        <td style="padding:4px 2px;text-align:center;border-bottom:1px dashed #eee;color:#555;font-size:16px;white-space:nowrap;">${modifier.unitPriceWithTax?.toFixed(2) ?? '0.00'}</td>
                         <td style="padding:4px 2px;text-align:left;border-bottom:1px dashed #eee;color:#555;font-size:16px;white-space:nowrap;">${modTotal.toFixed(2)}</td>
                     </tr>`;
                 }
