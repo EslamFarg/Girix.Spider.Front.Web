@@ -10,7 +10,7 @@
         </div>
         <div class="flex flex-col gap-1">
             <label class="text-xs text-text-gray">بحث</label>
-            <input pInputText type="text" formControlName="searchTerm" placeholder="اسم العميل..." class="bg-transparent!" />
+            <input pInputText type="text" formControlName="searchTerm" placeholder="بحث..." class="bg-transparent!" />
         </div>
         <div class="flex gap-2 ms-auto">
             <button type="submit" class="flex items-center gap-1 cursor-pointer" pTooltip="بحث">
@@ -23,7 +23,7 @@
     </form>
 
     <app-report-print-view
-        title="تقرير العملاء"
+        title="تقرير الميزانية"
         [columns]="columns"
         [rows]="rows()"
         [filters]="lastSearchFilters()"

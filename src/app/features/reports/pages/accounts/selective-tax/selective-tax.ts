@@ -7,17 +7,17 @@ import { TooltipModule } from 'primeng/tooltip';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
-import { ReportPrintView, IReportColumn, IReportFilter } from '../../components/report-print-view/report-print-view';
-import { ReportsService } from '../../services/reports-service';
-import { ICustomersReportRow } from '../../types/api/reports-types';
+import { ReportPrintView, IReportColumn, IReportFilter } from '../../../components/report-print-view/report-print-view';
+import { ReportsService } from '../../../services/reports-service';
+import { ISelectiveTaxReportRow } from '../../../types/api/reports-types';
 
 @Component({
-  selector: 'app-customers-report',
+  selector: 'app-selective-tax-report',
   imports: [SectionWrapper, ReactiveFormsModule, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule, ReportPrintView],
-  templateUrl: './customers.html',
-  styleUrl: './customers.css',
+  templateUrl: './selective-tax.html',
+  styleUrl: './selective-tax.css',
 })
-export class CustomersReport extends BaseComponent {
+export class SelectiveTaxReport extends BaseComponent {
   reportsService = inject(ReportsService);
 
   fg = this.fb.group({
@@ -27,13 +27,14 @@ export class CustomersReport extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'customerName', label: 'اسم العميل' },
-    { key: 'phoneNumber', label: 'رقم الجوال' },
-    { key: 'address', label: 'العنوان' },
-    { key: 'balance', label: 'الرصيد', type: 'currency', total: true },
+    { key: 'invoiceNumber', label: 'رقم الفاتورة' },
+    { key: 'date', label: 'التاريخ', type: 'date' },
+    { key: 'partyName', label: 'الطرف' },
+    { key: 'selectiveTaxAmount', label: 'الضريبة الانتقائية', type: 'currency', total: true },
+    { key: 'tobaccoFeesAmount', label: 'رسوم التبغ', type: 'currency', total: true },
   ];
 
-  rows = signal<ICustomersReportRow[]>([]);
+  rows = signal<ISelectiveTaxReportRow[]>([]);
   lastSearchFilters = signal<IReportFilter[]>([]);
   paginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
@@ -49,7 +50,7 @@ export class CustomersReport extends BaseComponent {
       { label: 'إلى تاريخ', value: v.toDate },
       { label: 'بحث', value: v.searchTerm || null },
     ]);
-    this.reportsService.getCustomersReport({ ...v, pageIndex, pageSize: 10 }).subscribe({
+    this.reportsService.getSelectiveTaxReport({ ...v, pageIndex, pageSize: 10 }).subscribe({
       next: (res) => {
         this.rows.set(res.data);
         this.paginationInfo = { pageIndex, totalPagesCount: res.paginationInfo.totalPagesCount, totalRowsCount: res.paginationInfo.totalRowsCount };

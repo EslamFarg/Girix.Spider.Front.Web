@@ -26,6 +26,19 @@ import {
   IAccountMovementRow,
   IVoucherReportRow,
   IGeneralJournalRow,
+  ISingleItemProfitRow,
+  ITrialBalanceRow,
+  IGroupedTrialBalanceRow,
+  IAccountGroupBalanceRow,
+  IGeneralLedgerRow,
+  IIncomeStatementRow,
+  ICustomersReportRow,
+  ISuppliersReportRow,
+  IDailyTransactionRow,
+  IMiniDailyJournalRow,
+  IDailySalesMovementRow,
+  IVatReportRow,
+  ISelectiveTaxReportRow,
 } from '../types/api/reports-types';
 
 @Injectable({ providedIn: 'root' })
@@ -232,6 +245,111 @@ export class ReportsService extends BaseService {
   getGeneralJournal(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IGeneralJournalRow>>(
       `${this.apiUrl}/GeneralJournal`,
+      criteria,
+    );
+  }
+
+  getSingleItemProfit(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<ISingleItemProfitRow>>(
+      `${this.apiUrl}/SingleItemProfit`,
+      criteria,
+    );
+  }
+
+  getTrialBalance(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<ITrialBalanceRow>>(
+      `${this.apiUrl}/TrialBalance`,
+      criteria,
+    );
+  }
+
+  getGroupedTrialBalance(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<IGroupedTrialBalanceRow>>(
+      `${this.apiUrl}/GroupedTrialBalance`,
+      criteria,
+    );
+  }
+
+  getAccountGroupBalance(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<IAccountGroupBalanceRow>>(
+      `${this.apiUrl}/AccountGroupBalance`,
+      criteria,
+    );
+  }
+
+  getGeneralLedger(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<IGeneralLedgerRow>>(
+      `${this.apiUrl}/GeneralLedger`,
+      criteria,
+    );
+  }
+
+  getAccountStatement(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<IAccountStatementRow>>(
+      `${this.apiUrl}/AccountStatement`,
+      criteria,
+    );
+  }
+
+  getBalanceSheet(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<IAccountBalanceRow>>(
+      `${this.apiUrl}/BalanceSheet`,
+      criteria,
+    );
+  }
+
+  getIncomeStatement(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<IIncomeStatementRow>>(
+      `${this.apiUrl}/IncomeStatement`,
+      criteria,
+    );
+  }
+
+  getCustomersReport(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<ICustomersReportRow>>(
+      `${this.apiUrl}/Customers`,
+      criteria,
+    );
+  }
+
+  getSuppliersReport(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<ISuppliersReportRow>>(
+      `${this.apiUrl}/Suppliers`,
+      criteria,
+    );
+  }
+
+  getDailyTransaction(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<IDailyTransactionRow>>(
+      `${this.apiUrl}/DailyTransaction`,
+      criteria,
+    );
+  }
+
+  getMiniDailyJournal(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<IMiniDailyJournalRow>>(
+      `${this.apiUrl}/MiniDailyJournal`,
+      criteria,
+    );
+  }
+
+  getDailySalesMovement(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<IDailySalesMovementRow>>(
+      `${this.apiUrl}/DailySalesMovement`,
+      criteria,
+    );
+  }
+
+  getVatReport(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<IVatReportRow>>(
+      `${this.apiUrl}/Vat`,
+      criteria,
+    );
+  }
+
+  getSelectiveTaxReport(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<ISelectiveTaxReportRow>>(
+      `${this.apiUrl}/SelectiveTax`,
       criteria,
     );
   }

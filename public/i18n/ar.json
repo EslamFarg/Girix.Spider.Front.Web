@@ -190,7 +190,22 @@
         "ACCOUNT_MOVEMENT": { "LABEL": "حركة الحسابات" },
         "RECEIPT_VOUCHERS": { "LABEL": "سندات القبض" },
         "PAYMENT_VOUCHERS": { "LABEL": "سندات الصرف" },
-        "GENERAL_JOURNAL": { "LABEL": "اليومية العامة" }
+        "GENERAL_JOURNAL": { "LABEL": "اليومية العامة" },
+        "SingleItemProfit": { "LABEL": "تقرير أرباح صنف واحد" },
+        "TrialBalance": { "LABEL": "تقرير ميزان المراجعة" },
+        "GroupedTrialBalance": { "LABEL": "تقرير ميزان المراجعة المجمع" },
+        "AccountGroupBalance": { "LABEL": "تقرير ميزان مجموعة الحسابات" },
+        "GeneralLedger": { "LABEL": "تقرير دفتر الأستاذ" },
+        "AccountStatement": { "LABEL": "تقرير كشف الحساب" },
+        "BalanceSheet": { "LABEL": "تقرير الميزانية" },
+        "IncomeStatement": { "LABEL": "تقرير قائمة الدخل" },
+        "Customers": { "LABEL": "تقرير العملاء" },
+        "Suppliers": { "LABEL": "تقرير الموردين" },
+        "DailyTransaction": { "LABEL": "تقرير حركة اليومية" },
+        "MiniDailyJournal": { "LABEL": "تقرير اليومية المصغرة" },
+        "DailySalesMovement": { "LABEL": "تقرير حركة المبيعات اليومية" },
+        "Vat": { "LABEL": "تقرير ضريبة القيمة المضافة" },
+        "SelectiveTax": { "LABEL": "تقرير الضريبة الانتقائية ورسوم التبغ" }
       }
     }
   },

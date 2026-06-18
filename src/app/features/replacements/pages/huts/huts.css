@@ -1,18 +1,9 @@
-.hut-available {
-  --color: 80, 209, 170;
-  border-color: rgb(var(--color));
-  color: rgb(var(--color));
-}
-
-.hut-reserved {
-  --color: 255, 56, 60;
-  /* border-color: var(--color); */
-
-  color: rgb(var(--color));
-}
-
-.hut-on-hold {
-  --color: 255, 141, 40;
-  /* border-color: rgb(var(--color)) */
-  color: rgb(var(--color));
+.hut-switch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 140px);
+  column-gap: 12px;
+  row-gap: 16px;
+  justify-content: center;
+  padding-top: 48px;
+  margin-top: 1rem;
 }

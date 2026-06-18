@@ -7,33 +7,35 @@ import { TooltipModule } from 'primeng/tooltip';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
-import { ReportPrintView, IReportColumn, IReportFilter } from '../../components/report-print-view/report-print-view';
-import { ReportsService } from '../../services/reports-service';
-import { ICustomersReportRow } from '../../types/api/reports-types';
+import { ReportPrintView, IReportColumn, IReportFilter } from '../../../components/report-print-view/report-print-view';
+import { ReportsService } from '../../../services/reports-service';
+import { ISingleItemProfitRow } from '../../../types/api/reports-types';
 
 @Component({
-  selector: 'app-customers-report',
+  selector: 'app-single-item-profit',
   imports: [SectionWrapper, ReactiveFormsModule, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule, ReportPrintView],
-  templateUrl: './customers.html',
-  styleUrl: './customers.css',
+  templateUrl: './single-item-profit.html',
+  styleUrl: './single-item-profit.css',
 })
-export class CustomersReport extends BaseComponent {
+export class SingleItemProfit extends BaseComponent {
   reportsService = inject(ReportsService);
 
   fg = this.fb.group({
     fromDate: this.fb.control<string | null>(null),
     toDate: this.fb.control<string | null>(null),
     searchTerm: this.fb.control<string>(''),
+    itemId: this.fb.control<number | null>(null),
   });
 
   columns: IReportColumn[] = [
-    { key: 'customerName', label: 'اسم العميل' },
-    { key: 'phoneNumber', label: 'رقم الجوال' },
-    { key: 'address', label: 'العنوان' },
-    { key: 'balance', label: 'الرصيد', type: 'currency', total: true },
+    { key: 'itemId', label: 'كود الصنف' },
+    { key: 'itemNameAr', label: 'اسم الصنف' },
+    { key: 'totalSales', label: 'إجمالي المبيعات', type: 'currency', total: true },
+    { key: 'totalCost', label: 'إجمالي التكلفة', type: 'currency', total: true },
+    { key: 'profit', label: 'الربح', type: 'currency', total: true },
   ];
 
-  rows = signal<ICustomersReportRow[]>([]);
+  rows = signal<ISingleItemProfitRow[]>([]);
   lastSearchFilters = signal<IReportFilter[]>([]);
   paginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
@@ -48,8 +50,9 @@ export class CustomersReport extends BaseComponent {
       { label: 'من تاريخ', value: v.fromDate },
       { label: 'إلى تاريخ', value: v.toDate },
       { label: 'بحث', value: v.searchTerm || null },
+      { label: 'رقم الصنف', value: v.itemId || null },
     ]);
-    this.reportsService.getCustomersReport({ ...v, pageIndex, pageSize: 10 }).subscribe({
+    this.reportsService.getSingleItemProfit({ ...v, pageIndex, pageSize: 10 }).subscribe({
       next: (res) => {
         this.rows.set(res.data);
         this.paginationInfo = { pageIndex, totalPagesCount: res.paginationInfo.totalPagesCount, totalRowsCount: res.paginationInfo.totalRowsCount };

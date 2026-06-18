@@ -233,3 +233,107 @@ export interface IGeneralJournalRow {
   debit: number;
   credit: number;
 }
+
+// ── New Reports ───────────────────────────────────────────────────────────────
+
+export interface ISingleItemProfitRow {
+  itemId: number;
+  itemNameAr: string;
+  totalSales: number;
+  totalCost: number;
+  profit: number;
+}
+
+export interface ITrialBalanceRow {
+  accountCode: string;
+  accountName: string;
+  debitBalance: number;
+  creditBalance: number;
+}
+
+export interface IGroupedTrialBalanceRow {
+  groupName: string;
+  accountCode: string;
+  accountName: string;
+  debitBalance: number;
+  creditBalance: number;
+}
+
+export interface IAccountGroupBalanceRow {
+  groupName: string;
+  debitBalance: number;
+  creditBalance: number;
+  netBalance: number;
+}
+
+export interface IGeneralLedgerRow {
+  date: string;
+  accountCode: string;
+  accountName: string;
+  description: string;
+  referenceNumber: string;
+  debit: number;
+  credit: number;
+  balance: number;
+}
+
+export interface IIncomeStatementRow {
+  accountCode: string;
+  accountName: string;
+  amount: number;
+}
+
+export interface ICustomersReportRow {
+  customerName: string;
+  phoneNumber: string;
+  address: string;
+  balance: number;
+}
+
+export interface ISuppliersReportRow {
+  supplierName: string;
+  phoneNumber: string;
+  address: string;
+  balance: number;
+}
+
+export interface IDailyTransactionRow {
+  date: string;
+  description: string;
+  referenceNumber: string;
+  debit: number;
+  credit: number;
+}
+
+export interface IMiniDailyJournalRow {
+  journalNumber: string;
+  date: string;
+  description: string;
+  debit: number;
+  credit: number;
+}
+
+export interface IDailySalesMovementRow {
+  invoiceNumber: string;
+  date: string;
+  customerName: string;
+  totalAmount: number;
+  taxAmount: number;
+  netAmount: number;
+}
+
+export interface IVatReportRow {
+  invoiceNumber: string;
+  date: string;
+  partyName: string;
+  taxableAmount: number;
+  vatAmount: number;
+}
+
+export interface ISelectiveTaxReportRow {
+  invoiceNumber: string;
+  date: string;
+  partyName: string;
+  selectiveTaxAmount: number;
+  tobaccoFeesAmount: number;
+}

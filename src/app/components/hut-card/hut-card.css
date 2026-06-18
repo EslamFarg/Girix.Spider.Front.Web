@@ -11,6 +11,41 @@
   color: rgb(var(--color));
 }
 
+/*
+  Hut switch screen (تبديل الأكواخ) — ~85% scale from ~165px baseline.
+  Body: 140 × 92px (110/72 aspect) | Roof: ~93px (4/6 of body width)
+*/
+:host(.hut-switch-card) {
+  display: block;
+  width: 140px;
+  flex-shrink: 0;
+}
+
+:host(.hut-switch-card) .hut-body {
+  width: 100%;
+  aspect-ratio: 110 / 72;
+  border-radius: 0.875rem;
+}
+
+:host(.hut-switch-card) .hut-roof {
+  width: 66.666667%;
+  left: 50%;
+  transform: rotate(45deg) translate(-50%, calc(-50% + 4px));
+  border-radius: 0.75rem;
+  box-shadow: -3px -3px 5px 0px rgba(var(--color), 0.5) !important;
+}
+
+:host(.hut-switch-card) .hut-card-label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+:host(.hut-switch-card) .hut-timer {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  margin-top: 2px;
+}
+
 .hut-available {
   --color: black;
   &.active ,

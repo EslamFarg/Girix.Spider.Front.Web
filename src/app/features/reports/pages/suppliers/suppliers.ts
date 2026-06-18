@@ -9,15 +9,15 @@ import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { ReportPrintView, IReportColumn, IReportFilter } from '../../components/report-print-view/report-print-view';
 import { ReportsService } from '../../services/reports-service';
-import { ICustomersReportRow } from '../../types/api/reports-types';
+import { ISuppliersReportRow } from '../../types/api/reports-types';
 
 @Component({
-  selector: 'app-customers-report',
+  selector: 'app-suppliers-report',
   imports: [SectionWrapper, ReactiveFormsModule, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule, ReportPrintView],
-  templateUrl: './customers.html',
-  styleUrl: './customers.css',
+  templateUrl: './suppliers.html',
+  styleUrl: './suppliers.css',
 })
-export class CustomersReport extends BaseComponent {
+export class SuppliersReport extends BaseComponent {
   reportsService = inject(ReportsService);
 
   fg = this.fb.group({
@@ -27,13 +27,13 @@ export class CustomersReport extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'customerName', label: 'اسم العميل' },
+    { key: 'supplierName', label: 'اسم المورد' },
     { key: 'phoneNumber', label: 'رقم الجوال' },
     { key: 'address', label: 'العنوان' },
     { key: 'balance', label: 'الرصيد', type: 'currency', total: true },
   ];
 
-  rows = signal<ICustomersReportRow[]>([]);
+  rows = signal<ISuppliersReportRow[]>([]);
   lastSearchFilters = signal<IReportFilter[]>([]);
   paginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
@@ -49,7 +49,7 @@ export class CustomersReport extends BaseComponent {
       { label: 'إلى تاريخ', value: v.toDate },
       { label: 'بحث', value: v.searchTerm || null },
     ]);
-    this.reportsService.getCustomersReport({ ...v, pageIndex, pageSize: 10 }).subscribe({
+    this.reportsService.getSuppliersReport({ ...v, pageIndex, pageSize: 10 }).subscribe({
       next: (res) => {
         this.rows.set(res.data);
         this.paginationInfo = { pageIndex, totalPagesCount: res.paginationInfo.totalPagesCount, totalRowsCount: res.paginationInfo.totalRowsCount };

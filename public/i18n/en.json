@@ -195,7 +195,22 @@
         "ACCOUNT_MOVEMENT": { "LABEL": "Account Movement" },
         "RECEIPT_VOUCHERS": { "LABEL": "Receipt Vouchers" },
         "PAYMENT_VOUCHERS": { "LABEL": "Payment Vouchers" },
-        "GENERAL_JOURNAL": { "LABEL": "General Journal" }
+        "GENERAL_JOURNAL": { "LABEL": "General Journal" },
+        "SingleItemProfit": { "LABEL": "Single Item Profit Report" },
+        "TrialBalance": { "LABEL": "Trial Balance Report" },
+        "GroupedTrialBalance": { "LABEL": "Grouped Trial Balance Report" },
+        "AccountGroupBalance": { "LABEL": "Account Group Balance Report" },
+        "GeneralLedger": { "LABEL": "General Ledger Report" },
+        "AccountStatement": { "LABEL": "Account Statement Report" },
+        "BalanceSheet": { "LABEL": "Balance Sheet Report" },
+        "IncomeStatement": { "LABEL": "Income Statement Report" },
+        "Customers": { "LABEL": "Customers Report" },
+        "Suppliers": { "LABEL": "Suppliers Report" },
+        "DailyTransaction": { "LABEL": "Daily Transaction Report" },
+        "MiniDailyJournal": { "LABEL": "Mini Daily Journal Report" },
+        "DailySalesMovement": { "LABEL": "Daily Sales Movement Report" },
+        "Vat": { "LABEL": "VAT Report" },
+        "SelectiveTax": { "LABEL": "Selective Tax & Tobacco Fees Report" }
       }
     }
   },
