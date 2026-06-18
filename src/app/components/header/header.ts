@@ -386,6 +386,21 @@ export class Header extends BaseComponent implements AfterViewInit {
                 },
             ],
         },
+        // Reports
+        {
+            labelKey: 'REPORTS',
+            imgUrl: 'reports',
+            routerLink: '/reports',
+            roles: [Role.Admin, Role.Cashier, Role.Waiter],
+            children: [
+                {
+                    labelKey: 'CUSTOMERS',
+                    imgUrl: '../customers',
+                    routerLink: '/reports/customers',
+                    roles: [Role.Admin, Role.Cashier, Role.Waiter],
+                },
+            ],
+        }
     ];
     activeLink = signal<string>('/');
     prevActiveLink = signal<string>('/');

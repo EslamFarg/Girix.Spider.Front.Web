@@ -48,6 +48,10 @@ export const routes: Routes = [
         loadChildren: () => import('@/routes/settings').then((m) => m.default),
       },
       {
+        path: 'reports',
+        loadChildren: () => import('@/routes/reports').then((m) => m.default),
+      },
+      {
         path: 'daily-journal',
         loadChildren: () => import('@/routes/daily-journal').then((m) => m.default),
       },

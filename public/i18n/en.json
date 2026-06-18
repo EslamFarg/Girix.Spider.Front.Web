@@ -163,6 +163,13 @@
         "RESTAURANT": {
           "LABEL": "Restaurant Info"
         }
+      },
+      
+      "REPORTS": {
+        "LABEL": "Reports",
+        "CUSTOMERS": {
+          "LABEL": "Customers"
+        }
       }
     }
   },
