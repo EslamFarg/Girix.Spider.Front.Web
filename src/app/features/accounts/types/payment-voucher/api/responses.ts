@@ -34,5 +34,6 @@ export interface IPaymentVoucherReadResponse {
     finincalAccountName: string;
     isHasTax: boolean;
     totalAmount: number;
+    notes: string;
   }>;
 }

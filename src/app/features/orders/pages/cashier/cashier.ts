@@ -1455,8 +1455,13 @@ export class Cashier extends BaseComponent implements OnInit {
     ];
     productService = inject(ProductService);
     groupService = inject(GroupService);
-    currentMenuItemIx = signal(0);
-    currentMenuItemAdditions = computed(() => this.orderMenuItems()[this.currentMenuItemIx()].additions);
+    currentMenuItemIx = signal<number | null>(null);
+    currentMenuItem = computed(() => {
+        const currentIndex = this.currentMenuItemIx();
+        if (currentIndex == null) return null;
+        return this.orderMenuItems()[currentIndex] ?? null;
+    });
+    currentMenuItemAdditions = computed(() => this.currentMenuItem()?.additions ?? []);
     additionProducts = signal<IProductSearchRow[]>([]);
     additionPaginationInfo: {
         pageIndex: number;
@@ -1469,8 +1474,9 @@ export class Cashier extends BaseComponent implements OnInit {
     };
 
     addAdditionQuantity(addition: IProductSearchRow, quantity: number | null) {
-        const currentMenuItem = this.orderMenuItems()[this.currentMenuItemIx()];
-        console.log('add existingAddition', addition, quantity);
+        const currentIndex = this.currentMenuItemIx();
+        const currentMenuItem = this.currentMenuItem();
+        if (currentIndex == null || !currentMenuItem) return;
 
         const existingAddition = currentMenuItem.additions.find(
             (existingAddition) => existingAddition.product.id === addition.id,
@@ -1479,7 +1485,7 @@ export class Cashier extends BaseComponent implements OnInit {
         const deleteAddition = () =>
             this.orderMenuItems.update((orderItems) =>
                 orderItems.map((orderItem, i) =>
-                    i == this.currentMenuItemIx()
+                    i == currentIndex
                         ? {
                               ...orderItem,
                               additions: orderItem.additions.filter(
@@ -1497,8 +1503,6 @@ export class Cashier extends BaseComponent implements OnInit {
         }
 
         if (existingAddition) {
-            //adding quantity
-
             const futureQuantity = existingAddition.quantity + quantity;
 
             if (futureQuantity <= 0) {
@@ -1506,22 +1510,20 @@ export class Cashier extends BaseComponent implements OnInit {
                 return;
             }
 
-            currentMenuItem.additions.forEach((existingAddition) => {
-                if (existingAddition.product.id === addition.id) {
-                    existingAddition.quantity = futureQuantity > 100 ? 100 : futureQuantity;
-                }
-            });
+            const nextAdditions = currentMenuItem.additions.map((existingAddition) =>
+                existingAddition.product.id === addition.id
+                    ? { ...existingAddition, quantity: futureQuantity > 100 ? 100 : futureQuantity }
+                    : existingAddition,
+            );
 
             this.orderMenuItems.update((items) =>
-                items.map((item, i) => (i == this.currentMenuItemIx() ? currentMenuItem : item)),
+                items.map((item, i) => (i == currentIndex ? { ...currentMenuItem, additions: nextAdditions } : item)),
             );
         } else {
             if (quantity <= 0) return;
-            //add new
-            console.log('new addition', addition);
             this.orderMenuItems.update((orderItems) =>
                 orderItems.map((orderItem, i) =>
-                    i == this.currentMenuItemIx()
+                    i == currentIndex
                         ? {
                               ...orderItem,
                               additions: orderItem.additions.concat({
@@ -1551,19 +1553,30 @@ export class Cashier extends BaseComponent implements OnInit {
     }
 
     updateAdditionQuantity(addition: IProductSearchRow, quantity: number) {
-        const currentMenuItem = this.orderMenuItems()[this.currentMenuItemIx()];
+        const currentIndex = this.currentMenuItemIx();
+        const currentMenuItem = this.currentMenuItem();
+        if (currentIndex == null || !currentMenuItem) return;
         const existingAddition = currentMenuItem.additions.find(
             (existingAddition) => existingAddition.product.id === addition.id,
         );
         if (existingAddition) {
-            existingAddition.quantity = quantity;
             this.orderMenuItems.update((items) =>
-                items.map((item, i) => (i == this.currentMenuItemIx() ? currentMenuItem : item)),
+                items.map((item, i) =>
+                    i == currentIndex
+                        ? {
+                              ...currentMenuItem,
+                              additions: currentMenuItem.additions.map((existing) =>
+                                  existing.product.id === addition.id ? { ...existing, quantity } : existing,
+                              ),
+                          }
+                        : item,
+                ),
             );
         }
     }
 
     getProductAdditions(product: IProductSearchRow, currentMenuItemIx: number) {
+        this.currentMenuItemIx.set(currentMenuItemIx);
         this.productService.getAdditions(product.id).subscribe({
             next: (products) => {
                 if (products?.length > 0) {
