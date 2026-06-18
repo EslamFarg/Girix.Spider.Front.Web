@@ -1,5 +1,5 @@
 <app-section-wrapper>
-    <form [formGroup]="fg" (ngSubmit)="onSubmit()" appLoadingDisabled class="flex flex-wrap items-end gap-2 w-full mb-4">
+    <form [formGroup]="fg" (ngSubmit)="onSubmit()" appLoadingDisabled class="no-print flex flex-wrap items-end gap-2 w-full mb-4">
         <div class="flex flex-col gap-1">
             <label class="text-xs text-text-gray">من تاريخ</label>
             <input pInputText type="date" formControlName="fromDate" class="bg-transparent!" />
@@ -18,38 +18,13 @@
         </div>
     </form>
 
-    <table class="my-4 w-full main-table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>الصنف</th>
-                <th>الخاصية</th>
-                <th>القيمة</th>
-                <th>المستودع</th>
-                <th>الكمية</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (item of rows(); track $index) {
-                <tr [style]="`--ix:${$index}`">
-                    <td><div>{{ getRowNumber($index, paginationInfo.pageIndex) }}</div></td>
-                    <td><div>{{ item.itemName }}</div></td>
-                    <td><div>{{ item.propertyName }}</div></td>
-                    <td><div>{{ item.propertyValue }}</div></td>
-                    <td><div>{{ item.warehouseName }}</div></td>
-                    <td><div>{{ item.quantity }}</div></td>
-                </tr>
-            }
-            @empty {
-                <tr><td colspan="6" class="text-center py-8 text-text-gray">لا توجد بيانات</td></tr>
-            }
-        </tbody>
-    </table>
-
-    <p-paginator
-        (onPageChange)="onPageChange($event)"
-        [first]="getCurrentRowsIx(paginationInfo.pageIndex)"
-        [rows]="10"
-        [totalRecords]="paginationInfo.totalRowsCount"
+    <app-report-print-view
+        title="تقرير الجرد بالخصائص"
+        [columns]="columns"
+        [rows]="rows()"
+        [filters]="lastSearchFilters()"
+        [paginationInfo]="paginationInfo"
+        [isLoading]="isLoading()"
+        (pageChange)="onPageChange($event)"
     />
 </app-section-wrapper>

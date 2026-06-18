@@ -1,22 +1,23 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Paginator, PaginatorState } from 'primeng/paginator';
+import { PaginatorState } from 'primeng/paginator';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { TooltipModule } from 'primeng/tooltip';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { ReportPrintView, IReportColumn, IReportFilter } from '../../../components/report-print-view/report-print-view';
 import { ReportsService } from '../../../services/reports-service';
-import { ISupplierAnalysisRow } from '../../../types/api/reports-types';
+import { ISupplierAnalysisRow, IPaginatedReportResponse } from '../../../types/api/reports-types';
 
 @Component({
-  selector: 'app-suppliers-analysis',
-  imports: [SectionWrapper, ReactiveFormsModule, Paginator, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule],
+  selector: 'app-purchases-suppliers-analysis-report',
+  imports: [SectionWrapper, ReactiveFormsModule, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule, ReportPrintView],
   templateUrl: './suppliers-analysis.html',
   styleUrl: './suppliers-analysis.css',
 })
-export class SuppliersAnalysis extends BaseComponent {
+export class PurchasesSuppliersAnalysis extends BaseComponent {
   reportsService = inject(ReportsService);
 
   fg = this.fb.group({
@@ -25,7 +26,16 @@ export class SuppliersAnalysis extends BaseComponent {
     searchTerm: this.fb.control<string>(''),
   });
 
+  columns: IReportColumn[] = [
+    { key: 'supplierName', label: 'المورد' },
+    { key: 'invoicesCount', label: 'عدد الفواتير', type: 'number' },
+    { key: 'totalPurchases', label: 'إجمالي المشتريات', type: 'currency', total: true },
+    { key: 'totalReturns', label: 'إجمالي المرتجعات', type: 'currency' },
+    { key: 'netAmount', label: 'الصافي', type: 'currency', total: true },
+  ];
+
   rows = signal<ISupplierAnalysisRow[]>([]);
+  lastSearchFilters = signal<IReportFilter[]>([]);
   paginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
   constructor() {
@@ -35,8 +45,13 @@ export class SuppliersAnalysis extends BaseComponent {
 
   search(pageIndex: number) {
     const v = this.fg.getRawValue();
+    this.lastSearchFilters.set([
+      { label: 'من تاريخ', value: v.fromDate },
+      { label: 'إلى تاريخ', value: v.toDate },
+      { label: 'بحث', value: v.searchTerm || null },
+    ]);
     this.reportsService.getSuppliersAnalysis({ ...v, pageIndex, pageSize: 10 }).subscribe({
-      next: (res) => {
+      next: (res: IPaginatedReportResponse<ISupplierAnalysisRow>) => {
         this.rows.set(res.data);
         this.paginationInfo = { pageIndex, totalPagesCount: res.paginationInfo.totalPagesCount, totalRowsCount: res.paginationInfo.totalRowsCount };
       },

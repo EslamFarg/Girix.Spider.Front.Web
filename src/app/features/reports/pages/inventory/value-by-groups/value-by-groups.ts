@@ -1,18 +1,19 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Paginator, PaginatorState } from 'primeng/paginator';
+import { PaginatorState } from 'primeng/paginator';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { TooltipModule } from 'primeng/tooltip';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { ReportPrintView, IReportColumn, IReportFilter } from '../../../components/report-print-view/report-print-view';
 import { ReportsService } from '../../../services/reports-service';
 import { IInventoryValueByGroupRow } from '../../../types/api/reports-types';
 
 @Component({
   selector: 'app-inventory-value-by-groups',
-  imports: [SectionWrapper, ReactiveFormsModule, Paginator, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule],
+  imports: [SectionWrapper, ReactiveFormsModule, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule, ReportPrintView],
   templateUrl: './value-by-groups.html',
   styleUrl: './value-by-groups.css',
 })
@@ -22,10 +23,17 @@ export class InventoryValueByGroups extends BaseComponent {
   fg = this.fb.group({
     fromDate: this.fb.control<string | null>(null),
     toDate: this.fb.control<string | null>(null),
-    groupId: this.fb.control<number | null>(null),
+    warehouseId: this.fb.control<number | null>(null),
   });
 
+  columns: IReportColumn[] = [
+    { key: 'groupName', label: 'المجموعة' },
+    { key: 'itemsCount', label: 'عدد الأصناف', type: 'number' },
+    { key: 'totalValue', label: 'القيمة الإجمالية', type: 'currency', total: true },
+  ];
+
   rows = signal<IInventoryValueByGroupRow[]>([]);
+  lastSearchFilters = signal<IReportFilter[]>([]);
   paginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
   constructor() {
@@ -35,6 +43,10 @@ export class InventoryValueByGroups extends BaseComponent {
 
   search(pageIndex: number) {
     const v = this.fg.getRawValue();
+    this.lastSearchFilters.set([
+      { label: 'من تاريخ', value: v.fromDate },
+      { label: 'إلى تاريخ', value: v.toDate },
+    ]);
     this.reportsService.getInventoryValueByGroups({ ...v, pageIndex, pageSize: 10 }).subscribe({
       next: (res) => {
         this.rows.set(res.data);
