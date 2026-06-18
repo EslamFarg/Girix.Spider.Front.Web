@@ -1,23 +1,22 @@
+import { SectionWrapper, IPaginationInfo, BaseComponent } from '@/components';
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { ReportPrintView, IReportColumn, IReportFilter } from '@/features/reports/components/report-print-view/report-print-view';
+import { ReportsService } from '@/features/reports/services/reports-service';
+import { ICategoryProfitRow, ISalesDeliveryRow } from '@/features/reports/types/api/reports-types';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { PaginatorState } from 'primeng/paginator';
-import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { InputTextModule } from 'primeng/inputtext';
+import { PaginatorState } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
-import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { LoadingDisabledDirective } from '@/directives/loading-disabled';
-import { ReportPrintView, IReportColumn, IReportFilter } from '../../../components/report-print-view/report-print-view';
-import { ReportsService } from '../../../services/reports-service';
-import { ISalesCashierRow } from '../../../types/api/reports-types';
 
 @Component({
-  selector: 'app-sales-cashiers-report',
+  selector: 'app-category-profit',
   imports: [SectionWrapper, ReactiveFormsModule, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule, ReportPrintView],
-  templateUrl: './sales-cashiers.html',
-  styleUrl: './sales-cashiers.css',
+  templateUrl: './category-profit.html',
+  styleUrl: './category-profit.css',
 })
-export class SalesCashiers extends BaseComponent {
+export class CategoryProfit  extends BaseComponent{
   reportsService = inject(ReportsService);
 
   fg = this.fb.group({
@@ -26,13 +25,14 @@ export class SalesCashiers extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'itemId', label: 'كود الصنف' },
-    { key: 'itemNameAr', label: 'اسم الصنف', type: 'number' },
-    { key: 'totalQuantity', label: 'الكمية', type: 'currency', total: true },
-    { key: 'totalSales', label: 'المبيعات', type: 'currency' },
+    { key: 'categoryId', label: 'رقم المجموعه', type: 'number' },
+    { key: 'categoryNameAr', label: 'اسم المجموعه' },
+    { key: 'totalSales', label: 'المبيعات', type: 'currency', total: true },
+    { key: 'totalCost', label: 'التكلفة', type: 'currency', total: true },
+    { key: 'profit', label: 'الربح', type: 'currency', total: true },
   ];
 
-  rows = signal<ISalesCashierRow[]>([]);
+  rows = signal<ICategoryProfitRow[]>([]);
   lastSearchFilters = signal<IReportFilter[]>([]);
   paginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
@@ -47,7 +47,7 @@ export class SalesCashiers extends BaseComponent {
       { label: 'من تاريخ', value: v.fromDate },
       { label: 'إلى تاريخ', value: v.toDate },
     ]);
-    this.reportsService.getSalesCashiers({ ...v, pageIndex, pageSize: 10 }).subscribe({
+    this.reportsService.getCategoryProfit({ ...v, pageIndex, pageSize: 10 }).subscribe({
       next: (res) => {
         this.rows.set(res.data);
         this.paginationInfo = { pageIndex, totalPagesCount: res.paginationInfo.totalPagesCount, totalRowsCount: res.paginationInfo.totalRowsCount };
@@ -57,4 +57,5 @@ export class SalesCashiers extends BaseComponent {
 
   onSubmit = () => this.search(1);
   onPageChange = (event: PaginatorState) => this.search(event.page! + 1);
+
 }

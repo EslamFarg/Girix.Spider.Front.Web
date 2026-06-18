@@ -44,21 +44,21 @@ export class ReportsService extends BaseService {
 
   getInventoryByProperties(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IInventoryByPropertyRow>>(
-      `${this.apiUrl}/InventoryByProperties`,
+      `${this.apiUrl}/InventoryValueByCategories`,
       criteria,
     );
   }
 
   getItemMovementFull(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IItemMovementRow>>(
-      `${this.apiUrl}/InventoryItemMovementFull`,
+      `${this.apiUrl}/ItemMovementFull`,
       criteria,
     );
   }
 
   getItemMovementActual(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IItemMovementRow>>(
-      `${this.apiUrl}/InventoryItemMovementActual`,
+      `${this.apiUrl}/ItemMovementActual`,
       criteria,
     );
   }
@@ -72,7 +72,7 @@ export class ReportsService extends BaseService {
 
   getInventoryValueByGroups(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IInventoryValueByGroupRow>>(
-      `${this.apiUrl}/InventoryValueByGroups`,
+      `${this.apiUrl}/InventoryValueByCategories`,
       criteria,
     );
   }
@@ -95,7 +95,7 @@ export class ReportsService extends BaseService {
 
   getPurchasesItemsDetails(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IPurchaseItemDetailRow>>(
-      `${this.apiUrl}/PurchasesItemsDetails`,
+      `${this.apiUrl}/PurchaseItemsDetails`,
       criteria,
     );
   }
@@ -109,7 +109,7 @@ export class ReportsService extends BaseService {
 
   getPurchaseReturnsItemsDetails(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IPurchaseReturnItemDetailRow>>(
-      `${this.apiUrl}/PurchaseReturnsItemsDetails`,
+      `${this.apiUrl}/PurchaseReturnItemsDetails`,
       criteria,
     );
   }
@@ -146,28 +146,28 @@ export class ReportsService extends BaseService {
 
   getSalesReturnsItemsDetails(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<ISalesReturnItemDetailRow>>(
-      `${this.apiUrl}/SalesReturnsItemsDetails`,
+      `${this.apiUrl}/SalesReturnItemsDetails`,
       criteria,
     );
   }
 
-  getSalesCustomers(criteria: IReportSearchCriteria) {
+  getSalesEmployees(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<ISalesCustomerRow>>(
-      `${this.apiUrl}/SalesCustomers`,
+      `${this.apiUrl}/EmployeeSales`,
       criteria,
     );
   }
 
   getSalesCashiers(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<ISalesCashierRow>>(
-      `${this.apiUrl}/SalesCashiers`,
+      `${this.apiUrl}/MiniSalesItems`,
       criteria,
     );
   }
 
   getSalesDelivery(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<ISalesDeliveryRow>>(
-      `${this.apiUrl}/SalesDelivery`,
+      `${this.apiUrl}/SalesInvoicesProfit`,
       criteria,
     );
   }
@@ -176,28 +176,34 @@ export class ReportsService extends BaseService {
 
   getSupplierStatement(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IAccountStatementRow>>(
-      `${this.apiUrl}/SupplierStatement`,
+      `${this.apiUrl}/SupplierAccountStatement`,
       criteria,
     );
   }
 
   getCustomerStatement(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IAccountStatementRow>>(
-      `${this.apiUrl}/CustomerStatement`,
+      `${this.apiUrl}/CustomerAccountStatement`,
       criteria,
     );
   }
 
   getFinancialStatement(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IAccountStatementRow>>(
-      `${this.apiUrl}/FinancialStatement`,
+      `${this.apiUrl}/SalesItemsProfit`,
+      criteria,
+    );
+  }
+  getCategoryProfit(criteria: IReportSearchCriteria) {
+    return this.http.post<IPaginatedReportResponse<any>>(
+      `${this.apiUrl}/CategoryProfit`,
       criteria,
     );
   }
 
   getAccountBalances(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IAccountBalanceRow>>(
-      `${this.apiUrl}/AccountBalances`,
+      `${this.apiUrl}/BalanceSheet`,
       criteria,
     );
   }

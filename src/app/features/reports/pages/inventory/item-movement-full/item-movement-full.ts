@@ -25,16 +25,17 @@ export class InventoryItemMovementFull extends BaseComponent {
     toDate: this.fb.control<string | null>(null),
     searchTerm: this.fb.control<string>(''),
     warehouseId: this.fb.control<number | null>(null),
-    itemId: this.fb.control<number | null>(null),
+    itemId: this.fb.control<number | null>(0),
   });
 
   columns: IReportColumn[] = [
-    { key: 'date', label: 'التاريخ', type: 'date' },
-    { key: 'itemName', label: 'الصنف' },
+    { key: 'movementDate', label: 'التاريخ', type: 'date' },
+    { key: 'itemNameAr', label: 'الصنف' },
     { key: 'movementType', label: 'نوع الحركة' },
     { key: 'referenceNumber', label: 'المرجع' },
-    { key: 'warehouseName', label: 'المستودع' },
-    { key: 'quantity', label: 'الكمية', type: 'number' },
+    { key: 'quantityIn', label: 'الكمية القادمه', type: 'number' },
+    { key: 'quantityOut', label: 'الكمية المنتهيه', type: 'number' },
+    { key: 'balance', label: 'الرصيد' , type: 'number' , total: true },
   ];
 
   rows = signal<IItemMovementRow[]>([]);

@@ -181,6 +181,12 @@ export interface ISalesDeliveryRow {
   totalAmount: number;
   netAmount: number;
 }
+export interface ICategoryProfitRow {
+  deliveryName: string;
+  ordersCount: number;
+  totalAmount: number;
+  netAmount: number;
+}
 
 // ── Accounts ──────────────────────────────────────────────────────────────────
 
