@@ -1,10 +1,29 @@
+/*
+  ─────────────────────────────────────────────────────────
+  HUT CARD — restored to match original reference design
+  ─────────────────────────────────────────────────────────
+  Structure (original):
+    [roof diamond — above body, border reacts to status]
+    [body — contains only the name]
+    [timer — below body, external]
+
+  Roof technique: square element rotated 45° (diamond shape).
+    - The bottom half sits behind .hut-body (z-index: 10 > 0).
+    - Only the top triangle is visible → "hut roof" appearance.
+    - Border uses rgb(var(--color)) → visually reacts on hover/state.
+
+  Phase 3: 8% uniform size reduction applied via direct dimensions.
+  Phase 4: Hover covers full component — diamond (DOM child) bubbles
+            :hover to .hut-card-root, changing --color everywhere.
+  ─────────────────────────────────────────────────────────
+*/
+
 :host {
   --color: black;
-  /* Default (non-switch) roof sizing */
-  --hut-roof-width: 80%;
-  --hut-roof-height: 3rem;
-  --hut-roof-overlap: 8px;
-  --hut-roof-space: calc(var(--hut-roof-height) - var(--hut-roof-overlap));
+
+  /* Default roof sizing (used outside switch-screen context) */
+  --hut-roof-size: 88px;
+  --hut-roof-top: 58px; /* = card-root padding-top = where body starts */
 
   display: block;
   box-sizing: content-box;
@@ -19,58 +38,60 @@
   color: rgb(var(--color));
 }
 
-/* Push body down so roof can sit above without being clipped by the grid row */
+/* ── Card root ── */
 .hut-card-root {
-  padding-top: var(--hut-roof-space);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   overflow: visible;
+  padding-top: var(--hut-roof-top);
 }
 
-/*
-  Gable roof — solid triangle rendered ABOVE the body (z-index: 20).
-  Fixes:
-    1. z-index 20 > body z-10 → roof is in front
-    2. Solid background (no transparency/blur) → clearly visible
-    3. clip-path polygon → real triangle shape
-    4. filter: drop-shadow → shadow works with clip-path (box-shadow does not)
-*/
+/* ── Gable roof (diamond) ──
+   A square rotated 45° — border color tracks --color (status/hover).
+   z-index: 0 so the body (z-10) clips the bottom half. */
 .hut-roof {
-  position: absolute;
-  width: var(--hut-roof-width);
-  height: var(--hut-roof-height);
-  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-  top: var(--hut-roof-space);
-  left: 50%;
-  transform: translate(-50%, calc(-100% + var(--hut-roof-overlap)));
-  z-index: 20;
-
-  /* Solid visible roof fill — no transparency in this range */
+  aspect-ratio: 1;
+  width: var(--hut-roof-size);
+  top: var(--hut-roof-top);
+  border: 1.5px solid rgb(var(--color));
   background: linear-gradient(
-    160deg,
-    rgb(190, 195, 200) 0%,
-    rgb(215, 218, 222) 55%,
-    rgb(230, 232, 235) 100%
+    135deg,
+    rgb(240, 242, 244) 0%,
+    rgb(220, 224, 229) 45%,
+    rgb(195, 202, 210) 100%
   );
-
-  /* drop-shadow works with clip-path; box-shadow does not */
-  filter: drop-shadow(-3px -3px 4px rgba(var(--color), 0.35));
+  transform: translate(-50%, -50%) rotate(45deg);
+  z-index: 0;
 }
 
-/*
-  Hut switch screen — body 140 × 92px (aspect 110/72).
-  Roof target: 80% wide, ~46px tall (~50% of 92px body height).
-*/
-:host(.hut-switch-card) {
-  --hut-roof-width: 80%;
-  --hut-roof-height: 46px;
-  --hut-roof-overlap: 8px;
-  --hut-roof-space: calc(var(--hut-roof-height) - var(--hut-roof-overlap));
+/* ── Body ── */
+.hut-body {
+  width: 100%;
+}
 
-  width: 140px;
+/* ── Timer (below body, external) ── */
+.hut-timer {
+  width: 100%;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════
+   SWITCH SCREEN  (.hut-switch-card)
+   8% size reduction applied here (Phase 3):
+     original 140px  → 129px  (×0.921)
+     original roof 88px → 81px (×0.921)
+     original top  58px → 53px (×0.914)
+   ══════════════════════════════════════════ */
+:host(.hut-switch-card) {
+  --hut-roof-size: 81px;
+  --hut-roof-top: 53px;
+
+  width: 129px;
   flex-shrink: 0;
 }
 
 :host(.hut-switch-card) .hut-body {
-  width: 100%;
   aspect-ratio: 110 / 72;
   border-radius: 0.875rem;
 }
@@ -83,11 +104,13 @@
 :host(.hut-switch-card) .hut-timer {
   font-size: 0.8125rem;
   line-height: 1.125rem;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
+/* ── Status colour rules ── */
 .hut-available {
   --color: black;
+
   &.active,
   &:hover {
     --color: 80, 209, 170;

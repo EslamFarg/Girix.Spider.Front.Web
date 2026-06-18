@@ -1,5 +1,5 @@
 <div [class]="'hut-card-root relative text-black cursor-pointer ' + hutStatusClass()">
-  <div class="hut-roof hut absolute left-1/2"></div>
+  <div class="hut-roof absolute left-1/2"></div>
   <div
     style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #a3a3a34d"
     class="hut-body flex flex-col border-2 z-10 relative bordered border-transparent aspect-[calc(110/72)] items-center justify-center bg-white/80 rounded-2xl"
@@ -10,12 +10,12 @@
     >
       {{ data()?.name }}
     </div>
-    <countdown
-      #countdown
-      dir="ltr"
-      class="hut-timer mx-auto w-fit block font-bold shrink-0"
-      [config]="countdownConfig"
-      (event)="handleCountdownEvent($event)"
-    />
   </div>
+  <countdown
+    #countdown
+    dir="ltr"
+    class="hut-timer mx-auto w-fit block font-bold shrink-0"
+    [config]="countdownConfig"
+    (event)="handleCountdownEvent($event)"
+  />
 </div>

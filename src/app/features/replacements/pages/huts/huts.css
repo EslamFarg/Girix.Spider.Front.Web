@@ -1,9 +1,11 @@
 .hut-switch-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 140px);
+  grid-template-columns: repeat(auto-fill, 129px);
   column-gap: 12px;
   row-gap: 16px;
   justify-content: center;
-  padding-top: 48px;
+  /* padding-top creates clearance above the first row's diamond roof.
+     53px (diamond-top-to-center) + a few px of visual breathing room. */
+  padding-top: 56px;
   margin-top: 1rem;
 }
