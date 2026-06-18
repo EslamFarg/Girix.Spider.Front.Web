@@ -130,9 +130,9 @@
                             <span class="inline-block max-w-20 overflow-hidden text-ellipsis">{{
                                 this.chosenLocalPlace()?.name ?? '-'
                             }}</span>
-                            @if (activeLocalType() === OrderLocalType.Hut && (orderFg.value.placeRefId ?? 0) > 0) {
+                            @if (activeLocalType() === OrderLocalType.Hut && (orderFg.getRawValue().placeRefId ?? 0) > 0) {
                                 <span class="text-text-lighter">{{
-                                    formatMinutesToHHMMSS(orderFg.value.durationMinutes ?? 0)
+                                    formatMinutesToHHMMSS(orderFg.getRawValue().durationMinutes ?? 0)
                                 }}</span>
                             }
                         </div>
@@ -661,7 +661,7 @@
                             [allowDecimal]="true"
                             [formControl]="orderFg.controls.payingCash"
                             [max]="net()"
-                            [disabled]="orderFg.value.paymentType === OrderPaymentType.Pending"
+                            [disabled]="orderFg.getRawValue().paymentType === OrderPaymentType.Pending"
                             [min]="0"
                             #payingCash
                             id="payingCash"
@@ -673,7 +673,7 @@
                                 pButton
                                 class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
                                 type="button"
-                                (click)="orderFg.controls.payingCash.setValue(orderFg.value.payingNetwork || 0)"
+                                (click)="orderFg.controls.payingCash.setValue(orderFg.getRawValue().payingNetwork || 0)"
                             >
                                 <i class="pi pi-arrow-down"></i>
                             </button>
@@ -708,7 +708,7 @@
                             [allowDecimal]="true"
                             [max]="net()"
                             [min]="0"
-                            [disabled]="orderFg.value.paymentType === OrderPaymentType.Pending"
+                            [disabled]="orderFg.getRawValue().paymentType === OrderPaymentType.Pending"
                             id="payingNetwork"
                             type="number"
                             aria-describedby="network-help"
@@ -722,7 +722,7 @@
                                 pButton
                                 class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
                                 type="button"
-                                (click)="orderFg.controls.payingNetwork.setValue(orderFg.value.payingCash || 0)"
+                                (click)="orderFg.controls.payingNetwork.setValue(orderFg.getRawValue().payingCash || 0)"
                             >
                                 <i class="pi pi-arrow-up"></i>
                             </button>
@@ -746,7 +746,7 @@
                     </app-input-error-message-handler>
                 </div>
 
-                @if (orderFg.value.paymentType) {
+                @if (orderFg.getRawValue().paymentType) {
                     <!-- amount received from customer (for change calculation) -->
                     <div class="md:col-span-2 border-t border-b-text-light pt-4 mt-2">
                         <label for="amountReceived">المبلغ المستلم من العميل</label>

@@ -506,10 +506,17 @@ export class Cashier extends BaseComponent implements OnInit {
             return;
         }
 
-        switch (this.orderFg.value.orderType) {
-            case OrderLocationType.CompanyDelivery:
+        const rawValue = this.orderFg.getRawValue();
+        let values: any = {
+            ...rawValue,
+            items: this.orderCreateItems(),
+        };
+
+        switch (rawValue.orderType) {
+            case OrderLocationType.CompanyDelivery: {
                 const currentCompany = this.currentCompanyDelivery();
-                this.orderFg.patchValue({
+                values = {
+                    ...values,
                     deliveryId: null,
                     customerRequest: {
                         nameAr: currentCompany?.name || '',
@@ -519,10 +526,11 @@ export class Cashier extends BaseComponent implements OnInit {
                         nameEn: currentCompany?.name || '',
                         secondaryMobileNumber: currentCompany?.secondaryMobileNumber || '',
                     },
-                });
+                };
                 break;
+            }
             case OrderLocationType.DineIn:
-                if (!this.orderFg.value.placeRefId) {
+                if (!rawValue.placeRefId) {
                     this.messageService.add({
                         severity: 'error',
                         summary: 'فشل',
@@ -533,10 +541,8 @@ export class Cashier extends BaseComponent implements OnInit {
                 break;
         }
 
-        let values: any = this.orderFg.value;
-
-        if (!this.orderFg.value?.customerRequest?.id) {
-            values = { ...this.orderFg.value, createAt: this.localDateIso, customerRequest: null };
+        if (!values?.customerRequest?.id || values.customerRequest.id === this.cashCustomer.id) {
+            values = { ...values, createAt: this.localDateIso, customerRequest: null };
         }
 
         switch (this.formMode()) {
@@ -575,6 +581,7 @@ export class Cashier extends BaseComponent implements OnInit {
         this.currentDelivery.set(null);
         this.currentCompanyDelivery.set(null);
         this.amountReceived.set(0);
+        this.setSelectedCustomer(this.cashCustomer);
         this.orderFg.patchValue({
             placeRefId: null,
             placeType: null,
@@ -582,10 +589,23 @@ export class Cashier extends BaseComponent implements OnInit {
             orderType: OrderLocationType.Takeaway,
         });
         this.orderLocationType.set(OrderLocationType.Takeaway);
-        this.patchCustomerFg(this.cashCustomer);
         this.resetIdempotencyKey();
         this.orderFg.updateValueAndValidity();
         this.resetData();
+    }
+
+    private setSelectedCustomer(customer: ICustomerSearchRow | null | undefined) {
+        const selectedCustomer = customer ?? this.cashCustomer;
+        const isCashCustomer = selectedCustomer.id === this.cashCustomer.id;
+        const contactControls = [this.customerFg.controls.phoneNumber, this.customerFg.controls.addressDescription];
+
+        if (isCashCustomer) {
+            contactControls.forEach((control) => control.disable({ emitEvent: false }));
+        } else {
+            contactControls.forEach((control) => control.enable({ emitEvent: false }));
+        }
+
+        this.patchCustomerFg(selectedCustomer);
     }
 
     requireCustomer(isRequired: boolean) {
@@ -1661,18 +1681,7 @@ export class Cashier extends BaseComponent implements OnInit {
     }
 
     onCustomerSelected(customer: ICustomerSearchRow) {
-        const controls = [this.customerFg.controls.phoneNumber, this.customerFg.controls.addressDescription];
-
-        controls.forEach((control) => {
-            if (customer?.id) {
-                control.enable();
-            } else {
-                control.disable();
-                control.setValue(null);
-            }
-        });
-
-        if (customer?.id) this.patchCustomerFg(customer);
+        this.setSelectedCustomer(customer);
     }
 
     patchCustomerFg(values?: ICustomerSearchRow) {
