@@ -7,7 +7,6 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { DatePicker } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components';
 import { PurchaseService } from '../../services/purchase-service';
 import { IPurchaseReadResponse } from '../../types/api/purchases/responses';
@@ -36,6 +35,7 @@ import {
     FixedFinancialAccountService,
     FixedFinancialAccountRefId,
 } from '@/features/settings/services/fixed-financial-account-service';
+import { catchError } from 'rxjs';
 
 interface IAppPurchaseReturnItem {
     menuItemsId: number | null;
@@ -60,7 +60,6 @@ enum FilterOption {
         DatePicker,
         InputTextModule,
         Select,
-        TextareaModule,
         ReactiveFormsModule,
         Debounce,
         AllowNumbers,
@@ -104,7 +103,6 @@ export class PurchaseReturnForm extends BaseComponent {
         purchaseInvoiceId: this.fb.control<number | null>(null, []),
         paymentType: this.fb.control<number | null>(OrderPaymentType.Paid, [Validators.required]),
         returnDate: this.fb.control<Date | string | null>(new Date(), [Validators.required]),
-        reason: this.fb.control<string | null>(null, [Validators.maxLength(1000)]),
         items: this.fb.array<FormGroup<IAppPurchaseReturnItemControls>>(
             [],
             [Validators.required, Validators.minLength(1)],
@@ -206,13 +204,14 @@ export class PurchaseReturnForm extends BaseComponent {
     // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     ngOnInit() {
-        const purchaseId = this.id();
-        switch (this.formMode()) {
+        const returnId = this.id();
+        switch (this.initialFormMode()) {
             case FormMode.Create:
                 this._loadDefaultAccounts();
+                this._initCreateFromQueryParams();
                 break;
             case FormMode.Update:
-                this.purchaseReturnService.getById(purchaseId!).subscribe({
+                this.purchaseReturnService.getById(returnId!).subscribe({
                     next: (data) => {
                         this.currentPurchaseReturn.set(data);
                         this.fg.patchValue({
@@ -260,7 +259,7 @@ export class PurchaseReturnForm extends BaseComponent {
             case FormMode.Create:
                 this.purchaseReturnService.create(data).subscribe({
                     next: () => {
-                        this.router.navigate(['/storage/purchases']);
+                        this.router.navigate(['/storage/purchases-returns']);
                     },
                 });
                 break;
@@ -295,31 +294,8 @@ export class PurchaseReturnForm extends BaseComponent {
         switch (this.currentFilterOption) {
             case FilterOption.Purchase:
                 this.purchaseService.getByInvoiceNumber(invoiceNumber).subscribe({
-                    next: (data) => {
-                        this.currentPurchaseReturn.set(null);
-                        this.currentPurchase.set(data);
-                        this.fg.patchValue({
-                            ...data,
-                            returnDate: new Date(),
-                            purchaseInvoiceId: data.id,
-                        });
-                        this._setCurrentSupplierFromPurchase(data);
-                        this._fetchAndSetAccount(data.cashAccountId, 'cash');
-                        this._fetchAndSetAccount(data.networkAccountId, 'network');
-                        this.fg.setControl(
-                            'items',
-                            this.fb.array(
-                                data.items.map((item) =>
-                                    this.createItemFg({
-                                        menuItemsId: item.menuItemsId,
-                                        quantity: item.quantity,
-                                        purchaseInvoiceItemId: item.id,
-                                        unitId: item.unitId,
-                                    }),
-                                ),
-                            ),
-                        );
-                    },
+                    next: (data) => this._loadFromPurchase(data),
+                    error: () => this._notifyPurchaseLoadFailed(),
                 });
                 break;
             case FilterOption.PurchaseReturn:
@@ -354,6 +330,80 @@ export class PurchaseReturnForm extends BaseComponent {
                 });
                 break;
         }
+    }
+
+    /** Pre-load purchase invoice when navigated from Purchase Explorer (orders→refunds pattern). */
+    private _initCreateFromQueryParams() {
+        const purchaseId = Number(this.activatedRoute.snapshot.queryParamMap.get('purchaseId'));
+        const invoiceNumber = this.activatedRoute.snapshot.queryParamMap.get('invoiceNumber');
+
+        if (purchaseId && !Number.isNaN(purchaseId)) {
+            this._loadPurchaseForReturnById(purchaseId);
+            return;
+        }
+
+        if (invoiceNumber) {
+            this.purchaseService.getByInvoiceNumber(invoiceNumber).subscribe({
+                next: (data) => this._loadFromPurchase(data),
+                error: () => this._notifyPurchaseLoadFailed(),
+            });
+        }
+    }
+
+    private _loadPurchaseForReturnById(purchaseInvoiceId: number) {
+        this.purchaseReturnService
+            .getPurchaseRemaining(purchaseInvoiceId)
+            .pipe(catchError(() => this.purchaseService.getById(purchaseInvoiceId)))
+            .subscribe({
+                next: (data) => this._loadFromPurchase(data),
+                error: () => this._notifyPurchaseLoadFailed(),
+            });
+    }
+
+    private _loadFromPurchase(data: IPurchaseReadResponse) {
+        const returnableItems = data.items.filter((item) => (item.quantity ?? 0) > 0);
+        if (!returnableItems.length) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'مرتجع مشتريات',
+                detail: 'لا توجد كميات متبقية للإرجاع في هذه الفاتورة',
+            });
+            return;
+        }
+
+        this.currentPurchaseReturn.set(null);
+        this.currentPurchase.set({ ...data, items: returnableItems });
+        this.currentFilterOption = FilterOption.Purchase;
+
+        this.fg.patchValue({
+            ...data,
+            returnDate: new Date(),
+            purchaseInvoiceId: data.id,
+        });
+        this._setCurrentSupplierFromPurchase(data);
+        this._fetchAndSetAccount(data.cashAccountId, 'cash');
+        this._fetchAndSetAccount(data.networkAccountId, 'network');
+        this.fg.setControl(
+            'items',
+            this.fb.array(
+                returnableItems.map((item) =>
+                    this.createItemFg({
+                        menuItemsId: item.menuItemsId,
+                        quantity: item.quantity,
+                        purchaseInvoiceItemId: item.id,
+                        unitId: item.unitId,
+                    }),
+                ),
+            ),
+        );
+    }
+
+    private _notifyPurchaseLoadFailed() {
+        this.messageService.add({
+            severity: 'error',
+            summary: 'مرتجع مشتريات',
+            detail: 'تعذر تحميل فاتورة المشتريات',
+        });
     }
 
     private _setCurrentSupplierFromPurchase(data: IPurchaseReadResponse) {

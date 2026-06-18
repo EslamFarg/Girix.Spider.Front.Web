@@ -1,4 +1,8 @@
-.replacement-dialog-nav {
+.room-switch-picker {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
   --p-button-primary-background: var(--color-text-lighter);
   --p-button-primary-color: var(--color-dark-line);
 }
