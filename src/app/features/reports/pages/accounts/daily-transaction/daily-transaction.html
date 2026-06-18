@@ -22,13 +22,13 @@
         </div>
     </form>
 
-    <app-report-print-view
-        title="تقرير حركة اليومية"
-        [columns]="columns"
-        [rows]="rows()"
-        [filters]="lastSearchFilters()"
-        [paginationInfo]="paginationInfo"
-        [isLoading]="isLoading()"
-        (pageChange)="onPageChange($event)"
-    />
+   <app-report-print-view
+    title="تقرير حركة اليومية"
+    [columns]="columns"
+    [rows]="rows()"
+    [filters]="lastSearchFilters()"
+    [paginationInfo]="paginationInfo"
+    [isLoading]="isLoading()"
+    (pageChange)="onPageChange($event)"
+/>
 </app-section-wrapper>
