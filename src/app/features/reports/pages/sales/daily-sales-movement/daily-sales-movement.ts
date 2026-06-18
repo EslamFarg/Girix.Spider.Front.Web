@@ -27,12 +27,12 @@ export class DailySalesMovement extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'invoiceNumber', label: 'رقم الفاتورة' },
-    { key: 'date', label: 'التاريخ', type: 'date' },
-    { key: 'customerName', label: 'العميل' },
-    { key: 'totalAmount', label: 'الإجمالي', type: 'currency', total: true },
-    { key: 'taxAmount', label: 'الضريبة', type: 'currency', total: true },
-    { key: 'netAmount', label: 'الصافي', type: 'currency', total: true },
+    { key: 'salesDate', label: 'التاريخ', type: 'date' },
+    { key: 'ordersCount', label: 'عدد الطلبات' },
+    { key: 'totalSales', label: 'المبيعات' },
+    { key: 'totalCash', label: 'الكاش', type: 'currency', total: true },
+    { key: 'totalNetwork', label: 'الشبكة', type: 'currency', total: true },
+    { key: 'totalReturns', label: 'المرتجعات', type: 'currency', total: true },
   ];
 
   rows = signal<IDailySalesMovementRow[]>([]);

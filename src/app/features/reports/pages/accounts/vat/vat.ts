@@ -27,10 +27,10 @@ export class VatReport extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'invoiceNumber', label: 'رقم الفاتورة' },
-    { key: 'date', label: 'التاريخ', type: 'date' },
-    { key: 'partyName', label: 'الطرف' },
-    { key: 'taxableAmount', label: 'المبلغ الخاضع', type: 'currency', total: true },
+    { key: 'referenceNumber', label: 'المرجع' },
+    { key: 'tranDate', label: 'التاريخ', type: 'date' },
+    { key: 'sourceType', label: 'نوع المصدر' },
+    { key: 'taxableAmount', label: 'القيمة المضافة', type: 'currency', total: true },
     { key: 'vatAmount', label: 'ضريبة القيمة المضافة', type: 'currency', total: true },
   ];
 

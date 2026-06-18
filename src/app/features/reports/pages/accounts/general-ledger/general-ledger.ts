@@ -24,18 +24,19 @@ export class GeneralLedger extends BaseComponent {
     fromDate: this.fb.control<string | null>(null),
     toDate: this.fb.control<string | null>(null),
     searchTerm: this.fb.control<string>(''),
-    accountId: this.fb.control<number | null>(null),
+    accountId: this.fb.control<number | null>(0),
   });
 
   columns: IReportColumn[] = [
-    { key: 'date', label: 'التاريخ', type: 'date' },
-    { key: 'accountCode', label: 'كود الحساب' },
-    { key: 'accountName', label: 'اسم الحساب' },
-    { key: 'description', label: 'البيان' },
-    { key: 'referenceNumber', label: 'المرجع' },
+    { key: 'tranDate', label: 'التاريخ', type: 'date' },
+    { key: 'accountId', label: 'كود الحساب' },
+    { key: 'accountNameAr', label: 'اسم الحساب' },
+    { key: 'transactionId', label: 'رقم المعاملة'},
+    { key: 'transactionType', label: 'نوع المعاملة' },
+    { key: 'refId', label: 'المرجع' },
     { key: 'debit', label: 'مدين', type: 'currency', total: true },
     { key: 'credit', label: 'دائن', type: 'currency', total: true },
-    { key: 'balance', label: 'الرصيد', type: 'currency' },
+    { key: 'notes', label: 'البيان' },
   ];
 
   rows = signal<IGeneralLedgerRow[]>([]);
