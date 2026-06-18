@@ -83,7 +83,7 @@ export class ReceiptTemplateService {
                     <div><strong>التاريخ:</strong> ${this.formatDate(bill.dateTime)}</div>
                     <div><strong>العميل:</strong> ${bill.customer?.name ?? ''}</div>
                     <div><strong>رقم الجوال:</strong> ${bill.customer?.phone ?? ''}</div>
-                    <div><strong>نوع الدفع:</strong> ${bill.paymentType ? 'مدفوع' : 'غير مدفوع'}</div>
+                    <div><strong>نوع الدفع:</strong> ${bill.paymentType ? 'نقدي' : 'آجل'}</div>
                 </div>
                 <table style="width:100%;border-collapse:collapse;">
                     <thead>

@@ -272,8 +272,8 @@
           <app-input-error-message-handler [fc]="fg.controls.paymentType">
             <p-select
               [options]="[
-                { name: 'مدفوع', value: PaymentType.Paid },
-                { name: 'معلق', value: PaymentType.Pending }
+                { name: 'نقدي', value: PaymentType.Paid },
+                { name: 'آجل', value: PaymentType.Pending }
               ]"
               optionLabel="name"
               formControlName="paymentType"

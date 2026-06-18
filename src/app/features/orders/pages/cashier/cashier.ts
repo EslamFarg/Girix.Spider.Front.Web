@@ -463,9 +463,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
         switch (this.formMode()) {
             case FormMode.Create:
-                this.orderFg.patchValue({
-                    items: this.orderCreateItems(),
-                });
+                this.printService.selectedPrinters.set([]);
                 this.orderConfirmationDialogVisible = true;
                 break;
             case FormMode.Update:
@@ -581,6 +579,7 @@ export class Cashier extends BaseComponent implements OnInit {
         this.currentDelivery.set(null);
         this.currentCompanyDelivery.set(null);
         this.amountReceived.set(0);
+        this.printService.selectedPrinters.set([]);
         this.setSelectedCustomer(this.cashCustomer);
         this.orderFg.patchValue({
             placeRefId: null,
@@ -797,15 +796,19 @@ export class Cashier extends BaseComponent implements OnInit {
         // Build category mapping from items (fetches product categories from API)
         const categoryMap = await this.buildCategoryMap(bill);
 
-        // Check which printer roles the user has selected (from dialog/previous selection)
-        // If nothing selected, default to all configured roles for silent printing
+        // Check which printer roles the user has selected in the cashier confirmation dialog.
         const selectedPrinters = this.printService.selectedPrinters();
         console.log('[DEBUG printOrder] selectedPrinters:', selectedPrinters.map(p => ({ id: p.id, name: p.name, type: p.type, appPrinterType: p.appPrinterType })));
-        const selectedTypes = new Set(
-            selectedPrinters.length > 0 
-                ? selectedPrinters.map((p) => p.appPrinterType)
-                : [AppPrinterType.programPrinter, AppPrinterType.captionOrderPrinter, AppPrinterType.cashierPrinter]
-        );
+        if (selectedPrinters.length === 0) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'تنبيه',
+                detail: 'لم يتم اختيار أي طابعة',
+            });
+            return;
+        }
+
+        const selectedTypes = new Set(selectedPrinters.map((p) => p.appPrinterType));
         console.log('[DEBUG printOrder] selectedTypes:', Array.from(selectedTypes));
         console.log('[DEBUG printOrder] settings:', { programPrinter: settings.programPrinter?.id, captionOrderPrinter: settings.captionOrderPrinter?.id, cashierPrinter: settings.cashierPrinter?.id });
 
