@@ -6,8 +6,6 @@
 .hut-switch-picker {
   max-width: 100%;
   overflow-x: hidden;
-  column-gap: 12px;
-  row-gap: 8px;
 }
 
 .replacement-dialog-nav {

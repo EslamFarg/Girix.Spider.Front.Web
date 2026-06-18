@@ -1,5 +1,13 @@
 :host {
   --color: black;
+  /* Default (non-switch) roof sizing */
+  --hut-roof-width: 80%;
+  --hut-roof-height: 3rem;
+  --hut-roof-overlap: 8px;
+  --hut-roof-space: calc(var(--hut-roof-height) - var(--hut-roof-overlap));
+
+  display: block;
+  box-sizing: content-box;
 
   &.active {
     --color: 80, 209, 170 !important;
@@ -11,44 +19,76 @@
   color: rgb(var(--color));
 }
 
-.hut-body {
-  gap: 6px;
-}
-
-/* Default: roof zone collapses — roof overlaps body top as before */
-.hut-roof-zone {
-  position: relative;
-  height: 0;
+/* Push body down so roof can sit above without being clipped by the grid row */
+.hut-card-root {
+  padding-top: var(--hut-roof-space);
   overflow: visible;
 }
 
 /*
-  Hut switch screen (تبديل الأكواخ) — self-contained card: roof + body (name + timer).
+  Gable roof — solid triangle rendered ABOVE the body (z-index: 20).
+  Fixes:
+    1. z-index 20 > body z-10 → roof is in front
+    2. Solid background (no transparency/blur) → clearly visible
+    3. clip-path polygon → real triangle shape
+    4. filter: drop-shadow → shadow works with clip-path (box-shadow does not)
 */
-:host(.hut-switch-card) {
-  --hut-base-width: 165px;
-  --hut-scale: 0.92;
-  --hut-roof-zone: 54px;
+.hut-roof {
+  position: absolute;
+  width: var(--hut-roof-width);
+  height: var(--hut-roof-height);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  top: var(--hut-roof-space);
+  left: 50%;
+  transform: translate(-50%, calc(-100% + var(--hut-roof-overlap)));
+  z-index: 20;
 
-  display: block;
-  width: var(--hut-base-width);
-  zoom: var(--hut-scale);
-  flex-shrink: 0;
-  box-sizing: content-box;
+  /* Solid visible roof fill — no transparency in this range */
+  background: linear-gradient(
+    160deg,
+    rgb(190, 195, 200) 0%,
+    rgb(215, 218, 222) 55%,
+    rgb(230, 232, 235) 100%
+  );
+
+  /* drop-shadow works with clip-path; box-shadow does not */
+  filter: drop-shadow(-3px -3px 4px rgba(var(--color), 0.35));
 }
 
-:host(.hut-switch-card) .hut-roof-zone {
-  height: var(--hut-roof-zone);
-  overflow: visible;
+/*
+  Hut switch screen — body 140 × 92px (aspect 110/72).
+  Roof target: 80% wide, ~46px tall (~50% of 92px body height).
+*/
+:host(.hut-switch-card) {
+  --hut-roof-width: 80%;
+  --hut-roof-height: 46px;
+  --hut-roof-overlap: 8px;
+  --hut-roof-space: calc(var(--hut-roof-height) - var(--hut-roof-overlap));
+
+  width: 140px;
+  flex-shrink: 0;
+}
+
+:host(.hut-switch-card) .hut-body {
+  width: 100%;
+  aspect-ratio: 110 / 72;
+  border-radius: 0.875rem;
+}
+
+:host(.hut-switch-card) .hut-card-label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
 :host(.hut-switch-card) .hut-timer {
-  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  margin-top: 2px;
 }
 
 .hut-available {
   --color: black;
-  &.active ,
+  &.active,
   &:hover {
     --color: 80, 209, 170;
     & .bordered {
@@ -61,7 +101,6 @@
 
 .hut-reserved {
   --color: 255, 56, 60;
-
   color: rgb(var(--color));
 }
 

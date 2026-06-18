@@ -10,6 +10,21 @@
   border-color: rgb(var(--color));
   color: rgb(var(--color));
 }
+
+/* Tables switch screen — fixed 175px × 175px circle */
+:host(.table-switch-card) {
+  display: block;
+  width: 175px;
+  height: 175px;
+  flex-shrink: 0;
+  justify-self: center;
+}
+
+/* Target the inner circle div directly — same pattern as hut-card */
+:host(.table-switch-card) > div {
+  width: 175px;
+  height: 175px;
+}
 .table-available {
   --color: black;
   &.active ,

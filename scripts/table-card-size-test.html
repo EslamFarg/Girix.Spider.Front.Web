@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Table Card Size Test</title>
+<style>
+  /* Simulates Angular's compiled ViewEncapsulation.Emulated output */
+
+  /* BEFORE fix — only host had width: 175px */
+  .before-card {
+    display: block;
+    width: 175px;        /* :host(.table-switch-card) */
+    height: 175px;
+    flex-shrink: 0;
+    justify-self: center;
+    /* inner div uses aspect-square (aspect-ratio:1/1) → fills host width */
+  }
+  .before-card > .circle {
+    /* aspect-square only — no explicit w/h */
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* AFTER fix — both host AND inner div have explicit 175×175 */
+  .after-card {
+    display: block;
+    width: 175px;        /* :host(.table-switch-card) */
+    height: 175px;
+    flex-shrink: 0;
+    justify-self: center;
+  }
+  .after-card > .circle {
+    width: 175px;        /* :host(.table-switch-card) > div */
+    height: 175px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Grid simulating tables.html */
+  .grid-before {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 32px;
+    padding: 16px;
+  }
+  .grid-after {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 32px;
+    padding: 16px;
+    justify-items: center;  /* tables.html justify-items-center */
+  }
+
+  .circle {
+    border-radius: 50%;
+    background: white;
+    border: 1px solid #393C49;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 20px 0 rgba(0,0,0,0.3) inset;
+  }
+  body { background: #1a1a2e; font-family: Arial; }
+  h2 { color: white; }
+  .label { color: #aaa; font-size: 12px; margin: 4px 0; }
+  .result { color: #50d1aa; font-weight: bold; }
+  .fail { color: #ff383c; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h2>BEFORE fix — grid without justify-items-center (simulates 218.4px column tracks)</h2>
+<div class="grid-before" id="grid-before">
+  <div class="before-card" id="before-host">
+    <div class="circle" id="before-div">
+      <span style="font-size:11px; color:#333; overflow:hidden; white-space:nowrap;">طاولة 1</span>
+    </div>
+  </div>
+</div>
+<div class="label" id="before-label">Measuring...</div>
+
+<h2>AFTER fix — grid with justify-items-center</h2>
+<div class="grid-after" id="grid-after">
+  <div class="after-card" id="after-host">
+    <div class="circle" id="after-div">
+      <span style="font-size:11px; color:#333; overflow:hidden; white-space:nowrap;">طاولة 1</span>
+    </div>
+  </div>
+</div>
+<div class="label" id="after-label">Measuring...</div>
+
+<script>
+  window.onload = () => {
+    function measure(hostId, divId, labelId, name) {
+      const host = document.getElementById(hostId);
+      const div = document.getElementById(divId);
+      const label = document.getElementById(labelId);
+      const hr = host.getBoundingClientRect();
+      const dr = div.getBoundingClientRect();
+      const hSize = `${Math.round(hr.width*10)/10} × ${Math.round(hr.height*10)/10}`;
+      const dSize = `${Math.round(dr.width*10)/10} × ${Math.round(dr.height*10)/10}`;
+      const pass = Math.round(dr.width) === 175 && Math.round(dr.height) === 175;
+      label.innerHTML = `
+        <strong>${name}</strong><br>
+        Host: ${hSize} px &nbsp;|&nbsp; Inner div (circle): ${dSize} px &nbsp;
+        <span class="${pass ? 'result' : 'fail'}">${pass ? '✅ 175×175 PASS' : '❌ NOT 175×175'}</span>
+      `;
+      window[name] = { host: hSize, div: dSize, pass };
+    }
+
+    measure('before-host', 'before-div', 'before-label', 'BEFORE');
+    measure('after-host', 'after-div', 'after-label', 'AFTER');
+  };
+</script>
+</body>
+</html>
