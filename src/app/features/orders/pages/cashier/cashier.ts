@@ -295,6 +295,10 @@ export class Cashier extends BaseComponent implements OnInit {
                 this.restaurantName.set('فاتورة كاشير');
             }
         });
+        // Pre-load customers so the dropdown isn't empty when dialog opens
+        this.searchCustomers({ pageIndex: 1 });
+        // Default to cash customer
+        this.setSelectedCustomer(this.cashCustomer);
 
         this.orderTypeControl?.valueChanges.subscribe((orderType) => {
             const { placeRefId, deliveryId, paymentType } = this.orderFg.controls;
