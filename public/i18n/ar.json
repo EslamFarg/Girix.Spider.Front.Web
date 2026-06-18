@@ -159,6 +159,12 @@
         "CHANGE_PASSWORD": {
           "LABEL": "تغيير كلمة المرور"
         }
+      },
+      "REPORTS": {
+        "LABEL": "التقارير",
+        "CUSTOMERS": {
+          "LABEL": "العملاء"
+        }
       }
     }
   },
