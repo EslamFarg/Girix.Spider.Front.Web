@@ -796,20 +796,18 @@ export class Cashier extends BaseComponent implements OnInit {
         const settings = this.printerSettingsService.printerSettings();
         if (!settings) return;
 
+        // Snapshot the selection before any async work starts.
+        // The cashier submit flow resets form state after kicking off printing.
+        const selectedPrinters = [...this.printService.selectedPrinters()];
+        if (selectedPrinters.length === 0) {
+            return;
+        }
+
         // Build category mapping from items (fetches product categories from API)
         const categoryMap = await this.buildCategoryMap(bill);
 
         // Check which printer roles the user has selected in the cashier confirmation dialog.
-        const selectedPrinters = this.printService.selectedPrinters();
         console.log('[DEBUG printOrder] selectedPrinters:', selectedPrinters.map(p => ({ id: p.id, name: p.name, type: p.type, appPrinterType: p.appPrinterType })));
-        if (selectedPrinters.length === 0) {
-            this.messageService.add({
-                severity: 'warn',
-                summary: 'تنبيه',
-                detail: 'لم يتم اختيار أي طابعة',
-            });
-            return;
-        }
 
         const selectedTypes = new Set(selectedPrinters.map((p) => p.appPrinterType));
         console.log('[DEBUG printOrder] selectedTypes:', Array.from(selectedTypes));
