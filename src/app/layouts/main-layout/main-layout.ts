@@ -8,6 +8,7 @@ import { LayoutService } from '../services/layout-service';
 import { Dialog } from "primeng/dialog";
 import { FullKeyboard } from "@/features/keyboard/components/full-keyboard/full-keyboard";
 import { NumbersKeyboardDialog } from "@/features/keyboard/components/numbers-keyboard-dialog/numbers-keyboard-dialog";
+import { PrinterSettingsService } from '@/features/printers/services/printer-settings-service';
 
 @Component({
   selector: 'app-main-layout',
@@ -16,8 +17,10 @@ import { NumbersKeyboardDialog } from "@/features/keyboard/components/numbers-ke
   styleUrl: './main-layout.css',
 })
 export class MainLayout extends BaseComponent {
-  constructor() {
+  constructor(printerSettingsService: PrinterSettingsService) {
     super();
+    printerSettingsService.getSettings().subscribe();
+
    }
   header = viewChild<Header>('header');
   mainEl = viewChild<ElementRef<HTMLElement>>('main');
