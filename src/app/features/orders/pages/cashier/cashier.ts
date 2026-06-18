@@ -1594,10 +1594,16 @@ export class Cashier extends BaseComponent implements OnInit {
     }
 
     getOrderItemAdditionQuantity(additionId: number) {
-        const orderItem = this.orderMenuItems()[this.currentMenuItemIx()];
-        console.log('orderItem', orderItem);
+        const orderItem = this.currentMenuItem();
+        if (!orderItem) return 0;
         const existingAddition = orderItem.additions.find((addition) => addition.product.id == additionId);
         return existingAddition ? existingAddition.quantity : 0;
+    }
+
+    closeAdditionsDialog() {
+        this.additionsDialogVisible = false;
+        this.additionProducts.set([]);
+        this.currentMenuItemIx.set(null);
     }
 
     //#endregion
