@@ -1,6 +1,6 @@
-<div [class]="'relative text-black cursor-pointer ' + hutStatusClass()">
+<div [class]="'hut-card-root relative text-black cursor-pointer ' + hutStatusClass()">
   <div
-    class="absolute w-4/6 hut rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded-xl"
+    class="hut-roof hut absolute w-4/6 rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded-xl"
     style="
       background: linear-gradient(
         306deg,
@@ -14,11 +14,11 @@
   ></div>
   <div
     style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #a3a3a34d"
-    class="flex border-2 z-10 relative bordered border-transparent aspect-[calc(110/72)] items-center justify-center bg-white/80 rounded-2xl"
+    class="hut-body flex border-2 z-10 relative bordered border-transparent aspect-[calc(110/72)] items-center justify-center bg-white/80 rounded-2xl"
   >
     <div
       [title]="data()?.name"
-      class="font-bold mx-auto w-[95%] text-center text-ellipsis overflow-hidden whitespace-nowrap"
+      class="hut-card-label font-bold mx-auto w-[95%] text-center text-ellipsis overflow-hidden whitespace-nowrap"
     >
       {{ data()?.name }}
     </div>
@@ -26,7 +26,7 @@
   <countdown
     #countdown
     dir="ltr"
-    class="mx-auto w-fit block font-bold"
+    class="hut-timer mx-auto w-fit block font-bold"
     [config]="countdownConfig"
     (event)="handleCountdownEvent($event)"
   />

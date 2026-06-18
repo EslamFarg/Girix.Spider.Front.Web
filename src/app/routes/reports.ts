@@ -1,5 +1,7 @@
 import { Route } from '@angular/router';
-import { Customers } from '@/features/reports/pages/customers/customers';
+// Customers & Suppliers
+import { CustomersReport } from '@/features/reports/pages/customers/customers';
+import { SuppliersReport } from '@/features/reports/pages/suppliers/suppliers';
 // Inventory
 import { InventoryByItems } from '@/features/reports/pages/inventory/by-items/by-items';
 import { InventoryByProperties } from '@/features/reports/pages/inventory/by-properties/by-properties';
@@ -34,9 +36,24 @@ import { ReceiptVouchersReport } from '@/features/reports/pages/accounts/receipt
 import { PaymentVouchersReport } from '@/features/reports/pages/accounts/payment-vouchers/payment-vouchers';
 import { GeneralJournal } from '@/features/reports/pages/accounts/general-journal/general-journal';
 import { CategoryProfit } from '@/features/reports/pages/accounts/category-profit/category-profit';
+import { SingleItemProfit } from '@/features/reports/pages/accounts/single-item-profit/single-item-profit';
+import { TrialBalance } from '@/features/reports/pages/accounts/trial-balance/trial-balance';
+import { GroupedTrialBalance } from '@/features/reports/pages/accounts/grouped-trial-balance/grouped-trial-balance';
+import { AccountGroupBalance } from '@/features/reports/pages/accounts/account-group-balance/account-group-balance';
+import { GeneralLedger } from '@/features/reports/pages/accounts/general-ledger/general-ledger';
+import { AccountStatement } from '@/features/reports/pages/accounts/account-statement/account-statement';
+import { BalanceSheet } from '@/features/reports/pages/accounts/balance-sheet/balance-sheet';
+import { IncomeStatement } from '@/features/reports/pages/accounts/income-statement/income-statement';
+import { DailyTransaction } from '@/features/reports/pages/accounts/daily-transaction/daily-transaction';
+import { MiniDailyJournal } from '@/features/reports/pages/accounts/mini-daily-journal/mini-daily-journal';
+import { VatReport } from '@/features/reports/pages/accounts/vat/vat';
+import { SelectiveTaxReport } from '@/features/reports/pages/accounts/selective-tax/selective-tax';
+import { DailySalesMovement } from '@/features/reports/pages/sales/daily-sales-movement/daily-sales-movement';
 
 export default [
-  { path: 'customers', component: Customers },
+  // ── Customers & Suppliers ───────────────────────────────────────────────────
+  { path: 'Customers', component: CustomersReport },
+  { path: 'Suppliers', component: SuppliersReport },
 
   // ── Inventory ───────────────────────────────────────────────────────────────
   { path: 'InventoryByItems', component: InventoryByItems },
@@ -77,4 +94,19 @@ export default [
   { path: 'PaymentVouchersReport', component: PaymentVouchersReport },
   { path: 'GeneralJournal', component: GeneralJournal },
   { path: 'CategoryProfit', component: CategoryProfit },
+
+  // ── New Reports ─────────────────────────────────────────────────────────────
+  { path: 'SingleItemProfit', component: SingleItemProfit },
+  { path: 'TrialBalance', component: TrialBalance },
+  { path: 'GroupedTrialBalance', component: GroupedTrialBalance },
+  { path: 'AccountGroupBalance', component: AccountGroupBalance },
+  { path: 'GeneralLedger', component: GeneralLedger },
+  { path: 'AccountStatement', component: AccountStatement },
+  { path: 'BalanceSheet', component: BalanceSheet },
+  { path: 'IncomeStatement', component: IncomeStatement },
+  { path: 'DailyTransaction', component: DailyTransaction },
+  { path: 'MiniDailyJournal', component: MiniDailyJournal },
+  { path: 'DailySalesMovement', component: DailySalesMovement },
+  { path: 'Vat', component: VatReport },
+  { path: 'SelectiveTax', component: SelectiveTaxReport },
 ] satisfies Route[];

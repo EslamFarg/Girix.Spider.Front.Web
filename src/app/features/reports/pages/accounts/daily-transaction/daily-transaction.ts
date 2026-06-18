@@ -7,17 +7,17 @@ import { TooltipModule } from 'primeng/tooltip';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
-import { ReportPrintView, IReportColumn, IReportFilter } from '../../components/report-print-view/report-print-view';
-import { ReportsService } from '../../services/reports-service';
-import { ICustomersReportRow } from '../../types/api/reports-types';
+import { ReportPrintView, IReportColumn, IReportFilter } from '../../../components/report-print-view/report-print-view';
+import { ReportsService } from '../../../services/reports-service';
+import { IDailyTransactionRow } from '../../../types/api/reports-types';
 
 @Component({
-  selector: 'app-customers-report',
+  selector: 'app-daily-transaction',
   imports: [SectionWrapper, ReactiveFormsModule, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule, ReportPrintView],
-  templateUrl: './customers.html',
-  styleUrl: './customers.css',
+  templateUrl: './daily-transaction.html',
+  styleUrl: './daily-transaction.css',
 })
-export class CustomersReport extends BaseComponent {
+export class DailyTransaction extends BaseComponent {
   reportsService = inject(ReportsService);
 
   fg = this.fb.group({
@@ -27,13 +27,14 @@ export class CustomersReport extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'customerName', label: 'اسم العميل' },
-    { key: 'phoneNumber', label: 'رقم الجوال' },
-    { key: 'address', label: 'العنوان' },
-    { key: 'balance', label: 'الرصيد', type: 'currency', total: true },
+    { key: 'date', label: 'التاريخ', type: 'date' },
+    { key: 'description', label: 'البيان' },
+    { key: 'referenceNumber', label: 'المرجع' },
+    { key: 'debit', label: 'مدين', type: 'currency', total: true },
+    { key: 'credit', label: 'دائن', type: 'currency', total: true },
   ];
 
-  rows = signal<ICustomersReportRow[]>([]);
+  rows = signal<IDailyTransactionRow[]>([]);
   lastSearchFilters = signal<IReportFilter[]>([]);
   paginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
@@ -49,7 +50,7 @@ export class CustomersReport extends BaseComponent {
       { label: 'إلى تاريخ', value: v.toDate },
       { label: 'بحث', value: v.searchTerm || null },
     ]);
-    this.reportsService.getCustomersReport({ ...v, pageIndex, pageSize: 10 }).subscribe({
+    this.reportsService.getDailyTransaction({ ...v, pageIndex, pageSize: 10 }).subscribe({
       next: (res) => {
         this.rows.set(res.data);
         this.paginationInfo = { pageIndex, totalPagesCount: res.paginationInfo.totalPagesCount, totalRowsCount: res.paginationInfo.totalRowsCount };

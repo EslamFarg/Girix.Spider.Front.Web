@@ -7,17 +7,17 @@ import { TooltipModule } from 'primeng/tooltip';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
-import { ReportPrintView, IReportColumn, IReportFilter } from '../../components/report-print-view/report-print-view';
-import { ReportsService } from '../../services/reports-service';
-import { ICustomersReportRow } from '../../types/api/reports-types';
+import { ReportPrintView, IReportColumn, IReportFilter } from '../../../components/report-print-view/report-print-view';
+import { ReportsService } from '../../../services/reports-service';
+import { IDailySalesMovementRow } from '../../../types/api/reports-types';
 
 @Component({
-  selector: 'app-customers-report',
+  selector: 'app-daily-sales-movement',
   imports: [SectionWrapper, ReactiveFormsModule, InputTextModule, InputGroupAddon, LoadingDisabledDirective, TooltipModule, ReportPrintView],
-  templateUrl: './customers.html',
-  styleUrl: './customers.css',
+  templateUrl: './daily-sales-movement.html',
+  styleUrl: './daily-sales-movement.css',
 })
-export class CustomersReport extends BaseComponent {
+export class DailySalesMovement extends BaseComponent {
   reportsService = inject(ReportsService);
 
   fg = this.fb.group({
@@ -27,13 +27,15 @@ export class CustomersReport extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'customerName', label: 'اسم العميل' },
-    { key: 'phoneNumber', label: 'رقم الجوال' },
-    { key: 'address', label: 'العنوان' },
-    { key: 'balance', label: 'الرصيد', type: 'currency', total: true },
+    { key: 'invoiceNumber', label: 'رقم الفاتورة' },
+    { key: 'date', label: 'التاريخ', type: 'date' },
+    { key: 'customerName', label: 'العميل' },
+    { key: 'totalAmount', label: 'الإجمالي', type: 'currency', total: true },
+    { key: 'taxAmount', label: 'الضريبة', type: 'currency', total: true },
+    { key: 'netAmount', label: 'الصافي', type: 'currency', total: true },
   ];
 
-  rows = signal<ICustomersReportRow[]>([]);
+  rows = signal<IDailySalesMovementRow[]>([]);
   lastSearchFilters = signal<IReportFilter[]>([]);
   paginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
@@ -49,7 +51,7 @@ export class CustomersReport extends BaseComponent {
       { label: 'إلى تاريخ', value: v.toDate },
       { label: 'بحث', value: v.searchTerm || null },
     ]);
-    this.reportsService.getCustomersReport({ ...v, pageIndex, pageSize: 10 }).subscribe({
+    this.reportsService.getDailySalesMovement({ ...v, pageIndex, pageSize: 10 }).subscribe({
       next: (res) => {
         this.rows.set(res.data);
         this.paginationInfo = { pageIndex, totalPagesCount: res.paginationInfo.totalPagesCount, totalRowsCount: res.paginationInfo.totalRowsCount };

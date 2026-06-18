@@ -3,6 +3,11 @@
   overflow-x: hidden;
 }
 
+.hut-switch-picker {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 .replacement-dialog-nav {
   --p-button-primary-background: var(--color-text-lighter);
   --p-button-primary-color: var(--color-dark-line);

@@ -18,7 +18,7 @@
         <app-room-card class="room-switch-card" [data]="currentItem()?.data!" />
       }
       @case (SpaceTypeEnum.Hut) {
-        <app-hut-card  class="mt-12 w-25" [data]="currentItem()?.data!" />
+        <app-hut-card class="hut-switch-card mt-12" [data]="currentItem()?.data!" />
       }
       @case (SpaceTypeEnum.Table) {
         <app-table-card  class="w-25" [data]="currentItem()?.data!" />
@@ -95,9 +95,10 @@
         }
         <!--  -->
         @case (SpaceTypeEnum.Hut) {
-          <div class="flex my-4 gap-8 w-fit pt-11 pb-2 *:w-25 *:min-w-25 relative z-1">
+          <div class="hut-switch-picker flex flex-wrap my-4 gap-3 w-full justify-center pt-11 pb-2 relative z-1">
             @for (hut of huts(); track $index) {
               <app-hut-card
+                class="hut-switch-card"
                 [class.active]="
                   hut.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Hut
                 "
