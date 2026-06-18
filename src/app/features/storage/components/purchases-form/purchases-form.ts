@@ -1,17 +1,5 @@
-import {
-    AbstractControl,
-    FormGroup,
-    ReactiveFormsModule,
-    Validators,
-} from '@angular/forms';
-import {
-    Component,
-    computed,
-    inject,
-    input,
-    Signal,
-    signal,
-} from '@angular/core';
+import { AbstractControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, computed, inject, input, Signal, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
@@ -26,11 +14,7 @@ import { IPurchaseReadResponse } from '../../types/api/purchases/responses';
 import { IProductSearchRow, IProductUnit, ProductSearchEnum, ProductService } from '@/features/classes';
 import { IDebounceEvent, Debounce } from '@/directives/debounce';
 import { UnitService } from '@/features/classes/services/unit-service';
-import {
-    noSymbolsAllowed,
-    onlyNumbersOrDotAllowed,
-    onlyNumbersOrEnLettersAllowed,
-} from '@/yn-ng';
+import { noSymbolsAllowed, onlyNumbersOrDotAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { OrderPaymentType } from '@/features/orders';
 import { SupplierService, SupplierSearchEnum } from '../../services/supplier-service';
@@ -108,9 +92,7 @@ export class PurchasesForm extends BaseComponent {
         notes: this.fb.control<string | null>(null, [Validators.maxLength(1000)]),
         items: this.fb.array<FormGroup<IAppPurchaseItemControls>>([], [Validators.required, Validators.minLength(1)]),
         supplierId: this.fb.control<number | null>(null, [Validators.required]),
-        supplierName: this.fb.control<string | null>({ value: null, disabled: true }, [
-            Validators.maxLength(100),
-        ]),
+        supplierName: this.fb.control<string | null>({ value: null, disabled: true }, [Validators.maxLength(100)]),
         supplierPhoneNumber: this.fb.control<string | null>(null, []),
         supplierTaxNumber: this.fb.control<string | null>(null, []),
         cashAmount: this.fb.control<number | null>(null, [
@@ -139,13 +121,19 @@ export class PurchasesForm extends BaseComponent {
                 this.fg.controls.networkAccountId,
             ];
             if (value == OrderPaymentType.Paid) {
-                controls.forEach((c) => { c.setValue(null); c.enable(); });
+                controls.forEach((c) => {
+                    c.setValue(null);
+                    c.enable();
+                });
                 // Re-apply defaults for new invoices after controls are cleared & enabled
                 if (this.formMode() === FormMode.Create) {
                     setTimeout(() => this._applyDefaultAccountsToForm());
                 }
             } else {
-                controls.forEach((c) => { c.setValue(null); c.disable(); });
+                controls.forEach((c) => {
+                    c.setValue(null);
+                    c.disable();
+                });
             }
             this.paymentType.set(value!);
         },
@@ -165,24 +153,18 @@ export class PurchasesForm extends BaseComponent {
 
     totalQuantity = computed(() => {
         this._itemsChange();
-        return this.fg.controls.items.controls.reduce(
-            (sum, ctrl) => sum + (Number(ctrl.value.quantity) || 0),
-            0,
-        );
+        return this.fg.controls.items.controls.reduce((sum, ctrl) => sum + (Number(ctrl.value.quantity) || 0), 0);
     });
 
     totalTax = computed(() => {
         this._itemsChange();
         return this.fg.controls.items.controls.reduce(
-            (sum, ctrl) =>
-                sum + (Number(ctrl.value.taxAmount) || 0) * (Number(ctrl.value.quantity) || 0),
+            (sum, ctrl) => sum + (Number(ctrl.value.taxAmount) || 0) * (Number(ctrl.value.quantity) || 0),
             0,
         );
     });
 
-    finalNet = computed(() =>
-        this.fg.value.paymentType === OrderPaymentType.Paid ? this.net() : 0,
-    );
+    finalNet = computed(() => (this.fg.value.paymentType === OrderPaymentType.Paid ? this.net() : 0));
 
     // ── Cash / network amount cross-update ────────────────────────────────────
 
@@ -237,6 +219,11 @@ export class PurchasesForm extends BaseComponent {
             .subscribe({
                 next: (res) => {
                     this.suppliersByName.set(res.value.rows);
+                    this.supplierService.getDefaultSupplier().subscribe({
+                        next: (res) => {
+                            this.fg.patchValue({ supplierId: res.id });
+                        },
+                    });
                 },
             });
 
@@ -326,7 +313,9 @@ export class PurchasesForm extends BaseComponent {
         switch (this.formMode()) {
             case FormMode.Create:
                 this.purchaseService.create(data).subscribe({
-                    next: () => { this.router.navigate(['/storage/purchases']); },
+                    next: () => {
+                        this.router.navigate(['/storage/purchases']);
+                    },
                 });
                 break;
             case FormMode.Update:
@@ -344,9 +333,7 @@ export class PurchasesForm extends BaseComponent {
                 this.currentPurchase.set(data);
                 this.fg.patchValue({ ...data, invoiceDate: new Date(data.invoiceDate) });
                 this._setCurrentSupplierFromPurchase(data);
-                this.currentProducts.set(
-                    data.items.map((item) => ({ id: item.menuItemsId, name: item.menuItemName })),
-                );
+                this.currentProducts.set(data.items.map((item) => ({ id: item.menuItemsId, name: item.menuItemName })));
                 this.fg.setControl(
                     'items',
                     this.fb.array(
@@ -424,11 +411,6 @@ export class PurchasesForm extends BaseComponent {
         return list;
     });
 
-
-
-
-
-
     onSupplierSelected(supplier: ISupplierSearchRow) {
         if (!supplier) return;
         this.currentSupplier.set(supplier);
@@ -498,10 +480,7 @@ export class PurchasesForm extends BaseComponent {
     units = new Map<number, Signal<IProductUnit[]>>();
     unitService = inject(UnitService);
 
-    getProductUnits(
-        productId: number,
-        fg: FormGroup<IAppPurchaseItemControls> = this.newPurchaseItemRowFg,
-    ) {
+    getProductUnits(productId: number, fg: FormGroup<IAppPurchaseItemControls> = this.newPurchaseItemRowFg) {
         if (!this.units.has(productId)) {
             const unitsSignal = signal<IProductUnit[]>([]);
             this.units.set(productId, unitsSignal);
@@ -568,10 +547,7 @@ export class PurchasesForm extends BaseComponent {
                 Validators.min(0),
             ]),
             total: this.fb.control<number | null>(this.calculateItemTotal(data).total, []),
-            taxAmount: this.fb.control<number | null>(data?.taxAmount ?? 0, [
-                Validators.required,
-                Validators.min(0),
-            ]),
+            taxAmount: this.fb.control<number | null>(data?.taxAmount ?? 0, [Validators.required, Validators.min(0)]),
             taxPercentage: this.fb.control<number | null>(data?.taxPercentage ?? -1, []),
         });
 
@@ -605,10 +581,7 @@ export class PurchasesForm extends BaseComponent {
 
         const currentProduct = this.products().find((p) => p.id === fgValue.menuItemsId);
         if (currentProduct) {
-            this.currentProducts.update((pre) => [
-                ...pre.filter((p) => p.id !== fgValue.menuItemsId),
-                currentProduct,
-            ]);
+            this.currentProducts.update((pre) => [...pre.filter((p) => p.id !== fgValue.menuItemsId), currentProduct]);
         }
 
         this.lastClickedTableRowIndex.set(this.fg.value.items!.length - 1);
@@ -677,9 +650,7 @@ export class PurchasesForm extends BaseComponent {
     searchAccounts(data: { pageIndex: number; searchTerm?: string }) {
         return this.financialAccountService.search({
             paginationInfo: { pageIndex: data.pageIndex, pageSize: 10 },
-            searchFilters: [
-                { column: FinancialAccountSearchEnum.Name, values: [data.searchTerm ?? ''] },
-            ],
+            searchFilters: [{ column: FinancialAccountSearchEnum.Name, values: [data.searchTerm ?? ''] }],
             fromDate: null,
         });
     }
@@ -809,7 +780,9 @@ export class PurchasesForm extends BaseComponent {
 
         const paymentLabel = invoice.paymentType === 1 ? 'نقدي' : 'آجل';
 
-        const itemRows = invoice.items.map((item, i) => `
+        const itemRows = invoice.items
+            .map(
+                (item, i) => `
           <tr>
             <td class="num">${i + 1}</td>
             <td>${item.menuItemName ?? '-'}</td>
@@ -818,9 +791,13 @@ export class PurchasesForm extends BaseComponent {
             <td class="num">${money(item.purchasePrice)}</td>
             <td class="num">${money(item.taxAmount)}</td>
             <td class="num">${money(item.lineTotal)}</td>
-          </tr>`).join('');
+          </tr>`,
+            )
+            .join('');
 
-        const paymentRows = invoice.paymentType === 1 ? `
+        const paymentRows =
+            invoice.paymentType === 1
+                ? `
           <div class="total-item">
             <span class="total-label">نقدي</span>
             <span class="total-value">${money(invoice.cashAmount)}</span>
@@ -828,7 +805,8 @@ export class PurchasesForm extends BaseComponent {
           <div class="total-item">
             <span class="total-label">شبكة</span>
             <span class="total-value">${money(invoice.networkAmount)}</span>
-          </div>` : '';
+          </div>`
+                : '';
 
         const html = `
           <div class="doc-header">
@@ -871,11 +849,15 @@ export class PurchasesForm extends BaseComponent {
             </div>
           </div>
 
-          ${invoice.statement ? `
+          ${
+              invoice.statement
+                  ? `
           <div class="statement-banner mb-2">
             <span class="meta-label">البيان: </span>
             <span>${invoice.statement}</span>
-          </div>` : ''}
+          </div>`
+                  : ''
+          }
 
           <table class="lines-table">
             <thead>
@@ -956,7 +938,9 @@ export class PurchasesForm extends BaseComponent {
             acceptButtonProps: { label: 'حذف', severity: 'danger' },
             accept: () => {
                 this.purchaseService.delete(id).subscribe({
-                    next: () => { this.router.navigateByUrl('/storage/purchases/add'); },
+                    next: () => {
+                        this.router.navigateByUrl('/storage/purchases/add');
+                    },
                 });
             },
         });
