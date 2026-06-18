@@ -67,7 +67,7 @@ export class CollectivePaymentForm extends BaseComponent {
 
   initialFormValue = {
     id: this.fb.control<number | null>({ value: null, disabled: true }, []),
-    voucherNo: this.fb.control<string | null>(null, []),
+    voucherNo: this.fb.control<string | null>(null,),
     voucherDate: this.fb.control<Date | null>(new Date(), [Validators.required]),
     payee: this.fb.control<string | null>(null, [  Validators.maxLength(300)]),
     creditAccountId: this.fb.control<number | null>(null, [Validators.required]),
@@ -147,6 +147,7 @@ export class CollectivePaymentForm extends BaseComponent {
         finincalAccountId: item.finincalAccountId!,
         isHasTax: item.isHasTax ?? false,
         totalAmount: +(item.totalAmount ?? 0),
+        notes: item.notes,
       })),
     };
 

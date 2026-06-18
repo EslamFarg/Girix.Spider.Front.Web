@@ -66,7 +66,7 @@ export class CollectiveReceiptForm extends BaseComponent {
 
   initialFormValue = {
     id: this.fb.control<number | null>({ value: null, disabled: true }, []),
-    voucherNo: this.fb.control<string | null>(null, [Validators.required]),
+    voucherNo: this.fb.control<string | null>(null),
     voucherDate: this.fb.control<Date | null>(new Date(), [Validators.required]),
     debitAccountId: this.fb.control<number | null>(null, [Validators.required]),
     isHasTax: this.fb.control<boolean>(false, []),
@@ -146,6 +146,7 @@ export class CollectiveReceiptForm extends BaseComponent {
         finincalAccountId: item.finincalAccountId!,
         isHasTax: item.isHasTax ?? false,
         totalAmount: +(item.totalAmount ?? 0),
+        notes: item.notes,
       })),
     };
 

@@ -69,7 +69,6 @@ export class OpeningBalanceForm extends BaseComponent {
   initialFormValue = {
     // المرجع
     referenceNumber: this.fb.control<string | null>(null, [
-      Validators.required,
       Validators.minLength(2),
       Validators.maxLength(7),
       onlyNumbersAllowed,

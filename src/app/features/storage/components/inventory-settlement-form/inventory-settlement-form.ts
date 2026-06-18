@@ -78,7 +78,7 @@ export class InventorySettlementForm extends BaseComponent {
 
   initialFormValue = {
     // المرجع
-    referenceNumber: this.fb.control<string | null>(null, [Validators.required,Validators.maxLength(16),onlyNumbersOrEnLettersAllowed]),
+    referenceNumber: this.fb.control<string | null>(null, [Validators.maxLength(16),onlyNumbersOrEnLettersAllowed]),
     // الرقم الفاتورة
     settlementDate: this.fb.control<Date | null>(new Date(), [Validators.required]),
     items: this.fb.array<FormGroup<IAppInventoryItemControls>>([], [Validators.required, Validators.minLength(1)]),

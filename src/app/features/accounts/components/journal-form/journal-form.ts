@@ -76,7 +76,6 @@ export class JournalForm extends BaseComponent {
         id: this.fb.control<number | null>({ value: null, disabled: true }, []),
         // المرجع
         refNumber: this.fb.control<string | null>(null, [
-            Validators.required,
             Validators.minLength(2),
             Validators.maxLength(16),
             labeledRegexValidator(
@@ -87,7 +86,6 @@ export class JournalForm extends BaseComponent {
         ]),
         // الرقم الدفتري
         voucherNo: this.fb.control<string | null>(null, [
-            Validators.required,
             onlyNumbersAllowed,
             Validators.minLength(2),
             Validators.maxLength(7),
