@@ -105,7 +105,6 @@ export class SupplierForm extends BaseComponent implements OnInit {
                 this.supplierService.getById(this.id()!).subscribe((Supplier) => {
                     this.currentSupplier.set(Supplier);
                     //-> bind data
-                    console.log('supplier', Supplier);
                     this.supplierFg.patchValue({ ...Supplier, nameAr: Supplier.name, nameEn: Supplier.name });
                 });
                 break;
@@ -130,14 +129,14 @@ export class SupplierForm extends BaseComponent implements OnInit {
             case FormMode.Create:
                 this.supplierService.create(this.supplierFg.value).subscribe({
                     next: (res) => {
-                        this.router.navigate(['/suppliers']);
+                        this.router.navigate(['/accounts/suppliers']);
                     },
                 });
                 break;
             case FormMode.Update:
                 this.supplierService.put({ ...this.supplierFg.value, id: Number(this.id()) }).subscribe({
                     next: (res) => {
-                        this.router.navigate(['/suppliers']);
+                        this.router.navigate(['/accounts/suppliers']);
                     },
                 });
                 break;

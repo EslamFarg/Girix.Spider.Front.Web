@@ -108,7 +108,7 @@ export class DeliveryManForm extends BaseComponent implements OnInit {
                         phoneNumber: delivery.phoneNumber,
                         email: delivery.email ?? '',
                         address: delivery.address,
-                        description: delivery.description,
+                        description: delivery.description ?? '',
                         identityNumber: delivery.identityNumber,
                     });
 
