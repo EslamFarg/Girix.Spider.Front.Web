@@ -464,6 +464,9 @@ export class Cashier extends BaseComponent implements OnInit {
         switch (this.formMode()) {
             case FormMode.Create:
                 this.printService.selectedPrinters.set([]);
+                this.orderFg.patchValue({
+                    items: this.orderCreateItems(),
+                })
                 this.orderConfirmationDialogVisible = true;
                 break;
             case FormMode.Update:
@@ -999,35 +1002,6 @@ export class Cashier extends BaseComponent implements OnInit {
 
     //#endregion
 
-    //
-    //#region keyboard
-    //
-
-    // keyboardService = inject(KeyboardService);
-    // closeFullKeyboard = this.keyboardService.closeFullKeyboard;
-    // toggleNumbersKeyboard = () => {
-    //     if (this.keyboardService.isNumbersKeyboardVisible()) {
-    //         this.closeNumbersKeyboard();
-    //     } else {
-    //         this.keyboardService.openNumbersKeyboard();
-    //     }
-    // };
-    // triggerFullKeyboard(inputClassSelector: string) {
-    //     this.keyboardService.triggerFullKeyboard(inputClassSelector, 'full-keyboard');
-    // }
-    // closeNumbersKeyboard = this.keyboardService.closeNumbersKeyboard;
-
-    // triggerNumbersKeyboard(input: HTMLInputElement) {
-    //     this.keyboardService.triggerNumbersKeyboard(input);
-    // }
-
-    // // Local numbers keyboard visibility for payment dialog
-    // isPaymentNumbersKeyboardVisible = signal(false);
-    // togglePaymentNumbersKeyboard() {
-    //     this.isPaymentNumbersKeyboardVisible.update((v) => !v);
-    // }
-
-    //#endregion
 
     //
     //#region Accounts
