@@ -184,18 +184,13 @@
                             [items]="displayedSuppliersByName()"
                             bindLabel="name"
                             bindValue="id"
-                            [formControl]="getFormControl(fg, 'supplierId')"
+                            [formControl]="fg.controls.supplierId"
                             (change)="onSupplierSelected($event)"
                             placeholder="ابحث عن المورد..."
                             [clearable]="false"
                             appendTo="body"
                             #supplierNameSelect
                             appDebounce
-                            [customEvents]="[
-                                { type: 'searchEvent', value: supplierNameSelect.searchEvent },
-                                { type: 'scrollToEnd', value: supplierNameSelect.scrollToEnd },
-                            ]"
-                            (debounced)="onSupplierNameSearch($event, supplierNameSelect.searchTerm)"
                         />
                     </app-input-error-message-handler>
                 </div>

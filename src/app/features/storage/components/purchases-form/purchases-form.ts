@@ -230,7 +230,7 @@ export class PurchasesForm extends BaseComponent {
         // Load all suppliers initially so the dropdown is pre-populated
         this.supplierService
             .search({
-                paginationInfo: { pageIndex: 1, pageSize: 0 },
+                paginationInfo: { pageIndex: 0, pageSize: 0 },
                 searchFilters: [{ column: SupplierSearchEnum.Name, values: [''] }],
                 fromDate: null,
             })
@@ -424,50 +424,10 @@ export class PurchasesForm extends BaseComponent {
         return list;
     });
 
-    searchSuppliers(
-        pageIndex: number,
-        searchTerm: string,
-        searchEnum: SupplierSearchEnum,
-    ) {
-        this.supplierService
-            .search({
-                paginationInfo: { pageIndex, pageSize: 10 },
-                searchFilters: [{ column: searchEnum, values: [searchTerm] }],
-                fromDate: null,
-            })
-            .subscribe({
-                next: (res) => {
-                    const rows = res.value.rows;
-                    if (searchEnum === SupplierSearchEnum.Id) {
-                        if (pageIndex === 1) this.suppliersByCode.set(rows);
-                        else this.suppliersByCode.update((p) => [...p, ...rows]);
-                        this._suppliersCodePage = pageIndex;
-                    } else {
-                        if (pageIndex === 1) this.suppliersByName.set(rows);
-                        else this.suppliersByName.update((p) => [...p, ...rows]);
-                        this._suppliersNamePage = pageIndex;
-                    }
-                },
-            });
-    }
 
-    onSupplierCodeSearch(event: IDebounceEvent, searchTerm: string) {
-        if (event.type === 'scrollToEnd') {
-            this.searchSuppliers(this._suppliersCodePage + 1, this._suppliersCodeTerm, SupplierSearchEnum.Id);
-        } else {
-            this._suppliersCodeTerm = searchTerm ?? '';
-            this.searchSuppliers(1, this._suppliersCodeTerm, SupplierSearchEnum.Id);
-        }
-    }
 
-    onSupplierNameSearch(event: IDebounceEvent, searchTerm: string) {
-        if (event.type === 'scrollToEnd') {
-            this.searchSuppliers(this._suppliersNamePage + 1, this._suppliersNameTerm, SupplierSearchEnum.Name);
-        } else {
-            this._suppliersNameTerm = searchTerm ?? '';
-            this.searchSuppliers(1, this._suppliersNameTerm, SupplierSearchEnum.Name);
-        }
-    }
+
+
 
     onSupplierSelected(supplier: ISupplierSearchRow) {
         if (!supplier) return;
