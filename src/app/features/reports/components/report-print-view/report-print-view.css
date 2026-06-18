@@ -7,6 +7,8 @@
 .report-wrapper {
   font-family: 'Cairo', sans-serif;
   direction: rtl;
+  width: 75%;
+  margin: auto;
 }
 
 /* ── Action bar ── */
