@@ -296,7 +296,8 @@
 
         <!-- البحث برقم فاتورة المشتريات -->
         <div>
-          <label>البحث برقم فاتورة المشتريات</label>
+          <label for="searchVoucherForm">البحث برقم فاتورة المشتريات</label>
+          <app-input-error-message-handler>
           <form
             #searchVoucherForm
             id="searchVoucherForm"
@@ -314,6 +315,7 @@
                 #voucherSearchInput
                 placeholder="رقم الفاتورة / المرتجع"
               />
+              
               <p-inputgroup-addon class="p-0! cursor-pointer relative">
                 <button
                   appLoadingDisabled
@@ -335,6 +337,7 @@
                 <p-menu
                   dir="rtl"
                   #filterMenu
+                  appendTo="body"
                   [model]="filterMenuItems()"
                   [popup]="true"
                   [style]="{ insetInlineEnd: '100%' }"
@@ -350,6 +353,7 @@
               </p-inputgroup-addon>
             </app-input-error-message-handler>
           </form>
+          </app-input-error-message-handler>
         </div>
 
         <!-- Row 4: البيان (full-width) ─────────────────────────────────────── -->
