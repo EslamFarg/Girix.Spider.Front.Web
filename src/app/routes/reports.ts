@@ -38,41 +38,41 @@ export default [
   { path: 'customers', component: Customers },
 
   // ── Inventory ───────────────────────────────────────────────────────────────
-  { path: 'inventory/by-items', component: InventoryByItems },
-  { path: 'inventory/by-properties', component: InventoryByProperties },
-  { path: 'inventory/item-movement-full', component: ItemMovementFull },
-  { path: 'inventory/item-movement-actual', component: ItemMovementActual },
-  { path: 'inventory/value-by-items', component: InventoryValueByItems },
-  { path: 'inventory/value-by-groups', component: InventoryValueByGroups },
-  { path: 'inventory/reorder-limit-by-warehouse', component: ReorderLimitByWarehouse },
+  { path: 'InventoryByItems', component: InventoryByItems },
+  { path: 'InventoryByProperties', component: InventoryByProperties },
+  { path: 'InventoryItemMovementFull', component: ItemMovementFull },
+  { path: 'InventoryItemMovementActual', component: ItemMovementActual },
+  { path: 'InventoryValueByItems', component: InventoryValueByItems },
+  { path: 'InventoryValueByGroups', component: InventoryValueByGroups },
+  { path: 'InventoryReorderLimitByWarehouse', component: ReorderLimitByWarehouse },
 
   // ── Purchases ───────────────────────────────────────────────────────────────
-  { path: 'purchases/list', component: PurchasesListReport },
-  { path: 'purchases/items-details', component: PurchasesItemsDetails },
-  { path: 'purchases/suppliers-analysis', component: SuppliersAnalysis },
+  { path: 'PurchasesList', component: PurchasesListReport },
+  { path: 'PurchasesItemsDetails', component: PurchasesItemsDetails },
+  { path: 'PurchasesSuppliersAnalysis', component: SuppliersAnalysis },
 
   // ── Purchase Returns ────────────────────────────────────────────────────────
-  { path: 'purchase-returns/list', component: PurchaseReturnsListReport },
-  { path: 'purchase-returns/items-details', component: PurchaseReturnsItemsDetails },
+  { path: 'PurchaseReturnsList', component: PurchaseReturnsListReport },
+  { path: 'PurchaseReturnsItemsDetails', component: PurchaseReturnsItemsDetails },
 
   // ── Sales ───────────────────────────────────────────────────────────────────
-  { path: 'sales/list', component: SalesListReport },
-  { path: 'sales/items-details', component: SalesItemsDetails },
-  { path: 'sales/customers', component: SalesCustomers },
-  { path: 'sales/cashiers', component: SalesCashiers },
-  { path: 'sales/delivery', component: SalesDelivery },
+  { path: 'SalesList', component: SalesListReport },
+  { path: 'SalesItemsDetails', component: SalesItemsDetails },
+  { path: 'SalesCustomers', component: SalesCustomers },
+  { path: 'SalesCashiers', component: SalesCashiers },
+  { path: 'SalesDelivery', component: SalesDelivery },
 
   // ── Sales Returns ───────────────────────────────────────────────────────────
-  { path: 'sales-returns/list', component: SalesReturnsListReport },
-  { path: 'sales-returns/items-details', component: SalesReturnsItemsDetails },
+  { path: 'SalesReturnsList', component: SalesReturnsListReport },
+  { path: 'SalesReturnsItemsDetails', component: SalesReturnsItemsDetails },
 
   // ── Accounts ────────────────────────────────────────────────────────────────
-  { path: 'accounts/supplier-statement', component: SupplierStatement },
-  { path: 'accounts/customer-statement', component: CustomerStatement },
-  { path: 'accounts/financial-statement', component: FinancialStatement },
-  { path: 'accounts/balances', component: AccountBalances },
-  { path: 'accounts/movement', component: AccountMovement },
-  { path: 'accounts/receipt-vouchers', component: ReceiptVouchers },
-  { path: 'accounts/payment-vouchers', component: PaymentVouchers },
-  { path: 'accounts/general-journal', component: GeneralJournalReport },
+  { path: 'SupplierStatement', component: SupplierStatement },
+  { path: 'CustomerStatement', component: CustomerStatement },
+  { path: 'FinancialStatement', component: FinancialStatement },
+  { path: 'AccountBalances', component: AccountBalances },
+  { path: 'AccountMovement', component: AccountMovement },
+  { path: 'ReceiptVouchersReport', component: ReceiptVouchers },
+  { path: 'PaymentVouchersReport', component: PaymentVouchers },
+  { path: 'GeneralJournal', component: GeneralJournalReport },
 ] satisfies Route[];

@@ -51,14 +51,14 @@ export class ReportsService extends BaseService {
 
   getItemMovementFull(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IItemMovementRow>>(
-      `${this.apiUrl}/ItemMovementFull`,
+      `${this.apiUrl}/InventoryItemMovementFull`,
       criteria,
     );
   }
 
   getItemMovementActual(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IItemMovementRow>>(
-      `${this.apiUrl}/ItemMovementActual`,
+      `${this.apiUrl}/InventoryItemMovementActual`,
       criteria,
     );
   }
@@ -79,7 +79,7 @@ export class ReportsService extends BaseService {
 
   getReorderLimitByWarehouse(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IReorderLimitRow>>(
-      `${this.apiUrl}/ReorderLimitByWarehouse`,
+      `${this.apiUrl}/InventoryReorderLimitByWarehouse`,
       criteria,
     );
   }
@@ -116,7 +116,7 @@ export class ReportsService extends BaseService {
 
   getSuppliersAnalysis(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<ISupplierAnalysisRow>>(
-      `${this.apiUrl}/SuppliersAnalysis`,
+      `${this.apiUrl}/PurchasesSuppliersAnalysis`,
       criteria,
     );
   }
@@ -211,14 +211,14 @@ export class ReportsService extends BaseService {
 
   getReceiptVouchers(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IVoucherReportRow>>(
-      `${this.apiUrl}/ReceiptVouchers`,
+      `${this.apiUrl}/ReceiptVouchersReport`,
       criteria,
     );
   }
 
   getPaymentVouchers(criteria: IReportSearchCriteria) {
     return this.http.post<IPaginatedReportResponse<IVoucherReportRow>>(
-      `${this.apiUrl}/PaymentVouchers`,
+      `${this.apiUrl}/PaymentVouchersReport`,
       criteria,
     );
   }
