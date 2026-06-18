@@ -393,12 +393,12 @@ export class Header extends BaseComponent implements AfterViewInit {
             routerLink: '/reports',
             roles: [Role.Admin, Role.Cashier, Role.Waiter],
             children: [
-                {
-                    labelKey: 'CUSTOMERS',
-                    imgUrl: '../customers',
-                    routerLink: '/reports/customers',
-                    roles: [Role.Admin, Role.Cashier, Role.Waiter],
-                },
+                // {
+                //     labelKey: 'CUSTOMERS',
+                //     imgUrl: '../customers',
+                //     routerLink: '/reports/customers',
+                //     roles: [Role.Admin, Role.Cashier, Role.Waiter],
+                // },
                 // ── Inventory ──────────────────────────────────────────────
                 {
                     labelKey: 'INVENTORY_BY_ITEMS',
@@ -406,12 +406,12 @@ export class Header extends BaseComponent implements AfterViewInit {
                     routerLink: '/reports/InventoryByItems',
                     roles: [Role.Admin, Role.Cashier],
                 },
-                {
-                    labelKey: 'INVENTORY_BY_PROPERTIES',
-                    imgUrl: '../storage',
-                    routerLink: '/reports/InventoryByProperties',
-                    roles: [Role.Admin, Role.Cashier],
-                },
+                // {
+                //     labelKey: 'INVENTORY_BY_PROPERTIES',
+                //     imgUrl: '../storage',
+                //     routerLink: '/reports/InventoryByProperties',
+                //     roles: [Role.Admin, Role.Cashier],
+                // },
                 {
                     labelKey: 'ITEM_MOVEMENT_FULL',
                     imgUrl: '../storage',
@@ -436,12 +436,12 @@ export class Header extends BaseComponent implements AfterViewInit {
                     routerLink: '/reports/InventoryValueByGroups',
                     roles: [Role.Admin, Role.Cashier],
                 },
-                {
-                    labelKey: 'REORDER_LIMIT_BY_WAREHOUSE',
-                    imgUrl: '../storage',
-                    routerLink: '/reports/InventoryReorderLimitByWarehouse',
-                    roles: [Role.Admin, Role.Cashier],
-                },
+                // {
+                //     labelKey: 'REORDER_LIMIT_BY_WAREHOUSE',
+                //     imgUrl: '../storage',
+                //     routerLink: '/reports/InventoryReorderLimitByWarehouse',
+                //     roles: [Role.Admin, Role.Cashier],
+                // },
                 // ── Purchases ──────────────────────────────────────────────
                 {
                     labelKey: 'PURCHASES_LIST',
@@ -467,12 +467,12 @@ export class Header extends BaseComponent implements AfterViewInit {
                     routerLink: '/reports/PurchaseReturnsItemsDetails',
                     roles: [Role.Admin, Role.Cashier],
                 },
-                {
-                    labelKey: 'SUPPLIERS_ANALYSIS',
-                    imgUrl: '../storage',
-                    routerLink: '/reports/PurchasesSuppliersAnalysis',
-                    roles: [Role.Admin, Role.Cashier],
-                },
+                // {
+                //     labelKey: 'SUPPLIERS_ANALYSIS',
+                //     imgUrl: '../storage',
+                //     routerLink: '/reports/PurchasesSuppliersAnalysis',
+                //     roles: [Role.Admin, Role.Cashier],
+                // },
                 // ── Sales ──────────────────────────────────────────────────
                 {
                     labelKey: 'SALES_LIST',
@@ -499,13 +499,13 @@ export class Header extends BaseComponent implements AfterViewInit {
                     roles: [Role.Admin, Role.Cashier],
                 },
                 {
-                    labelKey: 'SALES_CUSTOMERS',
+                    labelKey: 'SALES_Employees',
                     imgUrl: '../customers',
                     routerLink: '/reports/SalesCustomers',
                     roles: [Role.Admin, Role.Cashier],
                 },
                 {
-                    labelKey: 'SALES_CASHIERS',
+                    labelKey: 'SALES_MINIITEMS',
                     imgUrl: '../collections',
                     routerLink: '/reports/SalesCashiers',
                     roles: [Role.Admin, Role.Cashier],
@@ -515,6 +515,18 @@ export class Header extends BaseComponent implements AfterViewInit {
                     imgUrl: '../collections',
                     routerLink: '/reports/SalesDelivery',
                     roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'FINANCIAL_STATEMENT',
+                    imgUrl: '../accounts',
+                    routerLink: '/reports/FinancialStatement',
+                    roles: [Role.Admin],
+                },
+                {
+                    labelKey: 'CategoryProfit',
+                    imgUrl: '../accounts',
+                    routerLink: '/reports/CategoryProfit',
+                    roles: [Role.Admin],
                 },
                 // ── Accounts ───────────────────────────────────────────────
                 {
@@ -529,42 +541,36 @@ export class Header extends BaseComponent implements AfterViewInit {
                     routerLink: '/reports/CustomerStatement',
                     roles: [Role.Admin],
                 },
-                {
-                    labelKey: 'FINANCIAL_STATEMENT',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/FinancialStatement',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'ACCOUNT_BALANCES',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/AccountBalances',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'ACCOUNT_MOVEMENT',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/AccountMovement',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'RECEIPT_VOUCHERS',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/ReceiptVouchersReport',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'PAYMENT_VOUCHERS',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/PaymentVouchersReport',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'GENERAL_JOURNAL',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/GeneralJournal',
-                    roles: [Role.Admin],
-                },
+                // {
+                //     labelKey: 'ACCOUNT_BALANCES',
+                //     imgUrl: '../accounts',
+                //     routerLink: '/reports/AccountBalances',
+                //     roles: [Role.Admin],
+                // },
+                // {
+                //     labelKey: 'ACCOUNT_MOVEMENT',
+                //     imgUrl: '../accounts',
+                //     routerLink: '/reports/AccountMovement',
+                //     roles: [Role.Admin],
+                // },
+                // {
+                //     labelKey: 'RECEIPT_VOUCHERS',
+                //     imgUrl: '../accounts',
+                //     routerLink: '/reports/ReceiptVouchersReport',
+                //     roles: [Role.Admin],
+                // },
+                // {
+                //     labelKey: 'PAYMENT_VOUCHERS',
+                //     imgUrl: '../accounts',
+                //     routerLink: '/reports/PaymentVouchersReport',
+                //     roles: [Role.Admin],
+                // },
+                // {
+                //     labelKey: 'GENERAL_JOURNAL',
+                //     imgUrl: '../accounts',
+                //     routerLink: '/reports/GeneralJournal',
+                //     roles: [Role.Admin],
+                // },
             ],
         }
     ];

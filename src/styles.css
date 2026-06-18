@@ -114,4 +114,8 @@ body {
   display: block;
 }
 
+/* Purchase return — payment type dropdown portaled to body */
+.pr-select-overlay {
+  z-index: 1100 !important;
+}
 

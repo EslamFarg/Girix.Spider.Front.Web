@@ -116,6 +116,14 @@
                                     />
                                 </svg>
                             </a>
+                            <a
+                                class="view"
+                                [routerLink]="['/storage/purchases-returns/add']"
+                                [queryParams]="{ purchaseId: item.id, invoiceNumber: item.invoiceNumber }"
+                                pTooltip="مرتجع مشتريات"
+                            >
+                                <i class="pi pi-replay"></i>
+                            </a>
                             <button
                                 appLoadingDisabled
                                 type="button"

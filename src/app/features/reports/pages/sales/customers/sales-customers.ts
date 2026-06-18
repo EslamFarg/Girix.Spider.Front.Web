@@ -50,7 +50,7 @@ export class SalesCustomers extends BaseComponent {
       { label: 'إلى تاريخ', value: v.toDate },
       { label: 'بحث', value: v.searchTerm || null },
     ]);
-    this.reportsService.getSalesCustomers({ ...v, pageIndex, pageSize: 10 }).subscribe({
+    this.reportsService.getSalesEmployees({ ...v, pageIndex, pageSize: 10 }).subscribe({
       next: (res) => {
         this.rows.set(res.data);
         this.paginationInfo = { pageIndex, totalPagesCount: res.paginationInfo.totalPagesCount, totalRowsCount: res.paginationInfo.totalRowsCount };

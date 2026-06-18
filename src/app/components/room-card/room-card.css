@@ -10,6 +10,26 @@
   border-color: rgb(var(--color));
   color: rgb(var(--color));
 }
+
+/* Room switch screen — fixed 160×180 card (تبديل الغرف) */
+:host(.room-switch-card) {
+  display: block;
+  width: 160px;
+  height: 180px;
+  flex-shrink: 0;
+}
+
+:host(.room-switch-card) .room-card-surface {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+:host(.room-switch-card) .room-card-label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
 .room-available {
   --color: black;
   &.active ,

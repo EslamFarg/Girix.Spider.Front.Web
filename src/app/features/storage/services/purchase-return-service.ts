@@ -1,6 +1,7 @@
 import { BaseSearchAndCrudService, ISearchCriteria, SearchColumEnum } from '@/core';
 import { Injectable } from '@angular/core';
 import { IPurchaseReturnReadResponse, IPurchaseReturnSearchResponseValue } from '../types/api/purchase-return/responses';
+import { IPurchaseReadResponse } from '../types/api/purchases/responses';
 
 //PurchaseReturn :Id,InvoiceNumber,ReferenceNumber,Name
 
@@ -44,6 +45,13 @@ export class PurchaseReturnService extends BaseSearchAndCrudService<
   getByInvoiceNumber(invoiceNumber: string) {
     return this.http.get<IPurchaseReturnReadResponse>(
       `${this.apiUrl}/getbyinvoicenumber?invoiceNumber=${invoiceNumber}`,
+    );
+  }
+
+  /** Remaining returnable quantities for a purchase invoice (mirrors OrderReturn/remaining). */
+  getPurchaseRemaining(purchaseInvoiceId: number) {
+    return this.http.get<IPurchaseReadResponse>(
+      `${this.apiUrl}/purchase/${purchaseInvoiceId}/remaining`,
     );
   }
   
