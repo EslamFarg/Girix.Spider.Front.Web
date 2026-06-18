@@ -17,7 +17,6 @@
   width: 175px;
   height: 175px;
   flex-shrink: 0;
-  justify-self: center;
 }
 
 /* Target the inner circle div directly — same pattern as hut-card */
