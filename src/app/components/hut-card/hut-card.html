@@ -1,20 +1,23 @@
 <div [class]="'hut-card-root relative text-black cursor-pointer ' + hutStatusClass()">
-  <div
-    class="hut-roof hut absolute w-4/6 rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded-xl"
-    style="
-      background: linear-gradient(
-        306deg,
-        rgba(201, 205, 209, 0) 46.91%,
-        rgb(201, 205, 209, 0.4) 80.82%,
-        rgba(201, 205, 209, 1) 91.82%
-      );
-      backdrop-filter: blur(30.445161819458008px);
-      box-shadow: -4px -4px 6.09px 0px rgba(var(--color), 0.5);
-    "
-  ></div>
+  <div class="hut-roof-zone">
+    <div
+      class="hut-roof hut absolute w-4/6 rotate-45 aspect-square -translate-y-[calc(50%-5px)] left-1/2 -translate-x-1/2 rounded-xl"
+      style="
+        background: linear-gradient(
+          306deg,
+          rgba(201, 205, 209, 0) 46.91%,
+          rgb(201, 205, 209, 0.4) 80.82%,
+          rgba(201, 205, 209, 1) 91.82%
+        );
+        backdrop-filter: blur(30.445161819458008px);
+        box-shadow: -4px -4px 6.09px 0px rgba(var(--color), 0.5);
+      "
+    ></div>
+  </div>
+
   <div
     style="backdrop-filter: blur(20px); box-shadow: 0px 0px 20px 0px #a3a3a34d"
-    class="hut-body flex border-2 z-10 relative bordered border-transparent aspect-[calc(110/72)] items-center justify-center bg-white/80 rounded-2xl"
+    class="hut-body flex flex-col border-2 z-10 relative bordered border-transparent aspect-[calc(110/72)] items-center justify-center bg-white/80 rounded-2xl"
   >
     <div
       [title]="data()?.name"
@@ -22,12 +25,12 @@
     >
       {{ data()?.name }}
     </div>
+    <countdown
+      #countdown
+      dir="ltr"
+      class="hut-timer mx-auto w-fit block font-bold shrink-0"
+      [config]="countdownConfig"
+      (event)="handleCountdownEvent($event)"
+    />
   </div>
-  <countdown
-    #countdown
-    dir="ltr"
-    class="hut-timer mx-auto w-fit block font-bold"
-    [config]="countdownConfig"
-    (event)="handleCountdownEvent($event)"
-  />
 </div>
