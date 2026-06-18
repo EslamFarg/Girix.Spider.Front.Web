@@ -1,6 +1,6 @@
 import { BaseComponent } from '@/components/base-component/base-component';
 import { Component, inject } from '@angular/core';
-import { InputErrorMessageHandler } from '@/yn-ng';
+import { InputErrorMessageHandler, onlyNumbersOrDotAllowed } from '@/yn-ng';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
@@ -17,8 +17,8 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 })
 export class CloseDailyJournal extends BaseComponent {
   initialFgValue = {
-    cashClosingAmount: this.fb.control<number>(0, [Validators.required]),
-    networkClosingAmount: this.fb.control<number>(0, [Validators.required]),
+    cashClosingAmount: this.fb.control<number>(0, [Validators.required,onlyNumbersOrDotAllowed]),
+    networkClosingAmount: this.fb.control<number>(0, [Validators.required,onlyNumbersOrDotAllowed]),
     closingNotes: this.fb.control<string | null>(null, [Validators.maxLength(200)]),
     closingDate: this.fb.control(this.localDateIso, []),
   };

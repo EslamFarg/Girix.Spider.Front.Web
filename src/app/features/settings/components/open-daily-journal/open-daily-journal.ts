@@ -1,6 +1,6 @@
 import { BaseComponent } from '@/components/base-component/base-component';
 import { Component, inject } from '@angular/core';
-import { InputErrorMessageHandler } from '@/yn-ng';
+import { InputErrorMessageHandler, onlyNumbersAllowed } from '@/yn-ng';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { Validators, ɵInternalFormsSharedModule, ReactiveFormsModule } from '@angular/forms';
@@ -17,7 +17,7 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 })
 export class OpenDailyJournal extends BaseComponent {
   initialFgValue = {
-    custodyBalance: this.fb.control<number>(0, [Validators.required]),
+    custodyBalance: this.fb.control<number>(0, [Validators.required,onlyNumbersAllowed]),
     openingNotes: this.fb.control<string | null>(null, [Validators.maxLength(200)]),
     dateTime: this.fb.control(this.localDateIso, [Validators.required]),
   };

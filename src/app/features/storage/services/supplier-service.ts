@@ -36,8 +36,26 @@ export class SupplierService extends BaseSearchAndCrudService<
   }
 
 
-  getCashSupplierByAccount(){
-    return this.http.get<ISupplierReadResponse>(`${this.apiRoute}/GetCashSupplierByAccount`);
+  getDefaultSupplier(){
+    return this.http.get<{
+            id: number;
+            name: string;
+            supplierCode: string;
+            phoneNumber: string;
+            secondaryMobileNumber: string;
+            city: string;
+            district: string;
+            street: string;
+            buildingNumber: string;
+            apartment: string;
+            landmark: string;
+            postalCode: string;
+            commercialRegister: string;
+            taxNumber: string;
+            isCompany: boolean;
+            numberOfFloor: number;
+            financiallyAccountId: number;
+        }>(`${this.apiRoute}/GetCashSupplierByAccount`);
   }
 
  
