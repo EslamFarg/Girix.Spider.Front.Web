@@ -34,11 +34,10 @@ export class BalanceSheet extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'accountCode', label: 'كود الحساب' },
-    { key: 'accountName', label: 'اسم الحساب' },
-    { key: 'debitBalance', label: 'الرصيد المدين', type: 'currency', total: true },
-    { key: 'creditBalance', label: 'الرصيد الدائن', type: 'currency', total: true },
-    { key: 'netBalance', label: 'الصافي', type: 'currency' },
+    { key: 'accountId', label: 'كود الحساب' },
+    { key: 'accountNameAr', label: 'اسم الحساب' },
+    { key: 'stage', label: 'المرحلة', type: 'currency', total: true },
+    { key: 'balance', label: 'الرصيد', type: 'currency', total: true },
   ];
 
   rows = signal<IAccountBalanceRow[]>([]);

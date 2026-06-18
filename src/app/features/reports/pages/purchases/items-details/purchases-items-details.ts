@@ -30,7 +30,6 @@ export class PurchasesItemsDetails extends BaseComponent {
   columns: IReportColumn[] = [
     { key: 'invoiceNumber', label: 'رقم الفاتورة' },
     { key: 'invoiceDate', label: 'التاريخ', type: 'date' },
-    { key: 'supplierName', label: 'المورد' },
     { key: 'itemNameAr', label: 'الصنف' },
     { key: 'purchasePrice', label: 'سعر الشراء', type: 'currency' },
     { key: 'quantity', label: 'الكمية', type: 'number' },
