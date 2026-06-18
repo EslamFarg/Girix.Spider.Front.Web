@@ -103,6 +103,25 @@ export class AssignToDelivery extends BaseComponent {
   deliveryMen = signal<IDeliverySearchRow[]>([]);
   selectedDelivery = signal<IDeliverySearchRow | null>(null);
 
+  /** Delivery IDs currently assigned to the selected orders — excluded from dialog */
+  excludedDeliveryIds = computed(() => {
+    const selectedIds = this.selectedOrderIds();
+    const ordersList = this.orders();
+    const ids = new Set<number>();
+    for (const order of ordersList) {
+      if (selectedIds.has(order.id) && order.deliveryId) {
+        ids.add(order.deliveryId);
+      }
+    }
+    return ids;
+  });
+
+  /** Delivery men shown in the dialog, excluding currently assigned ones */
+  availableDeliveryMen = computed(() => {
+    const excluded = this.excludedDeliveryIds();
+    return this.deliveryMen().filter((d) => !excluded.has(d.id));
+  });
+
   constructor() {
     super();
     this.searchOrders(1);
@@ -189,8 +208,8 @@ export class AssignToDelivery extends BaseComponent {
     this.deliveryService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 10,
+          pageIndex: 0,
+          pageSize: 0,
         },
         searchFilters: [],
         fromDate: null,

@@ -67,6 +67,7 @@
                         <th>اسم العميل</th>
                         <th>العنوان</th>
                         <th>رقم الجوال</th>
+                        <th>الدليفري</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,6 +94,9 @@
                         </td>
                         <td>
                             <div>{{ order.customerPhone || '-' }}</div>
+                        </td>
+                        <td>
+                            <div>{{ order.deliveryName || '-' }}</div>
                         </td>
                     </tr>
                     }
@@ -129,7 +133,7 @@
     [style]="{ width: '100%', maxWidth: '40rem' }" [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
     styleClass="bg-white!" [header]="'اختيار دليفري'">
     <div class="flex flex-col gap-2">
-        @for (delivery of deliveryMen(); track $index) {
+        @for (delivery of availableDeliveryMen(); track $index) {
         <div class="flex items-center justify-between p-3 bg-form-bg rounded-lg cursor-pointer hover:bg-dark-bg-2 transition-colors"
             (click)="selectDelivery(delivery)">
             <div class="flex flex-col gap-1">
