@@ -1,0 +1,57 @@
+<app-section-wrapper>
+    <form [formGroup]="fg" (ngSubmit)="onSubmit()" appLoadingDisabled class="flex flex-wrap items-end gap-2 w-full mb-4">
+        <div class="flex flex-col gap-1">
+            <label class="text-xs text-text-gray">من تاريخ</label>
+            <input pInputText type="date" formControlName="fromDate" class="bg-transparent!" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="text-xs text-text-gray">إلى تاريخ</label>
+            <input pInputText type="date" formControlName="toDate" class="bg-transparent!" />
+        </div>
+        <div class="flex gap-2 ms-auto">
+            <button type="submit" class="flex items-center gap-1 cursor-pointer" pTooltip="بحث">
+                <i class="pi pi-search"></i>
+            </button>
+            <button type="button" class="flex items-center gap-1 cursor-pointer" pTooltip="إعادة تعيين" (click)="fg.reset(); onSubmit()">
+                <i class="pi pi-refresh"></i>
+            </button>
+        </div>
+    </form>
+
+    <table class="my-4 w-full main-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>كود الصنف</th>
+                <th>اسم الصنف</th>
+                <th>الوحدة</th>
+                <th>الكمية</th>
+                <th>سعر التكلفة</th>
+                <th>القيمة الإجمالية</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (item of rows(); track $index) {
+                <tr [style]="`--ix:${$index}`">
+                    <td><div>{{ getRowNumber($index, paginationInfo.pageIndex) }}</div></td>
+                    <td><div>{{ item.itemCode }}</div></td>
+                    <td><div>{{ item.itemName }}</div></td>
+                    <td><div>{{ item.unit }}</div></td>
+                    <td><div>{{ item.quantity }}</div></td>
+                    <td><div>{{ item.costPrice?.toFixed(2) }}</div></td>
+                    <td><div>{{ item.totalValue?.toFixed(2) }}</div></td>
+                </tr>
+            }
+            @empty {
+                <tr><td colspan="7" class="text-center py-8 text-text-gray">لا توجد بيانات</td></tr>
+            }
+        </tbody>
+    </table>
+
+    <p-paginator
+        (onPageChange)="onPageChange($event)"
+        [first]="getCurrentRowsIx(paginationInfo.pageIndex)"
+        [rows]="10"
+        [totalRecords]="paginationInfo.totalRowsCount"
+    />
+</app-section-wrapper>

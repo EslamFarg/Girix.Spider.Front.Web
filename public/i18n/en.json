@@ -167,9 +167,34 @@
       
       "REPORTS": {
         "LABEL": "Reports",
-        "CUSTOMERS": {
-          "LABEL": "Customers"
-        }
+        "CUSTOMERS": { "LABEL": "Customers" },
+        "INVENTORY_BY_ITEMS": { "LABEL": "Inventory by Items" },
+        "INVENTORY_BY_PROPERTIES": { "LABEL": "Inventory by Properties" },
+        "ITEM_MOVEMENT_FULL": { "LABEL": "Full Item Movement" },
+        "ITEM_MOVEMENT_ACTUAL": { "LABEL": "Actual Item Movement" },
+        "INVENTORY_VALUE_BY_ITEMS": { "LABEL": "Inventory Value by Items" },
+        "INVENTORY_VALUE_BY_GROUPS": { "LABEL": "Inventory Value by Groups" },
+        "REORDER_LIMIT_BY_WAREHOUSE": { "LABEL": "Reorder Limit by Warehouse" },
+        "PURCHASES_LIST": { "LABEL": "Purchases List" },
+        "PURCHASES_ITEMS_DETAILS": { "LABEL": "Purchases Items Details" },
+        "PURCHASE_RETURNS_LIST": { "LABEL": "Purchase Returns List" },
+        "PURCHASE_RETURNS_ITEMS_DETAILS": { "LABEL": "Purchase Returns Items Details" },
+        "SUPPLIERS_ANALYSIS": { "LABEL": "Suppliers Analysis" },
+        "SALES_LIST": { "LABEL": "Sales List" },
+        "SALES_ITEMS_DETAILS": { "LABEL": "Sales Items Details" },
+        "SALES_RETURNS_LIST": { "LABEL": "Sales Returns List" },
+        "SALES_RETURNS_ITEMS_DETAILS": { "LABEL": "Sales Returns Items Details" },
+        "SALES_CUSTOMERS": { "LABEL": "Customer Sales" },
+        "SALES_CASHIERS": { "LABEL": "Cashier Sales" },
+        "SALES_DELIVERY": { "LABEL": "Delivery Sales" },
+        "SUPPLIER_STATEMENT": { "LABEL": "Supplier Statement" },
+        "CUSTOMER_STATEMENT": { "LABEL": "Customer Statement" },
+        "FINANCIAL_STATEMENT": { "LABEL": "Financial Statement" },
+        "ACCOUNT_BALANCES": { "LABEL": "Account Balances" },
+        "ACCOUNT_MOVEMENT": { "LABEL": "Account Movement" },
+        "RECEIPT_VOUCHERS": { "LABEL": "Receipt Vouchers" },
+        "PAYMENT_VOUCHERS": { "LABEL": "Payment Vouchers" },
+        "GENERAL_JOURNAL": { "LABEL": "General Journal" }
       }
     }
   },

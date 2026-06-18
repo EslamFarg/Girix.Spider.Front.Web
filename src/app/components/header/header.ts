@@ -399,6 +399,172 @@ export class Header extends BaseComponent implements AfterViewInit {
                     routerLink: '/reports/customers',
                     roles: [Role.Admin, Role.Cashier, Role.Waiter],
                 },
+                // ── Inventory ──────────────────────────────────────────────
+                {
+                    labelKey: 'INVENTORY_BY_ITEMS',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/inventory/by-items',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'INVENTORY_BY_PROPERTIES',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/inventory/by-properties',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'ITEM_MOVEMENT_FULL',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/inventory/item-movement-full',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'ITEM_MOVEMENT_ACTUAL',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/inventory/item-movement-actual',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'INVENTORY_VALUE_BY_ITEMS',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/inventory/value-by-items',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'INVENTORY_VALUE_BY_GROUPS',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/inventory/value-by-groups',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'REORDER_LIMIT_BY_WAREHOUSE',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/inventory/reorder-limit-by-warehouse',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                // ── Purchases ──────────────────────────────────────────────
+                {
+                    labelKey: 'PURCHASES_LIST',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/purchases/list',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'PURCHASES_ITEMS_DETAILS',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/purchases/items-details',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'PURCHASE_RETURNS_LIST',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/purchase-returns/list',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'PURCHASE_RETURNS_ITEMS_DETAILS',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/purchase-returns/items-details',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'SUPPLIERS_ANALYSIS',
+                    imgUrl: '../storage',
+                    routerLink: '/reports/purchases/suppliers-analysis',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                // ── Sales ──────────────────────────────────────────────────
+                {
+                    labelKey: 'SALES_LIST',
+                    imgUrl: '../collections',
+                    routerLink: '/reports/sales/list',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'SALES_ITEMS_DETAILS',
+                    imgUrl: '../collections',
+                    routerLink: '/reports/sales/items-details',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'SALES_RETURNS_LIST',
+                    imgUrl: '../collections',
+                    routerLink: '/reports/sales-returns/list',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'SALES_RETURNS_ITEMS_DETAILS',
+                    imgUrl: '../collections',
+                    routerLink: '/reports/sales-returns/items-details',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'SALES_CUSTOMERS',
+                    imgUrl: '../customers',
+                    routerLink: '/reports/sales/customers',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'SALES_CASHIERS',
+                    imgUrl: '../collections',
+                    routerLink: '/reports/sales/cashiers',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                {
+                    labelKey: 'SALES_DELIVERY',
+                    imgUrl: '../collections',
+                    routerLink: '/reports/sales/delivery',
+                    roles: [Role.Admin, Role.Cashier],
+                },
+                // ── Accounts ───────────────────────────────────────────────
+                {
+                    labelKey: 'SUPPLIER_STATEMENT',
+                    imgUrl: '../accounts',
+                    routerLink: '/reports/accounts/supplier-statement',
+                    roles: [Role.Admin],
+                },
+                {
+                    labelKey: 'CUSTOMER_STATEMENT',
+                    imgUrl: '../accounts',
+                    routerLink: '/reports/accounts/customer-statement',
+                    roles: [Role.Admin],
+                },
+                {
+                    labelKey: 'FINANCIAL_STATEMENT',
+                    imgUrl: '../accounts',
+                    routerLink: '/reports/accounts/financial-statement',
+                    roles: [Role.Admin],
+                },
+                {
+                    labelKey: 'ACCOUNT_BALANCES',
+                    imgUrl: '../accounts',
+                    routerLink: '/reports/accounts/balances',
+                    roles: [Role.Admin],
+                },
+                {
+                    labelKey: 'ACCOUNT_MOVEMENT',
+                    imgUrl: '../accounts',
+                    routerLink: '/reports/accounts/movement',
+                    roles: [Role.Admin],
+                },
+                {
+                    labelKey: 'RECEIPT_VOUCHERS',
+                    imgUrl: '../accounts',
+                    routerLink: '/reports/accounts/receipt-vouchers',
+                    roles: [Role.Admin],
+                },
+                {
+                    labelKey: 'PAYMENT_VOUCHERS',
+                    imgUrl: '../accounts',
+                    routerLink: '/reports/accounts/payment-vouchers',
+                    roles: [Role.Admin],
+                },
+                {
+                    labelKey: 'GENERAL_JOURNAL',
+                    imgUrl: '../accounts',
+                    routerLink: '/reports/accounts/general-journal',
+                    roles: [Role.Admin],
+                },
             ],
         }
     ];

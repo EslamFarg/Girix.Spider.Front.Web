@@ -162,9 +162,34 @@
       },
       "REPORTS": {
         "LABEL": "التقارير",
-        "CUSTOMERS": {
-          "LABEL": "العملاء"
-        }
+        "CUSTOMERS": { "LABEL": "العملاء" },
+        "INVENTORY_BY_ITEMS": { "LABEL": "تقرير الجرد بالأصناف" },
+        "INVENTORY_BY_PROPERTIES": { "LABEL": "تقرير الجرد بالخصائص" },
+        "ITEM_MOVEMENT_FULL": { "LABEL": "حركة الصنف كاملة" },
+        "ITEM_MOVEMENT_ACTUAL": { "LABEL": "حركة الصنف الفعلية" },
+        "INVENTORY_VALUE_BY_ITEMS": { "LABEL": "قيمة المخزون بالأصناف" },
+        "INVENTORY_VALUE_BY_GROUPS": { "LABEL": "قيمة المخزون بالمجموعات" },
+        "REORDER_LIMIT_BY_WAREHOUSE": { "LABEL": "حد الطلب حسب المستودع" },
+        "PURCHASES_LIST": { "LABEL": "قائمة المشتريات" },
+        "PURCHASES_ITEMS_DETAILS": { "LABEL": "تفاصيل أصناف المشتريات" },
+        "PURCHASE_RETURNS_LIST": { "LABEL": "قائمة مرتجعات المشتريات" },
+        "PURCHASE_RETURNS_ITEMS_DETAILS": { "LABEL": "تفاصيل أصناف مرتجعات المشتريات" },
+        "SUPPLIERS_ANALYSIS": { "LABEL": "تحليل مشتريات الموردين" },
+        "SALES_LIST": { "LABEL": "قائمة المبيعات" },
+        "SALES_ITEMS_DETAILS": { "LABEL": "تفاصيل أصناف المبيعات" },
+        "SALES_RETURNS_LIST": { "LABEL": "قائمة مرتجعات المبيعات" },
+        "SALES_RETURNS_ITEMS_DETAILS": { "LABEL": "تفاصيل أصناف مرتجعات المبيعات" },
+        "SALES_CUSTOMERS": { "LABEL": "مبيعات العملاء" },
+        "SALES_CASHIERS": { "LABEL": "مبيعات الكاشير" },
+        "SALES_DELIVERY": { "LABEL": "مبيعات الدليفري" },
+        "SUPPLIER_STATEMENT": { "LABEL": "كشف حساب مورد" },
+        "CUSTOMER_STATEMENT": { "LABEL": "كشف حساب عميل" },
+        "FINANCIAL_STATEMENT": { "LABEL": "كشف حساب مالي" },
+        "ACCOUNT_BALANCES": { "LABEL": "أرصدة الحسابات" },
+        "ACCOUNT_MOVEMENT": { "LABEL": "حركة الحسابات" },
+        "RECEIPT_VOUCHERS": { "LABEL": "سندات القبض" },
+        "PAYMENT_VOUCHERS": { "LABEL": "سندات الصرف" },
+        "GENERAL_JOURNAL": { "LABEL": "اليومية العامة" }
       }
     }
   },
