@@ -562,7 +562,7 @@ export class JournalForm extends BaseComponent {
       <tr>
         <td class="num">${i + 1}</td>
         <td>${line.finincalAccountName ?? '-'}</td>
-        <td>${line.notes ?? '-'}</td>
+        <td style="max-width: 36%;word-break: break-word;">${line.notes ?? '-'}</td>
         <td class="num">${line.side === 'مدين' ? money(line.totalAmount) : '-'}</td>
         <td class="num">${line.side === 'دائن' ? money(line.totalAmount) : '-'}</td>
       </tr>`,
@@ -617,7 +617,7 @@ export class JournalForm extends BaseComponent {
           <tr>
             <th style="width:4%">#</th>
             <th style="width:28%">الحساب</th>
-            <th style="width:36%">البيان</th>
+            <th style="width:36%; max-width:36%;word-break: break-word;">البيان</th>
             <th style="width:16%">مدين</th>
             <th style="width:16%">دائن</th>
           </tr>
