@@ -7,7 +7,7 @@ import { ImgFallback } from '@/directives/img-fallback';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { IMealSearchRow, MealService, IMealReadResponse } from '@/features/classes/services/meal-service';
 import { IProductSearchRow, ProductService, IProductReadResponse } from '@/features/classes/services/product-service';
-import { ProductsAndMealsService, ProductAndMealsSearchEnum } from '@/features/orders';
+import { ProductsAndMealsService, ProductAndMealsSearchEnum, OrderService } from '@/features/orders';
 import { Debounce } from '@/directives/debounce';
 import { MenuItem } from 'primeng/api';
 import { Menu as pMenu } from 'primeng/menu';
@@ -187,9 +187,11 @@ export class Menu extends BaseComponent implements OnDestroy {
     },
   ]);
 
-  constructor() {
+  constructor(orderService: OrderService) {
     super();
-
+    // orderService.reset.subscribe(() => {
+    //     this.pickedItems.set([]);
+    // });
     this.searchProductsAndMeals(1);
   }
 
