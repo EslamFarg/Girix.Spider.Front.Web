@@ -28,10 +28,10 @@ export class SalesReturnsList extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'returnNumber', label: 'رقم المرتجع' },
-    { key: 'date', label: 'التاريخ', type: 'date' },
+    { key: 'orderReturnId', label: 'رقم المرتجع' },
+    { key: 'createdAt', label: 'التاريخ', type: 'date' },
     { key: 'customerName', label: 'العميل' },
-    { key: 'totalAmount', label: 'الإجمالي', type: 'currency', total: true },
+    { key: 'netOrderReturn', label: 'الإجمالي', type: 'currency', total: true },
   ];
 
   rows = signal<ISalesReturnReportRow[]>([]);

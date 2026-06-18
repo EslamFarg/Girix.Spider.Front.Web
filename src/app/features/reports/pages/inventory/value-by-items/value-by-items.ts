@@ -28,9 +28,8 @@ export class InventoryValueByItems extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'itemCode', label: 'كود الصنف' },
-    { key: 'itemName', label: 'اسم الصنف' },
-    { key: 'unit', label: 'الوحدة' },
+    { key: 'itemId', label: 'كود الصنف' },
+    { key: 'itemNameAr', label: 'اسم الصنف' },
     { key: 'quantity', label: 'الكمية', type: 'number' },
     { key: 'costPrice', label: 'سعر التكلفة', type: 'currency' },
     { key: 'totalValue', label: 'القيمة الإجمالية', type: 'currency', total: true },

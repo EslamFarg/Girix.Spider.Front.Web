@@ -28,12 +28,12 @@ export class SalesList extends BaseComponent {
   });
 
   columns: IReportColumn[] = [
-    { key: 'invoiceNumber', label: 'رقم الفاتورة' },
-    { key: 'date', label: 'التاريخ', type: 'date' },
+    { key: 'orderNumber', label: 'رقم الفاتورة' },
+    { key: 'createdAt', label: 'التاريخ', type: 'date' },
     { key: 'customerName', label: 'العميل' },
-    { key: 'totalAmount', label: 'الإجمالي', type: 'currency', total: true },
-    { key: 'taxAmount', label: 'الضريبة', type: 'currency' },
-    { key: 'netAmount', label: 'الصافي', type: 'currency', total: true },
+    { key: 'payingNetwork', label: 'الشبكة', type: 'currency', total: true },
+    { key: 'payingCash', label: 'الكاش', type: 'currency' },
+    { key: 'netOrder', label: 'الصافي', type: 'currency', total: true },
   ];
 
   rows = signal<ISalesReportRow[]>([]);
