@@ -4,16 +4,16 @@
 @import "@ng-select/ng-select/themes/default.theme.css";
 
 @theme {
-  --color-main-bg: #111921;
-  --color-secondary-bg: #192633;
+  --color-main-bg: #355450fc;/*#111921;*/
+  --color-secondary-bg: #355450fc;/* #192633; */
   --color-app-blue: #137fec;
   /* base */
-  --color-dark-line: #393c49;
+  --color-dark-line: #506968;/* #393c49; */
   /* bg */
   --color-base-bg: #FAFAFA;
   --color-light-bg: #fff2e8;
-  --color-dark-bg-1: #252836;
-  --color-dark-bg-2: #1f1d2b;
+  --color-dark-bg-1: #355450fc;/* #252836; */
+  --color-dark-bg-2: #355450fc;/*#1f1d2b;*/
   --color-form-bg: #2d303e;
   /* text */
   --color-text-dark: #3b5162;

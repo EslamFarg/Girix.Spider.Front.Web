@@ -10,7 +10,7 @@ import { InputText } from 'primeng/inputtext';
 import { RouterOutlet } from '@angular/router';
 import { HutService, IHutSearchRow, HutSearchEnum } from '@/features/restaurant/services/hut-service';
 import { ITableSearchRow, TableSearchEnum, TableService } from '@/features/restaurant/services/table-service';
-import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
+import { BaseComponent } from '@/components/base-component/base-component';
 import { HutCard } from '@/components/hut-card/hut-card';
 import { RoomCard } from '@/components/room-card/room-card';
 import { TableCard } from '@/components/table-card/table-card';
@@ -165,17 +165,12 @@ export class RepalcementsLayout extends BaseComponent {
 
   roomService = inject(RoomService);
   rooms = signal<IRoomSearchRow[]>([]);
-  roomPaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
-    totalPagesCount: 0,
-    totalRowsCount: 0,
-  };
   searchRooms(pageIndex: number) {
     this.roomService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 20,
+          pageIndex: 0,
+          pageSize: 0,
         },
         searchFilters: [
           {
@@ -187,36 +182,9 @@ export class RepalcementsLayout extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
-          if (res.value.rows.length > 0) {
-            if (pageIndex === 1) this.rooms.set(res.value.rows);
-            else this.rooms.update((prev) => prev.concat(res.value.rows));
-            this.roomPaginationInfo = {
-              pageIndex,
-              totalPagesCount: res.value.paginationInfo.totalPagesCount,
-              totalRowsCount: res.value.paginationInfo.totalRowsCount,
-            };
-          }
+          this.rooms.set(res.value.rows);
         },
       });
-  }
-  onScroll(event: Event) {
-    let scrollingContainer = event.target as HTMLElement;
-
-    const rightOffset = Math.abs(scrollingContainer.scrollLeft) + scrollingContainer.offsetWidth;
-
-    if (rightOffset < scrollingContainer.scrollWidth - 5) return;
-
-    switch (this.changeToSpace()) {
-      case SpaceTypeEnum.Room:
-        this.searchRooms(this.roomPaginationInfo.pageIndex + 1);
-        break;
-      case SpaceTypeEnum.Hut:
-        this.searchHuts(this.hutPaginationInfo.pageIndex + 1);
-        break;
-      case SpaceTypeEnum.Table:
-        this.searchTables(this.tablePaginationInfo.pageIndex + 1);
-        break;
-    }
   }
 
   //
@@ -235,17 +203,12 @@ export class RepalcementsLayout extends BaseComponent {
 
   hutService = inject(HutService);
   huts = signal<IHutSearchRow[]>([]);
-  hutPaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
-    totalPagesCount: 0,
-    totalRowsCount: 0,
-  };
   searchHuts(pageIndex: number) {
     this.hutService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 20,
+          pageIndex: 0,
+          pageSize: 0,
         },
         searchFilters: [
           {
@@ -257,25 +220,9 @@ export class RepalcementsLayout extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
-          if (res.value.rows.length > 0) {
-            if (pageIndex === 1) this.huts.set(res.value.rows);
-            else this.huts.update((prev) => prev.concat(res.value.rows));
-            this.hutPaginationInfo = {
-              pageIndex,
-              totalPagesCount: res.value.paginationInfo.totalPagesCount,
-              totalRowsCount: res.value.paginationInfo.totalRowsCount,
-            };
-          }
+          this.huts.set(res.value.rows);
         },
       });
-  }
-  onHutsScroll(event: Event) {
-    const menuContainer = event.target as HTMLElement;
-
-    // if at bottom
-    if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
-      this.searchHuts(this.hutPaginationInfo.pageIndex + 1);
-    }
   }
 
   //
@@ -287,17 +234,12 @@ export class RepalcementsLayout extends BaseComponent {
 
   tableService = inject(TableService);
   tables = signal<ITableSearchRow[]>([]);
-  tablePaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
-    totalPagesCount: 0,
-    totalRowsCount: 0,
-  };
   searchTables(pageIndex: number) {
     this.tableService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 20,
+          pageIndex: 0,
+          pageSize: 0,
         },
         searchFilters: [
           {
@@ -309,25 +251,8 @@ export class RepalcementsLayout extends BaseComponent {
       })
       .subscribe({
         next: (res) => {
-          if (res.value.rows.length > 0) {
-            if (pageIndex === 1) this.tables.set(res.value.rows);
-            else this.tables.update((prev) => prev.concat(res.value.rows));
-
-            this.tablePaginationInfo = {
-              pageIndex,
-              totalPagesCount: res.value.paginationInfo.totalPagesCount,
-              totalRowsCount: res.value.paginationInfo.totalRowsCount,
-            };
-          }
+          this.tables.set(res.value.rows);
         },
       });
-  }
-  onTablesScroll(event: Event) {
-    const menuContainer = event.target as HTMLElement;
-
-    // if at bottom
-    if (menuContainer.scrollTop + menuContainer.clientHeight >= menuContainer.scrollHeight - 1) {
-      this.searchTables(this.tablePaginationInfo.pageIndex + 1);
-    }
   }
 }

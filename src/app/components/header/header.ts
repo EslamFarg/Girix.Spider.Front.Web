@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, effect, ElementRef, inject, OnDestroy, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, ElementRef, inject, OnDestroy, signal, viewChild } from '@angular/core';
 import { ImgFallback } from '@/directives/img-fallback';
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { BaseComponent } from '@/components/base-component/base-component';
@@ -669,6 +669,8 @@ export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
     isShowingMenu = signal(true);
     private _overflowTimeout: number | undefined;
 
+    isActiveLinkParent = computed(() => this.isParent(this.activeLink()));
+
     reUpdateActiveLink() {
         const parentRoute = this.getParent(this.router.url);
         const isKnownRoute = parentRoute !== undefined || this.isParent(this.router.url);
@@ -776,14 +778,14 @@ export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
         //   this.nav()!.nativeElement.style.overflow = 'auto';
         // }, 500);
 
-        const moveNav = () => {
-            if (opts.skipNavMove) return;
-            navItemsContainer.style.translate = `${offsetFromRight - 10}px 0`;
-        };
-        const resetNav = () => {
-            if (opts.skipNavMove) return;
-            navItemsContainer.style.translate = `0 0`;
-        };
+        // const moveNav = () => {
+        //     if (opts.skipNavMove) return;
+        //     navItemsContainer.style.translate = `${offsetFromRight - 10}px 0`;
+        // };
+        // const resetNav = () => {
+        //     if (opts.skipNavMove) return;
+        //     navItemsContainer.style.translate = `0 0`;
+        // };
 
         const isParent = this.isParent(link);
         const isPreviousParent = this.isParent(this.prevActiveLink());
@@ -803,19 +805,19 @@ export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
             this.isShowingMenu.set(true);
             if (this.prevActiveLink() === '/' || isPreviousParent) {
                 this.activeLink.set(link);
-                resetNav();
+                // resetNav();
             } else {
                 this.prevActiveLink.set(link);
             }
         } else if (isParent) {
             // console.log('is parent');
             if (isSameParentLink || this.isAnyChildActive(link)) {
-                resetNav();
+                // resetNav();
                 // console.log('reset translate');
                 this.isShowingMenu.set(true);
                 this.prevActiveLink.set('');
             } else {
-                moveNav();
+                // moveNav();
                 // console.log('move translate');
                 this.isShowingMenu.set(false);
                 this.prevActiveLink.set(link);

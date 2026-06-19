@@ -1,145 +1,173 @@
 <header #header class="w-full h-[125px] flex flex-col relative">
-  <!-- top section -->
-  <div class="bg-dark-bg-2">
-    <div class="px-4 xl:px-8 py-1.5 grid grid-cols-2  container relativeitems-center">
-      <a href="" routerLink="/">
-        <img class="w-7 rounded-full!" src="/images/logo.jpeg" alt="" />
-      </a>
-      <!-- <div class="flex items-center gap-3">
+    <!-- top section -->
+    <div class="bg-dark-bg-2">
+        <div class="px-4 xl:px-8 py-1.5 grid grid-cols-2 container relativeitems-center">
+            <a href="" routerLink="/">
+                <img class="w-7 rounded-full!" src="/images/logo.jpeg" alt="" />
+            </a>
+            <!-- <div class="flex items-center gap-3">
         <div class="text-text-gray px-3 py-1.5 bg-white font-medium text-xl rounded leading-none">LOGO</div>
         <div>أبناء المحله</div>
       </div> -->
 
-      <!-- <div class="hidden items-center justify-center text-sm sm:flex text-light-bg">20 يناير 2026 / 03:56:22 ص</div> -->
-      <!-- <div class="hidden items-center justify-center text-sm sm:flex text-light-bg">
+            <!-- <div class="hidden items-center justify-center text-sm sm:flex text-light-bg">20 يناير 2026 / 03:56:22 ص</div> -->
+            <!-- <div class="hidden items-center justify-center text-sm sm:flex text-light-bg">
         <p-message class="[&_.p-message-content]:py-0!   glow-pulse">قيد التطوير</p-message>
       </div> -->
 
-      <div class="flex items-center gap-2 text-light-bg ms-auto cursor-pointer" (click)="menu.toggle($event)">
-        <img class="w-6 h-6 rounded-full object-cover" [src]="baseUrl + userDetails()?.imageUrl" appImgFallback alt="" />
-        <p class="font-semibold text-xs max-w-25 text-ellipsis overflow-hidden">{{ userDetails()?.fullName }}</p>
-        <i class="pi pi-angle-down text-sm! transition-all" [class.rotate-180]="menu.visible"></i>
-      </div>
-      <p-menu dir="rtl" #menu [model]="popUpMenuItems" [popup]="true" appendTo="body" [style]="{ insetInlineEnd: '100%' }" />
-
-
-    </div>
-  </div>
-
-  <!-- loading animation -->
-  <p-progressbar
-    mode="indeterminate"
-    class="overflow-hidden transition-all"
-    [style]="{ height: '5px', maxHeight: isLoading() ? '5px' : '0', '--p-progressbar-border-radius': '0' }"
-  />
-
-  <!-- main navigation -->
-  <nav class="bg-text-lighter overflow-auto custom-scroll w-full flex-1 shadow" #nav>
-    <div class="container flex items-center h-full px-4 gap-2 py-1 min-w-max w-full transition-all" #navItemsContainer>
-      @for (parent of navItems; track $index) {
-        <div
-        [appAllowedRoles]="parent.roles"
-          class="relative flex items-center h-full"
-          #parentElWrapper
-          [id]="`header-link-wrapper-${parent.routerLink}`"
-        >
-          <!-- parent -->
-          <a
-            [id]="`header-link-${parent.routerLink}`"
-            class="nav-item max-w-50 opacity-0 z-20 h-full flex duration-500 ease-in-out transition-all flex-col gap-1 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg"
-            [class.nav-item-active]="
-              isShowingMenu() &&
-              (parent.routerLink === activeLink() ||
-                isParentActive(parent.routerLink) ||
-                isAnyChildSubLinksActive(parent.routerLink))
-            "
-            [class.ms-0!]="$first || isParentActive(parent.routerLink)"
-            [class.nav-item-visible]="
-              activeLink() == '/' ||
-              isAnyChildActive(parent.routerLink) ||
-              isAnyChildSubLinksActive(parent.routerLink) ||
-              parent.routerLink === activeLink() ||
-              isShowingMenu()
-            "
-            [routerLink]="parent.isLink ? parent.routerLink : []"
-            (click)="toggleActiveLink({ routerLink: parent.routerLink, isLink: parent.isLink }, parentElWrapper)"
-          >
-            <img class="h-10 object-center" [src]="'/images/icons/header/' + parent.imgUrl + '.png'" alt="" />
-            <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{
-              translate('HEADER.NAV.' + parent.labelKey + '.LABEL')
-            }}</span>
-          </a>
-
-          <!-- children -->
-          @if (
-            !parent?.isLink &&
-            !isShowingMenu() &&
-            (parent.routerLink === activeLink() ||
-              isParentActive(parent.routerLink) ||
-              isAnyChildSubLinksActive(parent.routerLink))
-          ) {
-            <svg
-              class="min-w-8 mx-3"
-              width="32"
-              height="32"
-              viewBox="0 0 32 32"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                opacity="0.4"
-                d="M21.0634 17.5871L25.9957 18.0233C27.1026 18.0233 28 17.1171 28 15.9994C28 14.8818 27.1026 13.9756 25.9957 13.9756L21.0634 14.4118C20.195 14.4118 19.491 15.1226 19.491 15.9994C19.491 16.8777 20.195 17.5871 21.0634 17.5871Z"
-                fill="black"
-              />
-              <path
-                d="M4.50175 17.5069C4.57884 17.5847 4.86684 17.9137 5.13738 18.1869C6.71555 19.8979 10.8362 22.6958 12.9918 23.552C13.3191 23.6886 14.1467 23.9794 14.5904 24C15.0136 24 15.418 23.9016 15.8034 23.7077C16.2849 23.436 16.6689 23.0072 16.8812 22.5019C17.0165 22.1524 17.2289 21.1023 17.2289 21.0832C17.4398 19.9361 17.5547 18.0709 17.5547 16.0088C17.5547 14.0466 17.4398 12.2578 17.2667 11.0916C17.2478 11.071 17.0354 9.76831 16.8042 9.32183C16.3809 8.50523 15.5533 8 14.6674 8H14.5904C14.0129 8.01909 12.7998 8.52579 12.7998 8.54342C10.7591 9.39967 6.73591 12.0624 5.11847 13.8322C5.11847 13.8322 4.66175 14.2875 4.46394 14.571C4.15558 14.9793 4.0014 15.4845 4.0014 15.9897C4.0014 16.5537 4.17449 17.078 4.50175 17.5069Z"
-                fill="black"
-              />
-            </svg>
-          }
-          <!--  -->
-          <div
-            class="flex custom-scroll children h-full z-10 min-w-0"
-            [class.max-w-fit!]="
-              !isShowingMenu() &&
-              (parent.routerLink === activeLink() ||
-                isParentActive(parent.routerLink) ||
-                isAnyChildSubLinksActive(parent.routerLink))
-            "
-            [class.children-visible]="
-              !isShowingMenu() && (isParentActive(parent.routerLink) || isAnyChildSubLinksActive(parent.routerLink))
-            "
-          >
-            @for (child of parent.children; track $index) {
-              <a
-              [appAllowedRoles]="child.roles"
-                [id]="`header-link-${child.routerLink}`"
-                class="child nav-item h-full mx-0! transition-all duration-500 flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg"
-                [style]="`--ix:${$index}`"
-                [class.nav-item-active]="
-                  child.routerLink === activeLink() || isAnySubLinksActive(parent.routerLink, child.routerLink)
-                "
-                (click)="
-                  toggleActiveLink(
-                    { routerLink: child?.subLinks ? child.subLinks![0] : child.routerLink!, isLink: true },
-                    parentElWrapper
-                  )
-                "
-                [routerLink]="child?.subLinks ? child.subLinks![0] : child.routerLink!"
-              >
+            <div class="flex items-center gap-2 text-light-bg ms-auto cursor-pointer" (click)="menu.toggle($event)">
                 <img
-                  class="h-10"
-                  [src]="'/images/icons/header/' + parent.imgUrl + '/' + child.imgUrl + '.png'"
-                  alt=""
+                    class="w-6 h-6 rounded-full object-cover"
+                    [src]="baseUrl + userDetails()?.imageUrl"
+                    appImgFallback
+                    alt=""
                 />
-                <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{
-                  translate(`HEADER.NAV.${parent.labelKey}.${child.labelKey}.LABEL`)
-                }}</span>
-              </a>
-            }
-          </div>
+                <p class="font-semibold text-xs max-w-25 text-ellipsis overflow-hidden">
+                    {{ userDetails()?.fullName }}
+                </p>
+                <i class="pi pi-angle-down text-sm! transition-all" [class.rotate-180]="menu.visible"></i>
+            </div>
+            <p-menu
+                dir="rtl"
+                #menu
+                [model]="popUpMenuItems"
+                [popup]="true"
+                appendTo="body"
+                [style]="{ insetInlineEnd: '100%' }"
+            />
         </div>
-      }
     </div>
-  </nav>
+
+    <!-- loading animation -->
+    <p-progressbar
+        mode="indeterminate"
+        class="overflow-hidden transition-all"
+        [style]="{ height: '5px', maxHeight: isLoading() ? '5px' : '0', '--p-progressbar-border-radius': '0' }"
+    />
+
+    <!-- main navigation -->
+    <nav class="bg-text-lighter overflow-auto custom-scroll w-full flex-1 shadow" #nav>
+        <div
+            [class]="
+                `container flex items-center h-full px-4 py-1 min-w-max w-full transition-all ${isShowingMenu() && 'gap-2 '}`
+            "
+            #navItemsContainer
+        >
+            @for (parent of navItems; track $index) {
+                <div
+                    [appAllowedRoles]="parent.roles"
+                    class="relative flex items-center h-full"
+                    #parentElWrapper
+                    [id]="`header-link-wrapper-${parent.routerLink}`"
+                >
+                    <!-- parent -->
+                    <a
+                        [id]="`header-link-${parent.routerLink}`"
+                        class="nav-item max-w-0 opacity-0 z-20 h-full flex duration-500 ease-in-out transition-all flex-col gap-1 items-center justify-between cursor-pointer group border-0 border-transparent rounded-lg"
+                        [class.nav-item-active]="
+                            isShowingMenu() &&
+                            (parent.routerLink === activeLink() ||
+                                isParentActive(parent.routerLink) ||
+                                isAnyChildSubLinksActive(parent.routerLink))
+                        "
+                        [class.ms-0!]="$first || isParentActive(parent.routerLink)"
+                        [class.nav-item-visible]="
+                            activeLink() == '/' ||
+                            isAnyChildActive(parent.routerLink) ||
+                            isAnyChildSubLinksActive(parent.routerLink) ||
+                            parent.routerLink === activeLink() ||
+                            isShowingMenu()
+                        "
+                        [routerLink]="parent.isLink ? parent.routerLink : []"
+                        (click)="
+                            toggleActiveLink({ routerLink: parent.routerLink, isLink: parent.isLink }, parentElWrapper)
+                        "
+                    >
+                        <img
+                            class="h-10 object-center"
+                            [src]="'/images/icons/header/' + parent.imgUrl + '.png'"
+                            alt=""
+                        />
+                        <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{
+                            translate('HEADER.NAV.' + parent.labelKey + '.LABEL')
+                        }}</span>
+                    </a>
+
+                    <!-- children -->
+                    @if (
+                        !parent?.isLink &&
+                        !isShowingMenu() &&
+                        (parent.routerLink === activeLink() ||
+                            isParentActive(parent.routerLink) ||
+                            isAnyChildSubLinksActive(parent.routerLink))
+                    ) {
+                        <svg
+                            class="min-w-8 mx-3"
+                            width="32"
+                            height="32"
+                            viewBox="0 0 32 32"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                opacity="0.4"
+                                d="M21.0634 17.5871L25.9957 18.0233C27.1026 18.0233 28 17.1171 28 15.9994C28 14.8818 27.1026 13.9756 25.9957 13.9756L21.0634 14.4118C20.195 14.4118 19.491 15.1226 19.491 15.9994C19.491 16.8777 20.195 17.5871 21.0634 17.5871Z"
+                                fill="black"
+                            />
+                            <path
+                                d="M4.50175 17.5069C4.57884 17.5847 4.86684 17.9137 5.13738 18.1869C6.71555 19.8979 10.8362 22.6958 12.9918 23.552C13.3191 23.6886 14.1467 23.9794 14.5904 24C15.0136 24 15.418 23.9016 15.8034 23.7077C16.2849 23.436 16.6689 23.0072 16.8812 22.5019C17.0165 22.1524 17.2289 21.1023 17.2289 21.0832C17.4398 19.9361 17.5547 18.0709 17.5547 16.0088C17.5547 14.0466 17.4398 12.2578 17.2667 11.0916C17.2478 11.071 17.0354 9.76831 16.8042 9.32183C16.3809 8.50523 15.5533 8 14.6674 8H14.5904C14.0129 8.01909 12.7998 8.52579 12.7998 8.54342C10.7591 9.39967 6.73591 12.0624 5.11847 13.8322C5.11847 13.8322 4.66175 14.2875 4.46394 14.571C4.15558 14.9793 4.0014 15.4845 4.0014 15.9897C4.0014 16.5537 4.17449 17.078 4.50175 17.5069Z"
+                                fill="black"
+                            />
+                        </svg>
+                    }
+                    <!--  -->
+                    <div
+                        class="flex custom-scroll children h-full z-10 min-w-0"
+                        [class.max-w-fit!]="
+                            !isShowingMenu() &&
+                            (parent.routerLink === activeLink() ||
+                                isParentActive(parent.routerLink) ||
+                                isAnyChildSubLinksActive(parent.routerLink))
+                        "
+                        [class.children-visible]="
+                            !isShowingMenu() &&
+                            (isParentActive(parent.routerLink) || isAnyChildSubLinksActive(parent.routerLink))
+                        "
+                    >
+                        @for (child of parent.children; track $index) {
+                            <a
+                                [appAllowedRoles]="child.roles"
+                                [id]="`header-link-${child.routerLink}`"
+                                class="child nav-item h-full mx-0! transition-all duration-500 flex flex-col gap-2 items-center justify-between py-1 px-2 cursor-pointer group border-2 border-transparent rounded-lg"
+                                [style]="`--ix:${$index}`"
+                                [class.nav-item-active]="
+                                    child.routerLink === activeLink() ||
+                                    isAnySubLinksActive(parent.routerLink, child.routerLink)
+                                "
+                                (click)="
+                                    toggleActiveLink(
+                                        {
+                                            routerLink: child?.subLinks ? child.subLinks![0] : child.routerLink!,
+                                            isLink: true,
+                                        },
+                                        parentElWrapper
+                                    )
+                                "
+                                [routerLink]="child?.subLinks ? child.subLinks![0] : child.routerLink!"
+                            >
+                                <img
+                                    class="h-10"
+                                    [src]="'/images/icons/header/' + parent.imgUrl + '/' + child.imgUrl + '.png'"
+                                    alt=""
+                                />
+                                <span class="text-dark-bg-2 font-bold text-xs w-max max-w-50 text-center">{{
+                                    translate(`HEADER.NAV.${parent.labelKey}.${child.labelKey}.LABEL`)
+                                }}</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </nav>
 </header>
