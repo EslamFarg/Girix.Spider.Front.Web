@@ -1,0 +1,7 @@
+/* Grid layout for tables — matches Replacements tables grid exactly */
+.table-switch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 160px);
+  gap: 12px;
+  justify-content: center;
+}

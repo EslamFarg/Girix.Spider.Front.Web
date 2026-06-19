@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
@@ -11,11 +12,13 @@ import { IOpeningBalanceSearchRow } from '../../types/api/opening-balances/respo
 import { DatePipe } from '@angular/common';
 import { Debounce } from "@/directives/debounce";
 import { Menu } from "primeng/menu";
-import { TranslatePipe } from '@ngx-translate/core';
 import { RouterLink } from "@angular/router";
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
 import { TooltipModule } from 'primeng/tooltip';
+import { Select } from 'primeng/select';
+import { A4PrintService } from '@/core';
+import { buildOpeningBalancePrintHtml } from '../../utils/opening-balance-print.util';
 
 @Component({
   selector: 'app-opening-balances',
@@ -24,16 +27,17 @@ import { TooltipModule } from 'primeng/tooltip';
     InputErrorMessageHandler,
     Paginator,
     ReactiveFormsModule,
+    FormsModule,
     InputTextModule,
     SectionWrapper,
     DatePipe,
     Debounce,
     Menu,
-    TranslatePipe,
     RouterLink,
     LoadingDisabledDirective,
     Listbox,
-    TooltipModule
+    TooltipModule,
+    Select,
 ],
   templateUrl: './opening-balances.html',
   styleUrl: './opening-balances.css',
@@ -48,6 +52,15 @@ export class OpeningBalances extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
 
   openingBalanceService = inject(OpeningBalanceService);
+  a4PrintService = inject(A4PrintService);
+
+  pageSize = signal(10);
+  pageSizeOptions = [
+    { label: '10', value: 10 },
+    { label: '25', value: 25 },
+    { label: '50', value: 50 },
+    { label: '100', value: 100 },
+  ];
   filterMenuItems = signal([
     {
       label: 'رقم الفاتورة',
@@ -59,9 +72,32 @@ export class OpeningBalances extends BaseComponent {
     },
   ]);
 
+  private _filterValue = toSignal(this.fg.controls.searchEnum.valueChanges, {
+    initialValue: this.fg.controls.searchEnum.value,
+  });
+
+  searchPlaceholder = computed(() => {
+    switch (this._filterValue()) {
+      case OpeningBalanceSearchEnum.InvoiceNumber:
+        return 'ابحث برقم الفاتورة';
+      case OpeningBalanceSearchEnum.ReferenceNumber:
+        return 'ابحث بالرقم الدفتري';
+      default:
+        return 'ابحث...';
+    }
+  });
+
   constructor() {
     super();
-    this.searchOpeningBalances(1);
+  }
+
+  ngOnInit() {
+    this.loadExplorer(1);
+  }
+
+  /** Reload explorer grid — called on init and after returning from sibling routes. */
+  private loadExplorer(pageIndex: number) {
+    this.searchOpeningBalances(pageIndex);
   }
 
   periodOptions = [
@@ -84,7 +120,7 @@ export class OpeningBalances extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 10,
+          pageSize: this.pageSize(),
         },
         searchFilters: [
           {
@@ -109,6 +145,28 @@ export class OpeningBalances extends BaseComponent {
   onSubmit = () => this.fg.valid && this.searchOpeningBalances(1);
 
   onPageChange = (event: PaginatorState) => this.searchOpeningBalances(event.page! + 1);
+
+  onFilterSelect(filterMenu: Menu) {
+    filterMenu.hide();
+    this.fg.controls.searchTerm.setValue('', { emitEvent: false });
+    this.searchOpeningBalances(1);
+  }
+
+  onPageSizeChange(size: number) {
+    if (!size || size === this.pageSize()) {
+      return;
+    }
+    this.pageSize.set(size);
+    this.searchOpeningBalances(1);
+  }
+
+  printOpeningBalance(id: number) {
+    this.openingBalanceService.getById(id).subscribe({
+      next: (invoice) => {
+        this.a4PrintService.print(buildOpeningBalancePrintHtml(invoice));
+      },
+    });
+  }
 
   deleteOpeningBalance(id: number, event: Event) {
     this.confirmationService.confirm({

@@ -18,11 +18,10 @@
   </form>
 
   <!-- items grid -->
-  <div
-    class="grid gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 my-4 mt-8"
-  >
+  <div class="room-switch-grid my-4 mt-8">
     @for (room of rooms(); track $index) {
       <app-room-card
+        class="room-switch-card"
         (click)="
           openCollectionDialog({
             orderId: room.orderId,

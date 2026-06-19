@@ -11,11 +11,11 @@
   color: rgb(var(--color));
 }
 
-/* Room switch screen — fixed 160×180 card (تبديل الغرف) */
+/* Room switch screen — fixed 160×160 card (تبديل الغرف) */
 :host(.room-switch-card) {
   display: block;
   width: 160px;
-  height: 180px;
+  height: 160px;
   flex-shrink: 0;
 }
 

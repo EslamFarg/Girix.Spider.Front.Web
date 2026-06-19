@@ -1,0 +1,252 @@
+/* ─── Form shell: table-first (~75% grid) ─────────────────────────────────── */
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+/* ─── Compact header (~25%) ──────────────────────────────────────────────── */
+
+.ob-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ob-header-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  direction: rtl;
+  align-items: start;
+}
+
+.ob-header-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ob-header-field label {
+  display: block;
+  font-size: 12px;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  min-height: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ob-header-field app-input-error-message-handler,
+.ob-header-search-form {
+  display: block;
+  width: 100%;
+}
+
+.ob-header-control,
+.ob-header-field .p-inputtext,
+.ob-header-field .p-datepicker-input {
+  width: 100% !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  box-sizing: border-box;
+}
+
+.ob-header-datepicker,
+.ob-header-datepicker .p-datepicker,
+.ob-header-datepicker .p-inputwrapper {
+  width: 100%;
+}
+
+.ob-header-datepicker .p-datepicker-input {
+  font-size: 13px;
+}
+
+.ob-header-search-btn {
+  height: 32px;
+  align-items: center;
+}
+
+.ob-notes-row label {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.ob-notes-input {
+  min-height: 2rem;
+  max-height: 4.5rem;
+  resize: vertical;
+  padding: 4px 8px !important;
+  line-height: 1.35;
+}
+
+.ob-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ob-toolbar button:disabled,
+.ob-toolbar button[disabled] {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .ob-header-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ─── Grid wrapper: scrollable body ─────────────────────────────────────── */
+
+.ob-grid-wrapper {
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 6px;
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+/* ─── Sticky header + add row (matches purchases) ────────────────────────── */
+
+.ob-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background-color: var(--color-dark-bg-2);
+}
+
+.ob-entry-row {
+  position: sticky;
+  top: 44px;
+  z-index: 2;
+}
+
+.ob-entry-row,
+.ob-entry-row td {
+  background-color: #eef6ff !important;
+  border-top: 1px solid #bfdbfe !important;
+  border-bottom: 2px solid #93c5fd !important;
+}
+
+.ob-add-indicator {
+  font-weight: 700;
+  text-align: center;
+  font-size: 0.9rem;
+  user-select: none;
+  opacity: 0.6;
+}
+
+/* ─── Column header totals ───────────────────────────────────────────────── */
+
+.ob-col-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.ob-col-total {
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+/* ─── Density overrides ──────────────────────────────────────────────────── */
+
+.ob-table.main-table {
+  border-spacing: 0 2px;
+}
+
+.ob-table.main-table thead th {
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+.ob-table.main-table tbody td {
+  padding: 2px 4px;
+  font-size: 13px;
+}
+
+.ob-table.main-table th,
+.ob-table.main-table td {
+  max-width: none;
+  overflow: visible;
+  white-space: normal;
+}
+
+.ob-table .app-input,
+.ob-table .app-select {
+  min-height: 28px;
+}
+
+.ob-table .actions {
+  justify-content: center;
+  gap: 0;
+}
+
+.ob-table .actions .delete {
+  padding: 4px;
+}
+
+/* ─── Column widths ──────────────────────────────────────────────────────── */
+
+.ob-table th:nth-child(1),
+.ob-table td:nth-child(1) {
+  width: 3%;
+  min-width: 28px;
+}
+
+.ob-table th:nth-child(2),
+.ob-table td:nth-child(2) {
+  width: 25%;
+  min-width: 110px;
+}
+
+.ob-table th:nth-child(3),
+.ob-table td:nth-child(3) {
+  width: 12%;
+  min-width: 70px;
+}
+
+.ob-table th:nth-child(4),
+.ob-table td:nth-child(4) {
+  width: 12%;
+  min-width: 64px;
+}
+
+.ob-table th:nth-child(5),
+.ob-table td:nth-child(5) {
+  width: 12%;
+  min-width: 64px;
+}
+
+.ob-table th:nth-child(6),
+.ob-table td:nth-child(6) {
+  width: 12%;
+  min-width: 64px;
+}
+
+.ob-table th:nth-child(7),
+.ob-table td:nth-child(7) {
+  width: 18%;
+  min-width: 72px;
+}
+
+.ob-table th:nth-child(8),
+.ob-table td:nth-child(8) {
+  width: 6%;
+  min-width: 44px;
+  max-width: 60px;
+}
+
+.ob-readonly-total {
+  font-variant-numeric: tabular-nums;
+}

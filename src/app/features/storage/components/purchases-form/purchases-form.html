@@ -147,8 +147,8 @@
                         severity="danger"
                         variant="outlined"
                         class="app-p-btn py-1! w-full! justify-center!"
-                        [disabled]="!currentPurchase()?.id"
-                        (click)="deletePurchase(currentPurchase()!.id, $event)"
+                        [disabled]="isNewRecord()"
+                        (click)="deletePurchase(savedRecordId()!, $event)"
                     >
                         حذف
                     </button>
@@ -158,7 +158,7 @@
                         type="button"
                         variant="outlined"
                         class="app-p-btn py-1! w-full! justify-center!"
-                        [disabled]="!currentPurchase()?.id"
+                        [disabled]="isNewRecord()"
                         (click)="printPurchaseInvoice()"
                     >
                         طباعة

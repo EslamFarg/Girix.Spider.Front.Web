@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
-import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -8,7 +9,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Menu } from 'primeng/menu';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { Select } from 'primeng/select';
-import { TranslatePipe } from '@ngx-translate/core';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Debounce } from '@/directives/debounce';
@@ -18,6 +18,8 @@ import { IPurchaseSearchRow } from '../../types/api/purchases/responses';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
 import { TooltipModule } from 'primeng/tooltip';
+import { A4PrintService } from '@/core';
+import { buildPurchasePrintHtml } from '../../utils/purchase-print.util';
 
 @Component({
   selector: 'app-purchases',
@@ -26,16 +28,17 @@ import { TooltipModule } from 'primeng/tooltip';
     InputGroupAddon,
     Paginator,
     ReactiveFormsModule,
+    FormsModule,
     InputTextModule,
     SectionWrapper,
     DatePipe,
     Debounce,
     Menu,
-    TranslatePipe,
     RouterLink,
     LoadingDisabledDirective,
     Listbox,
-    TooltipModule
+    TooltipModule,
+    Select,
 ],
   templateUrl: './purchases.html',
   styleUrl: './purchases.css',
@@ -50,33 +53,46 @@ export class Purchases extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
 
   purchaseService = inject(PurchaseService);
+  a4PrintService = inject(A4PrintService);
+
+  pageSize = signal(10);
+  pageSizeOptions = [
+    { label: '10', value: 10 },
+    { label: '25', value: 25 },
+    { label: '50', value: 50 },
+    { label: '100', value: 100 },
+  ];
+
   filterMenuItems = signal<MenuItem[]>([
-    {
-      label: 'رقم الفاتورة',
-      value:PurchaseSearchEnum.InvoiceNumber,
-    },
-    {
-      label: 'الرقم الدفتري',
-      value:PurchaseSearchEnum.ReferenceNumber,
-    },
-    {
-      label: 'اسم المورد',
-      value:PurchaseSearchEnum.Name,
-    },
+    { label: 'رقم الفاتورة', value: PurchaseSearchEnum.InvoiceNumber },
+    { label: 'الرقم الدفتري', value: PurchaseSearchEnum.ReferenceNumber },
+    { label: 'اسم المورد', value: PurchaseSearchEnum.Name },
   ]);
+
+  private _filterValue = toSignal(this.fg.controls.searchEnum.valueChanges, {
+    initialValue: this.fg.controls.searchEnum.value,
+  });
+
+  searchPlaceholder = computed(() => {
+    switch (this._filterValue()) {
+      case PurchaseSearchEnum.InvoiceNumber:
+        return 'ابحث برقم الفاتورة';
+      case PurchaseSearchEnum.ReferenceNumber:
+        return 'ابحث بالرقم الدفتري';
+      case PurchaseSearchEnum.Name:
+        return 'ابحث باسم المورد';
+      default:
+        return 'ابحث...';
+    }
+  });
 
   constructor() {
     super();
-    this.searchPurchases(1);
   }
 
-  periodOptions = [
-    { label: 'الكل', value: null },
-    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
-    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
-    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
-    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
-  ];
+  ngOnInit() {
+    this.searchPurchases(1);
+  }
 
   purchases = signal<IPurchaseSearchRow[]>([]);
   purchasesPaginationInfo: IPaginationInfo = {
@@ -90,7 +106,7 @@ export class Purchases extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex,
-          pageSize: 10,
+          pageSize: this.pageSize(),
         },
         searchFilters: [
           {
@@ -116,6 +132,28 @@ export class Purchases extends BaseComponent {
 
   onPageChange = (event: PaginatorState) => this.searchPurchases(event.page! + 1);
 
+  onFilterSelect(filterMenu: Menu) {
+    filterMenu.hide();
+    this.fg.controls.searchTerm.setValue('', { emitEvent: false });
+    this.searchPurchases(1);
+  }
+
+  onPageSizeChange(size: number) {
+    if (!size || size === this.pageSize()) {
+      return;
+    }
+    this.pageSize.set(size);
+    this.searchPurchases(1);
+  }
+
+  printPurchase(id: number) {
+    this.purchaseService.getById(id).subscribe({
+      next: (invoice) => {
+        this.a4PrintService.print(buildPurchasePrintHtml(invoice));
+      },
+    });
+  }
+
   deletePurchase(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
@@ -132,6 +170,7 @@ export class Purchases extends BaseComponent {
         label: 'حذف',
         severity: 'danger',
       },
+
       accept: () => {
         this.purchaseService.delete(id).subscribe({
           next: () => {

@@ -18,19 +18,16 @@
   </form>
   
   <!-- items grid -->
-  <div
-    class="grid grid-cols-2 gap-[8rem_2rem] sm:grid-cols-3  md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 my-4"
-  >
+  <div class="hut-switch-grid">
     @for (hut of huts(); track $index) {
       <app-hut-card
+        class="hut-switch-card"
         (click)="
           openCollectionDialog({
             orderId: hut.orderId,
             isCollected: hut.isAvailable,
           })
         "
-        class="self-end"
-        [class.mt-[50%]]="$first"
         [data]="hut"
       />
     }

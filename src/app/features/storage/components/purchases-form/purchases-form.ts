@@ -30,6 +30,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { TooltipModule } from 'primeng/tooltip';
 import { A4PrintService } from '@/core';
+import { buildPurchasePrintHtml } from '../../utils/purchase-print.util';
 
 interface IAppPurchaseItem {
     menuItemsId: number | null;
@@ -75,9 +76,20 @@ export class PurchasesForm extends BaseComponent {
     id = input<number | null>(null);
 
     formMode = computed(() => {
-        if (this.currentPurchase()) return FormMode.Update;
-        return this.initialFormMode();
+        if (this.currentPurchase()?.id) return FormMode.Update;
+        return FormMode.Create;
     });
+
+    /** Saved record identity — only from API-loaded entity with a persisted id. */
+    savedRecordId = computed(() => {
+        const id = this.currentPurchase()?.id;
+        if (id == null || id <= 0) {
+            return null;
+        }
+        return id;
+    });
+
+    isNewRecord = computed(() => this.savedRecordId() === null);
 
     // ── Form definition ───────────────────────────────────────────────────────
 
@@ -239,44 +251,47 @@ export class PurchasesForm extends BaseComponent {
 
     ngOnInit() {
         const purchaseId = this.id();
-        switch (this.formMode()) {
-            case FormMode.Create:
-                break;
-            case FormMode.Update:
-                this.purchaseService.getById(purchaseId!).subscribe({
-                    next: (data) => {
-                        this.currentPurchase.set(data);
-                        this.fg.patchValue({
-                            ...data,
-                            invoiceDate: new Date(data.invoiceDate),
-                        });
-                        this._setCurrentSupplierFromPurchase(data);
-                        this.currentProducts.set(
-                            data.items.map((item) => ({ id: item.menuItemsId, name: item.menuItemName })),
-                        );
-                        this.fg.setControl(
-                            'items',
-                            this.fb.array(
-                                data.items.map((item) => {
-                                    this.getProductUnits(item.menuItemsId);
-                                    return this.createItemFg({
-                                        menuItemsId: item.menuItemsId,
-                                        unitId: item.unitId,
-                                        quantity: item.quantity,
-                                        purchasePrice: item.purchasePrice,
-                                        salePrice: item.salePrice,
-                                        taxAmount: item.quantity > 0 ? item.taxAmount / item.quantity : 0,
-                                        taxPercentage: -1,
-                                        total: null,
-                                    });
-                                }),
-                            ),
-                        );
-                        this.updateNet();
-                    },
-                });
-                break;
+        if (purchaseId && this.initialFormMode() === FormMode.Update) {
+            this.loadPurchaseById(purchaseId);
         }
+    }
+
+    /** Loads entity from API and patches form — keeps items, enables Update mode. */
+    private applyPurchaseFromApi(data: IPurchaseReadResponse) {
+        this.currentPurchase.set(data);
+        this.fg.patchValue({
+            ...data,
+            invoiceDate: new Date(data.invoiceDate),
+        });
+        this._setCurrentSupplierFromPurchase(data);
+        this.currentProducts.set(
+            data.items.map((item) => ({ id: item.menuItemsId, name: item.menuItemName })),
+        );
+        this.fg.setControl(
+            'items',
+            this.fb.array(
+                data.items.map((item) => {
+                    this.getProductUnits(item.menuItemsId);
+                    return this.createItemFg({
+                        menuItemsId: item.menuItemsId,
+                        unitId: item.unitId,
+                        quantity: item.quantity,
+                        purchasePrice: item.purchasePrice,
+                        salePrice: item.salePrice,
+                        taxAmount: item.quantity > 0 ? item.taxAmount / item.quantity : 0,
+                        taxPercentage: -1,
+                        total: null,
+                    });
+                }),
+            ),
+        );
+        this.updateNet();
+    }
+
+    private loadPurchaseById(id: number) {
+        this.purchaseService.getById(id).subscribe({
+            next: (data) => this.applyPurchaseFromApi(data),
+        });
     }
 
     // ── Submit ────────────────────────────────────────────────────────────────
@@ -313,13 +328,17 @@ export class PurchasesForm extends BaseComponent {
         switch (this.formMode()) {
             case FormMode.Create:
                 this.purchaseService.create(data).subscribe({
-                    next: () => {
-                        this.router.navigate(['/storage/purchases']);
+                    next: (createdId) => {
+                        this.loadPurchaseById(createdId);
                     },
                 });
                 break;
             case FormMode.Update:
-                this.purchaseService.put({ ...data, id: this.currentPurchase()?.id }).subscribe();
+                this.purchaseService.put({ ...data, id: this.savedRecordId()! }).subscribe({
+                    next: () => {
+                        this.loadPurchaseById(this.savedRecordId()!);
+                    },
+                });
                 break;
         }
     }
@@ -329,31 +348,7 @@ export class PurchasesForm extends BaseComponent {
     debouncedFindPurchaseInvoiceByNumber(event: any, invoiceNumber: string) {
         if (!invoiceNumber) return;
         this.purchaseService.getByInvoiceNumber(invoiceNumber).subscribe({
-            next: (data) => {
-                this.currentPurchase.set(data);
-                this.fg.patchValue({ ...data, invoiceDate: new Date(data.invoiceDate) });
-                this._setCurrentSupplierFromPurchase(data);
-                this.currentProducts.set(data.items.map((item) => ({ id: item.menuItemsId, name: item.menuItemName })));
-                this.fg.setControl(
-                    'items',
-                    this.fb.array(
-                        data.items.map((item) => {
-                            this.getProductUnits(item.menuItemsId);
-                            return this.createItemFg({
-                                menuItemsId: item.menuItemsId,
-                                unitId: item.unitId,
-                                quantity: item.quantity,
-                                purchasePrice: item.purchasePrice,
-                                salePrice: item.salePrice,
-                                taxAmount: item.taxAmount,
-                                taxPercentage: -1,
-                                total: null,
-                            });
-                        }),
-                    ),
-                );
-                this.updateNet();
-            },
+            next: (data) => this.applyPurchaseFromApi(data),
         });
     }
 
@@ -752,13 +747,14 @@ export class PurchasesForm extends BaseComponent {
     // ── Form reset / new invoice ──────────────────────────────────────────────
 
     onResetForm() {
-        if (this.formMode() === FormMode.Create) {
+        if (!this.savedRecordId()) {
             this.fg.reset({ invoiceDate: new Date(), paymentType: OrderPaymentType.Paid });
             this.fg.setControl('items', this.fb.array<FormGroup<IAppPurchaseItemControls>>([]));
             this.currentSupplier.set(null);
             this.currentPurchase.set(null);
             this.net.set(0);
             this.setUpNewPurchaseDetailRowFg();
+            this._applyDefaultAccountsToForm();
         } else {
             this.router.navigateByUrl('/storage/purchases/add');
         }
@@ -772,157 +768,7 @@ export class PurchasesForm extends BaseComponent {
         const invoice = this.currentPurchase();
         if (!invoice) return;
 
-        const fmt = (dateStr: string) => {
-            const d = new Date(dateStr);
-            return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-        };
-        const money = (v: number) => (+v || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-        const paymentLabel = invoice.paymentType === 1 ? 'نقدي' : 'آجل';
-
-        const itemRows = invoice.items
-            .map(
-                (item, i) => `
-          <tr>
-            <td class="num">${i + 1}</td>
-            <td>${item.menuItemName ?? '-'}</td>
-            <td class="num">${item.unitName ?? '-'}</td>
-            <td class="num">${item.quantity}</td>
-            <td class="num">${money(item.purchasePrice)}</td>
-            <td class="num">${money(item.taxAmount)}</td>
-            <td class="num">${money(item.lineTotal)}</td>
-          </tr>`,
-            )
-            .join('');
-
-        const paymentRows =
-            invoice.paymentType === 1
-                ? `
-          <div class="total-item">
-            <span class="total-label">نقدي</span>
-            <span class="total-value">${money(invoice.cashAmount)}</span>
-          </div>
-          <div class="total-item">
-            <span class="total-label">شبكة</span>
-            <span class="total-value">${money(invoice.networkAmount)}</span>
-          </div>`
-                : '';
-
-        const html = `
-          <div class="doc-header">
-            <div class="doc-logo">🛒</div>
-            <div class="doc-company">
-              <div class="doc-company-name">Rest House</div>
-              <div class="doc-company-sub">نظام إدارة المطاعم والحسابات</div>
-            </div>
-            <div class="doc-title-box">فاتورة شراء</div>
-          </div>
-
-          <div class="meta-grid">
-            <div class="meta-field">
-              <span class="meta-label">رقم الفاتورة:</span>
-              <span class="meta-value">${invoice.invoiceNumber ?? '-'}</span>
-            </div>
-            <div class="meta-field">
-              <span class="meta-label">التاريخ:</span>
-              <span class="meta-value">${fmt(invoice.invoiceDate)}</span>
-            </div>
-            <div class="meta-field">
-              <span class="meta-label">نوع الدفع:</span>
-              <span class="meta-value">${paymentLabel}</span>
-            </div>
-            <div class="meta-field">
-              <span class="meta-label">الرقم الدفتري:</span>
-              <span class="meta-value">${invoice.referenceNumber ?? '-'}</span>
-            </div>
-            <div class="meta-field">
-              <span class="meta-label">المورد:</span>
-              <span class="meta-value">${invoice.supplierName ?? '-'}</span>
-            </div>
-            <div class="meta-field">
-              <span class="meta-label">رقم الجوال:</span>
-              <span class="meta-value">${invoice.supplierPhoneNumber ?? '-'}</span>
-            </div>
-            <div class="meta-field">
-              <span class="meta-label">الرقم الضريبي:</span>
-              <span class="meta-value">${invoice.supplierTaxNumber ?? '-'}</span>
-            </div>
-          </div>
-
-          ${
-              invoice.statement
-                  ? `
-          <div class="statement-banner mb-2">
-            <span class="meta-label">البيان: </span>
-            <span>${invoice.statement}</span>
-          </div>`
-                  : ''
-          }
-
-          <table class="lines-table">
-            <thead>
-              <tr>
-                <th style="width:4%">#</th>
-                <th style="width:30%">المنتج</th>
-                <th style="width:10%">الوحدة</th>
-                <th style="width:10%">الكمية</th>
-                <th style="width:14%">سعر الشراء</th>
-                <th style="width:12%">الضريبة</th>
-                <th style="width:20%">الإجمالي</th>
-              </tr>
-            </thead>
-            <tbody>${itemRows}</tbody>
-            <tfoot>
-              <tr>
-                <td colspan="5" class="bold">الإجمالي</td>
-                <td class="num bold">${money(invoice.taxAmount)}</td>
-                <td class="num bold">${money(invoice.totalAmount)}</td>
-              </tr>
-            </tfoot>
-          </table>
-
-          <div class="totals-box">
-            <div class="total-item">
-              <span class="total-label">المبلغ قبل الضريبة</span>
-              <span class="total-value">${money(invoice.subTotal)}</span>
-            </div>
-            <div class="total-item">
-              <span class="total-label">إجمالي الضريبة</span>
-              <span class="total-value">${money(invoice.taxAmount)}</span>
-            </div>
-            <div class="total-item">
-              <span class="total-label">الإجمالي الكلي</span>
-              <span class="total-value">${money(invoice.totalAmount)}</span>
-            </div>
-            ${paymentRows}
-          </div>
-
-          <div class="sig-footer">
-            <div class="sig-row">
-              <div class="sig-box">
-                <span class="sig-title">المستلم</span>
-                <div class="sig-line"></div>
-                <span class="sig-name">التوقيع / الاسم</span>
-              </div>
-              <div class="sig-box">
-                <span class="sig-title">المورد</span>
-                <div class="sig-line"></div>
-                <span class="sig-name">التوقيع / الختم</span>
-              </div>
-              <div class="sig-box">
-                <span class="sig-title">المحاسب</span>
-                <div class="sig-line"></div>
-                <span class="sig-name">التوقيع / الاسم</span>
-              </div>
-              <div class="sig-box">
-                <span class="sig-title">اعتماد الإدارة</span>
-                <div class="sig-line"></div>
-                <span class="sig-name">التوقيع / الختم</span>
-              </div>
-            </div>
-          </div>`;
-
-        this.a4PrintService.print(html);
+        this.a4PrintService.print(buildPurchasePrintHtml(invoice));
     }
 
     // ── Delete invoice ────────────────────────────────────────────────────────

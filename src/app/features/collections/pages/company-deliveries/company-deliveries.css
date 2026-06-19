@@ -1,0 +1,31 @@
+/* Grid layout — 12px gap, 200px card columns */
+.delivery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 200px);
+  gap: 12px;
+  justify-content: center;
+}
+
+.delivery-grid > .delivery-card {
+  width: 200px;
+  height: 100px;
+  box-sizing: border-box;
+}
+
+/* Available card hover: green inset shadow */
+.delivery-grid > .delivery-card:not(.replacements-reserved):hover {
+  box-shadow: 0px 0px 20px 0px rgba(80, 209, 170, 0.25) inset;
+  border-color: rgb(80, 209, 170) !important;
+  color: rgb(80, 209, 170);
+}
+
+/* Reserved card: orange border + orange inset (scoped to delivery screens only) */
+.delivery-grid > .delivery-card.replacements-reserved {
+  border-color: rgb(255, 140, 0) !important;
+  box-shadow: 0px 0px 20px 0px rgba(255, 140, 0, 0.25) inset !important;
+}
+
+/* Reserved card hover: slightly stronger orange inset */
+.delivery-grid > .delivery-card.replacements-reserved:hover {
+  box-shadow: 0px 0px 28px 0px rgba(255, 140, 0, 0.35) inset !important;
+}

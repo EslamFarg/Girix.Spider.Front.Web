@@ -11,18 +11,18 @@
   color: rgb(var(--color));
 }
 
-/* Tables switch screen — fixed 175px × 175px circle */
+/* Tables switch screen — fixed 160px × 160px circle */
 :host(.table-switch-card) {
   display: block;
-  width: 175px;
-  height: 175px;
+  width: 160px;
+  height: 160px;
   flex-shrink: 0;
 }
 
 /* Target the inner circle div directly — same pattern as hut-card */
 :host(.table-switch-card) > div {
-  width: 175px;
-  height: 175px;
+  width: 160px;
+  height: 160px;
 }
 .table-available {
   --color: black;

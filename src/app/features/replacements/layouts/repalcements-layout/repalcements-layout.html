@@ -1,126 +1,155 @@
 <router-outlet />
 
 <p-dialog
-  header=" "
+  header="تبديل المكان"
   [modal]="true"
   [dismissableMask]="true"
   [visible]="isVisible()"
   [style]="{ width: '100%', maxWidth: '800px' }"
   [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
-  styleClass="bg-base-bg!"
+  styleClass="bg-base-bg! replacement-dialog"
   (onHide)="closeDialog()"
-  contentStyleClass="no-scrollbar"
+  contentStyleClass="no-scrollbar replacement-dialog-content"
 >
-  <div [class]="`flex flex-col gap-6 items-center justify-center ${isLoading() ? 'opacity-70 cursor-wait' : ''}`">
-    @switch (currentItem()?.localSpaceType) {
-      <!--  -->
-      @case (SpaceTypeEnum.Room) {
-        <app-room-card class="room-switch-card" [data]="currentItem()?.data!" />
+  <div [class]="`replacement-dialog-body flex flex-col gap-2 w-full min-h-0 flex-1 overflow-hidden ${isLoading() ? 'opacity-70 cursor-wait' : ''}`">
+    <!-- Current place -->
+    <section class="replacement-current-section w-full shrink-0">
+      <h3 class="replacement-section-label">المكان الحالي</h3>
+      @if (currentItem(); as item) {
+        <p class="replacement-place-name">
+          @switch (item.localSpaceType) {
+            @case (SpaceTypeEnum.Room) {
+              غرفة {{ item.data.name }}
+            }
+            @case (SpaceTypeEnum.Table) {
+              طاولة {{ item.data.name }}
+            }
+            @case (SpaceTypeEnum.Hut) {
+              كوخ {{ item.data.name }}
+            }
+          }
+        </p>
+        <div class="replacement-current-card flex justify-center">
+          @switch (item.localSpaceType) {
+            @case (SpaceTypeEnum.Room) {
+              <app-room-card class="room-switch-card replacement-readonly-card" [data]="item.data" />
+            }
+            @case (SpaceTypeEnum.Hut) {
+              <app-hut-card class="hut-switch-card replacement-readonly-card" [data]="item.data" />
+            }
+            @case (SpaceTypeEnum.Table) {
+              <app-table-card class="table-switch-card replacement-readonly-card" [data]="item.data" />
+            }
+          }
+        </div>
       }
-      @case (SpaceTypeEnum.Hut) {
-        <app-hut-card class="hut-switch-card mt-12" [data]="currentItem()?.data!" />
-      }
-      @case (SpaceTypeEnum.Table) {
-        <app-table-card  class="w-25" [data]="currentItem()?.data!" />
-      }
-    }
+    </section>
 
-    <!-- nav -->
-    <div class="flex gap-2 justify-center replacement-dialog-nav">
-      <p-button
-        styleClass=" py-1! w-full   border-transparent! text-sm!"
-        label="طاوله"
-        class="w-25"
-        [attr.style]=""
-        [class.replacement-dialog-nav-active]="changeToSpace() == SpaceTypeEnum.Table"
-        (onClick)="setChangeToSpace(SpaceTypeEnum.Table)"
-      />
-      <p-button
-        styleClass="  py-1! w-full   border-transparent! text-sm!"
-        label="غرفه"
-        class="w-25"
-        [class.replacement-dialog-nav-active]="changeToSpace() == SpaceTypeEnum.Room"
-        (onClick)="setChangeToSpace(SpaceTypeEnum.Room)"
-      />
-      <p-button
-        styleClass="  py-1! w-full    border-transparent! text-sm!"
-        label="كوخ"
-        class="w-25"
-        [class.replacement-dialog-nav-active]="changeToSpace() == SpaceTypeEnum.Hut"
-        (onClick)="setChangeToSpace(SpaceTypeEnum.Hut)"
-      />
-    </div>
+    <!-- Destination selection -->
+    <section class="replacement-destination-section w-full flex flex-col flex-1 min-h-0 overflow-hidden">
+      <h3 class="replacement-section-label replacement-destination-heading shrink-0">اختر المكان الجديد</h3>
 
-    <!-- (Hut | Room | Table) cards -->
-    <div class="w-full overflow-auto custom-scroll" (scroll)="onScroll($event)">
-      @switch (changeToSpace()) {
-        <!--  -->
-        @case (SpaceTypeEnum.Table) {
-          <div class="flex my-4 gap-8 w-fit pb-2 *:w-25 *:min-w-25 relative z-1">
-            @for (table of tables(); track $index) {
-              <app-table-card
-                [class.active]="
-                  table.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Table
-                "
-                (click)="
-                  chooseItem({
-                    data: table,
-                    localSpaceType: SpaceTypeEnum.Table,
-                  })
-                "
-                 [data]="table"
-              />
-            }
-          </div>
+      <div class="flex gap-2 justify-center replacement-dialog-nav shrink-0">
+        <p-button
+          styleClass="replacement-nav-btn py-2! w-full border-transparent! text-sm!"
+          label="طاولة"
+          class="replacement-nav-item min-w-22"
+          [class.replacement-dialog-nav-active]="changeToSpace() == SpaceTypeEnum.Table"
+          (onClick)="setChangeToSpace(SpaceTypeEnum.Table)"
+        />
+        <p-button
+          styleClass="replacement-nav-btn py-2! w-full border-transparent! text-sm!"
+          label="غرفة"
+          class="replacement-nav-item min-w-22"
+          [class.replacement-dialog-nav-active]="changeToSpace() == SpaceTypeEnum.Room"
+          (onClick)="setChangeToSpace(SpaceTypeEnum.Room)"
+        />
+        <p-button
+          styleClass="replacement-nav-btn py-2! w-full border-transparent! text-sm!"
+          label="كوخ"
+          class="replacement-nav-item min-w-22"
+          [class.replacement-dialog-nav-active]="changeToSpace() == SpaceTypeEnum.Hut"
+          (onClick)="setChangeToSpace(SpaceTypeEnum.Hut)"
+        />
+      </div>
+
+      <div class="replacement-destination-grid w-full flex-1 min-h-0 flex flex-col">
+        @switch (changeToSpace()) {
+          @case (SpaceTypeEnum.Table) {
+            <div
+              class="replacement-modal-picker replacement-modal-picker--table replacement-modal-picker-scroll custom-scroll pb-1 relative z-1"
+              (scroll)="onScroll($event)"
+            >
+              @for (table of tables(); track $index) {
+                <app-table-card
+                  class="table-switch-card"
+                  [class.active]="
+                    table.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Table
+                  "
+                  (click)="
+                    chooseItem({
+                      data: table,
+                      localSpaceType: SpaceTypeEnum.Table,
+                    })
+                  "
+                  [data]="table"
+                />
+              }
+            </div>
+          }
+          @case (SpaceTypeEnum.Room) {
+            <div
+              class="replacement-modal-picker replacement-modal-picker--room replacement-modal-picker-scroll custom-scroll pb-1 relative z-1"
+              (scroll)="onScroll($event)"
+            >
+              @for (room of rooms(); track $index) {
+                <app-room-card
+                  class="room-switch-card"
+                  [class.active]="
+                    room.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Room
+                  "
+                  (click)="
+                    chooseItem({
+                      data: room,
+                      localSpaceType: SpaceTypeEnum.Room,
+                    })
+                  "
+                  [data]="room"
+                />
+              }
+            </div>
+          }
+          @case (SpaceTypeEnum.Hut) {
+            <div
+              class="replacement-modal-picker replacement-modal-picker--hut replacement-modal-picker-scroll custom-scroll pb-1 relative z-1"
+              (scroll)="onScroll($event)"
+            >
+              @for (hut of huts(); track $index) {
+                <app-hut-card
+                  class="hut-switch-card"
+                  [class.active]="
+                    hut.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Hut
+                  "
+                  (click)="
+                    chooseItem({
+                      data: hut,
+                      localSpaceType: SpaceTypeEnum.Hut,
+                    })
+                  "
+                  [data]="hut"
+                />
+              }
+            </div>
+          }
         }
-        <!--  -->
-        @case (SpaceTypeEnum.Room) {
-          <div class="room-switch-picker flex flex-wrap my-4 gap-3 w-full justify-center pb-2 relative z-1">
-            @for (room of rooms(); track $index) {
-              <app-room-card
-                class="room-switch-card"
-                [class.active]="
-                  room.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Room
-                "
-                (click)="
-                  chooseItem({
-                    data: room,
-                    localSpaceType: SpaceTypeEnum.Room,
-                  })
-                "
-                 [data]="room"
-              />
-            }
-          </div>
-        }
-        <!--  -->
-        @case (SpaceTypeEnum.Hut) {
-          <div class="hut-switch-picker flex flex-wrap my-4 w-full justify-center pt-11 pb-2 relative z-1">
-            @for (hut of huts(); track $index) {
-              <app-hut-card
-                class="hut-switch-card"
-                [class.active]="
-                  hut.id === changeToItem()?.data?.id && changeToItem()?.localSpaceType == SpaceTypeEnum.Hut
-                "
-                (click)="
-                  chooseItem({
-                    data: hut,
-                    localSpaceType: SpaceTypeEnum.Hut,
-                  })
-                "
-                 [data]="hut"
-              />
-            }
-          </div>
-        }
-      }
-    </div>
+      </div>
+    </section>
 
     <!-- Hut only form -->
     @if (changeToSpace() == localSpaceTypeEnum.Hut) {
       <form
         [formGroup]="hutChangeFg"
-        class="flex w-full *:flex-1 [&_p-select]:h-[46px]! [&_input]:h-[46px]! items-start gap-4 relative z-2"
+        class="replacement-hut-form shrink-0 flex w-full *:flex-1 [&_p-select]:h-[46px]! [&_input]:h-[46px]! items-start gap-2 relative z-2"
       >
         <div>
           <label for="productName">مدة الحجز</label>
@@ -162,10 +191,29 @@
       </form>
     }
 
-    <!--  -->
-    <div class="flex justify-end gap-2">
+    <!-- Selection summary -->
+    @if (changeToItem(); as selected) {
+      <div class="replacement-selection-summary w-full shrink-0">
+        <p class="replacement-selection-label">تم اختيار:</p>
+        <p class="replacement-selection-name">
+          @switch (selected.localSpaceType) {
+            @case (SpaceTypeEnum.Room) {
+              غرفة {{ selected.data.name }}
+            }
+            @case (SpaceTypeEnum.Table) {
+              طاولة {{ selected.data.name }}
+            }
+            @case (SpaceTypeEnum.Hut) {
+              كوخ {{ selected.data.name }}
+            }
+          }
+        </p>
+      </div>
+    }
+
+    <div class="replacement-dialog-footer shrink-0 flex justify-end gap-2 w-full">
       <button pButton severity="secondary" (click)="closeDialog()">الغاء</button>
-      <button pButton class="app-p-btn" (click)="submitItemChange()">استمرار</button>
+      <button pButton class="app-p-btn" (click)="submitItemChange()">تأكيد النقل</button>
     </div>
   </div>
 </p-dialog>
