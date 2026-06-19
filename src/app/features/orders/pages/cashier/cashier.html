@@ -545,273 +545,282 @@
 
 <!-- order final submittion -->
 <p-dialog
-    [(visible)]="orderConfirmationDialogVisible"
+    [visible]="orderConfirmationDialogVisible()"
+    (visibleChange)="orderConfirmationDialogVisible.set($event)"
     [modal]="true"
     [dismissableMask]="true"
-    [style]="{ width: '80%', maxWidth: '50rem' }"
-    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    [style]="{ width: '650px', maxWidth: '90vw' }"
+    [attr.style]="'--p-mask-background:#0f172ab8!important;'"
     styleClass="bg-white!"
-    class="addition-dialog"
-    [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
+    class="addition-dialog payment-dialog"
+    [contentStyleClass]="`payment-dialog-content ${isLoading() && 'opacity-50 cursor-wait'}`"
+    (onHide)="onPaymentConfirmationDialogHide()"
 >
     <ng-template #headless>
-        <div class="flex flex-col p-4 gap-4 h-full overflow-auto">
-            <button class="cursor-pointer p-1 w-fit ms-auto" (click)="orderConfirmationDialogVisible = false">
-                <i class="pi pi-times"></i>
-            </button>
+        <div class="payment-dialog-shell" dir="rtl">
+            <div class="payment-dialog-header">
+                <button type="button" class="payment-dialog-close" (click)="closeOrderConfirmationDialog()">
+                    <i class="pi pi-times"></i>
+                </button>
+            </div>
 
-            <form id="orderFinalSubmission" (ngSubmit)="onFinalOrderSubmit()" class="overflow-visible grid gap-4 md:grid-cols-2" [formGroup]="orderFg">
-                <!-- name (search) -->
-                <div>
-                    <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
-                    <app-input-error-message-handler [fc]="orderFg.controls.customerRequest.controls.id">
-                        <ng-select
-                            class="app-select w-full"
-                            [items]="displayedCustomers()"
-                            [formControl]="orderFg.controls.customerRequest.controls.id"
-                            bindLabel="name"
-                            bindValue="id"
-                            [clearable]="false"
-                            appLoadingDisabled
-                            placeholder="الكل"
-                            #customerSelect
-                            appDebounce
-                            [customEvents]="[
-                                { type: 'searchEvent', value: customerSelect.searchEvent },
-                                { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
-                            ]"
-                            (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
-                            (change)="onCustomerSelected($event)"
-                        />
-                    </app-input-error-message-handler>
-                </div>
-
-                <!-- phone -->
-                <div>
-                    <label for="phoneNumber">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
-                    <app-input-error-message-handler [fc]="orderFg.controls.customerRequest.controls.phoneNumber">
-                        <input
-                            pInputText
-                            [formControl]="orderFg.controls.customerRequest.controls.phoneNumber"
-                            aria-describedby="phoneNumber-help"
-                            [placeholder]="'FORM.PHONE_NUMBER' | translate"
-                            #customerPhoneSearch
-                            appDebounce
-                            class="app-input"
-                        />
-                    </app-input-error-message-handler>
-                </div>
-
-                <!-- address -->
-                <div class="md:col-span-2">
-                    <label for="customerAddress">{{ 'FORM.CUSTOMER_ADDRESS' | translate }}</label>
-                    <app-input-error-message-handler
-                        [fc]="orderFg.controls.customerRequest.controls.addressDescription"
-                    >
-                        <input
-                            pInputText
-                            [formControl]="orderFg.controls.customerRequest.controls.addressDescription"
-                            aria-describedby="productAddress-help"
-                            [placeholder]="'FORM.CUSTOMER_ADDRESS' | translate"
-                            class="app-input order-customer-address"
-                        />
-                    </app-input-error-message-handler>
-                </div>
-
-                <hr class="md:col-span-2  border-text-light/30 my-4! block">
-
-                <!-- paid / postponed (radio) -->
-                <div
-                    class="md:col-span-2 *:w-fit **:cursor-pointer grid grid-cols-2 gap-4  [&_input]:w-5 [&_input]:aspect-square"
+            <div class="payment-dialog-body">
+                <form
+                    id="orderFinalSubmission"
+                    (ngSubmit)="onFinalOrderSubmit()"
+                    class="pos-payment-form"
+                    [formGroup]="orderFg"
                 >
-                    <!-- paid -->
-                    <div [appAllowedRoles]="[Role.Cashier, Role.Admin]" class="flex items-center gap-1">
-                        <input
-                            type="radio"
-                            name="orderPaymentType"
-                            id="paymentInfoPaid"
-                            [formControl]="orderFg.controls.paymentType"
-                            [value]="OrderPaymentType.Paid"
-                        />
-                        <label for="paymentInfoPaid">{{ 'FORM.PAID' | translate }}</label>
-                    </div>
+                    <!-- 1. Invoice summary -->
+                    <section class="pos-pay-summary">
+                        <span class="pos-pay-summary-label">إجمالي الفاتورة</span>
+                        <span class="pos-pay-summary-value">{{ initialNet().toFixed(2) }}</span>
+                    </section>
 
-                    <!-- postponed -->
-                    <div class="flex items-center gap-1">
-                        <input
-                            type="radio"
-                            name="orderPaymentType"
-                            id="paymentInfoPostponed"
-                            [formControl]="orderFg.controls.paymentType"
-                            [value]="OrderPaymentType.Pending"
-                        />
-                        <label for="paymentInfoPostponed">{{ 'FORM.POSTPONED' | translate }}</label>
-                    </div>
-                </div>
-
-                <!-- cash -->
-                <div>
-                    <label for="cash">{{ 'FORM.CASH_PAID' | translate }}</label>
-                    <app-input-error-message-handler [fc]="orderFg.controls.payingCash">
-                        <input
-                            pInputText
-                            aria-describedby="cash-help"
-                            [placeholder]="'FORM.CASH' | translate"
-                            appAllowNumbers
-                            appDecimalMask
-                            [allowDecimal]="true"
-                            [formControl]="orderFg.controls.payingCash"
-                            [max]="net()"
-                            [disabled]="orderFg.getRawValue().paymentType === OrderPaymentType.Pending"
-                            [min]="0"
-                            #payingCash
-                            id="payingCash"
-                            type="number"
-                            class="app-input"
-                        />
-                        <p-inputgroup-addon class="flex p-0!">
+                    <!-- Invoice type -->
+                    <section class="pos-pay-section">
+                        <span class="pos-pay-section-title">نوع الفاتورة</span>
+                        <div class="pos-pay-segmented">
                             <button
-                                pButton
-                                class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
                                 type="button"
-                                (click)="orderFg.controls.payingCash.setValue(orderFg.getRawValue().payingNetwork || 0)"
+                                class="pos-pay-segment"
+                                [class.pos-pay-segment--active]="paymentTypeSignal() === OrderPaymentType.Paid"
+                                [appAllowedRoles]="[Role.Cashier, Role.Admin]"
+                                (click)="selectPaymentType(OrderPaymentType.Paid)"
                             >
-                                <i class="pi pi-arrow-down"></i>
+                                <input
+                                    type="radio"
+                                    name="orderPaymentType"
+                                    id="paymentInfoPaid"
+                                    [formControl]="orderFg.controls.paymentType"
+                                    [value]="OrderPaymentType.Paid"
+                                    tabindex="-1"
+                                />
+                                {{ 'FORM.PAID' | translate }}
                             </button>
-                        </p-inputgroup-addon>
-                    </app-input-error-message-handler>
-                </div>
-
-                <!-- cash account -->
-                <div>
-                    <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
-                    <app-input-error-message-handler [fc]="orderFg.get('cashAccountId')">
-                        <ng-select
-                            class="app-select w-full"
-                            [items]="displayedCashAccounts()"
-                            [formControl]="getFormControl(orderFg, 'cashAccountId')"
-                            bindLabel="name"
-                            bindValue="id"
-                            [clearable]="false"
-                            placeholder="الكل"
-                        />
-                    </app-input-error-message-handler>
-                </div>
-
-                <!-- network -->
-                <div>
-                    <label for="network">{{ 'FORM.NETWORK_PAID' | translate }}</label>
-                    <app-input-error-message-handler [fc]="orderFg.controls.payingNetwork">
-                        <input
-                            pInputText
-                            appAllowNumbers
-                            appDecimalMask
-                            [allowDecimal]="true"
-                            [max]="net()"
-                            [min]="0"
-                            [disabled]="orderFg.getRawValue().paymentType === OrderPaymentType.Pending"
-                            id="payingNetwork"
-                            type="number"
-                            aria-describedby="network-help"
-                            #payingNetwork
-                            [formControl]="orderFg.controls.payingNetwork"
-                            [placeholder]="'FORM.NETWORK' | translate"
-                            class="app-input"
-                        />
-                        <p-inputgroup-addon class="flex p-0!">
                             <button
-                                pButton
-                                class="app-p-btn p-0! h-full px-3! rounded-e-lg!"
                                 type="button"
-                                (click)="orderFg.controls.payingNetwork.setValue(orderFg.getRawValue().payingCash || 0)"
+                                class="pos-pay-segment"
+                                [class.pos-pay-segment--active]="paymentTypeSignal() === OrderPaymentType.Pending"
+                                (click)="selectPaymentType(OrderPaymentType.Pending)"
                             >
-                                <i class="pi pi-arrow-up"></i>
+                                <input
+                                    type="radio"
+                                    name="orderPaymentType"
+                                    id="paymentInfoPostponed"
+                                    [formControl]="orderFg.controls.paymentType"
+                                    [value]="OrderPaymentType.Pending"
+                                    tabindex="-1"
+                                />
+                                {{ 'FORM.POSTPONED' | translate }}
                             </button>
-                        </p-inputgroup-addon>
-                    </app-input-error-message-handler>
-                </div>
+                        </div>
+                    </section>
 
-                <!-- network account -->
-                <div>
-                    <label>{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
-                    <app-input-error-message-handler [fc]="orderFg.get('networkAccountId')">
-                        <ng-select
-                            class="app-select w-full"
-                            [items]="displayedNetworkAccounts()"
-                            [formControl]="getFormControl(orderFg, 'networkAccountId')"
-                            bindLabel="name"
-                            bindValue="id"
-                            [clearable]="false"
-                            placeholder="الكل"
-                        />
-                    </app-input-error-message-handler>
-                </div>
+                    @if (paymentTypeSignal() === OrderPaymentType.Paid) {
+                        <section class="pos-pay-section pos-pay-split-columns">
+                            <!-- Cash -->
+                            <div class="pos-pay-amount-block">
+                                <label for="payingCash">{{ 'FORM.CASH_PAID' | translate }}</label>
+                                <app-input-error-message-handler [fc]="orderFg.controls.payingCash">
+                                    <input
+                                        pInputText
+                                        id="payingCash"
+                                        appAllowNumbers
+                                        appDecimalMask
+                                        [allowDecimal]="true"
+                                        [formControl]="orderFg.controls.payingCash"
+                                        [max]="initialNet()"
+                                        [min]="0"
+                                        type="text"
+                                        inputmode="decimal"
+                                        class="app-input pos-pay-amount-input"
+                                    />
+                                    <p-inputgroup-addon class="flex p-0!">
+                                        <button
+                                            pButton
+                                            type="button"
+                                            class="pos-pay-transfer-btn app-p-btn"
+                                            title="تحويل كامل للشبكة"
+                                            (click)="transferAllToNetwork()"
+                                        >
+                                            <i class="pi pi-arrow-down"></i>
+                                        </button>
+                                    </p-inputgroup-addon>
+                                </app-input-error-message-handler>
+                                <label class="pos-pay-account-label">{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
+                                <app-input-error-message-handler [fc]="orderFg.get('cashAccountId')">
+                                    <ng-select
+                                        class="app-select w-full"
+                                        [items]="displayedCashAccounts()"
+                                        [formControl]="getFormControl(orderFg, 'cashAccountId')"
+                                        bindLabel="name"
+                                        bindValue="id"
+                                        [clearable]="false"
+                                        placeholder="اختر الحساب"
+                                    />
+                                </app-input-error-message-handler>
+                            </div>
 
-                @if (orderFg.getRawValue().paymentType) {
-                    <!-- amount received from customer (for change calculation) -->
-                    <div class="md:col-span-2 border-t border-b-text-light pt-4 mt-2">
-                        <label for="amountReceived">المبلغ المستلم من العميل</label>
-                        <input
-                            pInputText
-                            appAllowNumbers
-                            [allowDecimal]="true"
-                            [min]="0"
-                            id="amountReceived"
-                            aria-describedby="amountReceived-help"
-                            placeholder="أدخل المبلغ المستلم"
-                            [ngModel]="amountReceived()"
-                            (ngModelChange)="amountReceived.set(+$event || 0)"
-                            [ngModelOptions]="{ standalone: true }"
-                            #amountReceivedInput
-                            appDebounce
-                            class="app-input"
-                        />
-                    </div>
+                            <!-- Network -->
+                            <div class="pos-pay-amount-block">
+                                <label for="payingNetwork">{{ 'FORM.NETWORK_PAID' | translate }}</label>
+                                <app-input-error-message-handler [fc]="orderFg.controls.payingNetwork">
+                                    <input
+                                        pInputText
+                                        id="payingNetwork"
+                                        appAllowNumbers
+                                        appDecimalMask
+                                        [allowDecimal]="true"
+                                        [formControl]="orderFg.controls.payingNetwork"
+                                        [max]="initialNet()"
+                                        [min]="0"
+                                        type="text"
+                                        inputmode="decimal"
+                                        class="app-input pos-pay-amount-input"
+                                    />
+                                    <p-inputgroup-addon class="flex p-0!">
+                                        <button
+                                            pButton
+                                            type="button"
+                                            class="pos-pay-transfer-btn app-p-btn"
+                                            title="تحويل كامل للنقد"
+                                            (click)="transferAllToCash()"
+                                        >
+                                            <i class="pi pi-arrow-up"></i>
+                                        </button>
+                                    </p-inputgroup-addon>
+                                </app-input-error-message-handler>
+                                <label class="pos-pay-account-label">{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
+                                <app-input-error-message-handler [fc]="orderFg.get('networkAccountId')">
+                                    <ng-select
+                                        class="app-select w-full"
+                                        [items]="displayedNetworkAccounts()"
+                                        [formControl]="getFormControl(orderFg, 'networkAccountId')"
+                                        bindLabel="name"
+                                        bindValue="id"
+                                        [clearable]="false"
+                                        placeholder="اختر الحساب"
+                                    />
+                                </app-input-error-message-handler>
+                            </div>
+                        </section>
 
-                    <!-- change / remaining amount display -->
-                    <div class="md:col-span-2">
-                        @if (changeAmount() > 0) {
-                            <div
-                                class="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-4 py-3"
-                            >
-                                <span class="font-bold text-green-700">الباقي للعميل:</span>
-                                <span class="font-bold text-green-700 text-lg">{{ changeAmount().toFixed(2) }}</span>
-                            </div>
-                        } @else if (changeAmount() < 0) {
-                            <div
-                                class="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg px-4 py-3"
-                            >
-                                <span class="font-bold text-red-700">المبلغ المتبقي:</span>
-                                <span class="font-bold text-red-700 text-lg">
-                                    {{ Math.abs(changeAmount()).toFixed(2) }}
-                                </span>
-                            </div>
-                        } @else if (amountReceived() > 0) {
-                            <div
-                                class="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-3"
-                            >
-                                <span class="font-bold text-blue-700">المبلغ بالضبط</span>
-                                <span class="font-bold text-blue-700 text-lg">0.00</span>
-                            </div>
+                        @if (showReceivedAndChange()) {
+                            <section class="pos-pay-section pos-pay-details">
+                                <div class="pos-pay-received">
+                                    <label class="pos-pay-received-label">المبلغ المستلم من العميل</label>
+                                    <div class="pos-pay-received-row">
+                                        <button
+                                            type="button"
+                                            class="pos-pay-received-input"
+                                            (click)="openReceivedAmountPopup()"
+                                        >
+                                            {{ amountReceived() ? amountReceived().toFixed(2) : '0.00' }}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            pButton
+                                            class="pos-pay-full-btn app-p-btn"
+                                            (click)="setFullReceivedAmount()"
+                                        >
+                                            استلام كامل
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="pos-pay-change"
+                                    [class.pos-pay-change--positive]="customerChangeAmount() > 0"
+                                    [class.pos-pay-change--neutral]="customerChangeAmount() === 0"
+                                >
+                                    <span class="pos-pay-change-label">المرتجع للعميل</span>
+                                    <span class="pos-pay-change-value">{{ customerChangeAmount().toFixed(2) }}</span>
+                                </div>
+                            </section>
                         }
-                    </div>
-                }
+                    }
 
-                <hr class="md:col-span-2  border-text-light/30 my-4! block">
+                    <!-- Customer (compact) -->
+                    <section class="pos-pay-section pos-pay-customer">
+                        <div class="pos-pay-customer-grid">
+                            <div class="pos-pay-field">
+                                <label for="customerName">{{ 'FORM.CUSTOMER_NAME' | translate }}</label>
+                                <app-input-error-message-handler [fc]="orderFg.controls.customerRequest.controls.id">
+                                    <ng-select
+                                        class="app-select w-full"
+                                        [items]="displayedCustomers()"
+                                        [formControl]="orderFg.controls.customerRequest.controls.id"
+                                        bindLabel="name"
+                                        bindValue="id"
+                                        [clearable]="false"
+                                        appLoadingDisabled
+                                        placeholder="الكل"
+                                        #customerSelect
+                                        appDebounce
+                                        [customEvents]="[
+                                            { type: 'searchEvent', value: customerSelect.searchEvent },
+                                            { type: 'scrollToEnd', value: customerSelect.scrollToEnd },
+                                        ]"
+                                        (debounced)="onCustomersNameSearch($event, customerSelect.searchTerm)"
+                                        (change)="onCustomerSelected($event)"
+                                    />
+                                </app-input-error-message-handler>
+                            </div>
+                            <div class="pos-pay-field">
+                                <label for="phoneNumber">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
+                                <app-input-error-message-handler [fc]="orderFg.controls.customerRequest.controls.phoneNumber">
+                                    <input
+                                        pInputText
+                                        [formControl]="orderFg.controls.customerRequest.controls.phoneNumber"
+                                        [placeholder]="'FORM.PHONE_NUMBER' | translate"
+                                        class="app-input"
+                                    />
+                                </app-input-error-message-handler>
+                            </div>
+                            <div class="pos-pay-field pos-pay-field--full">
+                                <label for="customerAddress">{{ 'FORM.CUSTOMER_ADDRESS' | translate }}</label>
+                                <app-input-error-message-handler
+                                    [fc]="orderFg.controls.customerRequest.controls.addressDescription"
+                                >
+                                    <input
+                                        pInputText
+                                        [formControl]="orderFg.controls.customerRequest.controls.addressDescription"
+                                        [placeholder]="'FORM.CUSTOMER_ADDRESS' | translate"
+                                        class="app-input"
+                                    />
+                                </app-input-error-message-handler>
+                            </div>
+                        </div>
+                    </section>
 
-                <app-print-options class="md:col-span-2 " styleClass="flex-row" />
-            </form>
+                    <!-- Printers -->
+                    <section class="pos-pay-section pos-pay-printers">
+                        <app-print-options styleClass="payment-print-pos" />
+                    </section>
+                </form>
+            </div>
 
-            <button
-                pButton
-                appLoadingDisabled
-                styleClass="app-p-btn"
-                class="mx-auto min-h-max app-p-btn px-6!"
-                type="submit"
-                form="orderFinalSubmission"
-             >
-                حفظ
-            </button>
+            <app-pos-numeric-popup
+                [visible]="numericPopupVisible()"
+                (visibleChange)="numericPopupVisible.set($event)"
+                [initialValue]="amountReceived()"
+                title="أدخل مبلغ"
+                (confirm)="onNumericPopupConfirm($event)"
+            />
+
+            <div class="payment-dialog-footer">
+                <button
+                    pButton
+                    appLoadingDisabled
+                    styleClass="app-p-btn"
+                    class="pos-pay-save-btn app-p-btn"
+                    type="submit"
+                    form="orderFinalSubmission"
+                >
+                    حفظ الفاتورة
+                </button>
+            </div>
         </div>
     </ng-template>
 </p-dialog>

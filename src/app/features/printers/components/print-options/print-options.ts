@@ -201,5 +201,28 @@ export class PrintOptions extends BaseComponent {
         }
     }
 
+    isPrinterSelected(item: IPrintOptionItem) {
+        return this.selectedPrinters().some(
+            (p) => p.id === item.id && p.appPrinterType === item.appPrinterType,
+        );
+    }
+
+    isPosCompact() {
+        return this.styleClass().includes('payment-print-pos');
+    }
+
+    getPrinterRoleLabel(item: IPrintOptionItem): string {
+        switch (item.appPrinterType) {
+            case AppPrinterType.cashierPrinter:
+                return 'طابعة كاشير';
+            case AppPrinterType.captionOrderPrinter:
+                return 'طابعة كابتن أوردر';
+            case AppPrinterType.programPrinter:
+                return 'طابعة المطبخ';
+            default:
+                return item.name;
+        }
+    }
+
     print = this.printerService.confirmDialogPrint;
 }
