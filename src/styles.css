@@ -5,10 +5,10 @@
 
 @theme {
   --color-main-bg: #355450fc;/*#111921;*/
-  --color-secondary-bg: #355450fc;/* #192633; */
+  --color-secondary-bg: #543539;/* #192633; */
   --color-app-blue: #137fec;
   /* base */
-  --color-dark-line: #494859;/* #393c49; */
+  --color-dark-line: #543539;/* #393c49; */
   /* bg */
   --color-base-bg: #FAFAFA;
   --color-light-bg: #fff2e8;

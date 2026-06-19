@@ -233,7 +233,13 @@ export class PurchasesForm extends BaseComponent {
                     this.suppliersByName.set(res.value.rows);
                     this.supplierService.getDefaultSupplier().subscribe({
                         next: (res) => {
-                            this.fg.patchValue({ supplierId: res.id });
+                            this.currentSupplier.set(res);
+                            this.fg.patchValue({
+                                supplierId: res.id,
+                                supplierName: res.name,
+                                supplierPhoneNumber: res.phoneNumber,
+                                supplierTaxNumber: res.taxNumber,
+                            });
                         },
                     });
                 },
