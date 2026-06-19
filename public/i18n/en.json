@@ -264,6 +264,7 @@
 
   "ACTIONS": {
     "SAVE": "Save",
+    "SAVE_AND_PRINT": "Save & Print",
     "CANCEL": "Cancel",
     "NEW": "New",
     "SUBMIT": "Submit",

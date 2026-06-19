@@ -137,8 +137,8 @@
           <button
             pButton type="button" severity="danger" variant="outlined"
             class="app-p-btn py-1! w-full! justify-center!"
-            [disabled]="!currentPurchaseReturn()?.id"
-            (click)="deletePurchaseReturn(currentPurchaseReturn()!.id, $event)"
+            [disabled]="isNewRecord()"
+            (click)="deletePurchaseReturn(savedRecordId()!, $event)"
           >
             حذف
           </button>
@@ -146,7 +146,7 @@
           <button
             pButton type="button" variant="outlined"
             class="app-p-btn py-1! w-full! justify-center!"
-            [disabled]="!currentPurchaseReturn()?.id"
+            [disabled]="isNewRecord()"
             (click)="printPurchaseReturn()"
           >
             طباعة

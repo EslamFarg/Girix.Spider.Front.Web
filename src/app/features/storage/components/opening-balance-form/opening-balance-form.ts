@@ -1,4 +1,5 @@
 import { Component, computed, inject, input, Signal, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { Textarea } from 'primeng/textarea';
@@ -6,18 +7,18 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IProductSearchRow, IProductUnit, ProductSearchEnum, ProductService } from '@/features/classes';
 import { IDebounceEvent, Debounce } from '@/directives/debounce';
 import { PaginatorState } from 'primeng/paginator';
 import { OpeningBalanceSearchEnum, OpeningBalanceService } from '../../services/opening-balance-service';
 import { IOpeningBalanceReadResponse } from '../../types/api/opening-balances/responses';
-import { ConsoleService, NgSelectComponent } from '@ng-select/ng-select';
+import { NgSelectComponent } from '@ng-select/ng-select';
 import { AllowNumbers } from '@/directives/allow-numbers';
-import { IUnitSearchRow, UnitSearchEnum, UnitService } from '@/features/classes/services/unit-service';
-import { FormControlNotifier } from '@/directives/form-control-notifier';
-import { onlyNumbersAllowed, onlyNumbersOrDotAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { onlyNumbersAllowed, onlyNumbersOrDotAllowed } from '@/yn-ng';
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { A4PrintService } from '@/core';
+import { buildOpeningBalancePrintHtml } from '../../utils/opening-balance-print.util';
 
 interface IAppOpeningBalanceItem {
   itemId: number | null;
@@ -49,9 +50,8 @@ interface IAppOpeningBalanceItemControls {
     NgSelectComponent,
     Debounce,
     AllowNumbers,
-    FormControlNotifier,
     ButtonDirective,
-    LoadingDisabledDirective
+    LoadingDisabledDirective,
 ],
   templateUrl: './opening-balance-form.html',
   styleUrl: './opening-balance-form.css',
@@ -59,16 +59,30 @@ interface IAppOpeningBalanceItemControls {
 export class OpeningBalanceForm extends BaseComponent {
   currentOpeningBalance = signal<IOpeningBalanceReadResponse | null>(null);
   openingBalanceService = inject(OpeningBalanceService);
+  a4PrintService = inject(A4PrintService);
   id = input<number | null>(null);
 
   formMode = computed(() => {
-    if (this.currentOpeningBalance()) return FormMode.Update;
-    return this.initialFormMode();
+    if (this.currentOpeningBalance()?.id) return FormMode.Update;
+    return FormMode.Create;
   });
+
+  /** Saved record identity — only from API-loaded entity with a persisted id. */
+  savedRecordId = computed(() => {
+    const id = this.currentOpeningBalance()?.id;
+    if (id == null || id <= 0) {
+      return null;
+    }
+    return id;
+  });
+
+  /** True while no persisted OpeningBalance entity is loaded. */
+  isNewRecord = computed(() => this.savedRecordId() === null);
 
   initialFormValue = {
     // المرجع
     referenceNumber: this.fb.control<string | null>(null, [
+      Validators.required,
       Validators.minLength(2),
       Validators.maxLength(7),
       onlyNumbersAllowed,
@@ -80,6 +94,18 @@ export class OpeningBalanceForm extends BaseComponent {
     items: this.fb.array<FormGroup<IAppOpeningBalanceItemControls>>([], [Validators.required, Validators.minLength(1)]),
   };
   fg = this.fb.group(this.initialFormValue);
+
+  private _itemsChange = toSignal(this.fg.controls.items.valueChanges, { initialValue: null });
+
+  totalQuantity = computed(() => {
+    this._itemsChange();
+    return this.fg.controls.items.controls.reduce((sum, ctrl) => sum + (Number(ctrl.value.quantity) || 0), 0);
+  });
+
+  totalValue = computed(() => {
+    this._itemsChange();
+    return this.fg.controls.items.controls.reduce((sum, ctrl) => sum + (Number(ctrl.value.total) || 0), 0);
+  });
 
   //
   //
@@ -95,42 +121,51 @@ export class OpeningBalanceForm extends BaseComponent {
     super();
     this.searchProducts(1);
     this.setUpNewJournalDetailRowFg();
+
+    this.fg.controls.date.valueChanges.subscribe((value) => {
+      if (!value) {
+        this.fg.controls.date.setValue(new Date(), { emitEvent: false });
+      }
+    });
   }
 
   ngOnInit() {
     const openingBalanceId = this.id();
-    switch (this.formMode()) {
-      case FormMode.Create:
-        break;
-      case FormMode.Update:
-        this.openingBalanceService.getById(openingBalanceId!).subscribe({
-          next: (data) => {
-            this.currentOpeningBalance.set(data);
-            this.fg.patchValue({
-              referenceNumber: data.referenceNumber,
-              invoiceNumber: data.invoiceNumber,
-              date: new Date(data.date),
-              notes: data.notes,
-            });
-            this.currentProducts.set(
-              data.items.map((item) => ({
-                id: item.itemId,
-                name: item.itemName,
-              })),
-            );
-            this.fg.setControl(
-              'items',
-              this.fb.array(
-                data.items.map((item) => {
-                  this.getProductUnits(item.itemId);
-                  return this.createItemFg(item);
-                }),
-              ),
-            );
-          },
-        });
-        break;
+    if (openingBalanceId && this.initialFormMode() === FormMode.Update) {
+      this.loadOpeningBalanceById(openingBalanceId);
     }
+  }
+
+  /** Loads entity from API and patches form — keeps items, enables Update mode. */
+  private applyOpeningBalanceFromApi(data: IOpeningBalanceReadResponse) {
+    this.currentOpeningBalance.set(data);
+    this.fg.patchValue({
+      referenceNumber: data.referenceNumber,
+      invoiceNumber: data.invoiceNumber,
+      date: new Date(data.date),
+      notes: data.notes,
+    });
+    this.currentProducts.set(
+      data.items.map((item) => ({
+        id: item.itemId,
+        name: item.itemName,
+      })),
+    );
+    this.fg.setControl(
+      'items',
+      this.fb.array(
+        data.items.map((item) => {
+          this.getProductUnits(item.itemId);
+          return this.createItemFg(item);
+        }),
+      ),
+    );
+  }
+
+  private loadOpeningBalanceById(id: number) {
+    this.openingBalanceService.getById(id).subscribe({
+      next: (data) => this.applyOpeningBalanceFromApi(data),
+    });
   }
   //
   //
@@ -162,13 +197,17 @@ export class OpeningBalanceForm extends BaseComponent {
     switch (this.formMode()) {
       case FormMode.Create:
         this.openingBalanceService.create(data).subscribe({
-          next: (data) => {
-            this.router.navigate(['/storage/opening-balances']);
+          next: (createdId) => {
+            this.loadOpeningBalanceById(createdId);
           },
         });
         break;
       case FormMode.Update:
-        this.openingBalanceService.patch({ ...data, id: this.currentOpeningBalance()?.id }).subscribe();
+        this.openingBalanceService.patch({ ...data, id: this.savedRecordId()! }).subscribe({
+          next: () => {
+            this.loadOpeningBalanceById(this.savedRecordId()!);
+          },
+        });
         break;
     }
   }
@@ -194,30 +233,7 @@ export class OpeningBalanceForm extends BaseComponent {
     if (!invoiceNumber) return;
 
     this.findOpeningBalanceInvoiceByNumber(invoiceNumber).subscribe({
-      next: (data) => {
-        this.currentOpeningBalance.set(data);
-        this.fg.patchValue({
-          referenceNumber: data.referenceNumber,
-          invoiceNumber: data.invoiceNumber,
-          date: new Date(data.date),
-          notes: data.notes,
-        });
-        this.currentProducts.set(
-          data.items.map((item) => ({
-            id: item.itemId,
-            name: item.itemName,
-          })),
-        );
-        this.fg.setControl(
-          'items',
-          this.fb.array(
-            data.items.map((item) => {
-              this.getProductUnits(item.itemId);
-              return this.createItemFg(item);
-            }),
-          ),
-        );
-      },
+      next: (data) => this.applyOpeningBalanceFromApi(data),
     });
   }
 
@@ -237,15 +253,50 @@ export class OpeningBalanceForm extends BaseComponent {
 
   newOpeningBalanceItemRowFg!: FormGroup<IAppOpeningBalanceItemControls>;
 
-  createItemFg(data?: IAppOpeningBalanceItem) {
-    return this.fb.group<IAppOpeningBalanceItemControls>({
+  calculateItemTotal(data?: Partial<IAppOpeningBalanceItem>) {
+    const quantity = +(data?.quantity ?? 0);
+    const purchasePrice = +(data?.purchasePrice ?? 0);
+    return { total: +(quantity * purchasePrice).toFixed(2) };
+  }
+
+  normalizeAmount(control: AbstractControl) {
+    const num = parseFloat(String(control.value ?? 0));
+    if (isNaN(num) || num < 0) {
+      control.setValue(0, { emitEvent: true });
+      return;
+    }
+    control.setValue(parseFloat(num.toFixed(2)), { emitEvent: true });
+  }
+
+  createItemFg(data?: Partial<IAppOpeningBalanceItem>) {
+    const initialTotal = data?.total ?? this.calculateItemTotal(data).total;
+    const fg = this.fb.group<IAppOpeningBalanceItemControls>({
       itemId: this.fb.control<number | null>(data?.itemId ?? null, [Validators.required]),
       unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
-      quantity: this.fb.control<number | null>(data?.quantity ?? null, [Validators.required,onlyNumbersAllowed]),
-      purchasePrice: this.fb.control<number | null>(data?.purchasePrice ?? null, [Validators.required,onlyNumbersOrDotAllowed]),
-      salePrice: this.fb.control<number | null>(data?.salePrice ?? null, [Validators.required,onlyNumbersOrDotAllowed]),
-      total: this.fb.control<number | null>(data?.total ?? null, [onlyNumbersOrDotAllowed]),
+      quantity: this.fb.control<number | null>(data?.quantity ?? null, [
+        Validators.required,
+        onlyNumbersOrDotAllowed,
+      ]),
+      purchasePrice: this.fb.control<number | null>(data?.purchasePrice ?? null, [
+        Validators.required,
+        onlyNumbersOrDotAllowed,
+      ]),
+      salePrice: this.fb.control<number | null>(data?.salePrice ?? null, [
+        Validators.required,
+        onlyNumbersOrDotAllowed,
+      ]),
+      total: this.fb.control<number | null>(initialTotal, [onlyNumbersOrDotAllowed]),
     });
+
+    fg.valueChanges.subscribe({
+      next: (values) => {
+        const { total } = this.calculateItemTotal(values);
+        fg.patchValue({ total }, { emitEvent: false });
+        this.fg.updateValueAndValidity({ emitEvent: false });
+      },
+    });
+
+    return fg;
   }
 
   setUpNewJournalDetailRowFg() {
@@ -268,9 +319,10 @@ export class OpeningBalanceForm extends BaseComponent {
       return;
     }
 
-    const fgValue = this.newOpeningBalanceItemRowFg.value;
+    const fgValue = { ...this.newOpeningBalanceItemRowFg.getRawValue() };
+    const { total } = this.calculateItemTotal(fgValue);
 
-    this.fg.controls.items!.push(this.createItemFg(fgValue as IAppOpeningBalanceItem));
+    this.fg.controls.items!.push(this.createItemFg({ ...fgValue, total }));
 
     const currentProduct = this.products().find((product) => product.id === fgValue.itemId)!;
 
@@ -280,38 +332,48 @@ export class OpeningBalanceForm extends BaseComponent {
     this.setUpNewJournalDetailRowFg();
   }
 
-  onCurrentItemChange(itemId: IProductSearchRow) {
-    this.newOpeningBalanceItemRowFg.controls.itemId.setValue(itemId.id);
-    this.newOpeningBalanceItemRowFg.controls.unitId.setValue(null);
-    this.getProductUnits(itemId.id);
+  onCurrentItemChange(selected: IProductSearchRow | number) {
+    this.applyProductToRow(selected, this.newOpeningBalanceItemRowFg);
   }
 
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //current opening balance item changes
-  //
+  onItemChange(selected: IProductSearchRow | number, fg: FormGroup<IAppOpeningBalanceItemControls>) {
+    this.applyProductToRow(selected, fg);
+  }
+
+  private resolveProduct(selected: IProductSearchRow | number): IProductSearchRow | undefined {
+    const id = typeof selected === 'number' ? selected : selected.id;
+    return this.products().find((p) => p.id === id);
+  }
+
+  /** Same product auto-fill logic as Purchases screen. */
+  private applyProductToRow(
+    selected: IProductSearchRow | number,
+    fg: FormGroup<IAppOpeningBalanceItemControls>,
+  ) {
+    const item = this.resolveProduct(selected);
+    if (!item) {
+      return;
+    }
+
+    const purchasePrice = item.costPrice > 0 ? item.costPrice / (1 + item.tax / 100) : 0;
+    const { total } = this.calculateItemTotal({ quantity: 1, purchasePrice });
+
+    fg.patchValue({
+      itemId: item.id,
+      unitId: null,
+      quantity: 1,
+      salePrice: +item.priceWithTax,
+      purchasePrice: +purchasePrice.toFixed(2),
+      total: +total.toFixed(2),
+    });
+
+    this.getProductUnits(item.id, fg);
+  }
 
   lastClickedTableRowIndex = signal<number | null>(null);
 
-  currentEditRowIndex = signal<number>(-1);
-
-  editOpeningBalanceRow(rowIndex: number) {
-    this.lastClickedTableRowIndex.set(rowIndex + 1);
-    this.currentEditRowIndex.set(rowIndex);
-  }
-  isRowEditable(rowIndex: number) {
-    return this.currentEditRowIndex() === rowIndex;
-  }
   deleteOpeningBalanceRow(rowIndex: number) {
     this.fg.controls.items.removeAt(rowIndex);
-    this.currentEditRowIndex.set(-1);
   }
   //
   //
@@ -417,35 +479,58 @@ export class OpeningBalanceForm extends BaseComponent {
 
   units = new Map<number, Signal<IProductUnit[]>>();
 
-  getProductUnits(productId: number) {
+  getProductUnits(
+    productId: number,
+    fg: FormGroup<IAppOpeningBalanceItemControls> = this.newOpeningBalanceItemRowFg,
+  ) {
+    if (!productId) {
+      return signal<IProductUnit[]>([]);
+    }
+
     if (!this.units.has(productId)) {
       const unitsSignal = signal<IProductUnit[]>([]);
       this.units.set(productId, unitsSignal);
       this.productService.getUnitsByProductId(productId).subscribe({
         next: (res) => {
           unitsSignal.set(res);
+          fg.patchValue({ unitId: res[0]?.unitId ?? null });
         },
       });
       return unitsSignal;
-    } else {
-      return this.units.get(productId)!;
     }
+
+    const cached = this.units.get(productId)!();
+    if (cached.length && !fg.controls.unitId.value) {
+      fg.patchValue({ unitId: cached[0]?.unitId ?? null });
+    }
+    return this.units.get(productId)!;
   }
-     onResetForm() {
-    if(this.formMode() === FormMode.Create){
-      this.fg.reset();
-      // clear unit rows
+
+  onResetForm() {
+    if (!this.savedRecordId()) {
+      this.currentOpeningBalance.set(null);
+      this.fg.reset({ date: new Date() });
       this.fg.controls.items.clear();
-    }else{
+      this.setUpNewJournalDetailRowFg();
+    } else {
       this.router.navigateByUrl('/storage/opening-balances/add');
     }
   }
 
-   deleteOpeningBalance(id: number, event: Event) {
+  printOpeningBalance() {
+    const invoice = this.currentOpeningBalance();
+    if (!invoice?.id) {
+      return;
+    }
+
+    this.a4PrintService.print(buildOpeningBalancePrintHtml(invoice));
+  }
+
+  deleteOpeningBalance(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف المنتج',
-      header: 'حذف المنتج',
+      message: 'هل أنت متأكد من حذف الرصيد الافتتاحي؟',
+      header: 'حذف الرصيد الافتتاحي',
       icon: 'pi pi-info-circle',
       rejectLabel: 'الغاء',
       rejectButtonProps: {

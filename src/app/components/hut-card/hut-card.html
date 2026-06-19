@@ -10,12 +10,12 @@
     >
       {{ data()?.name }}
     </div>
+    <countdown
+      #countdown
+      dir="ltr"
+      class="hut-timer mx-auto w-fit block font-bold shrink-0"
+      [config]="countdownConfig"
+      (event)="handleCountdownEvent($event)"
+    />
   </div>
-  <countdown
-    #countdown
-    dir="ltr"
-    class="hut-timer mx-auto w-fit block font-bold shrink-0"
-    [config]="countdownConfig"
-    (event)="handleCountdownEvent($event)"
-  />
 </div>

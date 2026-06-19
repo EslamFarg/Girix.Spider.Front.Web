@@ -1,29 +1,23 @@
 /*
-  ─────────────────────────────────────────────────────────
-  HUT CARD — restored to match original reference design
-  ─────────────────────────────────────────────────────────
-  Structure (original):
-    [roof diamond — above body, border reacts to status]
-    [body — contains only the name]
-    [timer — below body, external]
+  HUT CARD
+  ─────────────────────────────────────────
+  Structure:
+    [diamond roof — rotate-45 square, border reacts to status color]
+    [body — contains name + timer, both inside the white card]
 
-  Roof technique: square element rotated 45° (diamond shape).
-    - The bottom half sits behind .hut-body (z-index: 10 > 0).
-    - Only the top triangle is visible → "hut roof" appearance.
-    - Border uses rgb(var(--color)) → visually reacts on hover/state.
-
-  Phase 3: 8% uniform size reduction applied via direct dimensions.
-  Phase 4: Hover covers full component — diamond (DOM child) bubbles
-            :hover to .hut-card-root, changing --color everywhere.
-  ─────────────────────────────────────────────────────────
+  Roof technique: a square rotated 45° forms a diamond.
+    Bottom half hides behind .hut-body (z-index: 10 > roof z-index: 0).
+    Only the top triangle is visible → gable roof appearance.
+    Border (1.5px solid rgb(var(--color))) reacts to hover / status.
+  ─────────────────────────────────────────
 */
 
 :host {
   --color: black;
 
-  /* Default roof sizing (used outside switch-screen context) */
+  /* Default roof sizing (non-switch-card context) */
   --hut-roof-size: 88px;
-  --hut-roof-top: 58px; /* = card-root padding-top = where body starts */
+  --hut-roof-top: 58px;
 
   display: block;
   box-sizing: content-box;
@@ -38,7 +32,7 @@
   color: rgb(var(--color));
 }
 
-/* ── Card root ── */
+/* Card root — flex column centres body + creates padding for the roof */
 .hut-card-root {
   display: flex;
   flex-direction: column;
@@ -47,9 +41,8 @@
   padding-top: var(--hut-roof-top);
 }
 
-/* ── Gable roof (diamond) ──
-   A square rotated 45° — border color tracks --color (status/hover).
-   z-index: 0 so the body (z-10) clips the bottom half. */
+/* Gable roof — rotated square diamond.
+   z-index: 0 → body (z-10) hides the diamond's bottom half. */
 .hut-roof {
   aspect-ratio: 1;
   width: var(--hut-roof-size);
@@ -65,29 +58,20 @@
   z-index: 0;
 }
 
-/* ── Body ── */
+/* Body fills the host width */
 .hut-body {
   width: 100%;
 }
 
-/* ── Timer (below body, external) ── */
-.hut-timer {
-  width: 100%;
-  text-align: center;
-}
-
-/* ══════════════════════════════════════════
-   SWITCH SCREEN  (.hut-switch-card)
-   8% size reduction applied here (Phase 3):
-     original 140px  → 129px  (×0.921)
-     original roof 88px → 81px (×0.921)
-     original top  58px → 53px (×0.914)
-   ══════════════════════════════════════════ */
+/* ── Switch screen (.hut-switch-card) ──
+   Dimensions restored to original reference proportions.
+   No unauthorised size reduction applied here.
+   ─────────────────────────────────────────────────────── */
 :host(.hut-switch-card) {
-  --hut-roof-size: 81px;
-  --hut-roof-top: 53px;
+  --hut-roof-size: 88px;
+  --hut-roof-top: 58px;
 
-  width: 129px;
+  width: 140px;
   flex-shrink: 0;
 }
 
@@ -104,7 +88,65 @@
 :host(.hut-switch-card) .hut-timer {
   font-size: 0.8125rem;
   line-height: 1.125rem;
-  margin-top: 4px;
+  margin-top: 2px;
+}
+
+/* ── Huts screen grid (160px, scale 160/140) ──
+   Scoped to .hut-switch-grid so replacement dialog stays at 140px. */
+:host-context(.hut-switch-grid).hut-switch-card {
+  --hut-roof-size: calc(88px * 160 / 140);
+  --hut-roof-top: calc(58px * 160 / 140);
+  width: 160px;
+}
+
+:host-context(.hut-switch-grid).hut-switch-card .hut-body {
+  border-radius: calc(0.875rem * 160 / 140);
+}
+
+:host-context(.hut-switch-grid).hut-switch-card .hut-card-label {
+  font-size: calc(0.875rem * 160 / 140);
+  line-height: calc(1.25rem * 160 / 140);
+}
+
+:host-context(.hut-switch-grid).hut-switch-card .hut-timer {
+  font-size: calc(0.8125rem * 160 / 140);
+  line-height: calc(1.125rem * 160 / 140);
+  margin-top: calc(2px * 160 / 140);
+}
+
+/* ── Huts screen: inset shadows & hover (scoped to .hut-switch-grid only) ──
+   Reference: src/ui-reference/kokh.png
+   - Available:       no inset shadow; existing outer gray shadow preserved
+   - Reserved/on-hold: orange body border + orange inset shadow (permanent)
+   - Hover (any):     green body border + green inset shadow + green text/roof
+   No outer drop-shadow. No transform. No lift.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Reserved/on-hold — orange body border */
+:host-context(.hut-switch-grid) .hut-reserved.hut-card-root .bordered,
+:host-context(.hut-switch-grid) .hut-on-hold.hut-card-root .bordered {
+  border-color: rgb(var(--color));
+}
+
+/* Reserved/on-hold — orange inset shadow inside body only */
+:host-context(.hut-switch-grid) .hut-reserved.hut-card-root .hut-body,
+:host-context(.hut-switch-grid) .hut-on-hold.hut-card-root .hut-body {
+  box-shadow: 0px 0px 20px 0px #a3a3a34d, inset 0 0 20px rgba(255, 140, 0, 0.25) !important;
+}
+
+/* Hover (any status) — switch --color to green for roof border + text */
+:host-context(.hut-switch-grid) .hut-card-root:hover {
+  --color: 80, 209, 170;
+}
+
+/* Hover — green body border */
+:host-context(.hut-switch-grid) .hut-card-root:hover .bordered {
+  border-color: rgb(80, 209, 170);
+}
+
+/* Hover — green inset shadow inside body only (overrides reserved/on-hold) */
+:host-context(.hut-switch-grid) .hut-card-root:hover .hut-body {
+  box-shadow: 0px 0px 20px 0px #a3a3a34d, inset 0 0 20px rgba(80, 209, 170, 0.25) !important;
 }
 
 /* ── Status colour rules ── */

@@ -1,7 +1,8 @@
 import { BaseComponent, IPaginationInfo, SectionWrapper } from '@/components';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { InventorySettlementSearchEnum, InventoryService } from '../../services/inventory-service';
-import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { IInventorySettlementSearchRow } from '../../types/api/inventory/responses';
 import { PaginatorState, Paginator } from 'primeng/paginator';
 import { RouterLink } from '@angular/router';
@@ -10,11 +11,13 @@ import { Debounce } from '@/directives/debounce';
 import { InputErrorMessageHandler } from '@/yn-ng';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Menu } from 'primeng/menu';
-import { TranslatePipe } from '@ngx-translate/core';
 import { InputText } from 'primeng/inputtext';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
 import { TooltipModule } from 'primeng/tooltip';
+import { Select } from 'primeng/select';
+import { A4PrintService } from '@/core';
+import { buildInventorySettlementPrintHtml } from '../../utils/inventory-settlement-print.util';
 
 @Component({
   selector: 'app-inventory',
@@ -24,15 +27,16 @@ import { TooltipModule } from 'primeng/tooltip';
     DatePipe,
     Debounce,
     ReactiveFormsModule,
+    FormsModule,
     SectionWrapper,
     InputErrorMessageHandler,
     InputGroupAddon,
     Menu,
-    TranslatePipe,
     InputText,
     LoadingDisabledDirective,
     Listbox,
-    TooltipModule
+    TooltipModule,
+    Select,
 ],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
@@ -49,28 +53,48 @@ export class Inventory extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
 
   inventoryService = inject(InventoryService);
+  a4PrintService = inject(A4PrintService);
+
+  pageSize = signal(10);
+  pageSizeOptions = [
+    { label: '10', value: 10 },
+    { label: '25', value: 25 },
+    { label: '50', value: 50 },
+    { label: '100', value: 100 },
+  ];
+
+  filterMenuItems = [
+    { label: 'رقم التسوية', value: InventorySettlementSearchEnum.InvoiceNumber },
+    { label: 'الرقم الدفتري', value: InventorySettlementSearchEnum.ReferenceNumber },
+  ];
+
+  private _filterValue = toSignal(this.fg.controls.searchEnum.valueChanges, {
+    initialValue: this.fg.controls.searchEnum.value,
+  });
+
+  searchPlaceholder = computed(() => {
+    switch (this._filterValue()) {
+      case InventorySettlementSearchEnum.InvoiceNumber:
+        return 'ابحث برقم التسوية';
+      case InventorySettlementSearchEnum.ReferenceNumber:
+        return 'ابحث بالرقم الدفتري';
+      default:
+        return 'ابحث...';
+    }
+  });
 
   constructor() {
     super();
-    this.searchInventorySettlements(1);
   }
-  filterMenuItems = [
-    {
-      label: 'رقم التسوية',
-      value:InventorySettlementSearchEnum.InvoiceNumber,
-    },
-    {
-      label: 'رقم المرجع',
-      value:InventorySettlementSearchEnum.ReferenceNumber,
-    },
-  ];
-  periodOptions = [
-    { label: 'الكل', value: null },
-    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
-    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
-    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
-    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
-  ];
+
+  ngOnInit() {
+    this.loadExplorer(1);
+  }
+
+  /** Reload explorer grid — called on init and after returning from sibling routes. */
+  private loadExplorer(pageIndex: number) {
+    this.searchInventorySettlements(pageIndex);
+  }
 
   inventories = signal<IInventorySettlementSearchRow[]>([]);
   inventoriesPaginationInfo: IPaginationInfo = {
@@ -83,8 +107,8 @@ export class Inventory extends BaseComponent {
     this.inventoryService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 10,
+          pageIndex,
+          pageSize: this.pageSize(),
         },
         searchFilters: [
           {
@@ -109,6 +133,28 @@ export class Inventory extends BaseComponent {
   onSubmit = () => this.fg.valid && this.searchInventorySettlements(1);
 
   onPageChange = (event: PaginatorState) => this.searchInventorySettlements(event.page! + 1);
+
+  onFilterSelect(filterMenu: Menu) {
+    filterMenu.hide();
+    this.fg.controls.searchTerm.setValue('', { emitEvent: false });
+    this.searchInventorySettlements(1);
+  }
+
+  onPageSizeChange(size: number) {
+    if (!size || size === this.pageSize()) {
+      return;
+    }
+    this.pageSize.set(size);
+    this.searchInventorySettlements(1);
+  }
+
+  printInventorySettlement(id: number) {
+    this.inventoryService.getById(id).subscribe({
+      next: (settlement) => {
+        this.a4PrintService.print(buildInventorySettlementPrintHtml(settlement));
+      },
+    });
+  }
 
   deleteInventory(id: number, event: Event) {
     this.confirmationService.confirm({

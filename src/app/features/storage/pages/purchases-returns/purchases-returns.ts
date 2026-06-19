@@ -1,13 +1,14 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
-import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { Menu } from 'primeng/menu';
 import { Paginator, PaginatorState } from 'primeng/paginator';
-import { TranslatePipe } from '@ngx-translate/core';
+import { Select } from 'primeng/select';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { Debounce } from '@/directives/debounce';
@@ -17,6 +18,8 @@ import { IPurchaseReturnSearchRow } from '../../types/api/purchase-return/respon
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
 import { TooltipModule } from 'primeng/tooltip';
+import { A4PrintService } from '@/core';
+import { buildPurchaseReturnPrintHtml } from '../../utils/purchase-return-print.util';
 
 @Component({
   selector: 'app-purchases-returns',
@@ -25,16 +28,17 @@ import { TooltipModule } from 'primeng/tooltip';
     InputGroupAddon,
     Paginator,
     ReactiveFormsModule,
+    FormsModule,
     InputTextModule,
     SectionWrapper,
     DatePipe,
     Debounce,
     Menu,
-    TranslatePipe,
     RouterLink,
     LoadingDisabledDirective,
     Listbox,
-    TooltipModule
+    TooltipModule,
+    Select,
 ],
   templateUrl: './purchases-returns.html',
   styleUrl: './purchases-returns.css',
@@ -49,37 +53,49 @@ export class PurchasesReturns extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
 
   purchaseReturnService = inject(PurchaseReturnService);
+  a4PrintService = inject(A4PrintService);
+
+  pageSize = signal(10);
+  pageSizeOptions = [
+    { label: '10', value: 10 },
+    { label: '25', value: 25 },
+    { label: '50', value: 50 },
+    { label: '100', value: 100 },
+  ];
+
   filterMenuItems = signal<MenuItem[]>([
-    {
-      label: 'رقم المرتجع',
-      value:PurchaseReturnSearchEnum.Id,
-    },
-    {
-      label: 'رقم الفاتورة',
-      value:PurchaseReturnSearchEnum.InvoiceNumber,
-    },
-    {
-      label: 'الرقم الدفتري',
-      value:PurchaseReturnSearchEnum.ReferenceNumber,
-    },
-    {
-      label: 'اسم المورد',
-      value:PurchaseReturnSearchEnum.Name,
-    },
+    { label: 'رقم المرتجع', value: PurchaseReturnSearchEnum.Id },
+    { label: 'رقم الفاتورة', value: PurchaseReturnSearchEnum.InvoiceNumber },
+    { label: 'الرقم الدفتري', value: PurchaseReturnSearchEnum.ReferenceNumber },
+    { label: 'اسم المورد', value: PurchaseReturnSearchEnum.Name },
   ]);
+
+  private _filterValue = toSignal(this.fg.controls.searchEnum.valueChanges, {
+    initialValue: this.fg.controls.searchEnum.value,
+  });
+
+  searchPlaceholder = computed(() => {
+    switch (this._filterValue()) {
+      case PurchaseReturnSearchEnum.Id:
+        return 'ابحث برقم المرتجع';
+      case PurchaseReturnSearchEnum.InvoiceNumber:
+        return 'ابحث برقم الفاتورة';
+      case PurchaseReturnSearchEnum.ReferenceNumber:
+        return 'ابحث بالرقم الدفتري';
+      case PurchaseReturnSearchEnum.Name:
+        return 'ابحث باسم المورد';
+      default:
+        return 'ابحث...';
+    }
+  });
 
   constructor() {
     super();
-    this.searchPurchaseReturns(1);
   }
 
-  periodOptions = [
-    { label: 'الكل', value: null },
-    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
-    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
-    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
-    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
-  ];
+  ngOnInit() {
+    this.searchPurchaseReturns(1);
+  }
 
   purchaseReturns = signal<IPurchaseReturnSearchRow[]>([]);
   purchaseReturnsPaginationInfo: IPaginationInfo = {
@@ -93,7 +109,7 @@ export class PurchasesReturns extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex,
-          pageSize: 10,
+          pageSize: this.pageSize(),
         },
         searchFilters: [
           {
@@ -118,6 +134,28 @@ export class PurchasesReturns extends BaseComponent {
   onSubmit = () => this.fg.valid && this.searchPurchaseReturns(1);
 
   onPageChange = (event: PaginatorState) => this.searchPurchaseReturns(event.page! + 1);
+
+  onFilterSelect(filterMenu: Menu) {
+    filterMenu.hide();
+    this.fg.controls.searchTerm.setValue('', { emitEvent: false });
+    this.searchPurchaseReturns(1);
+  }
+
+  onPageSizeChange(size: number) {
+    if (!size || size === this.pageSize()) {
+      return;
+    }
+    this.pageSize.set(size);
+    this.searchPurchaseReturns(1);
+  }
+
+  printPurchaseReturn(id: number) {
+    this.purchaseReturnService.getById(id).subscribe({
+      next: (ret) => {
+        this.a4PrintService.print(buildPurchaseReturnPrintHtml(ret));
+      },
+    });
+  }
 
   deletePurchaseReturn(id: number, event: Event) {
     this.confirmationService.confirm({

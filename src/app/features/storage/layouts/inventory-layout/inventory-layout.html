@@ -1,5 +1,7 @@
-<div class="app-layout overflow-auto! no-scrollbar">
-  <app-section-nav [links]="links" class="mb-4" />
+<div class="app-layout overflow-hidden! flex flex-col h-full no-scrollbar">
+  <app-section-nav [links]="links" class="mb-2 shrink-0" />
 
-  <router-outlet />
+  <div class="flex-1 min-h-0">
+    <router-outlet />
+  </div>
 </div>

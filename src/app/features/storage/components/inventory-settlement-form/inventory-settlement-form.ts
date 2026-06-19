@@ -1,26 +1,23 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
+import { Button, ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { InputTextModule } from 'primeng/inputtext';
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components/base-component/base-component';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PaginatorState, Paginator } from 'primeng/paginator';
-import { Button, ButtonDirective } from 'primeng/button';
 import { IInventoryProductSearchRow, IInventoryReadResponse } from '../../types/api/inventory/responses';
 import { InventoryProductSearchEnum, InventoryService } from '../../services/inventory-service';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { Debounce, IDebounceEvent } from '@/directives/debounce';
-import { tap } from 'rxjs';
 import { AllowNumbers } from '@/directives/allow-numbers';
-import { onlyNumbersAllowed, onlyNumbersOrDotAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { onlyNumbersOrDotAllowed, onlyNumbersOrEnLettersAllowed } from '@/yn-ng';
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { TooltipModule } from 'primeng/tooltip';
-
- 
- 
+import { A4PrintService } from '@/core';
+import { buildInventorySettlementPrintHtml } from '../../utils/inventory-settlement-print.util';
 
 interface IAppInventoryItem {
   itemId: number | null;
@@ -44,42 +41,49 @@ enum QuantityOptions {
 @Component({
   selector: 'app-inventory-settlement-form',
   imports: [
-    SectionWrapper,
     InputErrorMessageHandler,
     InputTextModule,
     DatePickerModule,
     InputGroupAddon,
     ReactiveFormsModule,
     Button,
-    ReactiveFormsModule,
     NgSelectComponent,
     Debounce,
     AllowNumbers,
     ButtonDirective,
     LoadingDisabledDirective,
     Paginator,
-    TooltipModule
-],
+    TooltipModule,
+  ],
   templateUrl: './inventory-settlement-form.html',
   styleUrl: './inventory-settlement-form.css',
 })
 export class InventorySettlementForm extends BaseComponent {
   currentInventory = signal<IInventoryReadResponse | null>(null);
   inventoryService = inject(InventoryService);
+  a4PrintService = inject(A4PrintService);
   id = input<number | null>(null);
   InventoryProductSearchEnum = InventoryProductSearchEnum;
   QuantityOptions = QuantityOptions;
 
   formMode = computed(() => {
-    if (this.currentInventory()) return FormMode.Update;
-    return this.initialFormMode();
+    if (this.currentInventory()?.id) return FormMode.Update;
+    return FormMode.Create;
   });
-  currentFormMode = signal<FormMode>(FormMode.Create);
+
+  savedRecordId = computed(() => {
+    const recordId = this.currentInventory()?.id;
+    if (recordId == null || recordId <= 0) {
+      return null;
+    }
+    return recordId;
+  });
+
+  isNewRecord = computed(() => this.savedRecordId() === null);
 
   initialFormValue = {
-    // المرجع
-    referenceNumber: this.fb.control<string | null>(null, [Validators.maxLength(16),onlyNumbersOrEnLettersAllowed]),
-    // الرقم الفاتورة
+    settlementNumber: this.fb.control<string | null>({ value: null, disabled: true }, []),
+    referenceNumber: this.fb.control<string | null>(null, [Validators.maxLength(16), onlyNumbersOrEnLettersAllowed]),
     settlementDate: this.fb.control<Date | null>(new Date(), [Validators.required]),
     items: this.fb.array<FormGroup<IAppInventoryItemControls>>([], [Validators.required, Validators.minLength(1)]),
   };
@@ -88,126 +92,33 @@ export class InventorySettlementForm extends BaseComponent {
     quantityOption: this.fb.control<QuantityOptions | null>(QuantityOptions.All),
   });
 
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  /**
-   *
-   */
   constructor() {
     super();
     this.searchInventoryProducts(1);
     this.setUpNewInventorySettlementRowFg();
+
+    this.fg.controls.settlementDate.valueChanges.subscribe((value) => {
+      if (!value) {
+        this.fg.controls.settlementDate.setValue(new Date(), { emitEvent: false });
+      }
+    });
+
+    this.inventoryBulkSearchFg.controls.quantityOption.valueChanges.subscribe(() => {
+      this.searchInventorySettlementProducts(1);
+    });
   }
 
   ngOnInit() {
     const inventoryId = this.id();
-    this.currentFormMode.set(this.formMode());
-
-    switch (this.currentFormMode()) {
-      case FormMode.Create:
-        break;
-      case FormMode.Update:
-        this.inventoryService.getById(inventoryId!).subscribe({
-          next: (data) => {
-            this.loadInventorySettlement(data);
-          },
-        });
-        break;
-    }
-  }
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-
-  onSubmitInventory() {
-     if (this.fg.controls.items.length === 0) {
-    this.messageService.add({
-      severity: 'error',
-      summary: 'خطأ',
-      detail: 'يجب إضافة صنف واحد على الأقل',
-    });
-    this.fg.controls.items.markAsTouched();
-    return;
-  }
-    if (this.fg.invalid) {
-      this.fg.markAllAsTouched();
-      
-      return;
-    }
-
-    const rawValue = this.fg.getRawValue();
-    const data = {
-      settlementDate: this.UtcToLocalIso(rawValue.settlementDate!.toISOString()),
-      referenceNumber: rawValue.referenceNumber!,
-      items: rawValue.items.map((item) => ({
-        itemId: item.itemId!,
-        unitId: item.unitId!,
-        systemQuantity: item.systemQuantity!,
-        actualQuantity: item.actualQuantity!,
-      })),
-    };
-
-    switch (this.currentFormMode()) {
-      case FormMode.Create:
-        this.inventoryService.create(data).subscribe({
-          next: (data) => {
-            this.router.navigate(['/storage/inventory']);
-          },
-        });
-        break;
-      case FormMode.Update:
-        this.inventoryService.put({ ...data, id: this.currentInventory()?.id }).subscribe();
-        break;
+    if (inventoryId && this.initialFormMode() === FormMode.Update) {
+      this.loadInventorySettlementById(inventoryId);
     }
   }
 
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-
-  findInventorySettlementByNumber(invoiceNumber: string) {
-    return this.inventoryService.getByNumber(invoiceNumber).pipe(
-      tap({
-        next: (data) => {
-          this.loadInventorySettlement(data);
-        },
-      }),
-    );
-  }
-
-  debouncedFindInventorySettlementByNumberByNumber(event: IDebounceEvent, invoiceNumber: string) {
-    console.log(event);
-    if (!invoiceNumber) return;
-
-    this.findInventorySettlementByNumber(invoiceNumber).subscribe();
-  }
-
-  loadInventorySettlement(data: IInventoryReadResponse) {
+  private applyInventorySettlementFromApi(data: IInventoryReadResponse) {
     this.currentInventory.set(data);
-    this.currentFormMode.set(FormMode.Update);
     this.fg.patchValue({
+      settlementNumber: data.settlementNumber,
       referenceNumber: data.referenceNumber,
       settlementDate: new Date(data.settlementDate),
     });
@@ -228,32 +139,82 @@ export class InventorySettlementForm extends BaseComponent {
         }),
       ),
     );
-    this.currentEditRowIndex.set(-1);
     this.lastClickedTableRowIndex.set(null);
   }
 
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //setting up new opening balance item
-  //
+  private loadInventorySettlementById(id: number) {
+    this.inventoryService.getById(id).subscribe({
+      next: (data) => this.applyInventorySettlementFromApi(data),
+    });
+  }
+
+  onSubmitInventory() {
+    if (this.fg.controls.items.length === 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'خطأ',
+        detail: 'يجب إضافة صنف واحد على الأقل',
+      });
+      this.fg.controls.items.markAsTouched();
+      return;
+    }
+    if (this.fg.invalid) {
+      this.fg.markAllAsTouched();
+      return;
+    }
+
+    const rawValue = this.fg.getRawValue();
+    const data = {
+      settlementDate: this.UtcToLocalIso(rawValue.settlementDate!.toISOString()),
+      referenceNumber: rawValue.referenceNumber!,
+      items: rawValue.items.map((item) => ({
+        itemId: item.itemId!,
+        unitId: item.unitId!,
+        systemQuantity: item.systemQuantity!,
+        actualQuantity: item.actualQuantity!,
+      })),
+    };
+
+    switch (this.formMode()) {
+      case FormMode.Create:
+        this.inventoryService.create(data).subscribe({
+          next: (createdId) => {
+            this.loadInventorySettlementById(createdId);
+          },
+        });
+        break;
+      case FormMode.Update:
+        this.inventoryService.put({ ...data, id: this.savedRecordId()! }).subscribe({
+          next: () => {
+            this.loadInventorySettlementById(this.savedRecordId()!);
+          },
+        });
+        break;
+    }
+  }
+
+  debouncedFindInventorySettlementByNumber(event: IDebounceEvent, settlementNumber: string) {
+    if (!settlementNumber) return;
+
+    this.inventoryService.getByNumber(settlementNumber).subscribe({
+      next: (data) => this.applyInventorySettlementFromApi(data),
+    });
+  }
 
   newInventorySettlementItemRowFg!: FormGroup<IAppInventoryItemControls>;
 
-  createItemFg(data?: IAppInventoryItem) {
+  createItemFg(data?: Partial<IAppInventoryItem>) {
     return this.fb.group<IAppInventoryItemControls>({
       itemId: this.fb.control<number | null>(data?.itemId ?? null, [Validators.required]),
       unitId: this.fb.control<number | null>(data?.unitId ?? null, [Validators.required]),
-      systemQuantity: this.fb.control<number | null>(data?.systemQuantity ?? null, [Validators.required,onlyNumbersOrDotAllowed]),
-      actualQuantity: this.fb.control<number | null>(data?.actualQuantity ?? null, [Validators.required,onlyNumbersOrDotAllowed]),
+      systemQuantity: this.fb.control<number | null>(data?.systemQuantity ?? null, [
+        Validators.required,
+        onlyNumbersOrDotAllowed,
+      ]),
+      actualQuantity: this.fb.control<number | null>(data?.actualQuantity ?? null, [
+        Validators.required,
+        onlyNumbersOrDotAllowed,
+      ]),
     });
   }
 
@@ -268,12 +229,6 @@ export class InventorySettlementForm extends BaseComponent {
   addNewInventorySettlementItem() {
     if (this.newInventorySettlementItemRowFg.invalid) {
       this.newInventorySettlementItemRowFg.markAllAsTouched();
-      //log errors
-      Object.entries(this.newInventorySettlementItemRowFg.controls!).forEach(([key, value]) => {
-        if (value.errors) {
-          console.log(key, value.errors);
-        }
-      });
       return;
     }
 
@@ -282,7 +237,7 @@ export class InventorySettlementForm extends BaseComponent {
     if (this.isInventorySettlementItemAlreadyAdded(fgValue.itemId)) {
       return this.messageService.add({
         severity: 'error',
-        summary: 'خطأ',
+        summary: 'خطأ',
         detail: 'تمت إضافة هذا المنتج بالفعل',
       });
     }
@@ -306,7 +261,6 @@ export class InventorySettlementForm extends BaseComponent {
 
   isInventorySettlementItemAlreadyAdded(itemId: number | null | undefined) {
     if (itemId == null) return false;
-
     return this.fg.controls.items.controls.some((item) => item.controls.itemId.value === itemId);
   }
 
@@ -314,55 +268,23 @@ export class InventorySettlementForm extends BaseComponent {
     return items.filter((item, index, array) => array.findIndex((current) => current.itemId === item.itemId) === index);
   }
 
+  /** Auto-fill unit and system quantity; user enters actual quantity only. */
   onCurrentInventoryItemChange(item: IInventoryProductSearchRow) {
     this.newInventorySettlementItemRowFg.patchValue({
       itemId: item.itemId,
       unitId: item.unitId,
       systemQuantity: item.quantity,
-      actualQuantity: item.quantity,
+      actualQuantity: null,
     });
 
     this.currentInventoryProducts.update((pre) => [...pre.filter((product) => product.itemId !== item.itemId), item]);
   }
 
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //current opening balance item changes
-  //
-
   lastClickedTableRowIndex = signal<number | null>(null);
 
-  currentEditRowIndex = signal<number>(-1);
-
-  editInventorySettlementRow(rowIndex: number) {
-    this.lastClickedTableRowIndex.set(rowIndex + 1);
-    this.currentEditRowIndex.set(rowIndex);
-  }
-  isInventorySettlementRowEditable(rowIndex: number) {
-    return this.currentEditRowIndex() === rowIndex;
-  }
   deleteInventorySettlementRow(rowIndex: number) {
     this.fg.controls.items.removeAt(rowIndex);
-    this.currentEditRowIndex.set(-1);
   }
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  // item products search
-  //
 
   products = signal<IInventoryProductSearchRow[]>([]);
   currentInventoryProducts = signal<Partial<IInventoryProductSearchRow>[]>([]);
@@ -373,14 +295,9 @@ export class InventorySettlementForm extends BaseComponent {
     if (!current.length) return products;
 
     const currentMap = new Map(current.map((a) => [a.itemId, a]));
-
-    // Replace matching ones, keep the rest
     const merged = products.map((p) => (currentMap.has(p.itemId) ? { ...p, ...currentMap.get(p.itemId)! } : p));
-
-    // Inject ones not present in current page
     const missing = current.filter((c) => !products.some((p) => p.itemId === c.itemId));
 
-    // Usually best UX: current selections first
     return [...missing, ...merged];
   });
   productsPaginationInfo: IPaginationInfo = {
@@ -388,7 +305,6 @@ export class InventorySettlementForm extends BaseComponent {
     totalPagesCount: 0,
     totalRowsCount: 0,
   };
-  previousInventoryProductSearchValue = '';
 
   searchInventoryProducts(
     pageIndex: number,
@@ -426,14 +342,11 @@ export class InventorySettlementForm extends BaseComponent {
       });
   }
 
-   onPageChange = (event: PaginatorState) => this.searchInventorySettlementProducts(event.page! + 1);
-
   debouncedInventoryProductsSearch(
     event: IDebounceEvent,
     searchValue: string,
     searchEnum: InventoryProductSearchEnum,
   ) {
-    console.log(event);
     if (event.type === 'scrollToEnd') {
       this.searchInventoryProducts(this.productsPaginationInfo.pageIndex + 1, searchValue, searchEnum);
     } else {
@@ -445,9 +358,9 @@ export class InventorySettlementForm extends BaseComponent {
     pageIndex: 0,
     totalPagesCount: 0,
     totalRowsCount: 0,
-  }
+  };
 
-  searchInventorySettlementProducts(pageIndex: number=1) {
+  searchInventorySettlementProducts(pageIndex: number = 1) {
     const quantityOption = this.inventoryBulkSearchFg.controls.quantityOption.value;
 
     const searchFilters: { column: InventoryProductSearchEnum; values: string[] }[] = [];
@@ -482,21 +395,22 @@ export class InventorySettlementForm extends BaseComponent {
                   itemId: item.itemId,
                   unitId: item.unitId,
                   systemQuantity: item.quantity,
-                  actualQuantity: item.quantity,
+                  actualQuantity: null,
                 }),
               ),
             ),
           );
           this.inventorySettlementProductsPaginationInfo = {
-            pageIndex: 1,
+            pageIndex,
             totalPagesCount: res.paginationInfo.totalPagesCount,
             totalRowsCount: res.paginationInfo.totalRowsCount,
-          }
-          this.currentEditRowIndex.set(-1);
+          };
           this.lastClickedTableRowIndex.set(null);
         },
       });
   }
+
+  onBulkPageChange = (event: PaginatorState) => this.searchInventorySettlementProducts(event.page! + 1);
 
   getInventoryProduct(itemId: number | null) {
     if (itemId === null) return null;
@@ -516,22 +430,49 @@ export class InventorySettlementForm extends BaseComponent {
     return this.getInventoryProduct(itemId)?.unitName ?? '';
   }
 
-  getDifferenceQuantity(systemQuantity: number | null, actualQuantity: number | null) {
-    return +(actualQuantity ?? 0) - +(systemQuantity ?? 0);
+  getDifferenceQuantity(systemQuantity: number | null | undefined, actualQuantity: number | null | undefined) {
+    if (actualQuantity == null) {
+      return '';
+    }
+    const diff = +(actualQuantity) - +(systemQuantity ?? 0);
+    return diff.toFixed(2);
   }
 
-  onInventoryProductPageChange = (event: PaginatorState) => this.searchInventoryProducts(event.page! + 1);
-     onResetForm() {
-    if(this.formMode() === FormMode.Create){
-      this.fg.reset();
-      // clear unit rows
+  formatQuantity(value: number | null | undefined) {
+    if (value == null) return '';
+    return (+value).toFixed(2);
+  }
+
+  normalizeAmount(control: AbstractControl) {
+    const num = parseFloat(String(control.value ?? 0));
+    if (isNaN(num)) {
+      control.setValue(null, { emitEvent: true });
+      return;
+    }
+    control.setValue(parseFloat(num.toFixed(2)), { emitEvent: true });
+  }
+
+  onResetForm() {
+    if (!this.savedRecordId()) {
+      this.currentInventory.set(null);
+      this.fg.reset({ settlementDate: new Date() });
       this.fg.controls.items.clear();
-      this.inventoryBulkSearchFg.controls.quantityOption.setValue(QuantityOptions.All);
-    }else{
+      this.inventoryBulkSearchFg.controls.quantityOption.setValue(QuantityOptions.All, { emitEvent: false });
+      this.setUpNewInventorySettlementRowFg();
+    } else {
       this.router.navigateByUrl('/storage/inventory/add');
     }
   }
-    deleteInventory(id: number, event: Event) {
+
+  printInventorySettlement() {
+    const settlement = this.currentInventory();
+    if (!settlement?.id) {
+      return;
+    }
+    this.a4PrintService.print(buildInventorySettlementPrintHtml(settlement));
+  }
+
+  deleteInventory(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'هل انت متاكد من حذف التسوية',
@@ -555,7 +496,6 @@ export class InventorySettlementForm extends BaseComponent {
           },
         });
       },
-      
     });
   }
 }

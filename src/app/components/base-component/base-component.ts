@@ -85,7 +85,7 @@ export class BaseComponent {
     this.debounceMap.forEach((value) => value.subject.complete());
   }
 
-  getRowNumber = (index: number, pageNumber: number) => index + 1 + (pageNumber - 1) * 10;
+  getRowNumber = (index: number, pageNumber: number, pageSize = 10) => index + 1 + (pageNumber - 1) * pageSize;
   getCurrentRowsIx = (pageIndex: number , pageSize:number = 10) => (pageIndex - 1) * pageSize;
 
   getPreviousLocalDateIso(days: number) {

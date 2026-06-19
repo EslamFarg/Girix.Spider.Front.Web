@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { Button, ButtonDirective } from 'primeng/button';
 import { Select } from 'primeng/select';
@@ -6,7 +7,11 @@ import { InputText } from 'primeng/inputtext';
 import { Dialog } from 'primeng/dialog';
 import { CollectionsService } from '../../services/collections-service';
 import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
-import { OrderLocationType, OrderService } from '@/features/orders';
+import { IOrderBillReadResponse, OrderLocationType, OrderService } from '@/features/orders';
+import { ReceiptTemplateService } from '@/features/orders/services/receipt-template-service';
+import { AppPrinterType, IPrintJob, PrinterService } from '@/features/printers';
+import { PrinterSettingsService, IPrinterSettingsReadResponse } from '@/features/printers/services/printer-settings-service';
+import { RestaurantInfoService } from '@/features/settings/services/restaurant-info-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BaseComponent, IPaginationInfo } from '@/components';
 import { ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
@@ -57,6 +62,10 @@ export class CollectionDialog extends BaseComponent {
   collectPersonDelivery = this.collectionsService.collectPersonDelivery;
   collectCompanyDelivery = this.collectionsService.collectCompanyDelivery;
   orderService = inject(OrderService);
+  receiptTemplateService = inject(ReceiptTemplateService);
+  printService = inject(PrinterService);
+  printerSettingsService = inject(PrinterSettingsService);
+  restaurantInfoService = inject(RestaurantInfoService);
   ordersCollectionsCaluclationsService = inject(OrderCollectionCalculationsService);
   currentBill = this.collectionsService.currentBill;
   isCollectionInvoiceDialogVisible = this.collectionsService.isCollectionInvoiceDialogVisible;
@@ -141,9 +150,8 @@ export class CollectionDialog extends BaseComponent {
   currentDeliveryType = this.collectionsService.currentOrderType;
   currentDeliveryId = this.collectionsService.currentDeliveryId;
 
-  onSubmitCollection() {
+  onSubmitCollection(withPrint = false) {
     if (this.paymentFg.invalid) {
-      // console.log('invalid paymentFg');
       this.paymentFg.markAllAsTouched();
       return;
     }
@@ -153,6 +161,7 @@ export class CollectionDialog extends BaseComponent {
       return;
     }
 
+    const orderIdsToPrint = this.resolveOrderIdsForPrint();
     const cashPaymentAmount = +(this.paymentFg.get('cashPaymentAmount')?.value ?? 0);
     const networkPaymentAmount = +(this.paymentFg.get('networkPaymentAmount')?.value ?? 0);
     let formValue: any = {
@@ -161,51 +170,124 @@ export class CollectionDialog extends BaseComponent {
       networkPaymentAmount: +networkPaymentAmount.toFixed(2),
       collectionDate: this.localDateIso,
     };
-    //        orderId: ,
+
+    const onCollectionSuccess = (value: { id: number }, collectedOrderIds: number[]) => {
+      this.closeCollectionInvoiceDialog();
+      this.collectionsService.lastCollectedId.set(value.id);
+      this.collectionsService.collectionCompleted$.next();
+      this.collectionsService.collectedOrderIds.set(collectedOrderIds);
+      this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
+      if (withPrint) {
+        this.printCustomerInvoices(orderIdsToPrint);
+      }
+    };
 
     if (this.currentBill()) {
-      formValue = { ...formValue, orderId: this.currentBill()!.id };
+      const orderId = this.currentBill()!.id;
+      formValue = { ...formValue, orderId };
       this.collectNonDelivery(formValue).subscribe({
-        next: (value) => {
-          this.closeCollectionInvoiceDialog();
-          this.collectionsService.lastCollectedId.set(value.id);
-          this.collectionsService.collectionCompleted$.next();
-          const orderId = this.collectionsService.currentOrderId();
-          if (orderId != null) {
-            this.collectionsService.collectedOrderIds.set([orderId]);
-          }
-          this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
-        },
+        next: (value) => onCollectionSuccess(value, [orderId]),
       });
       return;
     }
 
+    const checkedOrderIds = [...this.checkedOrderIds()];
     switch (this.currentDeliveryType()) {
       case OrderLocationType.PersonDelivery:
-        formValue = { ...formValue, deliveryId: this.currentDeliveryId(), orderIds: this.checkedOrderIds() };
+        formValue = { ...formValue, deliveryId: this.currentDeliveryId(), orderIds: checkedOrderIds };
         this.collectPersonDelivery(formValue).subscribe({
           next: (value) => {
-            this.closeCollectionInvoiceDialog();
-            this.collectionsService.lastCollectedId.set(value.id);
-            this.collectionsService.collectionCompleted$.next();
-            this.optimisticallyMarkOrdersAsCollected(this.checkedOrderIds());
-            this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
+            this.optimisticallyMarkOrdersAsCollected(checkedOrderIds);
+            onCollectionSuccess(value, checkedOrderIds);
           },
         });
         break;
       case OrderLocationType.CompanyDelivery:
-        formValue = { ...formValue, companyId: this.currentDeliveryId(), orderIds: this.checkedOrderIds() };
+        formValue = { ...formValue, companyId: this.currentDeliveryId(), orderIds: checkedOrderIds };
         this.collectCompanyDelivery(formValue).subscribe({
           next: (value) => {
-            this.closeCollectionInvoiceDialog();
-            this.collectionsService.lastCollectedId.set(value.id);
-            this.collectionsService.collectionCompleted$.next();
-            this.optimisticallyMarkOrdersAsCollected(this.checkedOrderIds());
-            this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم التحصيل بنجاح' });
+            this.optimisticallyMarkOrdersAsCollected(checkedOrderIds);
+            onCollectionSuccess(value, checkedOrderIds);
           },
         });
         break;
     }
+  }
+
+  private resolveOrderIdsForPrint(): number[] {
+    if (this.currentBill()) {
+      return [this.currentBill()!.id];
+    }
+    if (this.isDeliveryDialog()) {
+      return [...this.checkedOrderIds()];
+    }
+    return [];
+  }
+
+  /** Reuses POS cashier receipt: ReceiptTemplateService + global PrintDialog queue. */
+  private printCustomerInvoices(orderIds: number[]) {
+    if (orderIds.length === 0) {
+      return;
+    }
+
+    forkJoin(orderIds.map((orderId) => this.orderService.getBill(orderId))).subscribe({
+      next: (bills) => {
+        this.restaurantInfoService.getSettings().subscribe({
+          next: (restaurantSettings) => {
+            this.printerSettingsService.getSettings().subscribe({
+              next: (printerSettings) => {
+                const restaurantName = restaurantSettings.nameAr ?? 'فاتورة كاشير';
+                const jobs = this.buildCashierPrintJobs(bills, printerSettings, restaurantName);
+                if (jobs.length > 0) {
+                  this.printService.openPrinterDialogWithJobs(jobs);
+                  return;
+                }
+                this.messageService.add({
+                  severity: 'warn',
+                  summary: 'تنبيه',
+                  detail: 'لم يتم العثور على طابعة كاشير. يرجى ضبط الطابعات من الإعدادات.',
+                });
+              },
+            });
+          },
+        });
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'خطأ',
+          detail: 'تعذر تحميل بيانات الفاتورة للطباعة',
+        });
+      },
+    });
+  }
+
+  private buildCashierPrintJobs(
+    bills: IOrderBillReadResponse[],
+    settings: IPrinterSettingsReadResponse,
+    restaurantName: string,
+  ): IPrintJob[] {
+    if (!settings.cashierPrinter?.id) {
+      return [];
+    }
+
+    const cashierPrinter = settings.cashierPrinter;
+    return bills.map((bill) => {
+      const receipt = this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items, restaurantName);
+      return {
+        printer: {
+          id: cashierPrinter.id,
+          name: cashierPrinter.name,
+          ipAddressOrMacAddress: cashierPrinter.ipAddressOrMacAddress,
+          port: cashierPrinter.port,
+          type: cashierPrinter.type,
+          comPort: cashierPrinter.comPort,
+          appPrinterType: AppPrinterType.cashierPrinter,
+        },
+        html: receipt.html,
+        css: receipt.css,
+      };
+    });
   }
 
   private optimisticallyMarkOrdersAsCollected(orderIds: number[]) {

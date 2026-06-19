@@ -262,6 +262,7 @@
 
   "ACTIONS": {
     "SAVE": "حفظ",
+    "SAVE_AND_PRINT": "حفظ وطباعة",
     "CANCEL": "الغاء",
     "NEW": "جديد",
     "SUBMIT": "حفظ",
