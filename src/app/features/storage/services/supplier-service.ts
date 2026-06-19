@@ -55,7 +55,7 @@ export class SupplierService extends BaseSearchAndCrudService<
             isCompany: boolean;
             numberOfFloor: number;
             financiallyAccountId: number;
-        }>(`${this.apiRoute}/GetCashSupplierByAccount`);
+        }>(`${this.apiUrl}/GetCashSupplierByAccount`);
   }
 
  
