@@ -4,23 +4,34 @@
 @import "@ng-select/ng-select/themes/default.theme.css";
 
 @theme {
-  --color-main-bg: #355450fc;/*#111921;*/
-  --color-secondary-bg: #543539;/* #192633; */
+  /* ── Primary theme palette ── */
+  --color-primary: #375652;
+  --color-primary-hover: #44665f;
+  --color-primary-active: #2d4a46;
+  --color-primary-focus: rgba(55, 86, 82, 0.25);
+  --color-primary-selected: rgba(55, 86, 82, 0.12);
+  --color-primary-border: #375652;
+  --color-primary-text: #ffffff;
+
+  /* App surfaces (legacy names mapped to primary theme) */
+  --color-main-bg: #375652;
+  --color-secondary-bg: #2d4a46;
   --color-app-blue: #137fec;
-  /* base */
-  --color-dark-line: #543539;/* #393c49; */
-  /* bg */
-  --color-base-bg: #FAFAFA;
+
+  /* Action / structural aliases */
+  --color-dark-line: #375652;
+  --color-base-bg: #fafafa;
   --color-light-bg: #fff2e8;
-  --color-dark-bg-1: #355450fc;/* #252836; */
-  --color-dark-bg-2: #355450fc;/*#1f1d2b;*/
-  --color-form-bg: #2d303e;
-  /* text */
+  --color-dark-bg-1: #375652;
+  --color-dark-bg-2: #2d4a46;
+  --color-form-bg: #375652;
+
+  /* Text (non-action) */
   --color-text-dark: #3b5162;
   --color-text-gray: #889898;
   --color-text-light: #d3dce6;
   --color-text-lighter: #e0e6e9;
- }
+}
 @import 'primeicons/primeicons.css';
 @import './app/styles/fonts.css';
 @import './app/styles/layout.css';
@@ -34,9 +45,21 @@
   --p-paginator-background: transparent !important;
   --p-form-field-border-color: var(--color-text-lighter) !important;
   --p-select-background: transparent !important;
-  --p-select-color:var(--color-text-dark) !important;
-  /* --p-overlay-select-background: transparent !important; */
-  
+  --p-select-color: var(--color-text-dark) !important;
+
+  /* Global primary button theme */
+  --p-button-primary-background: #375652;
+  --p-button-primary-border-color: #375652;
+  --p-button-primary-color: #ffffff;
+  --p-button-primary-hover-background: #44665f;
+  --p-button-primary-hover-border-color: #44665f;
+  --p-button-primary-hover-color: #ffffff;
+  --p-button-primary-active-background: #2d4a46;
+  --p-button-primary-active-border-color: #2d4a46;
+  --p-button-primary-active-color: #ffffff;
+  --p-button-primary-focus-ring-color: rgba(55, 86, 82, 0.25);
+
+  --p-form-field-focus-ring-color: rgba(55, 86, 82, 0.25);
 }
 @custom-variant dark (&:where(.dark-mode, .dark-mode *));
 @custom-variant electron (&:where(.electron, .electron *));

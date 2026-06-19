@@ -1,11 +1,11 @@
-<!-- Table -->
+﻿<!-- Table -->
 <p-dialog
     [visible]="printerService.isPrinterDialogVisible()"
     (visibleChange)="printerService.isPrinterDialogVisible.set($event)"
     [modal]="true"
     [dismissableMask]="true"
     [style]="{ width: '80%', maxWidth: '300px' }"
-    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    [attr.style]="'--p-mask-background:#375652e5!important;'"
     styleClass="bg-text-lighter!"
     class="addition-dialog"
     [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"

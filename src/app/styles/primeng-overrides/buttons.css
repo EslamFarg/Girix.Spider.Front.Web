@@ -1,6 +1,12 @@
 .app-p-btn {
-  --p-button-primary-color: #fff;
-  --p-button-primary-background: var(--color-dark-line);
-  --p-button-primary-border-color: var(--color-dark-line);
-  --p-button-primary-hover-color: var(--color-dark-line);
+  --p-button-primary-color: #ffffff;
+  --p-button-primary-background: #375652;
+  --p-button-primary-border-color: #375652;
+  --p-button-primary-hover-background: #44665f;
+  --p-button-primary-hover-border-color: #44665f;
+  --p-button-primary-hover-color: #ffffff;
+  --p-button-primary-active-background: #2d4a46;
+  --p-button-primary-active-border-color: #2d4a46;
+  --p-button-primary-active-color: #ffffff;
+  --p-button-primary-focus-ring-color: rgba(55, 86, 82, 0.25);
 }

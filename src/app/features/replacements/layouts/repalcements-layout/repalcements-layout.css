@@ -33,7 +33,7 @@
   margin: 0 0 0.25rem;
   font-size: 0.8125rem;
   font-weight: 700;
-  color: var(--color-dark-line, #393c49);
+  color: var(--color-dark-line, #375652);
   text-align: center;
 }
 
@@ -276,12 +276,12 @@
 }
 
 .replacement-dialog-nav-active {
-  --p-button-primary-background: var(--color-dark-bg-2) !important;
-  --p-button-primary-color: white;
+  --p-button-primary-background: var(--color-primary) !important;
+  --p-button-primary-color: #ffffff !important;
 }
 
 :host ::ng-deep .replacement-dialog-nav-active .p-button {
-  box-shadow: 0 0 0 2px rgba(31, 29, 43, 0.15), 0px 0px 15px 0px #ffffff80 inset !important;
-  border: 2px solid var(--color-dark-bg-2, #1f1d2b) !important;
+  box-shadow: 0 0 0 2px rgba(55, 86, 82, 0.15), 0px 0px 15px 0px #ffffff80 inset !important;
+  border: 2px solid var(--color-primary) !important;
   font-weight: 700;
 }

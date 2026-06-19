@@ -60,6 +60,8 @@ export interface IOrderMenuItem {
   styleUrl: './menu.css',
 })
 export class Menu extends BaseComponent implements OnDestroy {
+  static readonly ALL_CATEGORY_ID = -1;
+
   groups = input<IGroupSearchRow[]>([]);
   menuItemChange = output<IOrderMenuItem>();
   pickedItems = input<IOrderMenuItem[]>([]);
@@ -84,16 +86,55 @@ export class Menu extends BaseComponent implements OnDestroy {
     return this.pickedItemCounts().get(item.id) ?? 0;
   }
 
+  categoryTabs = computed(() => {
+    const allTab: IGroupSearchRow = {
+      id: Menu.ALL_CATEGORY_ID,
+      name: 'الكل',
+      printerName: '',
+      isOnCasher: true,
+      attachment: [],
+    };
+    const groups = this.groups().filter((group) => group.name !== 'الكل');
+    return [allTab, ...groups];
+  });
+
+  isCategoryActive(item: IGroupSearchRow): boolean {
+    const selectedCategory = this.menuSearchFg.getRawValue().category;
+    if (item.id === Menu.ALL_CATEGORY_ID) {
+      return selectedCategory === null;
+    }
+    return selectedCategory?.id === item.id;
+  }
+
   selectCategory(category: { id: number; label: string }) {
+    if (category.id === Menu.ALL_CATEGORY_ID) {
+      if (this.menuSearchFg.getRawValue().category === null) {
+        return;
+      }
+
+      this.menuSearchFg.patchValue({ category: null });
+      this.onSubmitSearch();
+      return;
+    }
+
     const previousCategoryId = this.menuSearchFg.getRawValue().category?.id;
 
     if (previousCategoryId === category.id) {
       this.menuSearchFg.patchValue({ category: null });
+      this.onSubmitSearch();
       return;
     }
 
     this.menuSearchFg.patchValue({ category });
+    this.onSubmitSearch();
+  }
 
+  resetToAllCategory() {
+    if (this.menuSearchFg.getRawValue().category === null) {
+      return;
+    }
+
+    this.menuSearchFg.patchValue({ category: null });
     this.onSubmitSearch();
   }
 

@@ -22,8 +22,8 @@
 }
 .nav-item:hover,
 .nav-item-active {
-  border-color: var(--color-dark-line);
-  background-color: #25283633;
+  border-color: var(--color-primary-border);
+  background-color: var(--color-primary-selected);
 }
 
 .slide-out {

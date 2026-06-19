@@ -1,4 +1,4 @@
-<app-section-wrapper class="block p-4 overflow-auto custom-scroll">
+﻿<app-section-wrapper class="block p-4 overflow-auto custom-scroll">
     <!-- search -->
     <form
         #form
@@ -64,7 +64,7 @@
         @for (item of customers(); track $index) {
             <div
                 style="backdrop-filter: blur(20px)"
-                class="delivery-card flex border-2 relative cursor-pointer border-[#393C49] items-center justify-center bg-white rounded-[14px]"
+                class="delivery-card flex border-2 relative cursor-pointer border-[#375652] items-center justify-center bg-white rounded-[14px]"
                 [class.replacements-reserved]="item.orderNumbers > 0"
                 (click)="
                     openCollectionDialog({

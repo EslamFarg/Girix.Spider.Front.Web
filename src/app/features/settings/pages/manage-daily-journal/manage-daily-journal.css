@@ -26,8 +26,9 @@
 }
 
 .nav-items .active {
-  --p-button-primary-background: var(--color-dark-bg-2);
-  --p-button-primary-border-color: transparent;
+  --p-button-primary-background: var(--color-primary);
+  --p-button-primary-border-color: var(--color-primary);
   --p-button-primary-color: #fff !important;
-  --p-button-primary-hover-color: #000000;
+  --p-button-primary-hover-background: var(--color-primary-hover);
+  --p-button-primary-hover-color: #ffffff;
 }

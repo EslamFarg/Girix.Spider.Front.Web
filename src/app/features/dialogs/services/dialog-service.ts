@@ -34,7 +34,7 @@ export class DialogService extends BaseService {
             closable: true,
             dismissableMask: true,
             contentStyle: { overflow: 'auto' },
-            style: { '--p-mask-background': '#1f1d2be5!important', maxWidth: '50rem', width: '80%' },
+            style: { '--p-mask-background': '#375652e5!important', maxWidth: '50rem', width: '80%' },
             styleClass: `flex 123 flex-col ${this.loadingService.isLoading() && 'opacity-50 cursor-wait'}`,
             inputValues: data?.inputs,
             // breakpoints: {

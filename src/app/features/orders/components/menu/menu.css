@@ -1,22 +1,119 @@
-:host{
+:host {
   height: 100%;
   overflow: hidden;
 }
-.filter-category-active{
-  background-color: var(--color-dark-bg-2);
-  box-shadow: 0px 0px 15px 0px #FFFFFF80 inset;
-  font-weight: bold;
-  color: white;
+
+/* ── Category tabs (cashier menu) ─────────────────────────────────────────── */
+
+.menu-category-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 11px;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-height: max-content;
+  padding-bottom: 0.625rem;
 }
 
+.menu-category-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: max-content;
+  height: 52px;
+  min-height: 52px;
+  padding-inline: 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d3dce6;
+  background-color: #f8fafb;
+  color: #375652;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
 
- 
+.menu-category-tab:hover:not(.menu-category-tab--active) {
+  background-color: #eef6f3;
+  border-color: #4a726d;
+  color: #375652;
+}
 
-.slide-in{
+.menu-category-tab--active {
+  background-color: #375652;
+  border-color: #375652;
+  color: #ffffff;
+}
+
+.menu-category-tab:active:not(.menu-category-tab--active) {
+  background-color: #e4eee9;
+  border-color: #375652;
+}
+
+.menu-category-tab--active:active {
+  background-color: #2f4a45;
+  border-color: #2f4a45;
+}
+
+/* ── Product cards (cashier menu only) ───────────────────────────────────── */
+
+.menu-product-card {
+  background-color: #375652;
+  border: 2px solid transparent;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.menu-product-card:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+.menu-product-card--active {
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 0 0 1px #4a726d,
+    0 0 14px 3px rgba(55, 86, 82, 0.55),
+    0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.menu-product-card__name {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.menu-product-card__price {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.menu-product-card__details {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.menu-product-card__badge {
+  background-color: #10b981;
+}
+
+.slide-in {
   transform: translateY(-100%);
   opacity: 0;
   animation: slide-in 0.5s ease-in-out forwards;
 }
+
 @keyframes slide-in {
   0% {
     opacity: 0;

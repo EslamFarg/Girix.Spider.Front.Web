@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 
 /**
- * A4 Print Engine — accounting documents only.
+ * A4 Print Engine â€” accounting documents only.
  *
  * Opens a new window containing the supplied HTML, waits for render,
  * then triggers the OS/browser native print dialog (supports any
@@ -21,7 +21,7 @@ export class A4PrintService {
   print(bodyFragment: string): void {
     const win = window.open('', '_blank', 'width=850,height=1200,scrollbars=yes,resizable=yes');
     if (!win) {
-      alert('لم يتمكن المتصفح من فتح نافذة الطباعة. يرجى السماح بالنوافذ المنبثقة.');
+      alert('Ù„Ù… ÙŠØªÙ…ÙƒÙ† Ø§Ù„Ù…ØªØµÙØ­ Ù…Ù† ÙØªØ­ Ù†Ø§ÙØ°Ø© Ø§Ù„Ø·Ø¨Ø§Ø¹Ø©. ÙŠØ±Ø¬Ù‰ Ø§Ù„Ø³Ù…Ø§Ø­ Ø¨Ø§Ù„Ù†ÙˆØ§ÙØ° Ø§Ù„Ù…Ù†Ø¨Ø«Ù‚Ø©.');
       return;
     }
 
@@ -30,9 +30,9 @@ export class A4PrintService {
     win.document.close();
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Private helpers
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   private buildFullDocument(bodyFragment: string): string {
     return `<!DOCTYPE html>
@@ -40,12 +40,12 @@ export class A4PrintService {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>طباعة</title>
+  <title>Ø·Ø¨Ø§Ø¹Ø©</title>
   <style>
-    /* ── Reset ─────────────────────────────────────────────────── */
+    /* â”€â”€ Reset â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Base ──────────────────────────────────────────────────── */
+    /* â”€â”€ Base â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     html, body {
       font-family: 'Arial', 'Tahoma', 'Segoe UI', sans-serif;
       font-size: 10pt;
@@ -54,7 +54,7 @@ export class A4PrintService {
       direction: rtl;
     }
 
-    /* ── Screen preview wrapper ────────────────────────────────── */
+    /* â”€â”€ Screen preview wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     @media screen {
       body { background: #e8e8e8; padding: 20px; }
       .a4-page {
@@ -73,7 +73,7 @@ export class A4PrintService {
         justify-content: flex-end;
       }
       .btn-print {
-        background: #1f1d2b;
+        background: #375652;
         color: #fff;
         border: none;
         padding: 8px 24px;
@@ -85,7 +85,7 @@ export class A4PrintService {
       .btn-print:hover { background: #333; }
     }
 
-    /* ── Print page setup ──────────────────────────────────────── */
+    /* â”€â”€ Print page setup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     @page {
       size: A4 portrait;
       margin: 15mm;
@@ -100,7 +100,7 @@ export class A4PrintService {
       tr    { page-break-inside: avoid; }
     }
 
-    /* ── Document header ───────────────────────────────────────── */
+    /* â”€â”€ Document header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .doc-header {
       display: flex;
       align-items: center;
@@ -124,17 +124,17 @@ export class A4PrintService {
     .doc-company-name  { font-size: 16pt; font-weight: bold; }
     .doc-company-sub   { font-size: 9pt;  color: #555;  margin-top: 2px; }
     .doc-title-box {
-      border: 2px solid #1f1d2b;
+      border: 2px solid #375652;
       padding: 6px 20px;
       text-align: center;
       font-size: 14pt;
       font-weight: bold;
-      color: #1f1d2b;
+      color: #375652;
       border-radius: 4px;
       min-width: 140px;
     }
 
-    /* ── Meta fields grid ──────────────────────────────────────── */
+    /* â”€â”€ Meta fields grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .meta-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -151,9 +151,9 @@ export class A4PrintService {
     .meta-label { font-weight: bold; font-size: 9pt; white-space: nowrap; color: #333; }
     .meta-value { font-size: 9pt; border-bottom: 1px dotted #999; flex: 1; min-width: 0; padding-bottom: 1px; }
 
-    /* ── Statement banner ──────────────────────────────────────── */
+    /* â”€â”€ Statement banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .statement-banner {
-      border: 1px solid #1f1d2b;
+      border: 1px solid #375652;
       background: #f0f4ff;
       padding: 8px 14px;
       border-radius: 4px;
@@ -166,7 +166,7 @@ export class A4PrintService {
       color: #1a1a2e;
     }
 
-    /* ── Lines table ───────────────────────────────────────────── */
+    /* â”€â”€ Lines table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .lines-table {
       width: 100%;
       border-collapse: collapse;
@@ -174,13 +174,13 @@ export class A4PrintService {
       font-size: 9pt;
     }
     .lines-table thead tr th {
-      background: #1f1d2b;
+      background: #375652;
       color: #fff;
       font-size: 9pt;
       font-weight: bold;
       padding: 6px 8px;
       text-align: center;
-      border: 1px solid #1f1d2b;
+      border: 1px solid #375652;
     }
     .lines-table tbody tr td {
       border: 1px solid #bbb;
@@ -198,9 +198,9 @@ export class A4PrintService {
     .num { text-align: center !important; font-variant-numeric: tabular-nums; }
     .bold { font-weight: bold; }
 
-    /* ── Totals summary row ────────────────────────────────────── */
+    /* â”€â”€ Totals summary row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .totals-box {
-      border: 1px solid #1f1d2b;
+      border: 1px solid #375652;
       border-radius: 4px;
       padding: 8px 14px;
       margin-bottom: 14px;
@@ -215,7 +215,7 @@ export class A4PrintService {
     .balance-ok  { color: #16a34a; font-size: 8pt; font-weight: bold; }
     .balance-err { color: #dc2626; font-size: 8pt; font-weight: bold; }
 
-    /* ── Signature footer ──────────────────────────────────────── */
+    /* â”€â”€ Signature footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .sig-footer {
       margin-top: 36px;
       border-top: 1px solid #888;
@@ -241,7 +241,7 @@ export class A4PrintService {
     .sig-line  { border-top: 1px solid #555; margin: 0 8px; margin-top: 28px; }
     .sig-name  { font-size: 8pt; color: #777; }
 
-    /* ── Helpers ───────────────────────────────────────────────── */
+    /* â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .mb-2  { margin-bottom: 8px; }
     .mb-4  { margin-bottom: 16px; }
     .mt-2  { margin-top: 8px; }
@@ -253,8 +253,8 @@ export class A4PrintService {
 <body>
 
   <div class="print-actions">
-    <button class="btn-print" onclick="window.print()">🖨️ طباعة</button>
-    <button class="btn-print" style="background:#555" onclick="window.close()">✕ إغلاق</button>
+    <button class="btn-print" onclick="window.print()">ðŸ–¨ï¸ Ø·Ø¨Ø§Ø¹Ø©</button>
+    <button class="btn-print" style="background:#555" onclick="window.close()">âœ• Ø¥ØºÙ„Ø§Ù‚</button>
   </div>
 
   <div class="a4-page">

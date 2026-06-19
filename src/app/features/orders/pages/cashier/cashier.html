@@ -1,4 +1,4 @@
-<div class="container w-full h-full lg:grid grid-cols-5 gap-4 overflow-hidden">
+﻿<div class="container w-full h-full lg:grid grid-cols-5 gap-4 overflow-hidden">
     <app-menu
         (menuItemChange)="onMenuItemChange($event)"
         [groups]="groups()"
@@ -13,43 +13,46 @@
         class="flex w-full flex-col gap-4 h-full no-scrollbar overflow-auto p-4 lg:ps-0 lg:col-span-2"
     >
         <!-- actions btns -->
-        <div
-            class="w-full flex h-fit items-center justify-end gap-2"
-            style="--p-button-primary-background: transparent"
-        >
-            <button
-                pButton
-                type="button" 
-                (click)="isMenuVisible = true"
-                class="app-p-btn py-1! m1d:flex-none md:px-2! xl:hid1den! me-auto"
-                variant="outlined"
-                type="button"
-            >
-                <i class="pi pi-bars"></i>
-            </button>
-            <button
-                pButton
-                class="app-p-btn py-1! md:px-8! md:flex-none"
-                form="orderForm"
-                type="submit"
-                appLoadingDisabled
-            >
-                @if (formMode() === FormMode.Create) {
-                    {{ 'ACTIONS.CONTINUE' | translate }}
-                } @else {
-                    {{ 'ACTIONS.EDIT' | translate }}
-                }
-            </button>
-            <a
-                type="button"
-                routerLink="/"
-                pButton
-                class="app-p-btn p-button-outlined py-1! md:flex-none md:px-8!"
-                variant="outlined"
-                (click)="resetOrderForm()"
-            >
-                {{ 'ACTIONS.NEW' | translate }}
-            </a>
+        <div class="cashier-header pos-header-bar">
+            <div class="cashier-header__right">
+                <button
+                    pButton
+                    type="button"
+                    (click)="isMenuVisible = true"
+                    class="pos-header-btn pos-header-btn--products app-p-btn m1d:flex-none xl:hid1den! shrink-0"
+                >
+                    <i class="pi pi-th-large"></i>
+                    <span>الأصناف</span>
+                </button>
+            </div>
+
+            <div class="cashier-header__spacer" aria-hidden="true"></div>
+
+            <div class="cashier-header__left">
+                <button
+                    pButton
+                    class="pos-header-btn pos-header-btn--save app-p-btn md:flex-none"
+                    form="orderForm"
+                    type="submit"
+                    appLoadingDisabled
+                >
+                    @if (formMode() === FormMode.Create) {
+                        {{ 'ACTIONS.SAVE' | translate }}
+                    } @else {
+                        {{ 'ACTIONS.EDIT' | translate }}
+                    }
+                </button>
+                <a
+                    type="button"
+                    routerLink="/"
+                    pButton
+                    class="pos-header-btn pos-header-btn--new app-p-btn md:flex-none"
+                    variant="outlined"
+                    (click)="resetOrderForm()"
+                >
+                    {{ 'ACTIONS.NEW' | translate }}
+                </a>
+            </div>
         </div>
 
         <div>
@@ -187,14 +190,18 @@
                         <thead class="select-none">
                             <tr class="border-b border-text-gray *:pb-2 *:text-xs *:font-bold">
                                 <th class="px-2">الصنف</th>
-                                <th class="px-2">الكميه</th>
-                                <!-- <th class="px-2">
-                  <div><span>السعر</span>&nbsp;<span class="text-xs font-light">(شامل الضريبه)</span></div>
-                </th> -->
-
-                                <!-- <th class="px-2">المجموع</th> -->
-                                <!-- <th class="px-2">الضريبه</th> -->
-                                <th class="px-2">الاجمالي</th>
+                                <th class="px-2">
+                                    <div class="cashier-col-header">
+                                        <span>الكميه</span>
+                                        <span class="cashier-col-total">{{ totalOrderQuantity() }}</span>
+                                    </div>
+                                </th>
+                                <th class="px-2">
+                                    <div class="cashier-col-header">
+                                        <span>الاجمالي</span>
+                                        <span class="cashier-col-total">{{ orderItemsNet().toFixed(2) }}</span>
+                                    </div>
+                                </th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -259,7 +266,7 @@
                                                 <svg viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path
                                                         d="M7.32046 4.70834H4.74952V7.25698C4.74952 7.66734 4.41395 8 4 8C3.58605 8 3.25048 7.66734 3.25048 7.25698V4.70834H0.679545C0.293423 4.6687 0 4.34614 0 3.96132C0 3.5765 0.293423 3.25394 0.679545 3.21431H3.24242V0.673653C3.28241 0.290878 3.60778 0 3.99597 0C4.38416 0 4.70954 0.290878 4.74952 0.673653V3.21431H7.32046C7.70658 3.25394 8 3.5765 8 3.96132C8 4.34614 7.70658 4.6687 7.32046 4.70834Z"
-                                                        fill="#393C49"
+                                                        fill="#375652"
                                                     />
                                                 </svg>
                                             </button>
@@ -292,7 +299,7 @@
                                                 <svg viewBox="0 0 7 2" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path
                                                         d="M5.688 1.489H0.745C0.334 1.489 0 1.156 0 0.745C0 0.334 0.334 0 0.745 0H5.688C6.099 0 6.433 0.334 6.433 0.745C6.433 1.156 6.099 1.489 5.688 1.489Z"
-                                                        fill="#393C49"
+                                                        fill="#375652"
                                                     />
                                                 </svg>
                                             </button>
@@ -388,53 +395,49 @@
             <app-input-error-message-handler class="w-fit block mx-auto" [fc]="orderFg.get('items')" />
             <!-- items summary -->
             <div class="border-t border-text-light pt-2 mt-auto">
-                <!-- head -->
-                <div class="bg-text-light grid grid-cols-2 text-xs font-bold text-dark-bg-2 py-1 px-2 rounded">
-                    <span>المجموع (شامل الضريبة)</span>
-                    <span class="ms-auto">{{ orderItemsNet().toFixed(2) }}</span>
-                </div>
-                <!-- body -->
-                <div
-                    class="p-4 pb-0 relative grid grid-cols-2 text-dark-bg-2 *:flex *:justify-between *:items-center gap-3 text-xs font-semibold"
-                    [class.hidden]="!isCreateMode()"
-                >
-                    <div
-                        class="absolute w-0.5 h-[calc(100%-35px)] left-1/2 top-2 -translate-x-1/2 bg-dark-bg-2/20"
-                    ></div>
-                    @if (itemsDiscountAmount()) {
-                        <div class="px-1">
-                            <span>الخصم</span>
-                            <div>{{ itemsDiscountAmount().toFixed(2) }}</div>
-                        </div>
-                    }
-                    @if (serviceFee()) {
-                        <div class="px-1">
-                            <span>الخدمه</span>
-                            <div>{{ serviceFee().toFixed(2) }}</div>
-                        </div>
-                    }
-                    @if (hutNet()) {
-                        <div class="px-1">
-                            <span>حجز الكوخ</span>
-                            <div>{{ hutNet().toFixed(2) }}</div>
-                        </div>
-                    }
-                    @if (deliveryFee()) {
-                        <div class="px-1">
-                            <span>الدليفري</span>
-                            <div>{{ deliveryFee().toFixed(2) }}</div>
-                        </div>
+                <div class="pos-cart-summary text-dark-bg-2">
+                    @if (isCreateMode()) {
+                        @if (itemsDiscountAmount()) {
+                            <div class="pos-summary-row pos-summary-row--secondary">
+                                <span class="pos-summary-label">الخصم</span>
+                                <span class="pos-summary-value">{{ itemsDiscountAmount().toFixed(2) }}</span>
+                            </div>
+                        }
+                        @if (serviceFee()) {
+                            <div class="pos-summary-row pos-summary-row--secondary">
+                                <span class="pos-summary-label">الخدمه</span>
+                                <span class="pos-summary-value">{{ serviceFee().toFixed(2) }}</span>
+                            </div>
+                        }
+                        @if (hutNet()) {
+                            <div class="pos-summary-row pos-summary-row--secondary">
+                                <span class="pos-summary-label">حجز الكوخ</span>
+                                <span class="pos-summary-value">{{ hutNet().toFixed(2) }}</span>
+                            </div>
+                        }
+                        @if (deliveryFee()) {
+                            <div class="pos-summary-row pos-summary-row--secondary">
+                                <span class="pos-summary-label">الدليفري</span>
+                                <span class="pos-summary-value">{{ deliveryFee().toFixed(2) }}</span>
+                            </div>
+                        }
                     }
 
-                    <div class="px-1">
-                        <span>الضريبة</span>
-                        <div>{{ totalMenuItemsTax().toFixed(2) }}</div>
+                    <div class="pos-summary-row">
+                        <span class="pos-summary-label">المجموع</span>
+                        <span class="pos-summary-value">{{ cartSubtotalBeforeTax().toFixed(2) }}</span>
                     </div>
-                    <div
-                        class="flex text-xs col-span-2 mt-1 pt-1 font-bold justify-between items-center border-t border-text-light text-dark-bg-2"
-                    >
-                        <span>الصافي</span>
-                        <span>{{ initialNet().toFixed(2) }}</span>
+
+                    <div class="pos-summary-row">
+                        <span class="pos-summary-label">الضريبة</span>
+                        <span class="pos-summary-value">{{ cartTotalTax().toFixed(2) }}</span>
+                    </div>
+
+                    <div class="pos-summary-divider"></div>
+
+                    <div class="pos-summary-row pos-summary-row--grand-total">
+                        <span class="pos-summary-label">الإجمالي شامل الضريبة</span>
+                        <span class="pos-summary-value">{{ initialNet().toFixed(2) }}</span>
                     </div>
                 </div>
             </div>
@@ -471,7 +474,7 @@
     [modal]="true"
     [dismissableMask]="true"
     [style]="{ width: '80%', maxWidth: '50rem' }"
-    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    [attr.style]="'--p-mask-background:#375652e5!important;'"
     styleClass="bg-text-lighter!"
     class="addition-dialog"
     [contentStyleClass]="`no-scrollbar flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
@@ -831,7 +834,7 @@
     [modal]="true"
     [dismissableMask]="true"
     [style]="{ width: '80%', maxWidth: '50rem' }"
-    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    [attr.style]="'--p-mask-background:#375652e5!important;'"
     styleClass="bg-white!"
     class="addition-dialog"
     [contentStyleClass]="`flex flex-col overflow-visible!  ${isLoading() && 'opacity-50 cursor-wait'}`"
@@ -852,7 +855,7 @@
     [draggable]="false"
     [dismissableMask]="true"
     [style]="{ width: '80%', maxWidth: '50rem' }"
-    [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    [attr.style]="'--p-mask-background:#375652e5!important;'"
     styleClass="bg-text-lighter!"
     class="addition-dialog"
     [contentStyleClass]="`flex flex-col gap-4 ${isLoading() && 'opacity-50 cursor-wait'}`"
@@ -862,7 +865,7 @@
     </ng-template>
     <div
         class="flex gap-2 w-full justify-center pt-4"
-        style="--p-button-primary-background: #fff; --p-button-primary-color: #1f1d2b"
+        style="--p-button-primary-background: #fff; --p-button-primary-color: #375652"
     >
         <button
             pButton
@@ -906,7 +909,7 @@
                         >
                             <path
                                 d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
-                                stroke="#000000"
+                                stroke="#375652"
                                 stroke-width="2"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
@@ -942,7 +945,7 @@
                         >
                             <path
                                 d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
-                                stroke="#000000"
+                                stroke="#375652"
                                 stroke-width="2"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"

@@ -1,4 +1,4 @@
-<div class="p-4 h-full overflow-auto no-scrollbar">
+﻿<div class="p-4 h-full overflow-auto no-scrollbar">
     <app-section-wrapper class="h-full">
         <!-- Search Form -->
         <form appLoadingDisabled [formGroup]="fg" appDebounce [domEvents]="['submit']" (debounced)="onSubmit()"
@@ -130,7 +130,7 @@
 
 <!-- Choose Delivery Dialog -->
 <p-dialog [(visible)]="deliveryDialogVisible" [modal]="true" [dismissableMask]="true"
-    [style]="{ width: '100%', maxWidth: '40rem' }" [attr.style]="'--p-mask-background:#1f1d2be5!important;'"
+    [style]="{ width: '100%', maxWidth: '40rem' }" [attr.style]="'--p-mask-background:#375652e5!important;'"
     styleClass="bg-white!" [header]="'اختيار دليفري'">
     <div class="flex flex-col gap-2">
         @for (delivery of availableDeliveryMen(); track $index) {
