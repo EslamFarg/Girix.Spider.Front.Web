@@ -36,6 +36,7 @@
 
 .children {
   gap: 0;
+  overflow: hidden;
   & .child {
     max-width: 0;
     padding: 0;
@@ -44,6 +45,7 @@
   }
   &.children-visible {
     gap: 8px;
+    overflow: visible;
     & .child {
       --ix: 0;
       pointer-events: all;

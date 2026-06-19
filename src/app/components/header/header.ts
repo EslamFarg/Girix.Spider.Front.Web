@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, effect, ElementRef, inject, OnDestroy, signal, viewChild } from '@angular/core';
 import { ImgFallback } from '@/directives/img-fallback';
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { BaseComponent } from '@/components/base-component/base-component';
@@ -36,7 +36,7 @@ export interface ISubNavItem {
     templateUrl: './header.html',
     styleUrl: './header.css',
 })
-export class Header extends BaseComponent implements AfterViewInit {
+export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
     header = viewChild<ElementRef<HTMLElement>>('header');
     nav = viewChild<ElementRef<HTMLElement>>('nav');
     navItemsContainer = viewChild<ElementRef<HTMLElement>>('navItemsContainer');
@@ -667,6 +667,7 @@ export class Header extends BaseComponent implements AfterViewInit {
     activeLink = signal<string>('/');
     prevActiveLink = signal<string>('/');
     isShowingMenu = signal(true);
+    private _overflowTimeout: number | undefined;
 
     reUpdateActiveLink() {
         const parentRoute = this.getParent(this.router.url);
@@ -728,6 +729,20 @@ export class Header extends BaseComponent implements AfterViewInit {
         this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e) => {
             this.reUpdateActiveLink();
         });
+
+        // When menu mode toggles, ensure nav overflow is restored
+        effect(() => {
+            const showing = this.isShowingMenu();
+            const nav = this.nav()?.nativeElement;
+            if (nav) {
+                // Clear any pending overflow restore
+                window.clearTimeout(this._overflowTimeout);
+                // Small delay to let the transition start, then restore overflow
+                this._overflowTimeout = window.setTimeout(() => {
+                    nav.style.overflow = '';
+                }, 100);
+            }
+        });
     }
 
     getParent(childRoute: string) {
@@ -748,6 +763,13 @@ export class Header extends BaseComponent implements AfterViewInit {
         const rect = el.getBoundingClientRect();
         const offsetFromRight = containerRight - rect.right;
         nav.style.overflow = 'hidden';
+
+        // Restore scroll after transition completes (500ms matches CSS transition duration)
+        const transitionDuration = 550;
+        window.clearTimeout(this._overflowTimeout);
+        this._overflowTimeout = window.setTimeout(() => {
+            nav.style.overflow = '';
+        }, transitionDuration);
 
         // this.nav()!.nativeElement.scrollLeft = 0;
         // setTimeout(() => {
@@ -858,5 +880,9 @@ export class Header extends BaseComponent implements AfterViewInit {
                 this.authService.logout();
             },
         });
+    }
+
+    override ngOnDestroy(): void {
+        window.clearTimeout(this._overflowTimeout);
     }
 }
