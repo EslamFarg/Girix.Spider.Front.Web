@@ -12,24 +12,32 @@
   opacity: 1;
   display: flex;
   pointer-events: all;
-  /* margin: 0 5px; */
-  /* translate: 0 0 !important; */
   max-width: 200px;
-  /* order: 0 !important; */
   border-width: 2px;
-  padding: 4px 8px; ;
+  padding: 4px 8px;
   --tw-translate-x: 0 !important;
 }
+
 .nav-item:hover,
 .nav-item-active {
   border-color: var(--color-primary-border);
   background-color: var(--color-primary-selected);
 }
 
+/* Small badge on items that have children */
+.child-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-primary-border);
+  border: 1.5px solid white;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
 .slide-out {
-  /* animation: slideOut 1s ease-in-out forwards; */
-  /* display: none; */
-  /* max-width: 0 !important; */
   padding: 0;
   border: 0;
   transition: all 0.5s ease-in-out;
@@ -53,7 +61,50 @@
       pointer-events: all;
       animation: expandChild 0.5s calc(var(--ix) * 0.1s) ease-in-out forwards;
     }
+    /* Nested children also animate when parent is visible */
+    & .nested-children .child {
+      --ix: 0;
+      pointer-events: all;
+      animation: expandChild 0.5s calc(var(--ix) * 0.1s) ease-in-out forwards;
+    }
   }
+}
+
+/* Nested children inline horizontal expansion */
+.nested-children {
+  display: flex;
+  gap: 0;
+  overflow: hidden;
+  height: 100%;
+  & .child {
+    max-width: 0;
+    padding: 0;
+    border-width: 0;
+    opacity: 0;
+  }
+  &.nested-visible,
+  &:has(.child) {
+    gap: 8px;
+    overflow: visible;
+    & .child {
+      --ix: 0;
+      pointer-events: all;
+      animation: expandChild 0.5s calc(var(--ix) * 0.1s) ease-in-out forwards;
+    }
+  }
+}
+
+.nested-arrow {
+  opacity: 0;
+  max-width: 0;
+  transition: all 0.5s ease-in-out;
+}
+
+.children-visible .nested-arrow,
+.nested-children:has(.child) + .nested-arrow,
+.nested-arrow:has(+ .nested-children .child) {
+  opacity: 0.4;
+  max-width: 24px;
 }
 
 @keyframes expandChild {
@@ -73,7 +124,6 @@
 
 @keyframes slideOut {
   0% {
-    /* transform: translateX(0); */
     opacity: 1;
   }
 
@@ -82,9 +132,7 @@
   }
 
   99% {
-    /* transform: translateX(100vw); */
   }
   100% {
-    /* display: none; */
   }
 }

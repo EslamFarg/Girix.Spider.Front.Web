@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, computed, effect, ElementRef, inject, OnDestroy, signal, viewChild } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { ImgFallback } from '@/directives/img-fallback';
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { BaseComponent } from '@/components/base-component/base-component';
@@ -27,12 +28,13 @@ export interface ISubNavItem {
     imgUrl: string;
     routerLink: string;
     subLinks?: string[];
+    children?: ISubNavItem[];
     roles: number[];
 }
 
 @Component({
     selector: 'app-header',
-    imports: [ImgFallback, RouterLink, Menu, ProgressBar, MessageModule, AllowedRolesDirective],
+    imports: [ImgFallback, RouterLink, Menu, ProgressBar, MessageModule, AllowedRolesDirective, NgTemplateOutlet],
     templateUrl: './header.html',
     styleUrl: './header.css',
 })
@@ -48,16 +50,6 @@ export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
             icon: 'pi pi-sign-out',
             command: (event) => this.onLogoutClick(event.originalEvent!),
         },
-        // {
-        //   // label: 'الاجاراءات',
-        //   items: [
-        //     {
-        //       label: 'تسجيل الخروج',
-        //       icon: 'pi pi-sign-out',
-        //       command: (event) => this.onLogoutClick(event.originalEvent!),
-        //     },
-        //   ],
-        // },
     ];
 
     navItems: IMainNavItem[] = [
@@ -393,281 +385,271 @@ export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
             routerLink: '/reports',
             roles: [Role.Admin, Role.Cashier, Role.Waiter],
             children: [
-                // {
-                //     labelKey: 'CUSTOMERS',
-                //     imgUrl: '../customers',
-                //     routerLink: '/reports/customers',
-                //     roles: [Role.Admin, Role.Cashier, Role.Waiter],
-                // },
                 // ── Inventory ──────────────────────────────────────────────
                 {
-                    labelKey: 'INVENTORY_BY_ITEMS',
+                    labelKey: 'INVENTORY',
                     imgUrl: '../storage',
                     routerLink: '/reports/InventoryByItems',
                     roles: [Role.Admin, Role.Cashier],
+                    children: [
+                        {
+                            labelKey: 'INVENTORY_BY_ITEMS',
+                            imgUrl: '../storage',
+                            routerLink: '/reports/InventoryByItems',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'INVENTORY_VALUE_BY_ITEMS',
+                            imgUrl: '../storage',
+                            routerLink: '/reports/InventoryValueByItems',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'INVENTORY_VALUE_BY_GROUPS',
+                            imgUrl: '../storage',
+                            routerLink: '/reports/InventoryValueByGroups',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'ITEM_MOVEMENT',
+                            imgUrl: '../storage',
+                            routerLink: '/reports/InventoryItemMovementFull',
+                            roles: [Role.Admin, Role.Cashier],
+                            children: [
+                                {
+                                    labelKey: 'ITEM_MOVEMENT_FULL',
+                                    imgUrl: '../storage',
+                                    routerLink: '/reports/InventoryItemMovementFull',
+                                    roles: [Role.Admin, Role.Cashier],
+                                },
+                                {
+                                    labelKey: 'ITEM_MOVEMENT_ACTUAL',
+                                    imgUrl: '../storage',
+                                    routerLink: '/reports/InventoryItemMovementActual',
+                                    roles: [Role.Admin, Role.Cashier],
+                                },
+                            ],
+                        },
+                    ],
                 },
-                // {
-                //     labelKey: 'INVENTORY_BY_PROPERTIES',
-                //     imgUrl: '../storage',
-                //     routerLink: '/reports/InventoryByProperties',
-                //     roles: [Role.Admin, Role.Cashier],
-                // },
-                {
-                    labelKey: 'ITEM_MOVEMENT_FULL',
-                    imgUrl: '../storage',
-                    routerLink: '/reports/InventoryItemMovementFull',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'ITEM_MOVEMENT_ACTUAL',
-                    imgUrl: '../storage',
-                    routerLink: '/reports/InventoryItemMovementActual',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'INVENTORY_VALUE_BY_ITEMS',
-                    imgUrl: '../storage',
-                    routerLink: '/reports/InventoryValueByItems',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'INVENTORY_VALUE_BY_GROUPS',
-                    imgUrl: '../storage',
-                    routerLink: '/reports/InventoryValueByGroups',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                // {
-                //     labelKey: 'REORDER_LIMIT_BY_WAREHOUSE',
-                //     imgUrl: '../storage',
-                //     routerLink: '/reports/InventoryReorderLimitByWarehouse',
-                //     roles: [Role.Admin, Role.Cashier],
-                // },
                 // ── Purchases ──────────────────────────────────────────────
                 {
-                    labelKey: 'PURCHASES_LIST',
+                    labelKey: 'PURCHASES',
                     imgUrl: '../storage',
                     routerLink: '/reports/PurchasesList',
                     roles: [Role.Admin, Role.Cashier],
+                    children: [
+                        {
+                            labelKey: 'PURCHASES_LIST',
+                            imgUrl: '../storage',
+                            routerLink: '/reports/PurchasesList',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'PURCHASES_ITEMS_DETAILS',
+                            imgUrl: '../storage',
+                            routerLink: '/reports/PurchasesItemsDetails',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'PURCHASE_RETURNS_LIST',
+                            imgUrl: '../storage',
+                            routerLink: '/reports/PurchaseReturnsList',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'PURCHASE_RETURNS_ITEMS_DETAILS',
+                            imgUrl: '../storage',
+                            routerLink: '/reports/PurchaseReturnsItemsDetails',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                    ],
                 },
-                {
-                    labelKey: 'PURCHASES_ITEMS_DETAILS',
-                    imgUrl: '../storage',
-                    routerLink: '/reports/PurchasesItemsDetails',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'PURCHASE_RETURNS_LIST',
-                    imgUrl: '../storage',
-                    routerLink: '/reports/PurchaseReturnsList',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'PURCHASE_RETURNS_ITEMS_DETAILS',
-                    imgUrl: '../storage',
-                    routerLink: '/reports/PurchaseReturnsItemsDetails',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                // {
-                //     labelKey: 'SUPPLIERS_ANALYSIS',
-                //     imgUrl: '../storage',
-                //     routerLink: '/reports/PurchasesSuppliersAnalysis',
-                //     roles: [Role.Admin, Role.Cashier],
-                // },
                 // ── Sales ──────────────────────────────────────────────────
                 {
-                    labelKey: 'SALES_LIST',
+                    labelKey: 'SALES',
                     imgUrl: '../collections',
                     routerLink: '/reports/SalesList',
                     roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'SALES_ITEMS_DETAILS',
-                    imgUrl: '../collections',
-                    routerLink: '/reports/SalesItemsDetails',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'SALES_RETURNS_LIST',
-                    imgUrl: '../collections',
-                    routerLink: '/reports/SalesReturnsList',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'SALES_RETURNS_ITEMS_DETAILS',
-                    imgUrl: '../collections',
-                    routerLink: '/reports/SalesReturnsItemsDetails',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'SALES_Employees',
-                    imgUrl: '../customers',
-                    routerLink: '/reports/SalesCustomers',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'SALES_MINIITEMS',
-                    imgUrl: '../collections',
-                    routerLink: '/reports/SalesCashiers',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'SALES_DELIVERY',
-                    imgUrl: '../collections',
-                    routerLink: '/reports/SalesDelivery',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'FINANCIAL_STATEMENT',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/FinancialStatement',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'CategoryProfit',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/CategoryProfit',
-                    roles: [Role.Admin],
+                    children: [
+                        {
+                            labelKey: 'SALES_LIST',
+                            imgUrl: '../collections',
+                            routerLink: '/reports/SalesList',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'SALES_ITEMS_DETAILS',
+                            imgUrl: '../collections',
+                            routerLink: '/reports/SalesItemsDetails',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'SALES_RETURNS_LIST',
+                            imgUrl: '../collections',
+                            routerLink: '/reports/SalesReturnsList',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'SALES_RETURNS_ITEMS_DETAILS',
+                            imgUrl: '../collections',
+                            routerLink: '/reports/SalesReturnsItemsDetails',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'SALES_Employees',
+                            imgUrl: '../customers',
+                            routerLink: '/reports/SalesCustomers',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'SALES_MINIITEMS',
+                            imgUrl: '../collections',
+                            routerLink: '/reports/SalesCashiers',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'SALES_DELIVERY',
+                            imgUrl: '../collections',
+                            routerLink: '/reports/SalesDelivery',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                        {
+                            labelKey: 'DAILY_SALES_MOVEMENT',
+                            imgUrl: '../collections',
+                            routerLink: '/reports/DailySalesMovement',
+                            roles: [Role.Admin, Role.Cashier],
+                        },
+                    ],
                 },
                 // ── Accounts ───────────────────────────────────────────────
                 {
-                    labelKey: 'SUPPLIER_STATEMENT',
+                    labelKey: 'ACCOUNTS',
                     imgUrl: '../accounts',
                     routerLink: '/reports/SupplierStatement',
                     roles: [Role.Admin],
+                    children: [
+                        {
+                            labelKey: 'SUPPLIER_STATEMENT',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/SupplierStatement',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'CUSTOMER_STATEMENT',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/CustomerStatement',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'SingleItemProfit',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/SingleItemProfit',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'TrialBalance',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/TrialBalance',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'GroupedTrialBalance',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/GroupedTrialBalance',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'AccountGroupBalance',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/AccountGroupBalance',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'GeneralLedger',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/GeneralLedger',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'AccountStatement',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/AccountStatement',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'BalanceSheet',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/BalanceSheet',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'IncomeStatement',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/IncomeStatement',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'Customers',
+                            imgUrl: '../customers',
+                            routerLink: '/reports/Customers',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'Suppliers',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/Suppliers',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'DailyTransaction',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/DailyTransaction',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'MiniDailyJournal',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/MiniDailyJournal',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'Vat',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/Vat',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'SelectiveTax',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/SelectiveTax',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'FINANCIAL_STATEMENT',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/FinancialStatement',
+                            roles: [Role.Admin],
+                        },
+                        {
+                            labelKey: 'CategoryProfit',
+                            imgUrl: '../accounts',
+                            routerLink: '/reports/CategoryProfit',
+                            roles: [Role.Admin],
+                        },
+                    ],
                 },
-                {
-                    labelKey: 'CUSTOMER_STATEMENT',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/CustomerStatement',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'SingleItemProfit',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/SingleItemProfit',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'TrialBalance',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/TrialBalance',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'GroupedTrialBalance',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/GroupedTrialBalance',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'AccountGroupBalance',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/AccountGroupBalance',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'GeneralLedger',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/GeneralLedger',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'AccountStatement',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/AccountStatement',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'BalanceSheet',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/BalanceSheet',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'IncomeStatement',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/IncomeStatement',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'Customers',
-                    imgUrl: '../customers',
-                    routerLink: '/reports/Customers',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'Suppliers',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/Suppliers',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'DailyTransaction',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/DailyTransaction',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'MiniDailyJournal',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/MiniDailyJournal',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'DailySalesMovement',
-                    imgUrl: '../collections',
-                    routerLink: '/reports/DailySalesMovement',
-                    roles: [Role.Admin, Role.Cashier],
-                },
-                {
-                    labelKey: 'Vat',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/Vat',
-                    roles: [Role.Admin],
-                },
-                {
-                    labelKey: 'SelectiveTax',
-                    imgUrl: '../accounts',
-                    routerLink: '/reports/SelectiveTax',
-                    roles: [Role.Admin],
-                },
-                // {
-                //     labelKey: 'ACCOUNT_BALANCES',
-                //     imgUrl: '../accounts',
-                //     routerLink: '/reports/AccountBalances',
-                //     roles: [Role.Admin],
-                // },
-                // {
-                //     labelKey: 'ACCOUNT_MOVEMENT',
-                //     imgUrl: '../accounts',
-                //     routerLink: '/reports/AccountMovement',
-                //     roles: [Role.Admin],
-                // },
-                // {
-                //     labelKey: 'RECEIPT_VOUCHERS',
-                //     imgUrl: '../accounts',
-                //     routerLink: '/reports/ReceiptVouchersReport',
-                //     roles: [Role.Admin],
-                // },
-                // {
-                //     labelKey: 'PAYMENT_VOUCHERS',
-                //     imgUrl: '../accounts',
-                //     routerLink: '/reports/PaymentVouchersReport',
-                //     roles: [Role.Admin],
-                // },
-                // {
-                //     labelKey: 'GENERAL_JOURNAL',
-                //     imgUrl: '../accounts',
-                //     routerLink: '/reports/GeneralJournal',
-                //     roles: [Role.Admin],
-                // },
             ],
         }
     ];
+
     activeLink = signal<string>('/');
     prevActiveLink = signal<string>('/');
     isShowingMenu = signal(true);
     private _overflowTimeout: number | undefined;
+
+    // Track which nested items are expanded
+    expandedLinks = signal<Set<string>>(new Set());
 
     isActiveLinkParent = computed(() => this.isParent(this.activeLink()));
 
@@ -735,6 +717,10 @@ export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
         // When menu mode toggles, ensure nav overflow is restored
         effect(() => {
             const showing = this.isShowingMenu();
+            if (showing) {
+                // Collapse all nested children when returning to main menu
+                this.expandedLinks.set(new Set());
+            }
             const nav = this.nav()?.nativeElement;
             if (nav) {
                 // Clear any pending overflow restore
@@ -747,12 +733,44 @@ export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
         });
     }
 
-    getParent(childRoute: string) {
-        return this.navItems.find((p) => p.children?.some((c) => c.routerLink === childRoute))?.routerLink;
+    // ── Recursive Navigation Helpers ───────────────────────────────────────────
+
+    getParent(childRoute: string): string | undefined {
+        for (const parent of this.navItems) {
+            const found = this._findParentInChildren(childRoute, parent.children);
+            if (found) return parent.routerLink;
+        }
+        return undefined;
     }
 
-    isParent(route: string) {
+    private _findParentInChildren(childRoute: string, children?: ISubNavItem[]): string | undefined {
+        if (!children) return undefined;
+        for (const child of children) {
+            if (child.routerLink === childRoute) return child.routerLink;
+            // Also check if this child is a parent of the target
+            if (child.children) {
+                const deeper = this._findParentInChildren(childRoute, child.children);
+                if (deeper !== undefined) return child.routerLink;
+            }
+        }
+        return undefined;
+    }
+
+    isParent(route: string): boolean {
         return this.navItems.some((i) => i.routerLink === route);
+    }
+
+    /** Check if any node in the tree (at any depth) matches the route */
+    private _findNode(route: string, items?: ISubNavItem[]): ISubNavItem | undefined {
+        if (!items) return undefined;
+        for (const item of items) {
+            if (item.routerLink === route) return item;
+            if (item.children) {
+                const found = this._findNode(route, item.children);
+                if (found) return found;
+            }
+        }
+        return undefined;
     }
 
     toggleActiveLink(opts: { routerLink: string; isLink?: boolean; skipNavMove?: boolean }, el: HTMLElement) {
@@ -773,20 +791,6 @@ export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
             nav.style.overflow = '';
         }, transitionDuration);
 
-        // this.nav()!.nativeElement.scrollLeft = 0;
-        // setTimeout(() => {
-        //   this.nav()!.nativeElement.style.overflow = 'auto';
-        // }, 500);
-
-        // const moveNav = () => {
-        //     if (opts.skipNavMove) return;
-        //     navItemsContainer.style.translate = `${offsetFromRight - 10}px 0`;
-        // };
-        // const resetNav = () => {
-        //     if (opts.skipNavMove) return;
-        //     navItemsContainer.style.translate = `0 0`;
-        // };
-
         const isParent = this.isParent(link);
         const isPreviousParent = this.isParent(this.prevActiveLink());
         console.log(`
@@ -799,26 +803,18 @@ export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
             `);
         const isSameParentLink = link === this.prevActiveLink() && isParent;
 
-        // console.log(link, isParent, isPreviousParent, isSameParentLink);
-
         if (isParent && opts.isLink) {
             this.isShowingMenu.set(true);
             if (this.prevActiveLink() === '/' || isPreviousParent) {
                 this.activeLink.set(link);
-                // resetNav();
             } else {
                 this.prevActiveLink.set(link);
             }
         } else if (isParent) {
-            // console.log('is parent');
             if (isSameParentLink || this.isAnyChildActive(link)) {
-                // resetNav();
-                // console.log('reset translate');
                 this.isShowingMenu.set(true);
                 this.prevActiveLink.set('');
             } else {
-                // moveNav();
-                // console.log('move translate');
                 this.isShowingMenu.set(false);
                 this.prevActiveLink.set(link);
             }
@@ -828,32 +824,138 @@ export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
             this.activeLink.set(link);
             this.isShowingMenu.set(false);
         }
-
-        // this.changeDetectionRef.markForCheck();
     }
 
-    isAnyChildActive(parentLink: string) {
+    isAnyChildActive(parentLink: string): boolean {
         const parent = this.navItems.find((item) => item.routerLink === parentLink);
-        const isChildActive = parent?.children?.some((child) => child.routerLink === this.activeLink());
-        return isChildActive;
+        if (!parent?.children) return false;
+        return this._hasActiveDescendant(parent.children);
     }
 
-    isParentActive(parentLink: string) {
+    private _hasActiveDescendant(children: ISubNavItem[]): boolean {
+        for (const child of children) {
+            if (child.routerLink === this.activeLink()) return true;
+            if (child.children && this._hasActiveDescendant(child.children)) return true;
+            // Also check subLinks
+            if (child.subLinks?.some((sl) => sl === this.activeLink())) return true;
+        }
+        return false;
+    }
+
+    isParentActive(parentLink: string): boolean {
         return parentLink === this.activeLink() || this.isAnyChildActive(parentLink);
-        // return this.navItems.some((item) => item.routerLink === parentLink);
     }
 
-    isAnyChildSubLinksActive(parentLink: string) {
+    isAnyChildSubLinksActive(parentLink: string): boolean {
         const parent = this.navItems.find((item) => item.routerLink === parentLink);
-        return parent?.children?.some((child) => child.subLinks?.some((subLink) => subLink === this.activeLink()));
+        if (!parent?.children) return false;
+        return this._hasSubLinksActiveDescendant(parent.children);
     }
 
-    isAnySubLinksActive(parentLink: string, childLink: string) {
+    private _hasSubLinksActiveDescendant(children: ISubNavItem[]): boolean {
+        for (const child of children) {
+            if (child.subLinks?.some((sl) => sl === this.activeLink())) return true;
+            if (child.children && this._hasSubLinksActiveDescendant(child.children)) return true;
+        }
+        return false;
+    }
+
+    isAnySubLinksActive(parentLink: string, childLink: string): boolean {
         const parent = this.navItems.find((item) => item.routerLink === parentLink);
-        const child = parent?.children?.find((item) => item.routerLink === childLink);
+        const child = this._findChildRecursive(parent?.children, childLink);
         if (!child) return false;
         if (!child.subLinks) return false;
         return child.subLinks.some((subLink) => subLink === this.activeLink());
+    }
+
+    private _findChildRecursive(children: ISubNavItem[] | undefined, link: string): ISubNavItem | undefined {
+        if (!children) return undefined;
+        for (const child of children) {
+            if (child.routerLink === link) return child;
+            if (child.children) {
+                const found = this._findChildRecursive(child.children, link);
+                if (found) return found;
+            }
+        }
+        return undefined;
+    }
+
+    /** Get all ancestor routerLinks for a given route (excluding the route itself) */
+    private _getAncestorLinks(route: string): string[] {
+        const result: string[] = [];
+        for (const parent of this.navItems) {
+            if (this._collectAncestors(route, parent.children, result, [parent.routerLink])) {
+                return result;
+            }
+        }
+        return result;
+    }
+
+    private _collectAncestors(route: string, items: ISubNavItem[] | undefined, result: string[], parentChain: string[] = []): boolean {
+        if (!items) return false;
+        for (const item of items) {
+            if (item.routerLink === route) {
+                result.push(...parentChain);
+                return true;
+            }
+            if (item.children) {
+                const found = this._collectAncestors(route, item.children, result, [...parentChain, item.routerLink]);
+                if (found) return true;
+            }
+        }
+        return false;
+    }
+
+    // ── Expand / Collapse for nested items ────────────────────────────────────
+
+    isExpanded(link: string): boolean {
+        return this.expandedLinks().has(link);
+    }
+
+    toggleExpanded(link: string, event?: Event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        this.expandedLinks.update((set) => {
+            const next = new Set(set);
+            if (next.has(link)) {
+                next.delete(link);
+            } else {
+                // Get ancestors of the new item
+                const ancestors = new Set(this._getAncestorLinks(link));
+                // Keep only ancestors of the new item (they're part of the path),
+                // remove siblings and unrelated branches
+                for (const expanded of Array.from(next)) {
+                    if (!ancestors.has(expanded)) {
+                        next.delete(expanded);
+                    }
+                }
+                next.add(link);
+            }
+            return next;
+        });
+    }
+
+    /** Handle click on a child item that may have its own children */
+    onChildClick(item: ISubNavItem, parentEl: HTMLElement, event: Event) {
+        if (item.children && item.children.length > 0) {
+            // Non-leaf: toggle expansion
+            this.toggleExpanded(item.routerLink, event);
+        } else {
+            // Leaf: navigate
+            const targetLink = item.subLinks ? item.subLinks[0] : item.routerLink;
+            this.toggleActiveLink({ routerLink: targetLink, isLink: true }, parentEl);
+        }
+    }
+
+    /** Get the effective router link for an item (first leaf if it has children) */
+    getEffectiveLink(item: ISubNavItem): string {
+        if (item.subLinks && item.subLinks.length > 0) return item.subLinks[0];
+        if (item.children && item.children.length > 0) {
+            return this.getEffectiveLink(item.children[0]);
+        }
+        return item.routerLink;
     }
 
     onLogoutClick(event: Event) {
