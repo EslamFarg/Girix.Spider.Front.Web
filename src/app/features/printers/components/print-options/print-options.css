@@ -1,0 +1,239 @@
+.app-print-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  width: 100%;
+}
+
+.app-print-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  width: 100%;
+  max-width: 250px;
+  border: 1px solid var(--color-text-gray);
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.2;
+  background: #fafafa;
+}
+
+.app-print-options label .printer-card-title {
+  font-size: 12px;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.app-print-options label .printer-card-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 0.125rem;
+}
+
+.app-print-options label .printer-card-subtitle {
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-print-options label input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+/* Cashier payment popup — 3 equal compact printer cards */
+.payment-print-compact {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.375rem;
+  width: 100%;
+  max-width: 100%;
+  align-items: stretch;
+}
+
+.payment-print-compact label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: 100%;
+  min-width: 0;
+  min-height: 4.25rem;
+  padding: 0.35rem 0.3rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d3dce6;
+  background: #f8fafb;
+  text-align: center;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.payment-print-compact label:has(input:checked) {
+  border-color: var(--color-dark-line);
+  background: #eef6ff;
+}
+
+.payment-print-compact label input[type='checkbox'] {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+}
+
+.payment-print-compact label .printer-card-title {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-dark-bg-2);
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  width: 100%;
+}
+
+.payment-print-compact label .printer-card-badge {
+  font-size: 9px;
+  line-height: 1.1;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .payment-print-compact {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-print-compact label {
+    min-height: 3.5rem;
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .payment-print-compact label .printer-card-title {
+    -webkit-line-clamp: 1;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 620px) {
+  .payment-print-compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* POS payment popup — compact horizontal printer row */
+.payment-print-pos {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 0.3125rem;
+  width: 100%;
+}
+
+.payment-print-pos label {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  min-width: 0;
+  min-height: 3.25rem;
+  padding: 0.3125rem 0.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d3dce6;
+  background: #f8fafb;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.payment-print-pos label:has(input:checked) {
+  border-color: #059669;
+  background: #ecfdf5;
+  box-shadow: 0 0 0 1px #059669;
+}
+
+.payment-print-pos label input[type='checkbox'] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+.payment-print-pos label .printer-card-icon {
+  font-size: 0.875rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.payment-print-pos label .printer-card-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.0625rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.payment-print-pos label .printer-card-title {
+  font-size: 0.625rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--color-dark-bg-2);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.payment-print-pos label .printer-card-subtitle {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: #64748b;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.payment-print-pos label .printer-card-badge {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .payment-print-pos {
+    flex-wrap: wrap;
+  }
+
+  .payment-print-pos label {
+    flex: 1 1 calc(33.333% - 0.3125rem);
+    min-height: 3rem;
+  }
+}

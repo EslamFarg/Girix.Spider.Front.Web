@@ -1,0 +1,373 @@
+.payment-dialog {
+  --pos-accent: #059669;
+  --pos-accent-dark: #047857;
+  --pos-accent-light: #ecfdf5;
+  --pos-accent-border: #6ee7b7;
+  --pos-border: #e2e8f0;
+}
+
+.payment-dialog::ng-deep .p-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(650px, 90vw) !important;
+  max-width: 90vw !important;
+  max-height: 85vh !important;
+  overflow: hidden !important;
+  margin: 0 auto;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16) !important;
+}
+
+.payment-dialog::ng-deep .payment-dialog-content.p-dialog-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 85vh;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.payment-dialog-shell {
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  min-height: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
+.payment-dialog-header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.25rem 0.5rem 0;
+}
+
+.payment-dialog-close {
+  width: 1.625rem;
+  height: 1.625rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: #f1f5f9;
+  color: #475569;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.payment-dialog-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 0.625rem 0.25rem;
+}
+
+.pos-payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+/* Summary — compact */
+.pos-pay-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.4375rem 0.625rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--pos-accent-border);
+  background: linear-gradient(180deg, #fff, var(--pos-accent-light));
+}
+
+.pos-pay-summary-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.pos-pay-summary-value {
+  font-size: 1.625rem;
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--pos-accent-dark);
+}
+
+/* Sections */
+.pos-pay-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pos-pay-section-title {
+  display: block;
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: #475569;
+}
+
+.pos-pay-segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+  padding: 0.125rem;
+  border-radius: 0.5rem;
+  background: #f1f5f9;
+  border: 1px solid var(--pos-border);
+}
+
+.pos-pay-segment {
+  position: relative;
+  min-height: 2rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: transparent;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #475569;
+  cursor: pointer;
+}
+
+.pos-pay-segment input[type='radio'] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.pos-pay-segment--active {
+  background: var(--pos-accent);
+  color: #fff;
+}
+
+/* Cash / Network split columns */
+.pos-pay-split-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.pos-pay-amount-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.4375rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--pos-border);
+  background: #fafbfc;
+}
+
+.pos-pay-amount-block > label:first-child {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #334155;
+  margin: 0;
+}
+
+.pos-pay-account-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #64748b;
+  margin: 0.125rem 0 0;
+}
+
+.pos-pay-amount-input {
+  font-size: 1.125rem !important;
+  font-weight: 800 !important;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.pos-pay-transfer-btn {
+  min-width: 2.5rem !important;
+  min-height: 2.5rem !important;
+  padding: 0 !important;
+  justify-content: center;
+  background: var(--pos-accent) !important;
+  border-color: var(--pos-accent) !important;
+}
+
+.payment-dialog::ng-deep .pos-pay-amount-block .p-inputgroupaddon button {
+  min-height: 2.5rem;
+}
+
+.payment-dialog::ng-deep .pos-pay-amount-block .app-input,
+.payment-dialog::ng-deep .pos-pay-amount-block .p-inputtext {
+  min-height: 2.5rem !important;
+  height: 2.5rem !important;
+}
+
+.payment-dialog::ng-deep .pos-pay-amount-block .ng-select .ng-select-container {
+  min-height: 2.125rem !important;
+  height: 2.125rem !important;
+}
+
+/* Received / change details */
+.pos-pay-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3125rem;
+}
+
+.pos-pay-customer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3125rem;
+}
+
+.pos-pay-field label {
+  display: block;
+  margin-bottom: 0.125rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.pos-pay-field--full {
+  grid-column: 1 / -1;
+}
+
+.pos-pay-received {
+  border: 1px solid var(--pos-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.pos-pay-received-label {
+  display: block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #64748b;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--pos-border);
+}
+
+.pos-pay-received-row {
+  display: flex;
+  gap: 0.3125rem;
+  padding: 0.3125rem;
+}
+
+.pos-pay-received-input {
+  flex: 1;
+  min-height: 2rem;
+  border: 1px solid var(--pos-border);
+  border-radius: 0.375rem;
+  background: #f8fafc;
+  font-size: 1rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.pos-pay-received-input:focus-visible {
+  border-color: var(--pos-accent);
+  outline: none;
+}
+
+.pos-pay-full-btn {
+  min-height: 2rem !important;
+  padding: 0 0.625rem !important;
+  font-size: 0.6875rem !important;
+  font-weight: 800 !important;
+  background: var(--pos-accent) !important;
+  border-color: var(--pos-accent) !important;
+}
+
+/* Change — inline row inside details */
+.pos-pay-change {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3125rem 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--pos-border);
+  background: #f8fafc;
+}
+
+.pos-pay-change-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.pos-pay-change-value {
+  font-size: 1.125rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.pos-pay-change--positive {
+  border-color: var(--pos-accent-border);
+  background: var(--pos-accent-light);
+}
+
+.pos-pay-change--positive .pos-pay-change-value {
+  color: var(--pos-accent-dark);
+}
+
+.pos-pay-change--neutral .pos-pay-change-value {
+  color: #94a3b8;
+}
+
+.pos-pay-customer {
+  padding-top: 0.125rem;
+  border-top: 1px dashed var(--pos-border);
+}
+
+.pos-pay-printers {
+  padding-top: 0.125rem;
+}
+
+/* Footer — centered fixed-width save */
+.payment-dialog-footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.4375rem 0.625rem 0.5625rem;
+  border-top: 1px solid var(--pos-border);
+  background: #fff;
+}
+
+.pos-pay-save-btn {
+  width: 220px;
+  max-width: 100%;
+  min-height: 2.375rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 800 !important;
+  justify-content: center;
+  border-radius: 0.5rem !important;
+  background: var(--pos-accent) !important;
+  border-color: var(--pos-accent) !important;
+}
+
+.payment-dialog::ng-deep .pos-pay-field .app-input,
+.payment-dialog::ng-deep .pos-pay-field .p-inputtext,
+.payment-dialog::ng-deep .pos-pay-field .ng-select .ng-select-container {
+  min-height: 2rem !important;
+  height: 2rem !important;
+  font-size: 0.8125rem !important;
+}
+
+.payment-dialog::ng-deep .pos-pay-field .ng-select .ng-value-container {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+@media (max-width: 520px) {
+  .pos-pay-summary-value {
+    font-size: 1.375rem;
+  }
+
+  .pos-pay-split-columns,
+  .pos-pay-customer-grid {
+    grid-template-columns: 1fr;
+  }
+}

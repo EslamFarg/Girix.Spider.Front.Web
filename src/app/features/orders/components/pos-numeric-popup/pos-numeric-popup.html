@@ -1,0 +1,45 @@
+<p-dialog
+    [visible]="visible()"
+    (visibleChange)="onVisibleChange($event)"
+    [modal]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [closable]="false"
+    [style]="{ width: 'min(340px, 94vw)' }"
+    styleClass="pos-numeric-popup-dialog"
+    contentStyleClass="pos-numeric-popup-content"
+    appendTo="body"
+>
+    <div class="pos-numeric-popup" dir="rtl">
+        <p class="pos-numeric-popup-title">{{ title() }}</p>
+
+        <div class="pos-numeric-popup-display">{{ displayValue() }}</div>
+
+        <div class="pos-numeric-popup-grid">
+            @for (row of rows; track $index) {
+                @for (key of row; track key) {
+                    <button type="button" class="pos-numeric-key" (click)="onDigitPress(key)">
+                        {{ key }}
+                    </button>
+                }
+            }
+
+            <button type="button" class="pos-numeric-key pos-numeric-key--action" (click)="onClear()">
+                مسح
+            </button>
+            <button type="button" class="pos-numeric-key" (click)="onDigitPress('0')">0</button>
+            <button type="button" class="pos-numeric-key pos-numeric-key--action" (click)="onBackspace()">
+                <i class="pi pi-delete-left"></i>
+            </button>
+        </div>
+
+        <div class="pos-numeric-popup-actions">
+            <button type="button" pButton class="pos-numeric-cancel" severity="secondary" (click)="onCancel()">
+                إلغاء
+            </button>
+            <button type="button" pButton class="pos-numeric-confirm app-p-btn" (click)="onConfirm()">
+                تأكيد
+            </button>
+        </div>
+    </div>
+</p-dialog>

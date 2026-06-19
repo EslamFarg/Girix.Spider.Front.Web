@@ -42,9 +42,10 @@ import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message
 import { ICustomerSearchRow } from '@/features/customers/services/customer-types';
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { PrinterService, IPrintJob, AppPrinterType } from '@/features/printers';
+import { PrinterService, IPrintJob, AppPrinterType, IAppPrinter } from '@/features/printers';
 import { PrinterSettingsService } from '@/features/printers/services/printer-settings-service';
 import { PrintOptions } from '@/features/printers/components/print-options/print-options';
+import { PosNumericPopup } from '../../components/pos-numeric-popup/pos-numeric-popup';
 import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
 import {
     FinancialSettingsService,
@@ -57,8 +58,6 @@ import {
     onlyNumbersAllowed,
     onlyNumbersOrDotAllowed,
 } from '@/yn-ng/utils/text-validators';
-import { KeyboardService } from '@/features/keyboard/services/keyboard-service';
-import { NumbersKeyboard } from '@/features/keyboard/components/numbers-keyboard/numbers-keyboard';
 import { AmountType } from '@/core/enums';
 import {
     DeliverySearchEnum,
@@ -77,6 +76,11 @@ import { DialogType } from '@/features/dialogs/enums';
 import { ControlsOf, NullablePropsOf } from '@/yn-ng/types/helpers';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RestaurantInfoService } from '@/features/settings/services/restaurant-info-service';
+import {
+    IPosPaymentPreferences,
+    PosPaymentPreferencesService,
+    PosPaymentSplit,
+} from '../../services/pos-payment-preferences.service';
 
 //this interface has the same keys as IOrderCreateRequest but different valeus
 interface IOrderCreateFgValue {
@@ -120,7 +124,6 @@ interface IOrderCreateFgValue {
         ButtonDirective,
         NgSelectComponent,
         FormsModule,
-        NumbersKeyboard,
         SkeletonModule,
         RouterLink,
         PrintableOrderInvoice,
@@ -129,9 +132,10 @@ interface IOrderCreateFgValue {
         InputGroupAddon,
         DecimalMask,
         PrintOptions,
+        PosNumericPopup,
     ],
     templateUrl: './cashier.html',
-    styleUrl: './cashier.css',
+    styleUrls: ['./cashier.css', './payment-modal.css'],
 })
 export class Cashier extends BaseComponent implements OnInit {
     receiptTemplateService = inject(ReceiptTemplateService);
@@ -165,6 +169,7 @@ export class Cashier extends BaseComponent implements OnInit {
     printService = inject(PrinterService);
     printerSettingsService = inject(PrinterSettingsService);
     restaurantInfoService = inject(RestaurantInfoService);
+    posPaymentPreferencesService = inject(PosPaymentPreferencesService);
     restaurantName = signal<string>('فاتورة كاشير');
     // printBill = signal<IOrderBillReadResponse | null>(null);
     printableOrderInvoice = viewChild<PrintableOrderInvoice>('printableOrderInvoice');
@@ -380,7 +385,6 @@ export class Cashier extends BaseComponent implements OnInit {
             });
         });
 
-        this.paymentTypeControl?.disable();
         this.printerSettingsService.getSettings().subscribe();
         // this.orderFg.setValidators;
 
@@ -453,6 +457,15 @@ export class Cashier extends BaseComponent implements OnInit {
 
     orderFgValue = toSignal(this.orderFg.valueChanges, { initialValue: this.orderFg.getRawValue() });
     paymentTypeSignal = toSignal(this.paymentTypeControl.valueChanges, { initialValue: this.paymentTypeControl.value });
+    payingCashSignal = toSignal(this.payingCashControl.valueChanges, { initialValue: this.payingCashControl.value });
+    payingNetworkSignal = toSignal(this.payingNetworkControl.valueChanges, {
+        initialValue: this.payingNetworkControl.value,
+    });
+
+    showReceivedAndChange = computed(
+        () =>
+            this.paymentTypeSignal() === OrderPaymentType.Paid && +(this.payingCashSignal() ?? 0) > 0,
+    );
 
     get orderTypeControl() {
         return this.orderFg.controls.orderType;
@@ -476,11 +489,11 @@ export class Cashier extends BaseComponent implements OnInit {
 
         switch (this.formMode()) {
             case FormMode.Create:
-                this.printService.selectedPrinters.set([]);
                 this.orderFg.patchValue({
                     items: this.orderCreateItems(),
-                })
-                this.orderConfirmationDialogVisible = true;
+                });
+                this.preparePaymentConfirmationDialog();
+                this.orderConfirmationDialogVisible.set(true);
                 break;
             case FormMode.Update:
                 this.orderService
@@ -563,10 +576,11 @@ export class Cashier extends BaseComponent implements OnInit {
             case FormMode.Create:
                 this.orderService.create(values).subscribe({
                     next: (res) => {
+                        this.savePaymentPreferencesFromForm();
                         this.existingOrderBill.set(res as unknown as IOrderBillReadResponse);
                         this.printOrder();
                         this.resetOrderForm();
-                        this.orderConfirmationDialogVisible = false;
+                        this.orderConfirmationDialogVisible.set(false);
                     },
                     error: (err) => {
                         this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم انشاء الطلب' });
@@ -1012,12 +1026,19 @@ export class Cashier extends BaseComponent implements OnInit {
     });
 
     netListener = effect(() => {
-        let net = this.net();
+        if (this.orderConfirmationDialogVisible()) {
+            return;
+        }
 
-        this.orderFg.patchValue({
-            payingCash: +net.toFixed(2),
-            payingNetwork: 0,
-        });
+        const net = this.net();
+
+        this.orderFg.patchValue(
+            {
+                payingCash: +net.toFixed(2),
+                payingNetwork: 0,
+            },
+            { emitEvent: false },
+        );
     });
 
     //#endregion
@@ -1609,7 +1630,7 @@ export class Cashier extends BaseComponent implements OnInit {
     //#region customer info
     //
 
-    orderConfirmationDialogVisible = false;
+    orderConfirmationDialogVisible = signal(false);
     customerValidators: { [key: string]: ValidatorFn[] } = {
         id: [Validators.required],
         phoneNumber: [Validators.required, Validators.minLength(6)],
@@ -1619,7 +1640,7 @@ export class Cashier extends BaseComponent implements OnInit {
     customerFg = this.orderFg.controls.customerRequest;
 
     showCustomerDialog() {
-        this.orderConfirmationDialogVisible = true;
+        this.orderConfirmationDialogVisible.set(true);
     }
     // onCustomerInfoDialogVisibilityChange(visible: boolean) {
     //     if (!visible) {
@@ -1730,6 +1751,202 @@ export class Cashier extends BaseComponent implements OnInit {
 
     //#endregion
 
+    private preparePaymentConfirmationDialog() {
+        this.amountReceived.set(0);
+        this.numericPopupVisible.set(false);
+        this.enablePaymentTypeForDialog();
+
+        const prefs = this.posPaymentPreferencesService.load();
+        if (prefs) {
+            this.applyPaymentPreferences(prefs);
+        } else {
+            this.printService.selectedPrinters.set([]);
+        }
+
+        this.applyPaymentAmountDefaults(prefs);
+    }
+
+    private enablePaymentTypeForDialog() {
+        if (this.orderTypeControl.value === OrderLocationType.CompanyDelivery) {
+            this.paymentTypeControl.setValue(OrderPaymentType.Pending, { emitEvent: true });
+            this.paymentTypeControl.disable({ emitEvent: false });
+            return;
+        }
+
+        this.paymentTypeControl.enable({ emitEvent: false });
+    }
+
+    private applyPaymentPreferences(prefs: IPosPaymentPreferences) {
+        const orderType = this.orderTypeControl.value;
+
+        if (orderType !== OrderLocationType.CompanyDelivery) {
+            this.paymentTypeControl.setValue(prefs.paymentType, { emitEvent: true });
+        }
+
+        this.orderFg.patchValue(
+            {
+                cashAccountId: prefs.cashAccountId ?? this.orderFg.controls.cashAccountId.value,
+                networkAccountId: prefs.networkAccountId ?? this.orderFg.controls.networkAccountId.value,
+            },
+            { emitEvent: false },
+        );
+
+        this.restorePrinterSelections(prefs);
+    }
+
+    private applyPaymentAmountDefaults(_prefs: IPosPaymentPreferences | null = null) {
+        const paymentType = this.paymentTypeControl.value;
+
+        if (paymentType !== OrderPaymentType.Paid) {
+            this.orderFg.patchValue(
+                {
+                    payingCash: 0,
+                    payingNetwork: 0,
+                },
+                { emitEvent: false },
+            );
+            return;
+        }
+
+        this.applyDefaultPaymentAmounts();
+    }
+
+    private applyDefaultPaymentAmounts() {
+        const total = +this.initialNet().toFixed(2);
+        this.orderFg.patchValue(
+            {
+                payingCash: total,
+                payingNetwork: 0,
+            },
+            { emitEvent: false },
+        );
+    }
+
+    transferAllToNetwork() {
+        const total = +this.initialNet().toFixed(2);
+        this.orderFg.patchValue(
+            {
+                payingCash: 0,
+                payingNetwork: total,
+            },
+            { emitEvent: false },
+        );
+    }
+
+    transferAllToCash() {
+        const total = +this.initialNet().toFixed(2);
+        this.orderFg.patchValue(
+            {
+                payingCash: total,
+                payingNetwork: 0,
+            },
+            { emitEvent: false },
+        );
+    }
+
+    private detectPaymentSplit(cash: number | null, network: number | null): PosPaymentSplit {
+        const cashAmount = +(cash ?? 0);
+        const networkAmount = +(network ?? 0);
+
+        if (cashAmount > 0 && networkAmount === 0) {
+            return 'cash';
+        }
+        if (networkAmount > 0 && cashAmount === 0) {
+            return 'network';
+        }
+        return 'mixed';
+    }
+
+    selectPaymentType(type: OrderPaymentType) {
+        if (this.paymentTypeControl.disabled) {
+            return;
+        }
+
+        this.paymentTypeControl.setValue(type, { emitEvent: true });
+
+        if (type === OrderPaymentType.Paid) {
+            this.applyDefaultPaymentAmounts();
+        } else {
+            this.orderFg.patchValue(
+                {
+                    payingCash: 0,
+                    payingNetwork: 0,
+                },
+                { emitEvent: false },
+            );
+            this.amountReceived.set(0);
+        }
+    }
+
+    private restorePrinterSelections(prefs: IPosPaymentPreferences) {
+        const settings = this.printerSettingsService.printerSettings();
+        if (!settings) {
+            this.printService.selectedPrinters.set([]);
+            return;
+        }
+
+        const restored: IAppPrinter[] = [];
+
+        if (prefs.cashierPrinter && settings.cashierPrinter?.id === prefs.cashierPrinter.id) {
+            restored.push({ ...settings.cashierPrinter, appPrinterType: AppPrinterType.cashierPrinter });
+        }
+        if (prefs.captainPrinter && settings.captionOrderPrinter?.id === prefs.captainPrinter.id) {
+            restored.push({ ...settings.captionOrderPrinter, appPrinterType: AppPrinterType.captionOrderPrinter });
+        }
+        if (prefs.kitchenPrinter && settings.programPrinter?.id === prefs.kitchenPrinter.id) {
+            restored.push({ ...settings.programPrinter, appPrinterType: AppPrinterType.programPrinter });
+        }
+
+        this.printService.selectedPrinters.set(restored);
+    }
+
+    private savePaymentPreferencesFromForm() {
+        const raw = this.orderFg.getRawValue();
+        const selected = this.printService.selectedPrinters();
+
+        const toPref = (type: AppPrinterType) => {
+            const printer = selected.find((p) => p.appPrinterType === type);
+            return printer ? { id: printer.id, appPrinterType: type } : null;
+        };
+
+        this.posPaymentPreferencesService.save({
+            paymentType: raw.paymentType ?? OrderPaymentType.Paid,
+            lastPaymentSplit: this.detectPaymentSplit(raw.payingCash, raw.payingNetwork),
+            cashAccountId: raw.cashAccountId,
+            networkAccountId: raw.networkAccountId,
+            cashierPrinter: toPref(AppPrinterType.cashierPrinter),
+            captainPrinter: toPref(AppPrinterType.captionOrderPrinter),
+            kitchenPrinter: toPref(AppPrinterType.programPrinter),
+        });
+    }
+
+    private syncPaymentTypeControlWithOrderType() {
+        const orderType = this.orderTypeControl.value;
+
+        switch (orderType) {
+            case OrderLocationType.Takeaway:
+                this.paymentTypeControl.setValue(OrderPaymentType.Paid, { emitEvent: false });
+                this.paymentTypeControl.disable({ emitEvent: false });
+                break;
+            case OrderLocationType.CompanyDelivery:
+                this.paymentTypeControl.setValue(OrderPaymentType.Pending, { emitEvent: false });
+                this.paymentTypeControl.disable({ emitEvent: false });
+                break;
+            default:
+                this.paymentTypeControl.enable({ emitEvent: false });
+                break;
+        }
+    }
+
+    closeOrderConfirmationDialog() {
+        this.orderConfirmationDialogVisible.set(false);
+        this.syncPaymentTypeControlWithOrderType();
+    }
+
+    onPaymentConfirmationDialogHide() {
+        this.syncPaymentTypeControlWithOrderType();
+    }
+
     //
     //#region payment info
     //
@@ -1754,29 +1971,63 @@ export class Cashier extends BaseComponent implements OnInit {
     // Amount received from customer (for change calculation only)
     amountReceived = signal<number>(0);
 
-    // Calculate change (positive = return to customer, negative = still required)
-    changeAmount = computed(() => {
+    numericPopupVisible = signal(false);
+
+    // Change returned to customer when received exceeds invoice total
+    customerChangeAmount = computed(() => {
+        if (this.paymentTypeSignal() !== OrderPaymentType.Paid) {
+            return 0;
+        }
+
         const received = this.amountReceived() ?? 0;
-        const total = this.net() ?? 0;
-        return received - total;
+        const invoiceTotal = this.initialNet();
+        if (received <= invoiceTotal) {
+            return 0;
+        }
+
+        return +(received - invoiceTotal).toFixed(2);
     });
 
+    openReceivedAmountPopup() {
+        if (this.paymentTypeSignal() !== OrderPaymentType.Paid) {
+            return;
+        }
+
+        this.numericPopupVisible.set(true);
+    }
+
+    onNumericPopupConfirm(value: number) {
+        this.amountReceived.set(Math.max(0, +value.toFixed(2)));
+        this.numericPopupVisible.set(false);
+    }
+
+    setFullReceivedAmount() {
+        this.amountReceived.set(+this.initialNet().toFixed(2));
+    }
+
     orderPaymentTypeChangeListener = this.orderFg.controls.paymentType.valueChanges.subscribe((value) => {
-        let validators: ValidatorFn[] = [];
-        if (value === OrderPaymentType.Paid) validators = [Validators.required];
+        const validators: ValidatorFn[] = value === OrderPaymentType.Paid ? [Validators.required] : [];
 
         const controls = [this.payingCashControl, this.payingNetworkControl];
 
         controls.forEach((control) => {
-            if (value === OrderPaymentType.Paid) control?.enable();
-            else control?.disable();
+            if (value === OrderPaymentType.Paid) {
+                control?.enable({ emitEvent: false });
+            } else {
+                control?.disable({ emitEvent: false });
+            }
 
             control?.setValidators(validators);
+            control?.updateValueAndValidity({ emitEvent: false });
         });
     });
 
     cashInputSubscription = this.payingCashControl.valueChanges.subscribe((value) => {
-        const net = this.net();
+        if (this.paymentTypeControl.value !== OrderPaymentType.Paid) {
+            return;
+        }
+
+        const net = this.initialNet();
         let futureValue = +(value ?? 0);
 
         if (futureValue > net) futureValue = net;
@@ -1784,14 +2035,18 @@ export class Cashier extends BaseComponent implements OnInit {
 
         this.orderFg.patchValue(
             {
-                payingNetwork: net - futureValue,
+                payingNetwork: +Math.max(0, net - futureValue).toFixed(2),
             },
             { emitEvent: false },
         );
     });
 
     networkInputSubscription = this.payingNetworkControl?.valueChanges.subscribe((value) => {
-        const net = this.net();
+        if (this.paymentTypeControl.value !== OrderPaymentType.Paid) {
+            return;
+        }
+
+        const net = this.initialNet();
         let futureValue = +(value ?? 0);
 
         if (futureValue > net) futureValue = net;
@@ -1799,7 +2054,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
         this.orderFg.patchValue(
             {
-                payingCash: net - futureValue,
+                payingCash: +Math.max(0, net - futureValue).toFixed(2),
             },
             { emitEvent: false },
         );
