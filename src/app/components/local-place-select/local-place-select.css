@@ -196,86 +196,147 @@
     height: 110px;
 }
 
+/* ── Smooth base transitions (room + table — hover reverses cleanly) ──────── */
+
+.cashier-place-selector ::ng-deep .room-available,
+.cashier-place-selector ::ng-deep .table-available {
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease,
+        background-color 0.18s ease;
+}
+
+/* ── Card states: Available hover ────────────────────────────────────────── */
+
+/* Room: green border + lift
+   (green inset shadow already supplied by card's own inline style via --color) */
+.cashier-place-selector ::ng-deep .room-available:not(.active):hover {
+    border-color: rgb(80, 209, 170) !important;
+    transform: translateY(-2px);
+}
+
+/* Table: green border + lift */
+.cashier-place-selector ::ng-deep .table-available:not(.active):hover {
+    border-color: rgb(80, 209, 170) !important;
+    transform: translateY(-2px);
+}
+
+/* Hut: lift + green body inset shadow
+   (card's own --color on hover turns roof border green) */
+.cashier-place-selector ::ng-deep .hut-available:not(.active):hover {
+    transform: translateY(-2px);
+    transition: transform 0.18s ease;
+}
+
+.cashier-place-selector ::ng-deep .hut-available:not(.active):hover .hut-body {
+    box-shadow:
+        0 0 20px 0 #a3a3a34d,
+        inset 0 0 18px rgba(80, 209, 170, 0.30) !important;
+}
+
 /* ── Card states: Occupied / Reserved ────────────────────────────────────── */
 
-/* Room reserved — cursor + stronger red inset shadow */
+/* Room reserved — red border + strong red inset shadow + cursor */
 .cashier-place-selector ::ng-deep .room-reserved {
+    border-color: rgb(255, 56, 60) !important;
     cursor: not-allowed !important;
     box-shadow:
         0 0 20px 0 #a3a3a34d,
-        inset 0 0 18px rgba(255, 56, 60, 0.22) !important;
+        inset 0 0 22px rgba(255, 56, 60, 0.32) !important;
+    transition: box-shadow 0.18s ease;
 }
 
-/* Table reserved — cursor + stronger red inset shadow */
+/* Room reserved hover — increase red glow, never turns green */
+.cashier-place-selector ::ng-deep .room-reserved:hover {
+    box-shadow:
+        0 0 20px 0 #a3a3a34d,
+        inset 0 0 32px rgba(255, 56, 60, 0.52) !important;
+}
+
+/* Table reserved — red border + strong red inset shadow + cursor */
 .cashier-place-selector ::ng-deep .table-reserved {
+    border-color: rgb(255, 56, 60) !important;
     cursor: not-allowed !important;
     box-shadow:
         0 0 20px 0 #a3a3a34d,
-        inset 0 0 18px rgba(255, 56, 60, 0.22) !important;
+        inset 0 0 22px rgba(255, 56, 60, 0.32) !important;
+    transition: box-shadow 0.18s ease;
 }
 
-/* Hut reserved — red inset shadow on body */
+/* Table reserved hover — increase red glow, never turns green */
+.cashier-place-selector ::ng-deep .table-reserved:hover {
+    box-shadow:
+        0 0 20px 0 #a3a3a34d,
+        inset 0 0 32px rgba(255, 56, 60, 0.52) !important;
+}
+
+/* Hut reserved — red inset shadow on body + cursor */
 .cashier-place-selector ::ng-deep .hut-reserved .hut-body {
     box-shadow:
         0 0 20px 0 #a3a3a34d,
-        inset 0 0 20px rgba(255, 56, 60, 0.22) !important;
+        inset 0 0 22px rgba(255, 56, 60, 0.32) !important;
+    transition: box-shadow 0.18s ease;
 }
+
+/* Hut reserved hover — increase red glow */
+.cashier-place-selector ::ng-deep .hut-reserved:hover .hut-body {
+    box-shadow:
+        0 0 20px 0 #a3a3a34d,
+        inset 0 0 32px rgba(255, 56, 60, 0.52) !important;
+}
+
 .cashier-place-selector ::ng-deep .hut-reserved .hut-card-root {
     cursor: not-allowed !important;
 }
 
-/* Hut on-hold — orange inset shadow on body */
+/* Hut on-hold — orange inset shadow on body + cursor */
 .cashier-place-selector ::ng-deep .hut-on-hold .hut-body {
     box-shadow:
         0 0 20px 0 #a3a3a34d,
-        inset 0 0 20px rgba(255, 141, 40, 0.25) !important;
+        inset 0 0 22px rgba(255, 141, 40, 0.32) !important;
+    transition: box-shadow 0.18s ease;
 }
+
+/* Hut on-hold hover — increase orange glow */
+.cashier-place-selector ::ng-deep .hut-on-hold:hover .hut-body {
+    box-shadow:
+        0 0 20px 0 #a3a3a34d,
+        inset 0 0 32px rgba(255, 141, 40, 0.52) !important;
+}
+
 .cashier-place-selector ::ng-deep .hut-on-hold .hut-card-root {
     cursor: not-allowed !important;
 }
 
-/* ── Card states: Available hover — lift + green inset shadow ────────────── */
-
-/* Room available hover: lift */
-.cashier-place-selector ::ng-deep .room-available:not(.active):hover {
-    transform: translateY(-2px);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-/* Table available hover: lift */
-.cashier-place-selector ::ng-deep .table-available:not(.active):hover {
-    transform: translateY(-2px);
-    transition: transform 0.15s ease;
-}
-
-/* ── Card states: Selected — strong green inset + background tint ─────────── */
+/* ── Card states: Selected — green border + bg tint + strong inset glow ───── */
 
 /* Room selected */
 .cashier-place-selector ::ng-deep .room-available.active {
-    background-color: rgba(80, 209, 170, 0.08) !important;
+    border-color: rgb(80, 209, 170) !important;
+    background-color: rgba(80, 209, 170, 0.09) !important;
     box-shadow:
-        0 0 0 2px rgb(80, 209, 170),
-        inset 0 0 22px rgba(80, 209, 170, 0.35) !important;
-    transform: scale(1.02);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+        0 0 0 2.5px rgb(80, 209, 170),
+        inset 0 0 26px rgba(80, 209, 170, 0.42) !important;
+    transform: scale(1.03);
 }
 
 /* Table selected */
 .cashier-place-selector ::ng-deep .table-available.active {
-    background-color: rgba(80, 209, 170, 0.08) !important;
+    border-color: rgb(80, 209, 170) !important;
+    background-color: rgba(80, 209, 170, 0.09) !important;
     box-shadow:
-        0 0 0 2px rgb(80, 209, 170),
-        inset 0 0 22px rgba(80, 209, 170, 0.35) !important;
-    transform: scale(1.02);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+        0 0 0 2.5px rgb(80, 209, 170),
+        inset 0 0 26px rgba(80, 209, 170, 0.42) !important;
+    transform: scale(1.03);
 }
 
-/* Hut selected — stronger green inset on body */
+/* Hut selected — green inset on body + green bg tint */
 .cashier-place-selector ::ng-deep .hut-available.active .hut-body {
     box-shadow:
-        0 0 20px 0 rgba(80, 209, 170, 0.25),
-        inset 0 0 22px rgba(80, 209, 170, 0.35) !important;
-    background-color: rgba(80, 209, 170, 0.06) !important;
+        0 0 20px 0 rgba(80, 209, 170, 0.30),
+        inset 0 0 26px rgba(80, 209, 170, 0.42) !important;
+    background-color: rgba(80, 209, 170, 0.07) !important;
 }
 
 /* ── Footer ──────────────────────────────────────────────────────────────── */
