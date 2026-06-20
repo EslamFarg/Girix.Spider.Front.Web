@@ -1,97 +1,162 @@
-<!-- Compact layout: Header + Grid + Selected info bar at bottom -->
-<div class="flex flex-col h-full gap-3">
-    <!-- Top bar: Title + Selected info + Continue -->
-    <div
-        class="sticky top-0 z-20 flex items-center gap-3 pb-2 border-b border-dark-line bg-white/95 backdrop-blur-sm shrink-0"
-    >
-        <!-- Title -->
-        <h2 class="font-bold text-dark-bg-2 text-lg shrink-0">
-            {{ placeTypeLabel() }}
-        </h2>
+<!-- Cashier Local Place Selector — unified popup with tab navigation -->
+<div class="cashier-place-selector">
 
-        <!-- Results count -->
-        <span class="text-xs text-gray-500 shrink-0"> ({{ items().length }}) </span>
-
-        <!-- Selected place chip (only when selected) -->
-        @if (tempChosenLocalPlace(); as selected) {
-            <!-- <div class="flex items-center gap-3 bg-white/60 backdrop-blur-sm rounded-lg border border-dark-line/60 px-3 py-1.5 "> -->
-            <!-- <span class="text-xs text-gray-500">المختار:</span> -->
-            <!-- <span class="font-bold text-dark-bg-2 text-sm">{{ selected.name }}</span> -->
-
-            @if (selected.type === OrderLocalType.Hut) {
-                <div class="flex items-center gap-3 flex-1 justify-center">
-                    <div class="border-dark-line/60">
-                        <span class="text-xs text-gray-500">سعر الساعة: </span>
-                        <span class="font-semibold text-sm text-dark-bg-2">{{
-                            selected.pricePerHour?.toFixed(2) ?? '--'
-                        }}</span>
-                    </div>
-                    <div class="flex items-center gap-2 border-r border-r-dark-line/30 pr-4">
-                        <p-select [options]="[30, 60, 90, 120, 150, 180]" [ngModel]="reservationMinutes()" />
-                        <span class="text-xs text-gray-500">دقيقة</span>
-                    </div>
-                </div>
-            }
-            <!-- </div> -->
-        }
-
-        <!-- Continue Button -->
-        <button pButton class="app-p-btn py-1.5! px-6! ms-auto" (click)="closeDialog()">
-            {{ 'ACTIONS.CONTINUE' | translate }}
+    <!-- ── Tab bar ── -->
+    <div class="cps-tabs" role="tablist">
+        <button type="button" role="tab"
+            class="cps-tab"
+            [class.cps-tab--active]="placeType() === OrderLocalType.Table"
+            (click)="setActiveTab(OrderLocalType.Table)">
+            طاولة
+        </button>
+        <button type="button" role="tab"
+            class="cps-tab"
+            [class.cps-tab--active]="placeType() === OrderLocalType.Room"
+            (click)="setActiveTab(OrderLocalType.Room)">
+            غرفة
+        </button>
+        <button type="button" role="tab"
+            class="cps-tab"
+            [class.cps-tab--active]="placeType() === OrderLocalType.Hut"
+            (click)="setActiveTab(OrderLocalType.Hut)">
+            كوخ
         </button>
     </div>
 
-    <!-- Scrollable Grid -->
+    <!-- ── Search ── -->
+    <div class="cps-search-wrap">
+        <span class="cps-search-icon pi pi-search"></span>
+        <input
+            class="cps-search-input"
+            type="text"
+            [ngModel]="searchTerm()"
+            (ngModelChange)="searchTerm.set($event)"
+            [placeholder]="searchPlaceholder()"
+            autocomplete="off"
+        />
+        @if (searchTerm()) {
+            <button type="button" class="cps-search-clear pi pi-times" (click)="searchTerm.set('')"></button>
+        }
+    </div>
+
+    <!-- ── Result count ── -->
+    <div class="cps-count-row">
+        <span class="cps-count">{{ filteredItems().length }} نتيجة</span>
+    </div>
+
+    <!-- ── Scrollable grid ── -->
     <div
-        class="flex-1 overflow-auto no-scrollbar rounded-lg border border-dark-line/40 p-4"
+        class="cps-grid-scroll"
         appDebounce
         #scroller
         [domEvents]="['scroll']"
         (debounced)="onScroll($event, scroller)"
     >
         @switch (placeType()) {
+
             @case (OrderLocalType.Hut) {
-                <div
-                    class="h-fit grid pt-8 items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-[90px_20px]"
-                >
-                    @for (item of items(); track $index) {
+                <div class="cps-grid cps-grid--hut">
+                    @for (item of filteredItems(); track item.id) {
                         <app-hut-card
                             [active]="item.id == tempChosenLocalPlace()?.id"
-                            [data]="item"
+                            [data]="$any(item)"
                             (click)="onSelected(item)"
                             class="max-w-full!"
                         />
                     }
+                    @empty {
+                        <p class="cps-empty">لا توجد أكواخ متاحة</p>
+                    }
                 </div>
             }
+
             @case (OrderLocalType.Room) {
-                <div
-                    class="h-fit grid items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5"
-                >
-                    @for (item of items(); track $index) {
+                <div class="cps-grid cps-grid--room">
+                    @for (item of filteredItems(); track item.id) {
                         <app-room-card
                             [active]="item.id == tempChosenLocalPlace()?.id"
-                            [data]="item"
+                            [data]="$any(item)"
                             (click)="onSelected(item)"
-                            class="max-w-full"
                         />
+                    }
+                    @empty {
+                        <p class="cps-empty">لا توجد غرف متاحة</p>
                     }
                 </div>
             }
+
             @case (OrderLocalType.Table) {
-                <div
-                    class="h-fit grid items-center justify-center grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-5"
-                >
-                    @for (item of items(); track $index) {
+                <div class="cps-grid cps-grid--table">
+                    @for (item of filteredItems(); track item.id) {
                         <app-table-card
                             [active]="item.id == tempChosenLocalPlace()?.id"
-                            [data]="item"
+                            [data]="$any(item)"
                             (click)="onSelected(item)"
-                            class="max-w-full"
                         />
+                    }
+                    @empty {
+                        <p class="cps-empty">لا توجد طاولات متاحة</p>
                     }
                 </div>
             }
+
         }
     </div>
+
+    <!-- ── Footer ── -->
+    <div class="cps-footer">
+
+        <!-- Hut duration (only when a hut is selected) -->
+        @if (isHutSelected()) {
+            <div class="cps-hut-row">
+                <span class="cps-hut-label">مدة الحجز:</span>
+                <p-select
+                    [options]="[30, 60, 90, 120, 150, 180]"
+                    [ngModel]="reservationMinutes()"
+                    (ngModelChange)="reservationMinutes.set($event)"
+                    styleClass="cps-duration-select"
+                />
+                <span class="cps-hut-unit">دقيقة</span>
+                <span class="cps-hut-sep"></span>
+                <span class="cps-hut-price">
+                    سعر / ساعة:
+                    <strong>{{ tempChosenLocalPlace()?.pricePerHour?.toFixed(2) ?? '--' }}</strong>
+                </span>
+            </div>
+        }
+
+        <!-- Selection summary + actions -->
+        <div class="cps-footer-bottom">
+
+            <!-- Selection chip -->
+            <div class="cps-selection-area">
+                @if (tempChosenLocalPlace(); as selected) {
+                    <div class="cps-selection-chip">
+                        <span class="cps-selection-label">{{ selectionLabel() }}:</span>
+                        <span class="cps-selection-name">{{ selected.name }}</span>
+                    </div>
+                } @else {
+                    <span class="cps-no-selection">لم يتم اختيار مكان بعد</span>
+                }
+            </div>
+
+            <!-- Action buttons -->
+            <div class="cps-actions">
+                <button pButton severity="secondary" type="button" (click)="cancelDialog()">
+                    إلغاء
+                </button>
+                <button
+                    pButton
+                    class="app-p-btn"
+                    type="button"
+                    [disabled]="!hasSelection()"
+                    (click)="closeDialog()"
+                >
+                    متابعة
+                </button>
+            </div>
+
+        </div>
+    </div>
+
 </div>

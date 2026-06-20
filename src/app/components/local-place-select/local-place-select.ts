@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, linkedSignal, model, signal } from '@angular/core';
+import { Component, computed, effect, inject, linkedSignal, model, signal, untracked } from '@angular/core';
 import { Select } from 'primeng/select';
 import { HutCard } from '../hut-card/hut-card';
 import { Debounce } from '@/directives/debounce';
@@ -8,7 +8,6 @@ import { TableCard } from '../table-card/table-card';
 import { HutService, IHutSearchRow } from '@/features/restaurant/services/hut-service';
 import { IRoomSearchRow, RoomService } from '@/features/restaurant/services/room-service';
 import { ITableSearchRow, TableService } from '@/features/restaurant/services/table-service';
-import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { BaseComponent } from '../base-component/base-component';
 import { DialogType } from '@/features/dialogs/enums';
@@ -21,7 +20,7 @@ export type ChosenLocalPlace = IChosenPlace & {
 
 @Component({
     selector: 'app-local-place-select',
-    imports: [Select, HutCard, Debounce, RoomCard, TableCard, TranslatePipe, FormsModule, ButtonDirective],
+    imports: [Select, HutCard, Debounce, RoomCard, TableCard, FormsModule, ButtonDirective],
     templateUrl: './local-place-select.html',
     styleUrl: './local-place-select.css',
 })
@@ -31,16 +30,37 @@ export class LocalPlaceSelect extends BaseComponent {
     visible = model.required<boolean>();
     orderService = inject(OrderService);
 
+    // ── Search ────────────────────────────────────────────────────────────────
+    searchTerm = signal('');
+
+    filteredItems = computed((): IHutSearchRow[] | IRoomSearchRow[] | ITableSearchRow[] => {
+        const all = this.items();
+        const term = this.searchTerm().trim().toLowerCase();
+        if (!term) return all;
+        return all.filter((item: any) => (item.name as string).toLowerCase().includes(term)) as typeof all;
+    });
+
+    searchPlaceholder = computed(() => {
+        switch (this.placeType()) {
+            case OrderLocalType.Hut:   return 'ابحث عن كوخ';
+            case OrderLocalType.Room:  return 'ابحث عن غرفة';
+            case OrderLocalType.Table: return 'ابحث عن طاولة';
+        }
+    });
+
+    // ── State ─────────────────────────────────────────────────────────────────
     items = signal<IHutSearchRow[] | IRoomSearchRow[] | ITableSearchRow[]>([]);
     chosenLocalPlace = this.orderService.chosenLocalPlace;
     tempChosenLocalPlace = linkedSignal<ChosenLocalPlace | null>(() => this.chosenLocalPlace());
-    isHutSelected=computed(() => this.tempChosenLocalPlace()?.type === OrderLocalType.Hut);
+    isHutSelected = computed(() => this.tempChosenLocalPlace()?.type === OrderLocalType.Hut);
+    hasSelection = computed(() => !!this.tempChosenLocalPlace()?.id);
 
-    placeTypeLabel = computed(() => {
-        switch (this.placeType()) {
-            case OrderLocalType.Hut: return 'اختر الكوخ';
-            case OrderLocalType.Room: return 'اختر الغرفة';
-            case OrderLocalType.Table: return 'اختر الطاولة';
+    selectionLabel = computed(() => {
+        switch (this.tempChosenLocalPlace()?.type) {
+            case OrderLocalType.Hut:   return 'الكوخ المختار';
+            case OrderLocalType.Room:  return 'الغرفة المختارة';
+            case OrderLocalType.Table: return 'الطاولة المختارة';
+            default: return 'المختار';
         }
     });
 
@@ -52,32 +72,31 @@ export class LocalPlaceSelect extends BaseComponent {
         totalRowsCount: 0,
     };
 
-    hutService = inject(HutService);
-    roomService = inject(RoomService);
+    hutService   = inject(HutService);
+    roomService  = inject(RoomService);
     tableService = inject(TableService);
 
     placeService = computed(() => {
         switch (this.placeType()) {
-            case OrderLocalType.Hut:
-                return this.hutService;
-            case OrderLocalType.Room:
-                return this.roomService;
-            case OrderLocalType.Table:
-                return this.tableService;
+            case OrderLocalType.Hut:   return this.hutService;
+            case OrderLocalType.Room:  return this.roomService;
+            case OrderLocalType.Table: return this.tableService;
         }
     });
 
     placeServiceChangeEffect = effect(() => {
-        // const placeService = this.placeService();
         this.items.set([]);
-        this.paginationInfo = {
-            pageIndex: 1,
-            totalPagesCount: 1,
-            totalRowsCount: 0,
-        };
+        this.paginationInfo = { pageIndex: 1, totalPagesCount: 1, totalRowsCount: 0 };
+        untracked(() => this.searchTerm.set(''));
         this.searchPlaces({ pageIndex: 1 });
     });
 
+    // ── Tab switching ──────────────────────────────────────────────────────────
+    setActiveTab(tab: OrderLocalType): void {
+        this.placeType.set(tab);
+    }
+
+    // ── Data loading ──────────────────────────────────────────────────────────
     searchPlaces(dto: { searchTerm?: string; pageIndex: number }) {
         this.placeService()
             .search({
@@ -89,10 +108,8 @@ export class LocalPlaceSelect extends BaseComponent {
             .subscribe({
                 next: (res) => {
                     if (res.value.rows.length === 0) return;
-
                     if (dto.pageIndex === 1) this.items.set(res.value.rows);
                     else this.items.update((prev) => prev.concat(res.value.rows));
-
                     this.paginationInfo = {
                         pageIndex: dto.pageIndex,
                         totalPagesCount: res.value.paginationInfo.totalPagesCount,
@@ -103,7 +120,6 @@ export class LocalPlaceSelect extends BaseComponent {
     }
 
     onScroll(event: Event, scroller: HTMLElement) {
-        // if at bottom
         if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1) {
             this.searchPlaces({ pageIndex: this.paginationInfo.pageIndex + 1 });
         }
@@ -114,18 +130,23 @@ export class LocalPlaceSelect extends BaseComponent {
         this.tempChosenLocalPlace.set({
             ...item,
             type: this.placeType(),
-            reservationMinutes: this.isHutSelected() ? this.reservationMinutes() : null,
+            reservationMinutes: this.placeType() === OrderLocalType.Hut ? this.reservationMinutes() : null,
         });
     }
 
+    // ── Dialog actions ────────────────────────────────────────────────────────
     closeDialog() {
-        if(this.tempChosenLocalPlace()?.type !== this.placeType()) return
+        if (!this.hasSelection()) return;
+        if (this.isHutSelected()) {
+            this.tempChosenLocalPlace.update((p) =>
+                p ? { ...p, reservationMinutes: this.reservationMinutes() } : null
+            );
+        }
         this.chosenLocalPlace.set(this.tempChosenLocalPlace());
-        this.dialogService.close({
-            type: DialogType.LocalPlaceSelect,
-            data: this.chosenLocalPlace(),
-        });
+        this.dialogService.close({ type: DialogType.LocalPlaceSelect, data: this.chosenLocalPlace() });
     }
 
-
+    cancelDialog() {
+        this.dialogService.close({ type: DialogType.LocalPlaceSelect, data: null });
+    }
 }
