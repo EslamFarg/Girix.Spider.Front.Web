@@ -237,53 +237,64 @@
 
 /* ── Card states: Occupied / Reserved ────────────────────────────────────── */
 
-/* Room reserved — red border + strong red inset shadow + cursor */
+/* Room reserved — red border + strong red inset shadow + red label + cursor
+   NOTE: room label has Tailwind `text-black` so color must be forced on the span */
 .cashier-place-selector ::ng-deep .room-reserved {
     border-color: rgb(255, 56, 60) !important;
     cursor: not-allowed !important;
     box-shadow:
-        0 0 20px 0 #a3a3a34d,
-        inset 0 0 22px rgba(255, 56, 60, 0.32) !important;
+        0 0 20px 0 rgba(163, 163, 163, 0.30),
+        inset 0 0 35px rgba(255, 56, 60, 0.40) !important;
     transition: box-shadow 0.18s ease;
 }
 
-/* Room reserved hover — increase red glow, never turns green */
-.cashier-place-selector ::ng-deep .room-reserved:hover {
-    box-shadow:
-        0 0 20px 0 #a3a3a34d,
-        inset 0 0 32px rgba(255, 56, 60, 0.52) !important;
+.cashier-place-selector ::ng-deep .room-reserved .room-card-label {
+    color: rgb(220, 38, 38) !important;
 }
 
-/* Table reserved — red border + strong red inset shadow + cursor */
+/* Room reserved hover — stronger red glow, never turns green */
+.cashier-place-selector ::ng-deep .room-reserved:hover {
+    box-shadow:
+        0 0 20px 0 rgba(163, 163, 163, 0.30),
+        inset 0 0 45px rgba(255, 56, 60, 0.55) !important;
+}
+
+/* Table reserved — red border + strong red inset shadow + red text + cursor
+   NOTE: table label has Tailwind `text-black` — must override on span directly */
 .cashier-place-selector ::ng-deep .table-reserved {
     border-color: rgb(255, 56, 60) !important;
     cursor: not-allowed !important;
     box-shadow:
-        0 0 20px 0 #a3a3a34d,
-        inset 0 0 22px rgba(255, 56, 60, 0.32) !important;
+        0 0 20px 0 rgba(163, 163, 163, 0.30),
+        inset 0 0 35px rgba(255, 56, 60, 0.40) !important;
     transition: box-shadow 0.18s ease;
 }
 
-/* Table reserved hover — increase red glow, never turns green */
+.cashier-place-selector ::ng-deep .table-reserved span {
+    color: rgb(220, 38, 38) !important;
+}
+
+/* Table reserved hover — stronger red glow, never turns green */
 .cashier-place-selector ::ng-deep .table-reserved:hover {
     box-shadow:
-        0 0 20px 0 #a3a3a34d,
-        inset 0 0 32px rgba(255, 56, 60, 0.52) !important;
+        0 0 20px 0 rgba(163, 163, 163, 0.30),
+        inset 0 0 45px rgba(255, 56, 60, 0.55) !important;
 }
 
-/* Hut reserved — red inset shadow on body + cursor */
+/* Hut reserved — red inset shadow on body + cursor
+   (hut label already inherits --color: red from hut-card.css, no extra override needed) */
 .cashier-place-selector ::ng-deep .hut-reserved .hut-body {
     box-shadow:
-        0 0 20px 0 #a3a3a34d,
-        inset 0 0 22px rgba(255, 56, 60, 0.32) !important;
+        0 0 20px 0 rgba(163, 163, 163, 0.30),
+        inset 0 0 35px rgba(255, 56, 60, 0.40) !important;
     transition: box-shadow 0.18s ease;
 }
 
-/* Hut reserved hover — increase red glow */
+/* Hut reserved hover — stronger red glow */
 .cashier-place-selector ::ng-deep .hut-reserved:hover .hut-body {
     box-shadow:
-        0 0 20px 0 #a3a3a34d,
-        inset 0 0 32px rgba(255, 56, 60, 0.52) !important;
+        0 0 20px 0 rgba(163, 163, 163, 0.30),
+        inset 0 0 45px rgba(255, 56, 60, 0.55) !important;
 }
 
 .cashier-place-selector ::ng-deep .hut-reserved .hut-card-root {
@@ -293,16 +304,16 @@
 /* Hut on-hold — orange inset shadow on body + cursor */
 .cashier-place-selector ::ng-deep .hut-on-hold .hut-body {
     box-shadow:
-        0 0 20px 0 #a3a3a34d,
-        inset 0 0 22px rgba(255, 141, 40, 0.32) !important;
+        0 0 20px 0 rgba(163, 163, 163, 0.30),
+        inset 0 0 35px rgba(255, 141, 40, 0.40) !important;
     transition: box-shadow 0.18s ease;
 }
 
-/* Hut on-hold hover — increase orange glow */
+/* Hut on-hold hover — stronger orange glow */
 .cashier-place-selector ::ng-deep .hut-on-hold:hover .hut-body {
     box-shadow:
-        0 0 20px 0 #a3a3a34d,
-        inset 0 0 32px rgba(255, 141, 40, 0.52) !important;
+        0 0 20px 0 rgba(163, 163, 163, 0.30),
+        inset 0 0 45px rgba(255, 141, 40, 0.55) !important;
 }
 
 .cashier-place-selector ::ng-deep .hut-on-hold .hut-card-root {
