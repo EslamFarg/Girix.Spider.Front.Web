@@ -89,6 +89,25 @@
   white-space: nowrap;
 }
 
+/* Button variant — used when محلي is active and pill is clickable */
+.info-pill--btn {
+  border: none;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+  text-align: start;
+}
+
+.info-pill--btn:hover {
+  filter: brightness(1.18);
+}
+
+/* Call-to-action text when no place has been selected yet */
+.info-pill__cta {
+  opacity: 0.85;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
 .addition-dialog::ng-deep .p-dialog-header {
   padding-bottom: 0 !important;
 }

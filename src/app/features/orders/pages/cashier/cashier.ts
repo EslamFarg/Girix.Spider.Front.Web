@@ -1260,18 +1260,18 @@ export class Cashier extends BaseComponent implements OnInit {
 
     activeLocalType = signal<OrderLocalType | null>(null);
 
-    async openLocalTypeDialog(loaclPlaceType: OrderLocalType) {
+    async openLocalTypeDialog(initialPlaceType: OrderLocalType) {
         await this.dialogService.open({
             type: DialogType.LocalPlaceSelect,
-            inputs: { placeType: loaclPlaceType },
+            inputs: { placeType: initialPlaceType },
             onClose: (data: ChosenLocalPlace) => {
                 if (!data?.id) return;
                 this.chosenLocalPlace.set(data);
-                this.activeLocalType.set(loaclPlaceType);
+                this.activeLocalType.set(data.type);
                 this.orderLocationType.set(OrderLocationType.DineIn);
                 this.orderFg.patchValue({
                     orderType: OrderLocationType.DineIn,
-                    placeType: loaclPlaceType,
+                    placeType: data.type,
                     placeRefId: data.id,
                     durationMinutes: data.reservationMinutes,
                 });

@@ -61,9 +61,7 @@
                 <!-- سفري group -->
                 <div
                     [appAllowedRoles]="[Role.Cashier, Role.Admin]"
-                    class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
-                    [class.flex-1]="!localRadio.checked"
-                    [class.w-20]="localRadio.checked"
+                    class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300 flex-1"
                     [class.segmented-group]="takeAwayRadio.checked"
                 >
                     <input
@@ -82,9 +80,7 @@
 
                 <!-- محلي group -->
                 <div
-                    class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
-                    [class.flex-3]="localRadio.checked"
-                    [class.flex-1]="!localRadio.checked"
+                    class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300 flex-1"
                     [class.segmented-group]="localRadio.checked"
                 >
                     <input
@@ -96,58 +92,43 @@
                         formControlName="orderType"
                         [value]="OrderLocationType.DineIn"
                     />
+
+                    <!-- Not yet selected: clicking opens popup immediately (radio is checked by for= attribute) -->
                     @if (!localRadio.checked) {
-                        <label class="loc-btn flex-1" [class.location-active]="localRadio.checked" for="local"
-                            ><span>محلي</span></label
-                        >
+                        <label
+                            class="loc-btn flex-1"
+                            for="local"
+                            (click)="openLocalTypeDialog(activeLocalType() ?? OrderLocalType.Table)"
+                        ><span>محلي</span></label>
                     }
 
+                    <!-- Already selected: show info pill — click to change place via popup -->
                     @if (localRadio.checked) {
                         <button
                             type="button"
-                            (click)="openLocalTypeDialog(OrderLocalType.Table)"
-                            class="segment-btn flex-1"
-                            [class.location-active]="activeLocalType() === OrderLocalType.Table"
+                            class="info-pill info-pill--btn flex-1"
+                            (click)="openLocalTypeDialog(activeLocalType() ?? OrderLocalType.Table)"
                         >
-                            <span>طاوله</span>
-                        </button>
-                        <button
-                            type="button"
-                            (click)="openLocalTypeDialog(OrderLocalType.Room)"
-                            class="segment-btn flex-1"
-                            [class.location-active]="activeLocalType() === OrderLocalType.Room"
-                        >
-                            <span>غرفه</span>
-                        </button>
-                        <button
-                            type="button"
-                            (click)="openLocalTypeDialog(OrderLocalType.Hut)"
-                            class="segment-btn flex-1"
-                            [class.location-active]="activeLocalType() === OrderLocalType.Hut"
-                        >
-                            <span>كوخ</span>
-                        </button>
-
-                        <!-- info pill -->
-                        <div class="info-pill">
-                            <span class="inline-block max-w-20 overflow-hidden text-ellipsis">{{
-                                this.chosenLocalPlace()?.name ?? '-'
-                            }}</span>
-                            @if (activeLocalType() === OrderLocalType.Hut && (orderFg.getRawValue().placeRefId ?? 0) > 0) {
-                                <span class="text-text-lighter">{{
-                                    formatMinutesToHHMMSS(orderFg.getRawValue().durationMinutes ?? 0)
+                            @if (chosenLocalPlace()) {
+                                <span class="inline-block max-w-28 overflow-hidden text-ellipsis">{{
+                                    chosenLocalPlace()!.name
                                 }}</span>
+                                @if (activeLocalType() === OrderLocalType.Hut && (orderFg.getRawValue().placeRefId ?? 0) > 0) {
+                                    <span class="text-text-lighter">{{
+                                        formatMinutesToHHMMSS(orderFg.getRawValue().durationMinutes ?? 0)
+                                    }}</span>
+                                }
+                            } @else {
+                                <span class="info-pill__cta">محلي · اختر مكان ‹</span>
                             }
-                        </div>
+                        </button>
                     }
                 </div>
 
                 <!-- توصيل group -->
                 <div
                     [appAllowedRoles]="[Role.Cashier, Role.Admin]"
-                    class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300"
-                    [class.flex-1]="!localRadio.checked"
-                    [class.w-20]="localRadio.checked"
+                    class="flex gap-0 rounded-lg overflow-hidden transition-all duration-300 flex-1"
                     [class.segmented-group]="deliveryRadio.checked"
                 >
                     <input type="radio" hidden #deliveryRadio name="orderType" id="delivery" />
