@@ -21,7 +21,7 @@ export class A4PrintService {
   print(bodyFragment: string): void {
     const win = window.open('', '_blank', 'width=850,height=1200,scrollbars=yes,resizable=yes');
     if (!win) {
-      alert('Ù„Ù… ÙŠØªÙ…ÙƒÙ† Ø§Ù„Ù…ØªØµÙØ­ Ù…Ù† ÙØªØ­ Ù†Ø§ÙØ°Ø© Ø§Ù„Ø·Ø¨Ø§Ø¹Ø©. ÙŠØ±Ø¬Ù‰ Ø§Ù„Ø³Ù…Ø§Ø­ Ø¨Ø§Ù„Ù†ÙˆØ§ÙØ° Ø§Ù„Ù…Ù†Ø¨Ø«Ù‚Ø©.');
+      alert('لم يتمكن المتصفح من فتح نافذة الطباعة. يرجى السماح بالنوافذ المنبثقة.');
       return;
     }
 
@@ -40,7 +40,7 @@ export class A4PrintService {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ø·Ø¨Ø§Ø¹Ø©</title>
+  <title>طباعة</title>
   <style>
     /* â”€â”€ Reset â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -253,8 +253,8 @@ export class A4PrintService {
 <body>
 
   <div class="print-actions">
-    <button class="btn-print" onclick="window.print()">ðŸ–¨ï¸ Ø·Ø¨Ø§Ø¹Ø©</button>
-    <button class="btn-print" style="background:#555" onclick="window.close()">âœ• Ø¥ØºÙ„Ø§Ù‚</button>
+    <button class="btn-print" onclick="window.print()">ðŸ–¨ï¸ طباعة</button>
+    <button class="btn-print" style="background:#555" onclick="window.close()">âœ• إغلاق</button>
   </div>
 
   <div class="a4-page">

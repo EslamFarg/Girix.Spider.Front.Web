@@ -24,6 +24,11 @@ export class DialogService extends BaseService {
                 component = module.LocalPlaceSelect;
                 break;
             }
+            case DialogType.DeliveryPlaceSelect: {
+                const module = await import('../../../components/delivery-place-select/delivery-place-select');
+                component = module.DeliveryPlaceSelect;
+                break;
+            }
         }
 
         if (!component) return;

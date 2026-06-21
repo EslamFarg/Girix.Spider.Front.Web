@@ -134,7 +134,7 @@
                     <input type="radio" hidden #deliveryRadio name="orderType" id="delivery" />
                     <label
                         class="loc-btn flex-1"
-                        (click)="DeliveryDialogVisible = true"
+                        (click)="openDeliveryDialog()"
                         [class.location-active]="deliveryRadio.checked"
                         for="delivery"
                         ><span>توصيل</span></label
@@ -829,130 +829,66 @@
     </ng-template>
 </p-dialog>
 
-<!-- Delivery -->
+<!-- Journal Warning Dialog (shown when save is attempted but journal is closed) -->
 <p-dialog
-    [(visible)]="DeliveryDialogVisible"
+    [visible]="journalWarningDialogVisible()"
+    (visibleChange)="journalWarningDialogVisible.set($event)"
     [modal]="true"
-    [draggable]="false"
+    [closable]="true"
     [dismissableMask]="true"
-    [style]="{ width: '80%', maxWidth: '50rem' }"
-    [attr.style]="'--p-mask-background:#375652e5!important;'"
-    styleClass="bg-text-lighter!"
-    class="addition-dialog"
-    [contentStyleClass]="`flex flex-col gap-4 ${isLoading() && 'opacity-50 cursor-wait'}`"
+    [style]="{ width: '90%', maxWidth: '28rem' }"
+    [attr.style]="'--p-mask-background:#1a2e2be6!important;'"
+    styleClass="bg-white!"
 >
     <ng-template #header>
-        <p class="font-bold text-center text-dark-bg-2 text-lg flex-1">إختر الدليفري</p>
+        <div class="flex items-center gap-2 text-orange-600">
+            <i class="pi pi-exclamation-triangle text-xl"></i>
+            <span class="font-bold text-lg">يجب فتح اليومية أولاً</span>
+        </div>
     </ng-template>
-    <div
-        class="flex gap-2 w-full justify-center pt-4"
-        style="--p-button-primary-background: #fff; --p-button-primary-color: #375652"
-    >
-        <button
-            pButton
-            [class.text-green-500!]="!isCompanyDelivery"
-            (click)="changeDeliveryType(OrderLocationType.PersonDelivery)"
-        >
-            دليفري
-        </button>
-        <button
-            pButton
-            [class.text-green-500!]="isCompanyDelivery"
-            (click)="changeDeliveryType(OrderLocationType.CompanyDelivery)"
-        >
-            شركة
-        </button>
-    </div>
-    <div
-        class="flex-1 overflow-visible no-scrollbar"
-        appDebounce
-        #tablesScroller
-        [domEvents]="['scroll']"
-        (debounced)="onDeliveriesScroll($event, tablesScroller)"
-    >
-        <div
-            class="h-fit grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-5 *:flex *:flex-col *:items-center *:justify-center *:border *:p-4! *:rounded-[8px] *:cursor-pointer"
-            style="--p-button-primary-background: #fff"
-        >
-            @if (isCompanyDelivery) {
-                @for (item of companyDeliveries(); track $index) {
-                    <button
-                        pButton
-                        [class.location-active]="item.id === currentCompanyDelivery()?.id"
-                        (click)="onDeliverySelected(OrderLocationType.CompanyDelivery, item)"
-                    >
-                        <svg
-                            width="28px"
-                            height="28px"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
-                                stroke="#375652"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                        <p class="text-center text-dark-bg-2 text-sm">
-                            {{ item.name }}
-                        </p>
-                    </button>
-                } @empty {
-                    <p-skeleton class="h-20" />
-                    <p-skeleton class="h-20" />
-                    <p-skeleton class="h-20" />
-                }
-            } @else {
-                @for (item of deliveries(); track $index) {
-                    <button
-                        pButton
-                        class="relative overflow-visible!"
-                        [class.location-active]="item.id === currentDelivery()?.id"
-                        (click)="onDeliverySelected(OrderLocationType.PersonDelivery, item)"
-                    >
-                        <span
-                            class="absolute -top-2.5 -left-2.5 text-xs text-white bg-rose-600 rounded-full w-5 h-5 flex items-center justify-center"
-                            >{{ item.orderNumber }}</span
-                        >
-                        <svg
-                            width="28px"
-                            height="28px"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
-                                stroke="#375652"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                        <p class="text-center text-dark-bg-2 text-sm">
-                            {{ item.name }}
-                        </p>
-                    </button>
-                } @empty {
-                    <p-skeleton class="h-20" />
-                    <p-skeleton class="h-20" />
-                    <p-skeleton class="h-20" />
-                }
-            }
+    <div class="flex flex-col gap-6 py-2">
+        <p class="text-gray-600 text-sm leading-relaxed">
+            لا يمكن حفظ الفاتورة قبل فتح اليومية. هل تريد فتح اليومية الآن؟
+        </p>
+        <div class="flex gap-3 justify-end">
+            <button
+                pButton
+                type="button"
+                class="p-button-outlined p-button-secondary"
+                (click)="journalWarningDialogVisible.set(false); pendingOrderValues.set(null)"
+            >
+                إلغاء
+            </button>
+            <button
+                pButton
+                type="button"
+                (click)="openJournal()"
+            >
+                فتح اليومية الآن
+            </button>
         </div>
     </div>
-    <!-- <ng-template #footer>
-        <button
-            pButton
-            styleClass="app-p-btn"
-            class="mx-auto"
-            severity="secondary"
-            (click)="DeliveryDialogVisible = false"
-        >
-            استمرار
-        </button>
-    </ng-template> -->
 </p-dialog>
+
+<!-- Open Daily Journal Dialog -->
+<p-dialog
+    [visible]="openJournalDialogVisible()"
+    (visibleChange)="openJournalDialogVisible.set($event)"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '90%', maxWidth: '32rem' }"
+    [attr.style]="'--p-mask-background:#1a2e2be6!important;'"
+    styleClass="bg-white!"
+>
+    <ng-template #header>
+        <div class="flex items-center gap-2 text-green-700">
+            <i class="pi pi-calendar-plus text-xl"></i>
+            <span class="font-bold text-lg">فتح اليومية</span>
+        </div>
+    </ng-template>
+    <div class="py-2">
+        <app-open-daily-journal />
+    </div>
+</p-dialog>
+

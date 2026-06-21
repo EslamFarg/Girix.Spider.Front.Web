@@ -166,9 +166,9 @@
     /* inherits .cps-grid */
 }
 
-/* Hut grid — extra top padding for first-row roof overhang */
+/* Hut grid — proportional top padding (mirrors Replacements formula × 110/140) */
 .cps-grid--hut {
-    padding-top: 62px;
+    padding-top: calc(48px * 110 / 140);
     row-gap: 8px;
 }
 
@@ -194,6 +194,67 @@
 .cashier-place-selector ::ng-deep app-table-card > div {
     width: 110px;
     height: 110px;
+}
+
+/* Hut: 110 px proportional scale — mirrors Replacements hut picker (105/140 → 110/140)
+   hut-switch-card activates hut-card.css sizing system; we then override to 110 px */
+.cashier-place-selector ::ng-deep app-hut-card.hut-switch-card {
+    --hut-roof-size: calc(88px * 110 / 140);
+    --hut-roof-top: calc(58px * 110 / 140);
+    width: 110px;
+    flex-shrink: 0;
+}
+
+.cashier-place-selector ::ng-deep app-hut-card.hut-switch-card .hut-body {
+    border-radius: calc(0.875rem * 110 / 140);
+}
+
+.cashier-place-selector ::ng-deep app-hut-card.hut-switch-card .hut-card-label {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.cashier-place-selector ::ng-deep app-hut-card.hut-switch-card .hut-timer {
+    font-size: 0.6875rem;
+    line-height: 0.9375rem;
+    margin-top: calc(2px * 110 / 140);
+}
+
+/* ── Hut visibility improvements (Cashier context only) ─────────────────────
+   Scope: .cashier-place-selector ::ng-deep — zero leakage to Replacements /
+   Collections / any other screen.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* 1. Roof: very pale blue-gray — lighter visual weight than body, secondary indicator */
+.cashier-place-selector ::ng-deep app-hut-card.hut-switch-card .hut-roof {
+    background: linear-gradient(
+        135deg,
+        rgb(238, 241, 245) 0%,
+        rgb(225, 230, 237) 45%,
+        rgb(210, 218, 227) 100%
+    );
+}
+
+/* 2. Bidirectional transitions — set on base elements so hover both enters AND
+      exits smoothly (not just a one-way snap) */
+.cashier-place-selector ::ng-deep .hut-card-root {
+    transition: transform 0.18s ease;
+}
+
+.cashier-place-selector ::ng-deep .hut-body {
+    transition: box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+/* 3a. Available roof border: soften the default black stroke to near-invisible
+       so the roof acts as a shape cue only, not a dominant outline */
+.cashier-place-selector ::ng-deep .hut-available:not(.active) .hut-roof {
+    border-color: rgba(55, 86, 82, 0.18) !important;
+}
+
+/* 3b. Available body: calm, inactive — subtle border + minimal shadow */
+.cashier-place-selector ::ng-deep .hut-available:not(.active) .hut-body {
+    border-color: rgba(55, 86, 82, 0.14) !important;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07) !important;
 }
 
 /* ── Smooth base transitions (room + table — hover reverses cleanly) ──────── */
@@ -222,17 +283,15 @@
     transform: translateY(-2px);
 }
 
-/* Hut: lift + green body inset shadow
-   (card's own --color on hover turns roof border green) */
+/* Hut: lift + green border + stronger green body inset shadow
+   (card's --color on hover turns roof border + label green via hut-card.css) */
 .cashier-place-selector ::ng-deep .hut-available:not(.active):hover {
     transform: translateY(-2px);
-    transition: transform 0.18s ease;
 }
 
 .cashier-place-selector ::ng-deep .hut-available:not(.active):hover .hut-body {
-    box-shadow:
-        0 0 20px 0 #a3a3a34d,
-        inset 0 0 18px rgba(80, 209, 170, 0.30) !important;
+    border-color: rgba(80, 209, 170, 0.45) !important;
+    box-shadow: inset 0 0 14px rgba(80, 209, 170, 0.25) !important;
 }
 
 /* ── Card states: Occupied / Reserved ────────────────────────────────────── */
@@ -281,39 +340,41 @@
         inset 0 0 45px rgba(255, 56, 60, 0.55) !important;
 }
 
-/* Hut reserved — red inset shadow on body + cursor
-   (hut label already inherits --color: red from hut-card.css, no extra override needed) */
-.cashier-place-selector ::ng-deep .hut-reserved .hut-body {
-    box-shadow:
-        0 0 20px 0 rgba(163, 163, 163, 0.30),
-        inset 0 0 35px rgba(255, 56, 60, 0.40) !important;
-    transition: box-shadow 0.18s ease;
+/* Hut reserved — override --color to orange so roof border + text match on-hold
+   palette. Keeps occupied huts in one calm orange family in the Cashier context. */
+.cashier-place-selector ::ng-deep .hut-reserved {
+    --color: 255, 141, 40;
+    color: rgb(var(--color));
 }
 
-/* Hut reserved hover — stronger red glow */
+/* Hut reserved body — soft orange border + very light bg tint + gentle inset */
+.cashier-place-selector ::ng-deep .hut-reserved .hut-body {
+    border-color: rgba(255, 141, 40, 0.40) !important;
+    background-color: rgba(255, 141, 40, 0.04) !important;
+    box-shadow: inset 0 0 16px rgba(255, 141, 40, 0.18) !important;
+}
+
+/* Hut reserved hover — slightly stronger border + inset only */
 .cashier-place-selector ::ng-deep .hut-reserved:hover .hut-body {
-    box-shadow:
-        0 0 20px 0 rgba(163, 163, 163, 0.30),
-        inset 0 0 45px rgba(255, 56, 60, 0.55) !important;
+    border-color: rgba(255, 141, 40, 0.60) !important;
+    box-shadow: inset 0 0 20px rgba(255, 141, 40, 0.28) !important;
 }
 
 .cashier-place-selector ::ng-deep .hut-reserved .hut-card-root {
     cursor: not-allowed !important;
 }
 
-/* Hut on-hold — orange inset shadow on body + cursor */
+/* Hut on-hold body — matches reserved: soft orange, light bg tint, gentle inset */
 .cashier-place-selector ::ng-deep .hut-on-hold .hut-body {
-    box-shadow:
-        0 0 20px 0 rgba(163, 163, 163, 0.30),
-        inset 0 0 35px rgba(255, 141, 40, 0.40) !important;
-    transition: box-shadow 0.18s ease;
+    border-color: rgba(255, 141, 40, 0.40) !important;
+    background-color: rgba(255, 141, 40, 0.04) !important;
+    box-shadow: inset 0 0 16px rgba(255, 141, 40, 0.18) !important;
 }
 
-/* Hut on-hold hover — stronger orange glow */
+/* Hut on-hold hover — slightly stronger border + inset only */
 .cashier-place-selector ::ng-deep .hut-on-hold:hover .hut-body {
-    box-shadow:
-        0 0 20px 0 rgba(163, 163, 163, 0.30),
-        inset 0 0 45px rgba(255, 141, 40, 0.55) !important;
+    border-color: rgba(255, 141, 40, 0.60) !important;
+    box-shadow: inset 0 0 20px rgba(255, 141, 40, 0.28) !important;
 }
 
 .cashier-place-selector ::ng-deep .hut-on-hold .hut-card-root {
@@ -342,12 +403,16 @@
     transform: scale(1.03);
 }
 
-/* Hut selected — green inset on body + green bg tint */
+/* Hut selected — scale the whole card (roof + body move together, matches rooms/tables) */
+.cashier-place-selector ::ng-deep .hut-available.active {
+    transform: scale(1.03);
+}
+
+/* Hut selected — clear green border + light tint + subtle inset (scale is primary cue) */
 .cashier-place-selector ::ng-deep .hut-available.active .hut-body {
-    box-shadow:
-        0 0 20px 0 rgba(80, 209, 170, 0.30),
-        inset 0 0 26px rgba(80, 209, 170, 0.42) !important;
-    background-color: rgba(80, 209, 170, 0.07) !important;
+    border-color: rgb(80, 209, 170) !important;
+    box-shadow: inset 0 0 16px rgba(80, 209, 170, 0.22) !important;
+    background-color: rgba(80, 209, 170, 0.06) !important;
 }
 
 /* ── Footer ──────────────────────────────────────────────────────────────── */

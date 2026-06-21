@@ -35,6 +35,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         errorResponse?.error?.title ||
         'لا يمكن اتمام العملية';
 
+      const backendErrorMessages: Record<string, string> = {
+        'DailyJournalPeriod.NotOpened': 'اليومية غير مفتوحة، يرجى فتح اليومية أولاً.',
+      };
+      if (errorMessage && backendErrorMessages[errorMessage]) {
+        errorMessage = backendErrorMessages[errorMessage];
+      }
+
       const erros = errorResponse?.error?.errors ?? [];
 
       if (Array.isArray(erros) && erros.length > 0) {

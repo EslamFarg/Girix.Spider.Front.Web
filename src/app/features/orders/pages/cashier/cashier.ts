@@ -71,7 +71,10 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { DecimalMask } from '@/directives/decimal-mask';
 import { ChosenLocalPlace } from '@/components/local-place-select/local-place-select';
+import { DeliveryPlaceSelection } from '../../../../components/delivery-place-select/delivery-place-select';
 import { DialogType } from '@/features/dialogs/enums';
+import { DailyJournalService } from '@/features/settings/services/daily-journal-service';
+import { OpenDailyJournal } from '@/features/settings/components/open-daily-journal/open-daily-journal';
 import { ControlsOf, NullablePropsOf } from '@/yn-ng/types/helpers';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RestaurantInfoService } from '@/features/settings/services/restaurant-info-service';
@@ -132,6 +135,7 @@ interface IOrderCreateFgValue {
         DecimalMask,
         PrintOptions,
         PosNumericPopup,
+        OpenDailyJournal,
     ],
     templateUrl: './cashier.html',
     styleUrls: ['./cashier.css', './payment-modal.css'],
@@ -169,7 +173,7 @@ export class Cashier extends BaseComponent implements OnInit {
     printerSettingsService = inject(PrinterSettingsService);
     restaurantInfoService = inject(RestaurantInfoService);
     posPaymentPreferencesService = inject(PosPaymentPreferencesService);
-    restaurantName = signal<string>('ÙØ§ØªÙˆØ±Ø© ÙƒØ§Ø´ÙŠØ±');
+    restaurantName = signal<string>('فاتورة كاشير');
     // printBill = signal<IOrderBillReadResponse | null>(null);
     printableOrderInvoice = viewChild<PrintableOrderInvoice>('printableOrderInvoice');
 
@@ -204,7 +208,7 @@ export class Cashier extends BaseComponent implements OnInit {
         networkAccountId: this.fb.control<number | null>(null, [Validators.required]),
         items: this.fb.control<IOrderCreateItem[]>(
             [],
-            [Validators.minLength(1), labeledRequiredValidator('ÙŠØ¬Ø¨ Ø§Ø®ØªÙŠØ§Ø± ØµÙ†Ù', 'you must select an item')],
+            [Validators.minLength(1), labeledRequiredValidator('يجب اختيار صنف', 'you must select an item')],
         ),
         customerRequest: this.fb.group({
             id: this.fb.control<number | null>(null, []),
@@ -221,7 +225,7 @@ export class Cashier extends BaseComponent implements OnInit {
             this.orderFg.controls;
         items.setValidators([
             Validators.minLength(1),
-            labeledRequiredValidator('ÙŠØ¬Ø¨ Ø§Ø®ØªÙŠØ§Ø± ØµÙ†Ù', 'you must select an item'),
+            labeledRequiredValidator('يجب اختيار صنف', 'you must select an item'),
         ]);
         switch (this.formMode()) {
             case FormMode.Create:
@@ -293,10 +297,10 @@ export class Cashier extends BaseComponent implements OnInit {
         // this.searchAdditions(1);
         this.restaurantInfoService.getSettings().subscribe({
             next: (res) => {
-                this.restaurantName.set(res.nameAr ?? 'ÙØ§ØªÙˆØ±Ø© ÙƒØ§Ø´ÙŠØ±');
+                this.restaurantName.set(res.nameAr ?? 'فاتورة كاشير');
             },
             error: () => {
-                this.restaurantName.set('ÙØ§ØªÙˆØ±Ø© ÙƒØ§Ø´ÙŠØ±');
+                this.restaurantName.set('فاتورة كاشير');
             }
         });
         // Pre-load customers so the dropdown isn't empty when dialog opens
@@ -343,7 +347,7 @@ export class Cashier extends BaseComponent implements OnInit {
                             });
                             this.chosenLocalPlace.set(null);
                             deliveryId?.setValidators([
-                                labeledRequiredValidator('ÙŠØ±Ø¬Ù‰ Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø¯Ù„ÙŠÙØ±ÙŠ', 'you must select a delivery'),
+                                labeledRequiredValidator('يرجى اختيار الدليفري', 'you must select a delivery'),
                             ]);
 
                             switch (orderType) {
@@ -372,7 +376,7 @@ export class Cashier extends BaseComponent implements OnInit {
                             console.log('OrderLocationType.DineIn: paymentType.enable();');
                             deliveryId?.clearValidators();
                             placeRefId!.setValidators([
-                                labeledRequiredValidator('ÙŠØ±Ø¬Ù‰ Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù…ÙƒØ§Ù†', 'you must select a place'),
+                                labeledRequiredValidator('يرجى اختيار المكان', 'you must select a place'),
                             ]);
                             break;
                     }
@@ -385,11 +389,45 @@ export class Cashier extends BaseComponent implements OnInit {
         });
 
         this.printerSettingsService.getSettings().subscribe();
+
+        // When OpenDailyJournal succeeds it updates currentUserDaily signal.
+        // Detect that change here: close dialogs and auto-resume the pending save.
+        effect(() => {
+            const daily = this.dailyJournalService.currentUserDaily();
+            if (daily?.value?.dailyJournalPeriods?.isOpening) {
+                this.openJournalDialogVisible.set(false);
+                this.journalWarningDialogVisible.set(false);
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'تم فتح اليومية',
+                    detail: 'تم فتح اليومية بنجاح. جاري حفظ الفاتورة...',
+                });
+                const pending = this.pendingOrderValues();
+                if (pending) {
+                    this.pendingOrderValues.set(null);
+                    this.executeSave(pending);
+                }
+            }
+        });
         // this.orderFg.setValidators;
 
         // this.orderFg.get('placeType')?.valueChanges.subscribe((placeType) => {
         //   this.localPlaceType.set(placeType);
         // });
+    }
+
+    //
+    // Daily Journal enforcement (checked at save time only)
+    //
+    dailyJournalService = inject(DailyJournalService);
+    journalWarningDialogVisible = signal(false);
+    openJournalDialogVisible = signal(false);
+    pendingOrderValues = signal<any>(null);
+
+    openJournal() {
+        this.dailyJournalService.currentUserId = this.dailyJournalService.loggedInUserId;
+        this.journalWarningDialogVisible.set(false);
+        this.openJournalDialogVisible.set(true);
     }
 
     ngOnInit(): void {
@@ -483,7 +521,7 @@ export class Cashier extends BaseComponent implements OnInit {
     onInitialOrderSubmit() {
         if (this.orderCreateItems().length === 0) {
             this.orderFg.markAllAsTouched();
-            this.messageService.add({ severity: 'error', summary: 'Ø®Ø·Ø§Ù”', detail: 'ÙŠØ¬Ø¨ Ø§Ø®ØªÙŠØ§Ø± Ø§ØµÙ†Ø§Ù' });
+            this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب اختيار اصناف' });
             return;
         }
 
@@ -504,7 +542,7 @@ export class Cashier extends BaseComponent implements OnInit {
                     })
                     .subscribe({
                         next: (res) => {
-                            this.messageService.add({ severity: 'success', summary: 'Ù†Ø¬Ø§Ø­', detail: 'ØªÙ… ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨' });
+                            this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم تعديل الطلب' });
                             this.resetOrderForm();
                             this.router.navigate(['/']);
                         },
@@ -512,8 +550,8 @@ export class Cashier extends BaseComponent implements OnInit {
                             console.log(err);
                             this.messageService.add({
                                 severity: 'error',
-                                summary: 'ÙØ´Ù„',
-                                detail: 'Ù„Ù… ÙŠØªÙ… ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨',
+                                summary: 'فشل',
+                                detail: 'لم يتم تعديل الطلب',
                             });
                             this.resetIdempotencyKey();
                         },
@@ -560,8 +598,8 @@ export class Cashier extends BaseComponent implements OnInit {
                 if (!rawValue.placeRefId) {
                     this.messageService.add({
                         severity: 'error',
-                        summary: 'ÙØ´Ù„',
-                        detail: 'Ù„Ù… ÙŠØªÙ… Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù…ÙƒØ§Ù†',
+                        summary: 'فشل',
+                        detail: 'لم يتم اختيار المكان',
                     });
                     return;
                 }
@@ -574,23 +612,41 @@ export class Cashier extends BaseComponent implements OnInit {
 
         switch (this.formMode()) {
             case FormMode.Create:
-                this.orderService.create(values).subscribe({
+                this.dailyJournalService.getCurrentUserDaily().subscribe({
                     next: (res) => {
-                        this.savePaymentPreferencesFromForm();
-                        this.existingOrderBill.set(res as unknown as IOrderBillReadResponse);
-                        this.printOrder();
-                        this.resetOrderForm();
-                        this.orderConfirmationDialogVisible.set(false);
+                        if (res.isOpening) {
+                            this.executeSave(values);
+                        } else {
+                            this.pendingOrderValues.set(values);
+                            this.journalWarningDialogVisible.set(true);
+                        }
                     },
-                    error: (err) => {
-                        this.messageService.add({ severity: 'error', summary: 'ÙØ´Ù„', detail: 'Ù„Ù… ÙŠØªÙ… Ø§Ù†Ø´Ø§Ø¡ Ø§Ù„Ø·Ù„Ø¨' });
-                        this.resetIdempotencyKey();
+                    error: () => {
+                        // Cannot determine journal state — treat as closed
+                        this.pendingOrderValues.set(values);
+                        this.journalWarningDialogVisible.set(true);
                     },
                 });
                 break;
             case FormMode.Update:
                 break;
         }
+    }
+
+    private executeSave(values: any) {
+        this.orderService.create(values).subscribe({
+            next: (res) => {
+                this.savePaymentPreferencesFromForm();
+                this.existingOrderBill.set(res as unknown as IOrderBillReadResponse);
+                this.printOrder();
+                this.resetOrderForm();
+                this.orderConfirmationDialogVisible.set(false);
+            },
+            error: () => {
+                this.messageService.add({ severity: 'error', summary: 'فشل', detail: 'لم يتم انشاء الطلب' });
+                this.resetIdempotencyKey();
+            },
+        });
     }
 
     resetIdempotencyKey() {
@@ -687,7 +743,7 @@ export class Cashier extends BaseComponent implements OnInit {
             for (const item of bill.items) {
                 categoryMap.set(item.id, { 
                     categoryId: item.categoryId ?? 0, 
-                    categoryName: item.categoryName ?? 'Ù…Ø·Ø¨Ø®',
+                    categoryName: item.categoryName ?? 'مطبخ',
                     printer: item.printer
                 });
             }
@@ -717,7 +773,7 @@ export class Cashier extends BaseComponent implements OnInit {
                         if (product.categoryId) {
                             productCategoryMap.set(product.id, {
                                 categoryId: product.categoryId,
-                                categoryName: product.categoryName ?? 'Ù…Ø·Ø¨Ø®'
+                                categoryName: product.categoryName ?? 'مطبخ'
                             });
                         }
                     }
@@ -741,7 +797,7 @@ export class Cashier extends BaseComponent implements OnInit {
             } else {
                 // Fallback to printer id as proxy for group
                 const printerId = item.printer?.id ?? 0;
-                const printerName = item.printer?.name ?? 'Ù…Ø·Ø¨Ø®';
+                const printerName = item.printer?.name ?? 'مطبخ';
                 
                 categoryMap.set(item.id, {
                     categoryId: printerId,
@@ -772,7 +828,7 @@ export class Cashier extends BaseComponent implements OnInit {
         for (const item of bill.items) {
             const mapped = categoryMap.get(item.id);
             const categoryId = mapped?.categoryId ?? item.categoryId ?? 0;
-            const categoryName = mapped?.categoryName ?? item.categoryName ?? (defaultPrinter?.name ?? 'Ù…Ø·Ø¨Ø®');
+            const categoryName = mapped?.categoryName ?? item.categoryName ?? (defaultPrinter?.name ?? 'مطبخ');
             const itemPrinter = mapped?.printer ?? item.printer ?? defaultPrinter;
             
             if (itemPrinter != null) {
@@ -1437,7 +1493,17 @@ export class Cashier extends BaseComponent implements OnInit {
             this.currentCompanyDelivery.set(null);
         }
         this.DeliveryDialogVisible = false;
-        this.messageService.add({ severity: 'success', summary: 'Ù†Ø¬Ø§Ø­', detail: 'ØªÙ… Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø¯Ù„ÙŠÙØ±ÙŠ Ø¨Ù†Ø¬Ø§Ø­' });
+        this.messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم اختيار الدليفري بنجاح' });
+    }
+
+    async openDeliveryDialog() {
+        await this.dialogService.open({
+            type: DialogType.DeliveryPlaceSelect,
+            onClose: (data: DeliveryPlaceSelection) => {
+                if (!data?.delivery) return;
+                this.onDeliverySelected(data.orderType, data.delivery);
+            },
+        });
     }
 
     //#endregion
@@ -1623,11 +1689,11 @@ export class Cashier extends BaseComponent implements OnInit {
                     this.currentMenuItemIx.set(currentMenuItemIx);
                     this.additionsDialogVisible = true;
                 } else {
-                    this.messageService.add({ severity: 'error', summary: 'Ø®Ø·Ø§Ù”', detail: 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø§Ø¶Ø§ÙØ§Øª Ù„Ù„Ù…Ù†ØªØ¬' });
+                    this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يوجد اضافات للمنتج' });
                 }
             },
             error: (error) => {
-                this.messageService.add({ severity: 'error', summary: 'Ø®Ø·Ø§Ù”', detail: 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø§Ø¶Ø§ÙØ§Øª Ù„Ù„Ù…Ù†ØªØ¬' });
+                this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'لا يوجد اضافات للمنتج' });
             },
         });
     }
@@ -1674,7 +1740,7 @@ export class Cashier extends BaseComponent implements OnInit {
     customers = signal<ICustomerSearchRow[]>([]);
     cashCustomer: ICustomerSearchRow = {
         id: 0,
-        name: 'Ø¹Ù…ÙŠÙ„ Ù†Ù‚Ø¯ÙŠ',
+        name: 'عميل نقدي',
         phoneNumber: '',
         secondaryMobileNumber: '',
         city: '',
@@ -1750,8 +1816,8 @@ export class Cashier extends BaseComponent implements OnInit {
 
         this.orderFg.controls.customerRequest.patchValue({
             id: customer?.id ?? 0,
-            nameAr: customer?.name ?? 'Ø¹Ù…ÙŠÙ„ Ù†Ù‚Ø¯ÙŠ',
-            nameEn: customer?.name ?? 'Ø¹Ù…ÙŠÙ„ Ù†Ù‚Ø¯ÙŠ',
+            nameAr: customer?.name ?? 'عميل نقدي',
+            nameEn: customer?.name ?? 'عميل نقدي',
             phoneNumber: customer?.phoneNumber ?? '',
             secondaryMobileNumber: customer?.secondaryMobileNumber ?? '',
             addressDescription: address,
@@ -1994,19 +2060,22 @@ export class Cashier extends BaseComponent implements OnInit {
 
     numericPopupVisible = signal(false);
 
-    // Change returned to customer when received exceeds invoice total
+    // Change returned to customer when received cash exceeds the cash portion of the invoice.
+    // For mixed (cash + network) payments the network amount is excluded from change calculation
+    // because it is settled electronically — only the cash portion matters.
     customerChangeAmount = computed(() => {
         if (this.paymentTypeSignal() !== OrderPaymentType.Paid) {
             return 0;
         }
 
         const received = this.amountReceived() ?? 0;
-        const invoiceTotal = this.initialNet();
-        if (received <= invoiceTotal) {
+        // Use the cash-payment slice, not the full invoice total
+        const cashPortion = +(this.payingCashSignal() ?? this.initialNet());
+        if (received <= cashPortion) {
             return 0;
         }
 
-        return +(received - invoiceTotal).toFixed(2);
+        return +(received - cashPortion).toFixed(2);
     });
 
     openReceivedAmountPopup() {
@@ -2023,7 +2092,9 @@ export class Cashier extends BaseComponent implements OnInit {
     }
 
     setFullReceivedAmount() {
-        this.amountReceived.set(+this.initialNet().toFixed(2));
+        // Pre-fill with the cash portion only so the change display starts at 0
+        const cashPortion = +(this.payingCashSignal() ?? this.initialNet());
+        this.amountReceived.set(+cashPortion.toFixed(2));
     }
 
     orderPaymentTypeChangeListener = this.orderFg.controls.paymentType.valueChanges.subscribe((value) => {
@@ -2041,6 +2112,11 @@ export class Cashier extends BaseComponent implements OnInit {
             control?.setValidators(validators);
             control?.updateValueAndValidity({ emitEvent: false });
         });
+
+        // When switching away from Paid (e.g. Credit), clear stale received amount
+        if (value !== OrderPaymentType.Paid) {
+            this.amountReceived.set(0);
+        }
     });
 
     cashInputSubscription = this.payingCashControl.valueChanges.subscribe((value) => {
@@ -2060,6 +2136,9 @@ export class Cashier extends BaseComponent implements OnInit {
             },
             { emitEvent: false },
         );
+
+        // Clamp received cash to the new cash portion — prevents stale received > new cash
+        this.amountReceived.set(+Math.min(this.amountReceived(), futureValue).toFixed(2));
     });
 
     networkInputSubscription = this.payingNetworkControl?.valueChanges.subscribe((value) => {
@@ -2073,12 +2152,17 @@ export class Cashier extends BaseComponent implements OnInit {
         if (futureValue > net) futureValue = net;
         else if (futureValue < 0) futureValue = 0;
 
+        const newCash = +Math.max(0, net - futureValue).toFixed(2);
+
         this.orderFg.patchValue(
             {
-                payingCash: +Math.max(0, net - futureValue).toFixed(2),
+                payingCash: newCash,
             },
             { emitEvent: false },
         );
+
+        // Clamp received cash to the new cash portion — prevents stale received > new cash
+        this.amountReceived.set(+Math.min(this.amountReceived(), newCash).toFixed(2));
     });
 
     //#endregion
@@ -2095,7 +2179,7 @@ export class Cashier extends BaseComponent implements OnInit {
     class="addition-dialog"
     [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-    <p class="font-bold text-center text-dark-bg-2 text-lg">Ø¥Ø®ØªØ± Ø§Ù„ÙƒÙˆØ®</p>
+    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الكوخ</p>
 
     <div
         class="flex-1 overflow-auto no-scrollbar"
@@ -2121,7 +2205,7 @@ export class Cashier extends BaseComponent implements OnInit {
     <div class="grid grid-cols-3 gap-4 border-t border-dark-line pt-4 [&_label]:mb-1 [&_label]:inline-block">
         <!-- reservation time -->
         <div>
-            <label for="">Ù…Ø¯Ø© Ø§Ù„Ø­Ø¬Ø²</label>
+            <label for="">مدة الحجز</label>
             <p-select
                 style="--p-select-background: #ffffff"
                 class="w-full border border-dark-line!"
@@ -2132,7 +2216,7 @@ export class Cashier extends BaseComponent implements OnInit {
         </div>
         <!-- hut name/id -->
         <div>
-            <label for="">Ø±Ù‚Ù… / Ø§Ø³Ù… Ø§Ù„ÙƒÙˆØ®</label>
+            <label for="">رقم / اسم الكوخ</label>
             <input
                 type="text"
                 name=""
@@ -2145,7 +2229,7 @@ export class Cashier extends BaseComponent implements OnInit {
         </div>
         <!-- hut price -->
         <div>
-            <label for="">Ø³Ø¹Ø± Ø§Ù„ÙƒÙˆØ® ÙÙŠ Ø§Ù„Ø³Ø§Ø¹Ù‡</label>
+            <label for="">سعر الكوخ في الساعه</label>
             <input
                 type="text"
                 name=""
@@ -2181,7 +2265,7 @@ export class Cashier extends BaseComponent implements OnInit {
     class="addition-dialog"
     [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-    <p class="font-bold text-center text-dark-bg-2 text-lg">Ø¥Ø®ØªØ± Ø§Ù„ØºØ±ÙØ©</p>
+    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الغرفة</p>
 
     <div
         class="flex-1 overflow-auto no-scrollbar"
@@ -2204,7 +2288,7 @@ export class Cashier extends BaseComponent implements OnInit {
 
     <ng-template #footer>
         <button pButton styleClass="app-p-btn" class="mx-auto" severity="secondary" (click)="RoomDialogVisible = false">
-            Ø§Ø³ØªÙ…Ø±Ø§Ø±
+            استمرار
         </button>
     </ng-template>
 </p-dialog>
@@ -2220,7 +2304,7 @@ export class Cashier extends BaseComponent implements OnInit {
     class="addition-dialog"
     [contentStyleClass]="`flex flex-col ${isLoading() && 'opacity-50 cursor-wait'}`"
 >
-    <p class="font-bold text-center text-dark-bg-2 text-lg">Ø¥Ø®ØªØ± Ø§Ù„Ø·Ø§ÙˆÙ„Ø©</p>
+    <p class="font-bold text-center text-dark-bg-2 text-lg">إختر الطاولة</p>
     <div
         class="flex-1 overflow-auto no-scrollbar"
         appDebounce
@@ -2248,7 +2332,7 @@ export class Cashier extends BaseComponent implements OnInit {
             severity="secondary"
             (click)="TableDialogVisible = false"
         >
-            Ø§Ø³ØªÙ…Ø±Ø§Ø±
+            استمرار
         </button>
     </ng-template>
 </p-dialog>

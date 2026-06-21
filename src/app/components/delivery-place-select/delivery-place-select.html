@@ -1,0 +1,76 @@
+<app-selector-popup-shell
+    [title]="title()"
+    [count]="displayCount()"
+    [searchTerm]="searchTerm()"
+    [searchPlaceholder]="searchPlaceholder()"
+    [confirmDisabled]="confirmDisabled()"
+    confirmLabel="متابعة"
+    cancelLabel="إلغاء"
+    (searchTermChange)="searchTerm.set($event)"
+    (cancel)="cancelDialog()"
+    (confirm)="closeDialog()"
+    (gridScroll)="onGridScroll($event)"
+>
+    <div selectorPopupExtra class="selector-popup__type-toggle">
+        <button
+            pButton
+            type="button"
+            class="selector-popup__type-btn"
+            [class.selector-popup__type-btn--active]="!isCompanyDelivery()"
+            (click)="setDeliveryType(false)"
+        >
+            دليفري
+        </button>
+        <button
+            pButton
+            type="button"
+            class="selector-popup__type-btn"
+            [class.selector-popup__type-btn--active]="isCompanyDelivery()"
+            (click)="setDeliveryType(true)"
+        >
+            شركة
+        </button>
+    </div>
+
+    @if (!isCompanyDelivery()) {
+        <div class="delivery-grid">
+            @for (item of filteredDeliveries(); track item.id) {
+                <div
+                    class="delivery-card"
+                    [class.selector-occupied]="item.orderNumber > 0"
+                    [class.delivery-card--active]="isDeliveryActive(item)"
+                    (click)="onSelectDelivery(item)"
+                >
+                    @if (item.orderNumber > 0) {
+                        <div
+                            class="absolute -top-3.5 -right-0.5 w-[23px] aspect-square flex items-center justify-center text-base font-bold bg-dark-line text-[#FA8D7B] rounded-full"
+                        >
+                            <span>{{ item.orderNumber }}</span>
+                        </div>
+                    }
+                    <span class="delivery-card__name">{{ item.name }}</span>
+                </div>
+            }
+        </div>
+    } @else {
+        <div class="delivery-grid">
+            @for (item of filteredCompanies(); track item.id) {
+                <div
+                    class="delivery-card"
+                    [class.selector-occupied]="item.orderNumbers > 0"
+                    [class.delivery-card--active]="isCompanyActive(item)"
+                    (click)="onSelectCompany(item)"
+                >
+                    @if (item.orderNumbers > 0) {
+                        <div
+                            class="absolute -top-3.5 -right-0.5 w-[23px] aspect-square flex items-center justify-center text-base font-bold bg-dark-line text-[#FA8D7B] rounded-full"
+                        >
+                            <span>{{ item.orderNumbers }}</span>
+                        </div>
+                    }
+                    <span class="delivery-card__name">{{ item.name }}</span>
+                </div>
+            }
+        </div>
+    }
+</app-selector-popup-shell>

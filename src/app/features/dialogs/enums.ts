@@ -1,4 +1,5 @@
 export enum DialogType {
     LocalPlaceSelect=1,
-    Collection
+    Collection,
+    DeliveryPlaceSelect
 }

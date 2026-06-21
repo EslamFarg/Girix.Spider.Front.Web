@@ -1,0 +1,128 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DELIVERY PLACE SELECT — delivery-place-select.css
+   ─────────────────────────────────────────────────────────────────────────
+   Scoped to this component via ViewEncapsulation.Emulated.
+   Zero impact on: Local Place popup, Rooms, Tables, Huts, Replacements,
+   Collections, or any shared card component.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+/* ── Type toggle — دليفري / شركة segmented control ─────────────────────── */
+
+.selector-popup__type-toggle {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.5rem;
+  padding-bottom: 0.125rem;
+}
+
+/* Override PrimeNG pButton defaults — we control all colours */
+.selector-popup__type-btn {
+  flex: 1;
+  min-height: 40px;
+  border-radius: 0.5rem;
+  border: 1.5px solid #d1d5db !important;
+  background-color: #f9fafb !important;
+  color: var(--color-dark-line, #375652) !important;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+  user-select: none;
+}
+
+.selector-popup__type-btn:hover:not(.selector-popup__type-btn--active) {
+  border-color: var(--color-primary, #375652) !important;
+  background-color: rgba(55, 86, 82, 0.06) !important;
+}
+
+.selector-popup__type-btn--active {
+  background-color: var(--color-primary, #375652) !important;
+  border-color: var(--color-primary, #375652) !important;
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+/* ── Card grid ───────────────────────────────────────────────────────────── */
+
+.delivery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  align-content: start;
+}
+
+/* ── Base card — calm, inactive ─────────────────────────────────────────── */
+
+.delivery-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70px;
+  padding: 0.75rem 0.5rem 0.625rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+  overflow: visible;
+  text-align: center;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+/* ── Available hover — green border + very soft shadow ─────────────────── */
+
+.delivery-card:not(.delivery-card--active):not(.selector-occupied):hover {
+  border-color: #50d1aa;
+  box-shadow: 0 4px 12px rgba(80, 209, 170, 0.12);
+}
+
+/* ── Occupied (active orders > 0) — soft orange ─────────────────────────── */
+
+.delivery-card.selector-occupied {
+  border-color: rgba(255, 141, 40, 0.45);
+  background-color: rgba(255, 141, 40, 0.03);
+}
+
+.delivery-card.selector-occupied:not(.delivery-card--active):hover {
+  border-color: rgba(255, 141, 40, 0.65);
+  box-shadow: 0 4px 10px rgba(255, 141, 40, 0.10);
+}
+
+/* ── Selected — green border + very light green background ───────────────── */
+
+.delivery-card.delivery-card--active {
+  border-color: #50d1aa;
+  background-color: #f4fffb;
+  box-shadow: 0 0 0 1.5px #50d1aa;
+}
+
+/* ── Name text ─────────────────────────────────────────────────────────── */
+
+.delivery-card__name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.2;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.delivery-card.selector-occupied .delivery-card__name {
+  color: #b45c08;
+}
+
+.delivery-card.delivery-card--active .delivery-card__name {
+  color: #057855;
+}

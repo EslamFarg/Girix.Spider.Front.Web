@@ -1,233 +1,396 @@
-<div class="flex justify-between">
-    @if (!isOrderPaid()) {
-        <p-tag severity="warn" class="w-max inline-block *:inline-block *:w-max" value="فاتورة اجلة" />
-    }
-    <div
-        class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
-        style="--p-button-primary-background: transparent"
-    >
-        @if (!isCreateMode()) {
-            <button
-                appLoadingDisabled
-                type="button"
-                pButton
-                severity="danger"
-                class="text-white! py-1! md:px-8! md:flex-none"
-                (click)="deleteRefund(refundId(), $event)"
-            >
-                حذف
-            </button>
-        }
+<form
+  id="refundForm"
+  [formGroup]="refundFg"
+  class="sr-form p-3 flex flex-col h-full gap-1.5"
+  (ngSubmit)="onSubmitClick()"
+>
+  <div class="pr-top-area shrink-0">
 
-        <button
-            pButton
-            style="--p-button-primary-background: var(--color-dark-line)"
-            class="border-dark-line! text-white! py-1! md:px-8! md:flex-none hover:text-white!"
-            form="refundForm"
-            type="submit"
+    <!-- Search + return meta -->
+    <div class="pi-panel sr-block-return flex flex-col">
+      <div class="pi-panel-header">البحث والمرتجع</div>
+      <div class="pi-panel-body grid grid-cols-2 gap-x-2 gap-y-1">
+
+        <div>
+          <label for="returnNumber">رقم المرتجع</label>
+          <input type="text" pInputText id="returnNumber" class="w-full" [value]="returnNumberDisplay()" disabled />
+        </div>
+
+        <div>
+          <label for="returnDate">التاريخ</label>
+          <input
+            type="text"
+            pInputText
+            id="returnDate"
+            class="w-full"
+            disabled
+            [value]="isLoaded() ? (orderData()?.dateTime | date: 'yyyy-MM-dd HH:mm') : '-'"
+          />
+        </div>
+
+        <div class="col-span-2">
+          <label for="searchInvoiceForm">البحث برقم فاتورة المبيعات</label>
+          <form
+            id="searchInvoiceForm"
+            [formGroup]="searchInvoiceFg"
             appLoadingDisabled
-        >
-            @if (isCreateMode()) {
-                {{ 'ACTIONS.SAVE' | translate }}
-            } @else {
-                {{ 'ACTIONS.EDIT' | translate }}
-            }
-        </button>
-    </div>
-</div>
+            appDebounce
+            [domEvents]="['submit']"
+            (debounced)="searchBySalesInvoice(searchInvoiceFg.value.term ?? '')"
+          >
+            <app-input-error-message-handler>
+              <input
+                type="text"
+                pInputText
+                formControlName="term"
+                form="searchInvoiceForm"
+                placeholder="رقم فاتورة المبيعات"
+                class="w-full"
+              />
+              <p-inputgroup-addon class="p-0! cursor-pointer">
+                <button type="submit" form="searchInvoiceForm" class="flex cursor-pointer" pTooltip="بحث">
+                  <i class="pi pi-search text-sm px-2"></i>
+                </button>
+              </p-inputgroup-addon>
+            </app-input-error-message-handler>
+          </form>
+        </div>
 
-<form id="refundForm" class="mt-6 flex flex-col gap-4" [formGroup]="refundFg" (ngSubmit)="onSubmitForm()">
-    <!-- Payment Info -->
-    <div class="grid md:grid-cols-2 gap-4">
-        @if (isOrderPaid()) {
-            <!-- المدفوع كاش -->
-            <div>
-                <label for="payingCash">المدفوع كاش</label>
-                <app-input-error-message-handler [fc]="refundFg.get('payingCash')">
-                    <input
-                        pInputText
-                        appAllowNumbers
-                        [allowDecimal]="true"
-                        [max]="isOrderPaid() ? calculateRefundTotal() : 0"
-                        [min]="0"
-                        id="payingCash"
-                        type="number"
-                        formControlName="payingCash"
-                        class="app-input"
-                        placeholder="المدفوع كاش"
-                    />
-                </app-input-error-message-handler>
-            </div>
+        <div class="col-span-2">
+          <label for="searchReturnForm">البحث برقم المرتجع / المرجع</label>
+          <form
+            id="searchReturnForm"
+            [formGroup]="searchReturnFg"
+            appLoadingDisabled
+            appDebounce
+            [domEvents]="['submit']"
+            (debounced)="searchByReturnReference(searchReturnFg.value.term ?? '')"
+          >
+            <app-input-error-message-handler>
+              <input
+                type="text"
+                pInputText
+                formControlName="term"
+                form="searchReturnForm"
+                placeholder="رقم المرتجع أو المرجع الدفتري"
+                class="w-full"
+              />
+              <p-inputgroup-addon class="p-0! cursor-pointer">
+                <button type="submit" form="searchReturnForm" class="flex cursor-pointer" pTooltip="بحث">
+                  <i class="pi pi-search text-sm px-2"></i>
+                </button>
+              </p-inputgroup-addon>
+            </app-input-error-message-handler>
+          </form>
+        </div>
 
-            <!-- المدفوع شبكة -->
-            <div>
-                <label for="payingNetwork">المدفوع شبكة</label>
-                <app-input-error-message-handler [fc]="refundFg.get('payingNetwork')">
-                    <input
-                        pInputText
-                        appAllowNumbers
-                        [allowDecimal]="true"
-                        [max]="isOrderPaid() ? calculateRefundTotal() : 0"
-                        [min]="0"
-                        type="number"
-                        id="payingNetwork"
-                        formControlName="payingNetwork"
-                        class="app-input"
-                        placeholder="المدفوع شبكة"
-                    />
-                </app-input-error-message-handler>
-            </div>
+        @if (isLoaded() && !isOrderPaid()) {
+          <div class="col-span-2">
+            <p-tag severity="warn" value="فاتورة آجلة" />
+          </div>
         }
-        <!-- التاريخ -->
-        <div>
-            <label for="payingNetwork">التاريخ</label>
-            <app-input-error-message-handler>
-                <input
-                    pInputText
-                    disabled
-                    [value]="orderData()?.dateTime | date: 'yyyy-MM-dd'"
-                    type="text"
-                    id="payingNetwork"
-                    class="app-input"
-                    placeholder="التاريخ"
-                />
-            </app-input-error-message-handler>
-        </div>
-
-        <!-- اسم العميل -->
-        <div>
-            <label for="payingNetwork">اسم العميل</label>
-            <app-input-error-message-handler>
-                <input
-                    pInputText
-                    disabled
-                    [value]="orderData()?.customer?.name"
-                    type="text"
-                    id="payingNetwork"
-                    class="app-input"
-                    placeholder="التاريخ"
-                />
-            </app-input-error-message-handler>
-        </div>
-    </div>
-
-    <!-- Items Table -->
-    <div class="overflow-x-auto mt-4">
-        <p>عناصر الطلب</p>
-        <table class="my-4 min-w-250 w-full main-table table-fixed">
-            <thead>
-                <tr>
-                    <th class="min-w-12.5 w-12.5">#</th>
-                    <th class="min-w-40">المنتج</th>
-                    <th class="min-w-20">السعر</th>
-                    <th class="min-w-20">الكمية المتاحة</th>
-                    <th class="min-w-20">الكمية المسترجعة</th>
-                    <th class="min-w-20">الإجمالي</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (item of filteredItems; track $index; let itemIndex = $index) {
-                    <tr [style]="`--ix:${itemIndex}`">
-                        <td>
-                            <div>{{ itemIndex + 1 }}</div>
-                        </td>
-                        <td>
-                            <div>{{ item.value.name }}</div>
-                        </td>
-                        <td>
-                            <div>{{ item.value.netUnitPriceWithTax?.toFixed(2) }}</div>
-                        </td>
-                        <td>
-                            <div>{{ item.value.originalQuantity }}</div>
-                        </td>
-                        <td>
-                            <app-input-error-message-handler [grouped]="false" [fc]="item.controls.quantity">
-                                <input
-                                    pInputText
-                                    appAllowNumbers
-                                    [allowDecimal]="true"
-                                    [min]="0"
-                                    [max]="item.value.originalQuantity ?? 0"
-                                    [formControl]="item.controls.quantity"
-                                    class="app-input text-center"
-                                    placeholder="الكمية"
-                                    (input)="onItemQuantityChange(itemIndex, $event)"
-                                />
-                            </app-input-error-message-handler>
-                        </td>
-                        <td>
-                            <div>
-                                {{ ((item.value.quantity ?? 0) * (item.value.netUnitPriceWithTax ?? 0)).toFixed(2) }}
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Addons -->
-                    @for (addon of getAddonRows(itemIndex).controls; track $index; let addonIndex = $index) {
-                        <tr [style]="`--ix:${itemIndex + addonIndex + 1}`" class="bg-secondary-bg/30">
-                            <td></td>
-                            <td class="pr-8">
-                                <div class="text-sm text-text-gray">↳ {{ addon.value.name }}</div>
-                            </td>
-                            <td>
-                                <div class="text-sm">{{ addon.value.netUnitPriceWithTax }}</div>
-                            </td>
-                            <td>
-                                <div class="text-sm">{{ addon.value.originalQuantity }}</div>
-                            </td>
-                            <td>
-                                <app-input-error-message-handler [grouped]="false" [fc]="addon.controls.quantity">
-                                    <input
-                                        pInputText
-                                        appAllowNumbers
-                                        [allowDecimal]="true"
-                                        [min]="0"
-                                        [max]="addon.value.originalQuantity ?? 0"
-                                        [formControl]="addon.controls.quantity"
-                                        class="app-input text-center text-sm"
-                                        placeholder="الكمية"
-                                        (input)="onAddonQuantityChange(itemIndex, addonIndex, $event)"
-                                    />
-                                </app-input-error-message-handler>
-                            </td>
-                            <td>
-                                <div class="text-sm">
-                                    {{
-                                        (addon.value.quantity ?? 0) * (addon.value.netUnitPriceWithTax ?? 0)
-                                            | number: '1.2-2'
-                                    }}
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                } @empty {
-                    <tr>
-                        <td colspan="6">
-                            <div class="py-4 text-center">لا توجد عناصر</div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Summary -->
-    <div class="flex flex-col gap-2 mt-2 p-4 bg-dark-bg-2 rounded-lg">
-        <!-- <div class="flex items-center gap-4">
-      <span class="text-text-lighter font-bold">إجمالي العناصر:</span>
-      <span class="text-white font-bold w-20 text-left">{{ calculateItemsTotal() | number: '1.2-2' }}</span>
-    </div>
-    @if (calculateReturnedServiceFee() > 0) {
-      <div class="flex items-center gap-4">
-        <span class="text-text-lighter font-bold">رسوم الخدمة المسترجعة:</span>
-        <span class="text-white font-bold w-20 text-left">{{ calculateReturnedServiceFee() | number: '1.2-2' }}</span>
       </div>
-    } -->
-        <div class="flex items-center gap-4 justify-end">
-            <span class="text-text-lighter font-bold">إجمالي المرتجع:</span>
-            <span class="text-white font-bold text-lg w-20 text-left">{{
-                calculateRefundTotal() | number: '1.2-2'
-            }}</span>
-        </div>
     </div>
+
+    <!-- Invoice summary cards -->
+    <div class="pi-panel sr-block-summary flex flex-col">
+      <div class="pi-panel-header">ملخص الفاتورة</div>
+      <div class="pi-panel-body flex-1">
+        @if (isLoaded()) {
+          <div class="sr-info-cards">
+            <div class="sr-info-card">
+              <span class="sr-info-card__label">رقم الفاتورة الأصلية</span>
+              <span class="sr-info-card__value">{{ originalInvoiceNumber() }}</span>
+            </div>
+            <div class="sr-info-card">
+              <span class="sr-info-card__label">العميل</span>
+              <span class="sr-info-card__value">{{ orderData()?.customer?.name || '-' }}</span>
+            </div>
+            <div class="sr-info-card">
+              <span class="sr-info-card__label">إجمالي الفاتورة</span>
+              <span class="sr-info-card__value">{{ invoiceTotal() | number: '1.2-2' }}</span>
+            </div>
+            <div class="sr-info-card sr-info-card--accent">
+              <span class="sr-info-card__label">المتبقي للاسترجاع</span>
+              <span class="sr-info-card__value">{{ remainingReturnable() | number: '1.2-2' }}</span>
+            </div>
+          </div>
+        } @else {
+          <p class="sr-empty-hint">ابحث عن فاتورة مبيعات أو مرتجع لبدء الاسترجاع.</p>
+        }
+      </div>
+    </div>
+
+    <!-- Operations + payment accounts -->
+    <div class="pi-panel sr-block-operations flex flex-col">
+      <div class="pi-panel-header">العمليات والمالية</div>
+      <div class="pi-panel-body flex flex-col justify-between flex-1 gap-2">
+
+        @if (isLoaded() && isOrderPaid()) {
+          <div class="sr-payment-cards">
+            <div class="sr-payment-card">
+              <span class="sr-payment-card__label">كاش</span>
+              <span class="sr-payment-card__amount">{{ (refundFg.value.payingCash ?? 0) | number: '1.2-2' }}</span>
+              <span class="sr-payment-card__account">{{ cashAccountName() }}</span>
+            </div>
+            <div class="sr-payment-card">
+              <span class="sr-payment-card__label">شبكة</span>
+              <span class="sr-payment-card__amount">{{ (refundFg.value.payingNetwork ?? 0) | number: '1.2-2' }}</span>
+              <span class="sr-payment-card__account">{{ networkAccountName() }}</span>
+            </div>
+          </div>
+        }
+
+        <div class="grid grid-cols-2 gap-1.5">
+          <button pButton type="button" class="app-p-btn py-1! w-full! justify-center!" (click)="onNewClick()">
+            جديد
+          </button>
+
+          <button
+            type="submit"
+            form="refundForm"
+            pButton
+            class="app-p-btn py-1! w-full! justify-center!"
+            appLoadingDisabled
+            [disabled]="!canSubmit()"
+          >
+            {{ submitLabel() }}
+          </button>
+
+          <button
+            pButton
+            type="button"
+            severity="danger"
+            variant="outlined"
+            class="app-p-btn py-1! w-full! justify-center!"
+            appLoadingDisabled
+            [disabled]="!canDelete()"
+            (click)="deleteRefund($event)"
+          >
+            حذف
+          </button>
+
+          <button
+            pButton
+            type="button"
+            variant="outlined"
+            class="app-p-btn py-1! w-full! justify-center!"
+            [disabled]="!canPrint()"
+            (click)="printReturn()"
+          >
+            طباعة
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live metrics above grid -->
+  <div class="sr-metrics-bar shrink-0">
+    <div class="sr-metric">
+      <span class="sr-metric__label">إجمالي الكمية المباعة</span>
+      <span class="sr-metric__value">{{ totalSoldQuantity() }}</span>
+    </div>
+    <div class="sr-metric">
+      <span class="sr-metric__label">إجمالي الكمية المسترجعة</span>
+      <span class="sr-metric__value">{{ totalReturnedQuantity() }}</span>
+    </div>
+    <div class="sr-metric sr-metric--highlight">
+      <span class="sr-metric__label">إجمالي مبلغ المرتجع</span>
+      <span class="sr-metric__value">{{ totalReturnAmount() | number: '1.2-2' }}</span>
+    </div>
+    <div class="sr-metric">
+      <span class="sr-metric__label">عدد الأصناف المختارة</span>
+      <span class="sr-metric__value">{{ selectedItemsCount() }}</span>
+    </div>
+  </div>
+
+  <!-- Items grid -->
+  <div class="pr-grid-wrapper flex-1 min-h-0">
+    <table class="pr-table w-full main-table table-fixed sr-items-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>المنتج</th>
+          <th>السعر</th>
+          <th>الكمية المتاحة</th>
+          <th>
+            <div class="pr-col-header sr-return-qty-header">
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="returnAllChecked()"
+                (ngModelChange)="onReturnAllCheckboxChange($event)"
+                [ngModelOptions]="{ standalone: true }"
+                [disabled]="!isLoaded()"
+                inputId="returnAllCheckbox"
+                pTooltip="تحديد الكل / تصفير الكل"
+              />
+              <span>الكمية المسترجعة</span>
+            </div>
+          </th>
+          <th>الإجمالي</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of itemRows.controls; track $index; let itemIndex = $index) {
+          <tr class="sr-item-row" [class.sr-item-row--active]="isRowActive(itemIndex)">
+            <td class="text-center">{{ itemIndex + 1 }}</td>
+            <td><div class="pr-cell-text">{{ item.value.name }}</div></td>
+            <td><div class="pr-cell-text text-center">{{ item.value.netUnitPriceWithTax?.toFixed(2) }}</div></td>
+            <td><div class="pr-cell-text text-center">{{ item.value.originalQuantity }}</div></td>
+            <td>
+              <div class="sr-qty-stepper">
+                <button
+                  type="button"
+                  pButton
+                  class="sr-qty-btn"
+                  [disabled]="(item.value.quantity ?? 0) <= 0"
+                  (click)="adjustItemQuantity(itemIndex, -1)"
+                >
+                  <i class="pi pi-minus text-xs"></i>
+                </button>
+                <span class="sr-qty-value">{{ item.value.quantity ?? 0 }}</span>
+                <button
+                  type="button"
+                  pButton
+                  class="sr-qty-btn"
+                  [disabled]="(item.value.quantity ?? 0) >= (item.value.originalQuantity ?? 0)"
+                  (click)="adjustItemQuantity(itemIndex, 1)"
+                >
+                  <i class="pi pi-plus text-xs"></i>
+                </button>
+              </div>
+            </td>
+            <td>
+              <div class="pr-cell-text text-center">{{ calculateItemTotal(item, itemIndex).toFixed(2) }}</div>
+            </td>
+            <td class="text-center">
+              @if (hasReturnedQuantity(item.value.quantity)) {
+                <button
+                  type="button"
+                  pButton
+                  severity="danger"
+                  variant="text"
+                  class="p-0! h-7! w-7! rounded-full!"
+                  (click)="deleteRow(itemIndex)"
+                  pTooltip="حذف السطر"
+                >
+                  <i class="pi pi-trash text-xs"></i>
+                </button>
+              }
+            </td>
+          </tr>
+
+          @for (addon of getAddonRows(itemIndex).controls; track $index; let addonIndex = $index) {
+            <tr
+              class="sr-addon-row"
+              [class.sr-item-row--active]="hasReturnedQuantity(addon.value.quantity)"
+            >
+              <td></td>
+              <td><div class="pr-cell-text pr-addon-name">↳ {{ addon.value.name }}</div></td>
+              <td><div class="pr-cell-text text-center">{{ addon.value.netUnitPriceWithTax?.toFixed(2) }}</div></td>
+              <td><div class="pr-cell-text text-center">{{ addon.value.originalQuantity }}</div></td>
+              <td>
+                <div class="sr-qty-stepper">
+                  <button
+                    type="button"
+                    pButton
+                    class="sr-qty-btn"
+                    [disabled]="(addon.value.quantity ?? 0) <= 0"
+                    (click)="adjustAddonQuantity(itemIndex, addonIndex, -1)"
+                  >
+                    <i class="pi pi-minus text-xs"></i>
+                  </button>
+                  <span class="sr-qty-value">{{ addon.value.quantity ?? 0 }}</span>
+                  <button
+                    type="button"
+                    pButton
+                    class="sr-qty-btn"
+                    [disabled]="(addon.value.quantity ?? 0) >= (addon.value.originalQuantity ?? 0)"
+                    (click)="adjustAddonQuantity(itemIndex, addonIndex, 1)"
+                  >
+                    <i class="pi pi-plus text-xs"></i>
+                  </button>
+                </div>
+              </td>
+              <td>
+                <div class="pr-cell-text text-center">
+                  {{ ((addon.value.quantity ?? 0) * (addon.value.netUnitPriceWithTax ?? 0)).toFixed(2) }}
+                </div>
+              </td>
+              <td class="text-center">
+                @if (hasReturnedQuantity(addon.value.quantity)) {
+                  <button
+                    type="button"
+                    pButton
+                    severity="danger"
+                    variant="text"
+                    class="p-0! h-7! w-7! rounded-full!"
+                    (click)="deleteAddonRow(itemIndex, addonIndex)"
+                    pTooltip="حذف الإضافة"
+                  >
+                    <i class="pi pi-trash text-xs"></i>
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        } @empty {
+          <tr>
+            <td colspan="7">
+              <div class="py-3 text-center text-sm text-text-gray">لا توجد عناصر — ابحث عن فاتورة لتحميل الأصناف.</div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </form>
+
+<p-dialog
+  [visible]="journalWarningDialogVisible()"
+  (visibleChange)="journalWarningDialogVisible.set($event)"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '90%', maxWidth: '28rem' }"
+  styleClass="bg-white!"
+>
+  <ng-template #header>
+    <div class="flex items-center gap-2 text-orange-600">
+      <i class="pi pi-exclamation-triangle text-xl"></i>
+      <span class="font-bold text-lg">يجب فتح اليومية أولاً</span>
+    </div>
+  </ng-template>
+  <div class="flex flex-col gap-6 py-2">
+    <p class="text-gray-600 text-sm leading-relaxed">
+      لا يمكن حفظ المرتجع قبل فتح اليومية. هل تريد فتح اليومية الآن؟
+    </p>
+    <div class="flex gap-3 justify-end">
+      <button pButton type="button" class="p-button-outlined p-button-secondary" (click)="cancelJournalSave()">
+        إلغاء
+      </button>
+      <button pButton type="button" (click)="openJournal()">فتح اليومية الآن</button>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog
+  [visible]="openJournalDialogVisible()"
+  (visibleChange)="openJournalDialogVisible.set($event)"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '90%', maxWidth: '32rem' }"
+  styleClass="bg-white!"
+>
+  <ng-template #header>
+    <div class="flex items-center gap-2 text-green-700">
+      <i class="pi pi-calendar-plus text-xl"></i>
+      <span class="font-bold text-lg">فتح اليومية</span>
+    </div>
+  </ng-template>
+  <div class="py-2">
+    <app-open-daily-journal />
+  </div>
+</p-dialog>

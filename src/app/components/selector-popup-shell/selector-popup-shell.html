@@ -1,0 +1,65 @@
+<div class="selector-popup">
+    <header class="selector-popup__header">
+        <h2 class="selector-popup__title">{{ title() }}</h2>
+        <span class="selector-popup__count">({{ count() }})</span>
+    </header>
+
+    @if (showSearch()) {
+        <div class="selector-popup__search">
+            <input
+                pInputText
+                type="text"
+                class="selector-popup__search-input"
+                [ngModel]="searchTerm()"
+                (ngModelChange)="onSearchInput($event)"
+                [placeholder]="searchPlaceholder()"
+            />
+            <span class="selector-popup__search-icon" aria-hidden="true">
+                <i class="pi pi-search"></i>
+            </span>
+        </div>
+    }
+
+    <ng-content select="[selectorPopupExtra]" />
+
+    <div class="selector-popup__grid-scroll custom-scroll" (scroll)="gridScroll.emit($event)">
+        <div class="selector-surface selector-popup__grid-body">
+            <ng-content />
+        </div>
+    </div>
+
+    <footer class="selector-popup__footer">
+        @if (showLegend()) {
+            <div class="selector-popup__legend">
+                <span class="selector-popup__legend-item">
+                    <span class="selector-popup__dot selector-popup__dot--available"></span>
+                    متاح
+                </span>
+                <span class="selector-popup__legend-item">
+                    <span class="selector-popup__dot selector-popup__dot--occupied"></span>
+                    مشغول
+                </span>
+            </div>
+        }
+        <div class="selector-popup__footer-actions">
+            <button
+                pButton
+                type="button"
+                class="app-p-btn selector-popup__footer-btn selector-popup__footer-btn--confirm"
+                [disabled]="confirmDisabled()"
+                (click)="confirm.emit()"
+            >
+                {{ confirmLabel() }}
+            </button>
+            <button
+                pButton
+                type="button"
+                severity="secondary"
+                class="selector-popup__footer-btn selector-popup__footer-btn--cancel"
+                (click)="cancel.emit()"
+            >
+                {{ cancelLabel() }}
+            </button>
+        </div>
+    </footer>
+</div>

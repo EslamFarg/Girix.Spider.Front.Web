@@ -1,0 +1,151 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SELECTOR POPUP SHELL — selector-popup-shell.css
+   ─────────────────────────────────────────────────────────────────────────
+   Generic shell used by delivery-place-select.
+   ViewEncapsulation.Emulated — scoped to this component.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* ── Root container — fixed height, flex column ─────────────────────────── */
+
+.selector-popup {
+  display: flex;
+  flex-direction: column;
+  height: 68vh;
+  max-height: 600px;
+  min-height: 360px;
+  overflow: hidden;
+  gap: 0.625rem;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.selector-popup__header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.selector-popup__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-dark-line, #375652);
+  margin: 0;
+}
+
+.selector-popup__count {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+/* ── Search ─────────────────────────────────────────────────────────────── */
+
+.selector-popup__search {
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.selector-popup__search-input {
+  width: 100%;
+  height: 40px;
+  padding-inline-start: 0.75rem;
+  padding-inline-end: 2.25rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: #111827;
+  outline: none;
+  background: #ffffff;
+  direction: rtl;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.selector-popup__search-input:focus {
+  border-color: var(--color-primary, #375652);
+  box-shadow: 0 0 0 2px rgba(55, 86, 82, 0.12);
+}
+
+.selector-popup__search-icon {
+  position: absolute;
+  right: 0.75rem;
+  color: #9ca3af;
+  pointer-events: none;
+  font-size: 0.8125rem;
+}
+
+/* ── Scrollable grid area ────────────────────────────────────────────────── */
+
+.selector-popup__grid-scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(55, 86, 82, 0.16);
+  padding: 0.75rem;
+}
+
+.selector-popup__grid-scroll::-webkit-scrollbar { width: 5px; }
+.selector-popup__grid-scroll::-webkit-scrollbar-track { background: transparent; }
+.selector-popup__grid-scroll::-webkit-scrollbar-thumb {
+  background: rgba(55, 86, 82, 0.22);
+  border-radius: 99px;
+}
+
+.selector-surface {
+  height: 100%;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.selector-popup__footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.selector-popup__legend {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.selector-popup__legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.selector-popup__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.selector-popup__dot--available { background: rgb(80, 209, 170); }
+.selector-popup__dot--occupied  { background: rgb(255, 141, 40); }
+
+.selector-popup__footer-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.selector-popup__footer-btn {
+  min-width: 90px;
+}
