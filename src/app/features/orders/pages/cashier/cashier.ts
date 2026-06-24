@@ -78,6 +78,8 @@ import { OpenDailyJournal } from '@/features/settings/components/open-daily-jour
 import { ControlsOf, NullablePropsOf } from '@/yn-ng/types/helpers';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RestaurantInfoService } from '@/features/settings/services/restaurant-info-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MaintenanceService } from '@/features/settings/services/maintenance-service';
 import {
     IPosPaymentPreferences,
     PosPaymentPreferencesService,
@@ -276,6 +278,10 @@ export class Cashier extends BaseComponent implements OnInit {
 
         this.financialSettingsService.getSettings().subscribe((res) => this.financialSettings.set(res));
         this.resetData();
+        inject(MaintenanceService)
+            .deliveryReset$
+            .pipe(takeUntilDestroyed())
+            .subscribe(() => this.onDeliveryReset());
         this.getAccounts().subscribe({
             next: (res) => {
                 this.cashAccounts.set(res.cash);
@@ -657,6 +663,25 @@ export class Cashier extends BaseComponent implements OnInit {
 
     resetData() {
         this.searchDeliveries(1);
+    }
+
+    private onDeliveryReset() {
+        this.DeliveryDialogVisible = false;
+        const isDeliveryMode =
+            this.orderLocationType() === OrderLocationType.PersonDelivery ||
+            this.orderLocationType() === OrderLocationType.CompanyDelivery;
+
+        if (isDeliveryMode) {
+            this.resetOrderForm();
+            return;
+        }
+
+        this.currentDelivery.set(null);
+        this.currentCompanyDelivery.set(null);
+        this.customers.set([]);
+        this.deliveryPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
+        this.searchDeliveries(1, false);
+        this.searchDeliveries(1, true);
     }
 
     resetOrderForm() {
@@ -1422,19 +1447,17 @@ export class Cashier extends BaseComponent implements OnInit {
                 })
                 .subscribe({
                     next: (res) => {
-                        if (res.value.rows.length > 0) {
-                            if (pageIndex == 1) {
-                                this.companyDeliveries.set(res.value.rows);
-                            } else {
-                                this.companyDeliveries.update((prev) => prev.concat(res.value.rows));
-                            }
-
-                            this.deliveryPaginationInfo = {
-                                pageIndex,
-                                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-                            };
+                        if (pageIndex == 1) {
+                            this.companyDeliveries.set(res.value.rows);
+                        } else if (res.value.rows.length > 0) {
+                            this.companyDeliveries.update((prev) => prev.concat(res.value.rows));
                         }
+
+                        this.deliveryPaginationInfo = {
+                            pageIndex,
+                            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+                        };
                     },
                 });
         } else {
@@ -1454,18 +1477,17 @@ export class Cashier extends BaseComponent implements OnInit {
                 })
                 .subscribe({
                     next: (res) => {
-                        if (res.value.rows.length > 0) {
-                            if (pageIndex == 1) {
-                                this.deliveries.set(res.value.rows);
-                            } else {
-                                this.deliveries.update((prev) => prev.concat(res.value.rows));
-                            }
-                            this.deliveryPaginationInfo = {
-                                pageIndex,
-                                totalPagesCount: res.value.paginationInfo.totalPagesCount,
-                                totalRowsCount: res.value.paginationInfo.totalRowsCount,
-                            };
+                        if (pageIndex == 1) {
+                            this.deliveries.set(res.value.rows);
+                        } else if (res.value.rows.length > 0) {
+                            this.deliveries.update((prev) => prev.concat(res.value.rows));
                         }
+
+                        this.deliveryPaginationInfo = {
+                            pageIndex,
+                            totalPagesCount: res.value.paginationInfo.totalPagesCount,
+                            totalRowsCount: res.value.paginationInfo.totalRowsCount,
+                        };
                     },
                 });
         }

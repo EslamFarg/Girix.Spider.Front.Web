@@ -1,0 +1,275 @@
+/* ═══════════════════════════════════════════════════════════════════
+   CLOSE DAILY JOURNAL — POS Layout
+   Two-zone design: Status Panel (dark) + Form Panel (white)
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Form container ─────────────────────────────────────────────── */
+.close-journal-form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ZONE 1 — STATUS PANEL  (shared styles with open form)
+══════════════════════════════════════════════════════════════════ */
+.pos-status-panel {
+  background: var(--color-dark-line);
+  border-radius: 10px 10px 0 0;
+  padding: 1rem 1.25rem 1.125rem;
+  color: #fff;
+}
+
+.pos-status-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.875rem;
+}
+
+.pos-status-panel__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pos-status-panel__title {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.pos-status-panel__meta {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.pos-status-panel__sep {
+  opacity: 0.5;
+}
+
+/* ── Status badge ───────────────────────────────────────────────── */
+.pos-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pos-status-badge::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pos-status-badge--open {
+  background: rgba(52, 199, 89, 0.2);
+  color: #a8ffbe;
+  border: 1px solid rgba(52, 199, 89, 0.35);
+}
+
+.pos-status-badge--open::before {
+  background: #34c759;
+  box-shadow: 0 0 4px #34c75980;
+}
+
+/* ── KPI cards row ──────────────────────────────────────────────── */
+.pos-kpi-row {
+  display: flex;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+
+.pos-kpi-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 0.5rem 1rem 0.625rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 110px;
+}
+
+.pos-kpi-card__label {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.pos-kpi-card__value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 5px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.pos-kpi-card__currency {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ZONE 2 — FORM PANEL
+══════════════════════════════════════════════════════════════════ */
+.pos-form-panel {
+  background: var(--color-base-bg);
+  border: 1px solid var(--color-text-lighter);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 4px 12px rgba(55, 86, 82, 0.07);
+}
+
+.pos-section-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-text-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-text-lighter);
+  margin: 0 0 0.125rem;
+}
+
+/* ── Closing cards grid (2 columns) ─────────────────────────────── */
+.pos-closing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* Individual grouped input card (cash / network) */
+.pos-closing-card {
+  border: 1px solid var(--color-text-lighter);
+  border-radius: 8px;
+  padding: 0.875rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.pos-closing-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pos-closing-card__type {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-dark-line);
+}
+
+.pos-closing-card__account {
+  font-size: 0.7rem;
+  color: var(--color-text-gray);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Field group ────────────────────────────────────────────────── */
+.pos-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pos-field-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin-bottom: 0 !important;
+}
+
+.pos-optional-hint {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--color-text-gray);
+  margin-inline-start: 4px;
+}
+
+/* ── POS-standard input (44 px touch target) ────────────────────── */
+.pos-input {
+  height: 44px !important;
+  min-height: 44px !important;
+  text-align: center !important;
+}
+
+/* ── Notes textarea ─────────────────────────────────────────────── */
+.pos-textarea {
+  resize: vertical;
+  min-height: 80px;
+  max-height: 100px;
+}
+
+/* ── Full-width submit button ───────────────────────────────────── */
+.pos-submit-btn {
+  height: 44px !important;
+  min-height: 44px !important;
+  font-size: 0.9375rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em;
+  margin-top: 0.25rem;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .pos-closing-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .pos-status-panel {
+    padding: 0.875rem 1rem 1rem;
+  }
+
+  .pos-kpi-row {
+    gap: 0.5rem;
+  }
+
+  .pos-kpi-card {
+    min-width: 90px;
+  }
+
+  .pos-kpi-card__value {
+    font-size: 1rem;
+  }
+
+  .pos-form-panel {
+    padding: 1rem;
+  }
+}

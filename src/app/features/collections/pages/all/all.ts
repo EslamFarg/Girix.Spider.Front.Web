@@ -1,6 +1,7 @@
-import { ReceiptTemplateService } from '@/features/orders/services/receipt-template-service';
+import { OrderPrintWorkflowService } from '@/features/orders/services/order-print-workflow.service';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
@@ -22,8 +23,6 @@ import {
   OrderPaymentType,
 } from '@/features/orders';
 import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
-import { PrinterService, IPrintJob, AppPrinterType } from '@/features/printers';
-import { PrinterSettingsService } from '@/features/printers/services/printer-settings-service';
 import { MenuItem } from 'primeng/api';
 import { DatePipe } from '@angular/common';
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
@@ -59,6 +58,7 @@ import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Menu } from "primeng/menu";
 import { Listbox } from "primeng/listbox";
 import { TooltipModule } from 'primeng/tooltip';
+import { MaintenanceService } from '@/features/settings/services/maintenance-service';
 
 @Component({
   selector: 'app-all',
@@ -95,7 +95,7 @@ import { TooltipModule } from 'primeng/tooltip';
   styleUrl: './all.css',
 })
 export class All extends BaseComponent {
-  receiptTemplateService = inject(ReceiptTemplateService);
+  orderPrintWorkflow = inject(OrderPrintWorkflowService);
   OrderLocationType = OrderLocationType;
   OrderLocalType = OrderLocalType;
   OrderPaymentType=OrderPaymentType;
@@ -111,8 +111,6 @@ export class All extends BaseComponent {
 
   financialSettingsService = inject(FinancialSettingsService);
   orderService = inject(OrderService);
-  printService = inject(PrinterService);
-  printerSettingsService = inject(PrinterSettingsService);
 
   currentOrderBill = signal<IOrderBillReadResponse | null>(null);
   printableOrderInvoice = viewChild<PrintableOrderInvoice>('printableOrderInvoice');
@@ -127,151 +125,10 @@ export class All extends BaseComponent {
     });
   }
 
-  /**
-   * Groups items and their modifiers by category/group id.
-   * Each group gets printed as a separate kitchen receipt.
-   */
-  private groupItemsByCategory(
-    bill: IOrderBillReadResponse,
-    defaultPrinter: IOrderBillReadResponse['items'][0]['printer'] | null,
-  ): Map<number, { name: string; printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }> {
-    const groups = new Map<number, { name: string; printer: IOrderBillReadResponse['items'][0]['printer']; items: IOrderBillReadResponse['items'] }>();
-
-    for (const item of bill.items) {
-      // Use item's category, or fall back to default printer's category (group 0)
-      const categoryId = item.categoryId ?? 0;
-      const categoryName = item.categoryName ?? (defaultPrinter?.name ?? 'مطبخ');
-      const itemPrinter = item.printer ?? defaultPrinter;
-      
-      if (itemPrinter != null) {
-        if (!groups.has(categoryId)) {
-          groups.set(categoryId, { name: categoryName, printer: itemPrinter, items: [] });
-        }
-        groups.get(categoryId)!.items.push(item);
-      }
-
-      // Group modifiers by their own printers (with fallback) but same category
-      for (const modifier of item.modifiers ?? []) {
-        const modPrinter = modifier.printer ?? defaultPrinter;
-        if (modPrinter != null) {
-          if (!groups.has(categoryId)) {
-            groups.set(categoryId, {
-              name: categoryName,
-              printer: {
-                id: modPrinter.id,
-                name: modPrinter.name,
-                ipAddressOrMacAddress: modPrinter.ipAddressOrMacAddress,
-                port: modPrinter.port,
-                type: modPrinter.type,
-              },
-              items: [],
-            });
-          }
-          groups.get(categoryId)!.items.push({
-            ...item,
-            name: `+ ${modifier.name}`,
-            qty: modifier.qty,
-            unitPrice: modifier.unitPrice,
-            modifiers: [],
-          });
-        }
-      }
-    }
-
-    return groups;
-  }
-
   printOrder() {
-    console.log('[DEBUG printOrder] called');
     const bill = this.currentOrderBill();
-    console.log('[DEBUG printOrder] bill:', bill ? 'set' : 'null');
     if (!bill) return;
-
-    this.printerSettingsService.getSettings().subscribe({
-      next: (settings) => {
-        console.log('[DEBUG printOrder] settings:', settings);
-        const jobs: IPrintJob[] = [];
-
-        // Kitchen (programPrinter)
-        if (settings.programPrinter?.id) {
-          const kitchenGroups = this.groupItemsByCategory(bill, settings.programPrinter);
-          console.log('[DEBUG printOrder] kitchenGroups:', kitchenGroups.size);
-          for (const [, group] of kitchenGroups) {
-            jobs.push({
-              printer: {
-                id: group.printer.id,
-                name: group.printer.name,
-                ipAddressOrMacAddress: group.printer.ipAddressOrMacAddress,
-                port: group.printer.port,
-                type: group.printer.type,
-                comPort: (group.printer as any).comPort,
-                appPrinterType: AppPrinterType.programPrinter,
-              },
-              html: this.receiptTemplateService.generateKitchenReceiptHtml(bill, group.items, group.name).html,
-              css: this.receiptTemplateService.generateKitchenReceiptHtml(bill, group.items, group.name).css,
-            });
-          }
-        }
-
-        // Captain (captionOrderPrinter)
-        if (settings.captionOrderPrinter?.id) {
-          jobs.push({
-            printer: {
-              id: settings.captionOrderPrinter.id,
-              name: settings.captionOrderPrinter.name,
-              ipAddressOrMacAddress: settings.captionOrderPrinter.ipAddressOrMacAddress,
-              port: settings.captionOrderPrinter.port,
-              type: settings.captionOrderPrinter.type,
-              comPort: settings.captionOrderPrinter.comPort,
-              appPrinterType: AppPrinterType.captionOrderPrinter,
-            },
-            html: this.receiptTemplateService.generateCaptainReceiptHtml(bill, bill.items).html,
-            css: this.receiptTemplateService.generateCaptainReceiptHtml(bill, bill.items).css,
-          });
-        }
-
-        // Cashier (cashierPrinter)
-        if (settings.cashierPrinter?.id) {
-          jobs.push({
-            printer: {
-              id: settings.cashierPrinter.id,
-              name: settings.cashierPrinter.name,
-              ipAddressOrMacAddress: settings.cashierPrinter.ipAddressOrMacAddress,
-              port: settings.cashierPrinter.port,
-              type: settings.cashierPrinter.type,
-              comPort: settings.cashierPrinter.comPort,
-              appPrinterType: AppPrinterType.cashierPrinter,
-            },
-            html: this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items).html,
-            css: this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items).css,
-          });
-        }
-
-        console.log('[DEBUG printOrder] jobs built:', jobs.length);
-        jobs.forEach((j, i) => console.log(`  Job ${i}:`, j.printer.name, 'type:', j.printer.appPrinterType, 'id:', j.printer.id));
-
-        if (jobs.length === 0) {
-          console.log('[DEBUG printOrder] no jobs, fallback print');
-          this.printService.printNow([{
-            printer: { id: 0, name: 'Default', ipAddressOrMacAddress: '', port: 0, type: 0, comPort: 0, appPrinterType: AppPrinterType.cashierPrinter },
-            html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
-            css: this.printableOrderInvoice()?.styles ?? '',
-          }]);
-          return;
-        }
-
-        console.log('[DEBUG printOrder] opening printer dialog');
-        this.printService.openPrinterDialogWithJobs(jobs);
-      },
-      error: (err) => {
-        console.log('[DEBUG printOrder] getSettings error:', err);
-        this.printService.printNow([{
-          printer: { id: 0, name: 'Default', ipAddressOrMacAddress: '', port: 0, type: 0, comPort: 0, appPrinterType: AppPrinterType.cashierPrinter },
-          html: this.printableOrderInvoice()?.html()?.nativeElement.outerHTML ?? '',
-          css: this.printableOrderInvoice()?.styles ?? '',
-        }]);
-      },
-    });
+    this.orderPrintWorkflow.openPrintDialogForBill(bill);
   }
 
   filterMenuItems = signal([
@@ -295,9 +152,14 @@ export class All extends BaseComponent {
 
   constructor() {
     super();
+    this.orderPrintWorkflow.preloadPrinterSettings();
     this.financialSettingsService.getSettings().subscribe((res) => this.financialSettings.set(res));
     this.searchOrders(1);
     this.updatePlace();
+    inject(MaintenanceService)
+      .deliveryReset$
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.onDeliveryReset());
     this.searchAccounts({
       pageIndex: 1,
       searchTerm: '',
@@ -1372,12 +1234,7 @@ export class All extends BaseComponent {
         })
         .subscribe({
           next: (res) => {
-            if (res.value.rows.length > 0) {
-                this.companyDeliveries.set(res.value.rows);
-
-
-
-            }
+            this.companyDeliveries.set(res.value.rows);
           },
         });
     } else {
@@ -1397,14 +1254,19 @@ export class All extends BaseComponent {
         })
         .subscribe({
           next: (res) => {
-            if (res.value.rows.length > 0) {
-                this.deliveries.set(res.value.rows);
-
-
-            }
+            this.deliveries.set(res.value.rows);
           },
         });
     }
+  }
+
+  private onDeliveryReset() {
+    this.DeliveryDialogVisible = false;
+    this.isInvoiceTypeChangeDialogVisible = false;
+    this.transferanceFg.patchValue({ deliveryId: null });
+    this.searchDeliveries(false);
+    this.searchDeliveries(true);
+    this.searchOrders(1);
   }
   // onDeliveriesScroll(event: Event, deliveriesScroller: HTMLElement) {
   //   // if at bottom

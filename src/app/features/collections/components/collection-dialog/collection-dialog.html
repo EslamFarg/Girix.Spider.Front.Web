@@ -174,6 +174,16 @@
       <button appLoadingDisabled pButton severity="secondary" class="bg-dark-bg-2" (click)="onSubmitCollection()">
         {{ 'ACTIONS.SAVE' | translate }}
       </button>
+      <button
+        appLoadingDisabled
+        pButton
+        severity="secondary"
+        class="bg-dark-bg-2"
+        [disabled]="!canPrintInvoices()"
+        (click)="printSelectedInvoices()"
+      >
+        {{ 'ACTIONS.PRINT' | translate }}
+      </button>
       <button appLoadingDisabled pButton severity="secondary" class="bg-dark-bg-2" (click)="onSubmitCollection(true)">
         {{ 'ACTIONS.SAVE_AND_PRINT' | translate }}
       </button>

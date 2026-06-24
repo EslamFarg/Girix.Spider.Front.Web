@@ -1,51 +1,108 @@
-<form appLoadingDisabled class="flex flex-col gap-4" [formGroup]="fg" (ngSubmit)="onSubmitOpenDaily()">
-    <!-- الرصيد السابق -->
-    <div>
-        <label>{{ 'DAILY_JOURNAL.PREVIOUS_BALANCE' | translate }}</label>
-        <app-input-error-message-handler>
-            <input pInputText id="productName" disabled aria-describedby="productName-help" [value]="0" />
-        </app-input-error-message-handler>
+<form appLoadingDisabled class="open-journal-form" [formGroup]="fg" (ngSubmit)="onSubmitOpenDaily()">
+
+    <!-- ══════════════════════════════════════════════════════
+         ZONE 1 — STATUS PANEL (dark teal brand background)
+    ══════════════════════════════════════════════════════ -->
+    <div class="pos-status-panel" role="banner">
+
+        <!-- Title + session state badge -->
+        <div class="pos-status-panel__header">
+            <div class="pos-status-panel__title-block">
+                <h2 class="pos-status-panel__title">فتح اليومية</h2>
+                <p class="pos-status-panel__meta">
+                    @if (dailyJournalService.currentUserDaily()?.value?.name) {
+                        <span>{{ dailyJournalService.currentUserDaily()?.value?.name }}</span>
+                        <span class="pos-status-panel__sep">&middot;</span>
+                    }
+                    <span>{{ todayDisplay }}</span>
+                </p>
+            </div>
+            <span
+                class="pos-status-badge pos-status-badge--closed"
+                role="status"
+                aria-label="حالة اليومية: مغلقة"
+            >
+                مغلقة
+            </span>
+        </div>
+
+        <!-- KPI cards row -->
+        <div class="pos-kpi-row">
+            <div class="pos-kpi-card" role="region" aria-label="الرصيد السابق">
+                <span class="pos-kpi-card__label">
+                    {{ 'DAILY_JOURNAL.PREVIOUS_BALANCE' | translate }}
+                </span>
+                <span class="pos-kpi-card__value">
+                    {{ (dailyJournalService.currentUserDaily()?.value?.dailyJournalPeriods?.openingBalance ?? 0) | number:'1.2-2' }}
+                    <small class="pos-kpi-card__currency">ر.س</small>
+                </span>
+            </div>
+        </div>
+
     </div>
 
-    <!-- العهده -->
-    <div>
-        <label>{{ 'DAILY_JOURNAL.CUSTODY_BALANCE' | translate }}</label>
-        <app-input-error-message-handler [fc]="fg.controls.custodyBalance">
-            <input
-                pInputText
-                id="custodyBalance"
-                formControlName="custodyBalance"
-                aria-describedby="custodyBalance-help"
-                placeholder=""
-            />
-        </app-input-error-message-handler>
+    <!-- ══════════════════════════════════════════════════════
+         ZONE 2 — FORM PANEL (white card)
+    ══════════════════════════════════════════════════════ -->
+    <div class="pos-form-panel">
+
+        <!-- Section heading -->
+        <p class="pos-section-label">بيانات الافتتاح</p>
+
+        <!-- العهدة ── required -->
+        <div class="pos-field-group">
+            <label class="pos-field-label" for="custodyBalance">
+                {{ 'DAILY_JOURNAL.CUSTODY_BALANCE' | translate }}
+                <span class="pos-required-star" aria-hidden="true">*</span>
+            </label>
+            <app-input-error-message-handler [fc]="fg.controls.custodyBalance">
+                <input
+                    pInputText
+                    appAllowNumbers
+                    appDecimalMask
+                    [allowDecimal]="true"
+                    [fixed]="2"
+                    [decimalPlaces]="2"
+                    inputmode="decimal"
+                    class="pos-input"
+                    id="custodyBalance"
+                    formControlName="custodyBalance"
+                    aria-describedby="custodyBalance-error"
+                    aria-required="true"
+                    placeholder="0.00"
+                />
+            </app-input-error-message-handler>
+        </div>
+
+        <!-- ملاحظات ── optional -->
+        <div class="pos-field-group">
+            <label class="pos-field-label" for="openingNotes">
+                {{ 'DAILY_JOURNAL.NOTES' | translate }}
+                <span class="pos-optional-hint">(اختياري)</span>
+            </label>
+            <app-input-error-message-handler [fc]="fg.controls.openingNotes">
+                <textarea
+                    rows="3"
+                    pTextarea
+                    class="w-full pos-textarea"
+                    formControlName="openingNotes"
+                    id="openingNotes"
+                    aria-describedby="openingNotes-error"
+                ></textarea>
+            </app-input-error-message-handler>
+        </div>
+
+        <!-- Submit -->
+        <button
+            pButton
+            appLoadingDisabled
+            type="submit"
+            class="pos-submit-btn w-full! text-white! justify-center!"
+            style="--p-button-primary-background: var(--color-dark-line); --p-button-primary-border-color: var(--color-dark-line);"
+        >
+            {{ 'ACTIONS.OPEN' | translate }} اليومية
+        </button>
+
     </div>
 
-    <!-- ملاحظات -->
-    <div>
-        <label>{{ 'DAILY_JOURNAL.NOTES' | translate }}</label>
-        <app-input-error-message-handler [fc]="fg.controls.openingNotes">
-            <textarea
-                rows="5"
-                pTextarea
-                class="flex-1"
-                formControlName="openingNotes"
-                class="w-full"
-                id="openingNotes"
-                aria-describedby="openingNotes-help"
-                placeholder=""
-            ></textarea>
-        </app-input-error-message-handler>
-    </div>
-
-
-    <button
-        pButton
-        appLoadingDisabled
-        style="--p-button-primary-background: var(--color-dark-line)"
-        class="border-dark-line! text-white! py-1! md:px-8! w-fit ms-auto mt-4"
-        type="submit"
-    >
-        {{ 'ACTIONS.OPEN' | translate }}
-    </button>
 </form>

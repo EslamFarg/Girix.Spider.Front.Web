@@ -6,6 +6,7 @@ import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button, ButtonDirective } from 'primeng/button';
+import { InputNumber } from 'primeng/inputnumber';
 import { CarouselModule } from 'primeng/carousel';
 import { InputText } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -44,7 +45,8 @@ import { AllowNumbers } from "@/directives/allow-numbers";
     TranslatePipe,
     ImgOnly,
     LoadingDisabledDirective,
-    AllowNumbers
+    AllowNumbers,
+    InputNumber,
 ],
   templateUrl: './meal-form.html',
   styleUrl: './meal-form.css',

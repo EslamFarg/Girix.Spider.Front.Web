@@ -37,8 +37,8 @@ export class PrinterService extends BaseSearchAndCrudService<
     // ─── Selection state ───
     selectedPrinters = signal<IAppPrinter[]>([]);
 
-    // ─── Print queue ───
-    private _printQueue: IPrintJob[] = [];
+    // ─── Print queue — Signal so computed consumers re-evaluate when queue changes ───
+    readonly printQueue$ = signal<IPrintJob[]>([]);
 
     constructor() {
         super();
@@ -54,22 +54,23 @@ export class PrinterService extends BaseSearchAndCrudService<
 
     /** Add jobs to the internal queue (does NOT print yet). */
     queuePrintRequest(jobs: IPrintJob[]): void {
-        this._printQueue.push(...jobs);
+        this.printQueue$.update((q) => [...q, ...jobs]);
     }
 
     /** Clear the queue without printing. */
     clearQueue(): void {
-        this._printQueue = [];
+        this.printQueue$.set([]);
     }
 
-    /** Get a copy of the current queue. */
+    /** Get a snapshot of the current queue (non-reactive; use printQueue$ signal in computed). */
     getQueue(): IPrintJob[] {
-        return [...this._printQueue];
+        return [...this.printQueue$()];
     }
 
-    /** Print queued jobs immediately, optionally filtering by selected printers. */
-    printQueue(): void {
-        if (this._printQueue.length === 0) {
+    /** Print queued jobs immediately. */
+    printQueueNow(): void {
+        const q = this.printQueue$();
+        if (q.length === 0) {
             this.messageService.add({
                 severity: 'warn',
                 summary: 'تنبيه',
@@ -77,13 +78,13 @@ export class PrinterService extends BaseSearchAndCrudService<
             });
             return;
         }
-        this._executePrint(this._printQueue);
-        this._printQueue = [];
+        this._executePrint(q);
+        this.printQueue$.set([]);
     }
 
-    /** Skip the queue and print immediately. Clears the queue first. */
+    /** Skip the queue and print immediately. */
     printNow(jobs: IPrintJob[]): void {
-        this._printQueue = [];
+        this.printQueue$.set([]);
         this._executePrint(jobs);
     }
 
@@ -92,13 +93,27 @@ export class PrinterService extends BaseSearchAndCrudService<
     // ─────────────────────────────────────────────
 
     openPrinterDialogWithJobs(jobs: IPrintJob[]) {
-        this._printQueue = jobs;
+        this.printQueue$.set(jobs);
+        this.selectedPrinters.set(this._deriveSelectedPrintersFromJobs(jobs));
         this.isPrinterDialogVisible.set(true);
+    }
+
+    /** Pre-select every distinct printer that has a queued job. */
+    private _deriveSelectedPrintersFromJobs(jobs: IPrintJob[]): IAppPrinter[] {
+        const seen = new Set<string>();
+        const selected: IAppPrinter[] = [];
+        for (const job of jobs) {
+            const key = `${job.printer.appPrinterType}-${job.printer.id}`;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            selected.push(job.printer);
+        }
+        return selected;
     }
 
     closePrinterDialog() {
         this.isPrinterDialogVisible.set(false);
-        this._printQueue = [];
+        this.printQueue$.set([]);
     }
 
     // ─────────────────────────────────────────────
@@ -120,13 +135,12 @@ export class PrinterService extends BaseSearchAndCrudService<
     // Legacy compatibility: print from dialog
     // ─────────────────────────────────────────────
 
-    /** Called by dialog when user confirms. Filters queue by selected printers. */
+    /** Called by dialog when user confirms. Filters queue by selected printers then executes. */
     confirmDialogPrint(): void {
-        console.log('[DEBUG confirmDialogPrint] called');
-        console.log('[DEBUG confirmDialogPrint] selectedPrinters:', this.selectedPrinters());
-        console.log('[DEBUG confirmDialogPrint] queue:', this._printQueue);
-        if (this.selectedPrinters().length === 0) {
-            console.log('[DEBUG confirmDialogPrint] no printers selected');
+        const selected = this.selectedPrinters();
+        const queue = this.printQueue$();
+
+        if (selected.length === 0) {
             this.messageService.add({
                 severity: 'error',
                 summary: 'خطأ',
@@ -135,25 +149,16 @@ export class PrinterService extends BaseSearchAndCrudService<
             return;
         }
 
-        // Filter jobs: for kitchen printers, match by specific printer id
-        // for captain/cashier, match by appPrinterType
-        const filtered = this._printQueue.filter((job) => {
-            return this.selectedPrinters().some((selected) => {
+        const filtered = queue.filter((job) =>
+            selected.some((s) => {
                 if (job.printer.appPrinterType === AppPrinterType.programPrinter) {
-                    // Kitchen: match by specific printer id
-                    return selected.id === job.printer.id && selected.appPrinterType === AppPrinterType.programPrinter;
-                } else {
-                    // Captain/Cashier: match by appPrinterType
-                    return selected.appPrinterType === job.printer.appPrinterType;
+                    return s.id === job.printer.id && s.appPrinterType === AppPrinterType.programPrinter;
                 }
-            });
-        });
-
-        console.log('[DEBUG confirmDialogPrint] filtered jobs:', filtered.length);
-        filtered.forEach((j, i) => console.log(`  Filtered job ${i}:`, j.printer.name, 'type:', j.printer.appPrinterType, 'id:', j.printer.id));
+                return s.appPrinterType === job.printer.appPrinterType;
+            }),
+        );
 
         if (filtered.length === 0) {
-            console.log('[DEBUG confirmDialogPrint] no matching jobs');
             this.messageService.add({
                 severity: 'error',
                 summary: 'خطأ',
@@ -163,7 +168,6 @@ export class PrinterService extends BaseSearchAndCrudService<
             return;
         }
 
-        console.log('[DEBUG confirmDialogPrint] executing print');
         this._executePrint(filtered);
         this.closePrinterDialog();
     }

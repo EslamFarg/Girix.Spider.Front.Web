@@ -1,17 +1,13 @@
 import { BaseComponent } from '@/components';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { Dialog } from 'primeng/dialog';
-import { IPrintJob, PrinterService, AppPrinterType, PrinterType, PrinterSearchEnum, IPrinterSearchRow } from '../..';
+import { PrinterService, AppPrinterType, PrinterType } from '../..';
 import { ButtonDirective } from 'primeng/button';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { IPrinterSettingsReadResponse, PrinterSettingsService } from '../../services/printer-settings-service';
+import { PrinterSettingsService } from '../../services/printer-settings-service';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
-import { PrintOptions } from "../print-options/print-options";
-
-export interface IAppPrinter extends IPrinterSearchRow {
-  appPrinterType: AppPrinterType;
-}
+import { PrintOptions } from '../print-options/print-options';
 
 @Component({
   selector: 'app-print-dialog',
@@ -23,9 +19,16 @@ export class PrintDialog extends BaseComponent {
   PrinterType = PrinterType;
   printerService = inject(PrinterService);
   printerSettingsService = inject(PrinterSettingsService);
-  printerSettings = signal<IPrinterSettingsReadResponse | null>(null);
   appPrinterType = AppPrinterType;
   closePrinterDialog = this.printerService.closePrinterDialog;
-
   confirmDialogPrint = this.printerService.confirmDialogPrint;
+
+  constructor() {
+    super();
+    effect(() => {
+      if (this.printerService.isPrinterDialogVisible() && !this.printerSettingsService.printerSettings()) {
+        this.printerSettingsService.getSettings().subscribe();
+      }
+    });
+  }
 }

@@ -1,5 +1,6 @@
 import BaseService from '@/core/services/BaseService';
 import { IOrderBillReadResponse, IOrderReadResponse, OrderLocationType, OrderService } from '@/features/orders';
+import { MaintenanceService } from '@/features/settings/services/maintenance-service';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
 
@@ -53,8 +54,14 @@ export class CollectionsService extends BaseService {
   currentBill = signal<IOrderBillReadResponse | null>(null);
   currentDeliveryOrders = signal<IDeliveryOrder[]>([]);
   orderService = inject(OrderService);
+  private maintenanceService = inject(MaintenanceService);
   lastCollectedId = signal<number | null>(null);
   collectionCompleted$ = new Subject<void>();
+
+  constructor() {
+    super();
+    this.maintenanceService.deliveryReset$.subscribe(() => this.resetDeliveryCollectionState());
+  }
   currentOrderType = signal<OrderLocationType | null>(null);
   currentDeliveryId = signal<number | null>(null);
   currentOrderId = signal<number | null>(null);
@@ -119,6 +126,15 @@ export class CollectionsService extends BaseService {
   closeCollectionInvoiceDialog() {
     this.currentBill.set(null);
     this.currentDeliveryOrders.set([]);
+  }
+
+  resetDeliveryCollectionState() {
+    this.closeCollectionInvoiceDialog();
+    this.currentOrderType.set(null);
+    this.currentDeliveryId.set(null);
+    this.currentOrderId.set(null);
+    this.collectedOrderIds.set([]);
+    this.lastCollectedId.set(null);
   }
 
   //

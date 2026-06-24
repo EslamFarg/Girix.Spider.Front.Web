@@ -71,9 +71,56 @@
   }
 }
 
+/* ── PrimeNG Select: ensure arrow and label are vertically centered ── */
 .p-select {
-  display: flex;
-  align-items: center;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.p-select .p-select-dropdown {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: stretch !important;
+  flex-shrink: 0;
+}
+
+.p-select .p-select-dropdown .p-select-dropdown-icon {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.p-select .p-select-label {
+  display: flex !important;
+  align-items: center !important;
+  align-self: stretch !important;
+}
+
+/* ── PrimeNG MultiSelect: same treatment ── */
+.p-multiselect {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.p-multiselect .p-multiselect-dropdown {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: stretch !important;
+  flex-shrink: 0;
+}
+
+.p-multiselect .p-multiselect-label-container {
+  display: flex !important;
+  align-items: center !important;
+  align-self: stretch !important;
+  flex: 1 !important;
+  min-width: 0;
+}
+
+.p-multiselect .p-multiselect-label {
+  display: flex !important;
+  align-items: center !important;
 }
 
 .p-password-toggle-mask-icon {

@@ -6,15 +6,13 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
 import { IMealSearchRow, MealSearchEnum, MealService } from '../../services/meal-service';
-import { Menu } from 'primeng/menu';
 import { ImgFallback } from '@/directives/img-fallback';
 import { Debounce } from '@/directives/debounce';
-import { RouterLink } from "@angular/router";
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
-import { Listbox } from "primeng/listbox";
+import { RouterLink } from '@angular/router';
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { TooltipModule } from 'primeng/tooltip';
+import { ButtonDirective } from 'primeng/button';
 
 @Component({
   selector: 'app-meals',
@@ -25,15 +23,13 @@ import { TooltipModule } from 'primeng/tooltip';
     InputTextModule,
     SelectModule,
     PaginatorModule,
-    SectionWrapper,
-    Menu,
     ImgFallback,
     Debounce,
     RouterLink,
     LoadingDisabledDirective,
-    Listbox,
-    TooltipModule
-],
+    TooltipModule,
+    ButtonDirective,
+  ],
   templateUrl: './meals.html',
   styleUrl: './meals.css',
 })
@@ -47,105 +43,86 @@ export class Meals extends BaseComponent {
   fg = this.fb.group(this.initialSearchFormValue);
 
   mealService = inject(MealService);
+
   filterMenuItems = signal([
-    {
-      label: 'الاسم',
-      value: MealSearchEnum.Name,
-    },
-    {
-      label: 'اسم المجموعة',
-      value: MealSearchEnum.CategoryName,
-    },
+    { label: 'اسم الوجبة',   value: MealSearchEnum.Name },
+    { label: 'اسم المجموعة', value: MealSearchEnum.CategoryName },
   ]);
+
+  // ── Page size ────────────────────────────────────────────────────
+  pageSizeCtrl = this.fb.control<number>(25);
+  pageSizeOptions = [
+    { label: '25',  value: 25  },
+    { label: '50',  value: 50  },
+    { label: '100', value: 100 },
+  ];
 
   constructor() {
     super();
-
     this.searchMeals(1);
   }
 
-  periodOptions = [
-    { label: 'الكل', value: null },
-    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
-    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
-    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
-    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
-  ];
-
   meals = signal<IMealSearchRow[]>([]);
-  mealsPaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
-    totalPagesCount: 0,
-    totalRowsCount: 0,
-  };
+  mealsPaginationInfo: IPaginationInfo = { pageIndex: 1, totalPagesCount: 0, totalRowsCount: 0 };
 
   searchMeals(pageIndex: number) {
+    const pageSize = this.pageSizeCtrl.value ?? 25;
     this.mealService
       .search({
-        paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 10,
-        },
-        searchFilters: [
-          {
-            column: this.fg.getRawValue().searchEnum,
-            values: [this.fg.getRawValue().searchTerm],
-          },
-        ],
+        paginationInfo: { pageIndex, pageSize },
+        searchFilters: [{ column: this.fg.getRawValue().searchEnum, values: [this.fg.getRawValue().searchTerm] }],
         fromDate: this.fg.getRawValue().fromDate,
       })
       .subscribe({
         next: (res) => {
           this.meals.set(res.value.rows);
           this.mealsPaginationInfo = {
-            pageIndex, // this.isIdenticalSearch() ? pageIndex : 1,
+            pageIndex,
             totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-            // searchEnum: this.fg.getRawValue().searchEnum,
-            // searchTerm: this.fg.getRawValue().searchTerm,
-            // fromDate: this.fg.getRawValue().fromDate,
-            // toDate: this.fg.getRawValue().toDate,
+            totalRowsCount:  res.value.paginationInfo.totalRowsCount,
           };
         },
       });
   }
-  // isIdenticalSearch() {
-  //   return (
-  //     this.fg.getRawValue().searchTerm === this.paginationInfo.searchTerm &&
-  //     this.fg.getRawValue().searchEnum === this.paginationInfo.searchEnum &&
-  //     this.fg.getRawValue().fromDate === this.paginationInfo.fromDate &&
-  //     this.fg.getRawValue().toDate === this.paginationInfo.toDate
-  //   );
-  // }
-  onSubmit = () => this.fg.valid && this.searchMeals(1);
 
-  onPageChange = (event: PaginatorState) => this.searchMeals(event.page! + 1);
+  onSubmit        = () => this.fg.valid && this.searchMeals(1);
+  onPageChange    = (event: PaginatorState) => this.searchMeals(event.page! + 1);
+  onPageSizeChange() { this.searchMeals(1); }
+
+  onFilterSelect(value: MealSearchEnum) {
+    this.fg.patchValue({ searchEnum: value });
+    this.onSubmit();
+  }
+
+  onRowClick(item: IMealSearchRow) {
+    this.router.navigate(['/classes/meals', item.id, 'edit']);
+  }
 
   deleteMeal(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف الوجبة',
-      header: 'حذف الوجبة',
-      icon: 'pi pi-info-circle',
-      rejectLabel: 'الغاء',
-      rejectButtonProps: {
-        label: 'الغاء',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'حذف',
-        severity: 'danger',
-      },
-
+      message: 'هل انت متأكد من حذف الوجبة',
+      header:  'حذف الوجبة',
+      icon:    'pi pi-info-circle',
+      rejectLabel:       'الغاء',
+      rejectButtonProps: { label: 'الغاء', severity: 'secondary', outlined: true },
+      acceptButtonProps: { label: 'حذف',   severity: 'danger' },
       accept: () => {
-        this.mealService.delete(id).subscribe({
-          next: () => {
-            this.searchMeals(1);
-          },
-        });
+        this.mealService.delete(id).subscribe({ next: () => this.searchMeals(1) });
       },
-      
     });
+  }
+
+  // ── Display range helpers ────────────────────────────────────────
+  get displayRangeStart(): number {
+    const { pageIndex, totalRowsCount } = this.mealsPaginationInfo;
+    const pageSize = this.pageSizeCtrl.value ?? 25;
+    return totalRowsCount === 0 ? 0 : (pageIndex - 1) * pageSize + 1;
+  }
+
+  get displayRangeEnd(): number {
+    const { pageIndex, totalRowsCount } = this.mealsPaginationInfo;
+    const pageSize = this.pageSizeCtrl.value ?? 25;
+    return Math.min(pageIndex * pageSize, totalRowsCount);
   }
 }

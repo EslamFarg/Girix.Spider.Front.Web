@@ -1,157 +1,378 @@
-﻿<div
-    class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
-    style="--p-button-primary-background: transparent"
->
-    @if (formMode() === FormMode.Update) {
+﻿<!-- ─────────────────────────────────────────────────────────────────────────
+     GROUP FORM — dual-mode layout
+     • singleScreenMode=false  → standalone page (existing 2-panel layout)
+     • singleScreenMode=true   → compact inline bar (master-detail table screen)
+     ───────────────────────────────────────────────────────────────────────── -->
+
+<!-- Hidden file input (shared by both layouts) -->
+<input
+    multiple
+    appImgOnly
+    id="fileInput"
+    type="file"
+    hidden
+    #fileInput
+    (change)="onImagesFilesSelected($event)"
+/>
+
+@if (singleScreenMode()) {
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     COMPACT INLINE LAYOUT  (single-screen mode)
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<!-- ── Unified action bar: title  |  حفظ/تعديل · جديد ─────────────── -->
+<div class="grp-compact-header">
+
+    <div class="grp-compact-header__title">
+        @if (formMode() === FormMode.Create) {
+            <span class="grp-compact-mode-pill grp-compact-mode-pill--create">
+                <i class="pi pi-plus-circle"></i>
+            </span>
+            إضافة مجموعة جديدة
+        } @else {
+            <span class="grp-compact-mode-pill grp-compact-mode-pill--edit">
+                <i class="pi pi-pencil"></i>
+            </span>
+            تعديل: <strong class="grp-compact-editing-name">{{ existingGroup()?.name }}</strong>
+        }
+    </div>
+
+    <div class="rest-compact-header__actions">
+
         <button
+            type="submit"
+            form="groupFormCompact"
+            class="border-dark-line! bg-dark-line! text-white! rest-compact-action-btn rest-compact-action-btn--save"
+            pButton
             appLoadingDisabled
+        >
+            @if (formMode() === FormMode.Create) {
+                {{ 'ACTIONS.SAVE' | translate }}
+            } @else {
+                {{ 'ACTIONS.EDIT' | translate }}
+            }
+        </button>
+
+        <button
             type="button"
             pButton
-            severity="danger"
-            class="text-white! py-1! md:px-8! md:flex-none"
-            (click)="deleteGroup(id(), $event)"
+            appLoadingDisabled
+            class="p-button-outlined border-dark-line! text-dark-line! rest-compact-action-btn rest-compact-action-btn--new"
+            (click)="onResetForm()"
         >
-            حذف
+            {{ 'ACTIONS.NEW' | translate }}
         </button>
-    }
-    <button
-        pButton
-        style="--p-button-primary-background: var(--color-dark-line)"
-        class="border-dark-line! text-white! py-1! md:px-8! md:flex-none"
-        form="groupForm"
-        appLoadingDisabled
-        type="submit"
-    >
-        @if (formMode() === FormMode.Create) {
-            {{ 'ACTIONS.SAVE' | translate }}
-        } @else {
-            {{ 'ACTIONS.EDIT' | translate }}
-        }
-    </button>
-    <a
-        (click)="onResetForm()"
-        pButton
-        appLoadingDisabled
-        class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
-        variant="outlined"
-    >
-        {{ 'ACTIONS.NEW' | translate }}
-    </a>
+
+    </div>
 </div>
 
-<form [formGroup]="groupFg" id="groupForm" class="mt-6 flex flex-col md:flex-row gap-4" (ngSubmit)="onSubmitForm()">
-    <div class="md:flex-1 md:max-w-50 lg:max-w-60 relative">
-        <input
-            multiple
-            appImgOnly
-            id="fileInput"
-            type="file"
-            hidden
-            #fileInput
-            (change)="onImagesFilesSelected($event)"
-        />
-        @if (currentImage()) {
-            <button
-                (click)="onDeleteImage()"
-                type="button"
-                class="absolute animate-shake cursor-pointer backdrop-blur-[10px] transition-all top-2 z-10 left-2 p-1.5 rounded border border-transparent hover:bg-rose-500/10 hover:border-red-500/50 group"
-            >
-                <svg
-                    class="group-hover:scale-125 transition-all"
-                    width="15"
-                    height="16"
-                    viewBox="0 0 15 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        opacity="0.4"
-                        d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z"
-                        fill="#FF383C"
-                    />
-                    <path
-                        d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z"
-                        fill="#FF383C"
-                    />
-                </svg>
-            </button>
-        }
-        <label
-            for="fileInput"
-            class="flex cursor-pointer items-center justify-center border-2 border-dark-line aspect-square rounded-lg h-fit mb-2 overflow-hidden"
-        >
-            @if (currentImage()) {
-                <img [src]="currentImage()?.fullPath" appImgFallback alt="" class="w-full object-cover aspect-square" />
-            } @else {
-                <svg width="92" height="96" viewBox="0 0 92 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M36.105 32.98V53.475C36.105 54.4475 35.1475 55.23 33.9575 55.23C32.7675 55.23 31.81 54.4475 31.81 53.475V32.98M26.7675 32.98V53.475C26.7675 54.4475 25.81 55.23 24.62 55.23C23.43 55.23 22.4725 54.4475 22.4725 53.475V32.98M35.5375 93.9975V71.1225C35.5375 68.715 35.5525 67.63 38.595 64.5825C41.64 61.5375 41.6525 60.3475 41.6525 58.045V36.285C41.6525 34.455 40.18 32.985 38.3525 32.985H36.1075M22.4775 32.985H20.2275C18.3975 32.985 16.9275 34.455 16.9275 36.285L16.935 58.045C16.945 60.3475 16.96 61.5375 20.0025 64.5825C23.045 67.6275 23.0625 68.715 23.0525 71.12L23.04 93.9975L13.715 94C8.2275 94 4.005 89.58 3.81 84.1L1.5 19.3075L13.445 1.5H77.805L89.745 19.3075L87.435 84.1C87.24 89.58 83.0175 94 77.53 94L69.335 93.9975V64.1925C73.5025 61.23 76.0975 55.5525 76.105 49.38C76.105 40.04 70.28 32.4675 63.0925 32.465H63.085C55.8975 32.465 50.0725 40.04 50.0725 49.38C50.08 55.5525 52.6725 61.23 56.8375 64.1925V93.9975M31.815 32.985H26.7725M35.535 94H56.835M26.75 19.56V12.085C26.75 10.2575 28.2225 8.785 30.05 8.785H61.19C63.02 8.785 64.4925 10.2575 64.4925 12.085V19.56H26.75Z"
-                        stroke="#375652"
-                        stroke-width="3"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    />
-                </svg>
-            }
-        </label>
+<!-- ── Form body: [Left: image + toggle]  |  [Right: name · printer / description] ── -->
+<!-- NOTE: In RTL flex-row, LAST child = visual LEFT, FIRST child = visual RIGHT.
+     Fields go first (visual right = RTL reading start), image goes last (visual left). -->
+<form [formGroup]="groupFg" id="groupFormCompact" class="grp-compact-body" (ngSubmit)="onSubmitForm()">
 
-        <span></span>
-        <app-input-error-message-handler [fc]="groupFg.get('allImages')" class="inline" />
-    </div>
-    <div class="grid md:grid-cols-2 gap-4 flex-1">
-        <div>
-            <label for="nameAr">{{ 'CLASSES.GROUPS.GROUP_NAME' | translate }}</label>
-            <app-input-error-message-handler [fc]="groupFg.get('nameAr')">
-                <input
-                    pInputText
-                    id="nameAr"
-                    class="app-input"
-                    formControlName="nameAr"
-                    aria-describedby="nameAr-help"
-                    [placeholder]="'CLASSES.GROUPS.GROUP_NAME' | translate"
-                />
-            </app-input-error-message-handler>
+    <!-- ── RIGHT side (DOM first = visual right in RTL): fields ──────────── -->
+    <div class="grp-compact-fields-col">
+
+        <!-- Row 1: اسم المجموعة | الطابعة -->
+        <div class="grp-compact-row1">
+
+            <div class="grp-field">
+                <label for="nameArCompact">{{ 'CLASSES.GROUPS.GROUP_NAME' | translate }}</label>
+                <app-input-error-message-handler [fc]="groupFg.get('nameAr')">
+                    <input
+                        pInputText
+                        id="nameArCompact"
+                        class="app-input"
+                        formControlName="nameAr"
+                        [placeholder]="'CLASSES.GROUPS.GROUP_NAME' | translate"
+                    />
+                </app-input-error-message-handler>
+            </div>
+
+            <div class="grp-field">
+                <label for="printerIdCompact">{{ 'CLASSES.GROUPS.PRINTER' | translate }}</label>
+                <app-input-error-message-handler [grouped]="false" [fc]="groupFg.get('printerId')">
+                    <ng-select
+                        class="app-select"
+                        [items]="displayedPrinters()"
+                        formControlName="printerId"
+                        bindLabel="name"
+                        bindValue="id"
+                        placeholder="اختر طابعة"
+                        [clearable]="false"
+                        #printerSelectCompact
+                        appDebounce
+                        [customEvents]="[
+                            { type: 'searchEvent', value: printerSelectCompact.searchEvent },
+                            { type: 'scrollToEnd', value: printerSelectCompact.scrollToEnd },
+                        ]"
+                        (debounced)="debouncedPrinterSearch($event)"
+                    />
+                </app-input-error-message-handler>
+            </div>
+
         </div>
 
-        <div>
-            <label for="printerId">{{ 'CLASSES.GROUPS.PRINTER' | translate }}</label>
-            <app-input-error-message-handler [grouped]="false" [fc]="groupFg.get('printerId')">
-                <ng-select
-                    class="app-select"
-                    [items]="displayedPrinters()"
-                    formControlName="printerId"
-                    bindLabel="name"
-                    bindValue="id"
-                    placeholder="الكل"
-                    [clearable]="false"
-                    #printerSelect
-                    appDebounce
-                    [customEvents]="[
-                        { type: 'searchEvent', value: printerSelect.searchEvent },
-                        { type: 'scrollToEnd', value: printerSelect.scrollToEnd },
-                    ]"
-                    (debounced)="debouncedPrinterSearch($event)"
-                />
-            </app-input-error-message-handler>
-        </div>
-
-        <div class="flex items-center h-fit gap-2 pb-1">
-            <app-input-error-message-handler>
-                <input formControlName="isOnCasher" type="checkbox" class="accent-dark-line w-5 h-5" name="" id="" />
-            </app-input-error-message-handler>
-            <label for="productName" class="text-dark-line text-sm font-semibold">{{
-                'CLASSES.GROUPS.SHOW_GROUP' | translate
-            }}</label>
-        </div>
-
-        <div class="md:col-span-2">
-            <label for="description">{{ 'CLASSES.GROUPS.DESCRIPTION' | translate }}</label>
+        <!-- Row 2: Description — height balanced with image + toggle column -->
+        <div class="grp-field grp-compact-desc-field">
+            <label for="descriptionCompact">
+                {{ 'CLASSES.GROUPS.DESCRIPTION' | translate }}
+                <span class="grp-optional-hint">(اختياري)</span>
+            </label>
             <app-input-error-message-handler [fc]="groupFg.get('description')">
                 <textarea
-                    rows="5"
-                    cols="30"
-                    class="w-full"
                     pTextarea
+                    class="w-full grp-compact-textarea"
+                    id="descriptionCompact"
+                    formControlName="description"
+                    [placeholder]="('CLASSES.GROUPS.DESCRIPTION' | translate) + '...'"
+                ></textarea>
+            </app-input-error-message-handler>
+        </div>
+
+    </div>
+
+    <!-- ── LEFT side (DOM last = visual left in RTL): image + toggle ─────── -->
+    <div class="grp-compact-image-col">
+
+        <!-- 120×120 image upload zone -->
+        <div class="grp-image-wrapper">
+            @if (currentImage()) {
+                <button
+                    (click)="onDeleteImage()"
+                    type="button"
+                    class="grp-image-delete"
+                    aria-label="حذف الصورة"
+                >
+                    <svg width="13" height="14" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path opacity="0.4" d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z" fill="#FF383C"/>
+                        <path d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z" fill="#FF383C"/>
+                    </svg>
+                </button>
+            }
+            <label for="fileInputCompact" class="grp-image-label">
+                @if (currentImage()) {
+                    <img
+                        [src]="currentImage()?.fullPath"
+                        appImgFallback
+                        alt=""
+                        class="grp-image-preview"
+                    />
+                } @else {
+                    <div class="grp-img-empty-state">
+                        <i class="pi pi-image"></i>
+                        <span>انقر لإضافة صورة</span>
+                    </div>
+                }
+            </label>
+            <input
+                appImgOnly
+                id="fileInputCompact"
+                type="file"
+                hidden
+                (change)="onImagesFilesSelected($event)"
+            />
+        </div>
+
+        <!-- Cashier visibility toggle — below the image, full column width -->
+        <div class="grp-compact-toggle-card">
+            <p-toggleswitch
+                formControlName="isOnCasher"
+                inputId="isOnCasherCompact"
+            />
+            <label for="isOnCasherCompact" class="grp-compact-toggle-label">
+                {{ 'CLASSES.GROUPS.SHOW_GROUP' | translate }}
+            </label>
+        </div>
+
+    </div>
+
+</form>
+
+} @else {
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     STANDALONE LAYOUT  (add-group / edit-group pages — unchanged)
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<!-- ── Centered composition wrapper ──────────────────────────────────── -->
+<div class="grp-form-wrapper">
+
+<!-- ── Page Header Bar ──────────────────────────────────────────────── -->
+<div class="grp-form-header" style="--p-button-primary-background: transparent">
+    <div class="grp-form-header__title">
+        @if (formMode() === FormMode.Create) {
+            إضافة مجموعة جديدة
+        } @else {
+            تعديل: {{ existingGroup()?.name }}
+        }
+    </div>
+    <div class="grp-form-header__actions">
+        <a
+            (click)="onResetForm()"
+            pButton
+            appLoadingDisabled
+            class="border-dark-line! text-dark-line! py-1! px-4! md:px-6!"
+            variant="outlined"
+        >
+            {{ 'ACTIONS.NEW' | translate }}
+        </a>
+        @if (formMode() === FormMode.Update) {
+            <button
+                appLoadingDisabled
+                type="button"
+                pButton
+                severity="danger"
+                class="text-white! py-1! px-4! md:px-6!"
+                (click)="deleteGroup(id(), $event)"
+            >
+                {{ 'ACTIONS.DELETE' | translate }}
+            </button>
+        }
+        <button
+            pButton
+            style="--p-button-primary-background: var(--color-dark-line)"
+            class="border-dark-line! text-white! py-1! px-4! md:px-8!"
+            form="groupForm"
+            appLoadingDisabled
+            type="submit"
+        >
+            @if (formMode() === FormMode.Create) {
+                {{ 'ACTIONS.SAVE' | translate }}
+            } @else {
+                {{ 'ACTIONS.EDIT' | translate }}
+            }
+        </button>
+    </div>
+</div>
+
+<!-- ── Two-panel form ──────────────────────────────────────────────── -->
+<form [formGroup]="groupFg" id="groupForm" class="grp-form-body" (ngSubmit)="onSubmitForm()">
+
+    <!-- ── Left: Identity Panel ────────────────────────────────────── -->
+    <div class="grp-identity-panel">
+
+        <!-- Image upload area -->
+        <div class="grp-image-wrapper">
+            @if (currentImage()) {
+                <button
+                    (click)="onDeleteImage()"
+                    type="button"
+                    class="grp-image-delete"
+                    aria-label="حذف الصورة"
+                >
+                    <svg
+                        width="13"
+                        height="14"
+                        viewBox="0 0 15 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            opacity="0.4"
+                            d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z"
+                            fill="#FF383C"
+                        />
+                        <path
+                            d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z"
+                            fill="#FF383C"
+                        />
+                    </svg>
+                </button>
+            }
+            <label for="fileInput" class="grp-image-label">
+                @if (currentImage()) {
+                    <img
+                        [src]="currentImage()?.fullPath"
+                        appImgFallback
+                        alt=""
+                        class="grp-image-preview"
+                    />
+                } @else {
+                    <i class="pi pi-image grp-image-placeholder-icon"></i>
+                }
+            </label>
+        </div>
+
+        <p class="grp-image-hint">
+            صورة المجموعة<br />
+            <span class="grp-optional">(اختياري)</span>
+        </p>
+        <app-input-error-message-handler [fc]="groupFg.get('allImages')" class="inline" />
+
+        <!-- Cashier visibility toggle card -->
+        <div class="grp-toggle-card">
+            <p-toggleswitch
+                formControlName="isOnCasher"
+                inputId="isOnCasher"
+            />
+            <label for="isOnCasher" class="grp-toggle-text">
+                {{ 'CLASSES.GROUPS.SHOW_GROUP' | translate }}
+            </label>
+        </div>
+
+    </div>
+
+    <!-- ── Right: Fields Panel ─────────────────────────────────────── -->
+    <div class="grp-fields-panel">
+
+        <p class="grp-section-label">الإعدادات الأساسية</p>
+
+        <!-- Name + Printer in two columns -->
+        <div class="grp-fields-row">
+
+            <div class="grp-field">
+                <label for="nameAr">{{ 'CLASSES.GROUPS.GROUP_NAME' | translate }}</label>
+                <app-input-error-message-handler [fc]="groupFg.get('nameAr')">
+                    <input
+                        pInputText
+                        id="nameAr"
+                        class="app-input"
+                        formControlName="nameAr"
+                        aria-describedby="nameAr-help"
+                        [placeholder]="'CLASSES.GROUPS.GROUP_NAME' | translate"
+                    />
+                </app-input-error-message-handler>
+            </div>
+
+            <div class="grp-field">
+                <label for="printerId">{{ 'CLASSES.GROUPS.PRINTER' | translate }}</label>
+                <app-input-error-message-handler [grouped]="false" [fc]="groupFg.get('printerId')">
+                    <ng-select
+                        class="app-select"
+                        [items]="displayedPrinters()"
+                        formControlName="printerId"
+                        bindLabel="name"
+                        bindValue="id"
+                        placeholder="الكل"
+                        [clearable]="false"
+                        #printerSelect
+                        appDebounce
+                        [customEvents]="[
+                            { type: 'searchEvent', value: printerSelect.searchEvent },
+                            { type: 'scrollToEnd', value: printerSelect.scrollToEnd },
+                        ]"
+                        (debounced)="debouncedPrinterSearch($event)"
+                    />
+                </app-input-error-message-handler>
+            </div>
+
+        </div>
+
+        <p class="grp-section-label">تفاصيل إضافية</p>
+
+        <div class="grp-field">
+            <label for="description">
+                {{ 'CLASSES.GROUPS.DESCRIPTION' | translate }}
+                <span class="grp-optional-hint">(اختياري)</span>
+            </label>
+            <app-input-error-message-handler [fc]="groupFg.get('description')">
+                <textarea
+                    rows="2"
+                    pTextarea
+                    class="w-full grp-textarea"
                     id="description"
                     formControlName="description"
                     aria-describedby="description-help"
@@ -159,5 +380,12 @@
                 ></textarea>
             </app-input-error-message-handler>
         </div>
+
     </div>
+
 </form>
+
+</div>
+<!-- ── /grp-form-wrapper ─────────────────────────────────────────────── -->
+
+} <!-- end @else standalone layout -->

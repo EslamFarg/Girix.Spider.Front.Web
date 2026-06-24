@@ -8,12 +8,15 @@ import { DailyJournalService } from '../../services/daily-journal-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { AllowNumbers } from "@/directives/allow-numbers";
+import { DecimalMask } from "@/directives/decimal-mask";
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-close-daily-journal',
   templateUrl: './close-daily-journal.html',
   styleUrl: './close-daily-journal.css',
-  imports: [InputErrorMessageHandler, InputText, Textarea, ReactiveFormsModule, TranslatePipe, ButtonDirective, LoadingDisabledDirective],
+  imports: [InputErrorMessageHandler, InputText, Textarea, ReactiveFormsModule, TranslatePipe, ButtonDirective, LoadingDisabledDirective, DecimalPipe, AllowNumbers, DecimalMask],
 })
 export class CloseDailyJournal extends BaseComponent {
   initialFgValue = {
@@ -23,12 +26,33 @@ export class CloseDailyJournal extends BaseComponent {
     closingDate: this.fb.control(this.localDateIso, []),
   };
   fg = this.fb.group(this.initialFgValue);
+
+  todayDisplay = new Date().toLocaleDateString('ar-SA', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
   constructor() {
     super();
   }
 
   dailyJournalService = inject(DailyJournalService);
   currentUserDaily = this.dailyJournalService.currentUserDaily;
+
+  formatTime(dateStr: string | undefined): string {
+    if (!dateStr) return '';
+    try {
+      return new Date(dateStr).toLocaleTimeString('ar-SA', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+    } catch {
+      return '';
+    }
+  }
 
   onCloseDaily() {
     if (this.fg.invalid) {

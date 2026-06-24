@@ -1,125 +1,95 @@
-import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
+import { BaseComponent, FormMode } from '@/components/base-component/base-component';
 import { Component, inject, signal } from '@angular/core';
-import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { InputTextModule } from 'primeng/inputtext';
-import { PaginatorModule, PaginatorState } from 'primeng/paginator';
-import { SelectModule } from 'primeng/select';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { Debounce } from '@/directives/debounce';
 import { IGroupSearchRow, GroupSearchEnum, GroupService } from '../../services/group-service';
-import { MenuItem } from 'primeng/api';
-import { Menu } from 'primeng/menu';
 import { TranslatePipe } from '@ngx-translate/core';
-import { RouterLink } from '@angular/router';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { TooltipModule } from 'primeng/tooltip';
+import { GroupForm } from '../../components/group-form/group-form';
+
 @Component({
   selector: 'app-groups',
   imports: [
-    ReactiveFormsModule,
-    InputErrorMessageHandler,
-    InputGroupAddon,
-    InputTextModule,
-    SelectModule,
-    PaginatorModule,
-    SectionWrapper,
-    Debounce,
     TranslatePipe,
-    RouterLink,
     LoadingDisabledDirective,
-    TooltipModule
-],
+    TooltipModule,
+    GroupForm,
+  ],
   templateUrl: './groups.html',
   styleUrl: './groups.css',
 })
 export class Groups extends BaseComponent {
-  initialSearchFormValue = {
-    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
-    searchEnum: this.fb.control<GroupSearchEnum>(GroupSearchEnum.Name, [Validators.required]),
-    fromDate: this.fb.control<string | null>(null, []),
-    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
-  };
-  fg = this.fb.group(this.initialSearchFormValue);
-
   groupService = inject(GroupService);
-  filterMenuItems = signal<MenuItem[]>([
-    {
-      label: 'الاسم',
-      command: (event) => this.fg.patchValue({ searchEnum: GroupSearchEnum.Name }),
-    },
-  ]);
+
+  groups = signal<IGroupSearchRow[]>([]);
+
+  /** Currently selected row id — drives the embedded form mode */
+  selectedGroupId = signal<number>(0);
 
   constructor() {
     super();
-
-    this.searchGroups(1);
+    this.searchGroups();
   }
 
-  periodOptions = [
-    { label: 'الكل', value: null },
-    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
-    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
-    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
-    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
-  ];
-  groups = signal<IGroupSearchRow[]>([]);
-  groupsPaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
-    totalPagesCount: 0,
-    totalRowsCount: 0,
-  };
-  searchGroups(pageIndex: number) {
+  searchGroups() {
     this.groupService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 10,
+          pageIndex: 1,
+          pageSize: 100,
         },
         searchFilters: [
           {
-            column: this.fg.getRawValue().searchEnum,
-            values: [this.fg.getRawValue().searchTerm],
+            column: GroupSearchEnum.Name,
+            values: [''],
           },
         ],
-        fromDate: this.fg.getRawValue().fromDate,
+        fromDate: null,
       })
       .subscribe({
         next: (res) => {
           this.groups.set(res.value.rows);
-          this.groupsPaginationInfo = {
-            pageIndex,
-            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
         },
       });
   }
 
-  onSubmit = () => this.fg.valid && this.searchGroups(1);
+  /** Select a row — loads the group into the embedded form */
+  onRowSelect(item: IGroupSearchRow) {
+    this.selectedGroupId.set(item.id);
+  }
 
-  onPageChange = (event: PaginatorState) => this.searchGroups(event.page! + 1);
+  /** Form emitted afterSave — refresh table and reset to create mode */
+  onGroupSaved() {
+    this.selectedGroupId.set(0);
+    this.searchGroups();
+  }
 
-  deleteGroup(id: number, event: Event) {
+  /** Form emitted afterReset — clear selection */
+  onGroupReset() {
+    this.selectedGroupId.set(0);
+  }
+
+  /** Get effective form mode based on selection */
+  get embeddedFormMode(): FormMode {
+    return this.selectedGroupId() > 0 ? FormMode.Update : FormMode.Create;
+  }
+
+  /** Delete from table action column — uses confirmation dialog */
+  deleteGroupFromTable(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'هل انت متاكد من حذف المجموعة',
       header: 'حذف المجموعة',
       icon: 'pi pi-info-circle',
       rejectLabel: 'الغاء',
-      rejectButtonProps: {
-        label: 'الغاء',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'حذف',
-        severity: 'danger',
-      },
-
-      accept: () => this.groupService.delete(id).subscribe({ next: () => this.searchGroups(1) }),
-      
+      rejectButtonProps: { label: 'الغاء', severity: 'secondary', outlined: true },
+      acceptButtonProps: { label: 'حذف', severity: 'danger' },
+      accept: () =>
+        this.groupService.delete(id).subscribe({
+          next: () => {
+            if (this.selectedGroupId() === id) this.selectedGroupId.set(0);
+            this.searchGroups();
+          },
+        }),
     });
   }
 }

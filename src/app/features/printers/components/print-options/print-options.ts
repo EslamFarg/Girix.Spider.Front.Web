@@ -1,12 +1,7 @@
 import { BaseComponent } from '@/components';
-import { Component, computed, inject, input, signal, TemplateRef } from '@angular/core';
-import { Dialog } from 'primeng/dialog';
-import { IPrintJob, PrinterService, AppPrinterType, IAppPrinter, PrinterType, PrinterSearchEnum, IPrinterSearchRow } from '../..';
-import { ButtonDirective } from 'primeng/button';
-import { TranslatePipe } from '@ngx-translate/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, inject, input } from '@angular/core';
+import { IPrintJob, PrinterService, AppPrinterType, IAppPrinter, PrinterType } from '../..';
 import { IPrinterSettingsReadResponse, PrinterSettingsService } from '../../services/printer-settings-service';
-import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { NgTemplateOutlet } from '@angular/common';
 
 export interface IPrintOptionItem {
@@ -40,24 +35,24 @@ export class PrintOptions extends BaseComponent {
     // When false, shows only printers that have jobs in the queue (for retry dialog)
     showAllRoles = input<boolean>(true);
 
-    // Dynamic printer items based on current print queue or all configured roles
+    // Dynamic printer items based on current print queue or all configured roles.
+    // IMPORTANT: reads printQueue$ signal so this computed re-runs whenever the queue changes.
     printerItems = computed<IPrintOptionItem[]>(() => {
         const settings = this.printerSettings();
-        const queue = this.printerService.getQueue();
+        const queue = this.printerService.printQueue$(); // ← reactive signal read
 
-        if (!settings) {
-            return [];
+        // When queue has jobs: build list from queue data (no settings required).
+        // This covers the Collections / invoice reprint path.
+        if (queue.length > 0) {
+            return this._buildFromQueue(queue);
         }
 
-        // If queue is empty and showAllRoles is true, show all configured printer roles
-        // This is used in the cashier final submission dialog
-        if (queue.length === 0 && this.showAllRoles()) {
+        // Queue empty + showAllRoles: show all printers from settings (Cashier payment dialog).
+        if (this.showAllRoles() && settings) {
             return this._buildFromSettings(settings);
         }
 
-        // Otherwise, show only printers that have jobs in the queue
-        // This is used when the dialog is opened with specific jobs (retry dialog)
-        return this._buildFromQueue(settings, queue);
+        return [];
     });
 
     private _buildFromSettings(settings: IPrinterSettingsReadResponse): IPrintOptionItem[] {
@@ -102,89 +97,32 @@ export class PrintOptions extends BaseComponent {
         return items;
     }
 
-    private _buildFromQueue(settings: IPrinterSettingsReadResponse, queue: IPrintJob[]): IPrintOptionItem[] {
-        const items: IPrintOptionItem[] = [];
+    /**
+     * Build printer option items directly from the jobs in the queue.
+     * Does NOT require printer settings — all data comes from the job's printer property.
+     * This is the reliable path for Collections / invoice reprint dialogs.
+     */
+    private _buildFromQueue(queue: IPrintJob[]): IPrintOptionItem[] {
+        const seen = new Map<string, IPrintOptionItem>();
 
-        // Group queue jobs by appPrinterType to detect multiple kitchen printers
-        const kitchenJobs = queue.filter(j => j.printer.appPrinterType === AppPrinterType.programPrinter);
-        const captainJobs = queue.filter(j => j.printer.appPrinterType === AppPrinterType.captionOrderPrinter);
-        const cashierJobs = queue.filter(j => j.printer.appPrinterType === AppPrinterType.cashierPrinter);
+        for (const job of queue) {
+            const key = `${job.printer.appPrinterType}-${job.printer.id}`;
+            if (seen.has(key)) continue;
 
-        // Kitchen: if multiple different printers, show each one
-        if (kitchenJobs.length > 0) {
-            const uniqueKitchenPrinters = new Map<number, IPrintJob>();
-            for (const job of kitchenJobs) {
-                if (!uniqueKitchenPrinters.has(job.printer.id)) {
-                    uniqueKitchenPrinters.set(job.printer.id, job);
-                }
-            }
-
-            if (uniqueKitchenPrinters.size > 1) {
-                // Multiple kitchen printers - show each one
-                for (const [, job] of uniqueKitchenPrinters) {
-                    items.push({
-                        id: job.printer.id,
-                        name: job.printer.name,
-                        type: job.printer.type,
-                        ipAddressOrMacAddress: job.printer.ipAddressOrMacAddress,
-                        port: job.printer.port,
-                        appPrinterType: AppPrinterType.programPrinter,
-                        comPort: (job.printer as any).comPort,
-                        isKitchenGroup: true,
-                    });
-                }
-            } else {
-                // Single kitchen printer - show as "Kitchen Printer"
-                // Use the job's actual printer ID so it matches the queue job's printer.id
-                // but keep the settings name for familiarity
-                items.push({
-                    id: kitchenJobs[0]!.printer.id,
-                    name: settings.programPrinter?.name ?? kitchenJobs[0]!.printer.name,
-                    type: settings.programPrinter?.type ?? kitchenJobs[0]!.printer.type,
-                    ipAddressOrMacAddress: settings.programPrinter?.ipAddressOrMacAddress ?? kitchenJobs[0]!.printer.ipAddressOrMacAddress,
-                    port: settings.programPrinter?.port ?? kitchenJobs[0]!.printer.port,
-                    appPrinterType: AppPrinterType.programPrinter,
-                    comPort: settings.programPrinter?.comPort,
-                });
-            }
+            seen.set(key, {
+                id: job.printer.id,
+                name: job.printer.name,
+                type: job.printer.type,
+                ipAddressOrMacAddress: job.printer.ipAddressOrMacAddress,
+                port: job.printer.port,
+                appPrinterType: job.printer.appPrinterType,
+                comPort: (job.printer as any).comPort ?? null,
+                isKitchenGroup: job.printer.appPrinterType === AppPrinterType.programPrinter,
+            });
         }
 
-        // Captain: always show as single option
-        if (settings.captionOrderPrinter) {
-            const hasCaptainJobs = captainJobs.length > 0;
-            if (hasCaptainJobs) {
-                items.push({
-                    id: settings.captionOrderPrinter.id,
-                    name: settings.captionOrderPrinter.name,
-                    type: settings.captionOrderPrinter.type,
-                    ipAddressOrMacAddress: settings.captionOrderPrinter.ipAddressOrMacAddress,
-                    port: settings.captionOrderPrinter.port,
-                    appPrinterType: AppPrinterType.captionOrderPrinter,
-                    comPort: settings.captionOrderPrinter.comPort,
-                });
-            }
-        }
-
-        // Cashier: always show as single option
-        if (settings.cashierPrinter) {
-            const hasCashierJobs = cashierJobs.length > 0;
-            if (hasCashierJobs) {
-                items.push({
-                    id: settings.cashierPrinter.id,
-                    name: settings.cashierPrinter.name,
-                    type: settings.cashierPrinter.type,
-                    ipAddressOrMacAddress: settings.cashierPrinter.ipAddressOrMacAddress,
-                    port: settings.cashierPrinter.port,
-                    appPrinterType: AppPrinterType.cashierPrinter,
-                    comPort: settings.cashierPrinter.comPort,
-                });
-            }
-        }
-
-        return items;
+        return [...seen.values()];
     }
-
-    printers = signal<IPrinterSearchRow[]>([]);
 
     onPrinterSelect(item: IPrintOptionItem) {
         const exists = this.selectedPrinters().find((p) => 

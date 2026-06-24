@@ -1,20 +1,26 @@
 import { Component, inject, signal } from '@angular/core';
-import { Button, ButtonDirective } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { Select } from 'primeng/select';
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { Paginator, PaginatorState } from 'primeng/paginator';
+import { API_GRID_PAGE_SIZE } from '@/core/constants/pagination.constants';
 import { ITableReadResponse, ITableSearchRow, TableSearchEnum, TableService } from '../../services/table-service';
+import {
+  clearMasterDataEditMode,
+  isMasterDataRowSelected,
+  logRowSelectClick,
+  RowSelectSource,
+  selectMasterDataRow,
+} from '../../utils/master-data-row-edit';
 import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { TooltipModule } from 'primeng/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-tables',
@@ -23,12 +29,12 @@ import { TooltipModule } from 'primeng/tooltip';
     ReactiveFormsModule,
     InputTextModule,
     SectionWrapper,
-    Paginator,
     ButtonDirective,
     Debounce,
     LoadingDisabledDirective,
-    TooltipModule
-],
+    TooltipModule,
+    TranslatePipe,
+  ],
   templateUrl: './tables.html',
   styleUrl: './tables.css',
 })
@@ -58,10 +64,25 @@ export class Tables extends BaseComponent {
 
   tableService = inject(TableService);
 
-  resetTableForm = () => {
-    this.tableFg.reset();
-    this.currentItem = null;
-  };
+  get isEditMode() {
+    return !!this.currentItem;
+  }
+
+  isRowSelected = (rowId: number) => isMasterDataRowSelected(rowId, this.currentItem);
+
+  resetTableForm = () => clearMasterDataEditMode(this.tableFg, (item) => (this.currentItem = item));
+
+  onRowSelect(item: ITableSearchRow, source: RowSelectSource = 'row') {
+    logRowSelectClick(item, source, 'tables');
+    selectMasterDataRow(
+      item.id,
+      (id) => this.tableService.getById(id),
+      this.tableFg,
+      (res) => (this.currentItem = res),
+      undefined,
+      { screen: 'tables', source },
+    );
+  }
 
   constructor() {
     super();
@@ -72,11 +93,11 @@ export class Tables extends BaseComponent {
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'الاسم',
-      command: (event) => this.searchFg.patchValue({ searchEnum: TableSearchEnum.Name }),
+      command: () => this.searchFg.patchValue({ searchEnum: TableSearchEnum.Name }),
     },
     {
       label: 'متاح',
-      command: (event) => this.searchFg.patchValue({ searchEnum: TableSearchEnum.IsAvaliable }),
+      command: () => this.searchFg.patchValue({ searchEnum: TableSearchEnum.IsAvaliable }),
     },
   ]);
 
@@ -87,15 +108,6 @@ export class Tables extends BaseComponent {
     { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
     { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
   ];
-
-  fetchAndBindTableData(tableId: number) {
-    return this.tableService.getById(tableId).subscribe({
-      next: (res) => {
-        this.tableFg.patchValue(res);
-        this.currentItem = res;
-      },
-    });
-  }
 
   deleteTable(id: number, event: Event) {
     this.confirmationService.confirm({
@@ -117,11 +129,11 @@ export class Tables extends BaseComponent {
       accept: () => {
         this.tableService.delete(id).subscribe({
           next: () => {
+            if (this.currentItem?.id === id) this.resetTableForm();
             this.searchTables(1);
           },
         });
       },
-      
     });
   }
 
@@ -138,7 +150,7 @@ export class Tables extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 10,
+          pageSize: API_GRID_PAGE_SIZE,
         },
         searchFilters: [
           {
@@ -161,8 +173,6 @@ export class Tables extends BaseComponent {
   }
 
   onSearchSubmit = () => this.searchFg.valid && this.searchTables(1);
-
-  onPageChange = (event: PaginatorState) => this.searchTables(event.page! + 1);
 
   onTableFormSubmit() {
     if (this.tableFg.invalid) {

@@ -1,12 +1,12 @@
 <form
   id="refundForm"
   [formGroup]="refundFg"
-  class="sr-form p-3 flex flex-col h-full gap-1.5"
+  class="sr-form p-2 flex flex-col h-full gap-1"
   (ngSubmit)="onSubmitClick()"
 >
   <div class="pr-top-area shrink-0">
 
-    <!-- Search + return meta -->
+    <!-- Search -->
     <div class="pi-panel sr-block-return flex flex-col">
       <div class="pi-panel-header">البحث والمرتجع</div>
       <div class="pi-panel-body grid grid-cols-2 gap-x-2 gap-y-1">
@@ -17,19 +17,19 @@
         </div>
 
         <div>
-          <label for="returnDate">التاريخ</label>
+          <label for="voucherNumber">رقم السند / المرجع</label>
           <input
             type="text"
             pInputText
-            id="returnDate"
+            id="voucherNumber"
             class="w-full"
+            [value]="!isCreateMode() ? voucherNumberDisplay() : '-'"
             disabled
-            [value]="isLoaded() ? (orderData()?.dateTime | date: 'yyyy-MM-dd HH:mm') : '-'"
           />
         </div>
 
         <div class="col-span-2">
-          <label for="searchInvoiceForm">البحث برقم فاتورة المبيعات</label>
+          <label for="searchInvoiceForm">رقم فاتورة المبيعات</label>
           <form
             id="searchInvoiceForm"
             [formGroup]="searchInvoiceFg"
@@ -56,27 +56,55 @@
           </form>
         </div>
 
-        <div class="col-span-2">
-          <label for="searchReturnForm">البحث برقم المرتجع / المرجع</label>
+        <div>
+          <label for="searchReturnNumberForm">رقم المرتجع</label>
           <form
-            id="searchReturnForm"
-            [formGroup]="searchReturnFg"
+            id="searchReturnNumberForm"
+            [formGroup]="searchReturnNumberFg"
             appLoadingDisabled
             appDebounce
             [domEvents]="['submit']"
-            (debounced)="searchByReturnReference(searchReturnFg.value.term ?? '')"
+            (debounced)="searchByReturnNumber(searchReturnNumberFg.value.term ?? '')"
           >
             <app-input-error-message-handler>
               <input
                 type="text"
                 pInputText
                 formControlName="term"
-                form="searchReturnForm"
-                placeholder="رقم المرتجع أو المرجع الدفتري"
+                form="searchReturnNumberForm"
+                placeholder="رقم المرتجع"
                 class="w-full"
               />
               <p-inputgroup-addon class="p-0! cursor-pointer">
-                <button type="submit" form="searchReturnForm" class="flex cursor-pointer" pTooltip="بحث">
+                <button type="submit" form="searchReturnNumberForm" class="flex cursor-pointer" pTooltip="بحث">
+                  <i class="pi pi-search text-sm px-2"></i>
+                </button>
+              </p-inputgroup-addon>
+            </app-input-error-message-handler>
+          </form>
+        </div>
+
+        <div>
+          <label for="searchReturnVoucherForm">رقم سند المرتجع</label>
+          <form
+            id="searchReturnVoucherForm"
+            [formGroup]="searchReturnVoucherFg"
+            appLoadingDisabled
+            appDebounce
+            [domEvents]="['submit']"
+            (debounced)="searchByReturnVoucher(searchReturnVoucherFg.value.term ?? '')"
+          >
+            <app-input-error-message-handler>
+              <input
+                type="text"
+                pInputText
+                formControlName="term"
+                form="searchReturnVoucherForm"
+                placeholder="رقم السند / المرجع"
+                class="w-full"
+              />
+              <p-inputgroup-addon class="p-0! cursor-pointer">
+                <button type="submit" form="searchReturnVoucherForm" class="flex cursor-pointer" pTooltip="بحث">
                   <i class="pi pi-search text-sm px-2"></i>
                 </button>
               </p-inputgroup-addon>
@@ -92,27 +120,79 @@
       </div>
     </div>
 
-    <!-- Invoice summary cards -->
+    <!-- Invoice summary dashboard -->
     <div class="pi-panel sr-block-summary flex flex-col">
       <div class="pi-panel-header">ملخص الفاتورة</div>
-      <div class="pi-panel-body flex-1">
+      <div class="pi-panel-body">
         @if (isLoaded()) {
-          <div class="sr-info-cards">
-            <div class="sr-info-card">
-              <span class="sr-info-card__label">رقم الفاتورة الأصلية</span>
-              <span class="sr-info-card__value">{{ originalInvoiceNumber() }}</span>
+          <div class="sr-dashboard">
+            @if (!isCreateMode() || voucherNumberDisplay() !== '-') {
+              <div class="sr-dash-row sr-dash-row--meta">
+                @if (!isCreateMode()) {
+                  <div class="sr-dash-card sr-dash-card--meta">
+                    <span class="sr-dash-label">رقم المرتجع</span>
+                    <span class="sr-dash-value">{{ returnNumberDisplay() }}</span>
+                  </div>
+                }
+                @if (voucherNumberDisplay() !== '-') {
+                  <div class="sr-dash-card sr-dash-card--meta">
+                    <span class="sr-dash-label">الرقم الدفتري للمرتجع</span>
+                    <span class="sr-dash-value">{{ voucherNumberDisplay() }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            <div class="sr-dash-row">
+              <div class="sr-dash-card">
+                <span class="sr-dash-label">رقم الفاتورة الأصلية</span>
+                <span class="sr-dash-value">{{ originalInvoiceNumber() }}</span>
+              </div>
+              <div class="sr-dash-card">
+                <span class="sr-dash-label">العميل</span>
+                <span class="sr-dash-value">{{ orderData()?.customer?.name || '-' }}</span>
+              </div>
+              <div class="sr-dash-card">
+                <span class="sr-dash-label">نوع الطلب</span>
+                <span class="sr-dash-value">{{ orderTypeLabel() }}</span>
+              </div>
             </div>
-            <div class="sr-info-card">
-              <span class="sr-info-card__label">العميل</span>
-              <span class="sr-info-card__value">{{ orderData()?.customer?.name || '-' }}</span>
+
+            <div class="sr-dash-row">
+              <div class="sr-dash-card sr-dash-card--neutral">
+                <span class="sr-dash-label">إجمالي الفاتورة</span>
+                <span class="sr-dash-value">{{ invoiceTotal() | number: '1.2-2' }}</span>
+              </div>
+              <div class="sr-dash-card sr-dash-card--warning">
+                <span class="sr-dash-label">إجمالي المرتجع السابق</span>
+                <span class="sr-dash-value">{{ previousReturnsTotal() | number: '1.2-2' }}</span>
+              </div>
+              <div class="sr-dash-card sr-dash-card--remaining">
+                <span class="sr-dash-label">المتبقي للاسترجاع</span>
+                <span class="sr-dash-value">{{ remainingReturnable() | number: '1.2-2' }}</span>
+              </div>
             </div>
-            <div class="sr-info-card">
-              <span class="sr-info-card__label">إجمالي الفاتورة</span>
-              <span class="sr-info-card__value">{{ invoiceTotal() | number: '1.2-2' }}</span>
+
+            <div class="sr-dash-row">
+              <div class="sr-dash-card sr-dash-card--qty">
+                <span class="sr-dash-label">إجمالي الكمية المباعة</span>
+                <span class="sr-dash-value">{{ totalSoldQuantity() }}</span>
+              </div>
+              <div class="sr-dash-card sr-dash-card--qty">
+                <span class="sr-dash-label">إجمالي الكمية المسترجعة</span>
+                <span class="sr-dash-value">{{ totalReturnedQuantity() }}</span>
+              </div>
+              <div class="sr-dash-card sr-dash-card--qty">
+                <span class="sr-dash-label">عدد الأصناف المختارة</span>
+                <span class="sr-dash-value">{{ selectedItemsCount() }}</span>
+              </div>
             </div>
-            <div class="sr-info-card sr-info-card--accent">
-              <span class="sr-info-card__label">المتبقي للاسترجاع</span>
-              <span class="sr-info-card__value">{{ remainingReturnable() | number: '1.2-2' }}</span>
+
+            <div class="sr-dash-row sr-dash-row--primary">
+              <div class="sr-dash-card sr-dash-card--primary">
+                <span class="sr-dash-label">إجمالي مبلغ المرتجع</span>
+                <span class="sr-dash-value sr-dash-value--primary">{{ totalReturnAmount() | number: '1.2-2' }}</span>
+              </div>
             </div>
           </div>
         } @else {
@@ -121,31 +201,105 @@
       </div>
     </div>
 
-    <!-- Operations + payment accounts -->
+    <!-- Operations + cashier-style payment -->
     <div class="pi-panel sr-block-operations flex flex-col">
       <div class="pi-panel-header">العمليات والمالية</div>
-      <div class="pi-panel-body flex flex-col justify-between flex-1 gap-2">
+      <div class="pi-panel-body flex flex-col justify-between flex-1 gap-1.5">
 
         @if (isLoaded() && isOrderPaid()) {
-          <div class="sr-payment-cards">
-            <div class="sr-payment-card">
-              <span class="sr-payment-card__label">كاش</span>
-              <span class="sr-payment-card__amount">{{ (refundFg.value.payingCash ?? 0) | number: '1.2-2' }}</span>
-              <span class="sr-payment-card__account">{{ cashAccountName() }}</span>
+          <section class="pos-pay-section pos-pay-split-columns sr-pay-section">
+            <div class="pos-pay-amount-block">
+              <label for="payingCash">{{ 'FORM.CASH_PAID' | translate }}</label>
+              <app-input-error-message-handler [fc]="refundFg.controls.payingCash">
+                <input
+                  pInputText
+                  id="payingCash"
+                  appAllowNumbers
+                  [allowDecimal]="true"
+                  [formControl]="refundFg.controls.payingCash"
+                  [max]="calculateRefundTotal()"
+                  [min]="0"
+                  type="number"
+                  class="app-input pos-pay-amount-input"
+                />
+                <p-inputgroup-addon class="flex p-0!">
+                  <button
+                    pButton
+                    type="button"
+                    class="pos-pay-transfer-btn app-p-btn"
+                    title="تحويل كامل للشبكة"
+                    (click)="transferAllToNetwork()"
+                  >
+                    <i class="pi pi-arrow-down"></i>
+                  </button>
+                </p-inputgroup-addon>
+              </app-input-error-message-handler>
+              <label class="pos-pay-account-label">{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
+              <app-input-error-message-handler [fc]="refundFg.controls.cashAccountId">
+                <ng-select
+                  class="app-select w-full"
+                  [items]="displayedCashAccounts()"
+                  [formControl]="refundFg.controls.cashAccountId"
+                  bindLabel="name"
+                  bindValue="id"
+                  [clearable]="false"
+                  placeholder="اختر الحساب"
+                />
+              </app-input-error-message-handler>
             </div>
-            <div class="sr-payment-card">
-              <span class="sr-payment-card__label">شبكة</span>
-              <span class="sr-payment-card__amount">{{ (refundFg.value.payingNetwork ?? 0) | number: '1.2-2' }}</span>
-              <span class="sr-payment-card__account">{{ networkAccountName() }}</span>
+
+            <div class="pos-pay-amount-block">
+              <label for="payingNetwork">{{ 'FORM.NETWORK_PAID' | translate }}</label>
+              <app-input-error-message-handler [fc]="refundFg.controls.payingNetwork">
+                <input
+                  pInputText
+                  id="payingNetwork"
+                  appAllowNumbers
+                  [allowDecimal]="true"
+                  [formControl]="refundFg.controls.payingNetwork"
+                  [max]="calculateRefundTotal()"
+                  [min]="0"
+                  type="number"
+                  class="app-input pos-pay-amount-input"
+                />
+                <p-inputgroup-addon class="flex p-0!">
+                  <button
+                    pButton
+                    type="button"
+                    class="pos-pay-transfer-btn app-p-btn"
+                    title="تحويل كامل للنقد"
+                    (click)="transferAllToCash()"
+                  >
+                    <i class="pi pi-arrow-up"></i>
+                  </button>
+                </p-inputgroup-addon>
+              </app-input-error-message-handler>
+              <label class="pos-pay-account-label">{{ 'FORM.ACCOUNT_NAME' | translate }}</label>
+              <app-input-error-message-handler [fc]="refundFg.controls.networkAccountId">
+                <ng-select
+                  class="app-select w-full"
+                  [items]="displayedNetworkAccounts()"
+                  [formControl]="refundFg.controls.networkAccountId"
+                  bindLabel="name"
+                  bindValue="id"
+                  [clearable]="false"
+                  placeholder="اختر الحساب"
+                />
+              </app-input-error-message-handler>
             </div>
-          </div>
+          </section>
         }
 
-        <div class="grid grid-cols-2 gap-1.5">
-          <button pButton type="button" class="app-p-btn py-1! w-full! justify-center!" (click)="onNewClick()">
+        <div class="grid grid-cols-2 gap-1.5 sr-action-buttons">
+          <button
+            pButton
+            type="button"
+            class="app-p-btn py-1! w-full! justify-center!"
+            [disabled]="!canNew()"
+            (click)="onNewClick()"
+          >
             جديد
           </button>
-
           <button
             type="submit"
             form="refundForm"
@@ -156,7 +310,6 @@
           >
             {{ submitLabel() }}
           </button>
-
           <button
             pButton
             type="button"
@@ -169,7 +322,6 @@
           >
             حذف
           </button>
-
           <button
             pButton
             type="button"
@@ -185,26 +337,6 @@
     </div>
   </div>
 
-  <!-- Live metrics above grid -->
-  <div class="sr-metrics-bar shrink-0">
-    <div class="sr-metric">
-      <span class="sr-metric__label">إجمالي الكمية المباعة</span>
-      <span class="sr-metric__value">{{ totalSoldQuantity() }}</span>
-    </div>
-    <div class="sr-metric">
-      <span class="sr-metric__label">إجمالي الكمية المسترجعة</span>
-      <span class="sr-metric__value">{{ totalReturnedQuantity() }}</span>
-    </div>
-    <div class="sr-metric sr-metric--highlight">
-      <span class="sr-metric__label">إجمالي مبلغ المرتجع</span>
-      <span class="sr-metric__value">{{ totalReturnAmount() | number: '1.2-2' }}</span>
-    </div>
-    <div class="sr-metric">
-      <span class="sr-metric__label">عدد الأصناف المختارة</span>
-      <span class="sr-metric__value">{{ selectedItemsCount() }}</span>
-    </div>
-  </div>
-
   <!-- Items grid -->
   <div class="pr-grid-wrapper flex-1 min-h-0">
     <table class="pr-table w-full main-table table-fixed sr-items-table">
@@ -213,7 +345,12 @@
           <th>#</th>
           <th>المنتج</th>
           <th>السعر</th>
-          <th>الكمية المتاحة</th>
+          <th>
+            <div class="pr-col-header">
+              <span>الكمية المتاحة</span>
+              <span class="pr-col-total">{{ totalSoldQuantity() }}</span>
+            </div>
+          </th>
           <th>
             <div class="pr-col-header sr-return-qty-header">
               <p-checkbox
@@ -226,9 +363,15 @@
                 pTooltip="تحديد الكل / تصفير الكل"
               />
               <span>الكمية المسترجعة</span>
+              <span class="pr-col-total">{{ totalReturnedQuantity() }}</span>
             </div>
           </th>
-          <th>الإجمالي</th>
+          <th>
+            <div class="pr-col-header">
+              <span>الإجمالي</span>
+              <span class="pr-col-total">{{ totalReturnAmount() | number: '1.2-2' }}</span>
+            </div>
+          </th>
           <th>إجراء</th>
         </tr>
       </thead>
@@ -266,27 +409,22 @@
               <div class="pr-cell-text text-center">{{ calculateItemTotal(item, itemIndex).toFixed(2) }}</div>
             </td>
             <td class="text-center">
-              @if (hasReturnedQuantity(item.value.quantity)) {
-                <button
-                  type="button"
-                  pButton
-                  severity="danger"
-                  variant="text"
-                  class="p-0! h-7! w-7! rounded-full!"
-                  (click)="deleteRow(itemIndex)"
-                  pTooltip="حذف السطر"
-                >
-                  <i class="pi pi-trash text-xs"></i>
-                </button>
-              }
+              <button
+                type="button"
+                pButton
+                severity="danger"
+                variant="text"
+                class="p-0! h-7! w-7! rounded-full!"
+                (click)="deleteRow(itemIndex)"
+                pTooltip="حذف السطر"
+              >
+                <i class="pi pi-trash text-xs"></i>
+              </button>
             </td>
           </tr>
 
           @for (addon of getAddonRows(itemIndex).controls; track $index; let addonIndex = $index) {
-            <tr
-              class="sr-addon-row"
-              [class.sr-item-row--active]="hasReturnedQuantity(addon.value.quantity)"
-            >
+            <tr class="sr-addon-row" [class.sr-item-row--active]="(addon.value.quantity ?? 0) > 0">
               <td></td>
               <td><div class="pr-cell-text pr-addon-name">↳ {{ addon.value.name }}</div></td>
               <td><div class="pr-cell-text text-center">{{ addon.value.netUnitPriceWithTax?.toFixed(2) }}</div></td>
@@ -320,19 +458,17 @@
                 </div>
               </td>
               <td class="text-center">
-                @if (hasReturnedQuantity(addon.value.quantity)) {
-                  <button
-                    type="button"
-                    pButton
-                    severity="danger"
-                    variant="text"
-                    class="p-0! h-7! w-7! rounded-full!"
-                    (click)="deleteAddonRow(itemIndex, addonIndex)"
-                    pTooltip="حذف الإضافة"
-                  >
-                    <i class="pi pi-trash text-xs"></i>
-                  </button>
-                }
+                <button
+                  type="button"
+                  pButton
+                  severity="danger"
+                  variant="text"
+                  class="p-0! h-7! w-7! rounded-full!"
+                  (click)="deleteAddonRow(itemIndex, addonIndex)"
+                  pTooltip="حذف الإضافة"
+                >
+                  <i class="pi pi-trash text-xs"></i>
+                </button>
               </td>
             </tr>
           }
@@ -368,9 +504,7 @@
       لا يمكن حفظ المرتجع قبل فتح اليومية. هل تريد فتح اليومية الآن؟
     </p>
     <div class="flex gap-3 justify-end">
-      <button pButton type="button" class="p-button-outlined p-button-secondary" (click)="cancelJournalSave()">
-        إلغاء
-      </button>
+      <button pButton type="button" class="p-button-outlined p-button-secondary" (click)="cancelJournalSave()">إلغاء</button>
       <button pButton type="button" (click)="openJournal()">فتح اليومية الآن</button>
     </div>
   </div>

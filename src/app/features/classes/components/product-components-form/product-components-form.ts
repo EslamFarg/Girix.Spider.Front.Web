@@ -18,6 +18,7 @@ import { ProductComponentsService } from '../../services/product-components-serv
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { ButtonDirective } from 'primeng/button';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
+import { TooltipModule } from 'primeng/tooltip';
 
 interface IProductComponentFormRow {
     componentId: number | null;
@@ -37,10 +38,11 @@ type ProductComponentFormRowControls = ControlsOf<IProductComponentFormRow>;
         InputErrorMessageHandler,
         Debounce,
         ReactiveFormsModule,
-        AllowNumbers,
-        ButtonDirective,
-        LoadingDisabledDirective,
-    ],
+    AllowNumbers,
+    ButtonDirective,
+    LoadingDisabledDirective,
+    TooltipModule,
+  ],
     templateUrl: './product-components-form.html',
     styleUrl: './product-components-form.css',
 })
@@ -109,23 +111,42 @@ export class ProductComponentsForm extends BaseComponent {
         return this.fb.group<ProductComponentFormRowControls>({
             componentId: this.fb.control(data?.componentId ?? null, [Validators.required]),
             unitId: this.fb.control(data?.unitId ?? null, [Validators.required]),
-            quantity: this.fb.control(data?.quantity ?? null, [Validators.required, Validators.min(1)]),
+            quantity: this.fb.control(data?.quantity ?? 1, [Validators.required, Validators.min(1)]),
             // price: this.fb.control(data?.price ?? null, [Validators.required, Validators.min(1)]),
             units: this.fb.control(data?.units ?? [], [Validators.required, Validators.min(1)]),
         });
     }
 
-    isProductComponentRowEditable(index: number) {
-        return index === this.currentProductComponentEditRowIndex();
+    isProductComponentRowEditable(_index: number) {
+        return true;
     }
+
     onNewProductComponentChange(event: IProductSearchRow) {
-        // clear unit selection and make it untouched
-        this.newProductComponentRowFg.controls.unitId.setValue(null);
-        this.newProductComponentRowFg.controls.unitId.markAsUntouched();
+        const mainUnit = event.menuItemUnits?.find((u) => u.isMainUnit) ?? null;
 
         this.newProductComponentRowFg.patchValue({
-            units: event.menuItemUnits,
+            units: event.menuItemUnits ?? [],
+            unitId: mainUnit?.unitId ?? null,
+            quantity: 1,
         });
+
+        if (!mainUnit) {
+            this.newProductComponentRowFg.controls.unitId.markAsUntouched();
+        }
+    }
+
+    onExistingRowComponentChange(event: IProductSearchRow, rowIndex: number) {
+        const row = this.componentsRows.at(rowIndex);
+        const mainUnit = event.menuItemUnits?.find((u) => u.isMainUnit) ?? null;
+
+        row.patchValue({
+            units: event.menuItemUnits ?? [],
+            unitId: mainUnit?.unitId ?? null,
+        });
+
+        if (!mainUnit) {
+            row.controls.unitId.markAsUntouched();
+        }
     }
 
     //
@@ -199,7 +220,12 @@ export class ProductComponentsForm extends BaseComponent {
         this.componentsRows.push(this.createProductComponentRowFg(rowValue));
         this.lastClickedTableRowIndex.set(this.componentsRows.length - 1);
 
-        this.newProductComponentRowFg.reset();
+        this.newProductComponentRowFg.reset({
+            componentId: null,
+            unitId: null,
+            quantity: 1,
+            units: [],
+        });
     }
 
     //

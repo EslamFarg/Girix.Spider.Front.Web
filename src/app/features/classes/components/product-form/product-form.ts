@@ -1,10 +1,11 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputNumber } from 'primeng/inputnumber';
+import { ToggleSwitch } from 'primeng/toggleswitch';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectFilterEvent, SelectLazyLoadEvent, SelectModule } from 'primeng/select';
-import { CarouselModule } from 'primeng/carousel';
 import { TextareaModule } from 'primeng/textarea';
 import { BaseComponent, FormMode, IPaginationInfo } from '@/components/base-component/base-component';
 import {
@@ -19,8 +20,6 @@ import { FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angula
 import { GroupSearchEnum, GroupService, IGroupSearchRow } from '../../services/group-service';
 import { ImgOnly } from '@/directives/img-only';
 import { omitKeys } from '@/yn-ng/utils/helpers';
-import { Slider } from '@/components/slider/slider';
-import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Dialog } from 'primeng/dialog';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
@@ -31,7 +30,6 @@ import { Debounce, IDebounceEvent } from '@/directives/debounce';
 import { ImgFallback } from '@/directives/img-fallback';
 import { ControlsOf } from '@/yn-ng/types/helpers';
 import { IUnitSearchRow, UnitSearchEnum, UnitService } from '../../services/unit-service';
-import { RouterLink } from '@angular/router';
 import { ProductComponentsService } from '../../services/product-components-service';
 import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 
@@ -48,14 +46,12 @@ type ProductUnitFormRowControls = ControlsOf<IProductUnitFormRow>;
         Button,
         InputErrorMessageHandler,
         InputTextModule,
+        InputNumber,
         SelectModule,
-        CarouselModule,
         TextareaModule,
         ReactiveFormsModule,
         ImgOnly,
-        Slider,
         ButtonDirective,
-        InputGroupAddon,
         Dialog,
         MultiSelectModule,
         AllowNumbers,
@@ -66,8 +62,8 @@ type ProductUnitFormRowControls = ControlsOf<IProductUnitFormRow>;
         ImgFallback,
         NgOptionTemplateDirective,
         NgLabelTemplateDirective,
-        RouterLink,
         LoadingDisabledDirective,
+        ToggleSwitch,
     ],
     templateUrl: './product-form.html',
     styleUrl: './product-form.css',
@@ -164,7 +160,6 @@ export class ProductForm extends BaseComponent implements OnInit {
 
     constructor() {
         super();
-        effect(() => console.log(this.allImages()));
     }
 
     ngOnInit() {
@@ -552,7 +547,7 @@ export class ProductForm extends BaseComponent implements OnInit {
     currentProductUnitEditRowIndex = signal<number>(-1);
     newProductUnitRowFg = this.fb.group<ProductUnitFormRowControls>({
         unitId: this.fb.control<number | null>(null, [Validators.required]),
-        quantity: this.fb.control<number | null>(null, [Validators.required, Validators.min(1)]),
+        quantity: this.fb.control<number | null>(1, [Validators.required, Validators.min(1)]),
         isMainUnit: this.fb.control<boolean | null>(false, [Validators.required]),
     });
 
@@ -587,7 +582,7 @@ export class ProductForm extends BaseComponent implements OnInit {
         this.productUnitRows.push(this.createProductUnitRowFg(rowValue));
         this.lastClickedTableRowIndex.set(this.productUnitRows.length - 1);
 
-        this.newProductUnitRowFg.reset();
+        this.newProductUnitRowFg.reset({ unitId: null, quantity: 1, isMainUnit: false });
     }
 
     createProductUnitRowFg(data?: IProductUnitFormRow) {
@@ -618,8 +613,8 @@ export class ProductForm extends BaseComponent implements OnInit {
         this.productUnitRows.removeAt(rowIndex);
     }
 
-    isProductUnitRowEditable(rowIndex: number) {
-        return this.currentProductUnitEditRowIndex() === rowIndex;
+    isProductUnitRowEditable(_rowIndex: number) {
+        return true; // all rows are always editable — inline editing
     }
 
     //

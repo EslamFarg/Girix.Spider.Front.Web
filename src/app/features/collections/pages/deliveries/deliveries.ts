@@ -19,6 +19,7 @@ import { OrderLocationType } from '@/features/orders';
 import { LoadingDisabledDirective } from "@/directives/loading-disabled";
 import { Listbox } from "primeng/listbox";
 import { TooltipModule } from 'primeng/tooltip';
+import { MaintenanceService } from '@/features/settings/services/maintenance-service';
 
 @Component({
   selector: 'app-deliveries',
@@ -78,15 +79,23 @@ export class Deliveries extends BaseComponent implements OnInit, OnDestroy {
   }
 
   collectionSub?: ReturnType<typeof this.collectionsService.collectionCompleted$.subscribe>;
+  deliveryResetSub?: ReturnType<typeof this.maintenanceService.deliveryReset$.subscribe>;
+  maintenanceService = inject(MaintenanceService);
 
   ngOnInit() {
     this.collectionSub = this.collectionsService.collectionCompleted$.subscribe(() => {
+      this.searchDeliverys(1);
+    });
+    this.deliveryResetSub = this.maintenanceService.deliveryReset$.subscribe(() => {
+      this.searchFg.reset(this.initialSearchFormValue);
+      this.isInvoiceTypeChangeDialogVisible = false;
       this.searchDeliverys(1);
     });
   }
 
   override ngOnDestroy() {
     this.collectionSub?.unsubscribe();
+    this.deliveryResetSub?.unsubscribe();
     super.ngOnDestroy();
   }
 

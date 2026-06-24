@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PaginatorState } from 'primeng/paginator';
 import { InputTextModule } from 'primeng/inputtext';
@@ -10,6 +10,7 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { ReportPrintView, IReportColumn, IReportFilter } from '../../../components/report-print-view/report-print-view';
 import { ReportsService } from '../../../services/reports-service';
 import { ISalesDeliveryRow } from '../../../types/api/reports-types';
+import { MaintenanceService } from '@/features/settings/services/maintenance-service';
 
 @Component({
   selector: 'app-sales-delivery-report',
@@ -17,8 +18,10 @@ import { ISalesDeliveryRow } from '../../../types/api/reports-types';
   templateUrl: './sales-delivery.html',
   styleUrl: './sales-delivery.css',
 })
-export class SalesDelivery extends BaseComponent {
+export class SalesDelivery extends BaseComponent implements OnDestroy {
   reportsService = inject(ReportsService);
+  maintenanceService = inject(MaintenanceService);
+  deliveryResetSub?: ReturnType<typeof this.maintenanceService.deliveryReset$.subscribe>;
 
   fg = this.fb.group({
     fromDate: this.fb.control<string | null>(null),
@@ -41,6 +44,15 @@ export class SalesDelivery extends BaseComponent {
   constructor() {
     super();
     this.search(1);
+    this.deliveryResetSub = this.maintenanceService.deliveryReset$.subscribe(() => {
+      this.fg.reset({ fromDate: null, toDate: null });
+      this.search(1);
+    });
+  }
+
+  override ngOnDestroy() {
+    this.deliveryResetSub?.unsubscribe();
+    super.ngOnDestroy();
   }
 
   search(pageIndex: number) {

@@ -1,21 +1,27 @@
-import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
+import { BaseComponent } from '@/components/base-component/base-component';
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { Button, ButtonDirective } from 'primeng/button';
-import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { Select } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { Paginator, PaginatorState } from 'primeng/paginator';
+import { API_GRID_PAGE_SIZE } from '@/core/constants/pagination.constants';
 import { HutSearchEnum, HutService, IHutReadResponse, IHutSearchRow } from '../../services/hut-service';
+import {
+  clearMasterDataEditMode,
+  isMasterDataRowSelected,
+  logRowSelectClick,
+  RowSelectSource,
+  selectMasterDataRow,
+} from '../../utils/master-data-row-edit';
 import { AllowNumbers } from '@/directives/allow-numbers';
 import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { MenuItem } from 'primeng/api';
 import { Debounce } from '@/directives/debounce';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { TooltipModule } from 'primeng/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-huts',
@@ -24,13 +30,13 @@ import { TooltipModule } from 'primeng/tooltip';
     InputErrorMessageHandler,
     InputTextModule,
     SectionWrapper,
-    Paginator,
     AllowNumbers,
     ButtonDirective,
     Debounce,
     LoadingDisabledDirective,
-    TooltipModule
-],
+    TooltipModule,
+    TranslatePipe,
+  ],
   templateUrl: './huts.html',
   styleUrl: './huts.css',
 })
@@ -60,35 +66,41 @@ export class Huts extends BaseComponent {
 
   hutService = inject(HutService);
 
-  resetHutForm = () => {
-    this.hutFg.reset();
-    this.currentItem = null;
-  };
+  get isEditMode() {
+    return !!this.currentItem;
+  }
 
-  fetchAndBindTableData(tableId: number) {
-    return this.hutService.getById(tableId).subscribe({
-      next: (res) => {
-        this.hutFg.patchValue(res);
-        this.currentItem = res;
-      },
-    });
+  isRowSelected = (rowId: number) => isMasterDataRowSelected(rowId, this.currentItem);
+
+  resetHutForm = () => clearMasterDataEditMode(this.hutFg, (item) => (this.currentItem = item));
+
+  onRowSelect(item: IHutSearchRow, source: RowSelectSource = 'row') {
+    logRowSelectClick(item, source, 'huts');
+    selectMasterDataRow(
+      item.id,
+      (id) => this.hutService.getById(id),
+      this.hutFg,
+      (res) => (this.currentItem = res),
+      { pricePerHour: item.pricePerHour },
+      { screen: 'huts', source },
+    );
   }
 
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'الاسم',
-      command: (event) => this.searchFg.patchValue({ searchEnum: HutSearchEnum.Name }),
+      command: () => this.searchFg.patchValue({ searchEnum: HutSearchEnum.Name }),
     },
     {
       label: 'متاح',
-      command: (event) => this.searchFg.patchValue({ searchEnum: HutSearchEnum.IsAvaliable }),
+      command: () => this.searchFg.patchValue({ searchEnum: HutSearchEnum.IsAvaliable }),
     },
   ]);
 
   constructor() {
     super();
 
-    this.searchHuts(1);
+    this.searchHuts();
   }
 
   periodOptions = [
@@ -100,18 +112,13 @@ export class Huts extends BaseComponent {
   ];
 
   huts = signal<IHutSearchRow[]>([]);
-  hutsPaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
-    totalPagesCount: 0,
-    totalRowsCount: 0,
-  };
 
-  searchHuts(pageIndex: number) {
+  searchHuts() {
     this.hutService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 10,
+          pageIndex: 1,
+          pageSize: API_GRID_PAGE_SIZE,
         },
         searchFilters: [
           {
@@ -124,24 +131,17 @@ export class Huts extends BaseComponent {
       .subscribe({
         next: (res) => {
           this.huts.set(res.value.rows);
-          this.hutsPaginationInfo = {
-            pageIndex,
-            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
         },
       });
   }
 
-  onSearchSubmit = () => this.searchFg.valid && this.searchHuts(1);
-
-  onPageChange = (event: PaginatorState) => this.searchHuts(event.page! + 1);
+  onSearchSubmit = () => this.searchFg.valid && this.searchHuts();
 
   deleteHut(id: number, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'هل انت متاكد من حذف المنتج',
-      header: 'حذف المنتج',
+      message: 'هل انت متاكد من حذف الكوخ؟',
+      header: 'حذف الكوخ',
       icon: 'pi pi-info-circle',
       rejectLabel: 'الغاء',
       rejectButtonProps: {
@@ -154,25 +154,33 @@ export class Huts extends BaseComponent {
         severity: 'danger',
       },
 
-      accept: () => this.hutService.delete(id).subscribe({ next: () => this.searchHuts(1) }),
-      
+      accept: () =>
+        this.hutService.delete(id).subscribe({
+          next: () => {
+            if (this.currentItem?.id === id) this.resetHutForm();
+            this.searchHuts();
+          },
+        }),
     });
   }
 
   onHutFormSubmit() {
-    if (this.hutFg.invalid) return;
+    if (this.hutFg.invalid) {
+      this.hutFg.markAllAsTouched();
+      return;
+    }
 
     if (this.currentItem) {
       this.hutService.put(this.hutFg.getRawValue()).subscribe({
         next: () => {
-          this.searchHuts(1);
+          this.searchHuts();
           this.resetHutForm();
         },
       });
     } else {
       this.hutService.create(omitKeys(this.hutFg.getRawValue(), ['id'])).subscribe({
         next: () => {
-          this.searchHuts(1);
+          this.searchHuts();
           this.resetHutForm();
         },
       });

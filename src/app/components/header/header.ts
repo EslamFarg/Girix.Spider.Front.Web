@@ -376,6 +376,12 @@ export class Header extends BaseComponent implements AfterViewInit, OnDestroy {
                     routerLink: '/app-info/restaurant',
                     roles: [Role.Admin, Role.Cashier],
                 },
+                {
+                    labelKey: 'DATABASE_SETTINGS',
+                    imgUrl: headerIcons.appInfo.children.databaseSettings,
+                    routerLink: '/app-info/database-settings',
+                    roles: [Role.Admin],
+                },
             ],
         },
         // Reports

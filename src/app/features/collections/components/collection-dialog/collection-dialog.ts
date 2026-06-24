@@ -7,11 +7,8 @@ import { InputText } from 'primeng/inputtext';
 import { Dialog } from 'primeng/dialog';
 import { CollectionsService } from '../../services/collections-service';
 import { PrintableOrderInvoice } from '@/features/orders/components/printable-order-invoice/printable-order-invoice';
-import { IOrderBillReadResponse, OrderLocationType, OrderService } from '@/features/orders';
-import { ReceiptTemplateService } from '@/features/orders/services/receipt-template-service';
-import { AppPrinterType, IPrintJob, PrinterService } from '@/features/printers';
-import { PrinterSettingsService, IPrinterSettingsReadResponse } from '@/features/printers/services/printer-settings-service';
-import { RestaurantInfoService } from '@/features/settings/services/restaurant-info-service';
+import { OrderLocationType, OrderService } from '@/features/orders';
+import { OrderPrintWorkflowService } from '@/features/orders/services/order-print-workflow.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BaseComponent, IPaginationInfo } from '@/components';
 import { ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
@@ -62,10 +59,7 @@ export class CollectionDialog extends BaseComponent {
   collectPersonDelivery = this.collectionsService.collectPersonDelivery;
   collectCompanyDelivery = this.collectionsService.collectCompanyDelivery;
   orderService = inject(OrderService);
-  receiptTemplateService = inject(ReceiptTemplateService);
-  printService = inject(PrinterService);
-  printerSettingsService = inject(PrinterSettingsService);
-  restaurantInfoService = inject(RestaurantInfoService);
+  orderPrintWorkflow = inject(OrderPrintWorkflowService);
   ordersCollectionsCaluclationsService = inject(OrderCollectionCalculationsService);
   currentBill = this.collectionsService.currentBill;
   isCollectionInvoiceDialogVisible = this.collectionsService.isCollectionInvoiceDialogVisible;
@@ -102,6 +96,7 @@ export class CollectionDialog extends BaseComponent {
 
   constructor() {
     super();
+    this.orderPrintWorkflow.preloadPrinterSettings();
     this.searchAccounts({
       pageIndex: 1,
       searchTerm: '',
@@ -224,34 +219,26 @@ export class CollectionDialog extends BaseComponent {
     return [];
   }
 
-  /** Reuses POS cashier receipt: ReceiptTemplateService + global PrintDialog queue. */
-  private printCustomerInvoices(orderIds: number[]) {
+  canPrintInvoices = computed(() => {
+    if (this.currentBill()) {
+      return true;
+    }
+    return this.isDeliveryDialog() && this.checkedOrderIds().length > 0;
+  });
+
+  printSelectedInvoices() {
+    const orderIds = this.resolveOrderIdsForPrint();
     if (orderIds.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'تنبيه',
+        detail: 'يرجى اختيار فاتورة للطباعة.',
+      });
       return;
     }
 
     forkJoin(orderIds.map((orderId) => this.orderService.getBill(orderId))).subscribe({
-      next: (bills) => {
-        this.restaurantInfoService.getSettings().subscribe({
-          next: (restaurantSettings) => {
-            this.printerSettingsService.getSettings().subscribe({
-              next: (printerSettings) => {
-                const restaurantName = restaurantSettings.nameAr ?? 'فاتورة كاشير';
-                const jobs = this.buildCashierPrintJobs(bills, printerSettings, restaurantName);
-                if (jobs.length > 0) {
-                  this.printService.openPrinterDialogWithJobs(jobs);
-                  return;
-                }
-                this.messageService.add({
-                  severity: 'warn',
-                  summary: 'تنبيه',
-                  detail: 'لم يتم العثور على طابعة كاشير. يرجى ضبط الطابعات من الإعدادات.',
-                });
-              },
-            });
-          },
-        });
-      },
+      next: (bills) => this.orderPrintWorkflow.openPrintDialogForBills(bills),
       error: () => {
         this.messageService.add({
           severity: 'error',
@@ -262,31 +249,21 @@ export class CollectionDialog extends BaseComponent {
     });
   }
 
-  private buildCashierPrintJobs(
-    bills: IOrderBillReadResponse[],
-    settings: IPrinterSettingsReadResponse,
-    restaurantName: string,
-  ): IPrintJob[] {
-    if (!settings.cashierPrinter?.id) {
-      return [];
+  /** Reuses shared Collections print workflow after successful collect. */
+  private printCustomerInvoices(orderIds: number[]) {
+    if (orderIds.length === 0) {
+      return;
     }
 
-    const cashierPrinter = settings.cashierPrinter;
-    return bills.map((bill) => {
-      const receipt = this.receiptTemplateService.generateCashierReceiptHtml(bill, bill.items, restaurantName);
-      return {
-        printer: {
-          id: cashierPrinter.id,
-          name: cashierPrinter.name,
-          ipAddressOrMacAddress: cashierPrinter.ipAddressOrMacAddress,
-          port: cashierPrinter.port,
-          type: cashierPrinter.type,
-          comPort: cashierPrinter.comPort,
-          appPrinterType: AppPrinterType.cashierPrinter,
-        },
-        html: receipt.html,
-        css: receipt.css,
-      };
+    forkJoin(orderIds.map((orderId) => this.orderService.getBill(orderId))).subscribe({
+      next: (bills) => this.orderPrintWorkflow.openPrintDialogForBills(bills),
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'خطأ',
+          detail: 'تعذر تحميل بيانات الفاتورة للطباعة',
+        });
+      },
     });
   }
 

@@ -1,0 +1,438 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Products Explorer  —  professional UX with server-side pagination
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+
+  --prd-gap:      8px;
+  --prd-pad:      12px;
+  --prd-radius:   10px;
+  --prd-row-h:    46px;   /* was 48px — denser rows */
+  --prd-thead-h:  40px;   /* was 44px — tighter header */
+  --prd-input-h:  34px;   /* aligned with form controls */
+  --prd-font-sz:  13px;
+}
+
+/* ── Page shell ─────────────────────────────────────────────────────── */
+.prd-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: var(--prd-gap);
+  padding: var(--prd-pad);
+  overflow: hidden;
+}
+
+/* ── Table card ─────────────────────────────────────────────────────── */
+.prd-table-region {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-card, #fff);
+  border: 1px solid rgba(55 86 82 / 0.12);
+  border-radius: var(--prd-radius);
+  padding: var(--prd-pad);
+  overflow: hidden;
+  gap: var(--prd-gap);
+  box-shadow: 0 1px 3px rgba(0 0 0 / 0.04);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TOOLBAR  —  single flex row (RTL): Add | Count | Search | Filters | PageSize
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* unified toolbar element height */
+:host { --prd-toolbar-h: 38px; }
+
+.prd-list-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--prd-gap);
+  padding-bottom: var(--prd-gap);
+  border-bottom: 1px solid var(--color-text-lighter, #eef0f2);
+  flex-wrap: nowrap;
+}
+
+/* ── Add product button ─────────────────────────────────────────────── */
+.prd-btn-add.p-button {
+  height: var(--prd-toolbar-h) !important;
+  padding-inline: 14px !important;
+  font-size: var(--prd-font-sz) !important;
+  font-weight: 600 !important;
+  border-radius: var(--prd-radius) !important;
+  background: var(--color-dark-line, #375652) !important;
+  border-color: var(--color-dark-line, #375652) !important;
+  gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ── Count badge ────────────────────────────────────────────────────── */
+.prd-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: var(--prd-toolbar-h);
+  padding: 0 10px;
+  border-radius: var(--prd-radius);
+  background: rgba(55 86 82 / 0.08);
+  color: var(--color-dark-line, #375652);
+  font-size: var(--prd-font-sz);
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: default;
+  border: 1px solid rgba(55 86 82 / 0.14);
+}
+
+/* ── Search form — dominant element, takes available space ──────────── */
+.prd-search-form {
+  flex: 1;
+  min-width: 280px;
+}
+
+.prd-search-form app-input-error-message-handler {
+  display: flex;
+  align-items: stretch;
+}
+
+.prd-compact-input,
+.prd-search-form ::ng-deep input {
+  width: 100% !important;
+  height: var(--prd-toolbar-h) !important;
+  min-height: var(--prd-toolbar-h) !important;
+  border-radius: var(--prd-radius) !important;
+  font-size: var(--prd-font-sz) !important;
+}
+
+/* ── Column filter pills ────────────────────────────────────────────── */
+.prd-filter-group {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.prd-filter-btn {
+  height: var(--prd-toolbar-h);
+  padding: 0 14px;
+  border-radius: var(--prd-radius);
+  border: 1px solid var(--color-text-lighter, #e0e6e9);
+  background: #f9fafa;
+  font-size: var(--prd-font-sz);
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--color-text-dark, #2d3748);
+  transition: background 0.12s, border-color 0.12s;
+  white-space: nowrap;
+}
+
+.prd-filter-btn--active {
+  background: rgba(55 86 82 / 0.10);
+  border-color: var(--color-dark-line, #375652);
+  color: var(--color-dark-line, #375652);
+}
+
+/* ── Page size selector ─────────────────────────────────────────────── */
+:host ::ng-deep .prd-page-size-select.p-select {
+  height: var(--prd-toolbar-h) !important;
+  min-height: var(--prd-toolbar-h) !important;
+  width: 90px !important;
+  min-width: 90px !important;
+  border-radius: var(--prd-radius) !important;
+  font-size: var(--prd-font-sz) !important;
+  flex-shrink: 0;
+}
+
+:host ::ng-deep .prd-page-size-select .p-select-label {
+  font-size: var(--prd-font-sz) !important;
+  padding: 0 8px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TABLE
+   ═══════════════════════════════════════════════════════════════════════ */
+.prd-table-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
+.prd-sticky-thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--color-dark-bg-2);
+  box-shadow: 0 1px 0 rgba(55 86 82 / 0.18);
+}
+
+.prd-table {
+  border-spacing: 0 1px !important;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.prd-table th,
+.prd-table td {
+  max-width: none !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prd-table thead th {
+  height: var(--prd-thead-h) !important;
+  min-height: var(--prd-thead-h) !important;
+  padding: 0 8px !important;
+  font-size: var(--prd-font-sz) !important;
+  font-weight: 700 !important;
+  color: var(--color-text-lighter, #eef0f2);
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* name column left-aligned */
+.prd-col-name { text-align: right !important; }
+
+.prd-table tbody tr {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+.prd-table tbody td {
+  padding: 0 8px !important;
+  height: var(--prd-row-h) !important;
+  border-bottom: 1px solid var(--color-text-gray) !important;
+  animation: none !important;          /* stop showTableRowCell animation */
+  font-size: var(--prd-font-sz) !important;
+  vertical-align: middle;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.prd-table tbody td > div {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  max-height: none !important;   /* override global max-height: 0 that hides content */
+  overflow: visible !important;  /* override global overflow: hidden */
+  line-height: 1.25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--prd-font-sz) !important;
+}
+
+/* ── Column widths ──────────────────────────────────────────────────── */
+.prd-col-index   { width: 5%;  }
+.prd-col-name    { width: 34%; }
+.prd-col-group   { width: 18%; }
+.prd-col-price   { width: 13%; }
+.prd-col-tax     { width: 9%;  }
+.prd-col-actions { width: 21%; }
+
+/* ── Name cell ─────────────────────────────────────────────────────── */
+.prd-name-cell {
+  justify-content: flex-start !important;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Product thumbnail — 36×36 */
+.prd-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--color-text-lighter, #eef0f2);
+  flex-shrink: 0;
+}
+
+.prd-thumb-empty {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(55 86 82 / 0.06);
+  border: 1px dashed rgba(55 86 82 / 0.20);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(55 86 82 / 0.35);
+  font-size: 0.8125rem;
+  flex-shrink: 0;
+}
+
+.prd-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+  text-align: start;
+  min-width: 0;
+}
+
+/* ── Tags ───────────────────────────────────────────────────────────── */
+.prd-tag {
+  display: inline-block;
+  margin-inline-start: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.prd-tag--addition {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* ── Price & Tax ────────────────────────────────────────────────────── */
+.prd-price {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-dark-line, #375652);
+  justify-content: center !important;
+}
+
+.prd-tax {
+  font-size: var(--prd-font-sz) !important;
+  color: var(--color-text-dark, #2d3748);
+  justify-content: center !important;
+}
+
+/* ── Action buttons — 32×32 ─────────────────────────────────────────── */
+.prd-table .actions {
+  gap: 6px;
+  justify-content: center !important;
+}
+
+.prd-table .actions > * {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Row interaction ────────────────────────────────────────────────── */
+.prd-row-clickable {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.prd-row-clickable:hover td {
+  background: rgba(55 86 82 / 0.04) !important;
+}
+
+/* ── Empty state ────────────────────────────────────────────────────── */
+.prd-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 2.5rem 1rem;
+  color: var(--color-text-gray, #889898);
+}
+
+.prd-empty i { font-size: 2.2rem; opacity: 0.30; }
+.prd-empty span { font-size: 0.875rem; font-weight: 500; }
+
+.prd-btn-add-empty.p-button {
+  height: 34px !important;
+  padding-inline: 14px !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  border-radius: var(--prd-radius) !important;
+  background: rgba(55 86 82 / 0.08) !important;
+  border-color: var(--color-dark-line, #375652) !important;
+  color: var(--color-dark-line, #375652) !important;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+/* ── Skeleton loading ───────────────────────────────────────────────── */
+.prd-skeleton-row td {
+  padding: 8px 8px !important;
+}
+
+.prd-skeleton-bar {
+  height: 11px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eef0f2 25%, #f8f9fa 50%, #eef0f2 75%);
+  background-size: 200% 100%;
+  animation: prdSkel 1.3s ease-in-out infinite;
+}
+
+@keyframes prdSkel {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PAGINATOR BAR
+   ═══════════════════════════════════════════════════════════════════════ */
+.prd-paginator-bar {
+  flex-shrink: 0;
+  border-top: 1px solid var(--color-text-lighter, #eef0f2);
+  padding-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Display range text: "عرض 1–25 من 1000 منتج" */
+.prd-display-range {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-gray, #889898);
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-inline: 4px;
+}
+
+/* Compact paginator */
+:host ::ng-deep .prd-paginator-bar .p-paginator {
+  flex: 1;
+  padding: 2px 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+:host ::ng-deep .prd-paginator-bar .p-paginator .p-paginator-element {
+  min-width: 28px !important;
+  height: 28px !important;
+  font-size: 0.75rem !important;
+  border-radius: 6px !important;
+}
+
+:host ::ng-deep .prd-paginator-bar .p-paginator .p-paginator-element.p-highlight {
+  background: var(--color-dark-line, #375652) !important;
+  color: #fff !important;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .prd-search-form { max-width: 220px; }
+  .prd-col-tax,
+  .prd-table tbody td:nth-child(5) { display: none; }
+  .prd-col-name { width: 40%; }
+}
+
+@media (max-width: 640px) {
+  .prd-page { padding: 8px; }
+  .prd-list-toolbar { flex-wrap: wrap; }
+  .prd-search-form { max-width: 100%; order: 3; flex-basis: 100%; }
+}

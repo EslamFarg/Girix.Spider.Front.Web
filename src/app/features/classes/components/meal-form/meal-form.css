@@ -1,0 +1,468 @@
+@import '../../../restaurant/styles/rest-compact-actions.css';
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Meal Form  —  compact ERP grid layout (mirrors product-form layout)
+   Prefix: mf-  (meal form)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+
+  /* ── spacing tokens ── */
+  --mf-gap:          4px;
+  --mf-row-gap:      6px;
+  --mf-pad:          10px;
+  --mf-radius:       10px;
+  --mf-font-size:    13px;
+  --mf-input-h:      34px;
+  --mf-textarea-h:   80px;
+  --mf-section-bg:   rgba(55 86 82 / 0.04);
+  --mf-section-bdr:  rgba(55 86 82 / 0.10);
+}
+
+/* ── Page shell ─────────────────────────────────────────────────────── */
+.mf-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  gap: var(--mf-row-gap);
+  overflow: hidden;
+  padding: var(--mf-pad) var(--mf-pad) 0;
+}
+
+/* ── Card ───────────────────────────────────────────────────────────── */
+.mf-form-card {
+  flex-shrink: 0;
+  background: var(--surface-card, #fff);
+  border: 1px solid rgba(55 86 82 / 0.14);
+  border-radius: var(--mf-radius);
+  padding: var(--mf-pad);
+  box-shadow: 0 1px 3px rgba(0 0 0 / 0.04);
+}
+
+/* ── Shell (flex column inside the card) ────────────────────────────── */
+.mf-compact-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mf-row-gap);
+  min-width: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════════════════ */
+.mf-compact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mf-gap);
+  flex-wrap: wrap;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--color-text-lighter, #eef0f2);
+  min-height: 36px;
+}
+
+.mf-compact-header__title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--mf-font-size);
+  font-weight: 600;
+  color: var(--color-text-dark, #2d3748);
+  min-width: 0;
+}
+
+.mf-compact-editing-name {
+  color: var(--color-dark-line, #375652);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 220px;
+}
+
+.mf-compact-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+.mf-compact-mode-pill--create { background: rgba(55 86 82 / 0.12); color: var(--color-dark-line, #375652); }
+.mf-compact-mode-pill--edit   { background: rgba(234 179 8 / 0.14); color: #b45309; }
+
+/* ── Action-button overrides (on top of rest-compact-actions.css) ─── */
+.mf-btn-delete.p-button {
+  height: var(--mf-input-h) !important;
+  min-height: var(--mf-input-h) !important;
+  padding-inline: 12px !important;
+  font-size: var(--mf-font-size) !important;
+  font-weight: 600 !important;
+  border-radius: var(--mf-radius) !important;
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+.rest-compact-action-btn--save.p-button {
+  background: var(--color-dark-line, #375652) !important;
+  border-color: var(--color-dark-line, #375652) !important;
+  color: white !important;
+  width: 140px !important;
+  min-width: 140px !important;
+}
+
+.rest-compact-action-btn--new.p-button {
+  background: white !important;
+  border: 1.5px solid var(--color-dark-line, #375652) !important;
+  color: var(--color-dark-line, #375652) !important;
+  width: 120px !important;
+  min-width: 120px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   FORM GRID  —  12 equal columns  (2 image + 10 fields)
+   ═══════════════════════════════════════════════════════════════════════ */
+.mf-form-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--mf-row-gap) var(--mf-gap);
+  align-items: start;
+  min-width: 0;
+  direction: ltr;     /* keep RTL rows reversed inside each row */
+}
+
+/* ── Form rows occupy columns 3-12 (the 10-column field area) ─────── */
+.mf-form-row {
+  grid-column: 3 / -1;
+  display: grid;
+  gap: var(--mf-gap);
+  align-items: start;
+  min-width: 0;
+  direction: rtl;
+}
+
+/* Row 1: name 7.5 | group 2.5 */
+.mf-form-row--identity {
+  grid-row: 1;
+  grid-template-columns: 7.5fr 2.5fr;
+}
+
+/* Row 2: price | cost | tax | excise  (each 2.5fr) */
+.mf-form-row--pricing {
+  grid-row: 2;
+  grid-template-columns: repeat(4, 2.5fr);
+  background: var(--mf-section-bg);
+  border: 1px solid var(--mf-section-bdr);
+  border-radius: 8px;
+  padding: 5px 8px 6px;
+  gap: 8px;
+}
+
+/* Row 3: products — full 10-column width */
+.mf-form-row--products {
+  grid-row: 3;
+  grid-template-columns: minmax(0, 1fr);
+  background: var(--mf-section-bg);
+  border: 1px solid var(--mf-section-bdr);
+  border-radius: 8px;
+  padding: 5px 8px 6px;
+}
+
+/* Row 4: description — FULL 12-column width (below image + fields) */
+.mf-form-row--desc {
+  grid-row: 4;
+  grid-column: 1 / -1 !important;   /* override the base 3/-1 */
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   FIELDS  —  label + control pair
+   ═══════════════════════════════════════════════════════════════════════ */
+.mf-compact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  width: 100%;
+}
+
+.mf-compact-field label {
+  margin: 0 !important;
+  font-size: var(--mf-font-size);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-text-dark, #2d3748);
+  display: block;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INPUTS
+   ═══════════════════════════════════════════════════════════════════════ */
+.mf-compact-input {
+  height: var(--mf-input-h) !important;
+  min-height: var(--mf-input-h) !important;
+  max-height: var(--mf-input-h) !important;
+  border-radius: var(--mf-radius) !important;
+  font-size: var(--mf-font-size) !important;
+  padding: 0 8px !important;
+  width: 100% !important;
+}
+
+/* Textarea overrides */
+.mf-compact-textarea {
+  height: var(--mf-textarea-h) !important;
+  min-height: var(--mf-textarea-h) !important;
+  max-height: var(--mf-textarea-h) !important;
+  resize: none;
+  line-height: 1.5;
+  padding: 6px 8px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PRICE INPUTS  (p-inputnumber)
+   ═══════════════════════════════════════════════════════════════════════ */
+:host ::ng-deep .mf-price-number {
+  display: flex !important;
+  width: 100% !important;
+}
+
+:host ::ng-deep .mf-price-number .p-inputnumber-input,
+:host ::ng-deep .mf-price-input {
+  width: 100% !important;
+  height: var(--mf-input-h) !important;
+  min-height: var(--mf-input-h) !important;
+  text-align: center !important;
+  font-size: var(--mf-font-size) !important;
+  border-radius: var(--mf-radius) !important;
+  padding: 0 8px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DROPDOWNS  (ng-select with app-select class)
+   ═══════════════════════════════════════════════════════════════════════ */
+:host ::ng-deep .mf-compact-select.ng-select.app-select {
+  --height: var(--mf-input-h);
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  font-size: var(--mf-font-size) !important;
+}
+
+:host ::ng-deep .mf-compact-select.ng-select .ng-select-container {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: var(--mf-input-h) !important;
+  min-height: var(--mf-input-h) !important;
+  border-radius: var(--mf-radius) !important;
+}
+
+:host ::ng-deep .mf-compact-select.ng-select .ng-value-container {
+  display: flex !important;
+  align-items: center !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  flex-wrap: nowrap;
+}
+
+:host ::ng-deep .mf-compact-select.ng-select.ng-select-single .ng-select-container .ng-value-container .ng-input {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+:host ::ng-deep .mf-compact-select.ng-select .ng-arrow-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: stretch !important;
+  height: auto !important;
+  top: unset !important;
+  transform: none !important;
+}
+
+:host ::ng-deep .mf-compact-select.ng-select .ng-value-container,
+:host ::ng-deep .mf-compact-select.ng-select .ng-input > input,
+:host ::ng-deep .mf-compact-select.ng-select .ng-placeholder,
+:host ::ng-deep .mf-compact-select.ng-select .ng-value-label,
+:host ::ng-deep .mf-compact-select.ng-select .ng-option {
+  font-size: var(--mf-font-size) !important;
+}
+
+/* Products multi-select: allow variable height for tags */
+:host ::ng-deep .mf-multiselect.ng-select .ng-select-container {
+  height: auto !important;
+  min-height: var(--mf-input-h) !important;
+  flex-wrap: wrap;
+}
+
+:host ::ng-deep .mf-multiselect.ng-select .ng-value-container {
+  flex-wrap: wrap !important;
+  padding: 4px !important;
+  gap: 2px;
+  align-items: flex-start !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   IMAGE PANEL  —  col 1-2, spans rows 1-3 only (not description row)
+   ═══════════════════════════════════════════════════════════════════════ */
+.mf-image-panel {
+  grid-column: 1 / span 2;
+  grid-row: 1 / span 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  align-self: start;   /* don't stretch — image controls its own size */
+  direction: rtl;
+}
+
+.mf-image-body {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.mf-image-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+/* Delete button overlay */
+.mf-image-delete {
+  position: absolute;
+  top: 4px;
+  inset-inline-start: 4px;
+  z-index: 10;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid rgba(255 56 60 / 0.35);
+  background: rgba(255 255 255 / 0.92);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff383c;
+  font-size: 0.625rem;
+  box-shadow: 0 1px 3px rgba(0 0 0 / 0.12);
+  transition: background 0.15s, border-color 0.15s;
+}
+.mf-image-delete:hover { background: rgba(255 56 60 / 0.12); border-color: rgba(255 56 60 / 0.6); }
+
+/* Image label (click area = upload trigger) — square 1:1 */
+.mf-image-label {
+  display: flex;
+  width: 100%;
+  aspect-ratio: 1 / 1;     /* always square */
+  border: 2px dashed rgba(55 86 82 / 0.30);
+  border-radius: 8px;
+  cursor: pointer;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(55 86 82 / 0.03), rgba(55 86 82 / 0.07));
+  transition: border-color 0.18s, background 0.18s;
+}
+.mf-image-label:hover {
+  border-color: rgba(55 86 82 / 0.55);
+  background: rgba(55 86 82 / 0.08);
+}
+
+/* When image exists, use solid border */
+.mf-image-preview ~ .mf-image-label,
+.mf-image-label:has(.mf-image-preview) {
+  border-style: solid;
+  border-color: rgba(55 86 82 / 0.35);
+}
+
+/* Preview image */
+.mf-image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+  display: block;
+}
+
+/* Empty placeholder */
+.mf-image-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  color: rgba(55 86 82 / 0.55);
+  text-align: center;
+}
+
+.mf-image-placeholder-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.mf-image-hint {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.mf-image-hint-sub {
+  font-size: 0.6875rem;
+  font-weight: 400;
+  opacity: 0.70;
+  line-height: 1.3;
+}
+
+/* Thumbnail strip (for multiple images) */
+.mf-image-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.mf-image-count {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  color: var(--color-text-gray, #889898);
+  line-height: 1;
+}
+
+.mf-thumb-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mf-thumb-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1.5px solid transparent;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+.mf-thumb-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mf-thumb-btn--active { border-color: var(--color-dark-line, #375652); }
+.mf-thumb-btn:hover   { border-color: rgba(55 86 82 / 0.50); }

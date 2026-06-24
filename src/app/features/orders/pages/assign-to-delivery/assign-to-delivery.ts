@@ -1,5 +1,5 @@
 import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -19,6 +19,7 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { Listbox } from "primeng/listbox";
 import { TooltipModule } from 'primeng/tooltip';
 import { DatePipe } from '@angular/common';
+import { MaintenanceService } from '@/features/settings/services/maintenance-service';
 
 @Component({
   selector: 'app-assign-to-delivery',
@@ -44,9 +45,11 @@ import { DatePipe } from '@angular/common';
   templateUrl: './assign-to-delivery.html',
   styleUrl: './assign-to-delivery.css',
 })
-export class AssignToDelivery extends BaseComponent {
+export class AssignToDelivery extends BaseComponent implements OnDestroy {
   orderService = inject(OrderService);
   deliveryService = inject(DeliveryService);
+  maintenanceService = inject(MaintenanceService);
+  deliveryResetSub?: ReturnType<typeof this.maintenanceService.deliveryReset$.subscribe>;
 
   initialSearchFormValue = {
     searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
@@ -124,6 +127,20 @@ export class AssignToDelivery extends BaseComponent {
 
   constructor() {
     super();
+    this.searchOrders(1);
+    this.deliveryResetSub = this.maintenanceService.deliveryReset$.subscribe(() => this.onDeliveryReset());
+  }
+
+  override ngOnDestroy() {
+    this.deliveryResetSub?.unsubscribe();
+    super.ngOnDestroy();
+  }
+
+  private onDeliveryReset() {
+    this.selectedOrderIds.set(new Set());
+    this.selectedDelivery.set(null);
+    this.deliveryDialogVisible.set(false);
+    this.fg.reset(this.initialSearchFormValue);
     this.searchOrders(1);
   }
 

@@ -1,116 +1,85 @@
-import { Component, inject, signal } from '@angular/core';
-import { DeliveriesNav } from '../../components/deliveries-nav/deliveries-nav';
-import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { Paginator, PaginatorState } from 'primeng/paginator';
-import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { BaseComponent, IPaginationInfo } from '@/components/base-component/base-component';
-import { InputText } from 'primeng/inputtext';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
+import { BaseComponent, FormMode } from '@/components/base-component/base-component';
 import { DeliverySearchEnum, DeliveryService, IDeliverySearchRow } from '../../services/delivery-service';
-import { MenuItem } from 'primeng/api';
-import { Debounce } from '@/directives/debounce';
-import { Menu } from 'primeng/menu';
-import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
-import { Listbox } from "primeng/listbox";
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { TooltipModule } from 'primeng/tooltip';
+import { MaintenanceService } from '@/features/settings/services/maintenance-service';
+import { DeliveryManForm } from '../../components/delivery-man-form/delivery-man-form';
+import { API_GRID_PAGE_SIZE } from '@/core/constants/pagination.constants';
 
 @Component({
   selector: 'app-delivery-men',
   imports: [
-    DeliveriesNav,
-    SectionWrapper,
-    InputErrorMessageHandler,
-    InputGroupAddon,
-    Paginator,
-    ReactiveFormsModule,
-    InputText,
-    Debounce,
-    Menu,
-    RouterLink,
     TranslatePipe,
     LoadingDisabledDirective,
-    Listbox,
-    TooltipModule
-],
+    TooltipModule,
+    DeliveryManForm,
+  ],
   templateUrl: './delivery-men.html',
   styleUrl: './delivery-men.css',
 })
-export class DeliveryMen extends BaseComponent {
-  initialSearchFormValue = {
-    searchTerm: this.fb.control<string>('', [Validators.maxLength(100)]),
-    searchEnum: this.fb.control<DeliverySearchEnum>(DeliverySearchEnum.Name, [Validators.required]),
-    fromDate: this.fb.control<string | null>(null, []),
-    toDate: this.fb.control<string>(new Date().toISOString(), [Validators.required]),
-  };
-  searchFg = this.fb.group(this.initialSearchFormValue);
-
+export class DeliveryMen extends BaseComponent implements OnDestroy {
   deliveryService = inject(DeliveryService);
-  filterMenuItems = signal<MenuItem[]>([
-    {
-      label: 'الاسم',
-      value: DeliverySearchEnum.Name,
-    },
-    {
-      label: 'رقم الهاتف',
-      value: DeliverySearchEnum.PhoneNumber,
-    },
-  ]);
+  maintenanceService = inject(MaintenanceService);
+  deliveryResetSub?: ReturnType<typeof this.maintenanceService.deliveryReset$.subscribe>;
+
+  deliveryMen = signal<IDeliverySearchRow[]>([]);
+  selectedDeliveryId = signal<number>(0);
 
   constructor() {
     super();
 
-    this.searchDeliverys(1);
+    this.loadDeliveryMen();
+    this.deliveryResetSub = this.maintenanceService.deliveryReset$.subscribe(() => {
+      this.selectedDeliveryId.set(0);
+      this.loadDeliveryMen();
+    });
   }
 
-  periodOptions = [
-    { label: 'الكل', value: null },
-    { label: 'اخر يوم', value: this.getPreviousLocalDateIso(1) },
-    { label: 'اخر اسبوع', value: this.getPreviousLocalDateIso(7) },
-    { label: 'اخر شهر', value: this.getPreviousLocalDateIso(30) },
-    { label: 'اخر سنة', value: this.getPreviousLocalDateIso(365) },
-  ];
+  override ngOnDestroy() {
+    this.deliveryResetSub?.unsubscribe();
+    super.ngOnDestroy();
+  }
 
-  deliveryMen = signal<IDeliverySearchRow[]>([]);
+  get embeddedFormMode(): FormMode {
+    return this.selectedDeliveryId() > 0 ? FormMode.Update : FormMode.Create;
+  }
 
-  deliveryMenPaginationInfo: IPaginationInfo = {
-    pageIndex: 1,
-    totalRowsCount: 0,
-    totalPagesCount: 0,
-  };
+  onRowSelect(item: IDeliverySearchRow) {
+    this.selectedDeliveryId.set(item.id);
+  }
 
-  searchDeliverys(pageIndex: number) {
+  onDeliverySaved() {
+    this.selectedDeliveryId.set(0);
+    this.loadDeliveryMen();
+  }
+
+  onDeliveryReset() {
+    this.selectedDeliveryId.set(0);
+  }
+
+  loadDeliveryMen() {
     this.deliveryService
       .search({
         paginationInfo: {
-          pageIndex: pageIndex,
-          pageSize: 10,
+          pageIndex: 1,
+          pageSize: API_GRID_PAGE_SIZE,
         },
         searchFilters: [
           {
-            column: this.searchFg.getRawValue().searchEnum,
-            values: [this.searchFg.getRawValue().searchTerm],
+            column: DeliverySearchEnum.Name,
+            values: [''],
           },
         ],
-        fromDate: this.searchFg.getRawValue().fromDate,
+        fromDate: null,
       })
       .subscribe({
         next: (res) => {
           this.deliveryMen.set(res.value.rows);
-          this.deliveryMenPaginationInfo = {
-            pageIndex,
-            totalPagesCount: res.value.paginationInfo.totalPagesCount,
-            totalRowsCount: res.value.paginationInfo.totalRowsCount,
-          };
         },
       });
   }
-
-  onSubmit = () => this.searchFg.valid && this.searchDeliverys(1);
-
-  onPageChange = (event: PaginatorState) => this.searchDeliverys(event.page! + 1);
 
   deleteDelivery(id: number, event: Event) {
     this.confirmationService.confirm({
@@ -128,15 +97,14 @@ export class DeliveryMen extends BaseComponent {
         label: 'حذف',
         severity: 'danger',
       },
-
       accept: () => {
         this.deliveryService.delete(id).subscribe({
           next: () => {
-            this.searchDeliverys(1);
+            if (this.selectedDeliveryId() === id) this.selectedDeliveryId.set(0);
+            this.loadDeliveryMen();
           },
         });
       },
-      
     });
   }
 }

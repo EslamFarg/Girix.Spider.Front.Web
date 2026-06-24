@@ -1,121 +1,173 @@
-<form class="grid grid-cols-2 gap-4" [formGroup]="fg" appLoadingDisabled (ngSubmit)="onCloseDaily()">
-    <!-- الرصيد السابق -->
-    <div>
-        <label>{{ 'DAILY_JOURNAL.PREVIOUS_BALANCE' | translate }}</label>
-        <app-input-error-message-handler>
-            <input pInputText id="productName" disabled aria-describedby="productName-help" [value]="0" />
-        </app-input-error-message-handler>
+<form class="close-journal-form" [formGroup]="fg" appLoadingDisabled (ngSubmit)="onCloseDaily()">
+
+    <!-- ══════════════════════════════════════════════════════
+         ZONE 1 — STATUS PANEL (dark teal brand background)
+    ══════════════════════════════════════════════════════ -->
+    <div class="pos-status-panel" role="banner">
+
+        <!-- Title + session state badge -->
+        <div class="pos-status-panel__header">
+            <div class="pos-status-panel__title-block">
+                <h2 class="pos-status-panel__title">غلق اليومية</h2>
+                <p class="pos-status-panel__meta">
+                    @if (currentUserDaily()?.value?.name) {
+                        <span>{{ currentUserDaily()?.value?.name }}</span>
+                        <span class="pos-status-panel__sep">&middot;</span>
+                    }
+                    <span>{{ todayDisplay }}</span>
+                </p>
+            </div>
+            <span
+                class="pos-status-badge pos-status-badge--open"
+                role="status"
+                aria-label="حالة اليومية: مفتوحة"
+            >
+                مفتوحة منذ
+                {{ formatTime(currentUserDaily()?.value?.dailyJournalPeriods?.openStartDate) }}
+            </span>
+        </div>
+
+        <!-- KPI cards row — 3 metrics -->
+        <div class="pos-kpi-row">
+
+            <!-- الرصيد السابق -->
+            <div class="pos-kpi-card" role="region" aria-label="الرصيد السابق">
+                <span class="pos-kpi-card__label">
+                    {{ 'DAILY_JOURNAL.PREVIOUS_BALANCE' | translate }}
+                </span>
+                <span class="pos-kpi-card__value">
+                    {{ (currentUserDaily()?.value?.dailyJournalPeriods?.openingBalance ?? 0) | number:'1.2-2' }}
+                    <small class="pos-kpi-card__currency">ر.س</small>
+                </span>
+            </div>
+
+            <!-- العهدة -->
+            <div class="pos-kpi-card" role="region" aria-label="العهدة">
+                <span class="pos-kpi-card__label">
+                    {{ 'DAILY_JOURNAL.CUSTODY_BALANCE' | translate }}
+                </span>
+                <span class="pos-kpi-card__value">
+                    {{ (currentUserDaily()?.value?.dailyJournalPeriods?.custodyBalance ?? 0) | number:'1.2-2' }}
+                    <small class="pos-kpi-card__currency">ر.س</small>
+                </span>
+            </div>
+
+            <!-- مجموع العجز -->
+            <div class="pos-kpi-card" role="region" aria-label="مجموع العجز">
+                <span class="pos-kpi-card__label">
+                    {{ 'FORM.TOTAL_SHORTAGE' | translate }}
+                </span>
+                <span class="pos-kpi-card__value">
+                    {{ (currentUserDaily()?.value?.totalShortage ?? 0) | number:'1.2-2' }}
+                    <small class="pos-kpi-card__currency">ر.س</small>
+                </span>
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- الحساب -->
-    <div>
-        <label>{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
-        <app-input-error-message-handler>
-            <input
-                pInputText
-                id="productName"
-                aria-describedby="productName-help"
-                disabled
-                [value]="currentUserDaily()?.value?.dailyJournalPeriods?.openingBalanceAccountName"
-            />
-        </app-input-error-message-handler>
+    <!-- ══════════════════════════════════════════════════════
+         ZONE 2 — FORM PANEL (white card)
+    ══════════════════════════════════════════════════════ -->
+    <div class="pos-form-panel">
+
+        <!-- Section heading -->
+        <p class="pos-section-label">مبالغ الإغلاق</p>
+
+        <!-- Two grouped input cards side-by-side -->
+        <div class="pos-closing-grid">
+
+            <!-- ── Card 1: إغلاق كاش ── -->
+            <div class="pos-closing-card">
+                <div class="pos-closing-card__header">
+                    <span class="pos-closing-card__type">إغلاق كاش</span>
+                    @if (currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName) {
+                        <span class="pos-closing-card__account">
+                            {{ currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName }}
+                        </span>
+                    }
+                </div>
+                <app-input-error-message-handler [fc]="fg.get('cashClosingAmount')">
+                    <input
+                        pInputText
+                        appAllowNumbers
+                        appDecimalMask
+                        [allowDecimal]="true"
+                        [fixed]="2"
+                        [decimalPlaces]="2"
+                        inputmode="decimal"
+                        class="pos-input"
+                        id="cashClosingAmount"
+                        formControlName="cashClosingAmount"
+                        [placeholder]="'DAILY_JOURNAL.ENTER_AMOUNT' | translate"
+                        aria-describedby="cashClosingAmount-error"
+                        aria-required="true"
+                    />
+                </app-input-error-message-handler>
+            </div>
+
+            <!-- ── Card 2: إغلاق شبكة ── -->
+            <div class="pos-closing-card">
+                <div class="pos-closing-card__header">
+                    <span class="pos-closing-card__type">إغلاق شبكة</span>
+                    @if (currentUserDaily()?.value?.dailyJournalPeriods?.networkAccountName) {
+                        <span class="pos-closing-card__account">
+                            {{ currentUserDaily()?.value?.dailyJournalPeriods?.networkAccountName }}
+                        </span>
+                    }
+                </div>
+                <app-input-error-message-handler [fc]="fg.get('networkClosingAmount')">
+                    <input
+                        pInputText
+                        appAllowNumbers
+                        appDecimalMask
+                        [allowDecimal]="true"
+                        [fixed]="2"
+                        [decimalPlaces]="2"
+                        inputmode="decimal"
+                        class="pos-input"
+                        id="networkClosingAmount"
+                        formControlName="networkClosingAmount"
+                        [placeholder]="'DAILY_JOURNAL.ENTER_AMOUNT' | translate"
+                        aria-describedby="networkClosingAmount-error"
+                        aria-required="true"
+                    />
+                </app-input-error-message-handler>
+            </div>
+
+        </div>
+
+        <!-- ملاحظات ── optional -->
+        <div class="pos-field-group">
+            <label class="pos-field-label" for="closingNotes">
+                {{ 'DAILY_JOURNAL.NOTES' | translate }}
+                <span class="pos-optional-hint">(اختياري)</span>
+            </label>
+            <app-input-error-message-handler [fc]="fg.controls.closingNotes">
+                <textarea
+                    rows="3"
+                    pTextarea
+                    class="w-full pos-textarea"
+                    id="closingNotes"
+                    formControlName="closingNotes"
+                    aria-describedby="closingNotes-error"
+                    [placeholder]="'DAILY_JOURNAL.NOTES' | translate"
+                ></textarea>
+            </app-input-error-message-handler>
+        </div>
+
+        <!-- Submit -->
+        <button
+            pButton
+            appLoadingDisabled
+            type="submit"
+            class="pos-submit-btn w-full! text-white! justify-center!"
+            style="--p-button-primary-background: var(--color-dark-line); --p-button-primary-border-color: var(--color-dark-line);"
+        >
+            {{ 'ACTIONS.CLOSE' | translate }} اليومية
+        </button>
+
     </div>
 
-    <!-- العهده -->
-    <div>
-        <label>{{ 'DAILY_JOURNAL.CUSTODY_BALANCE' | translate }}</label>
-        <app-input-error-message-handler>
-            <input
-                pInputText
-                id="productName"
-                disabled
-                aria-describedby="productName-help"
-                [value]="currentUserDaily()?.value?.dailyJournalPeriods?.custodyBalance"
-            />
-        </app-input-error-message-handler>
-    </div>
-    <div>
-        <label>{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
-        <app-input-error-message-handler>
-            <input
-                pInputText
-                id="productName"
-                disabled
-                aria-describedby="productName-help"
-                [value]="currentUserDaily()?.value?.dailyJournalPeriods?.custodyAccountName"
-            />
-        </app-input-error-message-handler>
-    </div>
-
-    <!-- مبلغ غلق كاش -->
-    <div>
-        <label>{{ 'DAILY_JOURNAL.CASH_CLOSING_AMOUNT' | translate }}</label>
-        <app-input-error-message-handler [fc]="fg.get('cashClosingAmount')">
-            <input
-                pInputText
-                id="cashClosingAmount"
-                formControlName="cashClosingAmount"
-                [placeholder]="'DAILY_JOURNAL.ENTER_AMOUNT' | translate"
-            />
-        </app-input-error-message-handler>
-    </div>
-    <div>
-        <label>{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
-        <app-input-error-message-handler>
-            <input
-                pInputText
-                id="cashClosingAmount"
-                disabled
-                [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName"
-                [placeholder]="'DAILY_JOURNAL.ENTER_AMOUNT' | translate"
-            />
-        </app-input-error-message-handler>
-    </div>
-
-    <!-- مبلغ غلق شيكه -->
-    <div>
-        <label>{{ 'DAILY_JOURNAL.NETWORK_CLOSING_AMOUNT' | translate }}</label>
-        <app-input-error-message-handler [fc]="fg.get('networkClosingAmount')">
-            <input
-                pInputText
-                id="networkClosingAmount"
-                formControlName="networkClosingAmount"
-                aria-describedby="networkClosingAmount-help"
-                placeholder="ادخل الرصيد"
-            />
-        </app-input-error-message-handler>
-    </div>
-    <div>
-        <label>{{ 'DAILY_JOURNAL.ACCOUNT' | translate }}</label>
-        <app-input-error-message-handler>
-            <input pInputText disabled [value]="currentUserDaily()?.value?.dailyJournalPeriods?.cashAccountName" />
-        </app-input-error-message-handler>
-    </div>
-
-    <!-- ملاحظات -->
-    <div class="col-span-2">
-        <label for="closingNotes" class="journal-label">{{ 'DAILY_JOURNAL.NOTES' | translate }}</label>
-        <app-input-error-message-handler [fc]="fg.controls.closingNotes">
-            <textarea
-                rows="5"
-                cols="30"
-                pTextarea
-                class="w-full"
-                id="closingNotes"
-                formControlName="closingNotes"
-                aria-describedby="closingNotes-help"
-                [placeholder]="'DAILY_JOURNAL.NOTES' | translate"
-            ></textarea>
-        </app-input-error-message-handler>
-    </div>
-
-    <button
-        pButton
-        appLoadingDisabled
-        style="--p-button-primary-background: var(--color-dark-line)"
-        class="border-dark-line! text-white! py-1! md:px-8! w-fit ms-auto mt-4 col-span-2"
-        type="submit"
-    >
-        {{ 'ACTIONS.CLOSE' | translate }}
-    </button>
 </form>

@@ -162,6 +162,12 @@
         },
         "RESTAURANT": {
           "LABEL": "Restaurant Info"
+        },
+        "DATABASE_SETTINGS": {
+          "LABEL": "Database Settings"
+        },
+        "CHANGE_PASSWORD": {
+          "LABEL": "Change Password"
         }
       },
       
@@ -282,6 +288,12 @@
     "ADD": "Add New Delivery"
   },
 
+  "RESTAURANT": {
+    "ADD_TABLE": "Add New Table",
+    "ADD_ROOM": "Add New Room",
+    "ADD_HUT": "Add New Hut"
+  },
+
   "USERS": {
     "EXPLORER": "Users Explorer",
     "ADD": "Add New User"
@@ -344,6 +356,8 @@
   "CLASSES": {
     "PRODUCTS": {
       "NAME": "Product Name",
+      "BASIC_INFO": "Basic Information",
+      "PRICING": "Pricing",
       "PRICE": "Product Price",
       "COST_PRICE": "Cost Price",
       "GROUP": "Group",
@@ -355,6 +369,7 @@
       "IMAGE": "Product Image",
       "DETAIL": "Product Detail",
       "UNITS": "Product Units",
+      "UNITS_HINT": "Define selling units and conversion quantities — one main unit is required",
       "COMPONENTS": "Product Components",
       "PRODUCT_ADDITION": "Product as Add-on"
     },

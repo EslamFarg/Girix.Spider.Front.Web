@@ -1,0 +1,155 @@
+<div class="overflow-auto h-full no-scrollbar">
+  <app-section-wrapper class="p-4 sm:px-6">
+    <app-app-info-nav />
+
+    <div class="mt-6 flex flex-col gap-4 max-w-4xl mx-auto">
+      <div class="text-center">
+        <h1 class="text-xl font-bold text-dark-bg-2">إعدادات قاعدة البيانات</h1>
+        <p class="text-sm text-text-gray mt-2 leading-relaxed">
+          اختر واحداً أو أكثر من إجراءات الصيانة/التصفير ثم اضغط تنفيذ.
+        </p>
+      </div>
+
+      <p-message severity="warn" styleClass="w-full">
+        تنبيه: هذه العملية قد تؤدي إلى حذف أو إعادة تعيين بيانات مهمة ولا يمكن التراجع عنها.
+      </p-message>
+
+      @if (contextualWarnings().length > 0) {
+        <div class="flex flex-col gap-2">
+          @for (warning of contextualWarnings(); track warning) {
+            <p-message severity="warn" styleClass="w-full">{{ warning }}</p-message>
+          }
+        </div>
+      }
+
+      @if (dependencyHints().length > 0) {
+        <div class="flex flex-col gap-2">
+          @for (hint of dependencyHints(); track hint) {
+            <p-message severity="info" styleClass="w-full">{{ hint }}</p-message>
+          }
+        </div>
+      }
+
+      <div class="db-settings-grid">
+        @for (option of actionOptions; track option.id) {
+          <label
+            class="db-settings-card"
+            [class.db-settings-card--selected]="isSelected(option)"
+            [for]="'maintenance-action-' + option.enum"
+          >
+            <input
+              class="sr-only"
+              type="checkbox"
+              [id]="'maintenance-action-' + option.enum"
+              [checked]="isSelected(option)"
+              (change)="toggleAction(option)"
+            />
+
+            <div class="db-settings-card__header">
+              <span class="db-settings-card__title">{{ option.name }}</span>
+              <span class="db-settings-card__enum">{{ option.enum }}</span>
+            </div>
+
+            <p class="db-settings-card__description">{{ option.description }}</p>
+
+            @if (option.warning && isSelected(option)) {
+              <p class="db-settings-card__warning">{{ option.warning }}</p>
+            }
+          </label>
+        }
+      </div>
+
+      <div class="flex justify-center pt-2">
+        <button
+          pButton
+          type="button"
+          severity="danger"
+          class="app-p-btn py-1! px-10!"
+          [disabled]="!hasSelection()"
+          (click)="openConfirmDialog()"
+        >
+          تنفيذ الإجراءات المحددة
+        </button>
+      </div>
+    </div>
+  </app-section-wrapper>
+</div>
+
+<p-dialog
+  [visible]="confirmDialogVisible()"
+  (visibleChange)="onConfirmDialogVisibleChange($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [style]="{ width: '92%', maxWidth: '28rem' }"
+  [attr.style]="'--p-mask-background:#375652e5!important;'"
+  styleClass="bg-text-lighter!"
+  class="addition-dialog"
+>
+  <ng-template #header>
+    <p class="font-bold text-center text-dark-bg-2 text-lg w-full">تأكيد تنفيذ عمليات الصيانة</p>
+  </ng-template>
+
+  <div class="flex flex-col gap-4 px-1">
+    <p-message severity="warn" styleClass="w-full">
+      <span class="block font-semibold mb-1">تنبيه:</span>
+      هذه العملية قد تؤدي إلى حذف أو إعادة تعيين بيانات مهمة ولا يمكن التراجع عنها.
+    </p-message>
+
+    <div class="db-settings-confirm-actions">
+      <span class="db-settings-confirm-actions__title">الإجراءات المحددة:</span>
+      <ul class="db-settings-confirm-actions__list">
+        @for (item of selectedActionItems(); track item.id) {
+          <li>• {{ item.name }}</li>
+        }
+      </ul>
+    </div>
+
+    @if (contextualWarnings().length > 0) {
+      <div class="flex flex-col gap-2">
+        @for (warning of contextualWarnings(); track warning) {
+          <p-message severity="warn" styleClass="w-full text-sm!">{{ warning }}</p-message>
+        }
+      </div>
+    }
+
+    <form class="flex flex-col gap-2" [formGroup]="passwordFg" (ngSubmit)="executeActions()">
+      <label for="maintenancePassword" class="text-dark-bg-1 font-medium text-sm">كلمة المرور الحالية</label>
+      <app-input-error-message-handler [fc]="passwordFg.get('password')">
+        <p-password
+          #passwordField
+          id="maintenancePassword"
+          class="app-input h-12! [&>input]:h-12! w-full"
+          formControlName="password"
+          placeholder="كلمة المرور الحالية"
+          [toggleMask]="true"
+          [feedback]="false"
+        />
+      </app-input-error-message-handler>
+    </form>
+  </div>
+
+  <ng-template #footer>
+    <div class="flex justify-center gap-2 w-full *:px-8! *:py-0.75! *:text-sm! *:font-bold">
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        class="bg-dark-bg-2"
+        (click)="onConfirmDialogVisibleChange(false)"
+      >
+        إلغاء
+      </button>
+      <button
+        appLoadingDisabled
+        pButton
+        type="button"
+        severity="danger"
+        [disabled]="!canExecute"
+        (click)="executeActions()"
+      >
+        تنفيذ
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

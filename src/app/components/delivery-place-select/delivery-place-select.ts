@@ -1,4 +1,5 @@
 import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CustomerSearchEnum, CustomerService } from '@/features/customers/services/customer-service';
 import { ICustomerSearchRow } from '@/features/customers/services/customer-types';
 import {
@@ -11,6 +12,7 @@ import { OrderLocationType } from '@/features/orders';
 import { BaseComponent } from '../base-component/base-component';
 import { SelectorPopupShell } from '../selector-popup-shell/selector-popup-shell';
 import { ButtonDirective } from 'primeng/button';
+import { MaintenanceService } from '@/features/settings/services/maintenance-service';
 
 export type DeliveryPlaceSelection = {
     orderType: OrderLocationType.PersonDelivery | OrderLocationType.CompanyDelivery;
@@ -72,6 +74,17 @@ export class DeliveryPlaceSelect extends BaseComponent {
     constructor() {
         super();
         this.loadItems(1);
+        inject(MaintenanceService)
+            .deliveryReset$
+            .pipe(takeUntilDestroyed())
+            .subscribe(() => this.onDeliveryReset());
+    }
+
+    private onDeliveryReset() {
+        this.searchTerm.set('');
+        this.tempSelection.set(null);
+        this.paginationInfo = { pageIndex: 1, totalPagesCount: 1, totalRowsCount: 0 };
+        this.loadItems(1);
     }
 
     setDeliveryType(isCompany: boolean) {
@@ -93,9 +106,11 @@ export class DeliveryPlaceSelect extends BaseComponent {
                 })
                 .subscribe({
                     next: (res) => {
-                        if (res.value.rows.length === 0) return;
-                        if (pageIndex === 1) this.companyDeliveries.set(res.value.rows);
-                        else this.companyDeliveries.update((prev) => prev.concat(res.value.rows));
+                        if (pageIndex === 1) {
+                            this.companyDeliveries.set(res.value.rows);
+                        } else if (res.value.rows.length > 0) {
+                            this.companyDeliveries.update((prev) => prev.concat(res.value.rows));
+                        }
                         this.paginationInfo = {
                             pageIndex,
                             totalPagesCount: res.value.paginationInfo.totalPagesCount,
@@ -112,9 +127,11 @@ export class DeliveryPlaceSelect extends BaseComponent {
                 })
                 .subscribe({
                     next: (res) => {
-                        if (res.value.rows.length === 0) return;
-                        if (pageIndex === 1) this.deliveries.set(res.value.rows);
-                        else this.deliveries.update((prev) => prev.concat(res.value.rows));
+                        if (pageIndex === 1) {
+                            this.deliveries.set(res.value.rows);
+                        } else if (res.value.rows.length > 0) {
+                            this.deliveries.update((prev) => prev.concat(res.value.rows));
+                        }
                         this.paginationInfo = {
                             pageIndex,
                             totalPagesCount: res.value.paginationInfo.totalPagesCount,

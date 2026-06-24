@@ -1,0 +1,53 @@
+/* Shared compact master-data action buttons (Tables, Rooms, Huts, Groups, Delivery) */
+
+.rest-compact-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.rest-compact-action-btn.p-button {
+  width: 120px !important;
+  height: 34px !important;
+  min-width: 120px !important;
+  min-height: 34px !important;
+  padding-block: 0 !important;
+  padding-inline: 16px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  white-space: nowrap;
+  justify-content: center !important;
+}
+
+.rest-compact-action-btn--save.p-button {
+  box-shadow: 0 1px 4px rgba(55 86 82 / 0.28);
+}
+
+.rest-compact-action-btn--save.p-button:hover {
+  box-shadow: 0 2px 6px rgba(55 86 82 / 0.35);
+}
+
+.rest-compact-action-btn--new.p-button {
+  font-weight: 600 !important;
+}
+
+.rest-compact-action-btn.p-button:disabled,
+.rest-compact-action-btn.p-button[disabled] {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .rest-compact-header__actions {
+    width: 100%;
+  }
+
+  .rest-compact-action-btn.p-button {
+    flex: 1;
+    min-width: 0 !important;
+    width: auto !important;
+  }
+}

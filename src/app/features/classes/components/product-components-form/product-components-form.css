@@ -1,0 +1,178 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Product Components Table  —  professional inline-editing layout
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:host {
+  --pc-radius:  8px;
+  --pc-font-sz: 13px;
+  --pc-row-h:   44px;
+  --pc-head-h:  40px;
+  --pc-input-h: 34px;
+  --pc-gap:     4px;
+}
+
+/* ── Table layout ───────────────────────────────────────────────────── */
+.pc-table {
+  table-layout: fixed;
+  width: 100%;
+  border-spacing: 0 2px !important;
+}
+
+.pc-table th,
+.pc-table td {
+  max-width: none !important;
+  overflow: visible !important;    /* allow dropdowns to overflow */
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+/* ── Column widths (percentage-based) ──────────────────────────────── */
+.pc-col-index     { width: 4%;  }
+.pc-col-component { width: 42%; }
+.pc-col-unit      { width: 18%; }
+.pc-col-qty       { width: 14%; }
+.pc-col-price     { width: 14%; }
+.pc-col-actions   { width: 8%;  }
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.pc-table thead tr {
+  height: var(--pc-head-h);
+}
+
+.pc-table thead th {
+  height: var(--pc-head-h) !important;
+  padding: 0 8px !important;
+  font-size: var(--pc-font-sz) !important;
+  font-weight: 700 !important;
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* name column right-aligned */
+.pc-col-component { text-align: right; }
+
+/* ── Body rows — override global animation ─────────────────────────── */
+.pc-table tbody tr {
+  height: var(--pc-row-h);
+  animation: none !important;       /* stop showTableRow */
+  opacity: 1 !important;
+}
+
+.pc-table tbody td {
+  padding: 4px 6px !important;
+  height: var(--pc-row-h) !important;
+  border-bottom: 1px solid var(--color-text-lighter, #eef0f2) !important;
+  vertical-align: middle;
+  animation: none !important;       /* stop showTableRowCell */
+  font-size: var(--pc-font-sz) !important;
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+.pc-table tbody td > div {
+  animation: none !important;       /* stop showTableRowCellContent */
+  opacity: 1 !important;
+  max-height: none !important;      /* override global max-height: 0 */
+  overflow: visible !important;     /* override global overflow: hidden */
+}
+
+/* ── Add row (first tbody row) ─────────────────────────────────────── */
+.pc-table tbody tr:first-child {
+  background: rgba(55 86 82 / 0.03);
+  border-radius: var(--pc-radius);
+}
+
+/* Add row hash placeholder */
+.pc-add-label {
+  color: var(--color-text-gray, #889898);
+  font-size: var(--pc-font-sz);
+  text-align: center;
+}
+
+/* ── Inputs & selects inside cells ─────────────────────────────────── */
+.pc-table tbody td app-input-error-message-handler,
+.pc-table tbody td .ng-select,
+.pc-table tbody td input.app-input {
+  width: 100%;
+}
+
+.pc-table tbody td input.app-input {
+  height: var(--pc-input-h) !important;
+  min-height: var(--pc-input-h) !important;
+  font-size: var(--pc-font-sz) !important;
+  border-radius: var(--pc-radius) !important;
+}
+
+/* ── Center alignment for qty & price cols ─────────────────────────── */
+.pc-col-qty,
+.pc-col-price {
+  text-align: center;
+}
+
+/* ── Price display cell ─────────────────────────────────────────────── */
+.pc-price-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  letter-spacing: 0.02em;
+  font-size: var(--pc-font-sz);
+  font-weight: 600;
+  color: var(--color-dark-bg-2);
+  height: var(--pc-input-h);
+  border-radius: var(--pc-radius);
+  background: rgba(55 86 82 / 0.06);
+  padding: 0 8px;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* ── Action button: Add ─────────────────────────────────────────────── */
+.pc-btn-add {
+  height: var(--pc-input-h) !important;
+  padding-inline: 14px !important;
+  font-size: var(--pc-font-sz) !important;
+  font-weight: 600 !important;
+  border-radius: var(--pc-radius) !important;
+  white-space: nowrap;
+  width: 100%;
+}
+
+/* ── Action buttons column — delete ────────────────────────────────── */
+.pc-table .actions {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+}
+
+.pc-table .actions > * {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Row hover highlight ────────────────────────────────────────────── */
+.pc-table tbody tr:not(:first-child):hover td {
+  background: rgba(55 86 82 / 0.03) !important;
+}
+
+/* Hover: subtle border highlight on ng-select inside existing rows */
+.pc-table tbody tr:not(:first-child):hover td .ng-select .ng-select-container {
+  border-color: var(--color-primary, #375652);
+  transition: border-color 0.15s ease;
+}
+
+.pc-table tbody tr:not(:first-child):hover td input.app-input {
+  border-color: var(--color-primary, #375652);
+  transition: border-color 0.15s ease;
+}
+
+/* ── Last-clicked row highlight ─────────────────────────────────────── */
+.last-clicked-table-row td {
+  background: rgba(55 86 82 / 0.04) !important;
+}

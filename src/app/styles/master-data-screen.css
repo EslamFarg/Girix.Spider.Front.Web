@@ -1,0 +1,85 @@
+/* ================================================================
+   ERP/POS Master-Data Screen — Shared Design System
+   Used by: Tables, Rooms, Cottages, and similar CRUD list screens.
+   ================================================================ */
+
+:root {
+  --erp-input-h: 44px;
+  --erp-btn-h: 36px;
+  --erp-row-h: 48px;
+  --erp-radius: 10px;
+  --erp-gap: 12px;
+  --erp-padding: 16px;
+  --erp-icon-sz: 18px;
+}
+
+/* ─── Compact form label spacing ──────────────────────────────── */
+.master-data-form label:has(+ app-input-error-message-handler) {
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+/* ─── Input field height ─────────────────────────────────────── */
+.erp-input {
+  height: var(--erp-input-h) !important;
+}
+
+/* ─── Action buttons (Save / New) ───────────────────────────── */
+.erp-action-btn {
+  height: var(--erp-btn-h) !important;
+  min-width: 76px;
+  font-size: 13px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border-radius: var(--erp-radius) !important;
+}
+
+/* ─── Table column widths (3-column name + actions layout) ─── */
+.erp-compact-table {
+  table-layout: fixed;
+}
+
+.erp-compact-table .erp-col-index {
+  width: 10%;
+}
+
+.erp-compact-table .erp-col-name {
+  width: 70%;
+}
+
+.erp-compact-table .erp-col-actions {
+  width: 20%;
+}
+
+.erp-compact-table th,
+.erp-compact-table td {
+  max-width: none;
+}
+
+/* ─── Sticky table header ────────────────────────────────────── */
+.erp-compact-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: var(--color-dark-bg-2);
+}
+
+/* ─── Compact row height override ───────────────────────────── */
+.erp-compact-table tbody td {
+  padding: 6px 8px !important;
+}
+
+.erp-compact-table tbody td > div {
+  max-height: var(--erp-row-h) !important;
+}
+
+/* ─── Edit / Delete action icons ─────────────────────────────── */
+.erp-compact-table .actions > * {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.erp-compact-table .actions svg {
+  width: var(--erp-icon-sz) !important;
+  height: var(--erp-icon-sz) !important;
+}

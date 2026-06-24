@@ -5,14 +5,22 @@ import { ButtonDirective } from 'primeng/button';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
 import { InputTextModule } from 'primeng/inputtext';
 import { SectionWrapper } from '@/components/section-wrapper/section-wrapper';
-import { Paginator, PaginatorState } from 'primeng/paginator';
+import { API_GRID_PAGE_SIZE } from '@/core/constants/pagination.constants';
 import { IRoomReadResponse, IRoomSearchRow, RoomSearchEnum, RoomService } from '../../services/room-service';
+import {
+  clearMasterDataEditMode,
+  isMasterDataRowSelected,
+  logRowSelectClick,
+  RowSelectSource,
+  selectMasterDataRow,
+} from '../../utils/master-data-row-edit';
 import { noSymbolsAllowed } from '@/yn-ng/utils/text-validators';
 import { omitKeys } from '@/yn-ng/utils/helpers';
 import { Debounce } from '@/directives/debounce';
 import { MenuItem } from 'primeng/api';
-import { LoadingDisabledDirective } from "@/directives/loading-disabled";
+import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 import { TooltipModule } from 'primeng/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-rooms',
@@ -21,12 +29,12 @@ import { TooltipModule } from 'primeng/tooltip';
     InputErrorMessageHandler,
     InputTextModule,
     SectionWrapper,
-    Paginator,
     ButtonDirective,
     Debounce,
     LoadingDisabledDirective,
-    TooltipModule
-],
+    TooltipModule,
+    TranslatePipe,
+  ],
   templateUrl: './rooms.html',
   styleUrl: './rooms.css',
 })
@@ -55,10 +63,25 @@ export class Rooms extends BaseComponent {
 
   searchFg = this.fb.group(this.initialSearchFormValue);
 
-  resetRoomForm = () => {
-    this.roomFg.reset();
-    this.currentItem = null;
-  };
+  get isEditMode() {
+    return !!this.currentItem;
+  }
+
+  isRowSelected = (rowId: number) => isMasterDataRowSelected(rowId, this.currentItem);
+
+  resetRoomForm = () => clearMasterDataEditMode(this.roomFg, (item) => (this.currentItem = item));
+
+  onRowSelect(item: IRoomSearchRow, source: RowSelectSource = 'row') {
+    logRowSelectClick(item, source, 'rooms');
+    selectMasterDataRow(
+      item.id,
+      (id) => this.roomService.getById(id),
+      this.roomFg,
+      (res) => (this.currentItem = res),
+      undefined,
+      { screen: 'rooms', source },
+    );
+  }
 
   periodOptions = [
     { label: 'الكل', value: null },
@@ -71,11 +94,11 @@ export class Rooms extends BaseComponent {
   filterMenuItems = signal<MenuItem[]>([
     {
       label: 'الاسم',
-      command: (event) => this.searchFg.patchValue({ searchEnum: RoomSearchEnum.Name }),
+      command: () => this.searchFg.patchValue({ searchEnum: RoomSearchEnum.Name }),
     },
     {
       label: 'متاح',
-      command: (event) => this.searchFg.patchValue({ searchEnum: RoomSearchEnum.IsAvaliable }),
+      command: () => this.searchFg.patchValue({ searchEnum: RoomSearchEnum.IsAvaliable }),
     },
   ]);
 
@@ -99,7 +122,7 @@ export class Rooms extends BaseComponent {
       .search({
         paginationInfo: {
           pageIndex: pageIndex,
-          pageSize: 10,
+          pageSize: API_GRID_PAGE_SIZE,
         },
         searchFilters: [
           {
@@ -144,17 +167,7 @@ export class Rooms extends BaseComponent {
     }
   }
 
-  onPageChange = (event: PaginatorState) => this.searchRooms(event.page! + 1);
   onSearchSubmit = () => this.searchFg.valid && this.searchRooms(1);
-
-  fetchAndBindTableData(roomId: number) {
-    return this.roomService.getById(roomId).subscribe({
-      next: (res) => {
-        this.roomFg.patchValue(res);
-        this.currentItem = res;
-      },
-    });
-  }
 
   deleteRoom(id: number, event: Event) {
     this.confirmationService.confirm({
@@ -173,8 +186,13 @@ export class Rooms extends BaseComponent {
         severity: 'danger',
       },
 
-      accept: () => this.roomService.delete(id).subscribe({ next: () => this.searchRooms(1) }),
-      
+      accept: () =>
+        this.roomService.delete(id).subscribe({
+          next: () => {
+            if (this.currentItem?.id === id) this.resetRoomForm();
+            this.searchRooms(1);
+          },
+        }),
     });
   }
 }

@@ -1,12 +1,13 @@
 import { FormMode, IPaginationInfo } from '@/components/base-component/base-component';
 import { InputErrorMessageHandler } from '@/yn-ng/components/input-error-message-handler/input-error-message-handler';
-import { Component, computed, effect, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, OnInit, output, signal } from '@angular/core';
 import { BaseComponent } from '@/components/base-component/base-component';
 import { ButtonDirective } from 'primeng/button';
 import { CarouselModule } from 'primeng/carousel';
 import { InputText } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
+import { ToggleSwitch } from 'primeng/toggleswitch';
 import { GroupService, IGroupReadResponse } from '../../services/group-service';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { IGroupFgControls } from './types';
@@ -29,6 +30,7 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
         SelectModule,
         CarouselModule,
         TextareaModule,
+        ToggleSwitch,
         NgSelectComponent,
         Debounce,
         ButtonDirective,
@@ -43,6 +45,11 @@ import { LoadingDisabledDirective } from '@/directives/loading-disabled';
 })
 export class GroupForm extends BaseComponent implements OnInit {
     id = input.required<number>();
+    /** Embed in a single-screen master-detail page instead of navigating on save/reset */
+    singleScreenMode = input<boolean>(false);
+    afterSave = output<void>();
+    afterReset = output<void>();
+
     formMode = computed(() => {
         if (this.existingGroup()) return FormMode.Update;
         return this.initialFormMode();
@@ -78,19 +85,20 @@ export class GroupForm extends BaseComponent implements OnInit {
     groupService = inject(GroupService);
     groupFg = this.fb.group(this.initialGroupFgValue);
     existingGroup = signal<IGroupReadResponse | null>(null);
-    /**
-     *
-     */
+
     constructor() {
         super();
-    }
 
-    ngOnInit() {
-        this.searchPrinters(1);
+        // Reactive loading: re-runs whenever id or initialFormMode changes.
+        // This supports single-screen row-selection without re-mounting the component.
+        effect(() => {
+            const id = this.id();
+            const mode = this.initialFormMode();
 
-        switch (this.formMode()) {
-            case FormMode.Update:
-                this.groupService.getById(this.id()).subscribe({
+            this._resetFormState();
+
+            if (id > 0 && mode === FormMode.Update) {
+                this.groupService.getById(id).subscribe({
                     next: (group) => {
                         this.existingGroup.set(group);
                         this.groupFg.patchValue({
@@ -110,14 +118,33 @@ export class GroupForm extends BaseComponent implements OnInit {
                         });
                     },
                 });
-                break;
-            default:
-                break;
-        }
+            }
+        });
+    }
 
-        // this.setDebounceItem<{ searchValue: string; pageIndex: number }>('searchGroups', (e) =>
-        //   this.searchPrinters(e.pageIndex, e.searchValue),
-        // );
+    ngOnInit() {
+        this.searchPrinters(1);
+    }
+
+    /** Reset all form-related state to create-mode defaults.
+     *  IMPORTANT: pass primitive values, NOT the initialGroupFgValue object
+     *  (which contains FormControl instances — passing FormControls to reset()
+     *  would set each control's VALUE to a FormControl object → [object Object]). */
+    private _resetFormState() {
+        this.existingGroup.set(null);
+        this.currentImage.set(null);
+        this.currentPrinter.set(null);
+        this.groupFg.reset({
+            nameEn: '',
+            nameAr: '',
+            isOnCasher: false,
+            printerId: null,
+            description: '',
+            images: [],
+            id: null,
+            imagesAdd: [],
+            listIdsOfDeleteImages: [],
+        });
     }
 
     onSubmitForm() {
@@ -125,8 +152,6 @@ export class GroupForm extends BaseComponent implements OnInit {
             nameEn: this.groupFg.value.nameAr?.trim(),
         });
         if (this.groupFg.invalid) {
-            console.log('invalid');
-            console.log(this.groupFg.value);
             this.groupFg.markAllAsTouched();
             return;
         }
@@ -143,8 +168,6 @@ export class GroupForm extends BaseComponent implements OnInit {
         }
         const formData = new FormData();
 
-        console.log(formValues);
-
         Array.from(Object.entries(formValues)).forEach(([key, value]) => {
             if (Array.isArray(value)) {
                 value.forEach((val) => formData.append(key, val));
@@ -156,17 +179,25 @@ export class GroupForm extends BaseComponent implements OnInit {
         switch (this.formMode()) {
             case FormMode.Create:
                 this.groupService.create(formData).subscribe({
-                    next: (res) => {
-                        console.log(res);
-                        this.router.navigate(['/classes/groups']);
+                    next: () => {
+                        if (this.singleScreenMode()) {
+                            this._resetFormState();
+                            this.afterSave.emit();
+                        } else {
+                            this.router.navigate(['/classes/groups']);
+                        }
                     },
                 });
                 break;
             case FormMode.Update:
                 this.groupService.patch(formData).subscribe({
-                    next: (res) => {
-                        console.log(res);
-                        this.router.navigate(['/classes/groups']);
+                    next: () => {
+                        if (this.singleScreenMode()) {
+                            this._resetFormState();
+                            this.afterSave.emit();
+                        } else {
+                            this.router.navigate(['/classes/groups']);
+                        }
                     },
                 });
                 break;
@@ -208,7 +239,6 @@ export class GroupForm extends BaseComponent implements OnInit {
     }
     onDeleteImage() {
         if (!this.currentImage()?.file) {
-            console.log(this.currentImage()?.id);
             this.groupFg.patchValue({ listIdsOfDeleteImages: [this.currentImage()?.id] });
         }
         this.currentImage.set(null);
@@ -264,7 +294,6 @@ export class GroupForm extends BaseComponent implements OnInit {
             })
             .subscribe({
                 next: (res) => {
-                    console.log(res.value.rows);
                     if (res.value.rows.length === 0) return;
                     if (pageIndex === 1) {
                         this.printers.set(res.value.rows);
@@ -281,7 +310,6 @@ export class GroupForm extends BaseComponent implements OnInit {
     }
 
     debouncedPrinterSearch(event: any) {
-        console.log(event);
         const searchValue = event?.term ?? '';
         if (this.previousSearchValue === searchValue) {
             this.searchPrinters(this.printersPaginationInfo.pageIndex + 1, searchValue);
@@ -290,8 +318,11 @@ export class GroupForm extends BaseComponent implements OnInit {
         }
     }
     onResetForm() {
-        if (this.formMode() === FormMode.Create) {
-            this.groupFg.reset();
+        if (this.singleScreenMode()) {
+            this._resetFormState();
+            this.afterReset.emit();
+        } else if (this.formMode() === FormMode.Create) {
+            this._resetFormState();
         } else {
             this.router.navigateByUrl('/classes/groups/add');
         }
@@ -313,7 +344,16 @@ export class GroupForm extends BaseComponent implements OnInit {
                 severity: 'danger',
             },
             accept: () =>
-                this.groupService.delete(id).subscribe({ next: () => this.router.navigate(['/classes/groups/add']) }),
+                this.groupService.delete(id).subscribe({
+                    next: () => {
+                        if (this.singleScreenMode()) {
+                            this._resetFormState();
+                            this.afterSave.emit();
+                        } else {
+                            this.router.navigate(['/classes/groups/add']);
+                        }
+                    },
+                }),
         });
     }
 }

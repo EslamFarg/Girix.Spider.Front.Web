@@ -20,8 +20,12 @@
       color: var(--color-text-lighter);
       padding: 8px;
       border-bottom: 1px solid var(--color-text-gray);
-
       text-align: center;
+      /* sticky header — activates when table is inside a scrollable container */
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background-color: var(--color-dark-bg-2);
     }
   }
   tbody tr {
@@ -96,8 +100,8 @@
     align-items: center;
     gap: 8px;
     & > * {
-      width: 35px;
-      height: 35px;
+      width: 32px;
+      height: 32px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -255,41 +259,74 @@ label + app-input-error-message-handler input */ {
 }
 /* ng-select */
 .ng-select.app-select {
-  /* background: var(--p-select-background); */
   --height: 32px;
+
+  /* ── Container ── */
   & .ng-select-container {
     border: 1px solid var(--p-form-field-border-color);
     background-color: var(--p-form-field-background);
-    /* padding: var(--p-form-field-padding-y) var(--p-form-field-padding-x); */
     color: var(--p-form-field-color);
     border-radius: var(--p-form-field-border-radius) !important;
-    height: auto;
     min-height: var(--height);
     height: var(--height);
+    display: flex !important;
+    align-items: center !important;
     transition:
       background var(--p-form-field-transition-duration),
       color var(--p-form-field-transition-duration),
       border-color var(--p-form-field-transition-duration),
       outline-color var(--p-form-field-transition-duration),
       box-shadow var(--p-form-field-transition-duration);
-    & .ng-value-container {
-      /* padding-left: 0; */
-      /* & .ng-input {
-        top: 50%;
-        transform: translateY(-50%);
-      } */
-    }
 
     &:hover {
       border-color: var(--p-form-field-hover-border-color);
     }
   }
+
+  /* ── Value + placeholder container ── */
+  & .ng-select-container .ng-value-container {
+    display: flex !important;
+    align-items: center !important;
+    align-self: stretch !important;
+    flex: 1 !important;
+    min-width: 0;
+    /* Reset multiple-select default padding-top that pushes content down */
+    padding-top: 0 !important;
+  }
+
+  /* ── Single-select: fix absolutely-positioned ng-input (default theme sets top:5px) ── */
+  &.ng-select-single .ng-select-container .ng-value-container .ng-input {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+  }
+
+  /* ── Multiple-select placeholder: default theme sets top:5px / padding-bottom:5px ── */
+  &.ng-select-multiple .ng-select-container .ng-value-container .ng-placeholder {
+    top: auto !important;
+    padding-bottom: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* ── Arrow wrapper: stretch full container height, center the arrow inside ── */
+  & .ng-select-container .ng-arrow-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: stretch !important;
+    height: auto !important;
+    /* reset any top/transform overrides from component-level encapsulation */
+    top: unset !important;
+    transform: none !important;
+    position: static !important;
+  }
+
+  /* ── Dropdown panel ── */
   & .ng-dropdown-panel {
     border: 1px solid var(--p-form-field-border-color);
     animation: popIn 0.15s ease-in-out;
     background-color: transparent;
     overflow: hidden;
-    /* margin-top: 0px !important; */
     border-radius: var(--p-form-field-border-radius);
     & .ng-option.ng-option-marked,
     & .ng-option {
@@ -308,20 +345,8 @@ label + app-input-error-message-handler input */ {
       bottom: calc(100% + 2px);
     }
   }
-  /* & .ng-value {
-    z-index: 2;
-  } */
-  & .ng-input {
-    /* &:has(input[aria-expanded='true']) {
-      position: absolute;
-      z-index: 3 !important;
-    } */
-    /* padding-right: 6px !important; */
-    /* & input {
-      height: auto !important;
-      cursor: text;
-    } */
-  }
+
+  /* ── Focus ring ── */
   &:not(&.ng-select-disable).ng-select-focused {
     & .ng-select-container {
       border-color: var(--p-form-field-focus-border-color);
@@ -331,14 +356,6 @@ label + app-input-error-message-handler input */ {
       outline-offset: var(--p-form-field-focus-ring-offset);
     }
   }
-  /* & .ng-placeholder {
-    z-index: 2;
-  } */
-  /* &.ng-select-single .ng-select-container .ng-value-container .ng-input {
-    top: 50%;
-    z-index: 1;
-    transform: translateY(-50%);
-  } */
 }
 
 .disabled {

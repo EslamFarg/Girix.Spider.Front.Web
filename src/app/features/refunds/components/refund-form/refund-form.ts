@@ -27,6 +27,11 @@ import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { TooltipModule } from 'primeng/tooltip';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FormsModule } from '@angular/forms';
+import { AllowNumbers } from '@/directives/allow-numbers';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { TranslatePipe } from '@ngx-translate/core';
+import { FinancialAccountService } from '@/features/accounts/services/financial-account-service';
+import { ITreeFinancialAccountSearchRow } from '@/features/accounts/types';
 import { buildSalesReturnPrintHtml, getPaymentMethodLabel, IRefundPrintLine } from '../../utils/refund-print.util';
 
 interface IRefundItemFormRow {
@@ -75,6 +80,9 @@ const ORDER_TYPE_LABELS: Record<number, string> = {
     InputGroupAddon,
     TooltipModule,
     CheckboxModule,
+    AllowNumbers,
+    NgSelectModule,
+    TranslatePipe,
   ],
   templateUrl: './refund-form.html',
   styleUrl: './refund-form.css',
@@ -84,6 +92,7 @@ export class RefundForm extends BaseComponent implements OnInit {
   orderService = inject(OrderService);
   dailyJournalService = inject(DailyJournalService);
   a4PrintService = inject(A4PrintService);
+  financialAccountService = inject(FinancialAccountService);
 
   formMode = input<FormMode>(FormMode.Create);
   refundId = input<number>(0);
@@ -91,20 +100,61 @@ export class RefundForm extends BaseComponent implements OnInit {
   OrderPaymentType = OrderPaymentType;
 
   searchInvoiceFg = this.fb.group({ term: this.fb.control('') });
-  searchReturnFg = this.fb.group({ term: this.fb.control('') });
+  searchReturnNumberFg = this.fb.group({ term: this.fb.control('') });
+  searchReturnVoucherFg = this.fb.group({ term: this.fb.control('') });
 
   orderData = signal<IOrderLatestUpdateResponse | IRefundResponse | null>(null);
   qtyRevision = signal(0);
   returnAllChecked = signal(false);
+  voucherNumberDisplay = signal('-');
+
+  cashAccounts = signal<Omit<ITreeFinancialAccountSearchRow, 'stage'>[]>([]);
+  networkAccounts = signal<Omit<ITreeFinancialAccountSearchRow, 'stage'>[]>([]);
+
+  displayedCashAccounts = computed(() => {
+    const accounts = this.cashAccounts();
+    const userDetails = this.authService.userDetails();
+    const defaultAccount: ITreeFinancialAccountSearchRow | null = userDetails?.cashPaymentAccountId
+      ? ({ id: userDetails.cashPaymentAccountId, name: userDetails.cashPaymentAccountName ?? '' } as ITreeFinancialAccountSearchRow)
+      : null;
+    if (!defaultAccount) return [...accounts];
+    return accounts.some((a) => a.id === defaultAccount.id) ? [...accounts] : [defaultAccount, ...accounts];
+  });
+
+  displayedNetworkAccounts = computed(() => {
+    const accounts = this.networkAccounts();
+    const userDetails = this.authService.userDetails();
+    const defaultAccount: ITreeFinancialAccountSearchRow | null = userDetails?.bankPaymentAccountId
+      ? ({ id: userDetails.bankPaymentAccountId, name: userDetails.bankPaymentAccountName ?? '' } as ITreeFinancialAccountSearchRow)
+      : null;
+    if (!defaultAccount) return [...accounts];
+    return accounts.some((a) => a.id === defaultAccount.id) ? [...accounts] : [defaultAccount, ...accounts];
+  });
 
   isOrderPaid = computed(() => this.orderData()?.paymentType === OrderPaymentType.Paid);
   isCreateMode = computed(() => this.formMode() === FormMode.Create);
   isLoaded = computed(() => this.orderData() !== null);
 
+  /** Persisted return id — set only when a saved refund is loaded from the API. */
+  private savedReturnId = signal<number | null>(null);
+
+  savedRecordId = computed(() => {
+    const id = this.savedReturnId();
+    if (id == null || id <= 0) return null;
+    return id;
+  });
+
+  isNewRecord = computed(() => this.savedRecordId() === null);
+
   submitLabel = computed(() => (this.isCreateMode() ? 'حفظ' : 'تعديل'));
-  canSubmit = computed(() => this.isLoaded() && (this.isCreateMode() || this.refundId() > 0));
-  canDelete = computed(() => !this.isCreateMode() && this.isLoaded() && this.refundId() > 0);
-  canPrint = computed(() => !this.isCreateMode() && this.isLoaded() && this.refundId() > 0);
+  canNew = computed(() => !this.isCreateMode());
+  canSubmit = computed(() => {
+    if (!this.isLoaded()) return false;
+    if (this.isCreateMode()) return true;
+    return this.savedRecordId() !== null;
+  });
+  canDelete = computed(() => this.savedRecordId() !== null);
+  canPrint = computed(() => this.savedRecordId() !== null);
 
   invoiceTotal = computed(() => this.orderData()?.summary?.totalNet ?? 0);
   previousReturnsTotal = computed(() => this.orderData()?.summary?.netReturnOrder ?? 0);
@@ -119,11 +169,8 @@ export class RefundForm extends BaseComponent implements OnInit {
     () => this.orderData()?.orderNumber ?? this.orderData()?.orderMasterId ?? '-',
   );
   returnNumberDisplay = computed(() =>
-    this.isCreateMode() ? '-' : String(this.refundId() || (this.orderData() as IRefundResponse)?.id || '-'),
+    this.isCreateMode() ? '-' : String(this.savedRecordId() ?? this.refundId() ?? '-'),
   );
-
-  cashAccountName = computed(() => this.authService.userDetails()?.cashPaymentAccountName ?? '-');
-  networkAccountName = computed(() => this.authService.userDetails()?.bankPaymentAccountName ?? '-');
 
   totalSoldQuantity = computed(() => {
     this.qtyRevision();
@@ -161,6 +208,8 @@ export class RefundForm extends BaseComponent implements OnInit {
   refundFg = this.fb.group({
     payingCash: this.fb.control<number>(0, [onlyNumbersOrDotAllowed]),
     payingNetwork: this.fb.control<number>(0, [onlyNumbersOrDotAllowed]),
+    cashAccountId: this.fb.control<number | null>(null),
+    networkAccountId: this.fb.control<number | null>(null),
     items: this.fb.array<FormGroup<RefundItemFormRowControls>>([], [Validators.required]),
   });
 
@@ -185,6 +234,30 @@ export class RefundForm extends BaseComponent implements OnInit {
         else if (mode === 'update') this.executeUpdate();
       }
     });
+
+    this.refundFg.get('payingCash')?.valueChanges.subscribe((value) => {
+      const total = this.calculateRefundTotal();
+      if (!this.isOrderPaid()) return;
+      let futureValue = value ?? 0;
+      if (futureValue > total) futureValue = total;
+      else if (futureValue < 0) futureValue = 0;
+      this.refundFg.patchValue(
+        { payingNetwork: +(total - futureValue).toFixed(2), payingCash: futureValue },
+        { emitEvent: false },
+      );
+    });
+
+    this.refundFg.get('payingNetwork')?.valueChanges.subscribe((value) => {
+      const total = this.calculateRefundTotal();
+      if (!this.isOrderPaid()) return;
+      let futureValue = value ?? 0;
+      if (futureValue > total) futureValue = total;
+      else if (futureValue < 0) futureValue = 0;
+      this.refundFg.patchValue(
+        { payingCash: +(total - futureValue).toFixed(2), payingNetwork: futureValue },
+        { emitEvent: false },
+      );
+    });
   }
 
   get itemRows() {
@@ -192,6 +265,8 @@ export class RefundForm extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loadFinancialAccounts();
+
     if (this.isCreateMode()) {
       this.activatedRoute.queryParamMap.subscribe((params) => {
         const orderId = Number(params.get('orderId'));
@@ -202,7 +277,7 @@ export class RefundForm extends BaseComponent implements OnInit {
         }
       });
     } else if (this.refundId()) {
-      this.searchReturnFg.patchValue({ term: String(this.refundId()) });
+      this.searchReturnNumberFg.patchValue({ term: String(this.refundId()) });
       this.refundService.getById(this.refundId()).subscribe({
         next: (res) => this.onRefundLoaded(res),
         error: () => {
@@ -214,6 +289,22 @@ export class RefundForm extends BaseComponent implements OnInit {
         },
       });
     }
+  }
+
+  private loadFinancialAccounts() {
+    this.financialAccountService.getCashAndBankAccountsAndCustodyAccounts().subscribe({
+      next: (res) => {
+        this.cashAccounts.set(res.cash);
+        this.networkAccounts.set(res.bank);
+        const userDetails = this.authService.userDetails();
+        if (userDetails?.cashPaymentAccountId) {
+          this.refundFg.patchValue({ cashAccountId: userDetails.cashPaymentAccountId }, { emitEvent: false });
+        }
+        if (userDetails?.bankPaymentAccountId) {
+          this.refundFg.patchValue({ networkAccountId: userDetails.bankPaymentAccountId }, { emitEvent: false });
+        }
+      },
+    });
   }
 
   private loadOrderForCreate(orderId: number) {
@@ -231,10 +322,14 @@ export class RefundForm extends BaseComponent implements OnInit {
 
   private resetEmptyCreateState() {
     this.orderData.set(null);
+    this.savedReturnId.set(null);
     this.itemRows.clear();
     this.addonArrays.set([]);
-    this.refundFg.reset({ payingCash: 0, payingNetwork: 0 });
+    this.refundFg.patchValue({ payingCash: 0, payingNetwork: 0 });
     this.searchInvoiceFg.reset({ term: '' });
+    this.searchReturnNumberFg.reset({ term: '' });
+    this.searchReturnVoucherFg.reset({ term: '' });
+    this.voucherNumberDisplay.set('-');
     this.returnAllChecked.set(false);
     this.bumpQtyRevision();
   }
@@ -256,6 +351,7 @@ export class RefundForm extends BaseComponent implements OnInit {
       });
     }
     this.orderData.set(order);
+    this.savedReturnId.set(null);
     this.searchInvoiceFg.patchValue({
       term: String(order.orderNumber ?? order.orderMasterId ?? ''),
     });
@@ -264,10 +360,11 @@ export class RefundForm extends BaseComponent implements OnInit {
 
   private onRefundLoaded(refund: IRefundResponse) {
     this.orderData.set(refund);
+    this.savedReturnId.set(refund.id > 0 ? refund.id : null);
     this.searchInvoiceFg.patchValue({
       term: String(refund.orderNumber ?? refund.orderMasterId ?? ''),
     });
-    this.searchReturnFg.patchValue({ term: String(refund.id) });
+    this.searchReturnNumberFg.patchValue({ term: String(refund.id) });
     this.patchFormFromRefund(refund);
   }
 
@@ -377,10 +474,6 @@ export class RefundForm extends BaseComponent implements OnInit {
     return addons.some((a) => (a.value.quantity ?? 0) > 0);
   }
 
-  hasReturnedQuantity(qty: number | null | undefined): boolean {
-    return (qty ?? 0) > 0;
-  }
-
   adjustItemQuantity(itemIndex: number, delta: number) {
     const row = this.itemRows.at(itemIndex);
     this.applyQuantityDelta(row, delta, row.value.name ?? 'الصنف');
@@ -453,32 +546,32 @@ export class RefundForm extends BaseComponent implements OnInit {
   }
 
   deleteRow(itemIndex: number) {
-    if (this.isCreateMode()) {
-      this.itemRows.removeAt(itemIndex);
-      this.addonArrays.update((arr) => {
-        const next = [...arr];
-        next.splice(itemIndex, 1);
-        return next;
-      });
-    } else {
-      this.itemRows.at(itemIndex).patchValue({ quantity: 0 });
-      const addons = this.getAddonRows(itemIndex)?.controls ?? [];
-      addons.forEach((addon) => addon.patchValue({ quantity: 0 }));
-    }
+    this.itemRows.removeAt(itemIndex);
+    this.addonArrays.update((arr) => {
+      const next = [...arr];
+      next.splice(itemIndex, 1);
+      return next;
+    });
     this.syncPaymentWithTotal();
     this.syncReturnAllCheckbox();
     this.bumpQtyRevision();
   }
 
   deleteAddonRow(itemIndex: number, addonIndex: number) {
-    if (this.isCreateMode()) {
-      this.getAddonRows(itemIndex).removeAt(addonIndex);
-    } else {
-      this.getAddonRows(itemIndex).at(addonIndex).patchValue({ quantity: 0 });
-    }
+    this.getAddonRows(itemIndex).removeAt(addonIndex);
     this.syncPaymentWithTotal();
     this.syncReturnAllCheckbox();
     this.bumpQtyRevision();
+  }
+
+  transferAllToNetwork() {
+    const total = +this.calculateRefundTotal().toFixed(2);
+    this.refundFg.patchValue({ payingCash: 0, payingNetwork: total }, { emitEvent: false });
+  }
+
+  transferAllToCash() {
+    const total = +this.calculateRefundTotal().toFixed(2);
+    this.refundFg.patchValue({ payingCash: total, payingNetwork: 0 }, { emitEvent: false });
   }
 
   private sumQuantities(field: 'quantity' | 'originalQuantity'): number {
@@ -574,11 +667,11 @@ export class RefundForm extends BaseComponent implements OnInit {
       const item = this.itemRows.at(i);
       const qty = item.value.quantity ?? 0;
       const max = item.value.originalQuantity ?? 0;
-      if (qty > max) {
+      if (qty < 0 || qty > max) {
         this.messageService.add({
           severity: 'error',
           summary: 'خطأ',
-          detail: `كمية "${item.value.name}" أكبر من الكمية المتاحة (${max}).`,
+          detail: `كمية "${item.value.name}" غير صالحة. المتاح: ${max}.`,
         });
         return false;
       }
@@ -586,11 +679,11 @@ export class RefundForm extends BaseComponent implements OnInit {
       for (const addon of addons) {
         const aQty = addon.value.quantity ?? 0;
         const aMax = addon.value.originalQuantity ?? 0;
-        if (aQty > aMax) {
+        if (aQty < 0 || aQty > aMax) {
           this.messageService.add({
             severity: 'error',
             summary: 'خطأ',
-            detail: `كمية "${addon.value.name}" أكبر من الكمية المتاحة (${aMax}).`,
+            detail: `كمية "${addon.value.name}" غير صالحة. المتاح: ${aMax}.`,
           });
           return false;
         }
@@ -673,41 +766,51 @@ export class RefundForm extends BaseComponent implements OnInit {
     });
   }
 
-  searchByReturnReference(rawTerm: string) {
+  searchByReturnNumber(rawTerm: string) {
     const term = rawTerm?.trim();
     if (!term) return;
 
-    const loadReturn = (id: number) => {
-      this.router.navigate(['/invoices/refunds', id, 'edit']);
-    };
-
-    const tryRefundSearch = (column: RefundSearchEnum) =>
-      this.refundService.search({
+    this.refundService
+      .search({
         paginationInfo: { pageIndex: 1, pageSize: 1 },
-        searchFilters: [{ column, values: [term] }],
+        searchFilters: [{ column: RefundSearchEnum.Id, values: [term] }],
         fromDate: null,
+      })
+      .subscribe({
+        next: (res) => {
+          const payload = this.unwrapSearchPayload<{ rows?: { id: number }[] }>(res);
+          const row = payload?.rows?.[0];
+          if (row) this.router.navigate(['/invoices/refunds', row.id, 'edit']);
+          else this.notifyReturnNotFound();
+        },
+        error: () => this.notifyReturnNotFound(),
       });
+  }
 
-    tryRefundSearch(RefundSearchEnum.Id).subscribe({
-      next: (res) => {
-        const payload = this.unwrapSearchPayload<{ rows?: { id: number }[] }>(res);
-        const row = payload?.rows?.[0];
-        if (row) {
-          loadReturn(row.id);
-          return;
-        }
-        tryRefundSearch(RefundSearchEnum.ReferenceNumber).subscribe({
-          next: (refRes) => {
-            const refPayload = this.unwrapSearchPayload<{ rows?: { id: number }[] }>(refRes);
-            const refRow = refPayload?.rows?.[0];
-            if (refRow) loadReturn(refRow.id);
-            else this.notifyReturnNotFound();
-          },
-          error: () => this.notifyReturnNotFound(),
-        });
-      },
-      error: () => this.notifyReturnNotFound(),
-    });
+  searchByReturnVoucher(rawTerm: string) {
+    const term = rawTerm?.trim();
+    if (!term) return;
+
+    this.refundService
+      .search({
+        paginationInfo: { pageIndex: 1, pageSize: 1 },
+        searchFilters: [{ column: RefundSearchEnum.ReferenceNumber, values: [term] }],
+        fromDate: null,
+      })
+      .subscribe({
+        next: (res) => {
+          const payload = this.unwrapSearchPayload<{ rows?: { id: number }[] }>(res);
+          const row = payload?.rows?.[0];
+          if (row) {
+            this.voucherNumberDisplay.set(term);
+            this.searchReturnVoucherFg.patchValue({ term });
+            this.router.navigate(['/invoices/refunds', row.id, 'edit']);
+          } else {
+            this.notifyReturnNotFound();
+          }
+        },
+        error: () => this.notifyReturnNotFound(),
+      });
   }
 
   private unwrapSearchPayload<T>(res: unknown): T {
@@ -786,14 +889,22 @@ export class RefundForm extends BaseComponent implements OnInit {
     this.refundService.create(payload).subscribe({
       next: (newId) => {
         const id = typeof newId === 'number' ? newId : Number(newId);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'تم',
+          detail: 'تم حفظ المرتجع بنجاح.',
+        });
         this.router.navigate(['/invoices/refunds', id, 'edit']);
       },
     });
   }
 
   private executeUpdate() {
+    const recordId = this.savedRecordId();
+    if (!recordId) return;
+
     const payload = {
-      id: this.refundId(),
+      id: recordId,
       paymentType: this.orderData()?.paymentType ?? 0,
       payingCash: +(this.refundFg.value.payingCash ?? 0).toFixed(2),
       payingNetwork: +(this.refundFg.value.payingNetwork ?? 0).toFixed(2),
@@ -807,9 +918,10 @@ export class RefundForm extends BaseComponent implements OnInit {
           summary: 'تم',
           detail: 'تم تحديث المرتجع بنجاح.',
         });
-        this.refundService.getById(this.refundId()).subscribe({
+        this.refundService.getById(recordId).subscribe({
           next: (res) => {
             this.orderData.set(res);
+            this.savedReturnId.set(res.id > 0 ? res.id : null);
             this.patchFormFromRefund(res);
           },
         });
@@ -818,17 +930,14 @@ export class RefundForm extends BaseComponent implements OnInit {
   }
 
   onNewClick() {
-    if (this.isCreateMode()) {
-      this.router.navigate(['/invoices/refunds/add']);
-      this.resetEmptyCreateState();
-    } else {
-      this.router.navigate(['/invoices/refunds/add']);
-    }
+    if (!this.canNew()) return;
+    this.router.navigate(['/invoices/refunds/add']);
   }
 
   printReturn() {
+    const recordId = this.savedRecordId();
     const data = this.orderData();
-    if (!data || !this.refundId()) return;
+    if (!data || !recordId) return;
 
     const lines: IRefundPrintLine[] = [];
     for (let i = 0; i < this.itemRows.length; i++) {
@@ -862,7 +971,7 @@ export class RefundForm extends BaseComponent implements OnInit {
 
     this.a4PrintService.print(
       buildSalesReturnPrintHtml({
-        returnNumber: (data as IRefundResponse).id ?? this.refundId(),
+        returnNumber: recordId,
         originalInvoiceNumber: data.orderNumber ?? data.orderMasterId,
         customerName: data.customer?.name ?? '-',
         date: data.dateTime,
@@ -879,6 +988,9 @@ export class RefundForm extends BaseComponent implements OnInit {
   }
 
   deleteRefund(event: Event) {
+    const recordId = this.savedRecordId();
+    if (!recordId) return;
+
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'هل أنت متأكد من حذف المرتجع؟',
@@ -888,7 +1000,7 @@ export class RefundForm extends BaseComponent implements OnInit {
       rejectButtonProps: { label: 'إلغاء', severity: 'secondary', outlined: true },
       acceptButtonProps: { label: 'حذف', severity: 'danger' },
       accept: () =>
-        this.refundService.delete(this.refundId()).subscribe({
+        this.refundService.delete(recordId).subscribe({
           next: () => this.router.navigate(['/invoices/refunds']),
         }),
     });

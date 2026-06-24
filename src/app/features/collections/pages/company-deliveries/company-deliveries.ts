@@ -16,6 +16,7 @@ import { Menu } from "primeng/menu";
 import { Listbox } from "primeng/listbox";
 import { ButtonDirective } from "primeng/button";
 import { TooltipModule } from 'primeng/tooltip';
+import { MaintenanceService } from '@/features/settings/services/maintenance-service';
 
 @Component({
   selector: 'app-company-deliveries',
@@ -67,15 +68,23 @@ export class CompanyDeliveries extends BaseComponent implements OnInit, OnDestro
   }
 
   collectionSub?: ReturnType<typeof this.collectionsService.collectionCompleted$.subscribe>;
+  deliveryResetSub?: ReturnType<typeof this.maintenanceService.deliveryReset$.subscribe>;
+  maintenanceService = inject(MaintenanceService);
 
   ngOnInit() {
     this.collectionSub = this.collectionsService.collectionCompleted$.subscribe(() => {
+      this.searchCustomers(1);
+    });
+    this.deliveryResetSub = this.maintenanceService.deliveryReset$.subscribe(() => {
+      this.fg.reset(this.initialFormValue);
+      this.isInvoiceTypeChangeDialogVisible = false;
       this.searchCustomers(1);
     });
   }
 
   override ngOnDestroy() {
     this.collectionSub?.unsubscribe();
+    this.deliveryResetSub?.unsubscribe();
     super.ngOnDestroy();
   }
   customersService = inject(CustomerService);

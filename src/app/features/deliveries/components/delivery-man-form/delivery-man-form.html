@@ -1,11 +1,191 @@
-﻿<div
+﻿@if (singleScreenMode()) {
+
+<div class="dlv-compact-shell">
+  <div class="dlv-compact-header">
+    <div class="dlv-compact-header__title">
+      @if (formMode() === FormMode.Create) {
+        <span class="dlv-compact-mode-pill dlv-compact-mode-pill--create">
+          <i class="pi pi-plus-circle"></i>
+        </span>
+        {{ 'DELIVERIES.ADD' | translate }}
+      } @else {
+        <span class="dlv-compact-mode-pill dlv-compact-mode-pill--edit">
+          <i class="pi pi-pencil"></i>
+        </span>
+        تعديل:
+        <strong class="dlv-compact-editing-name">{{ currentDelivery()?.name }}</strong>
+      }
+    </div>
+
+    <div class="dlv-compact-header__actions">
+      <button
+        type="submit"
+        form="deliveryFormCompact"
+        pButton
+        appLoadingDisabled
+        class="dlv-btn-save rest-compact-action-btn rest-compact-action-btn--save"
+      >
+        @if (formMode() === FormMode.Create) {
+          {{ 'ACTIONS.SAVE' | translate }}
+        } @else {
+          {{ 'ACTIONS.EDIT' | translate }}
+        }
+      </button>
+      <button
+        type="button"
+        pButton
+        appLoadingDisabled
+        variant="outlined"
+        class="dlv-btn-new rest-compact-action-btn rest-compact-action-btn--new"
+        (click)="onResetForm()"
+      >
+        {{ 'ACTIONS.NEW' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <form
+    id="deliveryFormCompact"
+    class="dlv-compact-body"
+    (ngSubmit)="onSubmitForm()"
+    [formGroup]="deliveryFg"
+    appLoadingDisabled
+  >
+    <div class="dlv-compact-fields-col">
+      <div class="dlv-compact-row dlv-compact-row--name-phone">
+        <div class="dlv-compact-field">
+          <label for="deliveryNameCompact">{{ 'FORM.DELIVERY_NAME' | translate }}</label>
+          <app-input-error-message-handler [fc]="localize(deliveryFg.get('nameAr'), deliveryFg.get('nameEn'))">
+            <input
+              pInputText
+              class="dlv-compact-input"
+              [id]="localize('nameArCompact', 'nameEnCompact')"
+              [formControlName]="localize('nameAr', 'nameEn')"
+              [placeholder]="'FORM.DELIVERY_NAME' | translate"
+            />
+          </app-input-error-message-handler>
+        </div>
+        <div class="dlv-compact-field">
+          <label for="phoneNumberCompact">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
+          <app-input-error-message-handler [fc]="deliveryFg.get('phoneNumber')">
+            <input
+              pInputText
+              class="dlv-compact-input"
+              id="phoneNumberCompact"
+              formControlName="phoneNumber"
+              [placeholder]="'FORM.PHONE_NUMBER' | translate"
+            />
+          </app-input-error-message-handler>
+        </div>
+      </div>
+
+      <div class="dlv-compact-row dlv-compact-row--triple-equal">
+        <div class="dlv-compact-field">
+          <label for="identityNumberCompact">{{ 'FORM.IDENTITY_NUMBER' | translate }}</label>
+          <app-input-error-message-handler [fc]="deliveryFg.get('identityNumber')">
+            <input
+              pInputText
+              class="dlv-compact-input"
+              id="identityNumberCompact"
+              formControlName="identityNumber"
+              [placeholder]="'FORM.IDENTITY_NUMBER' | translate"
+            />
+          </app-input-error-message-handler>
+        </div>
+        <div class="dlv-compact-field">
+          <label for="emailCompact">{{ 'FORM.EMAIL' | translate }}</label>
+          <app-input-error-message-handler [fc]="deliveryFg.get('email')">
+            <input
+              pInputText
+              class="dlv-compact-input"
+              id="emailCompact"
+              formControlName="email"
+              [placeholder]="'FORM.EMAIL' | translate"
+            />
+          </app-input-error-message-handler>
+        </div>
+        <div class="dlv-compact-field">
+          <label for="addressCompact">{{ 'FORM.ADDRESS' | translate }}</label>
+          <app-input-error-message-handler [fc]="deliveryFg.get('address')">
+            <input
+              pInputText
+              class="dlv-compact-input"
+              id="addressCompact"
+              formControlName="address"
+              [placeholder]="'FORM.ADDRESS' | translate"
+            />
+          </app-input-error-message-handler>
+        </div>
+      </div>
+
+      <div class="dlv-compact-row dlv-compact-row--full">
+        <div class="dlv-compact-field">
+          <label for="descriptionCompact">{{ 'FORM.DESCRIPTION' | translate }}</label>
+          <app-input-error-message-handler [fc]="deliveryFg.get('description')">
+            <textarea
+              id="descriptionCompact"
+              rows="1"
+              pTextarea
+              class="dlv-compact-input dlv-compact-textarea w-full"
+              formControlName="description"
+              [placeholder]="'FORM.DESCRIPTION' | translate"
+            ></textarea>
+          </app-input-error-message-handler>
+        </div>
+      </div>
+    </div>
+
+    <div class="dlv-compact-image-col">
+      <input
+        multiple
+        appImgOnly
+        id="deliveryFileInput"
+        type="file"
+        hidden
+        #fileInput
+        (change)="onImagesFilesSelected($event)"
+      />
+      <div class="dlv-image-wrapper">
+        @if (currentImage()) {
+          <button type="button" class="dlv-image-delete" (click)="onDeleteImage()" aria-label="حذف الصورة">
+            <i class="pi pi-trash"></i>
+          </button>
+        }
+        <label for="deliveryFileInput" class="dlv-image-label">
+          @if (currentImage()) {
+            <img [src]="currentImage()?.fullPath" appImgFallback alt="" class="dlv-image-preview" />
+          } @else {
+            <span class="dlv-image-empty">
+              <i class="pi pi-camera dlv-image-placeholder-icon"></i>
+              <span class="dlv-image-hint">رفع صورة</span>
+            </span>
+          }
+        </label>
+      </div>
+    </div>
+  </form>
+</div>
+
+} @else {
+
+<input
+  multiple
+  appImgOnly
+  id="deliveryFileInput"
+  type="file"
+  hidden
+  #fileInput
+  (change)="onImagesFilesSelected($event)"
+/>
+
+<div
   class="w-full overflow-auto custom-scroll flex items-center justify-end gap-2"
   style="--p-button-primary-background: transparent"
 >
   <button
     pButton
     appLoadingDisabled
-    class=" py-1! md:px-8! md:flex-none app-p-btn"
+    class="py-1! md:px-8! md:flex-none app-p-btn"
     form="deliveryForm"
     type="submit"
   >
@@ -15,7 +195,13 @@
       {{ 'ACTIONS.EDIT' | translate }}
     }
   </button>
-  <button appLoadingDisabled pButton class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!" variant="outlined" (click)="onResetForm()">
+  <button
+    appLoadingDisabled
+    pButton
+    class="border-dark-line! text-dark-line! py-1! flex-1 md:flex-none md:px-8!"
+    variant="outlined"
+    (click)="onResetForm()"
+  >
     جديد
   </button>
 </div>
@@ -27,60 +213,34 @@
   [formGroup]="deliveryFg"
   appLoadingDisabled
 >
-  <!-- images -->
   <div class="md:flex-1 md:max-w-50 lg:max-w-60 relative">
-    <input multiple appImgOnly id="fileInput" type="file" hidden #fileInput (change)="onImagesFilesSelected($event)" />
     @if (currentImage()) {
       <button
         (click)="onDeleteImage()"
         type="button"
         class="absolute animate-shake cursor-pointer backdrop-blur-[10px] transition-all top-2 z-10 left-2 p-1.5 rounded border border-transparent hover:bg-red-500/10 hover:border-red-500/50 group"
       >
-        <svg
-          class="group-hover:scale-125 transition-all"
-          width="15"
-          height="16"
-          viewBox="0 0 15 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            opacity="0.4"
-            d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z"
-            fill="#FF383C"
-          />
-          <path
-            d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z"
-            fill="#FF383C"
-          />
+        <svg class="group-hover:scale-125 transition-all" width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path opacity="0.4" d="M13.3136 5.99076C13.3136 6.04515 12.8872 11.4378 12.6437 13.7073C12.4912 15.1 11.5933 15.9448 10.2466 15.9688C9.21176 15.992 8.19875 16 7.20208 16C6.14394 16 5.10915 15.992 4.1047 15.9688C2.80303 15.9376 1.90439 15.076 1.75968 13.7073C1.50915 11.4298 1.09056 6.04515 1.08278 5.99076C1.075 5.82676 1.12791 5.67077 1.23528 5.54437C1.34109 5.42758 1.49359 5.35718 1.65386 5.35718H12.7503C12.9098 5.35718 13.0545 5.42758 13.1689 5.54437C13.2755 5.67077 13.3292 5.82676 13.3136 5.99076Z" fill="#FF383C"/>
+          <path d="M14.4 3.18149C14.4 2.8527 14.1409 2.59511 13.8297 2.59511H11.4971C11.0225 2.59511 10.6102 2.25752 10.5043 1.78154L10.3736 1.19836C10.1908 0.493583 9.5598 0 8.85178 0H5.549C4.8332 0 4.20843 0.493583 4.01859 1.23676L3.89643 1.78234C3.78984 2.25752 3.37748 2.59511 2.90365 2.59511H0.571083C0.259088 2.59511 0 2.8527 0 3.18149V3.48548C0 3.80627 0.259088 4.07186 0.571083 4.07186H13.8297C14.1409 4.07186 14.4 3.80627 14.4 3.48548V3.18149Z" fill="#FF383C"/>
         </svg>
       </button>
     }
     <label
-      for="fileInput"
+      for="deliveryFileInput"
       class="flex cursor-pointer items-center justify-center border-2 border-dark-line aspect-square rounded-lg h-fit mb-2 overflow-hidden"
     >
       @if (currentImage()) {
         <img [src]="currentImage()?.fullPath" appImgFallback alt="" class="w-full object-cover aspect-square" />
       } @else {
         <svg width="92" height="96" viewBox="0 0 92 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M36.105 32.98V53.475C36.105 54.4475 35.1475 55.23 33.9575 55.23C32.7675 55.23 31.81 54.4475 31.81 53.475V32.98M26.7675 32.98V53.475C26.7675 54.4475 25.81 55.23 24.62 55.23C23.43 55.23 22.4725 54.4475 22.4725 53.475V32.98M35.5375 93.9975V71.1225C35.5375 68.715 35.5525 67.63 38.595 64.5825C41.64 61.5375 41.6525 60.3475 41.6525 58.045V36.285C41.6525 34.455 40.18 32.985 38.3525 32.985H36.1075M22.4775 32.985H20.2275C18.3975 32.985 16.9275 34.455 16.9275 36.285L16.935 58.045C16.945 60.3475 16.96 61.5375 20.0025 64.5825C23.045 67.6275 23.0625 68.715 23.0525 71.12L23.04 93.9975L13.715 94C8.2275 94 4.005 89.58 3.81 84.1L1.5 19.3075L13.445 1.5H77.805L89.745 19.3075L87.435 84.1C87.24 89.58 83.0175 94 77.53 94L69.335 93.9975V64.1925C73.5025 61.23 76.0975 55.5525 76.105 49.38C76.105 40.04 70.28 32.4675 63.0925 32.465H63.085C55.8975 32.465 50.0725 40.04 50.0725 49.38C50.08 55.5525 52.6725 61.23 56.8375 64.1925V93.9975M31.815 32.985H26.7725M35.535 94H56.835M26.75 19.56V12.085C26.75 10.2575 28.2225 8.785 30.05 8.785H61.19C63.02 8.785 64.4925 10.2575 64.4925 12.085V19.56H26.75Z"
-            stroke="#375652"
-            stroke-width="3"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
+          <path d="M36.105 32.98V53.475C36.105 54.4475 35.1475 55.23 33.9575 55.23C32.7675 55.23 31.81 54.4475 31.81 53.475V32.98M26.7675 32.98V53.475C26.7675 54.4475 25.81 55.23 24.62 55.23C23.43 55.23 22.4725 54.4475 22.4725 53.475V32.98M35.5375 93.9975V71.1225C35.5375 68.715 35.5525 67.63 38.595 64.5825C41.64 61.5375 41.6525 60.3475 41.6525 58.045V36.285C41.6525 34.455 40.18 32.985 38.3525 32.985H36.1075M22.4775 32.985H20.2275C18.3975 32.985 16.9275 34.455 16.9275 36.285L16.935 58.045C16.945 60.3475 16.96 61.5375 20.0025 64.5825C23.045 67.6275 23.0625 68.715 23.0525 71.12L23.04 93.9975L13.715 94C8.2275 94 4.005 89.58 3.81 84.1L1.5 19.3075L13.445 1.5H77.805L89.745 19.3075L87.435 84.1C87.24 89.58 83.0175 94 77.53 94L69.335 93.9975V64.1925C73.5025 61.23 76.0975 55.5525 76.105 49.38C76.105 40.04 70.28 32.4675 63.0925 32.465H63.085C55.8975 32.465 50.0725 40.04 50.0725 49.38C50.08 55.5525 52.6725 61.23 56.8375 64.1925V93.9975M31.815 32.985H26.7725M35.535 94H56.835M26.75 19.56V12.085C26.75 10.2575 28.2225 8.785 30.05 8.785H61.19C63.02 8.785 64.4925 10.2575 64.4925 12.085V19.56H26.75Z" stroke="#375652" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       }
     </label>
-
-    <span></span>
-    <!-- <app-input-error-message-handler [fc]="groupFg.get('allImages')" class="inline" /> -->
   </div>
-  <!--  -->
+
   <div class="grid md:grid-cols-2 gap-4 flex-1">
-    <!-- deliveryName Ar -->
     <div class="col-span-2 md:col-span-1">
       <label for="deliveryName">{{ 'FORM.DELIVERY_NAME' | translate }} (Ar)</label>
       <app-input-error-message-handler [fc]="localize(deliveryFg.get('nameAr'), deliveryFg.get('nameEn'))">
@@ -88,67 +248,35 @@
           pInputText
           [id]="localize('nameAr', 'nameEn')"
           [formControlName]="localize('nameAr', 'nameEn')"
-          aria-describedby="deliveryName-help"
           [placeholder]="'FORM.DELIVERY_NAME' | translate"
           id="deliveryName"
         />
       </app-input-error-message-handler>
     </div>
-    <!-- phoneNumber -->
     <div class="col-span-2 md:col-span-1">
       <label for="phoneNumber">{{ 'FORM.PHONE_NUMBER' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('phoneNumber')">
-        <input
-          pInputText
-          id="phoneNumber"
-          formControlName="phoneNumber"
-          aria-describedby="phoneNumber-help"
-          [placeholder]="'FORM.PHONE_NUMBER' | translate"
-        />
+        <input pInputText id="phoneNumber" formControlName="phoneNumber" [placeholder]="'FORM.PHONE_NUMBER' | translate" />
       </app-input-error-message-handler>
     </div>
-    <!-- email -->
     <div class="col-span-2 md:col-span-1">
       <label for="email">{{ 'FORM.EMAIL' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('email')">
-        <input
-          pInputText
-          id="email"
-          aria-describedby="email-help"
-          formControlName="email"
-          [placeholder]="'FORM.EMAIL' | translate"
-        />
+        <input pInputText id="email" formControlName="email" [placeholder]="'FORM.EMAIL' | translate" />
       </app-input-error-message-handler>
     </div>
-    <!-- address -->
     <div class="col-span-2 md:col-span-1">
       <label for="address">{{ 'FORM.ADDRESS' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('address')">
-        <input
-          pInputText
-          id="address"
-          aria-describedby="address-help"
-          formControlName="address"
-          id="address"
-          [placeholder]="'FORM.ADDRESS' | translate"
-        />
+        <input pInputText id="address" formControlName="address" [placeholder]="'FORM.ADDRESS' | translate" />
       </app-input-error-message-handler>
     </div>
-    <!-- identityNumber -->
     <div class="col-span-2 md:col-span-1">
       <label for="identityNumber">{{ 'FORM.IDENTITY_NUMBER' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('identityNumber')">
-        <input
-          pInputText
-          id="identityNumber"
-          aria-describedby="identityNumber-help"
-          formControlName="identityNumber"
-          id="identityNumber"
-          [placeholder]="'FORM.IDENTITY_NUMBER' | translate"
-        />
+        <input pInputText id="identityNumber" formControlName="identityNumber" [placeholder]="'FORM.IDENTITY_NUMBER' | translate" />
       </app-input-error-message-handler>
     </div>
-    <!-- description -->
     <div class="col-span-2">
       <label for="notes">{{ 'FORM.DESCRIPTION' | translate }}</label>
       <app-input-error-message-handler [fc]="deliveryFg.get('description')">
@@ -157,12 +285,13 @@
           rows="7"
           cols="30"
           pTextarea
-          aria-describedby="description-help"
-          [placeholder]="'FORM.DESCRIPTION' | translate"
           class="w-full"
           formControlName="description"
+          [placeholder]="'FORM.DESCRIPTION' | translate"
         ></textarea>
       </app-input-error-message-handler>
     </div>
   </div>
 </form>
+
+}

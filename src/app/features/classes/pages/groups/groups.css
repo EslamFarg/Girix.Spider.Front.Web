@@ -1,0 +1,207 @@
+/* ──────────────────────────────────────────────────────────────────────
+   Groups — Single-Screen Master-Detail Layout
+   Form card (fixed) above, scrollable table region below.
+   No navigation required. No pagination.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* ── Host: fill the flex-1 space given by .app-layout ───────────────── */
+
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+
+    --grp-thead-h: 44px;
+}
+
+/* ── Page wrapper: two-row flex column ───────────────────────────────── */
+
+.grp-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0.75rem;
+    overflow: hidden;
+}
+
+/* ── Form card: fixed height, never shrinks or scrolls ──────────────── */
+
+.grp-form-card {
+    flex-shrink: 0;
+    background: var(--surface-card, #fff);
+    border: 1px solid rgba(55 86 82 / 0.14);
+    border-radius: 12px;
+    padding: 0.875rem 1rem;
+    box-shadow: 0 2px 8px rgba(0 0 0 / 0.06), 0 1px 2px rgba(0 0 0 / 0.04);
+}
+
+/* ── Table region: grows to fill all remaining height ───────────────── */
+
+.grp-table-region {
+    flex: 1;
+    min-height: 0;          /* critical: allows flex child to scroll */
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-card, #fff);
+    border: 1px solid rgba(55 86 82 / 0.12);
+    border-radius: 12px;
+    padding: 0.75rem 1rem 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0 0 0 / 0.04);
+}
+
+/* ── Table scroll container: takes all remaining space in the region ── */
+
+.grp-table-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+/* Sticky thead: stays at top of the scroll container */
+.grp-sticky-thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--color-dark-bg-2);
+    box-shadow: 0 1px 0 rgba(55 86 82 / 0.15);
+}
+
+/* ── Compact Table Overrides ─────────────────────────────────────────── */
+
+.grp-table td {
+    animation: grpShowTableRowCell 0.4s calc(var(--ix, 0) * 0.035s) linear forwards;
+}
+
+@keyframes grpShowTableRowCell {
+    from {
+        border-bottom: 0px solid var(--color-text-gray);
+        padding: 0 6px;
+    }
+    to {
+        border-bottom: 1px solid var(--color-text-gray);
+        padding: 5px 6px;
+    }
+}
+
+.grp-table {
+    border-spacing: 0 2px !important;
+}
+
+.grp-table thead th {
+    height: var(--grp-thead-h) !important;
+    min-height: var(--grp-thead-h) !important;
+    padding: 0 8px !important;
+    font-size: 14px !important;
+    font-weight: 700;
+    vertical-align: middle;
+    line-height: 1.25;
+}
+
+.grp-table tbody td {
+    font-size: 13px !important;
+}
+
+.grp-table tbody td > div {
+    font-size: 13px !important;
+}
+
+/* Fixed-width columns */
+.grp-th-num {
+    width: 40px;
+    min-width: 40px;
+}
+
+.grp-th-img {
+    width: 58px;
+    min-width: 58px;
+}
+
+/* Group name cell */
+.grp-name-cell {
+    font-weight: 500;
+}
+
+/* Row thumbnail — slightly larger for visibility */
+.grp-row-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid var(--color-text-lighter, #eef0f2);
+    display: block;
+    margin: 0 auto;
+}
+
+/* Placeholder when no image */
+.grp-row-img-empty {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: rgba(55 86 82 / 0.07);
+    border: 1px dashed rgba(55 86 82 / 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(55 86 82 / 0.4);
+    font-size: 0.75rem;
+    margin: 0 auto;
+}
+
+/* Printer name — truncate long text */
+.grp-printer-cell {
+    font-size: 13px;
+    color: var(--color-text-dark, #2d3748);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Compact action buttons */
+.grp-table .actions > * {
+    width: 28px;
+    height: 28px;
+}
+
+/* ── Row interaction ──────────────────────────────────────────────────── */
+
+.grp-row-clickable {
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+/* Hover state — subtle tint */
+.grp-row-clickable:hover:not(.grp-row-selected) td {
+    background: rgba(55 86 82 / 0.05) !important;
+}
+
+/* ── Selected row — strong, unmistakable active state ──────────────── */
+
+.grp-row-selected td {
+    background: rgba(55 86 82 / 0.13) !important;
+    border-bottom-color: rgba(55 86 82 / 0.35) !important;
+}
+
+/* Left accent bar on selected row */
+.grp-row-selected td:first-child {
+    border-inline-start: 3px solid var(--color-dark-line, #375652);
+}
+
+/* Selected row name — slightly bolder */
+.grp-row-selected .grp-name-cell {
+    color: var(--color-dark-line, #375652);
+    font-weight: 700;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+    /* Hide image column on small screens */
+    .grp-th-img,
+    .grp-table tbody td:nth-child(2) {
+        display: none;
+    }
+}
