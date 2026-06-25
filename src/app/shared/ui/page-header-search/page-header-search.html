@@ -113,7 +113,7 @@
     <!-- <span class="p-text-secondary block mb-8">/'.;</span> -->
 
     <form class="p-4">
-      <div
+      <!-- <div
         class="grid grid-cols-1 md:grid-cols-12 gap-x-[24px] gap-y-[5px] p-2 mb-5"
         style="background-color: var(--color-secondary)"
       >
@@ -128,9 +128,9 @@
           </div>
         </div>
         <div class="col-span-12 md:col-span-6">
-          <label for="fromDate">الفترة من</label>
+          <label for="fromDate">الفترة من</label> -->
           <!-- <input type="text" > -->
-          <p-datepicker
+          <!-- <p-datepicker
             appendTo="body"
             [iconDisplay]="'input'"
             [placeholder]="'التاريخ'"
@@ -140,9 +140,9 @@
           />
         </div>
         <div class="col-span-12 md:col-span-6">
-          <label for="fromDate">الفترة الي</label>
+          <label for="fromDate">الفترة الي</label> -->
           <!-- <input type="text" > -->
-          <p-datepicker
+          <!-- <p-datepicker
             appendTo="body"
             [iconDisplay]="'input'"
             [placeholder]="'التاريخ'"
@@ -150,7 +150,7 @@
             inputId="icondisplay"
           />
         </div>
-      </div>
+      </div> -->
 
 
       <div class="grid grid-cols-1 md:grid-cols-12 gap-[24px] gap-y-[10px]">
@@ -169,13 +169,19 @@
         @for(item of filteringData();track $index){
             <div [class]="item.class">
                 <label [for]="$index + 1">{{item.label}}</label>
-                <input [type]="item.type" [name]="'field' + $index" [id]="$index + 1" [placeholder]="item.placeholder" [(ngModel)]="item.value">
+                  <input
+                    [type]="item.type"
+                    [name]="'field' + $index"
+                    [id]="$index + 1"
+                    [placeholder]="item.placeholder"
+                    [(ngModel)]="item.value"
+                    (input)="onFieldInput(item)"  />
                 </div>
         }
       </div>
 
       <div class="mt-5 block text-end">
-        <p-button label="بحث" (click)="visible = false" />
+        <p-button label="بحث"   (click)="search()" />
       </div>
     </form>
   </p-dialog>

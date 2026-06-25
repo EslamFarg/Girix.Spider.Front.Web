@@ -3,31 +3,65 @@ import { inject } from '@angular/core';
 import { LoadingService } from '../../shared/ui/loading/services/loading';
 import { finalize } from 'rxjs';
 
+// export const httpInterceptor: HttpInterceptorFn = (req, next) => {
+//   const loadingService=inject(LoadingService);
+//   const token = JSON.parse(localStorage.getItem('erp_auth')!);
+//     const skipLoading = req.headers.has('skip-loading');
+
+
+//   let authReq=req;
+
+//   if(token){
+//     authReq = req.clone({
+//       headers: req.headers.set('Authorization', `Bearer ${token.token}`),
+//     });
+//   }
+//    if (!skipLoading) {
+//     // loadingService.show();
+//     Promise.resolve().then(() => {
+//     loadingService.show();
+//   });
+//   }
+
+//   return next(req).pipe(
+//     finalize(() => {
+//        if (!skipLoading) {
+//     loadingService.hide();
+//   }
+   
+//   }));
+// };
+
+
 export const httpInterceptor: HttpInterceptorFn = (req, next) => {
-  const loadingService=inject(LoadingService);
-  const token = JSON.parse(localStorage.getItem('payloadUser')!);
-    const skipLoading = req.headers.has('skip-loading');
+  const loadingService = inject(LoadingService);
 
+  const skipLoading = req.headers.has('skip-loading');
 
-  let authReq=req;
+  const auth =
+    JSON.parse(localStorage.getItem('erp_auth') || 'null') ||
+    JSON.parse(sessionStorage.getItem('erp_auth') || 'null');
 
-  if(token){
+  let authReq = req;
+
+  if (auth?.token) {
     authReq = req.clone({
-      headers: req.headers.set('Authorization', `Bearer ${token.token}`),
+      headers: req.headers.set(
+        'Authorization',
+        `Bearer ${auth.token}`
+      ),
     });
   }
-   if (!skipLoading) {
-    // loadingService.show();
-    Promise.resolve().then(() => {
-    loadingService.show();
-  });
+
+  if (!skipLoading) {
+    Promise.resolve().then(() => loadingService.show());
   }
 
-  return next(req).pipe(
+  return next(authReq).pipe(
     finalize(() => {
-       if (!skipLoading) {
-    loadingService.hide();
-  }
-   
-  }));
+      if (!skipLoading) {
+        loadingService.hide();
+      }
+    })
+  );
 };

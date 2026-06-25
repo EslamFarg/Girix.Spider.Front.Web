@@ -13,3 +13,14 @@ input{
         border-width: 8px ;
     }
 }
+
+
+.search_input{
+    width: 30%;
+}
+::ng-deep .p-autocomplete {
+  width: 100% !important;
+input{
+    width: 100% !important;
+}
+}

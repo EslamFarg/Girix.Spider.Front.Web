@@ -7,12 +7,12 @@ import { BasehttpService } from '../../../../../../shared/services/basehttp-serv
 export class GroupsServices extends BasehttpService {
   constructor() {
     super('',{
-      'create':'api/Category',
-      'update':'api/Category',
-      'getAll':'api/Category',
-      'getById':'api/Category',
-      'delete':'api/Category',
-      'search':'api/Category/Search'
+      'create':'api/ProductGroup/Create',
+      'update':'api/ProductGroup/Update',
+      'getAll':'api/ProductGroup/GetAll',
+      'getById':'api/ProductGroup/GetById',
+      'delete':'api/ProductGroup/Delete',
+      'search':'api/ProductGroup/Search'
     });
   }
   

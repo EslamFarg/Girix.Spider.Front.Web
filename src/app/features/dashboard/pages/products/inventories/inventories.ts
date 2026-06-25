@@ -12,6 +12,7 @@ import { NgClass } from '@angular/common';
 import { buildSearchPayload } from '../../../../../shared/config/search-config';
 import { SearchableColumnEnum } from '../../../../../shared/Enums/enumSearch';
 import { Paginator } from "primeng/paginator";
+import { userNameValidation } from '../../../../../shared/validations/user-name';
 
 @Component({
   selector: 'app-inventories',
@@ -27,8 +28,8 @@ _destroyRef:DestroyRef=inject(DestroyRef);
 _messageServices:MessageService=inject(MessageService)
 // !!!!!!!!!!!! properites
 inventoriesForm=this._fb.group({
-  nameAr: ['',[Validators.required,Validators.minLength(2),Validators.maxLength(100)]],
-  nameEn: ['',[Validators.required,Validators.minLength(2),Validators.maxLength(100)]],
+  nameAr: ['',[Validators.required,Validators.minLength(2),Validators.maxLength(100),userNameValidation()]],
+  nameEn: ['',[Validators.required,Validators.minLength(2),Validators.maxLength(100),userNameValidation()]],
 })
 items: any[] = [];
 selectedSearch:string='بحث'
@@ -41,7 +42,6 @@ pageIndex=1;
 pageSize=10
 showDeleteDialog=false
 buttonConfig=BUTTON_CONFIG;
-token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImJlNzA2NTc4LTg1ODUtNDZjNi1iOGI3LTljOTUyYzZiYjY1ZiIsImVtcGxveWVlSWQiOiIxIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiU3VwZXJBZG1pbiIsImV4cCI6MTc3NzQ0OTI5OCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzIwMi8iLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MjAyIn0.MpWq4_oaIMQ5IP9ydpD_0Tsqc35CtLWYryj_vScX5kg'
 
 // !!!!!!!!!! Methods
 
@@ -57,34 +57,6 @@ ngOnInit(): void {
   this.getAllData();
 }
 
-// search(event: AutoCompleteCompleteEvent) {
- 
-//   const query = (event.query ?? '').trim();
-
-//   console.log('query:', query);
-
-//   if (!query) {
-//     this.items = [];
-//     this.idResultSearch = 0;
-//     this.getAllData();
-//     return;
-//   }
-
-//       const EnumSearch=SearchableColumnEnum.NameEn
-//       const payload = buildSearchPayload(event.query,this.pageSize,EnumSearch);
-    
-//       this._inventoriesServices.search(payload)
-//         .pipe(takeUntilDestroyed(this._destroyRef))
-//         .subscribe({
-//           next: (res: any) => {
-//             this.items = res.data.rows.map((item: any) => ({
-//               label: item.name,
-//               value: item.id
-//             }));
-    
-//           }
-//         });
-//   }
 
 search(event: AutoCompleteCompleteEvent) {
 
@@ -161,38 +133,7 @@ if (!event || !event.value) {
   this.items = [];
   this.getAllData();
 }
-  // searchUnit() {
-  //   if (this.idResultSearch == 0) {
-  //     // this.getAll();
-  //     this._messageServices.add({
-  //       severity: 'error',
-  //       summary: 'خطاء في البيانات',
-  //       detail: 'الرجاء اختيار قيمة',
-  //     });
-  //     return;
-  //   }
 
-  //   console.log("id Result Search",this.idResultSearch);
-
-  // this._inventoriesServices.getById(this.idResultSearch)
-  //   .pipe(takeUntilDestroyed(this._destroyRef))
-  //   .subscribe({
-  //     next: (res: any) => {
-  //       this.inventoriesList = {
-  //         isSuccess: true,
-  //         data: {
-  //           rows: [res.data],
-  //           paginationInfo: {
-  //             totalRowsCount: 1,
-  //             totalPagesCount: 1
-  //           }
-  //         }
-  //       };
-
-  //       this.totalRecords = 1;
-  //     }
-  //   });
-  // }
 
   getAllData(){
     const pageNumber=Math.floor(this.pageIndex/this.pageSize) + 1
@@ -210,9 +151,7 @@ onSubmit(){
   }
   if(this.isEditMode == false){
   
-  this._inventoriesServices.create(this.inventoriesForm.value,{
-      "Authorization":`Bearer ${this.token}`
-  }).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+  this._inventoriesServices.create(this.inventoriesForm.value).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
     next:(res :any)=>{
       // this._toastr.show('تم الاضافة بنجاح','success');
       this._messageServices.add({
@@ -231,7 +170,7 @@ onSubmit(){
       id:this.idInventory,
       ...this.inventoriesForm.value,
     }
-    this._inventoriesServices.update(payload).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+    this._inventoriesServices.updateWithOutPathParameter(payload).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next:(res:any)=>{
         this._messageServices.add({
           severity: 'success',

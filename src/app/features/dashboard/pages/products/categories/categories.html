@@ -1,7 +1,10 @@
 <h3 class="mt-[20px] text-[20px] font-[700] mb-5">الفئات</h3>
 
-<div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-    <div class="col-span-12">
+<form class="grid grid-cols-1 md:grid-cols-12 gap-4"
+[formGroup]="categoryForm"
+(ngSubmit)="onSubmit()"
+>
+    <!-- <div class="col-span-12">
       
 
 
@@ -60,18 +63,24 @@
           </button>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <div class="col-span-12">
         <label for="unitName">اسم الفئة</label>
-        <input type="text" placeholder="اسم الفئة" id="unitName">
+        <input type="text" placeholder="اسم الفئة" id="unitName" maxlength="100" formControlName="nameAr">
+        <app-form-error [control]="categoryForm.controls['nameAr']" [errorKey]="'required'" [message]="'اسم الفئة مطلوب'"></app-form-error>
+        <app-form-error [control]="categoryForm.controls['nameAr']" [errorKey]="'invalidEntityName'" [message]="'اسم الفئه يجب ان لايحتوي علي اي محارف خاصة غير الحروف والارقام و _ و -'"></app-form-error>
+        <app-form-error [control]="categoryForm.controls['nameAr']" [errorKey]="'minlength'" [message]="'اسم الفئة يجب ان تتكون من 2 حرف او أكثر '"></app-form-error>
+        <app-form-error [control]="categoryForm.controls['nameAr']" [errorKey]="'maxlength'" [message]="'اسم الفئة يجب ان يكون اقل من 100 حرف'"></app-form-error>
     </div>
 
     <div class="col-span-12 flex justify-end gap-5 mt-[15px]">
-        <button class="btn btn-primary">اضافة</button>
-        <button class="btn ">جديد</button>
+        <button class="btn " [ngClass]="buttonClass" type="submit">
+            {{buttonLabel}}
+        </button>
+        <button class="btn " type="button" (click)="resetForm()">جديد</button>
     </div>
-</div>
+  </form>
 
 
 
@@ -79,6 +88,50 @@
 <div class="table-responsive mt-9">
   <table class="w-full ">
     <thead class="bg-gray-100 ">
+       <tr class="bg-[var(--color-primary)]">
+      <td class="text-right" colspan="3">   <div class="search_input relative md:w-[30%]">
+        <!-- <input type="text" class="text-[14px] w-[100%]"  placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/> -->
+        <p-autocomplete
+        (onClear)="clearSearch()"
+        (onSelect)="onSelect($event)"
+        class='autocomplete_full_width' [inputId]="'searchByCodeProduct'"  [suggestions]="items" (completeMethod)="search($event)" [placeholder]="selectedSearch"/>
+        <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[6px]" >
+         
+
+        
+                  
+
+          <button class="cursor-pointer" >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.4193 17.5001C6.04702 17.5001 2.5026 13.9557 2.5026 9.58341C2.5026 5.21116 6.04702 1.66675 10.4193 1.66675C14.7915 1.66675 18.3359 5.21116 18.3359 9.58341C18.3359 13.9557 14.7915 17.5001 10.4193 17.5001Z"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M1.66927 18.3334L3.33594 16.6667"
+                stroke="#7F7F7F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div></td>
+        <!-- <td></td> -->
+      <!-- <td></td> -->
+      
+        
+      </tr>
       <tr class="sticky top-0">
         <th class="p-2 text-center">م</th>
         <th class="p-2 text-center">الفئات</th>
@@ -88,30 +141,19 @@
     <tbody>
   
 
-        @for(item of itemsTable;track $index){
+        @for(item of groupDataList?.data?.rows;track $index){
 
             <tr >
             <td class="p-2 text-center">{{ $index + 1 }}</td>
-            <td class="p-2 text-center">{{ item.itemName }}</td>
-         <td class="p-2 w-full flex items-center justify-center gap-2">
-           <div class="printer">
-                <svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="33" height="25" rx="2" style="fill:#DADEE1; stroke:none;" fill="#DADEE1"/>
-<path style="fill:white; stroke:none;" d="M22.9634 6.04566C22.9634 6.04566 22.9705 6.43312 22.9705 7.06495C22.9967 10.0612 22.8884 18.6143 20.9249 18.6143C18.547 18.6143 20.5849 15.8972 18.887 15.8972H13.8047C14.5591 12.126 14.484 6.04566 14.484 6.04566C14.484 6.04566 14.5045 5.02637 15.1838 5.02637H23.6555C22.9769 5.02637 22.9634 6.04566 22.9634 6.04566Z" fill="white"/>
-<path style="fill:#E3E3E3; stroke:none;" d="M23.6599 5.02637H22.3268C22.2857 9.12266 19.7874 14.6165 15.9922 15.8972H18.89C20.5886 15.8972 18.55 18.615 20.9286 18.615C22.8921 18.615 23.0004 10.0612 22.9735 7.06495C22.9735 6.43312 22.9664 6.04495 22.9664 6.04495C22.9664 6.04495 22.9806 5.02637 23.6599 5.02637Z" fill="#E3E3E3"/>
-<path style="fill:none; stroke:#083448;" d="M16.5233 7.74424H17.8819M16.694 11.82H20.6004M16.694 9.78212H20.6004M16.184 13.8586H20.2604M22.9634 6.04566C22.9634 6.04566 22.9705 6.43312 22.9705 7.06495C22.9967 10.0612 22.8884 18.6143 20.9249 18.6143C18.547 18.6143 20.5849 15.8972 18.887 15.8972H13.8047C14.5591 12.126 14.484 6.04566 14.484 6.04566C14.484 6.04566 14.5045 5.02637 15.1838 5.02637H23.6555C22.9769 5.02637 22.9634 6.04566 22.9634 6.04566Z" stroke="#083448" stroke-linecap="round" stroke-linejoin="round"/>
-<path style="fill:#B2B2B2; stroke:#083448;" d="M24.2933 6.30349C24.304 6.3988 24.2943 6.49528 24.265 6.58659C24.2357 6.67791 24.1874 6.76199 24.1233 6.83333C24.061 6.90575 23.9839 6.96393 23.8971 7.00389C23.8103 7.04386 23.716 7.06468 23.6204 7.06495H22.9758C22.9758 6.43312 22.9688 6.04495 22.9688 6.04495C22.9688 6.04495 22.9822 5.02637 23.6615 5.02637C24.0624 5.02637 24.2253 5.7262 24.2933 6.30349Z" fill="#B2B2B2" stroke="#083448" stroke-linecap="round" stroke-linejoin="round"/>
-<path style="fill:white; stroke:#083448;" d="M18.8883 15.897C17.8491 15.897 18.209 17.4326 18.0935 18.6148C18.0255 19.3621 17.7677 19.9734 16.8504 19.9734H8.71094C11.0888 19.9734 9.05094 15.897 10.7495 15.897H18.8883Z" fill="white" stroke="#083448" stroke-linecap="round" stroke-linejoin="round"/>
-<path style="fill:#B2B2B2; stroke:#083448;" d="M20.9271 18.6148H18.0938C18.2092 17.4319 17.8494 15.897 18.8885 15.897C20.5871 15.897 18.5485 18.6148 20.9271 18.6148Z" fill="#B2B2B2" stroke="#083448" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-
-            </div>
-            <button class="update">
+            <td class="p-2 text-center">{{ item.name }}</td>
+                      <td class="p-2 w-full flex items-center justify-center gap-2">
+      
+            <button class="update" (click)="editData(item.id)">
 
 
 <i class="fa-solid fa-pen-to-square"></i>
             </button>
-            <button class="delete">
+            <button class="delete" type="button"  (click)="showPopupDelete(item.id)">
 
   <i class="fa-solid fa-trash"></i>
 
@@ -127,3 +169,9 @@
 
   </table>
 </div>
+
+  <div class="card flex justify-center mt-4">
+            <p-paginator (onPageChange)="onPageChange($event)" [showFirstLastIcon]="false" [first]="pageIndex" [rows]="pageSize" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 25, 50,100,250]"/>
+      </div>
+
+      <app-shared-confirm-dialog [show]="showDeleteDialog" [title]="'حذف الفئة'" [message]="'هل أنت متأكد من حذف هذه الفئة؟ لا يمكن التراجع عن هذا الإجراء.'" (confirm)="deleteGroup()" (cancel)="showDeleteDialog=false"></app-shared-confirm-dialog>

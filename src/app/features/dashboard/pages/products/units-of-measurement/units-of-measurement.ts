@@ -196,7 +196,7 @@ onSubmit(){
     ...this.unitForm.value,
   }
 
-  this._unitOfMeasure.update(payload).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+  this._unitOfMeasure.updateWithOutPathParameter(payload).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
     next:(res:any)=>{
       // this._toastr.show('تم التعديل بنجاح','success');
       this._messageServices.add({

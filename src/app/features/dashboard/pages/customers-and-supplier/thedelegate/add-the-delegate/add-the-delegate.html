@@ -5,7 +5,7 @@
   (actionClicked)="handleAction($event)"
 ></app-page-header>
 
-<form class="box_header">
+<form class="box_header" [formGroup]="delegateForm" >
   <div class="title">بيانات المندوب</div>
  
  
@@ -18,9 +18,45 @@
     <label>بحث بالكود    </label>
                 <div class="flex items-center gap-2 relative ">
                     <div class="search_input relative w-full">
-                  <input type="text" class="text-[14px] w-full" style="color:var(--color-black); font-weight:600; width:100%;"/>
-                  <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[10px]" >
-                    <button>
+                     <p-autocomplete (keydown.enter)="onEnter($event)" (onSelect)="onSelectDelegate($event)"  #autoComplete  [formControl]="searchControl" [suggestions]="items" (completeMethod)="search($event)" [placeholder]="selectedSearch" />
+                      <!-- <app-form-error [control]="searchControl" [errorKey]="'required'" [message]="'بحث مطلوب'"></app-form-error> -->
+                                    <div class="search_box absolute top-[40px] left-0 z-[20]
+shadow-md
+bg-white w-[200px] min-h-[32px] rounded
+p-2
+[&>*]:p-2
+[&>*]:hover:bg-[var(--color-primary)]
+[&>*]:hover:text-white
+[&>*:not(:last-child)]:mb-3
+[&>*]:text-[14px]
+[&>*]:rounded
+[&>*]:cursor-pointer
+transition-all duration-200"
+
+[ngClass]="{
+  'translate-y-[-20px] opacity-0 invisible': !showSearchBox,
+  'opacity-100 visible': showSearchBox
+}">
+
+  <p (click)="selectFilterSearch('code')"
+     [ngClass]="{'bg-primary text-white': selectedSearch == 'code'}">
+    بالكود
+  </p>
+
+  <p (click)="selectFilterSearch('name')"
+     [ngClass]="{'bg-primary text-white': selectedSearch == 'name'}">
+     بأسم المندوب
+  </p>
+  <p (click)="selectFilterSearch('mobile')"
+     [ngClass]="{'bg-primary text-white': selectedSearch == 'mobile'}">
+     برقم الجوال
+  </p>
+
+
+</div>
+
+                  <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[7px]" >
+                    <button (click)="showSearchBox = !showSearchBox" type="button">
                       <svg
                         width="20"
                         height="18"
@@ -75,43 +111,94 @@
                 </div>
   </div>
     </div>
-    <div class="col-span-4">
+    <div class="col-span-12 lg:col-span-4">
         <label for="codedelegate" >كود المندوب</label>
-        <input type="text" id="codedelegate" placeholder="كود المندوب">
+        <input type="text" id="codedelegate" placeholder="كود المندوب" value="0" #codeElement readOnly>
     </div>
-    <div class="col-span-8">
+    <div class="col-span-12 lg:col-span-8">
         <label for="reference">اسم  المندوب</label>
-        <input type="text" placeholder="اسم  المندوب" id="reference">
+        <input type="text" placeholder="اسم  المندوب" id="reference" formControlName="name" maxlength="100" >
+        <app-form-error [control]="delegateForm.controls['name']" [errorKey]="'required'" [message]="'اسم المندوب مطلوب'"></app-form-error>
+        <app-form-error [control]="delegateForm.controls['name']" [errorKey]="'minlength'" [message]="'اسم المندوب يجب ان يتكون من حرفين علي الاقل'"></app-form-error>
+        <app-form-error [control]="delegateForm.controls['name']" [errorKey]="'maxlength'" [message]="'اسم المندوب يجب ان يكون اقل من 100 حروف'"></app-form-error>
+        <app-form-error [control]="delegateForm.controls['name']" [errorKey]="'invalidEntityName'" [message]="'اسم المندوب يجب ان يحتوي علي احرف وارقام  وبعض الحروف الخاصه مثل _ , - ولايبدء برقم'"></app-form-error>
     </div>
-    <div class="col-span-3">
+    <!-- <div class="col-span-3">
         <label for="phonenumber">رقم الجوال</label>
         <input type="text" placeholder="رقم الجوال" id="phonenumber">
+    </div> -->
+       <div class="col-span-12 lg:col-span-3">
+        <label for="phonenumber">رقم الجوال</label>
+        <!-- <input type="text" placeholder="رقم الجوال" id="phonenumber" formControlName="phoneNumber"> -->
+  <intl-tel-input
+  #phoneInput
+  [countryOrder]="['eg','sa']"
+  [onlyCountries]="['eg','sa']"
+  initialCountry="sa"
+  [loadUtils]="loadUtils"
+  formControlName="phone"
+  >
+</intl-tel-input>
+<app-form-error [control]="delegateForm.controls['phone']" [errorKey]="'required'" [message]="'رقم الجوال مطلوب'"></app-form-error>
+<app-form-error [control]="delegateForm.controls['phone']" [errorKey]="'invalidSaudiPhone'" [message]="'رقم الجوال السعودي غير صحيح'"></app-form-error>
+<app-form-error [control]="delegateForm.controls['phone']" [errorKey]="'invalidEgyptPhone'" [message]="'رقم الجوال المصري غير صحيح'"></app-form-error>
     </div>
-    <div class="col-span-3">
+    <div class="col-span-12 lg:col-span-3">
         <label for="area">المنطقة</label>
-       <input type="text" name="area" id="area" placeholder="المنطقة">
+       <input type="text" name="area" id="area" placeholder="المنطقة" formControlName="area" maxlength="100">
+       <app-form-error [control]="delegateForm.controls['area']" [errorKey]="'required'" [message]="'المنطقة مطلوبة'"></app-form-error>
+       <app-form-error [control]="delegateForm.controls['area']" [errorKey]="'minlength'" [message]="'المنطقة يجب ان يتكون من حرفين علي الاقل'"></app-form-error>
+       <app-form-error [control]="delegateForm.controls['area']" [errorKey]="'maxlength'" [message]="'المنطقة يجب ان يكون اقل من 100 حروف'"></app-form-error>
+        <app-form-error [control]="delegateForm.controls['area']" [errorKey]="'invalidEntityName'" [message]="'اسم المنطقة يجب ان يحتوي علي احرف وارقام  وبعض الحروف الخاصه مثل _ , - ولايبدء برقم'"></app-form-error>
     </div>
-    <div class="col-span-3">
+    <div class="col-span-12 lg:col-span-3">
         <label for="warn">نسبه الارباح</label>
-       <input type="text" name="warn" id="warn" placeholder="الرقم">
+       <input type="text" name="warn" id="warn" placeholder="الرقم" formControlName="commissionPercent" maxlength="6" appMaxPercentage>
+       <app-form-error [control]="delegateForm.controls['commissionPercent']" [errorKey]="'required'" [message]="'نسبه الارباح مطلوبة'"></app-form-error>
     </div>
-    <div class="col-span-3 sm:mt-2 md:mt-9">
+    <!-- <div class="col-span-3 sm:mt-2 md:mt-9">
        <div class="flex items-center gap-8">
         <div class="flex items-center gap-2">
-           <input type="radio" name="valRadio" id="valueMoney" >
-            <label for="valueMoney" style="margin-bottom:0px;">قيمة الارباح</label>
+           <input type="radio" name="valRadio" id="valueMoney" [value]="CommissionTypeProfit" formControlName="commissionType">
+            <label for="valueMoney" style="margin-bottom:0px;" >قيمة الارباح</label>
        </div>
        <div class="flex items-center gap-2">
-           <input type="radio" name="valRadio" id="valueSales"  checked>
-            <label for="valueSales" style="margin-bottom:0px;">قيمة المبيعات</label>
+           <input type="radio" name="valRadio" id="valueSales" [value]="CommissionTypeSales" formControlName="commissionType" checked>
+            <label for="valueSales" style="margin-bottom:0px;" >قيمة المبيعات</label>
        </div> 
        </div>
        <div></div>
+    </div> -->
+
+    <div class="col-span-12 lg:col-span-3 sm:mt-2 md:mt-9">
+  <div class="flex items-center gap-8">
+
+    <div class="flex items-center gap-2">
+      <input
+        type="radio"
+        id="valueMoney"
+        formControlName="commissionType"
+        [value]="CommissionTypeProfit"
+      />
+      <label for="valueMoney" style="margin-bottom:0">قيمة الارباح</label>
     </div>
 
+    <div class="flex items-center gap-2">
+      <input
+        type="radio"
+        id="valueSales"
+        formControlName="commissionType"
+        [value]="CommissionTypeSales"
+      />
+      <label for="valueSales" style="margin-bottom:0">قيمة المبيعات</label>
+    </div>
+
+  </div>
+</div>
   </div>
 
 
 </form>
 
 
+<app-shared-confirm-dialog [show]="showDeleteDialog" [title]="'حذف المندوب'" [message]="'هل أنت متأكد من حذف هذا المندوب ؟ لا يمكن التراجع عن هذا الإجراء.'" (confirm)="deleteDialog()" (cancel)="showDeleteDialog=false"></app-shared-confirm-dialog>

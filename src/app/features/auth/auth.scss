@@ -48,7 +48,14 @@ form{
         color: #101728;
     }
     input[type='text'],input[type='password']{
-        height: 50px !important;
+        height: 42px !important;
+        font-size: 16px;
+        &.ng-invalid.ng-touched{
+            border-color: var(--color-danger) !important;
+        }
+        &.ng-valid.ng-touched{
+            border-color: var(--color-success) !important;
+        }
     }
 }
 
@@ -75,4 +82,14 @@ form{
         // margin: 0 autozz;
         
     }
+
+
+    // button[type="submit"]{
+    //     // width: 100% !important;
+    //     height:32px !important;
+    // }
+    button{
+    /* width: 100% !important; */
+    height: 45px !important;
+}
 }

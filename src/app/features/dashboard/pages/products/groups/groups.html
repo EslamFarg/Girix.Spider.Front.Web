@@ -12,7 +12,8 @@
         <label for="unitName">اسم المجموعة</label>
         <input type="text"  placeholder="اسم المجموعة" id="unitName" maxlength="100" appOnlyString formControlName="nameAr">
         <app-form-error [control]="groupForm.controls['nameAr']" [errorKey]="'required'" [message]="'اسم المجموعة مطلوب'"></app-form-error>
-        <app-form-error [control]="groupForm.controls['nameAr']" [errorKey]="'minlength'" [message]="'اسم المجموعة يجب ان يكون اكبر من 2 حرف'"></app-form-error>
+        <app-form-error [control]="groupForm.controls['nameAr']" [errorKey]="'invalidUserName'" [message]="'اسم المجموعة يجب ان يحتوي علي حروف وارقام و _ و - ويجب ان لايبدء برقم'"></app-form-error>
+        <app-form-error [control]="groupForm.controls['nameAr']" [errorKey]="'minlength'" [message]="'اسم المجموعة يجب ان تتكون من 2 حرف او أكثر '"></app-form-error>
         <app-form-error [control]="groupForm.controls['nameAr']" [errorKey]="'maxlength'" [message]="'اسم المجموعة يجب ان يكون اقل من 100 حرف'"></app-form-error>
     </div>
 
@@ -31,7 +32,7 @@
   <table class="w-full ">
     <thead class="bg-gray-100 ">
       <tr class="bg-[var(--color-primary)]">
-      <td class="text-right">   <div class="search_input relative w-[80%]">
+      <td class="text-right" colspan="3">   <div class="search_input relative md:w-[30%]">
         <!-- <input type="text" class="text-[14px] w-[100%]"  placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/> -->
         <p-autocomplete
         (onClear)="clearSearch()"
@@ -69,8 +70,8 @@
           </button>
         </div>
       </div></td>
-        <td></td>
-      <td></td>
+        <!-- <td></td> -->
+      <!-- <td></td> -->
       
         
       </tr>
@@ -87,7 +88,7 @@
 
             <tr >
             <td class="p-2 text-center">{{ $index + 1 }}</td>
-            <td class="p-2 text-center">{{ item.name }}</td>
+            <td class="p-2 text-center">{{ item.nameAr }}</td>
          <td class="p-2 w-full flex items-center justify-center gap-2">
       
             <button class="update" (click)="editData(item.id)">

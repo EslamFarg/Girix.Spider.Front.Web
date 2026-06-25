@@ -7,11 +7,11 @@ import { BasehttpService } from '../../../../../../shared/services/basehttp-serv
 export class Customers extends BasehttpService {
   constructor() {
     super('', {
-      create: 'api/Customer',
-      update: 'api/Customer',
-      delete: 'api/Customer',
-      getAll: 'api/Customers/Customer',
-      getById: 'api/Customers',
+      create: 'api/Customer/Create',
+      update: 'api/Customer/Update',
+      delete: '/api/Customer/delete',
+      getAll: 'api/Customer/GetAll',
+      getById: 'api/Customer/GetById',
       search: 'api/Customer/Search',
     });
   }

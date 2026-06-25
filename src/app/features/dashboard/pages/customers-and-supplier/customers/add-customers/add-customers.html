@@ -10,35 +10,18 @@
   <div>
     <label for="customer">العميل</label>
     <div class="flex items-center gap-2">
-        <input type="checkbox" id="checkbox" id="itemcheck" style="width:20px;"  formControlName="isCustAndSupp">
+        <input type="checkbox" id="checkbox" id="itemcheck" style="width:20px;"  formControlName="custSuppType">
         <label for="itemcheck" style="margin-bottom: 0;">عملاء وموردين</label>
 
     </div>
     
-
-    <!-- <div  class="grid grid-cols-1 md:grid-cols-2 mt-4">
-      <div class="flex items-center gap-2">
-        <input type="radio" name="company" id="company"  (click)="changeChecked($event)" checked data-label="company"
-        value="2"
-        formControlName="customerType"
-        >  
-        <label for="company" style="margin-bottom:0px !important;">شركة</label>
-      </div>
-      <div class="flex items-center gap-2">
-        <input type="radio" name="company" id="client" (click)="changeChecked($event)" data-label="client"
-        value="1"
-        formControlName="customerType">
-        <label for="client" style="margin-bottom:0px !important;">فرد</label>
-      </div>
-
-    </div> -->
-     <div  class="grid grid-cols-1 md:grid-cols-2 mt-4">
+     <div  class="grid grid-cols-2 md:grid-cols-2 mt-4">
     <div class="flex items-center gap-2">
   <input 
     type="radio"
     name="customerType"
     id="company"
-    [value]="2"
+    [value]="Company"
     data-label="company"
     formControlName="customerType"
     (change)="changeChecked($event)"
@@ -51,7 +34,7 @@
     type="radio"
     name="customerType"
     id="client"
-    [value]="1"
+    [value]="Individual"
     data-label="client"
     formControlName="customerType"
     (change)="changeChecked($event)"
@@ -173,18 +156,19 @@ transition-all duration-200"
                 </div>
   </div>
     </div>
-    <div class="col-span-4">
+    <div class="col-span-12 lg:col-span-4">
         <label for="customerCode" >كود العميل</label>
-        <input type="text" id="customerCode" placeholder="كود العميل" formControlName="customerCode">
+        <input type="text" id="customerCode" placeholder="كود العميل" formControlName="customerCode" readonly>
       </div>
-      <div class="col-span-8">
+      <div class="col-span-12 lg:col-span-8">
         <label for="reference">اسم العميل</label>
         <input type="text" placeholder="اسم العميل" id="reference" formControlName="nameAr" maxlength="100" appOnlyString>
         <app-form-error [control]="customerForm.controls['nameAr']" [errorKey]="'required'" [message]="'اسم العميل مطلوب'"></app-form-error>
-        <app-form-error [control]="customerForm.controls['nameAr']" [errorKey]="'minlength'" [message]="'اسم العميل يجب ان يكون اكبر من 2 حرف'"></app-form-error>
+        <app-form-error [control]="customerForm.controls['nameAr']" [errorKey]="'minlength'" [message]="'اسم العميل يجب أن يحتوي على حرفين على الأقل'"></app-form-error>
         <app-form-error [control]="customerForm.controls['nameAr']" [errorKey]="'maxlength'" [message]="'اسم العميل يجب ان يكون اقل من 100 حرف'"></app-form-error>
+        <app-form-error [control]="customerForm.controls['nameAr']" [errorKey]="'invalidUsername'" [message]="'اسم العميل يجب ان يحتوي على حروف وارقام و _ و - فقط'"></app-form-error>
     </div>
-    <div class="col-span-3">
+    <div class="col-span-12 lg:col-span-3">
         <label for="phonenumber">رقم الجوال</label>
         <!-- <input type="text" placeholder="رقم الجوال" id="phonenumber" formControlName="phoneNumber"> -->
   <intl-tel-input
@@ -200,49 +184,51 @@ transition-all duration-200"
 <app-form-error [control]="customerForm.controls['phoneNumber']" [errorKey]="'invalidSaudiPhone'" [message]="'رقم الجوال السعودي غير صحيح'"></app-form-error>
 <app-form-error [control]="customerForm.controls['phoneNumber']" [errorKey]="'invalidEgyptPhone'" [message]="'رقم الجوال المصري غير صحيح'"></app-form-error>
     </div>
-    <div class="col-span-3">
+    <div class="col-span-12 lg:col-span-3">
         <label for="email">البريد الالكتروني</label>
        <input type="text" name="email" id="email" placeholder="البريد الالكتروني" formControlName="email">
        <app-form-error [control]="customerForm.controls['email']" [errorKey]="'required'" [message]="'البريد الالكتروني مطلوب'"></app-form-error>
        <app-form-error [control]="customerForm.controls['email']" [errorKey]="'invalidEmail'" [message]="'البريد الالكتروني غير صحيح'"></app-form-error>
     </div>
-    <div class="col-span-3">
+    <div class="col-span-12 lg:col-span-3">
         <label for="warn">الحد التنبيهي</label>
        <input type="text" name="warn" id="warn" placeholder="عدد" formControlName="creditWarningLimit"
-       maxlength="20"
+       maxlength="12"
        appOnlyNumber
        >
        <app-form-error [control]="customerForm.controls['creditWarningLimit']" [errorKey]="'required'" [message]="'الحد التنبيهي مطلوب'"></app-form-error>
+                <app-form-error  [control]="customerForm.controls['creditWarningLimit']" [errorKey]="'minlength'" [message]="' الحد التنبيهي يجب ان يكون اقل من 12 رقم'"></app-form-error>
     </div>
-    <div class="col-span-3">
+    <div class="col-span-12 lg:col-span-3">
         <label for="pay">حد الائتمان</label>
        <input type="text" name="pay" id="pay" placeholder="الرقم" formControlName="creditLimit"
        appOnlyNumber
-       maxlength="20"
+       maxlength="12"
        >
          <app-form-error [control]="customerForm.controls['creditLimit']" [errorKey]="'required'" [message]="'حد الائتمان'"></app-form-error>
+         <app-form-error  [control]="customerForm.controls['creditLimit']" [errorKey]="'minlength'" [message]="'حد الائتمان يجب ان يكون اقل من 12 رقم'"></app-form-error>
     </div>
-    <div class="col-span-4">
+    <div class="col-span-12 lg:col-span-4">
         <label for="num1">نوع الهويه (السجل التجاري)</label>
        <ng-select [items]="commercialRegister" [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'نوع الهويه '" formControlName="idTypeId"></ng-select>
        <app-form-error [control]="customerForm.controls['idTypeId']" [errorKey]="'required'" [message]="'نوع الهويه مطلوب'"></app-form-error>
     </div>
-    <div class="col-span-4">
+    <div class="col-span-12 lg:col-span-4">
         <label for="nationalId">رقم الهويه</label>
        <input type="text" name="" id="nationalId" placeholder="رقم الهوية" formControlName="idNumber"
        maxlength="14"
        appOnlyNumber>
        <app-form-error [control]="customerForm.controls['idNumber']" [errorKey]="'required'" [message]="'رقم الهوية مطلوب'"></app-form-error>
-       <app-form-error [control]="customerForm.controls['idNumber']" [errorKey]="'minlength'" [message]="'رقم الهوية يجب ان يكون  14 رقم'"></app-form-error>
+       <app-form-error [control]="customerForm.controls['idNumber']" [errorKey]="'minlength'" [message]="'رقم الهوية يجب ان يكون من 10 الي 14 رقم'"></app-form-error>
    
     </div>
-    <div class="col-span-4">
+    <div class="col-span-12 lg:col-span-4">
         <label for="num2">الرقم الضريبي</label>
        <input type="text" name="" id="num2" placeholder="الرقم الضريبي" formControlName="taxNumber" appOnlyNumber
        maxlength="15"
       >
       <app-form-error [control]="customerForm.controls['taxNumber']" [errorKey]="'required'" [message]="'الرقم الضريبي مطلوب'"></app-form-error>
-      <app-form-error [control]="customerForm.controls['taxNumber']" [errorKey]="'minlength'" [message]="'الرقم الضريبي يجب ان يكون 15 رقم'"></app-form-error>
+      <app-form-error [control]="customerForm.controls['taxNumber']" [errorKey]="'minlength'" [message]="'الرقم الضريبي يجب ان يكون من 9 الي 15 رقم'"></app-form-error>
     </div>
 
    @if(this.dataChecked == 'client'){
@@ -253,6 +239,7 @@ transition-all duration-200"
                 <app-form-error [control]="customerForm.controls['simpleAddress']" [errorKey]="'required'" [message]="'العنوان مطلوب'"></app-form-error>
                 <app-form-error [control]="customerForm.controls['simpleAddress']" [errorKey]="'minlength'" [message]="'العنوان يجب ان يكون اكبر من 3 حروف'"></app-form-error>
                 <app-form-error [control]="customerForm.controls['simpleAddress']" [errorKey]="'maxlength'" [message]="'العنوان يجب ان يكون اقل من 200 حرف'"></app-form-error>
+                <app-form-error [control]="customerForm.controls['simpleAddress']" [errorKey]="'invalidUsername'" [message]="'العنوان غير صحيح'"></app-form-error>
     </div>
 
    }
@@ -322,7 +309,7 @@ transition-all duration-200"
 
       <div class="sm:col-span-12 md:col-span-4">
         <label>رمز البريد</label>
-        <input type="text" placeholder="رمز البريد" formControlName="postalCode" appOnlyNumber >
+        <input type="text" placeholder="رمز البريد" formControlName="postalCode" appOnlyNumber maxlength="10">
         <app-form-error [control]="customerForm.controls['address'].controls['postalCode']" [errorKey]="'required'" [message]="'رمز البريد مطلوب'"></app-form-error>
         <app-form-error [control]="customerForm.controls['address'].controls['postalCode']" [errorKey]="'minlength'" [message]="'رمز البريد يجب ان يكون 4 أرقام علي الأقل'"></app-form-error>
       </div>

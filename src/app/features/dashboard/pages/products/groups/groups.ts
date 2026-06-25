@@ -13,6 +13,7 @@ import { GroupsServices } from './services/groups';
 import { Paginator } from "primeng/paginator";
 import { SharedConfirmDialog } from "../../../../../shared/ui/shared-confirm-dialog/shared-confirm-dialog";
 import { buildSearchPayload } from '../../../../../shared/config/search-config';
+import { userNameValidation } from '../../../../../shared/validations/user-name';
 
 @Component({
   selector: 'app-groups',
@@ -30,8 +31,8 @@ export class Groups {
 
 
   groupForm = this._fb.group({
-    nameAr: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-    nameEn: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+    nameAr: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100),userNameValidation()]],
+    nameEn: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100),userNameValidation()]],
   });
 
   items: any[] = [];
@@ -74,7 +75,7 @@ export class Groups {
         .subscribe({
           next: (res: any) => {
             this.items = res.data.rows.map((item: any) => ({
-              label: item.name,
+              label: item.nameAr,
               value: item.id
             }));
     
@@ -103,7 +104,7 @@ if (!event || !event.value) {
 
 
 
-  this._groupService.getById(this.idResultSearch)
+  this._groupService.getByIdInQuery(this.idResultSearch)
     .pipe(takeUntilDestroyed(this._destroyRef))
     .subscribe({
       next: (res: any) => {
@@ -122,38 +123,7 @@ if (!event || !event.value) {
       }
     });
   }
-  // searchUnit() {
-  //   if (this.idResultSearch == 0) {
-  //     // this.getAll();
-  //     this._messageServices.add({
-  //       severity: 'error',
-  //       summary: 'خطاء في البيانات',
-  //       detail: 'الرجاء اختيار قيمة',
-  //     });
-  //     return;
-  //   }
-
-
-
-  // this._groupService.getById(this.idResultSearch)
-  //   .pipe(takeUntilDestroyed(this._destroyRef))
-  //   .subscribe({
-  //     next: (res: any) => {
-  //       this.groupDataList = {
-  //         isSuccess: true,
-  //         data: {
-  //           rows: [res.data],
-  //           paginationInfo: {
-  //             totalRowsCount: 1,
-  //             totalPagesCount: 1
-  //           }
-  //         }
-  //       };
-
-  //       this.totalRecords = 1;
-  //     }
-  //   });
-  // }
+  
 
 
   clearSearch() {
@@ -195,7 +165,7 @@ if (!event || !event.value) {
       };
 
       this._groupService
-        .update(payload)
+        .updateWithOutPathParameter(payload)
         .pipe(takeUntilDestroyed(this._destroyRef))
         .subscribe({
           next: (res: any) => {
@@ -205,6 +175,7 @@ if (!event || !event.value) {
               detail: 'تم التعديل بنجاح',
             });
             this.isEditMode = true;
+            this.getAllData();
           },
         });
     }
@@ -243,11 +214,11 @@ if (!event || !event.value) {
   editData(id:number){
     this.isEditMode=true;
     this.idGroup=id;
-    this._groupService.getById(id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+    this._groupService.getByIdInQuery(id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next:(res:any)=>{
         this.groupForm.patchValue({
-          nameAr:res.data.name,
-          nameEn:res.data.name
+          nameAr:res.data.nameAr,
+          nameEn:res.data.nameEn
         })
       }
     })
@@ -258,6 +229,8 @@ if (!event || !event.value) {
   showPopupDelete(id:number){
     this.showDeleteDialog=true;
     this.idGroup=id
+
+    console.log('Id Group',this.idGroup);
 
   }
 

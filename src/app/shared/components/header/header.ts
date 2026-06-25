@@ -16,7 +16,7 @@ export class Header {
 
   // !!!!! Properties
   isShowUserDropDown = false;
-  isSidebarOpen = true;
+  isSidebarOpen = false;
   isDark=false;
   isOpen = false;
 

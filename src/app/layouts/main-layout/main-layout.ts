@@ -14,7 +14,7 @@ export class MainLayout {
   protected readonly title = signal('spider2026');
 
   
-  showSidebar = true;
+  showSidebar = false;
 
   ShowAndHideSidebar(e:any){
     // console.log(e)

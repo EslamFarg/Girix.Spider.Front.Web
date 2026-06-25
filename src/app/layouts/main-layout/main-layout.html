@@ -12,8 +12,12 @@ overflow-y-scroll
 z-20
 " style="box-shadow: var(--color-shadow);">
   <app-sidebar class="fixed"></app-sidebar>
+ 
 </aside>
+@if(this.showSidebar){
+  <div class="overlay"></div>
 
+}
 
 <div class="body_content" style=" margin-right:auto;"   [ngClass]="{
     'w-full': !showSidebar,

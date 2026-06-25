@@ -5,3 +5,11 @@
         
     }
 }
+
+
+input{
+    &.ng-valid.ng-touched{
+    border: none !important;
+     background-image: none !important;
+    }
+}

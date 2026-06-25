@@ -1,4 +1,4 @@
 export const environment = {
-    baseUrl:'http://majedsoftcompany-001-site42.stempurl.com',
+    baseUrl:'https://spider-web.api.gts-sa.net',
     version:'1.0.0'
 };

@@ -53,7 +53,6 @@ private buildUrl(endpoint: string): string {
 
   getAllSendInBody<T>(pagination?:T){
     return this.http.post<T>(`${this.baseUrl}/${this.endPoints.getAll}`,pagination);
-
   }
   getAllSendInQuery<T>(pageIndex?:number,pageSize?:number){
     return this.http.get<T>(`${this.baseUrl}/${this.endPoints.getAll}?PageIndex=${pageIndex}&PageSize=${pageSize}`);
@@ -71,6 +70,9 @@ private buildUrl(endpoint: string): string {
   getById<T>(id:T){
     return this.http.get<T>(`${this.baseUrl}/${this.endPoints.getById}/${id}`);
   }
+  getByIdInQuery<T>(id:T){
+    return this.http.get<T>(`${this.baseUrl}/${this.endPoints.getById}?id=${id}`);
+  }
   update<T>(data:T,id?:string | number ,headers?:any){
 
     return this.http.put<T>(`${this.baseUrl}/${this.endPoints.update}/${id}`,data,{
@@ -78,6 +80,9 @@ private buildUrl(endpoint: string): string {
         ...headers ?? ''
       }
     });
+  }
+  updateWithOutPathParameter<T>(data:T){
+    return this.http.put<T>(`${this.baseUrl}/${this.endPoints.update}`,data);
   }
   delete<T>(id:T){
     return this.http.delete<T>(`${this.baseUrl}/${this.endPoints.delete}/${id}`);
@@ -89,5 +94,9 @@ private buildUrl(endpoint: string): string {
            'skip-loading': 'true'
       }
     });
+  }
+
+  searchWithoutSkipLoader<T>(data:T){
+    return this.http.post(`${this.baseUrl}/${this.endPoints.search}`,data);
   }
 }

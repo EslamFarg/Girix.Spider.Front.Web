@@ -10,12 +10,12 @@ export class UnitOfMeasure  extends BasehttpService{
   constructor(){
     super('',
       {
-        "create":'api/UnitOfMeasure',
-        "getAll":'api/UnitOfMeasure',
-        "getById":'/api/UnitOfMeasure',
-        "update":'api/UnitOfMeasure',
-        "delete":'/api/UnitOfMeasure',
-        'search':'api/UnitOfMeasure/Search'
+        "create":'api/unit',
+        "getAll":'api/unit',
+        "getById":'/api/unit',
+        "update":'api/unit',
+        "delete":'/api/unit',
+        'search':'api/unit/Search'
       }
     )
 

@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Paginator } from "primeng/paginator";
 import { PageHeaderSearch } from "../../../../../../shared/ui/page-header-search/page-header-search";
+import { Customers } from '../services/customers';
 
 @Component({
   selector: 'app-explorer-customers',
@@ -9,6 +10,13 @@ import { PageHeaderSearch } from "../../../../../../shared/ui/page-header-search
   styleUrl: './explorer-customers.scss',
 })
 export class ExplorerCustomers {
+
+  // !!!!!! Services
+  _customerServices:Customers=inject(Customers)
+
+
+  // !!!!!! Properties
+
      dataAddButton={
       label:'أضافة عميل ',
       action:'/customers/add'
@@ -39,4 +47,10 @@ onPageChange(event:any){
         this.rows = event.rows ?? 10;
 
 } 
+
+
+
+gellAllCustomers(){
+  this._customerServices.getAllSendInQuery()
+}
 }

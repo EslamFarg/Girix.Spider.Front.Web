@@ -10,7 +10,8 @@ export interface Data {
 
 export interface Row {
   id: number
-  name: string
+  nameAr: string
+  nameEn: string
 }
 
 export interface PaginationInfo {
