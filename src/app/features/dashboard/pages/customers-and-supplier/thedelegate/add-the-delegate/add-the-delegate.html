@@ -202,3 +202,10 @@ transition-all duration-200"
 
 
 <app-shared-confirm-dialog [show]="showDeleteDialog" [title]="'حذف المندوب'" [message]="'هل أنت متأكد من حذف هذا المندوب ؟ لا يمكن التراجع عن هذا الإجراء.'" (confirm)="deleteDialog()" (cancel)="showDeleteDialog=false"></app-shared-confirm-dialog>
+<app-pdf-printer 
+  #printer
+  [title]="'المندوب'"  
+  [headers]="['المندوب  كود', ' المندوب اسم', ' الجوال رقم', 'المنطقة', ' الأرباح  نسبة', ' العمولة نوع ']"
+  [keys]="['code', 'name', 'phone', 'area', 'commissionPercent', 'commissionType']"
+  [data]="getCombinedData()">
+</app-pdf-printer>

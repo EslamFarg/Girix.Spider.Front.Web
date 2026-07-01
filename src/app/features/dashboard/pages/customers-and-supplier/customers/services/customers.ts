@@ -9,7 +9,7 @@ export class Customers extends BasehttpService {
     super('', {
       create: 'api/Customer/Create',
       update: 'api/Customer/Update',
-      delete: '/api/Customer/delete',
+      delete: 'api/Customer/delete',
       getAll: 'api/Customer/GetAll',
       getById: 'api/Customer/GetById',
       search: 'api/Customer/Search',

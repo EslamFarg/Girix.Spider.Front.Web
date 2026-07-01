@@ -1,4 +1,4 @@
-<app-page-header-search [titleHeading]="' العملاء '" [addButton]="dataAddButton"
+<app-page-header-search [titleHeading]="' كارت الصنف '" [addButton]="dataAddButton"
 [filteringData]="filteringData"
 (clickSearch)="onSearch($event)"
 ></app-page-header-search>
@@ -8,12 +8,12 @@
     <thead class="bg-gray-100 ">
       <tr class="sticky top-0">
         <th class="p-2 text-center">م</th>
-        <th class="p-2 text-center">كود العميل</th>
-        <th class="p-2 text-center">اسم العميل</th>
-        <th class="p-2 text-center">رقم الجوال</th>
-        <th class="p-2 text-center">البريد الالكتروني</th>
-        <th class="p-2 text-center">رقم الهويه</th>
-        <th class="p-2 text-center">الرقم الضريبي</th>
+        <th class="p-2 text-center">كود الصنف</th>
+        <th class="p-2 text-center">اسم الصنف</th>
+        <th class="p-2 text-center">نوع الصنف</th>
+        <th class="p-2 text-center">ضريبه القيمة المضافة</th>
+        <th class="p-2 text-center">الضريبة الأنتقائية</th>
+        <th class="p-2 text-center">الوحدات</th>
         <th class="p-2 text-center">الادوات</th>
       </tr>
     </thead>
@@ -26,14 +26,23 @@
 <td class="p-2 text-center">{{ $index + 1 }}</td>
 <td class="p-2 text-center">{{ item.code }}</td>
 <td class="p-2 text-center">{{ item?.name }}</td>
-<td class="p-2 text-center">{{ item.phoneNumber }}</td>
-<td class="p-2 text-center">{{ item.email }}</td>
-<td class="p-2 text-center">{{ item.idNumber }}</td>
-<td class="p-2 text-center">{{ item.taxNumber }}</td>
+<td class="p-2 text-center" style="direction: ltr;">{{ item.productTypeId == 1 ? 'مخزني' : 'خدمي' }}</td>
+<td class="p-2 text-center">{{ item.vatRate }}%</td>
+<td class="p-2 text-center">{{ item.selectiveTaxRate }}%</td>
+<td class="text-center">
+  <button
+    class="view-btn cursor-pointer text-btn text-[16px] hover:transform hover:scale-110 duration-300"
+    (click)="showUnits(item)"
+   
+  >
+    <i class="fa-regular fa-eye"></i>
+  </button>
+</td>
+
 
       <td class="p-2 w-full flex items-center justify-center gap-2">
-          
-            <button class="update" (click)="sendIdToUpdateState(item.id)">
+
+            <button class="update" (click)="editProduct(item.id)">
                 <!-- <svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="33.0001" height="25.0001" rx="2" fill="#BEE0F0"/>
 <path d="M11 8H10C9.46957 8 8.96086 8.21071 8.58579 8.58579C8.21071 8.96086 8 9.46957 8 10V19C8 19.5304 8.21071 20.0391 8.58579 20.4142C8.96086 20.7893 9.46957 21 10 21H19C19.5304 21 20.0391 20.7893 20.4142 20.4142C20.7893 20.0391 21 19.5304 21 19V18" stroke="#083448" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -42,7 +51,7 @@
 
 <i class="fa-solid fa-pen-to-square"></i>
             </button>
-            <button class="delete" (click)="viewDeletePopup(item.id)">
+            <button class="delete" (click)="deleteProduct(item.id)">
                 <!-- <svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="33" height="25" rx="2" fill="#FFE5E5"/>
 <path d="M23.5 4.5H20L19 3.5H14L13 4.5H9.5V6.5H23.5M10.5 19.5C10.5 20.0304 10.7107 20.5391 11.0858 20.9142C11.4609 21.2893 11.9696 21.5 12.5 21.5H20.5C21.0304 21.5 21.5391 21.2893 21.9142 20.9142C22.2893 20.5391 22.5 20.0304 22.5 19.5V7.5H10.5V19.5Z" fill="#FF3D00"/>
@@ -54,7 +63,7 @@
 </tr>
 }@empty{
     <tr class="h-[420px]">
-      <td colspan="7">
+      <td colspan="10">
         <div class="flex flex-col items-center justify-center py-12 text-center">
           
           <!-- SVG -->
@@ -98,4 +107,56 @@
    <div class="card flex justify-center mt-4">
             <p-paginator (onPageChange)="onPageChange($event)" [showFirstLastIcon]="false" [first]="first" [rows]="rows" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 25, 50,100,250]"/>
       </div>
-      <app-shared-confirm-dialog [show]="showDeleteDialog" [title]="'حذف العميل'" [message]="'هل أنت متأكد من حذف هذا العميل؟ لا يمكن التراجع عن هذا الإجراء.'" (confirm)="deleteDialog()" (cancel)="showDeleteDialog=false"></app-shared-confirm-dialog>
+
+<app-shared-confirm-dialog [show]="showDeleteDialog" [title]="'حذف الصنف'" [message]="'هل أنت متأكد من حذف هذا الصنف ؟ لا يمكن التراجع عن هذا الإجراء.'" (confirm)="deleteDialog()" (cancel)="showDeleteDialog=false"></app-shared-confirm-dialog>
+
+<div class="filter_search_popup_explorer">
+    
+<p-dialog
+  [(visible)]="showUnitsDialog"
+  [modal]="true"
+  [style]="{ width: '700px' }"
+  header="وحدات الصنف"
+>
+<div class="table-responsive table_explorer">
+    <table class="w-full">
+      <thead>
+        <tr class="[&>*]:p-[14px]">
+          <th>الوحدة</th>
+          <th>معامل التحويل</th>
+          <th>الوحدة المصغرة</th>
+          <th>سعر الشراء</th>
+          <th>سعر البيع</th>
+          <th>الجملة</th>
+          <th>الافتراضية</th>
+        </tr>
+      </thead>
+  
+      <tbody>
+        @for(unit of units; track unit.id){
+  
+          <tr class="[&>*]:p-[14px]">
+            <td>{{ unit.unitOfMeasureName }}</td>
+            <td>{{ unit.conversionFactor }}</td>
+            <td>{{ unit.smallerUnitName || '-' }}</td>
+            <td>{{ unit.purchasePrice }}</td>
+            <td>{{ unit.retailPrice }}</td>
+            <td>{{ unit.wholesalePrice }}</td>
+  
+            <td>
+              @if(unit.isDefaultSellingUnit){
+                <i class="fa-solid fa-circle-check text-green-600"></i>
+              }@else{
+                -
+              }
+            </td>
+          </tr>
+  
+        }
+      </tbody>
+  
+    </table>
+</div>
+
+</p-dialog>
+</div>

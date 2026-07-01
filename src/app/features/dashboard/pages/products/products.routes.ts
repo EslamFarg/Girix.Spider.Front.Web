@@ -18,7 +18,23 @@ export const ProductsRoute:Routes=[
            },
            {
             path:'product-card',
-            loadComponent:()=>import('./product-card/product-card').then(m=>m.ProductCard)
+            loadComponent:()=>import('./product-card/product-card').then(m=>m.ProductCard),
+            children:[
+                {
+                  path:'',
+                  redirectTo:'explorer',
+                  pathMatch:'full'
+                },
+
+              {
+                path:'add',
+                loadComponent:()=>import('./product-card/add-product/add-product').then(m=>m.AddProduct)
+              },
+              {
+                path:'explorer',
+                loadComponent:()=>import('./product-card/explorer-product/explorer-product').then(m=>m.ExplorerProduct)
+              }
+            ]
            },
            {
             path:'inventories',

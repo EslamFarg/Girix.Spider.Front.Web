@@ -54,7 +54,7 @@
     <label>بحث بكود العميل </label>
                 <div class="flex items-center gap-2 relative ">
                    <div class="search_input relative w-[100%] ">
-           <p-autocomplete styleClass="w-full"  [inputId]="'searchByCodeProduct'" [suggestions]="items" (completeMethod)="search($event)" [placeholder]="selectedSearch"/>
+           <p-autocomplete styleClass="w-full" (keydown.enter)="onEnter($event)" (onSelect)="onSelectDelegate($event)" #autoComplete  [formControl]="searchControl"   [inputId]="'searchByCodeProduct'" [suggestions]="items" (completeMethod)="search($event)" [placeholder]="selectedSearch"/>
         
                  
                     <div class="search_box absolute top-[40px] left-0 z-[20]
@@ -62,7 +62,7 @@ shadow-md
 bg-white w-[200px] min-h-[32px] rounded
 p-2
 [&>*]:p-2
-[&>*]:hover:bg-[var(--color-primary)]
+[&>*]:hover:bg-[var(--color-btn)]
 [&>*]:hover:text-white
 [&>*:not(:last-child)]:mb-3
 [&>*]:text-[14px]
@@ -75,27 +75,21 @@ transition-all duration-200"
   'opacity-100 visible': showSearchBox
 }">
 
+  <p (click)="selectFilterSearch('code')"
+     [ngClass]="{'bg-btn text-white': selectedSearchType == 'code'}">
+     الكود
+  </p>
   <p (click)="selectFilterSearch('name')"
-     [ngClass]="{'bg-primary text-white': selectedSearch == 'name'}">
-     اسم العميل
+     [ngClass]="{'bg-btn text-white': selectedSearchType == 'name'}">
+     الأسم
   </p>
 
   <p (click)="selectFilterSearch('mobile')"
-     [ngClass]="{'bg-primary text-white': selectedSearch == 'mobile'}">
+     [ngClass]="{'bg-btn text-white': selectedSearchType == 'mobile'}">
      رقم الجوال
   </p>
 
-  <p (click)="selectFilterSearch('tax')"
-     [ngClass]="{'bg-primary text-white': selectedSearch == 'tax'}">
-     الرقم الضريبي
-  </p>
-
-  <p (click)="selectFilterSearch('commercial')"
-     [ngClass]="{'bg-primary text-white': selectedSearch == 'commercial'}"
-    
-     >
-     السجل التجاري
-  </p>
+ 
 
 </div>
         <!-- <input type="text" class="text-[14px] w-[100%]"  placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/> -->
@@ -319,3 +313,43 @@ transition-all duration-200"
  </div>
   </form>
 }
+
+
+
+<app-shared-confirm-dialog [show]="showDeleteDialog" [title]="'حذف العميل'" [message]="'هل أنت متأكد من حذف هذا العميل ؟ لا يمكن التراجع عن هذا الإجراء.'" (confirm)="deleteDialog()" (cancel)="showDeleteDialog=false"></app-shared-confirm-dialog>
+
+<app-pdf-printer
+  #printer
+  [title]="'العملاء'"
+  [headers]="[
+    'العميل / المورد',
+    'نوع العميل',
+    'كود العميل',
+    'اسم العميل',
+    'رقم الجوال',
+    'البريد الإلكتروني',
+    'الحد التنبيهي',
+    'حد الائتمان',
+    'نوع الهوية',
+    'رقم الهوية',
+    'الرقم الضريبي',
+    'العنوان',
+    'البيان',
+  ]"
+  [keys]="[
+    'custSuppTypeName',
+    'customerTypeName',
+    'customerCode',
+    'nameAr',
+    'phoneNumber',
+    'email',
+    'creditWarningLimit',
+    'creditLimit',
+    'idTypeName',
+    'idNumber',
+    'taxNumber',
+    'simpleAddress',
+    'notes',
+  ]"
+  [data]="getCombinedData()">
+</app-pdf-printer>

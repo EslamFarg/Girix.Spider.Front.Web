@@ -18,8 +18,11 @@
 
           @if(parent.isLeaf){
             <div class="flex items-center gap-[10px]">
-                <button class="w-[25px] h-[19px] bg-[#E8EFF4]  text-[#1B6392] flex items-center justify-center rounded-[2px]"><i class="fa-solid fa-pen-to-square"></i></button>
-                 <button class="w-[25px] h-[19px] bg-[#FFE5E5] text-[#FF3D00] flex items-center justify-center"><i class="fa-solid fa-trash"></i></button>
+                <button  (click)="sendEventEdit('edit',parent)"
+                 class="w-[25px] h-[19px] bg-[#E8EFF4]  text-[#1B6392] flex items-center justify-center rounded-[2px]"><i class="fa-solid fa-pen-to-square"></i></button>
+                 <button 
+                 (click)="sendEventDelete('delete',parent)"
+                 class="w-[25px] h-[19px] bg-[#FFE5E5] text-[#FF3D00] flex items-center justify-center"><i class="fa-solid fa-trash"></i></button>
             </div>
 
           }
@@ -28,7 +31,7 @@
 
      @if (parent.expanded && parent.children?.length) {
       <div class="children pl-6">
-        <app-tree-project [tree]="parent.children" [level]="level() + 1"></app-tree-project>
+        <app-tree-project [tree]="parent.children" [level]="level() + 1" (isDeleteOrUpdate)="isDeleteOrUpdate.emit($event)"></app-tree-project>
       </div>
     }
 }

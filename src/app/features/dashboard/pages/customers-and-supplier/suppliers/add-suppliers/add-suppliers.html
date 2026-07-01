@@ -5,7 +5,7 @@
   (actionClicked)="handleAction($event)"
 ></app-page-header>
 
-<form class="box_header">
+<form class="box_header" [formGroup]="supplierForm">
   <div class="title">بيانات المورد</div>
  
   <div>
@@ -15,19 +15,87 @@
         <label for="itemcheck" style="margin-bottom: 0;">عملاء وموردين</label>
 
     </div>
+
+        <div  class="grid grid-cols-2 md:grid-cols-2 mt-4">
+    <div class="flex items-center gap-2">
+  <input 
+    type="radio"
+    name="customerType"
+    id="company"
+    [value]="Company"
+    data-label="company"
+    formControlName="customerType"
+    (change)="changeChecked($event)"
+  >
+  <label for="company" style="margin-bottom:0px !important;">شركة</label>
+</div>
+
+<div class="flex items-center gap-2">
+  <input 
+    type="radio"
+    name="customerType"
+    id="client"
+    [value]="Individual"
+    data-label="client"
+    formControlName="customerType"
+    (change)="changeChecked($event)"
+  >
+  <label for="client" style="margin-bottom:0px !important;">فرد</label>
+</div>
+</div>
   </div>
 
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] mb-[20px]">
 
-    <div class="col-span-12">
+ <div class="col-span-12">
           <div class="input_group mt-3 w-full">
-    <label>بحث بكود المورد  </label>
-                <div class="flex items-center gap-2 relative ">
+    <label>بحث بكود المورد    </label>
+                <div class="flex items-center gap-2 relative " #searchBox>
                     <div class="search_input relative w-full">
-                  <input type="text" class="text-[14px] w-full" style="color:var(--color-black); font-weight:600; width:100%;"/>
-                  <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[10px]" >
-                    <button>
+                     <p-autocomplete (keydown.enter)="onEnter($event)" (onSelect)="onSelectDelegate($event)"  #autoComplete  [formControl]="searchControl" [suggestions]="items" (completeMethod)="search($event)" [placeholder]="selectedSearch" />
+                      <!-- <app-form-error [control]="searchControl" [errorKey]="'required'" [message]="'بحث مطلوب'"></app-form-error> -->
+                                    <div class="search_box absolute top-[40px] left-0 z-[20]
+shadow-md
+bg-white w-[200px] min-h-[32px] rounded
+p-2
+[&>*]:p-2
+[&>*]:hover:bg-[var(--color-btn)]
+[&>*]:hover:text-white
+[&>*:not(:last-child)]:mb-3
+[&>*]:text-[14px]
+[&>*]:rounded
+[&>*]:cursor-pointer
+transition-all duration-200"
+
+[ngClass]="{
+  'translate-y-[-20px] opacity-0 invisible': !showSearchBox,
+  'opacity-100 visible': showSearchBox
+}" >
+
+  <p (click)="selectFilterSearch('code')"
+     [ngClass]="{'bg-btn text-white': selectedSearchType  == 'code'}">
+    الكود
+  </p>
+
+  <p (click)="selectFilterSearch('name')"
+     [ngClass]="{'bg-btn text-white': selectedSearchType  == 'name'}">
+     الأسم
+  </p>
+  <!-- <p (click)="selectFilterSearch('email')"
+     [ngClass]="{'bg-btn text-white': selectedSearchType  == 'email'}">
+     بالبريد الالكتروني
+  </p> -->
+  <p (click)="selectFilterSearch('mobile')"
+     [ngClass]="{'bg-btn text-white': selectedSearchType  == 'mobile'}">
+    رقم الجوال
+  </p>
+
+
+</div>
+
+                  <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[7px]" >
+                    <button (click)="showSearchBox = !showSearchBox" type="button">
                       <svg
                         width="20"
                         height="18"
@@ -82,98 +150,194 @@
                 </div>
   </div>
     </div>
-    <div class="col-span-4">
+    <div class="col-span-12 lg:col-span-4">
         <label for="customerCode" >كود المورد</label>
-        <input type="text" id="customerCode" placeholder="كود المورد">
+        <input type="text" id="customerCode" placeholder="كود المورد" readonly formControlName="customerCode">
+        
     </div>
-    <div class="col-span-8">
+    <div class="col-span-12 lg:col-span-8">
         <label for="reference">اسم المورد</label>
-        <input type="text" placeholder="اسم المورد" id="reference">
+        <input type="text" placeholder="اسم المورد" id="reference" formControlName="nameAr" maxlength="100">
+        <app-form-error [control]="supplierForm.controls['nameAr']" [errorKey]="'required'" [message]="'اسم المورد مطلوب'"></app-form-error>
+        <app-form-error [control]="supplierForm.controls['nameAr']" [errorKey]="'minlength'" [message]="'اسم المورد يجب ان يحتوي على حرفين على الأقل'"></app-form-error>
+        <app-form-error [control]="supplierForm.controls['nameAr']" [errorKey]="'maxlength'" [message]="'اسم المورد مطلوب'"></app-form-error>
+        <app-form-error [control]="supplierForm.controls['nameAr']" [errorKey]="'invalidUsername'" [message]="'اسم المورد يجب ان يحتوي على حروف وارقام و _ و - فقط ويجب ان لايبدء برقم'"></app-form-error>
     </div>
-    <div class="col-span-3">
+    <!-- <div class="col-span-3">
         <label for="phonenumber">رقم الجوال</label>
         <input type="text" placeholder="رقم الجوال" id="phonenumber">
+    </div> -->
+       <div class="col-span-12 lg:col-span-3">
+        <label for="phonenumber">رقم الجوال</label>
+        <!-- <input type="text" placeholder="رقم الجوال" id="phonenumber" formControlName="phoneNumber"> -->
+  <intl-tel-input
+  #phoneInput
+  [countryOrder]="['eg','sa','ae']"
+  [onlyCountries]="['eg','sa','ae']"
+  initialCountry="sa"
+  [loadUtils]="loadUtils"
+  formControlName="phoneNumber"
+  (countryChange)="onCountryChange()">
+</intl-tel-input>
+<app-form-error [control]="supplierForm.controls['phoneNumber']" [errorKey]="'required'" [message]="'رقم الجوال مطلوب'"></app-form-error>
+<app-form-error [control]="supplierForm.controls['phoneNumber']" [errorKey]="'invalidSaudiPhone'" [message]="'رقم الجوال السعودي غير صحيح'"></app-form-error>
+<app-form-error [control]="supplierForm.controls['phoneNumber']" [errorKey]="'invalidEgyptPhone'" [message]="'رقم الجوال المصري غير صحيح'"></app-form-error>
     </div>
-    <div class="col-span-3">
+    <div class="col-span-12 lg:col-span-3">
         <label for="email">البريد الالكتروني</label>
-       <input type="text" name="email" id="email" placeholder="البريد الالكتروني">
+       <input type="text" name="email" id="email" placeholder="البريد الالكتروني" formControlName="email">
+              <app-form-error [control]="supplierForm.controls['email']" [errorKey]="'required'" [message]="'البريد الالكتروني مطلوب'"></app-form-error>
+       <app-form-error [control]="supplierForm.controls['email']" [errorKey]="'invalidEmail'" [message]="'البريد الالكتروني غير صحيح'"></app-form-error>
     </div>
-    <div class="col-span-3">
+    <div class="col-span-12 lg:col-span-3">
         <label for="warn">الحد التنبيهي</label>
-       <input type="text" name="warn" id="warn" placeholder="عدد">
+       <input type="text" name="warn" id="warn" placeholder="عدد" formControlName="creditWarningLimit"    maxlength="12"
+       appOnlyNumber>
+      <app-form-error [control]="supplierForm.controls['creditWarningLimit']" [errorKey]="'required'" [message]="'الحد التنبيهي مطلوب'"></app-form-error>
+      <app-form-error [control]="supplierForm.controls['creditWarningLimit']" [errorKey]="'maxlength'" [message]="' الحد التنبيهي يجب ان يكون 12 رقم علي الاقل'"></app-form-error>
     </div>
-    <div class="col-span-3">
+    <div class="col-span-12 lg:col-span-3">
         <label for="pay">حد الائتمان</label>
-       <input type="text" name="pay" id="pay" placeholder="الرقم">
+       <input type="text" name="pay" id="pay" placeholder="الرقم" formControlName="creditLimit" maxlength="12" appOnlyNumber>
+       <app-form-error [control]="supplierForm.controls['creditLimit']" [errorKey]="'required'" [message]="'حد الائتمان مطلوب'"></app-form-error>
+       <app-form-error [control]="supplierForm.controls['creditLimit']" [errorKey]="'maxlength'" [message]="'حد الائتمان يجب ان يكون 12 رقم علي الاقل'"></app-form-error>
     </div>
-    <div class="col-span-4">
+    <div class="col-span-12 lg:col-span-4">
         <label for="num1">نوع الهويه (السجل التجاري)</label>
-       <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'نوع الهويه '"></ng-select>
+       <ng-select [items]="commercialRegister" [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'نوع الهويه '" formControlName="idTypeId"></ng-select>
+       <app-form-error [control]="supplierForm.controls['idTypeId']" [errorKey]="'required'" [message]="'نوع الهويه مطلوب'"></app-form-error>
     </div>
-    <div class="col-span-4">
+    <div class="col-span-12 lg:col-span-4">
         <label for="num2">رقم الهويه</label>
-       <input type="text" name="" id="num2" placeholder="رقم الهوية">
+       <input type="text" name="" id="num2" placeholder="رقم الهوية" formControlName="idNumber" appOnlyNumber maxlength="14">
+       <app-form-error [control]="supplierForm.controls['idNumber']" [errorKey]="'required'" [message]="'رقم الهوية مطلوب'"> </app-form-error>
+       <app-form-error [control]="supplierForm.controls['idNumber']" [errorKey]="'minlength'" [message]="'رقم الهوية يجب ان يكون من 10 الي 14 رقم '"></app-form-error>
     </div>
-    <div class="col-span-4">
+    <div class="col-span-12 lg:col-span-4">
         <label for="num2">الرقم الضريبي</label>
-       <input type="text" name="" id="num2" placeholder="الرقم الضريبي">
+       <input type="text" name="" id="num2" placeholder="الرقم الضريبي" formControlName="taxNumber" appOnlyNumber maxlength="15">
+       <app-form-error [control]="supplierForm.controls['taxNumber']" [errorKey]="'required'" [message]="'الرقم الضريبي مطلوب'"></app-form-error>
+       <app-form-error [control]="supplierForm.controls['taxNumber']" [errorKey]="'minlength'" [message]="'الرقم الضريبي يجب ان يكون من 9 الي 15 رقم'"></app-form-error>
     </div>
+     @if(this.dataChecked == 'client'){
+     <div class="col-span-12">
+                <label for="simpleAddress" class="font-bold block mb-2"> العنوان </label>
+                <input type="text" id="simpleAddress" placeholder="العنوان" formControlName="simpleAddress" maxlength="200">
+
+                <app-form-error [control]="supplierForm.controls['simpleAddress']" [errorKey]="'required'" [message]="'العنوان مطلوب'"></app-form-error>
+                <app-form-error [control]="supplierForm.controls['simpleAddress']" [errorKey]="'minlength'" [message]="'العنوان يجب ان يكون 3 حروف علي الاقل'"></app-form-error>
+                <app-form-error [control]="supplierForm.controls['simpleAddress']" [errorKey]="'maxlength'" [message]="'العنوان يجب ان يكون اقل من 200 حرف'"></app-form-error>
+                <app-form-error [control]="supplierForm.controls['simpleAddress']" [errorKey]="'invalidUsername'" [message]="'العنوان غير صحيح'"></app-form-error>
+    </div>
+
+   }
 
 
      <div class="col-span-12">
                 <label for="icondisplay" class="font-bold block mb-2"> البيان </label>
-                <textarea style="height:89px !important;" placeholder="البيان"></textarea>
+                <textarea style="height:89px !important;" placeholder="البيان" formControlName="notes" maxlength="500"></textarea>
+                <app-form-error [control]="supplierForm.controls['notes']" [errorKey]="'maxlength'" [message]="'البيان يجب ان يكون اقل من او يساوي 500 حرف'"></app-form-error>
             </div>
 
   </div>
 
 
 </form>
-<form class="box_header my-[25px] relative" style="padding-top: 10px ;">
-  <div class="title">العنوان التفصيلي</div>
+@if(this.dataChecked == 'company'){
+  <form class="box_header my-[25px] relative mt-8" style="padding-top: 10px ;" [formGroup]="supplierForm">
 
+    <div class="title">العنوان التفصيلي</div>
 
+ <div formGroupName="address">
+     <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] my-[20px]">
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] my-[20px]">
-  
-    <div class="sm:col-span-12 md:col-span-4">
-        <label for="country">الدولة</label>
-        <input type="text" placeholder="الدولة" id="country">
+      <div class="sm:col-span-12 md:col-span-4">
+        <label>الدولة</label>
+        <input type="text" placeholder="الدولة" formControlName="country" maxlength="50">
+        <app-form-error [control]="addressForm.controls['country']" [errorKey]="'required'" [message]="'الدولة مطلوبة'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['country']" [errorKey]="'minlength'" [message]="'الدولة يجب ان يكون  2 حرف علي الأقل'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['country']" [errorKey]="'maxlength'" [message]="'الدولة يجب ان يكون أقل من 50 حرف'"></app-form-error>
+
+      </div>
+
+      <div class="sm:col-span-12 md:col-span-4">
+        <label>المدينة</label>
+        <input type="text" placeholder="المدينة" formControlName="city" maxlength="50">
+        <app-form-error [control]="addressForm.controls['city']" [errorKey]="'required'" [message]="'المدينة مطلوبة'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['city']" [errorKey]="'minlength'" [message]="'المدينة يجب ان يكون  2 حرف علي الأقل'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['city']" [errorKey]="'maxlength'" [message]="'المدينة يجب ان يكون أقل من 50 حرف'"></app-form-error>
+      </div>
+
+      <div class="sm:col-span-12 md:col-span-4">
+        <label>الحي</label>
+        <input type="text" placeholder="الحي" formControlName="district" maxlength="50">
+        <app-form-error [control]="addressForm.controls['district']" [errorKey]="'required'" [message]="'الحي مطلوب'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['district']" [errorKey]="'minlength'" [message]="'الحي يجب أن يكون   2 حرف علي الأقل'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['district']" [errorKey]="'maxlength'" [message]="'الحي يجب أن يكون أقل من 50 حرف'"></app-form-error>
+      </div>
+
+      <div class="sm:col-span-12 md:col-span-4">
+        <label>الشارع</label>
+        <input type="text" placeholder="الشارع" formControlName="street" maxlength="100">
+        <app-form-error [control]="addressForm.controls['street']" [errorKey]="'required'" [message]="'الشارع مطلوب'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['street']" [errorKey]="'minlength'" [message]="'علي الأقل الشارع يجب ان يكون  3 حروف'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['street']" [errorKey]="'maxlength'" [message]="'الشارع يجب ان يكون اقل من 100 حروف'"></app-form-error>
+      </div>
+
+      <div class="sm:col-span-12 md:col-span-4">
+        <label>المبنى</label>
+        <input type="text" placeholder="المبنى" formControlName="buildingNumber" maxlength="10" appOnlyNumber>
+        <app-form-error [control]="addressForm.controls['buildingNumber']" [errorKey]="'required'" [message]="'المبنى مطلوب'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['buildingNumber']" [errorKey]="'maxlength'" [message]="'المبنى يجب ان يكون أقل من 10 أرقام'"></app-form-error>
+      </div>
+
+      <div class="sm:col-span-12 md:col-span-4">
+        <label>رمز البريد</label>
+        <input type="text" placeholder="رمز البريد" formControlName="postalCode" appOnlyNumber maxlength="10">
+        <app-form-error [control]="addressForm.controls['postalCode']" [errorKey]="'required'" [message]="'رمز البريد مطلوب'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['postalCode']" [errorKey]="'minlength'" [message]="'رمز البريد يجب ان يكون 4 أرقام علي الأقل'"></app-form-error>
+      </div>
+
     </div>
-    <div class="sm:col-span-12 md:col-span-4">
-        <label for="city">المدينه</label>
-        <input type="text" placeholder="المدينه" id="city">
-    </div>
-    <div class="sm:col-span-12 md:col-span-4">
-        <label for="district">الحي</label>
-        <input type="text" placeholder="الحي" id="district">
-    </div>
-    <div class="sm:col-span-12 md:col-span-4">
-        <label for="street">الشارع</label>
-        <input type="text" placeholder="الشارع" id="street">
-    </div>
-    <div class="sm:col-span-12 md:col-span-4">
-        <label for="building">المبني</label>
-        <input type="text" placeholder="المبني" id="building">
-    </div>
-    <div class="sm:col-span-12 md:col-span-4">
-        <label for="postCode">رمز البريد</label>
-        <input type="text" placeholder="رمز البريد" id="postCode">
-    </div>
 
-     <div class="col-span-12">
-                <label for="icondisplay" class="font-bold block mb-2"> العنوان بالتفصيل </label>
-                <textarea style="height:89px !important;" placeholder="أدخل العنوان"></textarea>
-            </div>
+ </div>
+  </form>
+}
 
 
 
+<app-shared-confirm-dialog [show]="showDeleteDialog" [title]="'حذف المورد'" [message]="'هل أنت متأكد من حذف هذا المورد ؟ لا يمكن التراجع عن هذا الإجراء.'" (confirm)="deleteDialog()" (cancel)="showDeleteDialog=false"></app-shared-confirm-dialog>
+<!-- <app-pdf-printer 
+  #printer
+  [title]="'المندوب'"  
+  [headers]="['المندوب  كود', ' المندوب اسم', ' الجوال رقم', 'المنطقة', ' الأرباح  نسبة', ' العمولة نوع ']"
+  [keys]="['code', 'name', 'phone', 'area', 'commissionPercent', 'commissionType']"
+  [data]="getCombinedData()">
+</app-pdf-printer> -->
 
-     <!-- <p-button (click)="showDialog()" label="Show" /> -->
-
-
-  </div>
-
-
-</form>
+<app-pdf-printer
+  #printer
+  [title]="'المورد'"
+  [headers]="[
+    'المورد كود',
+    'المورد اسم',
+    'الجوال رقم',
+    'الإلكتروني البريد',
+    'الائتمان حد',
+    'الضريبي الرقم',
+    'الهوية رقم',
+    'الهوية نوع'
+  ]"
+  [keys]="[
+    'customerCode',
+    'nameAr',
+    'phoneNumber',
+    'email',
+    'creditLimit',
+    'taxNumber',
+    'idNumber',
+    'idTypeName'
+  ]"
+  [data]="getCombinedData()">
+</app-pdf-printer>
 

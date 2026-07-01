@@ -1,0 +1,60 @@
+.filter_search_popup_explorer{
+
+    ::ng-deep .p-dialog{
+        background-color: var(--color-bg);
+        overflow: hidden;
+        width: 1050px !important;
+        height: 360px !important;
+        @media (max-width:992px) {
+            width: 90% !important;
+            
+        }
+
+        .table-responsive{
+            height:250px !important;
+        }
+         .p-button-text.p-button-secondary {
+            background-color: transparent !important;
+        }
+        .p-dialog-header{
+
+            background-color: var(--color-head-table);
+                height: 56px;
+                color: var(--color-black) !important;
+               
+                
+        }
+
+       
+
+         .p-dialog-header-actions{
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid var(--color-black);
+            padding: 10px !important;
+            display: flex;
+            justify-content: center;
+            svg{
+                transform: scale(0.8);
+                path{
+                    color: var(--color-primary);
+                    
+                }
+            }
+        }
+
+        p-button{
+    button{
+        width: 120px !important; 
+        height: 40px !important;
+        background-color: var(--color-btn) !important;
+        border: 0 !important;
+        color: var(--color-text-btn) !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+    }
+}
+    }
+        
+}

@@ -1,4 +1,4 @@
-import { Component, input, Input } from '@angular/core';
+import { Component, input, Input, output } from '@angular/core';
 
 @Component({
   selector: 'app-tree-project',
@@ -9,4 +9,14 @@ import { Component, input, Input } from '@angular/core';
 export class TreeProject {
  tree: any=input<any>();
 level=input<any>(0) ;
+isDeleteOrUpdate=output<any>();
+
+
+
+sendEventDelete(event: any,parent: any) {
+  this.isDeleteOrUpdate.emit({event,parent});
+}
+sendEventEdit(event: any,parent: any) {
+  this.isDeleteOrUpdate.emit({event,parent});  
+}
 }

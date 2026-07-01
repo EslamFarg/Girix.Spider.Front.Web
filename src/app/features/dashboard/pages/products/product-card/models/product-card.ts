@@ -1,9 +1,11 @@
 export interface productModel{
-
+  id?: number,
   code: string,
   nameAr: string,
   nameEn: string,
+  name: string,
   productType: number,
+  productTypeId: number,
   categoryId: number,
   groupId: number,
   vat: number,
@@ -12,6 +14,8 @@ export interface productModel{
   vatCode: string,
   taxExemptionReasonCode: string,
   taxExemptionReason: string,
+  vatRate?: number,
+  selectiveTaxRate?: number,
   productCards: [
     {
       id: number,

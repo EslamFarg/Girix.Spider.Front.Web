@@ -168,19 +168,7 @@ export class PageHeaderSearch {
   }
 
   search() {
-//   const active = this.filteringData().find((x: any) => x.value?.trim());
-
-//   if (!active) return;
-  
-//   this.visible = false;
-//   this.cdr.detectChanges(); // إذا قمت بحقن CDR هناك أيضاً
-//   this.clickSearch.emit({
-//     key: active.key,
-//     value: active.value
-//   });
-
 const active = this.filteringData().find((x: any) => x.value?.trim());
-
     if (!active) return;
 
     this.visible = false;
@@ -191,6 +179,12 @@ const active = this.filteringData().find((x: any) => x.value?.trim());
     });
     
     this.cdr.detectChanges();
+      this.filteringData().forEach((item: any) => {
+        // إذا لم يكن هذا هو الحقل الحالي، قم بتفريغه
+    
+          item.value = ''; 
+      
+      });
   
 }
 

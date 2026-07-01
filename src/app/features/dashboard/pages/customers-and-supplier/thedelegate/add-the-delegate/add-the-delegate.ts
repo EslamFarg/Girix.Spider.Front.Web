@@ -19,6 +19,7 @@ import { SearchableColumnEnum } from '../../../../../../shared/Enums/enumSearch'
 import { buildSearchPayload } from '../../../../../../shared/config/search-config';
 import { SharedConfirmDialog } from "../../../../../../shared/ui/shared-confirm-dialog/shared-confirm-dialog";
 import { SharedStateServices } from '../../../../../../shared/services/shared-state-services';
+import { PdfPrinterComponent } from '../../../../../../shared/components/pdf-printer/pdf-printer';
 
 @Component({
   selector: 'app-add-the-delegate',
@@ -32,7 +33,8 @@ import { SharedStateServices } from '../../../../../../shared/services/shared-st
     MaxPercentageDirective,
     AutoCompleteModule, FormsModule,
     NgClass,
-    SharedConfirmDialog
+    SharedConfirmDialog,
+    PdfPrinterComponent
 ],
   templateUrl: './add-the-delegate.html',
   styleUrl: './add-the-delegate.scss',
@@ -47,6 +49,7 @@ export class AddTheDelegate extends FormComponentBase{
   // !!!!!!!!!!!!!!!!!!! Properties
   @ViewChild('codeElement') codeElement: any;
   @ViewChild('autoComplete') autoComplete!: AutoComplete;
+  @ViewChild('printer') printer!: PdfPrinterComponent;
   CommissionTypeProfit = CommissionType.ProfitValue;
   CommissionTypeSales = CommissionType.SalesValue;
   delegateForm = this._fb.group({
@@ -88,6 +91,7 @@ export class AddTheDelegate extends FormComponentBase{
   showDeleteDialog = false;
   // !!!!!!!!!!!! Methods
 
+  
   
 
   ngOnInit() {
@@ -135,16 +139,14 @@ export class AddTheDelegate extends FormComponentBase{
     if (type == 'name') {
       this.selectedSearch = 'اسم المندوب';
       this.SearchValEnum=SearchableColumnEnum.Name
-      this.showSearchBox = false;
     } else if (type == 'mobile') {
       this.selectedSearch = 'رقم الجوال';
       this.SearchValEnum=SearchableColumnEnum.Phone
-      this.showSearchBox = false;
     } else if (type == 'code') {
       this.selectedSearch = 'الكود';
       this.SearchValEnum=SearchableColumnEnum.Code
-      this.showSearchBox = false;
     } 
+    this.showSearchBox = false;
   }
 
     onEnter(event: any) {
@@ -212,6 +214,7 @@ export class AddTheDelegate extends FormComponentBase{
     });
 }
 
+// !!!!!!!!! Actions
   save() {
     if (this.delegateForm.invalid) {
       this.delegateForm.markAllAsTouched();
@@ -250,8 +253,8 @@ export class AddTheDelegate extends FormComponentBase{
     });
     this.idUpdate = 0;
     this.isEditMode = false;
-    this.refreshActions();
     this.codeElement.nativeElement.value = '0';
+    this.refreshActions();
   }
 
   delete() {
@@ -273,7 +276,14 @@ export class AddTheDelegate extends FormComponentBase{
     })
   }
 
+
+  getCombinedData() {
+    return {
+      ...this.delegateForm.value,
+      code: this.codeElement?.nativeElement?.value || '0' // دمج الكود اللي بره الـ form group
+    };
+  }
   print() {
-    console.log('Print action triggered');
+this.printer.print();
   }
 }

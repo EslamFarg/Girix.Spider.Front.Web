@@ -1,131 +1,524 @@
-import { Component } from '@angular/core';
-import { PageHeader } from "../../../../../../shared/ui/page-header/page-header";
-import { NgSelectComponent } from "@ng-select/ng-select";
+import { Component, DestroyRef, ElementRef, HostListener, inject, ViewChild } from '@angular/core';
+import { PageHeader } from '../../../../../../shared/ui/page-header/page-header';
+import { NgSelectComponent } from '@ng-select/ng-select';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CustSuppType } from '../../../../../../shared/Enums/custSupp-type.enum';
+import { customerType } from '../../../../../../shared/Enums/customer-type.enum';
+import { userNameValidation } from '../../../../../../shared/validations/user-name';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormError } from "../../../../../../shared/ui/form-error/form-error";
+import IntlTelInput from '@intl-tel-input/angular';
+import { FormComponentBase } from '../../../../../../shared/base/form-component-base';
+import { egyptSaudiPhoneValidator } from '../../../../../../shared/validations/phoneNumber';
+import { EmailValidation } from '../../../../../../shared/validations/email';
+import { onlyNumberDirective } from '../../../../../../shared/directives/only-number';
+import { addressValidations } from '../../../../../../shared/validations/address';
+import { Suppliers } from '../services/suppliers';
+import { MessageService } from 'primeng/api';
+import { SharedConfirmDialog } from "../../../../../../shared/ui/shared-confirm-dialog/shared-confirm-dialog";
+import { PdfPrinterComponent } from "../../../../../../shared/components/pdf-printer/pdf-printer";
+import { AutoComplete, AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
+import { NgClass } from '@angular/common';
+import { SearchableColumnEnum } from '../../../../../../shared/Enums/enumSearch';
+import { buildSearchPayload } from '../../../../../../shared/config/search-config';
+import { SharedStateServices } from '../../../../../../shared/services/shared-state-services';
 
 @Component({
   selector: 'app-add-suppliers',
-  imports: [PageHeader, NgSelectComponent],
+  imports: [PageHeader, NgSelectComponent, ReactiveFormsModule, FormError, IntlTelInput, onlyNumberDirective, SharedConfirmDialog, PdfPrinterComponent
+    ,AutoCompleteModule,NgClass
+  ],
   templateUrl: './add-suppliers.html',
   styleUrl: './add-suppliers.scss',
 })
-export class AddSuppliers {
-
-   
-   // !!!!!!!!!!!!!!!!! Services
+export class AddSuppliers extends FormComponentBase {
+  // !!!!!!!!!!!!!!!!! Services
+  _fb: FormBuilder = inject(FormBuilder);
+  _destroyRef:DestroyRef=inject(DestroyRef);
+  _supplierServices = inject(Suppliers);
+  _messageServices=inject(MessageService)
+  _sharedStateServices=inject(SharedStateServices)
+  
 
   // !!!!!!!!!!!!!!!!!!! Properties
-  date2: Date | undefined;
- actions = [
-  { label: 'حفظ', type: 'primary', action: 'save' },
-  { label: 'جديد', action: 'reset' },
-  { label: 'حذف', action: 'delete' },
-  { label: 'طباعه', action: 'print' }
-];
+  @ViewChild('phoneInput') phoneInput: any;
+    @ViewChild('printer') printer!: PdfPrinterComponent;
+    @ViewChild('searchBox') searchBoxElement!: ElementRef;
+    Company = customerType.Company;
+    Individual = customerType.Individual;
+    customer = CustSuppType.Customer;
+    customerAndSupplier = CustSuppType.CustomerSupplier;
+    supplierEnum=CustSuppType.Supplier
+     dataChecked = 'company';
+    loadUtils = () => import('intl-tel-input/utils');
+  supplierForm: FormGroup = this._fb.group({
+     customerCode: [{ value: '', disabled: true }],
+    customerType: [this.Company, Validators.required],
+    nameAr: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100),userNameValidation()]],
+    nameEn: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100),userNameValidation()]],
+    phoneNumber: ['', [Validators.required, egyptSaudiPhoneValidator]],
+    phoneCountryCode: ['+20', Validators.required],
+     email: ['', [Validators.required, EmailValidation]],
+    creditLimit: [null,[   Validators.required,
+        Validators.maxLength(12),]],
+    creditWarningLimit: [null,[Validators.required ,
+        Validators.maxLength(12)]],
+    idTypeId: [null, [
+         Validators.required,
+    ]],
+    custSuppType: [this.supplierEnum],
+    idNumber: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(14)]],
+    // taxNumber: [''],
+    taxNumber: ['', [Validators.required, Validators.minLength(9), Validators.maxLength(15)]],
+    notes: ['',[Validators.maxLength(500)]],
+    simpleAddress: [''],
 
-explorerBtn={
-  label:'مستكشف الموردين  ',
-  link:'/suppliers/explorer'
-}
+    address: this._fb.group({
+          country: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+      city: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+      district: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+      street: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+      buildingNumber: ['', [Validators.required, Validators.maxLength(10)]],
+      postalCode: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(10)]],
+    })
+  });  
+
+  
+    date2: Date | undefined;
 
 
-items=[
-  {name:'sherif yehia',id:1},
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-]
+  explorerBtn = {
+    label: 'مستكشف الموردين  ',
+    link: '/suppliers/explorer',
+  };
+
+  
+
+  visible: boolean = false;
+    showDeleteDialog = false;
+pageSize = 10;
+  showDialog() {
+    this.visible = true;
+  }
+
+    commercialRegister = [
+    {
+      id: 1,
+      name: 'رقم السجل التجارى',
+    },
+    {
+      id: 2,
+      name: 'رخصة وزارة الشؤون البلدية والقروية والإسكان',
+    },
+    {
+      id: 3,
+      name: 'رخصة وزارة الموارد البشرية والتنمية الاجتماعية',
+    },
+    {
+      id: 4,
+      name: 'رخصة وزارة الاستثمار',
+    },
+    {
+      id: 5,
+      name: 'معرف آخر',
+    },
+  ];
+
+  //**  Search
+   @ViewChild('autoComplete') autoComplete!: AutoComplete;
+    searchControl = new FormControl('',Validators.required);
+    showSearchBox = false;
+  selectedSearch = 'الكود';
+   SearchValEnum:any=SearchableColumnEnum.Code;
+   selectedSearchType: 'code' | 'name' | 'mobile' = 'code';
+  // !!!!!!!!!!!!!!! Methods
 
 
-   visible: boolean = false;
+  @HostListener('document:click', ['$event'])
 
-    showDialog() {
-        this.visible = true;
+  clickout(event: any) {
+    if (!this.searchBoxElement?.nativeElement?.contains(event.target)) {
+    this.showSearchBox = false;
+  }
+  }
+    updateSimpleAddressValidation(type: number | any) {
+      const simple = this.supplierForm.get('simpleAddress');
+      const address = this.supplierForm.get('address');
+  
+      if (type === 1) {
+        // 👤 فرد
+        address?.reset({ emitEvent: false });
+        address?.disable({ emitEvent: false });
+  
+        simple?.enable({ emitEvent: false });
+        simple?.setValidators([
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(200),
+          addressValidations(),
+  
+        ]);
+        simple?.updateValueAndValidity({ emitEvent: false });
+      } else {
+        const addressGroup = this.supplierForm.get('address') as any;
+  
+        simple?.reset();
+        simple?.clearValidators();
+        simple?.disable({ emitEvent: false });
+        simple?.updateValueAndValidity({ emitEvent: false });
+  
+        addressGroup.enable({ emitEvent: false });
+  
+        // شيل أي validators قديمة الأول
+        addressGroup.setValidators(null);
+        addressGroup.updateValueAndValidity({ emitEvent: false });
+  
+        // رجّع required لكل الحقول
+        Object.keys(addressGroup.controls).forEach((key) => {
+          const control = addressGroup.get(key);
+          control?.setValidators([Validators.required]);
+          control?.updateValueAndValidity({ emitEvent: false });
+        });
+  
+        addressGroup.updateValueAndValidity({ emitEvent: false });
+      }
     }
 
-// itemsTable:any=[
+    get addressForm(): FormGroup {
+  return this.supplierForm.get('address') as FormGroup;
+}
+  ngOnInit() {
+     this.refreshActions();
+    this.supplierForm.get('nameAr')?.valueChanges?.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
+      this.supplierForm.patchValue({
+        nameEn: value
+      },
+      { emitEvent: false })
+    })
+
+      this.supplierForm
+      .get('customerType')
+      ?.valueChanges.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((type: any) => {
+        this.updateSimpleAddressValidation(type);
+      });
+      this.loadSupplier();
+  }
+
+
+   loadSupplier() {
+   const id:any=this._sharedStateServices.selectedId$();
+   if(id){
+    this._supplierServices.getById(id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
+        if(res.data.customerType == 1){
+        this.dataChecked = 'client';
+      }else{
+        this.dataChecked = 'company';
+      }
+      this.updateSimpleAddressValidation(res.data.customerType);
+      this.supplierForm.patchValue({
+        ...res.data,
+        customerCode: res.data.code,
+        nameAr: res.data.name,
+        nameEn: res.data.name,
+        idTypeId: res.data.idType
+      });
+      this.addressForm.patchValue({
+        ...res.data
+      })
+      this.changeButtonState(res.data.id,true);
   
-//   { id: 1, name: 'قلم', unit: 'قطعة', quantity: 50 },
-//   { id: 2, name: 'دفتر', unit: 'قطعة', quantity: 30 },
-//   { id: 3, name: 'مسطرة', unit: 'قطعة', quantity: 20 },
-//   { id: 4, name: 'ممحاة', unit: 'قطعة', quantity: 40 },
-//   { id: 5, name: 'كشكول', unit: 'قطعة', quantity: 25 },
-//   { id: 6, name: 'آلة حاسبة', unit: 'قطعة', quantity: 10 },
-//   { id: 7, name: 'ملف', unit: 'قطعة', quantity: 15 },
-//   { id: 8, name: 'دباسة', unit: 'قطعة', quantity: 8 },
-//   { id: 9, name: 'ورق A4', unit: 'علبة', quantity: 12 },
-//   { id: 10, name: 'قلم رصاص', unit: 'قطعة', quantity: 60 }
 
-// ]
 
-tableData = [
-  {id:1, code:'ITM-001', name:'لاب توب Dell', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:5, price:15000, discountRate:5, discount:3750, tax:750, total:72000},
-  {id:2, code:'ITM-002', name:'ماوس Logitech', warehouse:'مخزن فرعي', unit:'قطعة', qty:20, price:200, discountRate:0, discount:0, tax:40, total:4040},
-  {id:3, code:'ITM-003', name:'كيبورد HP', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:15, price:300, discountRate:3, discount:135, tax:67.5, total:4432.5},
-  {id:4, code:'ITM-004', name:'شاشة Samsung', warehouse:'مخزن 1', unit:'قطعة', qty:10, price:2500, discountRate:2, discount:500, tax:125, total:24625},
-  {id:5, code:'ITM-005', name:'طابعة Canon', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:3, price:4000, discountRate:0, discount:0, tax:200, total:12200},
+const iti = this.phoneInput?.iti;
 
-  {id:6, code:'ITM-006', name:'هارد SSD', warehouse:'مخزن 2', unit:'قطعة', qty:12, price:1200, discountRate:4, discount:576, tax:72, total:14016},
-  {id:7, code:'ITM-007', name:'فلاش USB', warehouse:'مخزن فرعي', unit:'قطعة', qty:50, price:100, discountRate:5, discount:250, tax:25, total:4775},
-  {id:8, code:'ITM-008', name:'راوتر TP-Link', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:8, price:900, discountRate:0, discount:0, tax:45, total:7245},
-  {id:9, code:'ITM-009', name:'سماعات Sony', warehouse:'مخزن 1', unit:'قطعة', qty:6, price:700, discountRate:2, discount:84, tax:35, total:4131},
-  {id:10, code:'ITM-010', name:'كاميرا مراقبة', warehouse:'مخزن 2', unit:'قطعة', qty:4, price:1800, discountRate:3, discount:216, tax:90, total:6990},
-
-  {id:11, code:'ITM-011', name:'كرسي مكتب', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:10, price:1200, discountRate:5, discount:600, tax:60, total:11460},
-  {id:12, code:'ITM-012', name:'مكتب خشب', warehouse:'مخزن 1', unit:'قطعة', qty:2, price:5000, discountRate:0, discount:0, tax:250, total:10250},
-  {id:13, code:'ITM-013', name:'ورق A4', warehouse:'مخزن فرعي', unit:'كرتونة', qty:30, price:150, discountRate:2, discount:90, tax:7.5, total:4417.5},
-  {id:14, code:'ITM-014', name:'أقلام حبر', warehouse:'المخزن الرئيسي', unit:'علبة', qty:40, price:50, discountRate:0, discount:0, tax:2.5, total:2025},
-  {id:15, code:'ITM-015', name:'دفاتر', warehouse:'مخزن 2', unit:'قطعة', qty:60, price:20, discountRate:1, discount:12, tax:1, total:1189},
-
-  {id:16, code:'ITM-016', name:'مكيف هواء', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:2, price:8000, discountRate:5, discount:800, tax:400, total:15600},
-  {id:17, code:'ITM-017', name:'ثلاجة', warehouse:'مخزن 1', unit:'قطعة', qty:1, price:10000, discountRate:0, discount:0, tax:500, total:10500},
-  {id:18, code:'ITM-018', name:'غسالة', warehouse:'مخزن 2', unit:'قطعة', qty:1, price:7000, discountRate:3, discount:210, tax:350, total:7140},
-  {id:19, code:'ITM-019', name:'ميكروويف', warehouse:'مخزن فرعي', unit:'قطعة', qty:3, price:2500, discountRate:2, discount:150, tax:125, total:7475},
-  {id:20, code:'ITM-020', name:'مروحة', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:10, price:300, discountRate:0, discount:0, tax:15, total:3015}
-];
-
-// !!!!!!!!!!!!!!! Methods
-handleAction(action: string) {
-  switch (action) {
-    case 'save':
-      this.save();
+if (iti) {
+  switch (res.data.phoneCountryCode) {
+    case '+20':
+      iti.setCountry('eg');
       break;
-    case 'reset':
-      this.reset();
+
+    case '+966':
+      iti.setCountry('sa');
       break;
-    case 'delete':
-      this.delete();
-      break;
-    case 'print':
-      this.print();
+
+    case '+971':
+      iti.setCountry('ae');
       break;
   }
 }
+      
+      this.changeButtonState(res.data.id,true);
+      this.refreshActions();
+
+    })
+   }
+    
+  }
+
+   onPhoneChange(event: any) {
+    const number = event?.target?.value;
+    if (!number) return;
+
+    this.supplierForm.get('phoneNumber')?.setValue(number, {
+      emitEvent: false,
+    });
+  }
+
+  onCountryChange() {
+    const iti = this.phoneInput?.iti;
+
+    if (!iti) return;
+
+    const country = iti.getSelectedCountryData();
+
+    const dialCode = country?.dialCode;
+
+    this.supplierForm.patchValue({
+      phoneCountryCode: dialCode ? '+' + dialCode : '',
+    });
+  }
+
+   changeChecked(event: any) {
+    const checked = event.target.checked;
+    const label = event.target.getAttribute('data-label');
+    this.dataChecked = label;
+  }
+
+    // !!! Search
+   items: any[] = [];
+    value: any;
 
 
+        selectFilterSearch(type: 'mobile' | 'name' | 'code' ) {
+        this.selectedSearchType = type;
+    if (type == 'name') {
+      this.selectedSearch = 'الأسم';
+      this.SearchValEnum=SearchableColumnEnum.Name
+  
+    } else if (type == 'mobile') {
+      this.selectedSearch = 'رقم الجوال';
+      this.SearchValEnum=SearchableColumnEnum.Phone
 
-save(){
-  console.log('Save action triggered');
+    }  else if (type == 'code') {
+      this.selectedSearch = 'الكود';
+      this.SearchValEnum=SearchableColumnEnum.Code
+    } 
+    this.showSearchBox = false;
+  }
+
+
+  onEnter(event: any) {
+  if (this.searchControl.invalid) {
+    this._messageServices.add({
+      severity: 'error',
+      summary: 'خطأ',
+      detail: `يجب ادخال قيمه بحث ${this.selectedSearch}`,
+    })
+    return;
+  }
+  // نفذ البحث هنا
 }
 
-reset(){
-  console.log('Reset action triggered');
-}
+
+    search(event: AutoCompleteCompleteEvent) {
+      console.log('event', this.searchControl.value);
+      const query = (event.query ?? '').trim();
+      if(!query){
+        this.items = [];
+        return;
+      }
+
+        const payload = buildSearchPayload(query, this.pageSize, this.SearchValEnum);
+
+        this._supplierServices
+          .search(payload)
+          .pipe(takeUntilDestroyed(this._destroyRef))
+          .subscribe({
+          
+            next: (res: any) => {
+              this.items = res.data.rows.map((item: any) => ({
+                label: item.name,
+                value: item.id,
+              }));
+               setTimeout(() => {
+    this.autoComplete.show();
+  });
+            },
+          });
+    }
 
 
-delete(){
-  console.log('Delete action triggered');
+// dasdasd
+  onSelectDelegate(event: any) {
+  const delegateId = event.value.value;
+
+
+  this._supplierServices
+    .getById(delegateId)
+    .pipe(takeUntilDestroyed(this._destroyRef))
+    .subscribe(res => {
+      // console.log(res);
+      // this.idUpdate = res.data.id;
+      console.log(res.data);
+// asdasdasd
+      if(res.data.customerType == 1){
+        this.dataChecked = 'client';
+      }else{
+        this.dataChecked = 'company';
+      }
+      this.updateSimpleAddressValidation(res.data.customerType);
+      this.supplierForm.patchValue({
+        ...res.data,
+        nameAr: res.data.name,
+        nameEn: res.data.name,
+        idTypeId: res.data.idType
+      });
+      this.addressForm.patchValue({
+        ...res.data
+      })
+      this.changeButtonState(res.data.id,true);
+      // this..nativeElement.value = res.data.id;
+      this.supplierForm.get('customerCode')?.setValue(res.data.code);
+
+
+const iti = this.phoneInput?.iti;
+
+if (iti) {
+  switch (res.data.phoneCountryCode) {
+    case '+20':
+      iti.setCountry('eg');
+      break;
+
+    case '+966':
+      iti.setCountry('sa');
+      break;
+
+    case '+971':
+      iti.setCountry('ae');
+      break;
+  }
+}
+         this.searchControl.reset();
+      this.items = [];
+    });
 }
 
-print(){
-  console.log('Print action triggered');
+  save() {
+      if (this.supplierForm.invalid) {
+      this.supplierForm.markAllAsTouched();
+      return;
+    }
+    const raw = this.supplierForm.getRawValue();
+
+    let payload: any;
+
+    if (raw.customerType === 1) {
+      payload = {
+        ...raw,
+        address: null,
+      };
+    } else {
+      payload = {
+        ...raw,
+        simpleAddress: null,
+      };
+    }
+
+    if (this.isEditMode==false) {
+      this._supplierServices
+        .create(payload)
+        .pipe(takeUntilDestroyed(this._destroyRef))
+        .subscribe({
+          next: (res) => {
+            this._messageServices.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'تم الحفظ بنجاح',
+            });
+
+            // this.updateSimpleAddressValidation(this.supplierForm.get('customerType')?.value);
+          
+                this.changeButtonState(res.data.id,true);
+            this.supplierForm.get('customerCode')?.setValue(res.data.code);
+          
+          },
+        });
+    } else {
+      // Update
+
+      this._supplierServices
+        .update(payload, this.idUpdate)
+        .pipe(takeUntilDestroyed(this._destroyRef))
+        .subscribe({
+          next: (res) => {
+            this._messageServices.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'تم التحديث بنجاح',
+            });
+              // this.changeButtonState(res.data.id,true);
+          },
+        });
+    }
+  }
+
+  reset() {
+    this.supplierForm.reset({
+      customerCode:0,
+      custSuppType: this.customerAndSupplier,
+      customerType: this.Company,
+      phoneCountryCode: '+966',
+    });
+    this.idUpdate = 0;
+    this.isEditMode=false;
+    this.refreshActions();
+  }
+
+  
+  delete() {
+    this.showDeleteDialog = true;
+  }
+
+  deleteDialog(){
+   this._supplierServices.delete(this.idUpdate).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+     next:(res:any)=>{
+       this._messageServices.add({
+         severity: 'success',
+         summary: 'نجاح',
+         detail: 'تم الحذف بنجاح',
+       })
+       this.showDeleteDialog=false;
+       this.reset();
+     }
+   })
+ }
+
+  print() {
+   this.printer.print();
+  }
+
+  //  getCombinedData() {
+  //   return {
+  //     ...this.supplierForm.value,
+  //     code: this.supplierForm.get('customerCode')?.value || '0' // دمج الكود اللي بره الـ form group
+  //   };
+  // }
+
+  getCombinedData() {
+  const value = this.supplierForm.getRawValue();
+
+  return {
+      customerCode: value.customerCode,
+      nameAr: value.nameAr,
+      phoneNumber: value.phoneNumber,
+      email: value.email,
+      creditLimit: value.creditLimit,
+      taxNumber: value.taxNumber,
+      idNumber: value.idNumber,
+      idTypeName: this.commercialRegister.find(x => x.id === value.idTypeId)?.name ?? ''
+    }
+  
 }
+  
 }
