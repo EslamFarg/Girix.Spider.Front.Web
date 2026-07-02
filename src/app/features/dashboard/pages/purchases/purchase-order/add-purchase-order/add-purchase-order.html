@@ -5,19 +5,19 @@
   (actionClicked)="handleAction($event)"
 ></app-page-header>
 
-<form class="box_header">
+<form class="box_header" [formGroup]="purchaseOrderForm">
   <div class="title">بيانات الفاتوره</div>
   <div class="input_group">
     <label for="searchInvoice">بحث رقم الفاتوة</label>
     <div class="flex items-center gap-2 relative">
-        <div class="prev">
+        <div class="prev" (click)="prevProduct()">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path style="fill:#1791C8; stroke:none ;" fill-rule="evenodd" clip-rule="evenodd" d="M15.164 11.6835C15.2371 11.7729 15.2771 11.8848 15.2771 12.0003C15.2771 12.1158 15.2371 12.2277 15.164 12.317L9.67196 19.03C9.26946 19.522 9.11696 20.183 9.40596 20.7485C9.60696 21.141 9.89946 21.5985 10.308 21.999C10.723 22.4055 11.1965 22.694 11.601 22.891C12.17 23.1685 12.829 23.0135 13.3075 22.5985C16.675 19.6765 20.2765 15.7375 21.821 13.1855C22.261 12.4585 22.212 11.564 21.748 10.8525C20.084 8.30254 16.6615 4.33904 13.306 1.40254C12.8295 0.98554 12.1705 0.83054 11.601 1.10754C11.196 1.30504 10.722 1.59404 10.308 2.00004C9.89896 2.40004 9.60696 2.85804 9.40596 3.25054C9.11696 3.81654 9.26996 4.47754 9.67196 4.96904L15.164 11.6835ZM7.37696 2.47154C7.33046 1.55804 6.75796 0.84204 5.84546 0.78054C5.51538 0.759445 5.18471 0.749273 4.85396 0.75004C4.46896 0.75004 4.14096 0.76204 3.86246 0.78054C2.94996 0.84204 2.37746 1.55804 2.33096 2.47154C2.25746 3.91054 2.17546 6.70504 2.17546 12C2.17546 17.295 2.25746 20.089 2.33046 21.5285C2.37746 22.442 2.94996 23.158 3.86246 23.2195C4.14146 23.238 4.46946 23.25 4.85396 23.25C5.23846 23.25 5.56646 23.238 5.84546 23.2195C6.75796 23.158 7.33046 22.442 7.37696 21.5285C7.45046 20.089 7.53246 17.295 7.53246 12C7.53246 6.70504 7.45046 3.91054 7.37746 2.47154" fill="#1791C8"/>
 </svg>
 
         </div>
       <div class="search_input relative ">
-        <input id="searchInvoice" type="text" class="text-[14px]" style="color:var(--color-black); font-weight:600;" placeholder="بحث برقم الفاتورة"/>
+        <input id="searchInvoice" type="text" class="text-[14px]" style="color:var(--color-black); font-weight:600;" placeholder="بحث برقم الفاتورة" (keyup.enter)="search($event)"/>
         <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[7px]" >
           <button>
             <!-- <svg
@@ -78,7 +78,7 @@
           </button>
         </div>
       </div>
-      <div class="next">
+      <div class="next" >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path style="fill:#1791C8; stroke:none ;" fill-rule="evenodd" clip-rule="evenodd" d="M8.83604 11.6835C8.76288 11.7729 8.72291 11.8848 8.72291 12.0003C8.72291 12.1158 8.76288 12.2277 8.83604 12.317L14.328 19.03C14.7305 19.522 14.883 20.183 14.594 20.7485C14.393 21.141 14.1005 21.5985 13.692 21.999C13.277 22.4055 12.8035 22.694 12.399 22.891C11.83 23.1685 11.171 23.0135 10.6925 22.5985C7.32504 19.6765 3.72354 15.7375 2.17904 13.1855C1.73904 12.4585 1.78804 11.564 2.25204 10.8525C3.91604 8.30254 7.33854 4.33904 10.694 1.40254C11.1705 0.98554 11.8295 0.83054 12.399 1.10754C12.804 1.30504 13.278 1.59404 13.692 2.00004C14.101 2.40004 14.393 2.85804 14.594 3.25054C14.883 3.81654 14.73 4.47754 14.328 4.96904L8.83604 11.6835ZM16.623 2.47154C16.6695 1.55804 17.242 0.84204 18.1545 0.78054C18.4846 0.759445 18.8153 0.749273 19.146 0.75004C19.531 0.75004 19.859 0.76204 20.1375 0.78054C21.05 0.84204 21.6225 1.55804 21.669 2.47154C21.7425 3.91054 21.8245 6.70504 21.8245 12C21.8245 17.295 21.7425 20.089 21.6695 21.5285C21.6225 22.442 21.05 23.158 20.1375 23.2195C19.8585 23.238 19.5305 23.25 19.146 23.25C18.7615 23.25 18.4335 23.238 18.1545 23.2195C17.242 23.158 16.6695 22.442 16.623 21.5285C16.5495 20.089 16.4675 17.295 16.4675 12C16.4675 6.70504 16.5495 3.91054 16.6225 2.47154" fill="#1791C8"/>
 </svg>
@@ -90,25 +90,31 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] my-[20px]">
     <div class="col-span-4">
-        <label for="document" >رقم الفاتورة</label>
-        <input type="text" id="document" placeholder="رقم الفاتورة">
+        <label  >رقم الفاتورة</label>
+        <input type="text" id="document" placeholder="رقم الفاتورة" readonly formControlName="invoiceNumber"
+        style="user-select:none; pointer-events: none;"
+        >
     </div>
     <div class="col-span-4">
         <label for="reference">رقم المرجع</label>
-        <input type="text" placeholder="رقم المرجع" id="reference">
+        <input type="text" placeholder="رقم المرجع" id="reference" formControlName="reference" maxlength="100">
+        <app-form-error [control]="purchaseOrderForm.controls['reference']" [errorKey]="'required'" [message]="'رقم المرجع مطلوب'"></app-form-error>
+        <app-form-error [control]="purchaseOrderForm.controls['reference']" [errorKey]="'minlength'" [message]="'رقم المرجع يجب ان يتكون من حرفين او أكثر'"></app-form-error>
+        <app-form-error [control]="purchaseOrderForm.controls['reference']" [errorKey]="'maxlength'" [message]="'رقم المرجع يجب ان يكون اقل من 100 حرف'"></app-form-error>
     </div>
 
 
      <div class="col-span-4">
                 <label for="icondisplay" class="font-bold block mb-2"> التاريخ </label>
-                <p-datepicker  [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="icondisplay" />
+                <p-datepicker  [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="icondisplay" formControlName="invoiceDate" />
+                <app-form-error [control]="purchaseOrderForm.controls['invoiceDate']" [errorKey]="'required'" [message]="'التاريخ مطلوب'"></app-form-error>
             </div>
 
   </div>
 
 
 </form>
-<form class="box_header my-[25px]" style="padding-top: 10px ;">
+<form class="box_header my-[25px]" style="padding-top: 10px ;" [formGroup]="purchaseOrderForm">
   <div class="title">بيانات المورد</div>
 
 
@@ -117,24 +123,42 @@
     <div class="col-span-3">
         <label (click)="supplierSelect.focus()">اسم المورد</label>
         <!-- <input type="text" id="document" placeholder="رقم الفاتورة"> -->
-         <ng-select #supplierSelect [items]="items" [bindLabel]="'name'"   [searchable]="true" 
-  [clearable]="true" [bindValue]="'id'" [placeholder]="'اسم المورد'"></ng-select>
+         <ng-select #supplierSelect [items]="_lookup.suppliers()"  [bindLabel]="'name'"  (clear)="resetSupplier()"  [searchable]="true" 
+  [clearable]="true" [bindValue]="'id'" [placeholder]="'اسم المورد'" formControlName="supplierId"></ng-select>
+  <app-form-error [control]="purchaseOrderForm.controls['supplierId']" [errorKey]="'required'" [message]="'اسم المورد مطلوب'"></app-form-error>
     
   <!-- <ng-template ng-label-tmp let-item="item">
     {{ item ? item.name : 'الاسم' }}
   </ng-template> -->
     </div>
-    <div class="col-span-3">
+        <div class="col-span-12 lg:col-span-3">
         <label for="phonenumber">رقم الجوال</label>
-        <input type="text" placeholder="رقم الجوال" id="phonenumber">
+        <!-- <input type="text" placeholder="رقم الجوال" id="phonenumber" formControlName="phoneNumber"> -->
+  <intl-tel-input
+  #phoneInput
+  [countryOrder]="['eg','sa']"
+  [onlyCountries]="['eg','sa']"
+  initialCountry="sa"
+  [loadUtils]="loadUtils"
+  formControlName="supplierPhone"
+  (countryChange)="onCountryChange()">
+</intl-tel-input>
+<app-form-error [control]="purchaseOrderForm.controls['supplierPhone']" [errorKey]="'required'" [message]="'رقم الجوال مطلوب'"></app-form-error>
+<app-form-error [control]="purchaseOrderForm.controls['supplierPhone']" [errorKey]="'invalidSaudiPhone'" [message]="'رقم الجوال السعودي غير صحيح'"></app-form-error>
+<app-form-error [control]="purchaseOrderForm.controls['supplierPhone']" [errorKey]="'invalidEgyptPhone'" [message]="'رقم الجوال المصري غير صحيح'"></app-form-error>
     </div>
     <div class="col-span-3">
         <label for="taxnumber">رقم الضريبي</label>
-        <input type="text" placeholder="رقم الضريبي" id="taxnumber">
+        <input type="text" placeholder="رقم الضريبي" id="taxnumber" formControlName="taxNumber" maxlength="15">
+        <app-form-error [control]="purchaseOrderForm.controls['taxNumber']" [errorKey]="'required'" [message]="'رقم الضريبي مطلوب'"></app-form-error>
+        <app-form-error [control]="purchaseOrderForm.controls['taxNumber']" [errorKey]="'minlength'" [message]="'رقم الضريبي يجب ان يكون من 9 الي 15 رقم'"></app-form-error>
     </div>
     <div class="col-span-3">
         <label for="segelTogari">السجل التجاري</label>
-        <input type="text" placeholder="رقم السجل التجاري" id="segelTogari">
+        <input type="text" placeholder="رقم السجل التجاري" id="segelTogari" formControlName="commercialRegister" maxlength="15">
+        <app-form-error [control]="purchaseOrderForm.controls['commercialRegister']" [errorKey]="'required'" [message]="'رقم السجل التجاري مطلوب'"></app-form-error>
+        <app-form-error [control]="purchaseOrderForm.controls['commercialRegister']" [errorKey]="'minlength'" [message]="'رقم السجل التجاري يجب ان يكون من 7 الي 15 رقم'"></app-form-error>
+
     </div>
     <div class="col-span-3">
         <label >رصيد المورد</label>
@@ -146,7 +170,7 @@
 </svg>
 
           </div>
-          <input type="text" id="total" readonly style="user-select:none; pointer-events: none;" >
+          <input type="text" id="total" readonly style="user-select:none; pointer-events: none;" formControlName="supplierBalance" >
 
           <div class="flex items-center absolute right-[10px] top-[7px]">
             <!-- عليه -->
@@ -173,7 +197,7 @@
 </form>
 
 
-<div class="table-responsive">
+<div class="table-responsive" [formGroup]="purchaseOrderForm">
   <table class="w-full ">
     <thead class="bg-gray-100 ">
       <tr class="sticky top-0">
@@ -184,37 +208,51 @@
         <th class="p-2 text-center">الادوات</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody [formGroup]="detailForm">
       <tr class="section_add sticky top-[37px] [&>*]:bg-[var(--color-white)] border-b border-b-[#86C6E2]">
         <td class="p-2 text-center text-[var(--color-gray)] text-[14px] font-[400]">م</td>
         <td class="p-2">
-            <ng-select [items]="[]" [bindLabel]="''" placeholder="اسم الصنف"  [bindValue]="''"></ng-select>
+            <ng-select [items]="_lookup.products()" [bindLabel]="'name'" placeholder="اسم الصنف" [appendTo]="'body'" dropdownPosition="bottom"  [bindValue]="'id'"
+            formControlName="productCardId"
+            ></ng-select>
+            <app-form-error [control]="detailForm.controls['productCardId']" [errorKey]="'required'" [message]="'اسم الصنف مطلوب'"></app-form-error>
         </td>
         <td class="p-2">
-            <ng-select [items]="[]" [bindLabel]="''" placeholder="الوحدة"  [bindValue]="''"></ng-select>
+            <ng-select [items]="_lookup.unitOfMeasures()" [bindLabel]="'name'" placeholder="الوحدة" formControlName="unitId" [bindValue]="'id'" [appendTo]="'body'" dropdownPosition="bottom"></ng-select>
         </td>
         <td class="p-2">
-            <input type="text" placeholder="العدد" placeholder="العدد">
+            <input type="text" placeholder="العدد" placeholder="العدد" formControlName="quantity" appOnlyNumber>
+            <app-form-error [control]="detailForm.controls['quantity']" [errorKey]="'required'" [message]="'العدد مطلوب'"></app-form-error>
         </td>
 
         <td class="block text-center w-[100%] p-[11px]">
-            <button class="btn btn-primary">اضافه</button>
+            <button type="button" (click)="addDetail()" class="btn "
+            [ngClass]="{
+  'btn-warning': editIndex !== null,
+  'btn-primary': editIndex === null
+}"
+            >{{editIndex !== null ? 'تعديل' : 'اضافه'}}</button>
         </td>
   
       </tr>
+    </tbody>
+      <tbody  formArrayName="details">
+        
 
-@for(item of itemsTable;track $index){
+@for(control of  details.controls;track $index){
 
-    <tr >
+    <tr  [formGroupName]="$index">
 <td class="p-2 text-center">{{ $index + 1 }}</td>
-<td class="p-2 text-center">{{ item.name }}</td>
-<td class="p-2 text-center">{{ item?.unit }}</td>
-<td class="p-2 text-center">{{ item.quantity }}</td>
+<td class="p-2 text-center">
+   {{ getProductName(control.get('productCardId')?.value) }}
+</td>
+<td class="p-2 text-center"> {{ getUnitName(control.get('unitId')?.value) }}</td>
+<td class="p-2 text-center"> {{ control.get('quantity')?.value }}</td>
       <td class="p-2 w-full flex items-center justify-center gap-2">
-            <button class="update">
+            <button class="update" (click)="editDetail($index)">
 <i class="fa-solid fa-pen-to-square"></i>
             </button>
-            <button class="delete">
+            <button class="delete" (click)="removeDetail($index)">
   <i class="fa-solid fa-trash"></i>
 
             </button>
@@ -223,15 +261,17 @@
 }
     </tbody>
 
-    <tfoot>
+ @if(details.length > 0){
+      <tfoot>
         <tr class="sticky bottom-0">
             <td></td>
             <td class="text-center">الاجمالي</td>
             <td></td>
-            <td class="text-center">28</td>
+            <td class="text-center">{{ totalQuantity || '0' }}</td>
             <td></td>
         </tr>
     </tfoot>
+ }
   </table>
 </div>
 
@@ -249,3 +289,5 @@
   </div>
 
 </footer>
+
+<app-shared-confirm-dialog [show]="showDeleteDialog" [title]="'حذف طلب الشراء'" [message]="'هل أنت متأكد من حذف هذه طلب الشراء؟ لا يمكن التراجع عن هذا الإجراء.'" (confirm)="deleteGroup()" (cancel)="showDeleteDialog=false"></app-shared-confirm-dialog>

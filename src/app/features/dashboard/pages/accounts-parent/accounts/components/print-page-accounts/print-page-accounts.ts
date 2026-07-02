@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-print-page-accounts',
@@ -6,4 +6,7 @@ import { Component } from '@angular/core';
   templateUrl: './print-page-accounts.html',
   styleUrl: './print-page-accounts.scss',
 })
-export class PrintPageAccounts {}
+export class PrintPageAccounts {
+
+  @Input() accountData: any;
+}

@@ -26,7 +26,7 @@ import { buildSearchPayload } from '../../../../../shared/config/search-config';
 // import { NodeService } from '@/service/nodeservice';
 @Component({
   selector: 'app-accounts',
-  imports: [NgSelectComponent, TreeModule, TreeNode, ReactiveFormsModule, FormError, NgClass, OnlyStringDirective, onlyNumberDirective, SharedConfirmDialog, GeneratePdf, AutoComplete],
+  imports: [NgSelectComponent, TreeModule, TreeNode, ReactiveFormsModule, FormError, NgClass, OnlyStringDirective, onlyNumberDirective, SharedConfirmDialog, GeneratePdf, AutoComplete, PrintPageAccounts],
   templateUrl: './accounts.html',
   styleUrl: './accounts.scss',
   // providers: [NodeService]
@@ -206,6 +206,8 @@ accountsForm=this._fb.group({
 
 
 
+
+
   treeNode:any[]=[
 
   ]
@@ -344,6 +346,7 @@ onClick(event: any) {
   nameEn: this.accountsForm.value.nameEn,
   parentId: this.accountsForm.value.parentId,
   branchId: this.accountsForm.value.branchId,
+  accountGroup: this.accountsForm.value.accountGroup,
   accountNature: this.accountsForm.value.accountNature,
   accountStatus: this.accountsForm.value.accountStatus,
   closingType: this.accountsForm.value.closingType,
@@ -359,7 +362,7 @@ onClick(event: any) {
       id:this.idAccountForm,
       ...payload
     }
-    this._accountsService.update(payloadUpdate).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
+    this._accountsService.updateWithOutPathParameter(payloadUpdate).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
       this._messageServices.add({
         severity: 'success',
         summary: 'تم التحديث بنجاح',
@@ -401,6 +404,7 @@ onClick(event: any) {
     this.accountsForm.reset();
     this.isEditMode=false;
     this.idAccountForm=0
+    this.selectedAccountParent = null;
 
   }
 
@@ -458,21 +462,42 @@ onClick(event: any) {
     this.idAccountForm=id;
     this._accountsService.getById(id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
   
-      this.accountsForm.patchValue({
-        code:res?.data?.accountCode,
-        parentId:res?.data?.parentId,
-        nameAr:res?.data?.name,
-        nameEn:res?.data?.name,
-        branchId:res?.data?.branchId,
-        accountStatus:res?.data?.accountStatus,
-        accountNature:res?.data?.accountNature,
-        mobileNumber:res?.data?.contactInfo?.mobileNumber,
-        fax:res?.data?.contactInfo?.fax,
-        description:res?.data?.contactInfo?.description,
+      // this.accountsForm.patchValue({
+      //   code:res?.data?.accountCode,
+      //   parentId:res?.data?.parentId,
+      //   nameAr:res?.data?.name,
+      //   nameEn:res?.data?.name,
+      //   branchId:res?.data?.branchId,
+      //   accountStatus:res?.data?.accountStatus,
+      //   accountNature:res?.data?.accountNature,
+      //   mobileNumber:res?.data?.contactInfo?.mobileNumber,
+      //   fax:res?.data?.contactInfo?.fax,
+      //   description:res?.data?.contactInfo?.description,
 
-      })
+      // })
+      this.accountsForm.patchValue({
+  code: res.data.accountCode,
+  parentId: res.data.parentId,
+  nameAr: res.data.name,
+  nameEn: res.data.name,
+  branchId: res.data.branchId,
+
+  accountGroup: res.data.group,
+  closingType: res.data.closingType,
+
+  accountStatus: res.data.accountStatus,
+  accountNature: res.data.accountNature,
+
+  mobileNumber: res.data.contactInfo?.mobileNumber,
+  fax: res.data.contactInfo?.fax,
+  description: res.data.contactInfo?.description,
+});
       this.isEditMode=true
+    this.selectedAccountParent = res.data.parentCode;
+// أو
+this.selectedAccountParent = res.data.parentId;
     })
+    
 
   }
 
