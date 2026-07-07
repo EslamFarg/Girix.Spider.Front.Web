@@ -30,7 +30,7 @@ import { buildSearchPayload } from '../../../../../../shared/config/search-confi
   selector: 'app-add-purchase-order',
   standalone: true,
   imports: [CommonModule, PageHeader, DatePickerModule, FormsModule, NgSelectModule, ReactiveFormsModule, FormError, IntlTelInput, onlyNumberDirective,
-    NgClass, SharedConfirmDialog,AutoCompleteModule],
+    NgClass, SharedConfirmDialog,AutoCompleteModule,onlyNumberDirective],
   templateUrl: './add-purchase-order.html',
   styleUrl: './add-purchase-order.scss',
 })
@@ -51,7 +51,7 @@ export class AddPurchaseOrder  extends FormComponentBase{
   loadUtils = () => import('intl-tel-input/utils');
   @ViewChild('phoneInput') phoneInput: any;
   purchaseOrderForm = this._fb.group({
-    invoiceNumber:[0],
+    invoiceNumber:[null] as any,
     supplierBalance:[''],
       reference: [
     '',
@@ -63,7 +63,7 @@ export class AddPurchaseOrder  extends FormComponentBase{
   ],
 
   invoiceDate: this._fb.control<Date | null>(
-    null,
+    new Date(),
     Validators.required
   ),
 
@@ -166,44 +166,26 @@ ngOnInit(): void {
   this.listenSupplierChange();
   this.loadPurchaseOrder();
   this.refreshActions();
+
+setTimeout(() => {
+    console.log(this._lookup.products());
+},5000)
+  
 }
 
 loadPurchaseOrder(){
   const id=this._sharedStateServices.selectedId$();
   if(id){
     this._purchaseOrderService.getByIdInQuery(id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
-      console.log(res);
-      this.purchaseOrderForm.patchValue({
-        invoiceNumber:res.data.id,
-        supplierBalance:res.data.supplierBalance,
-        reference:res.data.reference,
-        invoiceDate: new Date(res.data.invoiceDate),
-        notes:res.data.notes,
-        branchId:res.data.branchId,
-        supplierId:res.data.supplierId,
-        supplierName:res.data.supplierName,
-        supplierPhone:res.data.supplierPhone,
-        taxNumber:res.data.taxNumber,
-        commercialRegister:res.data.commercialRegister,
-      })
+     console.log(res);
 
-      this.details.clear();
+this.fillForm(res.data);
+console.log("Details",this.details.getRawValue());
+console.log(this._lookup.products()[0]);
+// this.fillDetails(res.data.details);
+console.log(res.data.details);
 
-res.data.details.forEach((item: any) => {
-  this.details.push(
-    this._fb.group({
-      productCardId: [item.productCardId],
-      unitId: [item.unitId],
-      quantity: [item.quantity]
-    })
-  );
-  this.changeButtonState(res.data.id, true);
-});
 
-this.calculateTotalQuantity();
-      this.purchaseOrderForm.markAsPristine();
-      this.purchaseOrderForm.markAsUntouched();
-      this.purchaseOrderForm.updateValueAndValidity();
     })
   }
 }
@@ -212,6 +194,7 @@ private loadLookups(): void {
   this._lookup.loadProduct();
   this._lookup.loadSuppliers();
   this._lookup.loadUnitOfMeaguare();
+  
 }
 
 private listenSupplierChange(): void {
@@ -310,24 +293,62 @@ calculateTotalQuantity() {
     .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
 }
 
+// editDetail(index: number) {
+//   const row = this.details.at(index);
+
+//   this.detailForm.patchValue({
+//     productCardId: row.get('productCardId')?.value,
+//     unitId: row.get('unitId')?.value,
+//     quantity: row.get('quantity')?.value,
+//   });
+
+//   this.editIndex = index;
+// }
+
 editDetail(index: number) {
   const row = this.details.at(index);
 
+  const productId = row.get('productCardId')?.value;
+
+  const product: any = this._lookup.products().find(
+    x => x.id === productId
+  );
+
+  this.productCardDetails = product?.productCardDetails ?? [];
+
   this.detailForm.patchValue({
-    productCardId: row.get('productCardId')?.value,
+    productCardId: productId,
     unitId: row.get('unitId')?.value,
     quantity: row.get('quantity')?.value,
   });
 
   this.editIndex = index;
 }
+
+
 removeDetail(index: number) {
   this.details.removeAt(index);
+  this.detailForm.reset({
+    productCardId:null,
+    unitId:null,
+    quantity:null
+});
   this.calculateTotalQuantity();
 }
 
-getProductName(id: number) {
-  return this._lookup.products().find(x => x.id == id)?.name;
+// getProductName(id: number) {
+//   return this._lookup.products().find(x => x.id == id)?.name;
+// }
+
+getProductName(productCardId: number): string {
+
+  const product = this._lookup.products().find(product =>
+    product.productCardDetails?.some(
+      (detail: any) => detail.productCardId === productCardId
+    )
+  );
+
+  return product?.name ?? '';
 }
  
 getUnitName(id: number) {
@@ -399,123 +420,194 @@ getUnitName(id: number) {
       .getByIdInQuery(eventQuery)
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(res => {
-        // this.searchResults = res.data;
-        // this.showSearchBox = true;
-        console.log(res);
+      
+        this.fillForm(res.data);
+        
+        // this.fillDetails(res.data.details);
       });
   }
 
-  selectFilterSearch(type: 'mobile' | 'name' | 'code') {
-      this.selectedSearchType = type;
-    if (type == 'name') {
-      this.selectedSearch = 'الأسم';
-     
-    } else if (type == 'mobile') {
-      this.selectedSearch = 'رقم الجوال';
-     
-    } else if (type == 'code') {
-      this.selectedSearch = 'الكود';
-    } 
-    this.showSearchBox = false;
-  }
+productCardDetails: any[] = [];
 
 
-   onSelectDelegate(event: any) {
-  const delegateId = event.value.value;
+onProductChange(data: any) {
 
+  // console.log(productId);
+  // const product = this._lookup.products().find(x => x.id === productId) as any;
 
-  this._purchaseOrderService
-    .getByIdInQuery(delegateId)
-    .pipe(takeUntilDestroyed(this._destroyRef))
-    .subscribe(res => {
-      // console.log(res);
-      // this.idUpdate = res.data.id;
-      console.log(res.data);
-// asdasdasd
-    
-      this.purchaseOrderForm.patchValue({
-        ...res.data,
-        nameAr: res.data.name,
-        nameEn: res.data.name,
-        idTypeId: res.data.idType
-      });
-      // this..patchValue({
-        // ...res.data
-      // })
-      this.changeButtonState(res.data.id,true);
+  // console.log(product);
 
+  this.productCardDetails = data?.productCardDetails ?? [];
 
-const iti = this.phoneInput?.iti;
+  console.log(this.productCardDetails);
+  // إعادة تعيين الوحدة بعد تغيير الصنف
+  this.detailForm.patchValue({
+    unitId: null
+  });
 
-if (iti) {
-  switch (res.data.phoneCountryCode) {
-    case '+20':
-      iti.setCountry('eg');
-      break;
-
-    case '+966':
-      iti.setCountry('sa');
-      break;
-
-    case '+971':
-      iti.setCountry('ae');
-      break;
-  }
 }
-         this.searchControl.reset();
-      this.items = [];
-    });
-}
+
+ 
 
 // ******* search
 
+fillForm(data: any) {
+
+  this.purchaseOrderForm.patchValue({
+    invoiceNumber: data.id,
+    supplierBalance: data.supplierBalance,
+    reference: data.reference,
+    invoiceDate: new Date(data.invoiceDate),
+    notes: data.notes,
+    branchId: data.branchId,
+    supplierId: data.supplierId,
+    supplierName: data.supplierName,
+    supplierPhone: data.supplierPhone,
+    taxNumber: data.taxNumber,
+    commercialRegister: data.commercialRegister,
+  });
+
+  // تنظيف الـ FormArray
+  this.details.clear();
+
+  // إضافة التفاصيل
+  data.details.forEach((item: any) => {
+    this.details.push(
+      this._fb.group({
+        productCardId: [item.productCardId],
+        unitId: [item.unitId],
+        quantity: [item.quantity]
+      })
+    );
+  });
+    this.changeButtonState(data.id, true);
+
+  this.calculateTotalQuantity();
+  this.purchaseOrderForm.markAsPristine();
+this.purchaseOrderForm.markAsUntouched();
+this.purchaseOrderForm.updateValueAndValidity();
+
+this.editIndex = null;
   
+}
+  
+// private fillDetails(details: any[]) {
+
+//     this.details.clear();
+
+//     details.forEach(item => {
+//       console.log('DEEEEE',item)
+
+//         this.details.push(
+//             this._fb.group({
+//                 productCardId: item.productCardId,
+//                 unitId: item.unitId,
+//                 quantity: item.quantity
+//             })
+//         );
+
+//     });
+
+// }
  prevProduct() {
-  const currentCode = Number(this.purchaseOrderForm.get('invoiceNumber')?.value);
+  console.log('prev action triggered');
+  const currentInvoiceNumber = Number(this.purchaseOrderForm.get('invoiceNumber')?.value);
 
 
-  if (!currentCode || currentCode <= 1) {
+  if (!currentInvoiceNumber || currentInvoiceNumber <= 1) {
     return;
   }
 
-  const id = currentCode - 1;
+  const id = currentInvoiceNumber - 1;
 
   this.purchaseOrderForm.patchValue({
     invoiceNumber: id
   });
 
-  // this.getProductByCode(newCode);
+  this.getPurchaseById(id);
 }
 
 nextProduct() {
-  const currentCode = Number(this.purchaseOrderForm.get('code')?.value);
+  console.log('next');
+  debugger
+  const currentId = Number(this.purchaseOrderForm.get('invoiceNumber')?.value);
 
-  if(!currentCode){
+  if(!currentId){
     return;
   }
-  if (isNaN(currentCode)) {
+  if (isNaN(currentId)) {
     return;
   }
 
-  const newCode = currentCode + 1;
+  const newCode = currentId + 1;
 
   this.purchaseOrderForm.patchValue({
     invoiceNumber: newCode
   });
 
   // this.getProductByCode(newCode);
+   this.getPurchaseById(newCode);
 }
 
 
 getPurchaseById(id: number) {
+   console.log('Searching', id);
   this._purchaseOrderService
       .getByIdInQuery(id)
       .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(res => {
-  
-        console.log(res);
+      .subscribe({
+        next: (res: any) => {
+          this.fillForm(res.data);
+          // this.fillDetails(res.data.details);
+        },
+        error: (err: any) => {
+            this._messageService.add({
+
+      severity:'warn',
+
+      summary:'',
+
+      detail:'الفاتورة غير موجودة'
+
+   });
+          console.log(err);
+        },
       });
 };
+
+
+// getProductCardUnitName(productCardId: any): string {
+
+//   for (const product of this._lookup.products()) {
+
+//     const detail: any = product?.productCardDetails?.find(
+//       (x: any) => x.productCardId === productCardId
+//     );
+
+//     if (detail) {
+//       return detail.unitOfMeasureName;
+//     }
+
+//   }
+
+//   return '';
+// }
+
+getProductCardUnitName(unitId: number): string {
+
+  for (const product of this._lookup.products()) {
+
+    const detail = product.productCardDetails?.find(
+      (x: any) => x.unitOfMeasureId === unitId
+    );
+
+    if (detail) {
+      return detail.unitOfMeasureName;
+    }
+  }
+
+  return '';
+}
 
 
 save(){
@@ -537,7 +629,15 @@ save(){
 
   let payload:any={
     ...this.purchaseOrderForm.getRawValue(),
-    details: this.purchaseOrderForm.get('details')?.value
+  //   details:this.details.getRawValue().map(item => ({
+  //   productCardId: item.unitId,
+  //   quantity: item.quantity
+  // }))
+
+  details: this.details.getRawValue().map(item => ({
+    productCardId: item.productCardId,
+    quantity: item.quantity
+}))
   }
   if(this.isEditMode == false){
     
@@ -612,7 +712,8 @@ reset(){
 
   // رجوع الشاشة لوضع الإضافة
   this.changeButtonState(0, false);
-
+this.totalQuantity = 0;
+this.editIndex = null;
   // إعادة أزرار الشاشة
   this.refreshActions();
   
@@ -641,4 +742,8 @@ deleteGroup(){
 print(){
   console.log('Print action triggered');
 }
+
+ ngOnDestroy(): void {
+    this._sharedStateServices.clearSelectedId();
+  }
 }

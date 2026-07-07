@@ -1404,6 +1404,12 @@ sidebarSections:any = [
         
         },
         {
+          label:"البدالات",
+          icon:'',
+          link:'/hr/allowances'
+        
+        },
+        {
           label:"استلام عهدة",
           icon:'',
           link:'/hr/receipt-custody'

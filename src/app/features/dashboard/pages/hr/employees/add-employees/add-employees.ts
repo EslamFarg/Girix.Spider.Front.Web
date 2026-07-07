@@ -1,164 +1,256 @@
-import { Component, forwardRef, inject } from '@angular/core';
+import { Component, DestroyRef, forwardRef, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DatePicker } from "primeng/datepicker";
-import { NgSelectComponent } from "@ng-select/ng-select";
-import { Dialog } from "primeng/dialog";
-import { InputAttachment } from "../../../../../../shared/ui/input-attachment/input-attachment";
-import { FormBuilder, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { DatePicker } from 'primeng/datepicker';
+import { NgSelectComponent } from '@ng-select/ng-select';
+import { Dialog } from 'primeng/dialog';
+import { InputAttachment } from '../../../../../../shared/ui/input-attachment/input-attachment';
+import { FormBuilder, NG_VALUE_ACCESSOR, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormComponentBase } from '../../../../../../shared/base/form-component-base';
+import { entityNameValidator } from '../../../../../../shared/validations/entity-name-validator';
+import { SectionsService } from '../../sections/services/sections-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-add-employees',
-  imports: [RouterLink, DatePicker, NgSelectComponent, Dialog, InputAttachment,
-    ReactiveFormsModule
+  imports: [
+    RouterLink,
+    DatePicker,
+    NgSelectComponent,
+    Dialog,
+    InputAttachment,
+    ReactiveFormsModule,
   ],
   templateUrl: './add-employees.html',
   styleUrl: './add-employees.scss',
-  
 })
-export class AddEmployees {
-      // !!!!!!!!!!!!!!!!! Services
-      _fb:FormBuilder=inject(FormBuilder);
-      formAttachment=this._fb.group({
-        attachment:['']
-      })
-
+export class AddEmployees extends FormComponentBase {
+  // !!!!!!!!!!!!!!!!! Services
+  _fb: FormBuilder = inject(FormBuilder);
+  formAttachment = this._fb.group({
+    attachment: [''],
+  });
+  _sectionsService = inject(SectionsService);
+  _destroyRef: DestroyRef = inject(DestroyRef);
   // !!!!!!!!!!!!!!!!!!! Properties
   date2: Date | undefined;
- actions = [
-  { label: 'حفظ', type: 'primary', action: 'save' },
-  { label: 'جديد', action: 'reset' },
-  { label: 'حذف', action: 'delete' },
-  { label: 'طباعه', action: 'print' }
-];
+  visible: boolean = false;
+  visibleReject: boolean = false;
+  items = [];
 
+  employeeForm = this._fb.group({
+  employeeNumber: [
+    '',
+    [Validators.required, Validators.maxLength(40)]
+  ],
 
+  baseNember: [
+    '',
+    [Validators.required,Validators.maxLength(40)]
+  ],
 
-   visible: boolean = false;
-   visibleReject: boolean = false;
+  allowances: [
+    null,
+    [Validators.required]
+  ],
 
-explorerBtn={
-  label:' مستكشف  سند صرف مبسط ',
-  link:'/expenses/simple-payment-voucher/explorer'
-}
+  salary: [
+    null,
+    [Validators.required]
+  ],
 
+  departmentId: [
+    null,
+    [Validators.required]
+  ],
 
-paymentMethod=[
-  {
-    id:1,
-    name:'كاش'
-  },
-  {
-    id:1,
-    name:'شبكة'
-  },
-  {
-    id:1,
-    name:'حوالة'
+  nameAr: [
+    '',
+    [
+      Validators.required,
+      Validators.maxLength(200),
+      entityNameValidator()
+    ]
+  ],
+
+  nameEn: [
+    '',
+    [
+      Validators.required,
+      Validators.maxLength(200),
+      entityNameValidator()
+    ]
+  ],
+
+  phoneNember: [
+    '',
+    [
+      Validators.required,
+      Validators.maxLength(20)
+    ]
+  ],
+
+  image: [
+    null
+  ],
+
+  nationalIdOrIqamaNumber: [
+    '',
+    [Validators.required]
+  ],
+
+  nationalIdOrIqamaNumberFile: [
+    null
+  ],
+
+  medicalInsuranceDate: [
+    null
+  ],
+
+  medicalInsuranceFile: [
+    null
+  ],
+
+  iban: [
+    '',
+    [Validators.required]
+  ],
+
+  bankAttachmentFile: [
+    null
+  ],
+
+  passportNumber: [
+    ''
+  ],
+
+  passportAttachment: [
+    null
+  ],
+
+  borderNumber: [
+    ''
+  ],
+
+  borderAttachment: [
+    null
+  ],
+
+  nationality: [
+    '',
+    [Validators.required]
+  ],
+
+  jobTitle: [
+    '',
+    [Validators.required]
+  ],
+
+  dateOfBirth: [
+    null,
+    [Validators.required]
+  ],
+
+  workStartDate: [
+    new Date(),
+    [Validators.required]
+  ],
+
+  returnFromLeaveDate: [
+    null
+  ],
+
+  contractEndDate: [
+    null
+  ],
+
+  contractEndAttachmentFile: [
+    null
+  ],
+
+  address: [
+    '',
+    [
+      Validators.required,
+      Validators.maxLength(500)
+    ]
+  ]
+});
+
+accountExlorer:any=[]
+sectionsData:any[]=[]
+pageSize = 20;
+offset = 0;
+
+loading = false;
+hasMore = true;
+  // !!!!!!!!!!!!!!! Methods
+  ngOnInit() {
+    this.getAllDataSections();
+    this.refreshActions();
   }
-]
 
+  getAllDataSections(){
+     if (this.loading || !this.hasMore) return;
+    this.loading = true;
+    this._sectionsService.getAllSendInQuery(this.offset,this.pageSize).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
+      // this.sectionsData=res.data.rows
+         const rows = res.data.rows;
 
-items=[
-  {name:'sherif yehia',id:1},
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-]
+        this.sectionsData = [...this.sectionsData, ...rows];
 
+        // لو رجع أقل من 20 يبقى مفيش بيانات تاني
+        if (rows.length < this.pageSize) {
+          this.hasMore = false;
+        }
 
-
-itemsTable: any = Array.from({ length: 20 }, (_, i) => ({
-  id: i + 1,
-  code: `C${1000 + i}`, // كود الصنف
-  itemName: `صنف ${i + 1}`, // اسم الصنف
-  unit: ['قطعة', 'كرتونة', 'كيلو'][i % 3], // وحدة
-  qty: Math.floor(Math.random() * 100) + 1, // الكمية
-  returnedQty: Math.floor(Math.random() * 20), // الكمية المرتجعة
-  damagedValue: Math.floor(Math.random() * 500) + 50, // القيمة للتوالف
-  notes: `ملاحظة ${i + 1}`, // ملاحظات
-  tools: ['تعديل', 'حذف'], // الأدوات
-}));
-
-
-
-
-accountExlorer=Array.from({length:20},(_,i)=>({
-  id:1,
-  note:'هذا النص  يمكن أن يستبدل في نفس المساحة، لقد تم توليد هذا ال....',
-  depit:'1000',
-  credit:'0',
-  total:'1000',
-  
-}))
-
-// !!!!!!!!!!!!!!! Methods
-handleAction(action: string) {
-  switch (action) {
-    case 'save':
-      this.save();
-      break;
-    case 'reset':
-      this.reset();
-      break;
-    case 'delete':
-      this.delete();
-      break;
-    case 'print':
-      this.print();
-      break;
+        this.loading = false;
+      console.log(this.sectionsData);
+    })
   }
+
+  loadMoreSections() {
+
+  if (!this.hasMore) return;
+
+  this.offset += this.pageSize;
+
+  this.getAllDataSections();
 }
 
+  save() {
+    console.log('Save action triggered');
+  }
 
+  reset() {
+    console.log('Reset action triggered');
+  }
 
-save(){
-  console.log('Save action triggered');
-}
+  delete() {
+    console.log('Delete action triggered');
+  }
 
-reset(){
-  console.log('Reset action triggered');
-}
+  print() {
+    console.log('Print action triggered');
+  }
 
+  showDialogReject() {
+    this.visibleReject = true;
+  }
 
-delete(){
-  console.log('Delete action triggered');
-}
+  showDialog() {
+    this.visible = true;
+  }
 
-print(){
-  console.log('Print action triggered');
-}
+  imagePreview: string | ArrayBuffer | null = null;
 
+  onFileChange(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-showDialogReject(){
-  this.visibleReject = true
-}
-
-
-
-    showDialog() {
-        this.visible = true;
-    }
-
-
-    imagePreview: string | ArrayBuffer | null = null;
-
-onFileChange(event: any) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    this.imagePreview = reader.result;
-  };
-  reader.readAsDataURL(file);
-}
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
 }

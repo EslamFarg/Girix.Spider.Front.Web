@@ -1,4 +1,6 @@
-<app-page-header-search [titleHeading]="'مستكشف المشاريع '" [addButton]="dataAddButton" [filteringData]="filteringData"></app-page-header-search>
+<app-page-header-search [titleHeading]="'مستكشف المشاريع '" [addButton]="dataAddButton" [filteringData]="filteringData"
+(clickSearch)="onSearch($event)"
+></app-page-header-search>
 
 <div class="table-responsive table_explorer">
   <table class="w-full ">
@@ -11,30 +13,33 @@
         <th class="p-2 text-center">تاريخ البدايه </th>
         <th class="p-2 text-center">تاريخ النهايه</th>
         <th class="p-2 text-center">قيمه المشروع</th>
-        <th class="p-2 text-center">المبلغ</th>
+        <th class="p-2 text-center">ضريبة المشروع</th>
+        <th class="p-2 text-center">قيمه التأمين</th>
         <th class="p-2 text-center">الادوات</th>
       </tr>
     </thead>
     <tbody>
   
 
-@for(item of itemsTable;track $index){
+@for(item of ProjectData;track $index){
 
     <tr >
-<td class="p-2 text-center">{{ $index + 1 }}</td>
-<td class="p-2 text-center">9876543</td>
-<td class="p-2 text-center">80001630115</td>
-<td class="p-2 text-center">10/10/2025</td>
+<td class="p-2 text-center">{{$index + 1}}</td>
+<td class="p-2 text-center">{{item?.id}}</td>
+<td class="p-2 text-center">{{item?.referenceNumber}}</td>
+<td class="p-2 text-center">{{item?.nameAr}}</td>
 
-<td class="p-2 text-center">10/10/2025</td>
-<td class="p-2 text-center">10/10/2026</td>
-<td class="p-2 text-center">2000</td>
-<td class="p-2 text-center">2000</td>
-       <td class="p-2 w-full flex items-center justify-center gap-2">
+<td class="p-2 text-center">{{item?.startDate}}</td>
+<td class="p-2 text-center">{{item?.endDate}}</td>
+<td class="p-2 text-center">{{item?.projectValue}}</td>
+<td class="p-2 text-center">{{item?.projectTax}}</td>
+<td class="p-2 text-center">{{item?.insuranceValue}}</td>
+
+       <td class="p-2 w-full flex items-center justify-center gap-2" (click)="onEditProject(item.id)">
             <button class="update">
 <i class="fa-solid fa-pen-to-square"></i>
             </button>
-            <button class="delete">
+            <button class="delete" (click)="showPopupDelete(item.id)">
 
   <i class="fa-solid fa-trash"></i>
 
@@ -85,5 +90,6 @@
 </div>
 
    <div class="card flex justify-center mt-4">
-            <p-paginator (onPageChange)="onPageChange($event)" [showFirstLastIcon]="false" [first]="first" [rows]="rows" [totalRecords]="120" [rowsPerPageOptions]="[10, 25, 50,100,250]" />
+            <p-paginator (onPageChange)="onPageChange($event)" [showFirstLastIcon]="false" [first]="first" [rows]="rows" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 25, 50,100,250]" />
       </div>
+      <app-shared-confirm-dialog [show]="showDeleteDialog" [title]="'حذف المشروع'" [message]="'هل أنت متأكد من حذف هذا المشروع ؟ لا يمكن التراجع عن هذا الإجراء.'" (confirm)="deleteDialog()" (cancel)="showDeleteDialog=false"></app-shared-confirm-dialog>

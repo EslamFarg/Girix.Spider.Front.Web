@@ -27,6 +27,10 @@ export const HrRoute:Routes=[
           {
             path:'custody',
             loadComponent:()=>import('./custody/custody').then(m=>m.Custody)
+          },
+          {
+            path:'allowances',
+            loadComponent:()=>import('./allowances/allowances').then(m=>m.Allowances)
           }
         ]
     }

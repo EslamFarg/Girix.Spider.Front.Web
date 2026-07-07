@@ -113,7 +113,10 @@
 
         <div class="col-span-3">
              <label for="section" >القسم</label>
-           <ng-select [items]="[]" [bindLabel]="'name'" [bindValue]="'name'" [placeholder]="'أختر'"></ng-select>
+           <ng-select [items]="sectionsData" [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'أختر'"
+              [loading]="loading"
+             (scrollToEnd)="loadMoreSections()"
+           ></ng-select>
         </div>
         <div class="col-span-4">
              <label for="arabicName" >الأسم العربي</label>

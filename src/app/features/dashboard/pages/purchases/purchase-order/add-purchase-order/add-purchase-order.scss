@@ -1,0 +1,9 @@
+#searchInvoice{
+  &.ng-valid.ng-touched {
+   background-image: none;
+  }
+
+  &.ng-invalid.ng-touched {
+    border-color: red !important;
+  }
+}

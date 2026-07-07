@@ -304,9 +304,10 @@ textarea{
 
 
 .search_input{
-    width:380px ;
+    // width:380px ;
+    width: 100%;
   input{
-    width: 375px;
+    // width: 375px;
   }
 
 
@@ -1256,3 +1257,13 @@ input:-webkit-autofill {
 .ng-select .ng-select-container .ng-value-container .ng-input>input{
     box-shadow: none !important;
 }
+
+
+.p-datepicker .p-datepicker-panel {
+    background:#000 !important;
+}
+
+// .p-component.p-dialog{
+//     // background-color: #000 !important;
+//     // color: #fff !important;
+// }

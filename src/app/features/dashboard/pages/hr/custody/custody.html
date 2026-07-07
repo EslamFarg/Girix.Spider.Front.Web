@@ -84,15 +84,15 @@
 
             <tr >
             <td class="p-2 text-center">{{ $index + 1 }}</td>
-            <td class="p-2 text-center">{{ item.itemName }}</td>
+            <td class="p-2 text-center">{{ item.name }}</td>
          <td class="p-2 w-full flex items-center justify-center gap-2">
        
-            <button class="update">
+            <button class="update" (click)="onEditData(item.id)">
 
 
 <i class="fa-solid fa-pen-to-square"></i>
             </button>
-            <button class="delete">
+            <button class="delete" (click)="showPopupDelete(item.id)">
 
   <i class="fa-solid fa-trash"></i>
 

@@ -21,29 +21,37 @@ export class MaxPercentageDirective {
       return;
     }
 
-    value = value.replace(/\s/g, '').replace(/[^0-9.]/g, '');
 
-    const parts = value.split('.');
 
-    if (parts.length > 2) {
-      value = parts[0] + '.' + parts[1];
-    }
+value = value.replace(/\s/g, '').replace(/[^0-9.]/g, '');
 
-    if (parts[1]?.length > 1) {
-      value = parts[0] + '.' + parts[1].substring(0, 1);
-    }
+// السماح بنقطة واحدة فقط
+const firstDotIndex = value.indexOf('.');
 
-    const numericValue = parseFloat(value);
+if (firstDotIndex !== -1) {
+  value =
+    value.substring(0, firstDotIndex + 1) +
+    value.substring(firstDotIndex + 1).replace(/\./g, '');
+}
 
-    if (!isNaN(numericValue) && numericValue > 100) {
-      value = '100';
-    }
+const parts = value.split('.');
 
-    input.value = value;
+// السماح برقم واحد فقط بعد العلامة العشرية
+if (parts.length === 2 && parts[1].length > 1) {
+  value = parts[0] + '.' + parts[1].substring(0, 1);
+}
 
-    // تحديث الفورم كنترول
-    this.ngControl?.control?.setValue(value, {
-      emitEvent: false
-    });
+let numericValue = parseFloat(value);
+
+// لو القيمة 100 أو أكبر، اجعلها 100 فقط بدون نقطة
+if (!isNaN(numericValue) && numericValue >= 100) {
+  value = '100';
+}
+
+input.value = value;
+
+this.ngControl?.control?.setValue(value, {
+  emitEvent: false,
+});
   }
 }

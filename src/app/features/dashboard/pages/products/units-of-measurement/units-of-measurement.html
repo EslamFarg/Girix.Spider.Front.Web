@@ -2,13 +2,6 @@
 
 <form class="grid grid-cols-1 md:grid-cols-12 gap-4" [formGroup]="unitForm" (ngSubmit)="onSubmit()">
     <div class="col-span-12">
-      
-
-
-       
-    </div>
-
-    <div class="col-span-12">
         <label for="unitName">اسم الوحدة</label>
         <input type="text" placeholder="اسم الوحدة" appOnlyString formControlName="nameAr" id="unitName" maxlength="100">
         <app-form-error [control]="unitForm.controls['nameAr']" [errorKey]="'required'" [message]="'اسم الوحدة مطلوب'"></app-form-error>

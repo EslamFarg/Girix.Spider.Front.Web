@@ -5,6 +5,7 @@ import { productModel } from "../../features/dashboard/pages/products/product-ca
 import { ProductCardService } from "../../features/dashboard/pages/products/product-card/services/product-card";
 import { UnitOfMeasure } from "../../features/dashboard/pages/products/units-of-measurement/services/unit-of-measure";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { InventoriesServices } from "../../features/dashboard/pages/products/inventories/services/inventories-services";
 
 
 @Injectable({
@@ -16,11 +17,14 @@ export class LookupFacade {
       private supplierService = inject(Suppliers);
       private productService = inject(ProductCardService);
       private unitOfMeasureService = inject(UnitOfMeasure);
+      private inventoriesService = inject(InventoriesServices);
       private destroyRef = inject(DestroyRef);
+    
     // !!!! Properties
     suppliers = signal<SupplierModel[]>([]);
-    products = signal<productModel[]>([]);
+    products = signal<any[]>([]);
     unitOfMeasures = signal<any[]>([]);
+    inventories = signal<any[]>([]);
 
     // !!!! Methods
     loadSuppliers() : any {
@@ -39,6 +43,13 @@ export class LookupFacade {
     loadUnitOfMeaguare() : any {
         this.unitOfMeasureService.getAllWithoutPagination().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res:any)=>{
             this.unitOfMeasures.set(res.data.rows);
+        })
+    }
+
+
+    loadInventories(){
+        this.inventoriesService.getAllWithoutPagination().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res:any)=>{
+            this.inventories.set(res.data.rows);
         })
     }
 }
