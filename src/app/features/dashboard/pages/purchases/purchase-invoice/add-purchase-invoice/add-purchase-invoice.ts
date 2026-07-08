@@ -93,25 +93,13 @@ export class AddPurchaseInvoice extends FormComponentBase {
       ],
     ],
     taxNumber: [null, [Validators.required, Validators.minLength(9), Validators.maxLength(15)]],
-
-    // totalPrice: [0],
-    // vat: [0],
-    // disCountPercentage: [0],
-    // discountAmount: [0],
-    // allDiscount: [0],
-    // vatDiscount: [0],
-    // totalDiscount: [0],
     net: [0],
     expenses: ['', [Validators.required]],
-
     branchId: [null, Validators.required],
-
     paidCash: [null, [Validators.required]],
     paidCashAccountId: [null, [Validators.required]],
-
     networkPaid: [null, [Validators.required]],
     networkPaidAccountId: [null],
-
     purchaseDetails: this._fb.array([]) as any,
   });
 
@@ -164,19 +152,24 @@ export class AddPurchaseInvoice extends FormComponentBase {
     this.visible = true;
   }
 getDataInventories:any[]=[]
+warehouseData: any[] = [
+  {name:"EEE",id:1},
+  {name:"EEE",id:2},
+];
   // invoiceTypeEnum: invoiceType = invoiceType;
   // !!!!!!!!!!!!!!! Methods
   ngOnInit() {
     this._lookup.loadSuppliers();
     // this._lookup.loadInventories();
     this.getAllInventories();
-    console.log(this._lookup.inventories());
+    
     this.listenSupplierChange();
     this.loadNameEnInSupplier();
     this.loadPhoneNumber();
     this.listenPaymentChanges();
     this.getAllAccountsCash();
     this.getAllNetAccounts();
+  
     this.refreshActions();
   }
 
@@ -185,7 +178,7 @@ getDataInventories:any[]=[]
   getAllInventories(){
          this._inventoriesServices.getAllWithoutPagination().pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
           this.getDataInventories=res.data.rows
-          console.log(this.getDataInventories)
+         
         })
   }
 
@@ -199,7 +192,7 @@ getDataInventories:any[]=[]
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((res: any) => {
         this.cashAccounts = res.data;
-        console.log(this.cashAccounts);
+        
       });
   }
   getAllNetAccounts() {
@@ -208,7 +201,7 @@ getDataInventories:any[]=[]
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((res: any) => {
         this.NetAccounts = res.data;
-        console.log(this.cashAccounts);
+       
       });
   }
 
@@ -247,17 +240,6 @@ getDataInventories:any[]=[]
       control?.updateValueAndValidity({ emitEvent: false });
     });
 
-    // لو الفاتورة آجل
-    // if (invoiceTypeValidators === invoiceType.Credit) {
-
-    //   paidCash?.reset();
-    //   paidCashAccount?.reset();
-
-    //   networkPaid?.reset();
-    //   networkAccount?.reset();
-
-    //   return;
-    // }
 
     // لو كاش
     if (paymentMethodValue === PaymentMethod.Cash) {
@@ -319,53 +301,9 @@ getDataInventories:any[]=[]
 
     const dialCode = country?.dialCode;
 
-    // this.purchaseOrderForm.patchValue({
-    //   phoneCountryCode: dialCode ? '+' + dialCode : '',
-    // });
   }
 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 Table Product !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  //   return this._fb.group({
-  //     productCartId: [null, Validators.required],
-  //     warehouseId: [null, Validators.required],
 
-  //     quantity: [
-  //       1,
-  //       [
-  //         Validators.required,
-  //         Validators.min(1)
-  //       ]
-  //     ],
-
-  //     purchasesPrice: [
-  //       0,
-  //       [
-  //         Validators.required,
-  //         Validators.min(0.01)
-  //       ]
-  //     ],
-
-  //     total: [0],
-  //     vat: [0],
-
-  //     disCountPercentage: [
-  //       0,
-  //       [
-  //         Validators.min(0),
-  //         Validators.max(100)
-  //       ]
-  //     ],
-
-  //     discountAmount: [
-  //       0,
-  //       Validators.min(0)
-  //     ],
-
-  //     vatDiscount: [0],
-  //     totalDiscount: [0],
-  //     net: [0]
-  //   });
-  // }
 
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!! Table Products !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   get purchaseDetails(): any {
@@ -376,22 +314,7 @@ getDataInventories:any[]=[]
     this.purchaseDetails.push(this.createPurchaseDetail());
   }
 
-
-  // //   const value= e.target.value;
-
-  // //   if (!value) {
-  // //     this._messageService.add({
-  // //       severity: 'error',
-  // //       summary: 'خطأ',
-  // //       detail: `يجب ادخال قيمه بحث برقم الفاتورة`,
-  // //     })
-  // //     return;
-  // //   }
-
-  // //   console.log(value);
-  // // }
-
-  // // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ProductInvoice
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ProductInvoice
   createPurchaseDetail(product?: any): FormGroup {
     return this._fb.group({
       productCartId: [product?.id || null, Validators.required],
@@ -454,27 +377,45 @@ getDataInventories:any[]=[]
           label: item.name,
           value: item.id,
         }));
-        console.log(this.items);
+    
         setTimeout(() => {
           this.autoComplete.show();
         });
       });
   }
 
-
-  // 1. عند اختيار الصنف من الـ AutoComplete
   onSelectProduct(event: any) {
-    // const selectedItem = event.value; // حسب الـ Object الراجع (مثال: { label: '...', value: id })
-    // // this.loadProductToAddingRow(selectedItem.value);
-    // this.loadUnitData(selectedItem.value);
-
-    // للضمان: نتحقق هل القيمة القادمة كائن أم قيمة مباشرة
   const productId = event.value?.value ? event.value.value : event.value;
   
-  if (productId) {
-    this.loadUnitData(productId);
-  }
-  }
+  if (!productId) return;
+
+  // جلب بيانات وحدات الصنف وتحديث الفورم
+  this._purchaseServices.getProductCartByProductId(productId)
+    .pipe(takeUntilDestroyed(this._destroyRef))
+    .subscribe((res: any) => {
+      this.unitData = res.data; // مصفوفة الوحدات القادمة من السيرفر
+
+      if (this.unitData && this.unitData.length > 0) {
+        const firstUnit = this.unitData[0];
+        
+        // تحديث حقول سطر الإضافة بالوحدة الأولى وسعرها تلقائياً
+        this.itemAddingForm.patchValue({
+          productCartId: productId,
+          productCode: firstUnit.productCode || '', // تأكد من مطابقة المسميات مع الـ API
+          productName: event.value?.label || firstUnit.productName,
+          unitId: firstUnit.id,
+          unitName: firstUnit.name,
+          price: firstUnit.price || 0, // السعر الافتراضي لهذه الوحدة
+          qty: 1,
+          discountRate: 0,
+          discountAmount: 0
+        }, { emitEvent: false });
+
+        // إعادة حساب الإجماليات للسطر
+        // this.calculateAddingRowTotals();
+      }
+    });
+}
 
 
   
@@ -491,117 +432,146 @@ getDataInventories:any[]=[]
 
 
    onUnitChange(selectedUnitId: any) {
-    console.log(selectedUnitId.id);
-
-    this._purchaseServices.getUnitById(selectedUnitId.id).subscribe((res: any) => {
-      // this.itemAddingForm.patchValue({
-      //   unitName: res.data.name,
-      //   price: res.data.price, // تحديث السعر التابع للوحدة المختارة
-      // });
-      console.log(res.data);
-      this.calculateAddingRowTotals();
-    })
-
-    // const unit = this.currentProductUnits.find((u) => u.id === selectedUnitId);
-    // if (unit) {
-    //   this.itemAddingForm.patchValue({
-    //     unitName: unit.name,
-    //     price: unit.price, // تحديث السعر التابع للوحدة المختارة
-    //   });
-    //   this.calculateAddingRowTotals();
-    // }
-
-
+    
   }
-  // 2. عند البحث بكود الصنف والضغط على Enter
+
   searchByProductCode(e: any) {
     const code = e.target.value?.trim();
-    if (!code) return;
+    if (!code){
+      this._messageService.add({
+        severity: 'warn',
+        summary: 'تنبيه',
+        detail: 'الكود غير موجود',
+      })
+      return
+    } ;
 
-    const payload = buildSearchPayload(code, 1, SearchableColumnEnum.Code);
-    this._productServices.search(payload).subscribe((res: any) => {
-      if (res?.data?.rows?.length > 0) {
-        // this.loadProductToAddingRow(res.data.rows[0].id);
-        e.target.value = ''; // تصفير الحقل
+
+    this._purchaseServices.searchByCode(code).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res: any) => {
+      if (res?.data) {
+      const product = res?.data?.rows?.length > 0 ? res.data.rows[0] : res?.data;
+      if (product && product.id) {
+        this.loadProductToAddingRow(product);
+        e.target.value = '';
+      }
       } else {
         this._messageService.add({ severity: 'warn', summary: 'تنبيه', detail: 'الكود غير موجود' });
       }
-    });
+    })
+
   }
 
-  // دالة مشتركة لجلب بيانات الصنف ووحداته وسعره وتجهيز سطر الإضافة
+  loadProductToAddingRow(res: any) {
+  const product = res?.data || res;
+  if (!product || !product.id) return;
+
+  const units = product.productCart || [];
+  const defaultUnit = units.find((u: any) => u.selected === true) || units[0];
+
+  // إذا لم يكن للصنف أي وحدات، نضع قيم صفرية حماية للكود
+  const unitId = defaultUnit ? defaultUnit.id : null;
+  const unitName = defaultUnit ? defaultUnit.fromUnitName : '';
+  const price = defaultUnit ? (defaultUnit.purchasePrice || 0) : 0;
+  const vatRate = product.vat || 0; // نسبة الضريبة مثلاً 15
+
+  const totalBeforeTax = +(1 * price).toFixed(2);
+
+const taxAmount = +(
+  totalBeforeTax * (vatRate / 100)
+).toFixed(2);
+
+const netTotal = +(
+  totalBeforeTax + taxAmount
+).toFixed(2);
+
+  // 4. بناء الـ FormGroup المطابق تماماً للـ FormArray بالأسفل
+  const newRowGroup = this._fb.group({
+    productCartId: [product.id, Validators.required],
+    productCode: [product.code || ''], // لو الباكيند بيرجع كود
+    productName: [product.productName || ''],
+    warehouseId: [this.purchaseForm.get('branchId')?.value || null, Validators.required], 
+    warehouseName: [''], // سيتم عرضه بناءً على اختيار المخزن لاحقاً
+    unitId: [unitId, Validators.required],
+    unitName: [unitName],
+    quantity: [1, [Validators.required, Validators.min(1)]],
+    purchasesPrice: [price, [Validators.required, Validators.min(0.01)]],
+    disCountPercentage: [0],
+    discountAmount: [0],
+    vat: [taxAmount], // قيمة الضريبة المحسوبة للسطر
+    net: [netTotal], // الصافي النهائي الكلي للسطر
+  });
 
 
-  // loadProductToAddingRow(productId: number) {
-  //   this._purchaseServices.getProductCartByProductId(productId).subscribe((res: any) => {
-  //     // const = res.data;
-  //     this.unitData = res.data;
+  newRowGroup.valueChanges.subscribe(() => {
+    this.calculateRowTotals(newRowGroup, vatRate);
+  });
 
-  //     //假設 الوحدات بتيجي في مصفوفة داخل بيانات الصنف: product.productUnits
-  //     // this.currentProductUnits = product.productUnits || [
-  //     //   { id: 1, name: 'قطعة', multiplier: 1, price: product.purchasePrice || 0 }, // مظهر افتراضي لو مفيش جدول وحدات
-  //     // ];
 
-  //     // ملء بيانات الصنف الأساسية في سطر الإضافة
-  //     // this.itemAddingForm.patchValue({
-  //     //   productCartId: product.id,
-  //     //   productCode: product.code,
-  //     //   productName: product.nameAr,
-  //     //   price: product.purchasePrice || 0,
-  //     //   taxRate: product.vatRate || 15,
-  //     //   qty: 1,
-  //     //   discountRate: 0,
-  //     //   discountAmount: 0
-  //     // });
+  this.purchaseDetails.push(newRowGroup);
 
-  //     // اختيار أول وحدة تلقائياً وتحديث السعر بناءً عليها
-  //     // if (this.currentProductUnits.length > 0) {
-  //     //   const firstUnit = this.currentProductUnits[0];
-  //     //   this.itemAddingForm.patchValue({
-  //     //     unitId: firstUnit.id,
-  //     //     unitName: firstUnit.name,
-  //     //     price: firstUnit.price || product.purchasePrice || 0,
-  //     //   });
-  //     // }
+  this.calculateRowTotals(newRowGroup, vatRate);
 
-  //     // this.calculateAddingRowTotals();
-  //   });
-  // }
+  // تصفير حقل البحث العلوي
+  this.searchControl.reset(null, { emitEvent: false });
 
-  // عند تغيير الوحدة يدوياً من الـ Dropdown لسطر الإضافة
- 
+  // 8. تصفير حقول البحث للاستعداد للصنف القادم
+  this.searchControl.reset(null, { emitEvent: false });
+}
 
-  // حساب إجماليات السطر العلوي أثناء الكتابة والتعديل قبل الضغط على "إضافة"
-  calculateAddingRowTotals(updateType: 'percent' | 'amount' = 'percent') {
-    const form = this.itemAddingForm;
-    const qty = +form.get('qty')?.value || 0;
-    const price = +form.get('price')?.value || 0;
-    const taxRate = +form.get('taxRate')?.value || 0;
+ calculateRowTotals(row: FormGroup, vatRate: number) {
+  const qty = Number(row.get('quantity')?.value) || 0;
+  const price = Number(row.get('purchasesPrice')?.value) || 0;
+  let discountPercent = Number(row.get('disCountPercentage')?.value) || 0;
+  let discountAmount = Number(row.get('discountAmount')?.value) || 0;
 
-    const totalBeforeDiscount = qty * price;
-    let discountRate = +form.get('discountRate')?.value || 0;
-    let discountAmount = +form.get('discountAmount')?.value || 0;
+  const totalBeforeDiscount = qty * price;
 
-    if (updateType === 'percent') {
-      discountAmount = (discountRate / 100) * totalBeforeDiscount;
-      form.get('discountAmount')?.setValue(discountAmount, { emitEvent: false });
-    } else {
-      discountRate = totalBeforeDiscount > 0 ? (discountAmount / totalBeforeDiscount) * 100 : 0;
-      form.get('discountRate')?.setValue(discountRate, { emitEvent: false });
-    }
-
-    const totalAfterDiscount = totalBeforeDiscount - discountAmount;
-    const taxAmount = totalAfterDiscount * (taxRate / 100);
-    const finalTotal = totalAfterDiscount + taxAmount;
-
-    form.patchValue(
-      {
-        tax: taxAmount,
-        total: finalTotal,
-      },
-      { emitEvent: false },
-    );
+  if (row.get('disCountPercentage')?.dirty) {
+    discountAmount = totalBeforeDiscount * (discountPercent / 100);
+    row.get('discountAmount')?.setValue(discountAmount, { emitEvent: false });
+  } 
+  // إذا تم تغيير قيمة الخصم مباشرة، احسب النسبة المئوية لها
+  else if (row.get('discountAmount')?.dirty) {
+    discountPercent = totalBeforeDiscount > 0 ? (discountAmount / totalBeforeDiscount) * 100 : 0;
+    row.get('disCountPercentage')?.setValue(discountPercent, { emitEvent: false });
   }
+
+
+  const subTotal = +(totalBeforeDiscount - discountAmount).toFixed(2);
+
+// حساب قيمة الضريبة
+const vatAmount = +(subTotal * (vatRate / 100)).toFixed(2);
+
+const netTotal = +(subTotal + vatAmount).toFixed(2);
+
+  row.patchValue({
+    vat: vatAmount,
+    net: netTotal
+  }, { emitEvent: false });
+
+  // تحديث الإجماليات الكلية للفاتورة بالأسفل
+  this.calculateInvoiceTotals();
+}
+
+calculateInvoiceTotals() {
+  let totalQty = 0;
+  let totalDiscount = 0;
+  let totalVat = 0;
+  let netInvoice = 0;
+
+  this.purchaseDetails.controls.forEach((control:any) => {
+    totalQty += Number(control.get('quantity')?.value) || 0;
+    totalDiscount += Number(control.get('discountAmount')?.value) || 0;
+    totalVat += Number(control.get('vat')?.value) || 0;
+    netInvoice += Number(control.get('net')?.value) || 0;
+  });
+
+  // إسناد القيم لمتغيرات الـ tfoot المعروضة لديك في الـ HTML
+  this.totalQuantities = totalQty;
+  this.totalDiscounts = totalDiscount;
+  this.totalVat = totalVat;
+  this.invoiceNetTotal = netInvoice;
+}
 
   // ترحيل البيانات من السطر العلوي إلى جدول الـ FormArray بالأسفل
   addToTable() {
@@ -662,21 +632,7 @@ getDataInventories:any[]=[]
   totalDiscounts = 0;
   totalVat = 0;
   invoiceNetTotal = 0;
-  calculateInvoiceTotals() {
-    this.totalQuantities = 0;
-    this.totalDiscounts = 0;
-    this.totalVat = 0;
-    this.invoiceNetTotal = 0;
 
-    this.purchaseDetails.controls.forEach((control: any) => {
-      this.totalQuantities += +control.get('quantity')?.value || 0;
-      this.totalDiscounts += +control.get('discountAmount')?.value || 0;
-      this.totalVat += +control.get('vat')?.value || 0;
-      this.invoiceNetTotal += +control.get('net')?.value || 0;
-    });
-
-    this.purchaseForm.patchValue({ net: this.invoiceNetTotal }, { emitEvent: false });
-  }
 
   removePurchaseDetail(index: number) {
     this.purchaseDetails.removeAt(index);
@@ -721,19 +677,6 @@ getDataInventories:any[]=[]
       // this.productCards.push(form);
     });
 
-    // this.productForm.patchValue({
-    //   code: data.code,
-    //   nameAr: data.nameAr,
-    //   nameEn: data.nameEn,
-    //   productType: data.productTypeId,
-    //   categoryId: data.categoryId,
-    //   groupId: data.groupId,
-    //   vat: data.vatRate,
-    //   selectiveVat: data.selectiveTaxRate,
-    //   vatCode: data.eInvoiceTaxCode,
-    //   taxExemptionReason: data.eInvoiceExemptionReason,
-    //   isScaleItem: data.isScaleItem
-    // });
 
     this.changeButtonState(data.id, true);
   }
@@ -907,7 +850,7 @@ getDataInventories:any[]=[]
   }
 
   addSupplier() {
-    console.log(this.supplierForm.value);
+  
     if (this.supplierForm.invalid) {
       this.supplierForm.markAllAsTouched();
       return;
@@ -1042,7 +985,7 @@ getDataInventories:any[]=[]
   }
 
   searchSupplier(event: AutoCompleteCompleteEvent) {
-    console.log('event', this.searchControl.value);
+    
     const query = (event.query ?? '').trim();
     if (!query) {
       this.items = [];
@@ -1075,10 +1018,7 @@ getDataInventories:any[]=[]
       .getById(delegateId)
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((res) => {
-        // console.log(res);
-        // this.idUpdate = res.data.id;
-        console.log(res.data);
-        // asdasdasd
+     
 
         this.supplierForm.patchValue({
           ...res.data,

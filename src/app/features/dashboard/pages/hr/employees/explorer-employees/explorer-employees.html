@@ -1,4 +1,6 @@
-<app-page-header-search [titleHeading]="'مستكشف الموظفين '" [addButton]="dataAddButton" [filteringData]="filteringData"></app-page-header-search>
+<app-page-header-search [titleHeading]="'مستكشف الموظفين '" [addButton]="dataAddButton" [filteringData]="filteringData"
+ (clickSearch)="search($event)"
+></app-page-header-search>
 
 <div class="table-responsive table_explorer">
   <table class="w-full ">
@@ -17,23 +19,23 @@
     <tbody>
   
 
-@for(item of itemsTable;track $index){
+@for(item of employeeData;track $index){
 
     <tr >
 <td class="p-2 text-center">{{ $index + 1 }}</td>
-<td class="p-2 text-center">9876543</td>
+<td class="p-2 text-center">{{item.id}}</td>
 
 
-<td class="p-2 text-center">شريف يحيي</td>
-<td class="p-2 text-center">01026381737</td>
-<td class="p-2 text-center">الادارة</td>
-<td class="p-2 text-center">الجنسية</td>
-<td class="p-2 text-center">2000</td>
+<td class="p-2 text-center">{{item.name}}</td>
+<td class="p-2 text-center">{{item.phoneNember}}</td>
+<td class="p-2 text-center">{{item.departmentName}}</td>
+<td class="p-2 text-center">{{item.nationality}}</td>
+<td class="p-2 text-center">{{item.salary}}</td>
        <td class="p-2 w-full flex items-center justify-center gap-2">
-            <button class="update">
+            <button class="update" (click)="updateEmployee(item.id)">
 <i class="fa-solid fa-pen-to-square"></i>
             </button>
-            <button class="delete">
+            <button class="delete" (click)="deleteEmployee(item.id)">
 
   <i class="fa-solid fa-trash"></i>
 
@@ -84,5 +86,14 @@
 </div>
 
    <div class="card flex justify-center mt-4">
-            <p-paginator (onPageChange)="onPageChange($event)" [showFirstLastIcon]="false" [first]="first" [rows]="rows" [totalRecords]="120" [rowsPerPageOptions]="[10, 25, 50,100,250]" />
+            <p-paginator (onPageChange)="onPageChange($event)" [showFirstLastIcon]="false" [first]="first" [rows]="rows" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 25, 50,100,250]" />
       </div>
+
+
+      <app-shared-confirm-dialog
+  [show]="showDeleteDialog"
+  [title]="'حذف الموظف'"
+  [message]="'هل أنت متأكد من حذف هذا الموظف ؟ لا يمكن التراجع عن هذا الإجراء.'"
+  (confirm)="deleteDialog()"
+  (cancel)="showDeleteDialog = false"
+></app-shared-confirm-dialog>

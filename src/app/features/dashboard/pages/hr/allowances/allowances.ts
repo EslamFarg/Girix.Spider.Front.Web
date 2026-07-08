@@ -1,8 +1,8 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
 import { SharedConfirmDialog } from "../../../../../shared/ui/shared-confirm-dialog/shared-confirm-dialog";
 import { Paginator } from "primeng/paginator";
 import { FormError } from "../../../../../shared/ui/form-error/form-error";
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { entityNameValidator } from '../../../../../shared/validations/entity-name-validator';
 import { BUTTON_CONFIG } from '../../../../../shared/config/button-cofig';
@@ -32,6 +32,7 @@ private _destroyRef = inject(DestroyRef);
 
 
 // !!!!!!!!!!!!!!!!!! Properties
+@ViewChild('autoComplete') AutoComplete: any
 
 allowancesForm=this._fb.group({
   nameAr: ['',[Validators.required,Validators.minLength(2),Validators.maxLength(100),entityNameValidator()]],
@@ -61,7 +62,7 @@ totalPages = 0;
 searchPage = 1;
 searchPageSize = 10;
 idResultSearch: number =0;
-
+searchControl = new FormControl('');
 // !!!!!!!!!!!!!!! Methods
 
 ngOnInit(): void {
@@ -124,6 +125,11 @@ onSelect(event: any) {
 };
 
       this.totalRecords = 1 ;
+
+  this.searchControl.reset();
+  this.items = [];
+      // this.AutoComplete.clear();
+
     }
   })
 }
@@ -221,7 +227,8 @@ onEditData(id:number){
       console.log(res);
       this.allowancesForm.patchValue({
         nameAr:res.data.name,
-        nameEn:res.data.name
+        nameEn:res.data.name,
+        amount:res.data.amount
       })
     }
   })

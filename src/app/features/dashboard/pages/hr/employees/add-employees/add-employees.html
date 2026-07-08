@@ -5,10 +5,16 @@
       <div class="flex items-center flex-wrap gap-5 my-4
       [&>*]:w-[104px]  [&>*]:h-[32px]  
       ">
-          <button class="btn btn-primary">حفظ</button>
-          <button class="btn">جديد</button>
-          <button class="btn">حذف</button>
-          <button class="btn">طباعه</button>
+      
+          <button class="btn" [ngClass]="{'btn-primary':!isEditMode,'btn-warning':isEditMode}" (click)="save()">
+
+            {{isEditMode?'تعديل':'حفظ'}}
+          </button>
+          <button class="btn" (click)="reset()">جديد</button>
+            @if(this.isEditMode){
+              <button class="btn" (click)="delete()">حذف</button>
+              <button class="btn">طباعه</button> 
+        }
         </div>
     </div>
 
@@ -20,7 +26,7 @@
 </div>
 
 
-<form class="box_header mb-7">
+<form class="box_header mb-7" [formGroup]="employeeForm">
   <div class="title"> بيانات الموظف</div>
 
 
@@ -31,9 +37,11 @@
         <label for="numberEsal">رقم الموظف</label>
         <div class="flex items-center gap-2">
       
-        <input type="text" id="numberEsal" placeholder="رقم الموظف">
+        <input type="text" id="numberEsal" placeholder="رقم الموظف" formControlName="id" appOnlyNumber maxlength="15">
+       
        
         </div>
+        
     </div>
     <div class="col-span-12 md:col-span-8">
           <div class="input_group w-[100%]">
@@ -79,8 +87,19 @@
 
 
   <div class="flex gap-4 items-center mb-[20px]">
-    <div class="image">
-        <svg width="130" height="130" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+<div class="relative">
+      <label class="image">
+       @if(imagePreviewProfile){
+   <div >
+     <img
+      [src]="imagePreviewProfile"
+      class="w-[130px] h-[130px] rounded-xl object-cover border"
+    />
+   
+   </div>
+  } @else {
+
+    <svg width="130" height="130" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect x="1" y="1" width="128" height="128" rx="17" fill="white" stroke="#C3C2D9" stroke-width="2" stroke-dasharray="10 10"/>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M55.5038 53.6202C56.4289 53.0708 57.5164 52.7776 58.6289 52.7776C59.3432 52.7776 59.9222 53.2923 59.9222 53.9272C59.9222 54.5621 59.3432 55.0768 58.6289 55.0768C58.028 55.0768 57.4405 55.2352 56.9409 55.532C56.4412 55.8288 56.0518 56.2506 55.8218 56.7441C55.5918 57.2376 55.5317 57.7806 55.6489 58.3045C55.7661 58.8285 56.0555 59.3097 56.4804 59.6874C56.9054 60.0651 57.4468 60.3224 58.0361 60.4266C58.6255 60.5308 59.2365 60.4773 59.7917 60.2729C60.3468 60.0685 60.8214 59.7223 61.1552 59.2781C61.4891 58.834 61.6673 58.3118 61.6673 57.7776C61.6673 57.1427 62.2463 56.628 62.9606 56.628C63.6749 56.628 64.2539 57.1427 64.2539 57.7776C64.2539 58.7666 63.924 59.7333 63.3059 60.5555C62.6878 61.3778 61.8093 62.0186 60.7815 62.3971C59.7537 62.7755 58.6227 62.8745 57.5315 62.6816C56.4404 62.4887 55.4381 62.0125 54.6514 61.3132C53.8648 60.6139 53.329 59.723 53.112 58.7531C52.8949 57.7832 53.0063 56.7778 53.4321 55.8642C53.8578 54.9506 54.5788 54.1697 55.5038 53.6202Z" fill="#C3C2D9"/>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M86.7253 59.4443C87.4293 59.4443 88 59.9622 88 60.601V70.286C88 75.2405 86.9219 79.0096 84.1799 81.5117C81.4361 84.0153 77.3009 85.0002 71.8675 85.0002H59.1325C53.7008 85.0002 49.5657 84.0157 46.8215 81.5124C44.079 79.0105 43 75.2415 43 70.286V66.392C43 65.7532 43.5707 65.2353 44.2747 65.2353C44.9787 65.2353 45.5494 65.7532 45.5494 66.392V70.286C45.5494 75.0156 46.5948 78.0253 48.629 79.881C50.6615 81.7351 53.9554 82.6869 59.1325 82.6869H71.8675C77.0463 82.6869 80.3401 81.7347 82.3721 79.8805C84.4059 78.0247 85.4506 75.015 85.4506 70.286V60.601C85.4506 59.9622 86.0213 59.4443 86.7253 59.4443Z" fill="#C3C2D9"/>
@@ -89,26 +108,38 @@
 <path fill-rule="evenodd" clip-rule="evenodd" d="M79.2461 45C79.9364 45 80.4961 45.5325 80.4961 46.1894V57.1441C80.4961 57.801 79.9364 58.3335 79.2461 58.3335C78.5557 58.3335 77.9961 57.801 77.9961 57.1441V46.1894C77.9961 45.5325 78.5557 45 79.2461 45Z" fill="#C3C2D9"/>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M78.0581 66.8606L69.2115 73.6679L69.188 73.6855C68.1125 74.4737 66.763 74.9047 65.3702 74.9047C63.9775 74.9047 62.628 74.4737 61.5525 73.6855C61.5409 73.677 61.5294 73.6683 61.5182 73.6595L60.8353 73.122C60.2634 72.7119 59.561 72.4722 58.8274 72.4374C58.0894 72.4023 57.3578 72.5764 56.7378 72.9345L46.2426 79.2487C45.6568 79.6012 44.8611 79.4638 44.4655 78.942C44.0698 78.4201 44.224 77.7114 44.8098 77.3589L55.3313 71.0289C56.408 70.4034 57.6802 70.0992 58.9638 70.1602C60.2474 70.2212 61.476 70.6443 62.4718 71.3683C62.4848 71.3777 62.4975 71.3873 62.51 71.3971L63.195 71.9362C63.8096 72.3812 64.5777 72.6243 65.3702 72.6243C66.1649 72.6243 66.9351 72.3798 67.5506 71.9325L76.3973 65.1252L76.4208 65.1076C77.4963 64.3194 78.8458 63.8884 80.2385 63.8884C81.6313 63.8884 82.9807 64.3194 84.0563 65.1076L84.0798 65.1253L87.5528 67.7979C88.0878 68.2096 88.1468 68.9296 87.6847 69.4061C87.2226 69.8827 86.4143 69.9352 85.8793 69.5236L82.4189 66.8606C81.8033 66.4133 81.0332 66.1688 80.2385 66.1688C79.4438 66.1688 78.6737 66.4133 78.0581 66.8606Z" fill="#C3C2D9"/>
 </svg>
+  }
 
-    </div>
+<input type="file" hidden (change)="onFileChange($event)" #fileInput id="fileInput" accept="image/*">
 
+</label>
+@if(imagePreviewProfile){
+  <span class="remove absolute left-1 top-1 cursor-pointer text-white bg-red-500 w-6 h-6 rounded-full flex items-center justify-center" (click)="removeImage()"><i class="fa-solid fa-xmark"></i></span>
+}
+<app-form-error [control]="employeeForm.controls['image']" [errorKey]="'required'" [message]="'الصورة مطلوبة'"></app-form-error>
+</div>
 
     <div class=" flex-1 grid grid-col-1 md:grid-cols-15 gap-[24px] gap-y-[20px]">
         <div class="col-span-3">
             <label for="jopNum" >الرقم الوظيفي</label>
-            <input type="text" id="JobNum" placeholder="الرقم الوظيفي">
+            <input type="text" id="JobNum" placeholder="الرقم الوظيفي" formControlName="employeeNumber" maxlength="50" appOnlyNumber>
+            <app-form-error [control]="employeeForm.controls['employeeNumber']" [errorKey]="'required'" [message]="'الرقم الوظيفي مطلوب'"></app-form-error>
         </div>
         <div class="col-span-4">
             <label for="baseNum" >الرقم الاساسي</label>
-            <input type="text" id="baseNum" placeholder="الرقم الاساسي">
+            <input type="text" id="baseNum" placeholder="الرقم الاساسي" formControlName="baseNember" maxlength="50" appOnlyNumber>
+            <app-form-error [control]="employeeForm.controls['baseNember']" [errorKey]="'required'" [message]="'الرقم الاساسي مطلوب'"></app-form-error>
         </div>
         <div class="col-span-4">
             <label for="badal" >البدلات</label>
-            <input type="text" id="badal" placeholder="البدلات">
+            <!-- <input type="text" id="badal" placeholder="البدلات"> -->
+             <ng-select [items]="AllowancesList" [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'أختر'" multiple formControlName="allowancesIds"></ng-select>
+             <app-form-error [control]="employeeForm.controls['allowancesIds']" [errorKey]="'required'" [message]="'البدلات مطلوبة'"></app-form-error>
         </div>
         <div class="col-span-4">
-            <label for="salary" >الرواتب</label>
-            <input type="text" id="salary" placeholder="الرواتب">
+            <label for="salary" >الراتب</label>
+            <input type="text" id="salary" placeholder="الرواتب" formControlName="salary" appOnlyNumber maxlength="50">
+            <app-form-error [control]="employeeForm.controls['salary']" [errorKey]="'required'" [message]="'الرواتب مطلوب'"></app-form-error>
         </div>
 
         <div class="col-span-3">
@@ -116,19 +147,44 @@
            <ng-select [items]="sectionsData" [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'أختر'"
               [loading]="loading"
              (scrollToEnd)="loadMoreSections()"
+             formControlName="departmentId"
            ></ng-select>
+           <app-form-error [control]="employeeForm.controls['departmentId']" [errorKey]="'required'" [message]="'القسم مطلوب'"></app-form-error>
         </div>
         <div class="col-span-4">
              <label for="arabicName" >الأسم العربي</label>
-            <input type="text" name="arabicName" id="arabicName" placeholder="الأسم العربي">
+            <input type="text" name="arabicName" id="arabicName" placeholder="الأسم" formControlName="nameAr" maxlength="200">
+            <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'required'" [message]="'الأسم  مطلوب'"></app-form-error>
+            <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'minlength'" [message]="'الأسم  يجب ان يكون  2 حرف علي الأقل'"></app-form-error>
+            <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'maxlength'" [message]="'اسم المشروع يجب ان يكون اقل من 200 حرف'"></app-form-error>
+            <!-- <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'pattern'" [message]="'اسم المشروع يجب ان يكون حروف فقط'"></app-form-error> -->
+              <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'invalidEntityName'" [message]="'اسم المشروع يجب ان يحتوي على حروف وارقام و _ و - فقط'"></app-form-error>
         </div>
         <div class="col-span-4">
              <label for="englishName" >english name</label>
-            <input type="text" name="arabicName" id="englishName" placeholder="english name">
+            <input type="text" name="arabicName" id="englishName" placeholder="english name" formControlName="nameEn">
+
+                <app-form-error [control]="employeeForm.controls['nameEn']" [errorKey]="'required'" [message]="'الأسم  مطلوب'"></app-form-error>
+            <app-form-error [control]="employeeForm.controls['nameEn']" [errorKey]="'minlength'" [message]="'الأسم  يجب ان يكون  2 حرف علي الأقل'"></app-form-error>
+            <app-form-error [control]="employeeForm.controls['nameEn']" [errorKey]="'maxlength'" [message]="'اسم المشروع يجب ان يكون اقل من 200 حرف'"></app-form-error>
+            <!-- <app-form-error [control]="employeeForm.controls['nameEn']" [errorKey]="'pattern'" [message]="'اسم المشروع يجب ان يكون حروف فقط'"></app-form-error> -->
+              <app-form-error [control]="employeeForm.controls['nameEn']" [errorKey]="'invalidEntityName'" [message]="'اسم المشروع يجب ان يحتوي على حروف وارقام و _ و - فقط'"></app-form-error>
         </div>
             <div class="col-span-4">
              <label for="phoneNumber" >رقم الجوال</label>
-            <input type="text" name="phoneNumber" id="phoneNumber" placeholder="رقم الجوال">
+            <!-- <input type="text" name="phoneNumber" id="phoneNumber" placeholder="رقم الجوال"> -->
+             <intl-tel-input
+  #phoneInput
+  [countryOrder]="['eg','sa','ae']"
+  [onlyCountries]="['eg','sa','ae']"
+  initialCountry="sa"
+  [loadUtils]="loadUtils"
+  formControlName="phoneNember"
+  >
+</intl-tel-input>
+<app-form-error [control]="employeeForm.controls['phoneNember']" [errorKey]="'required'" [message]="'رقم الجوال مطلوب'"></app-form-error>
+<app-form-error [control]="employeeForm.controls['phoneNember']" [errorKey]="'invalidSaudiPhone'" [message]="'رقم الجوال السعودي غير صحيح'"></app-form-error>
+<app-form-error [control]="employeeForm.controls['phoneNember']" [errorKey]="'invalidEgyptPhone'" [message]="'رقم الجوال المصري غير صحيح'"></app-form-error>
         </div>
          
     </div>
@@ -137,7 +193,7 @@
 
 
 </form>
-<form class="box_header mb-7" [formGroup]="formAttachment">
+<form class="box_header mb-7" [formGroup]="formAttachment" [formGroup]="employeeForm">
   <div class="title"> بيانات اضافيه </div>
 
 
@@ -149,99 +205,118 @@
 
     <div class="col-span-12 md:col-span-4">
         <label for="idNumber" >رقم الهويه / الاقامه</label>
-        <input type="text" id="idNumber" placeholder="رقم الهويه / الاقامه" >
+        <input type="text" id="idNumber" placeholder="رقم الهويه / الاقامه"  formControlName="nationalIdOrIqamaNumber" appOnlyNumber maxlength="14">
+        <app-form-error [control]="employeeForm.controls['nationalIdOrIqamaNumber']" [errorKey]="'required'" [message]="'رقم الهويه / الاقامه مطلوب'"></app-form-error>
+        <app-form-error [control]="employeeForm.controls['nationalIdOrIqamaNumber']" [errorKey]="'minlength'" [message]="'رقم الهويه يجب ان يكون من 10 الي 14 رقم'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-4">
       <app-input-attachment [label]="'مرفق الهويه / الاقامه'"
-      formControlName="attachment"
+      formControlName="nationalIdOrIqamaNumberFile"
       ></app-input-attachment>
     </div>
      <div class="col-span-12 md:col-span-4">
             <label for="addDate" >التاريخ</label>
-            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="addDate" />
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="addDate" formControlName="medicalInsuranceDate" />
+            <app-form-error [control]="employeeForm.controls['medicalInsuranceDate']" [errorKey]="'required'" [message]="'التاريخ مطلوب'"></app-form-error>
             <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
         </div>
          <div class="col-span-12 md:col-span-4">
       <app-input-attachment [label]="'مرفق التامين الطبي'"
+      formControlName="medicalInsuranceFile"
     
       ></app-input-attachment>
     </div>
     <div class="col-span-12 md:col-span-4">
         <label for="document" >رقم الصرافه</label>
-        <input type="text" id="document" numMar placeholder="رقم الصرافه">
+        <input type="text" id="document" numMar placeholder="رقم الصرافه" formControlName="iban" appOnlyNumber maxlength="24">
+        <app-form-error [control]="employeeForm.controls['iban']" [errorKey]="'required'" [message]="'رقم الصرافه مطلوب'"></app-form-error>
     </div>
     
       <div class="col-span-12 md:col-span-4">
       <app-input-attachment [label]="'مرفق الصرافه'"
+      formControlName="bankAttachmentFile"
     
       ></app-input-attachment>
     </div>
 
      <div class="col-span-12 md:col-span-4">
         <label for="numMar" >رقم الجواز</label>
-        <input type="text" id="numMar" placeholder="رقم الجواز">
+        <input type="text" id="numMar" placeholder="رقم الجواز" formControlName="passportNumber" appOnlyNumber maxlength="14">
+        <app-form-error [control]="employeeForm.controls['passportNumber']" [errorKey]="'required'" [message]="'رقم الجواز مطلوب'"></app-form-error>
     </div>
 
       <div class="col-span-12 md:col-span-4">
       <app-input-attachment [label]="'مرفق الجواز'"
-    
+        formControlName="passportNumber"
       ></app-input-attachment>
     </div>
 
     <div class="col-span-12 md:col-span-4">
         <label for="numBor" >رقم الحدود</label>
-        <input type="text" id="numBor" placeholder="رقم الحدود">
+        <input type="text" id="numBor" placeholder="رقم الحدود" formControlName="borderNumber" appOnlyNumber maxlength="14">
+        <app-form-error [control]="employeeForm.controls['borderNumber']" [errorKey]="'required'" [message]="'رقم الحدود مطلوب'"></app-form-error>
     </div>
 
       <div class="col-span-12 md:col-span-4">
       <app-input-attachment [label]="'مرفق الحدود'"
-    
+        formControlName="borderAttachment"
       ></app-input-attachment>
     </div>
 
     
     <div class="col-span-12 md:col-span-4">
         <label for="Nationality" >الجنسية</label>
-        <input type="text" id="Nationality" placeholder="الجنسية">
+        <input type="text" id="Nationality" placeholder="الجنسية"
+        formControlName="nationality"         
+        >
+        <app-form-error [control]="employeeForm.controls['nationality']" [errorKey]="'required'" [message]="'الجنسية مطلوب'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-4">
         <label for="work" >المهنه</label>
-        <input type="text" id="work" placeholder="المهنه">
+        <input type="text" id="work" placeholder="المهنه" formControlName="jobTitle">
+        <app-form-error [control]="employeeForm.controls['jobTitle']" [errorKey]="'required'" [message]="'المهنه مطلوب'"></app-form-error>
     </div>
 
       <div class="col-span-12 md:col-span-4">
             <label for="Birth" >تاريخ الميلاد</label>
-            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ الميلاد'" [showIcon]="true" inputId="Birth" />
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ الميلاد'" [showIcon]="true" inputId="Birth" formControlName="dateOfBirth" />
+            <app-form-error [control]="employeeForm.controls['dateOfBirth']" [errorKey]="'required'" [message]="'تاريخ الميلاد مطلوب'"> </app-form-error>
+            
             <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
         </div>
 
       <div class="col-span-12 md:col-span-4">
             <label for="live" >تاريخ مباشره العمل</label>
-            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ مباشره العمل'" [showIcon]="true" inputId="live" />
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ مباشره العمل'" [showIcon]="true" inputId="live" formControlName="workStartDate" />
+            <app-form-error [control]="employeeForm.controls['workStartDate']" [errorKey]="'required'" [message]="'تاريخ مباشره العمل مطلوب'"></app-form-error>
             <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
         </div>
 
       <div class="col-span-12 md:col-span-4">
             <label for="Replay" >تاريخ العوده من الاجازه</label>
-            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ العوده من الاجازه'" [showIcon]="true" inputId="Replay" />
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ العوده من الاجازه'" [showIcon]="true" inputId="Replay"  formControlName="returnFromLeaveDate"/>
+            <app-form-error [control]="employeeForm.controls['returnFromLeaveDate']" [errorKey]="'required'" [message]="'تاريخ العوده من الاجازه مطلوب'"></app-form-error>
             <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
         </div>
 
       <div class="col-span-12 md:col-span-4">
             <label for="endContract" >تاريخ إنهاء العقد</label>
-            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ إنهاء العقد'" [showIcon]="true" inputId="endContract" />
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ إنهاء العقد'" [showIcon]="true" inputId="endContract" formControlName="contractEndDate"/>
+            <app-form-error [control]="employeeForm.controls['contractEndDate']" [errorKey]="'required'" [message]="'تاريخ إنهاء العقد مطلوب'"></app-form-error>
             <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
         </div>
 
         
             <div class="col-span-12 md:col-span-4">
       <app-input-attachment [label]="'مرفق انهاء العقد'"
-    
+      formControlName="contractEndAttachmentFile"
       ></app-input-attachment>
     </div>
         <div class="col-span-12 md:col-span-12">
         <label for="address" >العنوان</label>
-        <input type="text" id="address" placeholder="العنوان">
+        <input type="text" id="address" placeholder="العنوان" formControlName="address">
+        <app-form-error [control]="employeeForm.controls['address']" [errorKey]="'required'" [message]="'العنوان مطلوب'"></app-form-error>
+        <app-form-error [control]="employeeForm.controls['address']" [errorKey]="'minlength'" [message]="'العنوان يجب ان يكون على الاقل 3 حروف'"></app-form-error>
     </div>
 
 
@@ -260,6 +335,7 @@
 
 </form>
 
+<app-shared-confirm-dialog [show]="showDeleteDialog" [title]="'حذف الموظف'" [message]="'هل أنت متأكد من حذف هذا الموظف ؟ لا يمكن التراجع عن هذا الإجراء.'" (confirm)="deleteDialog()" (cancel)="showDeleteDialog=false"></app-shared-confirm-dialog>
 
 
 

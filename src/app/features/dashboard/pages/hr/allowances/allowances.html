@@ -30,12 +30,15 @@
   <table class="w-full ">
     <thead class="bg-gray-100 ">
        <tr class="bg-[var(--color-primary)]">
-      <td class="text-right" colspan="4">   <div class="search_input relative md:w-[30%]">
+      <td class="text-right" colspan="4">   <div class="search_input relative md:w-[50%]">
         <!-- <input type="text" class="text-[14px] w-[100%]"  placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/> -->
         <p-autocomplete
+        #autoComplete
         (onClear)="clearSearch()"
         (onSelect)="onSelect($event)"
-        class='autocomplete_full_width' [inputId]="'searchByCodeProduct'"  [suggestions]="items" (completeMethod)="search($event)" [placeholder]="selectedSearch"/>
+        class='autocomplete_full_width' [inputId]="'searchByCodeProduct'"  [suggestions]="items" (completeMethod)="search($event)" [placeholder]="selectedSearch"
+           [formControl]="searchControl"
+        />
         <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[6px]" >
          
 
@@ -88,7 +91,7 @@
             <tr >
             <td class="p-2 text-center">{{ $index + 1 }}</td>
             <td class="p-2 text-center">{{ item.name }}</td>
-            <td class="p-2 text-center">{{ item.name }}</td>
+            <td class="p-2 text-center">{{ item.amount }}</td>
          <td class="p-2 w-full flex items-center justify-center gap-2">
        
             <button class="update" (click)="onEditData(item.id)">

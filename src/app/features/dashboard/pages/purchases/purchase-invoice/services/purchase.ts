@@ -44,4 +44,10 @@ export class Purchase extends BasehttpService {
       }
     });
   }
+
+
+
+  searchByCode(code:any){
+    return this.http.get(environment.baseUrl + '/api/Purchase/SearchProductCartByBarCode?request='+code);
+  }
   }

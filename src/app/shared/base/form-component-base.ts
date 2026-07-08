@@ -1,6 +1,13 @@
+import { inject } from "@angular/core";
 import { BUTTON_CONFIG } from "../config/button-cofig";
+import { SharedStateServices } from "../services/shared-state-services";
+import { DestroyBaseComponent } from "./destroy-base-component";
 // type ActionType = 'save' | 'reset' | 'delete' | 'print' | 'string';
-export abstract class FormComponentBase {
+export abstract class FormComponentBase{
+
+   protected readonly _sharedStateService = inject(SharedStateServices);
+
+  
   
     isEditMode: boolean = false;
   //  actions = [
@@ -62,5 +69,8 @@ changeButtonState(idNumber: number, isEditMode: boolean) {
   this.isEditMode=isEditMode;
   this.refreshActions();
 }
+
+
+
 
 }

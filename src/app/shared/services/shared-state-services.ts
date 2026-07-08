@@ -13,13 +13,13 @@ export class SharedStateServices {
     readonly selectedId$=this.selectedId.asReadonly();
     readonly isEditMode$=this.isEditMode.asReadonly();
 
-     constructor(router: Router) {
-    router.events
-      .pipe(filter(event => event instanceof NavigationStart))
-      .subscribe(() => {
-        this.clearSelectedId();
-      });
-  }
+  //    constructor(router: Router) {
+  //   router.events
+  //     .pipe(filter(event => event instanceof NavigationStart))
+  //     .subscribe(() => {
+  //       this.clearSelectedId();
+  //     });
+  // }
 
     setSelectedId(id:number){
       this.selectedId.set(id);
