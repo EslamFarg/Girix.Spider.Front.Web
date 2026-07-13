@@ -141,6 +141,9 @@ export class PageHeaderSearch {
   addButton = input<any>(null);
   filteringData = input<any[]>([]);
   clickSearch = output<any>();
+  showIconSearch = input<boolean>(true);
+  multiFilter = input<boolean>(false);
+  filterDialogWidth = input<string>('25rem');
  
 
   private _activeFilterKey = inject(ActiveFilterKey);
@@ -157,36 +160,75 @@ export class PageHeaderSearch {
 
 
   onFieldInput(currentItem: any) {
-    if (currentItem.value && currentItem.value.trim() !== '') {
+    if (this.multiFilter()) {
+      return;
+    }
+
+    if (this.hasFilterValue(currentItem.value)) {
       this.filteringData().forEach((item: any) => {
-        // إذا لم يكن هذا هو الحقل الحالي، قم بتفريغه
         if (item !== currentItem) {
-          item.value = ''; 
+          this.clearFilterValue(item);
         }
       });
     }
   }
 
+  private hasFilterValue(value: unknown): boolean {
+    if (value instanceof Date) {
+      return !Number.isNaN(value.getTime());
+    }
+
+    return value != null && String(value).trim() !== '';
+  }
+
+  private formatFilterValue(value: unknown): string {
+    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+      const year = value.getFullYear();
+      const month = String(value.getMonth() + 1).padStart(2, '0');
+      const day = String(value.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    return String(value).trim();
+  }
+
+  private clearFilterValue(item: any): void {
+    item.value = item.type === 'date' ? null : '';
+  }
+
   search() {
-const active = this.filteringData().find((x: any) => x.value?.trim());
+    if (this.multiFilter()) {
+      const filters = this.filteringData().reduce(
+        (acc: Record<string, string>, item: any) => {
+          if (this.hasFilterValue(item.value)) {
+            acc[item.key] = this.formatFilterValue(item.value);
+          }
+          return acc;
+        },
+        {}
+      );
+
+      this.visible = false;
+      this.clickSearch.emit({ filters });
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const active = this.filteringData().find((x: any) => this.hasFilterValue(x.value));
     if (!active) return;
 
     this.visible = false;
-    
+
     this.clickSearch.emit({
       key: active.key,
-      value: active.value
+      value: this.formatFilterValue(active.value),
     });
-    
+
     this.cdr.detectChanges();
-      this.filteringData().forEach((item: any) => {
-        // إذا لم يكن هذا هو الحقل الحالي، قم بتفريغه
-    
-          item.value = ''; 
-      
-      });
-  
-}
+    this.filteringData().forEach((item: any) => {
+      this.clearFilterValue(item);
+    });
+  }
 
 
 

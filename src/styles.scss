@@ -308,6 +308,9 @@ textarea{
     // width: 100%;
   input{
     // width: 375px;
+    &.ng-valid.ng-touched{
+      background-image: none !important;
+    }
   }
 
 

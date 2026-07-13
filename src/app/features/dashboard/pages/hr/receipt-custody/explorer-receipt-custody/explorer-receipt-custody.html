@@ -1,4 +1,41 @@
-<app-page-header-search [titleHeading]="'مستكشف استلام عهدة '" [addButton]="dataAddButton" [filteringData]="filteringData"></app-page-header-search>
+<!-- <div
+  class="flex justify-between items-center gap-[20px] flex-wrap mb-[25px] sticky top-[60px] pt-[10px] mt-[10px] bg-[var(--color-bg)] z-1"
+>
+  <div>
+    <h2 class="text-[var(--color-primary)] sm:text-[14px] md:text-[20px] font-[700]">مستكشف استلام عهدة </h2>
+  </div>
+
+  <div class="explorer_button flex gap-2">
+    <button
+      class="btn btn-primary button_explorer flex items-center justify-center gap-[10px]"
+      style="width: 251px; height: 40px !important"
+      [routerLink]="dataAddButton.action"
+    >
+      <span>{{ dataAddButton.label }}</span>
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            style="color: var(--color-text-btn) !important; stroke: var(--color-text-btn) !important"
+            d="M10.1464 4.77305V14.319C10.1464 14.6451 9.8759 14.9156 9.54975 14.9156C9.22359 14.9156 8.95312 14.6451 8.95312 14.319V4.77305C8.95312 4.4469 9.22359 4.17643 9.54975 4.17643C9.8759 4.17643 10.1464 4.4469 10.1464 4.77305Z"
+            fill="white"
+            stroke="white"
+          />
+          <path
+            style="color: var(--color-text-btn) !important; stroke: var(--color-text-btn) !important"
+            d="M14.9189 9.54604C14.9189 9.87219 14.6484 10.1427 14.3222 10.1427H4.77631C4.45016 10.1427 4.17969 9.87219 4.17969 9.54604C4.17969 9.21989 4.45016 8.94942 4.77631 8.94942H14.3222C14.6484 8.94942 14.9189 9.21989 14.9189 9.54604Z"
+            fill="white"
+            stroke="white"
+          />
+        </svg>
+      </div>
+    </button>
+  </div>
+</div> -->
+
+<app-page-header-search [titleHeading]="'مستكشف استلام عهدة '" [addButton]="dataAddButton" [filteringData]="filteringData"
+ (clickSearch)="search($event)"
+></app-page-header-search>
+
 
 <div class="table-responsive table_explorer">
   <table class="w-full ">
@@ -8,7 +45,6 @@
         <th class="p-2 text-center">رقم الموظف</th>
         <th class="p-2 text-center">اسم الموظف</th>
         <th class="p-2 text-center">رقم الجوال</th>
-        <th class="p-2 text-center">القسم</th>
         <th class="p-2 text-center">الجنسية</th>
         <th class="p-2 text-center">الراتب الاساسي</th>
         <th class="p-2 text-center">نوع الاضافة</th>
@@ -19,25 +55,25 @@
     <tbody>
   
 
-@for(item of itemsTable;track $index){
+@for(item of itemsTable; track item.id){
 
     <tr >
 <td class="p-2 text-center">{{ $index + 1 }}</td>
-<td class="p-2 text-center">9876543</td>
+<td class="p-2 text-center">{{ getEmployeeId(item) }}</td>
 
 
-<td class="p-2 text-center">شريف يحيي</td>
-<td class="p-2 text-center">01026381737</td>
-<td class="p-2 text-center">الادارة</td>
-<td class="p-2 text-center">الجنسية</td>
-<td class="p-2 text-center">2000</td>
-<td class="p-2 text-center">مكافأه</td>
-<td class="p-2 text-center">3000</td>
+<td class="p-2 text-center">{{ getEmployeeName(item) }}</td>
+<td class="p-2 text-center">{{ getPhoneNumber(item) }}</td>
+<!-- <td class="p-2 text-center">{{ getDepartmentName(item) }}</td> -->
+<td class="p-2 text-center">{{ getNationality(item) }}</td>
+<td class="p-2 text-center">{{ getBaseSalary(item) }}</td>
+<td class="p-2 text-center">{{ getAdditionType(item) }}</td>
+<td class="p-2 text-center">{{ getAmount(item) }}</td>
        <td class="p-2 w-full flex items-center justify-center gap-2">
-            <button class="update">
+            <button class="update" (click)="updateReceipt(item.id)">
 <i class="fa-solid fa-pen-to-square"></i>
             </button>
-            <button class="delete">
+            <button class="delete" (click)="deleteReceipt(item.id)">
 
   <i class="fa-solid fa-trash"></i>
 
@@ -46,7 +82,7 @@
 </tr>
 }@empty{
     <tr class="h-[420px]">
-      <td colspan="7">
+      <td colspan="9">
         <div class="flex flex-col items-center justify-center py-12 text-center">
           
           <!-- SVG -->
@@ -88,5 +124,13 @@
 </div>
 
    <div class="card flex justify-center mt-4">
-            <p-paginator (onPageChange)="onPageChange($event)" [showFirstLastIcon]="false" [first]="first" [rows]="rows" [totalRecords]="120" [rowsPerPageOptions]="[10, 25, 50,100,250]" />
+            <p-paginator (onPageChange)="onPageChange($event)" [showFirstLastIcon]="false" [first]="first" [rows]="rows" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 25, 50,100,250]" />
       </div>
+
+<app-shared-confirm-dialog
+  [show]="showDeleteDialog"
+  [title]="'حذف استلام عهدة'"
+  [message]="'هل أنت متأكد من حذف هذا السجل ؟ لا يمكن التراجع عن هذا الإجراء.'"
+  (confirm)="deleteDialog()"
+  (cancel)="showDeleteDialog = false"
+></app-shared-confirm-dialog>

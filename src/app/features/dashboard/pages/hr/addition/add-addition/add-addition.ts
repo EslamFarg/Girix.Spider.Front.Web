@@ -1,131 +1,402 @@
-import { Component } from '@angular/core';
-import { NgSelectComponent } from "@ng-select/ng-select";
-import { Dialog } from "primeng/dialog";
-import { PageHeader } from "../../../../../../shared/ui/page-header/page-header";
-import { DatePicker } from "primeng/datepicker";
+import { Component, DestroyRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgSelectComponent } from '@ng-select/ng-select';
+import { MessageService } from 'primeng/api';
+import { DatePicker } from 'primeng/datepicker';
+import { Observable } from 'rxjs';
+import { FormComponentBase } from '../../../../../../shared/base/form-component-base';
+import { onlyNumberDirective } from '../../../../../../shared/directives/only-number';
+import { EmployeeAdditionsTypes } from '../../../../../../shared/Enums/enumEmployee.enum';
+import { EmployeeByIdResponse, EmployeeModel } from '../../employees/model/employee';
+import { EmployeeService } from '../../employees/services/employee-service';
+import { PageHeader } from '../../../../../../shared/ui/page-header/page-header';
+import { FormError } from '../../../../../../shared/ui/form-error/form-error';
+import { SharedConfirmDialog } from '../../../../../../shared/ui/shared-confirm-dialog/shared-confirm-dialog';
+import {
+  PayrollAdjustmentCreateModel,
+  PayrollAdjustmentModel,
+  PayrollAdjustmentUpdateModel,
+} from '../models/payroll-adjustment';
+import { PayrollAdjustmentService } from '../services/payroll-adjustment-service';
 
 @Component({
   selector: 'app-add-addition',
-  imports: [NgSelectComponent, Dialog, PageHeader, DatePicker],
+  imports: [
+    NgSelectComponent,
+    PageHeader,
+    DatePicker,
+    ReactiveFormsModule,
+    FormError,
+    SharedConfirmDialog,
+    onlyNumberDirective,
+  ],
   templateUrl: './add-addition.html',
   styleUrl: './add-addition.scss',
 })
-export class AddAddition {
-    // !!!!!!!!!!!!!!!!! Services
+export class AddAddition extends FormComponentBase implements OnInit, OnDestroy {
+  private readonly _fb = inject(FormBuilder);
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _payrollAdjustmentService = inject(PayrollAdjustmentService);
+  private readonly _employeeService = inject(EmployeeService);
+  private readonly _messageService = inject(MessageService);
 
-  // !!!!!!!!!!!!!!!!!!! Properties
-  date2: Date | undefined;
- actions = [
-  { label: 'حفظ', type: 'primary', action: 'save' },
-  { label: 'جديد', action: 'reset' },
-  { label: 'حذف', action: 'delete' },
-  { label: 'طباعه', action: 'print' }
-];
+  
 
-explorerBtn={
-  label:'مستكشف  الاضافات  ',
-  link:'/hr/addition/explorer'
-}
+  additionsList = [
+    { name: 'مكافأه', id: EmployeeAdditionsTypes.Bonuses },
+    { name: 'خصم', id: EmployeeAdditionsTypes.Deductions },
+    { name: 'جزاء', id: EmployeeAdditionsTypes.Penalties },
+    { name: 'سلفة', id: EmployeeAdditionsTypes.Advances },
+  ];
 
+  selectedEmployeeId: number | null = null;
+  adjustmentsTable: PayrollAdjustmentModel[] = [];
+  showDeleteDialog = false;
 
-items=[
-  {name:'sherif yehia',id:1},
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-]
+  employeeDisplay = {
+    employeeId: '',
+    employeeName: '',
+    departmentName: '',
+    phoneNumber: '',
+    nationalIdOrIqamaNumber: '',
+    gender: '',
+    nationality: '',
+    baseSalary: '',
+  };
 
+  employeeForm = this._fb.group({
+    employeeSearch: [''],
+  });
 
-   visible: boolean = false;
+  adjustmentForm = this._fb.group({
+    type: [null as EmployeeAdditionsTypes | null, [Validators.required]],
+    amount: ['', [Validators.required]],
+    adjustmentDate: [new Date(), [Validators.required]],
+  });
 
-    showDialog() {
-        this.visible = true;
+  today = new Date();
+
+  minDate = new Date(
+    this.today.getFullYear(),
+    this.today.getMonth(),
+    1
+  );
+  
+  maxDate = new Date();
+  // !!!!!!!!!1 Methods
+
+  ngOnInit(): void {
+    this.refreshActions();
+
+    const employeeId = this._sharedStateService.selectedId$();
+    if (employeeId) {
+      this.loadEmployeeById(employeeId);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this._sharedStateService.clearSelectedId();
+  }
+
+  searchEmployee(): void {
+    const query = this.employeeForm.get('employeeSearch')?.value?.trim();
+    if (!query) {
+      return;
     }
 
-// itemsTable:any=[
-  
-//   { id: 1, name: 'قلم', unit: 'قطعة', quantity: 50 },
-//   { id: 2, name: 'دفتر', unit: 'قطعة', quantity: 30 },
-//   { id: 3, name: 'مسطرة', unit: 'قطعة', quantity: 20 },
-//   { id: 4, name: 'ممحاة', unit: 'قطعة', quantity: 40 },
-//   { id: 5, name: 'كشكول', unit: 'قطعة', quantity: 25 },
-//   { id: 6, name: 'آلة حاسبة', unit: 'قطعة', quantity: 10 },
-//   { id: 7, name: 'ملف', unit: 'قطعة', quantity: 15 },
-//   { id: 8, name: 'دباسة', unit: 'قطعة', quantity: 8 },
-//   { id: 9, name: 'ورق A4', unit: 'علبة', quantity: 12 },
-//   { id: 10, name: 'قلم رصاص', unit: 'قطعة', quantity: 60 }
+    const employeeId = Number(query);
+    if (Number.isNaN(employeeId)) {
+      return;
+    }
 
-// ]
-
-tableData = [
-  {id:1, code:'ITM-001', name:'لاب توب Dell', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:5, price:15000, discountRate:5, discount:3750, tax:750, total:72000},
-  {id:2, code:'ITM-002', name:'ماوس Logitech', warehouse:'مخزن فرعي', unit:'قطعة', qty:20, price:200, discountRate:0, discount:0, tax:40, total:4040},
-  {id:3, code:'ITM-003', name:'كيبورد HP', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:15, price:300, discountRate:3, discount:135, tax:67.5, total:4432.5},
-  {id:4, code:'ITM-004', name:'شاشة Samsung', warehouse:'مخزن 1', unit:'قطعة', qty:10, price:2500, discountRate:2, discount:500, tax:125, total:24625},
-  {id:5, code:'ITM-005', name:'طابعة Canon', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:3, price:4000, discountRate:0, discount:0, tax:200, total:12200},
-
-  {id:6, code:'ITM-006', name:'هارد SSD', warehouse:'مخزن 2', unit:'قطعة', qty:12, price:1200, discountRate:4, discount:576, tax:72, total:14016},
-  {id:7, code:'ITM-007', name:'فلاش USB', warehouse:'مخزن فرعي', unit:'قطعة', qty:50, price:100, discountRate:5, discount:250, tax:25, total:4775},
-  {id:8, code:'ITM-008', name:'راوتر TP-Link', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:8, price:900, discountRate:0, discount:0, tax:45, total:7245},
-  {id:9, code:'ITM-009', name:'سماعات Sony', warehouse:'مخزن 1', unit:'قطعة', qty:6, price:700, discountRate:2, discount:84, tax:35, total:4131},
-  {id:10, code:'ITM-010', name:'كاميرا مراقبة', warehouse:'مخزن 2', unit:'قطعة', qty:4, price:1800, discountRate:3, discount:216, tax:90, total:6990},
-
-  {id:11, code:'ITM-011', name:'كرسي مكتب', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:10, price:1200, discountRate:5, discount:600, tax:60, total:11460},
-  {id:12, code:'ITM-012', name:'مكتب خشب', warehouse:'مخزن 1', unit:'قطعة', qty:2, price:5000, discountRate:0, discount:0, tax:250, total:10250},
-  {id:13, code:'ITM-013', name:'ورق A4', warehouse:'مخزن فرعي', unit:'كرتونة', qty:30, price:150, discountRate:2, discount:90, tax:7.5, total:4417.5},
-  {id:14, code:'ITM-014', name:'أقلام حبر', warehouse:'المخزن الرئيسي', unit:'علبة', qty:40, price:50, discountRate:0, discount:0, tax:2.5, total:2025},
-  {id:15, code:'ITM-015', name:'دفاتر', warehouse:'مخزن 2', unit:'قطعة', qty:60, price:20, discountRate:1, discount:12, tax:1, total:1189},
-
-  {id:16, code:'ITM-016', name:'مكيف هواء', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:2, price:8000, discountRate:5, discount:800, tax:400, total:15600},
-  {id:17, code:'ITM-017', name:'ثلاجة', warehouse:'مخزن 1', unit:'قطعة', qty:1, price:10000, discountRate:0, discount:0, tax:500, total:10500},
-  {id:18, code:'ITM-018', name:'غسالة', warehouse:'مخزن 2', unit:'قطعة', qty:1, price:7000, discountRate:3, discount:210, tax:350, total:7140},
-  {id:19, code:'ITM-019', name:'ميكروويف', warehouse:'مخزن فرعي', unit:'قطعة', qty:3, price:2500, discountRate:2, discount:150, tax:125, total:7475},
-  {id:20, code:'ITM-020', name:'مروحة', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:10, price:300, discountRate:0, discount:0, tax:15, total:3015}
-];
-
-// !!!!!!!!!!!!!!! Methods
-handleAction(action: string) {
-  switch (action) {
-    case 'save':
-      this.save();
-      break;
-    case 'reset':
-      this.reset();
-      break;
-    case 'delete':
-      this.delete();
-      break;
-    case 'print':
-      this.print();
-      break;
+    this.loadEmployeeById(employeeId);
   }
-}
 
+  navigateEmployee(direction: 'prev' | 'next'): void {
+    const currentValue = this.employeeForm.get('employeeSearch')?.value?.trim();
+    const currentId = Number(currentValue);
 
+    if (!currentValue || Number.isNaN(currentId)) {
+      return;
+    }
 
-save(){
-  console.log('Save action triggered');
-}
+    const nextId =
+      direction === 'prev' ? Math.max(1, currentId - 1) : currentId + 1;
 
-reset(){
-  console.log('Reset action triggered');
-}
+    this.loadEmployeeById(nextId);
+  }
 
+  loadEmployeeById(id: number): void {
+    this.employeeForm.patchValue({ employeeSearch: String(id) });
+    (
+      this._employeeService.getById(id) as unknown as Observable<EmployeeByIdResponse>
+    )
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res) => {
+          if (!res.data) {
+            this._messageService.add({
+              severity: 'error',
+              summary: 'خطأ',
+              detail: 'لم يتم العثور على الموظف',
+            });
+            this.clearEmployeeDisplay();
+            return;
+          }
 
-delete(){
-  console.log('Delete action triggered');
-}
+          this.selectEmployee(res.data);
+        },
+      });
+  }
 
-print(){
-  console.log('Print action triggered');
-}
+  selectEmployee(employee: EmployeeModel): void {
+    this.selectedEmployeeId = employee.id;
+    this.fillEmployeeDisplay(employee);
+    this.employeeForm.patchValue({ employeeSearch: String(employee.id) });
+    this.resetAdjustmentForm(false);
+    this.loadAdjustmentsByEmployee(employee.id);
+  }
+
+  loadAdjustmentsByEmployee(employeeId: number): void {
+    this._payrollAdjustmentService
+      .getAllByEmployee(employeeId)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.adjustmentsTable = this.extractAdjustments(res.data);
+        },
+      });
+  }
+
+  selectAdjustment(item: PayrollAdjustmentModel): void {
+    this.changeButtonState(item.id, true);
+
+    const adjustmentType = item.type ?? item.adjustmentType ?? null;
+    const adjustmentDate = item.adjustmentDate ?? item.adjustmentDate;
+
+    this.adjustmentForm.patchValue({
+      type: adjustmentType as EmployeeAdditionsTypes | null,
+      amount: item.amount != null ? String(item.amount) : '',
+      adjustmentDate: adjustmentDate ? new Date(adjustmentDate) : new Date(),
+    });
+  }
+
+  save(): void {
+    if (this.selectedEmployeeId == null) {
+      this._messageService.add({
+        severity: 'error',
+        summary: 'خطأ',
+        detail: 'الرجاء اختيار موظف',
+      });
+      return;
+    }
+
+    if (this.adjustmentForm.invalid) {
+      this.adjustmentForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.adjustmentForm.getRawValue();
+    const payload: any = {
+      employeeId: this.selectedEmployeeId,
+      type: formValue.type as EmployeeAdditionsTypes,
+      amount: Number(formValue.amount),
+      adjustmentDate: (formValue.adjustmentDate as Date).toISOString(),
+    };
+
+    if (!this.isEditMode) {
+      this._payrollAdjustmentService
+        .createPayrollAdjustment(payload)
+        .pipe(takeUntilDestroyed(this._destroyRef))
+        .subscribe({
+          next: (res) => {
+            this._messageService.add({
+              severity: 'success',
+              summary: 'نجاح',
+              detail: 'تم الاضافة بنجاح',
+            });
+            this.changeButtonState(res.data, true);
+            this.loadAdjustmentsByEmployee(this.selectedEmployeeId as number);
+          },
+        });
+      return;
+    }
+
+    const updatePayload: PayrollAdjustmentUpdateModel = {
+      id: this.idUpdate,
+      ...payload,
+    };
+
+    this._payrollAdjustmentService
+      .updatePayrollAdjustment(updatePayload)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'نجاح',
+            detail: 'تم التعديل بنجاح',
+          });
+          this.loadAdjustmentsByEmployee(this.selectedEmployeeId as number);
+        },
+      });
+  }
+
+  // reset(): void {
+  //   this.isEditMode = false;
+  //   this.idUpdate = 0;
+  //   this.resetAdjustmentForm(true);
+  //   this.refreshActions();
+  // }
+
+  reset(): void {
+    this.isEditMode = false;
+    this.idUpdate = 0;
+  
+    this.employeeForm.reset({
+      employeeSearch: '',
+    });
+  
+    this.clearEmployeeDisplay();
+  
+    this.resetAdjustmentForm(false);
+  
+    this.refreshActions();
+  }
+  delete(): void {
+    if (!this.idUpdate) {
+      return;
+    }
+    this.showDeleteDialog = true;
+  }
+
+  deleteAdjustment(item: PayrollAdjustmentModel): void {
+
+    /* this.showDeleteDialog = true;
+    this._payrollAdjustmentService
+      .deletePayrollAdjustment(item.id)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'نجاح',
+            detail: 'تم الحذف بنجاح',
+          });
+
+          if (this.idUpdate === item.id) {
+            this.reset();
+          }
+
+          if (this.selectedEmployeeId != null) {
+            this.loadAdjustmentsByEmployee(this.selectedEmployeeId);
+          }
+
+          this.showDeleteDialog = false;
+        },
+      }); */
+
+      this.idUpdate = item.id;
+      this.showDeleteDialog = true;
+  }
+
+  confirmDelete(): void {
+    this._payrollAdjustmentService
+      .deletePayrollAdjustment(this.idUpdate)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'نجاح',
+            detail: 'تم الحذف بنجاح',
+          });
+          this.showDeleteDialog = false;
+          // this.reset();
+          this.resetAdjustmentForm(true);
+          if (this.selectedEmployeeId != null) {
+            this.loadAdjustmentsByEmployee(this.selectedEmployeeId);
+          }
+        },
+      });
+  }
+
+  print(): void {
+    window.print();
+  }
+
+  getTypeLabel(item: PayrollAdjustmentModel): string {
+    const type = item.type ?? item.adjustmentType;
+    const found = this.additionsList.find((option) => option.id === type);
+    return found?.name ?? '-';
+  }
+
+  getAmount(item: PayrollAdjustmentModel): string {
+    return item.amount != null ? String(item.amount) : '-';
+  }
+
+  getDate(item: any): string {
+    const value = item.adjustmentDate ?? item.adjustmentDate;
+    if (!value) {
+      return '-';
+    }
+    return value.split('T')[0];
+  }
+
+  private resetAdjustmentForm(clearEditState: boolean): void {
+    if (clearEditState) {
+      this.isEditMode = false;
+      this.idUpdate = 0;
+    }
+
+    const currentDate =
+    this.adjustmentForm.get('adjustmentDate')?.value ?? new Date();
+
+    this.adjustmentForm.reset({
+      type: null,
+      amount: '',
+      adjustmentDate: currentDate,
+      // adjustmentDate: new Date(),
+    });
+    this.refreshActions();
+  }
+
+  private clearEmployeeDisplay(): void {
+    this.selectedEmployeeId = null;
+    this.adjustmentsTable = [];
+    this.employeeDisplay = {
+      employeeId: '',
+      employeeName: '',
+      departmentName: '',
+      phoneNumber: '',
+      nationalIdOrIqamaNumber: '',
+      gender: '',
+      nationality: '',
+      baseSalary: '',
+    };
+  }
+
+  private fillEmployeeDisplay(data: EmployeeModel): void {
+    this.employeeDisplay = {
+      employeeId: String(data.id),
+      employeeName: data.name ?? '',
+      departmentName: data.departmentName ?? '',
+      phoneNumber: data.phoneNember ?? '',
+      nationalIdOrIqamaNumber: data.nationalIdOrIqamaNumber ?? '',
+      gender: '',
+      nationality: data.nationality ?? '',
+      baseSalary: String(data.salary ?? ''),
+    };
+  }
+
+  private extractAdjustments(
+    data: PayrollAdjustmentModel[] | { rows: PayrollAdjustmentModel[] }
+  ): PayrollAdjustmentModel[] {
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    return data?.rows ?? [];
+  }
 }

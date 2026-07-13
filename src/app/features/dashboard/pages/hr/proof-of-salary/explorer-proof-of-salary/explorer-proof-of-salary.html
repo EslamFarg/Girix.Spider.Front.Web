@@ -1,0 +1,83 @@
+<app-page-header-search
+  [titleHeading]="'مستكشف إثبات رواتب'"
+  [addButton]="dataAddButton"
+  [filteringData]="filteringData"
+  [multiFilter]="true"
+  [filterDialogWidth]="'36rem'"
+  (clickSearch)="onSearch($event)"
+></app-page-header-search>
+
+<div class="table-responsive table_explorer">
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr class="sticky top-0">
+        <th class="p-2 text-center">م</th>
+        <th class="p-2 text-center">رقم الإثبات</th>
+        <th class="p-2 text-center">من تاريخ</th>
+        <th class="p-2 text-center">الي تاريخ</th>
+        <th class="p-2 text-center">تاريخ الإثبات</th>
+        <th class="p-2 text-center">الحالة</th>
+        <!-- <th class="p-2 text-center">عدد الموظفين</th> -->
+        <th class="p-2 text-center">إجمالي الصافي</th>
+        <th class="p-2 text-center">الادوات</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of itemsTable; track item.id) {
+        <tr>
+          <td class="p-2 text-center">{{ $index + 1 }}</td>
+          <td class="p-2 text-center">{{ getPostingNumber(item) }}</td>
+          <td class="p-2 text-center">{{ getPeriodFrom(item) }}</td>
+          <td class="p-2 text-center">{{ getPeriodTo(item) }}</td>
+          <td class="p-2 text-center">{{ getPostingDate(item) }}</td>
+          <td class="p-2 text-center">{{ getStatus(item) }}</td>
+          <!-- <td class="p-2 text-center">{{ getEmployeesCount(item) }}</td> -->
+          <td class="p-2 text-center">{{ getTotalNetSalary(item) }}</td>
+          <td class="p-2 w-full flex items-center justify-center gap-2">
+            <button type="button" class="update" (click)="onEditData(item.id)">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button type="button" class="delete" (click)="delete(item.id)">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        <tr class="h-[420px]">
+          <td colspan="9">
+            <div class="flex flex-col items-center justify-center py-12 text-center">
+              <div class="mb-4 opacity-70">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 7h18M5 7v13h14V7M9 3h6v4H9V3z" stroke="#9CA3AF" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <h3 class="text-lg font-bold text-gray-700 mb-2">لا توجد بيانات</h3>
+              <p class="text-sm text-gray-500 mb-4">
+                لم يتم العثور على أي نتائج، يمكنك إضافة بيانات جديدة أو تعديل الفلاتر
+              </p>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<div class="card flex justify-center mt-4">
+  <p-paginator
+    (onPageChange)="onPageChange($event)"
+    [showFirstLastIcon]="false"
+    [first]="first"
+    [rows]="rows"
+    [totalRecords]="totalRecords"
+    [rowsPerPageOptions]="[10, 25, 50, 100, 250]"
+  />
+</div>
+
+<app-shared-confirm-dialog
+  [show]="showDeleteDialog"
+  [title]="'حذف إثبات رواتب'"
+  [message]="'هل أنت متأكد من حذف هذا السجل ؟ لا يمكن التراجع عن هذا الإجراء.'"
+  (confirm)="deleteDialog()"
+  (cancel)="showDeleteDialog = false"
+></app-shared-confirm-dialog>

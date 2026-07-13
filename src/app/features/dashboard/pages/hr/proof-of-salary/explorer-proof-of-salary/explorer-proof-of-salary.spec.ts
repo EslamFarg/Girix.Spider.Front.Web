@@ -1,17 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ExplorerProofOfSalary } from './explorer-proof-of-salary';
 
-import { CompanySettings } from './company-settings';
-
-describe('CompanySettings', () => {
-  let component: CompanySettings;
-  let fixture: ComponentFixture<CompanySettings>;
+describe('ExplorerProofOfSalary', () => {
+  let component: ExplorerProofOfSalary;
+  let fixture: ComponentFixture<ExplorerProofOfSalary>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CompanySettings],
+      imports: [ExplorerProofOfSalary],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CompanySettings);
+    fixture = TestBed.createComponent(ExplorerProofOfSalary);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

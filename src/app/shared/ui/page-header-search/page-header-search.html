@@ -13,6 +13,7 @@
 
   
     <div class="explorer_button flex gap-2">
+   @if(showIconSearch()){
     <div class="icon_search cursor-pointer" (click)="showDialog()">
       <svg
         width="40"
@@ -34,7 +35,9 @@
           fill="#1791C8"
         />
       </svg>
-    </div>
+    </div> 
+  
+  }
    @if(addButton()){
     <button
       class="btn btn-primary button_explorer flex items-center justify-center gap-[10px]"
@@ -109,7 +112,7 @@
 </div> -->
 
 <div class="card flex justify-center filter_search_popup_explorer">
-  <p-dialog header="الفلتر" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+  <p-dialog header="الفلتر" [modal]="true" [(visible)]="visible" [style]="{ width: filterDialogWidth() }">
     <!-- <span class="p-text-secondary block mb-8">/'.;</span> -->
 
     <form class="p-4">
@@ -169,14 +172,30 @@
         @for(item of filteringData();track $index){
             <div [class]="item.class">
                 <label [for]="$index + 1">{{item.label}}</label>
+                @if (item.type === 'date') {
+                  <p-datepicker
+                    appendTo="body"
+                    [iconDisplay]="'input'"
+                    [placeholder]="item.placeholder"
+                    [showIcon]="true"
+                    [inputId]="'field-' + $index"
+                    [showOnFocus]="false"
+                    [name]="'field' + $index"
+                    [(ngModel)]="item.value"
+                    (ngModelChange)="onFieldInput(item)"
+                  />
+                } @else {
                   <input
                     [type]="item.type"
                     [name]="'field' + $index"
                     [id]="$index + 1"
                     [placeholder]="item.placeholder"
                     [(ngModel)]="item.value"
-                    (input)="onFieldInput(item)"  />
-                </div>
+                    (input)="onFieldInput(item)"
+                    (keydown.enter)="search()"
+                  />
+                }
+            </div>
         }
       </div>
 

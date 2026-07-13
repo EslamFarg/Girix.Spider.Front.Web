@@ -1388,7 +1388,7 @@ sidebarSections:any = [
         {
           label:"إثبات رواتب",
           icon:'',
-          link:'/hr/proof-of-salaries'
+          link:'/hr/proof-of-salaries/explorer'
         
         },
         {
@@ -1448,14 +1448,9 @@ sidebarSections:any = [
 `
       ),
       content:[
+     
         {
-          label:"اعدادت الشركة",
-          icon:'',
-          link:'/settings/company-settings'
-        
-        },
-        {
-          label:"اعدادت الفرع",
+          label:"الاعدادات العامة",
           icon:'',
           link:'/settings/branch-settings'
         

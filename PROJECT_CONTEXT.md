@@ -1,34 +1,13 @@
-# ERP System
+# Spider2026 Project Context
 
-Stack
+The complete project architecture is documented in:
 
-- Angular 20 or 21
-- Standalone Components
-- PrimeNG
-- TailwindCSS
-- RxJS
-- Signals
+PROJECT_SCAN_REPORT.md
 
-Architecture
+Before making any implementation:
 
-- Core
-- Shared
-- Features
-
-API
-
-Uses BaseHttpService
-
-Forms
-
-Reactive Forms only
-
-UI
-
-PrimeNG
-
-Coding Style
-
-Reusable Components
-Clean Code
-SOLID
+- Read PROJECT_SCAN_REPORT.md.
+- Follow the architecture exactly.
+- Never invent new patterns.
+- Reuse existing code.
+- Search for similar implemented modules.

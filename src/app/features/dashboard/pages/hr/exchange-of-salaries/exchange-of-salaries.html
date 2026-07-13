@@ -3,7 +3,7 @@
     <h2 class="text-[var(--color-primary)] sm:text-[14px] md:text-[20px] font-[700]">صرف الرواتب</h2>
   </div>
   <div class="flex items-center gap-3">
-      <div class="icon_search cursor-pointer" (click)="showDialog()">
+      <!-- <div class="icon_search cursor-pointer" (click)="showDialog()">
       <svg
         width="40"
         height="37"
@@ -24,26 +24,56 @@
           fill="#1791C8"
         />
       </svg>
-    </div>
+    </div> -->
     <button class="btn btn-primary">صرف</button>
   </div>
 </div>
 
-<form class="grid grid-cols-1 md:grid-cols-12 gap-4 my-5 mb-[30px] ">
+<form class="grid grid-cols-1 md:grid-cols-12 gap-4 my-5 mb-[30px] " [formGroup]="searchForm" (ngSubmit)="onSubmit()">
+
+  <div class="col-span-12 lg:col-span-6">
+    <label>الشهر</label>
+    <ng-select
+      formControlName="month"
+      [items]="monthsList"
+      [bindLabel]="'name'"
+      [bindValue]="'id'"
+      [placeholder]="'الشهر'"
+ 
+    ></ng-select>
+    <app-form-error [control]="searchForm.controls['month']" [errorKey]="'required'" [message]="'الشهر  مطلوب'"></app-form-error>
+  </div>
+  <div class="col-span-12 lg:col-span-6">
+    <label>السنة</label>
+    <ng-select
+      formControlName="year"
+      [items]="yearsList"
+      [bindLabel]="'name'"
+      [bindValue]="'id'"
+      [placeholder]="'السنة'"
+     
+    ></ng-select>
+    <app-form-error [control]="searchForm.controls['year']" [errorKey]="'required'" [message]="'السنة  مطلوب'"></app-form-error>
+  </div>
     <div class="col-span-6">
         <label for="">اسم القسم </label>
-        <ng-select [items]="[]" [bindLabel]="'name'" [bindValue]="'name'" [placeholder]="'اسم القسم'"></ng-select>
-
+        <ng-select formControlName="departmentId" [items]="departmentsList" [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'اسم القسم'"></ng-select>
+        <app-form-error [control]="searchForm.controls['departmentId']" [errorKey]="'required'" [message]="'اسم القسم  مطلوب'"></app-form-error>
     </div>
     <div class="col-span-6">
         <label for="">اسم الموظف </label>
         <div class="flex items-center gap-5">
-            <ng-select class="flex-1" [items]="[]" [bindLabel]="'name'" [bindValue]="'name'" [placeholder]="'اسم الموظف'"></ng-select>
-            <button class="btn btn-primary">أضافة</button>
-        </div>
+            <ng-select class="flex-1" formControlName="employeeIds" [items]="employeesList" multiple [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'اسم الموظف'"></ng-select>
+          </div>
+          <app-form-error [control]="searchForm.controls['employeeIds']" [errorKey]="'required'" [message]="'اسم الموظف  مطلوب'"></app-form-error>
 
     </div>
 
+    
+
+    <div class="col-span-12">
+    <button class="btn btn-primary mr-auto mt-3 block">أضافة</button>
+    </div>
 
 </form>
 
@@ -71,7 +101,7 @@
         <th class=""> 
              
        
-            <p-toggleswitch [(ngModel)]="checked" style="--p-toggleswitch-checked-background:var(--color-btn);
+            <p-toggleswitch [(ngModel)]="checked"  (change)="toggleAll($event)" style="--p-toggleswitch-checked-background:var(--color-btn);
             --p-toggleswitch-hover-background:var(--color-btn);
           --p-toggleswitch-handle-color:red;
             " />

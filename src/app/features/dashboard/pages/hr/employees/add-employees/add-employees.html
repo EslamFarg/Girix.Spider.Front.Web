@@ -37,7 +37,7 @@
         <label for="numberEsal">رقم الموظف</label>
         <div class="flex items-center gap-2">
       
-        <input type="text" id="numberEsal" placeholder="رقم الموظف" formControlName="id" appOnlyNumber maxlength="15">
+        <input type="text"  id="numberEsal"  placeholder="رقم الموظف" readonly formControlName="id" appOnlyNumber maxlength="15">
        
        
         </div>
@@ -48,7 +48,7 @@
     <label>بحث رقم الموظف</label>
     <div class="flex items-center gap-2 relative">
       <div class="search_input relative w-[100%]">
-        <input type="text" class="text-[14px] w-[100%]"  placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/>
+        <input type="text" class="text-[14px] w-[100%]" #inputSearch (keydown.enter)="searchEmployee(inputSearch.value)"   placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/>
         <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[7px]" >
      
  
@@ -310,6 +310,7 @@
             <div class="col-span-12 md:col-span-4">
       <app-input-attachment [label]="'مرفق انهاء العقد'"
       formControlName="contractEndAttachmentFile"
+    
       ></app-input-attachment>
     </div>
         <div class="col-span-12 md:col-span-12">

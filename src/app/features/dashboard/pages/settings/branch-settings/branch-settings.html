@@ -1,9 +1,10 @@
-<h2 class="text-[var(--color-primary)] text-[20px] font-[700] my-6 mb-8 ">اعدادات الفرع</h2>
+<!-- <h2 class="text-[var(--color-primary)] text-[20px] font-[700] my-6 mb-2 ">اعدادات الفرع</h2> -->
 
-<form class="box_header mb-7">
-  
+<form class="box_header my-6" [formGroup]="settingsForm">
 
-    <div class="flex justify-between items-center px-[10px] gap-[10px] mb-7  mx-auto w-[385px] h-[56px]  bg-[var(--color-gray-tabs)] rounded-[12px]">
+    <div class="flex justify-between items-center px-[10px] gap-[10px] mb-7  mx-auto w-[580px] h-[56px]  bg-[var(--color-gray-tabs)] rounded-[12px]">
+
+        <button type="button" (click)="currentTemplate = 'company'" class="text-[var(--color-black)]  p-[5px] rounded-[8px] cursor-pointer shadow shadow-[0px 3px 2px #000] text-[16px] font-[700] min-w-[178px] h-[40px] " [ngClass]="{'bg-[var(--color-white)]':currentTemplate == 'company'}">اعدادات الشركة</button>
         <button type="button" (click)="currentTemplate = 'main'" class="text-[var(--color-black)]  p-[5px] rounded-[8px] cursor-pointer shadow shadow-[0px 3px 2px #000] text-[16px] font-[700] min-w-[178px] h-[40px] " [ngClass]="{'bg-[var(--color-white)]':currentTemplate == 'main'}">البيانات الأساسية للفرع</button>
         <button type="button" (click)="currentTemplate = 'finance'" class="text-[var(--color-black)] p-[5px] rounded-[8px] cursor-pointer shadow shadow-[0px 3px 2px #000]  text-[16px] font-[700] min-w-[178px] h-[40px]"  [ngClass]="{'bg-[var(--color-white)]':currentTemplate == 'finance'}">الإعدادات المالية</button>
     </div>
@@ -17,104 +18,122 @@
 
     <div class="col-span-12 md:col-span-4">
         <label for="city">المدينة</label>
-        <input type="text" placeholder="المدينة" id="city">
+        <input type="text" placeholder="المدينة" id="city" formControlName="city" maxlength="50">
+        <app-form-error [control]="settingsForm.controls['city']" [errorKey]="'required'" [message]="'المدينة مطلوبة'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['city']" [errorKey]="'minlength'" [message]="'المدينة يجب ان تكون حرفين علي الأقل'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-4">
         <label for="hay">الحي</label>
-        <input type="text" placeholder="الحي" id="hay">
+        <input type="text" placeholder="الحي" id="hay" formControlName="district" maxlength="50">
+        <app-form-error [control]="settingsForm.controls['district']" [errorKey]="'required'" [message]="'الحي مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['district']" [errorKey]="'minlength'" [message]="'الحي يجب ان يكون حرفين علي الأقل'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-2">
         <label for="country">البلد</label>
-        <input type="text" placeholder="البلد" id="country">
+        <input type="text" placeholder="البلد" id="country" formControlName="country" maxlength="50">
+        <app-form-error [control]="settingsForm.controls['country']" [errorKey]="'required'" [message]="'البلد مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['country']" [errorKey]="'minlength'" [message]="'البلد يجب ان يكون حرفين علي الأقل'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-2">
         <label for="street">الشارع</label>
-        <input type="text" placeholder="الشارع" id="street">
+        <input type="text" placeholder="الشارع" id="street" formControlName="street" maxlength="100">
+        <app-form-error [control]="settingsForm.controls['street']" [errorKey]="'required'" [message]="'الشارع مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['street']" [errorKey]="'minlength'" [message]="'الشارع يجب ان يكون 3 أحرف علي الأقل'"></app-form-error>
     </div>
    
     <div class="col-span-12 md:col-span-4">
         <label for="address">العنوان بالتفصيل</label>
-        <input type="text" placeholder="العنوان بالتفصيل" id="address">
+        <input type="text" placeholder="العنوان بالتفصيل" id="address" formControlName="addressDetails" maxlength="500">
+        <app-form-error [control]="settingsForm.controls['addressDetails']" [errorKey]="'required'" [message]="'العنوان بالتفصيل مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['addressDetails']" [errorKey]="'minlength'" [message]="'العنوان يجب ان يكون 3 أحرف علي الأقل'"></app-form-error>
     </div>
    
     <div class="col-span-12 md:col-span-4">
         <label for="inventory">مخزن المشتريات</label>
-        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن المشتريات'"></ng-select>
+        <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن المشتريات" formControlName="purchaseStoreId"></ng-select>
+        <app-form-error [control]="settingsForm.controls['purchaseStoreId']" [errorKey]="'required'" [message]="'مخزن المشتريات مطلوب'"></app-form-error>
     </div>
    
     <div class="col-span-12 md:col-span-2">
         <label for="buildingNumber">رقم المبني</label>
-        <input type="text" placeholder="رقم المبني" id="buildingNumber">
+        <input type="text" placeholder="رقم المبني" id="buildingNumber" formControlName="buildingNumber" maxlength="10">
+        <app-form-error [control]="settingsForm.controls['buildingNumber']" [errorKey]="'required'" [message]="'رقم المبني مطلوب'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-2">
         <label for="phoneNumber">رقم الجوال</label>
-        <input type="text" placeholder="رقم الجوال" id="phoneNumber">
+        <input type="text" placeholder="رقم الجوال" id="phoneNumber" formControlName="mobile" maxlength="15">
+        <app-form-error [control]="settingsForm.controls['mobile']" [errorKey]="'required'" [message]="'رقم الجوال مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['mobile']" [errorKey]="'invalidSaudiPhone'" [message]="'رقم الجوال السعودي غير صحيح'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['mobile']" [errorKey]="'invalidEgyptPhone'" [message]="'رقم الجوال المصري غير صحيح'"></app-form-error>
     </div>
    
     <div class="col-span-12 md:col-span-4">
         <label for="zipCode">الرمز البريدي</label>
-        <input type="text" placeholder="الرمز البريدي" id="zipCode">
+        <input type="text" placeholder="الرمز البريدي" id="zipCode" formControlName="postalCode" appOnlyNumber maxlength="10">
+        <app-form-error [control]="settingsForm.controls['postalCode']" [errorKey]="'required'" [message]="'الرمز البريدي مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['postalCode']" [errorKey]="'minlength'" [message]="'الرمز البريدي يجب ان يكون 4 أرقام علي الأقل'"></app-form-error>
     </div>
    
     <div class="col-span-12 md:col-span-4">
         <label for="faxNumber">رقم الفاكس</label>
-        <input type="text" placeholder="رقم الفاكس" id="faxNumber">
+        <input type="text" placeholder="رقم الفاكس" id="faxNumber" formControlName="fax" maxlength="15">
+        <app-form-error [control]="settingsForm.controls['fax']" [errorKey]="'maxlength'" [message]="'رقم الفاكس يجب ان يكون 15 رقم كحد أقصى'"></app-form-error>
     </div>
    
     <div class="col-span-12 md:col-span-4">
         <label for="telephoneNumber">رقم الهاتف</label>
-        <input type="text" placeholder="رقم الهاتف" id="telephoneNumber">
+        <input type="text" placeholder="رقم الهاتف" id="telephoneNumber" formControlName="phone" maxlength="15">
+        <app-form-error [control]="settingsForm.controls['phone']" [errorKey]="'maxlength'" [message]="'رقم الهاتف يجب ان يكون 15 رقم كحد أقصى'"></app-form-error>
     </div>
    
     <div class="col-span-12 md:col-span-4">
         <label for="namePrinted">الاسم علي الطابعه</label>
-        <input type="text" placeholder="الاسم علي الطابعه" id="namePrinted">
+        <input type="text" placeholder="الاسم علي الطابعه" id="namePrinted" formControlName="printName" maxlength="200">
+        <app-form-error [control]="settingsForm.controls['printName']" [errorKey]="'required'" [message]="'الاسم علي الطابعة مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['printName']" [errorKey]="'minlength'" [message]="'الاسم يجب ان يكون حرفين علي الأقل'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-4">
-        <label for="zipCode">الرمز البريدي</label>
-        <input type="text" placeholder="الرمز البريدي" id="zipCode">
+        <label for="zipCodeMain">الرمز البريدي</label>
+        <input type="text" placeholder="الرمز البريدي" id="zipCodeMain" formControlName="postalCode" appOnlyNumber maxlength="10">
     </div>
     <div class="col-span-12 md:col-span-4">
         <label for="email">الأيميل</label>
-        <input type="text" placeholder="الأيميل" id="email">
+        <input type="text" placeholder="الأيميل" id="email" formControlName="email" maxlength="100">
+        <app-form-error [control]="settingsForm.controls['email']" [errorKey]="'required'" [message]="'البريد الالكتروني مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['email']" [errorKey]="'invalidEmail'" [message]="'البريد الالكتروني غير صحيح'"></app-form-error>
     </div>
    
       <div class="col-span-12 md:col-span-4">
         <label for="inventoryDefault">مخزن المشتريات الإفتراضي</label>
-        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن المشتريات الإفتراضي'"></ng-select>
+        <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن المشتريات الإفتراضي" formControlName="purchaseStoreId"></ng-select>
+        <app-form-error [control]="settingsForm.controls['purchaseStoreId']" [errorKey]="'required'" [message]="'مخزن المشتريات الإفتراضي مطلوب'"></app-form-error>
     </div>
       <div class="col-span-12 md:col-span-4">
-        <label for="inventoryDefault">مركز التكلفه الافتراضي</label>
-        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مركز التكلفه الافتراضي'"></ng-select>
+        <label for="costCenterDefault">مركز التكلفه الافتراضي</label>
+        <ng-select [items]="costCentersList" bindLabel="nameAr" bindValue="id" placeholder="مركز التكلفه الافتراضي" formControlName="costCenterId"></ng-select>
+        <app-form-error [control]="settingsForm.controls['costCenterId']" [errorKey]="'required'" [message]="'مركز التكلفة الافتراضي مطلوب'"></app-form-error>
     </div>
       <div class="col-span-12 md:col-span-4">
-        <label for="inventoryDefault">مخزن المبيعات الإفتراضي</label>
-        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن المبيعات الإفتراضي'"></ng-select>
+        <label for="salesStoreDefault">مخزن المبيعات الإفتراضي</label>
+        <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن المبيعات الإفتراضي" formControlName="salesStoreId"></ng-select>
+        <app-form-error [control]="settingsForm.controls['salesStoreId']" [errorKey]="'required'" [message]="'مخزن المبيعات الإفتراضي مطلوب'"></app-form-error>
     </div>
       <div class="col-span-12 md:col-span-3 flex items-center gap-3">
-        <input type="checkbox" id="alerts" checked>
-        <label for="alerts" style="margin-bottom:0px;">تفعيل التنبيهات</label>
+        <input type="checkbox" id="alertsMain" formControlName="enableStatistics">
+        <label for="alertsMain" style="margin-bottom:0px;">تفعيل التنبيهات</label>
     </div>
       <div class="col-span-12 md:col-span-3 flex items-center gap-3">
-        <input type="checkbox" id="items" checked>
-        <label for="items" style="margin-bottom:0px;">تفعيل أصناف الميزانيه بالوزن</label>
+        <input type="checkbox" id="itemsMain" formControlName="enableWeightedBalanceColor">
+        <label for="itemsMain" style="margin-bottom:0px;">تفعيل أصناف الميزانيه بالوزن</label>
     </div>
       <div class="col-span-12 md:col-span-3 flex items-center gap-3">
-        <input type="checkbox" id="activation" checked>
-        <label for="activation" style="margin-bottom:0px;">تفعيل الحد الائتماني وحد التنبيه للعميل</label>
+        <input type="checkbox" id="activationMain" formControlName="enableDiscounts">
+        <label for="activationMain" style="margin-bottom:0px;">تفعيل الحد الائتماني وحد التنبيه للعميل</label>
     </div>
       <div class="col-span-12 md:col-span-3 flex items-center gap-3">
-        <input type="checkbox" id="Tecrar" checked>
-        <label for="Tecrar" style="margin-bottom:0px;">تكرار الرقم الضريبي</label>
+        <input type="checkbox" id="TecrarMain" formControlName="repeatTaxNumber">
+        <label for="TecrarMain" style="margin-bottom:0px;">تكرار الرقم الضريبي</label>
     </div>
-
-      
-
-    <div class="btns col-span-12 flex items-center  justify-end gap-[12px]">
-        <button class="btn btn-primary">حفظ</button>
-
-    </div>
-  
 
   </div>
 
@@ -126,18 +145,25 @@
 
 
     <div class="col-span-12 md:col-span-4">
-        <label for="city">العملة</label>
-        <ng-select [items]="[]" [bindLabel]="'name'" [bindValue]="'name'" [placeholder]="'العملة'"></ng-select>
+        <label for="currency">العملة</label>
+        <ng-select [items]="currencyOptions" bindLabel="name" bindValue="id" placeholder="العملة" formControlName="currency"></ng-select>
+        <app-form-error [control]="settingsForm.controls['currency']" [errorKey]="'required'" [message]="'العملة مطلوبة'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-4">
         <label for="ashry">الكسور العشريه ( كميات )</label>
-        <input type="text" placeholder="الكسور العشريه " id="ashry">
+        <input type="text" placeholder="الكسور العشريه " id="ashry" formControlName="decimalQuantity" appOnlyNumber maxlength="1">
+        <app-form-error [control]="settingsForm.controls['decimalQuantity']" [errorKey]="'required'" [message]="'الكسور العشرية للكميات مطلوبة'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['decimalQuantity']" [errorKey]="'min'" [message]="'الكسور العشرية يجب ان تكون 0 أو أكثر'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['decimalQuantity']" [errorKey]="'max'" [message]="'الكسور العشرية يجب ان تكون 6 أو أقل'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-4">
         <label for="casrAshryprice">الكسور العشرية ( أسعار )</label>
-        <input type="text" placeholder="الكسور العشرية" id="casrAshryprice">
+        <input type="text" placeholder="الكسور العشرية" id="casrAshryprice" formControlName="decimalPrice" appOnlyNumber maxlength="1">
+        <app-form-error [control]="settingsForm.controls['decimalPrice']" [errorKey]="'required'" [message]="'الكسور العشرية للأسعار مطلوبة'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['decimalPrice']" [errorKey]="'min'" [message]="'الكسور العشرية يجب ان تكون 0 أو أكثر'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['decimalPrice']" [errorKey]="'max'" [message]="'الكسور العشرية يجب ان تكون 6 أو أقل'"></app-form-error>
     </div>
-    <div class="col-span-12 md:col-span-4">
+    <!-- <div class="col-span-12 md:col-span-4">
         <label for="referances">المرجع</label>
         <input type="text" placeholder="المرجع" id="referances">
     </div>
@@ -147,96 +173,159 @@
     </div>
    
     <div class="col-span-12 md:col-span-4">
-        <label for="address">الرصيد الدائن حتي </label>
-        <p-datePicker [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="icondisplay" />
-        <!-- <input type="text" placeholder="الرصيد الدائن حتي " id="address"> -->
-    </div>
+        <label for="balanceDate">الرصيد الدائن حتي </label>
+        <p-datePicker [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="balanceDate" />
+    </div> -->
    
    <div class="col-span-12 md:col-span-4">
-        <label for="inventoryDefault">مخزن المشتريات الإفتراضي</label>
-        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن المشتريات الإفتراضي'"></ng-select>
+        <label for="inventoryDefaultFinance">مخزن المشتريات الإفتراضي</label>
+        <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن المشتريات الإفتراضي" formControlName="purchaseStoreId"></ng-select>
+        <app-form-error [control]="settingsForm.controls['purchaseStoreId']" [errorKey]="'required'" [message]="'مخزن المشتريات الإفتراضي مطلوب'"></app-form-error>
     </div>
       <div class="col-span-12 md:col-span-4">
-        <label for="inventoryDefault">مركز التكلفه الافتراضي</label>
-        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مركز التكلفه الافتراضي'"></ng-select>
+        <label for="costCenterFinance">مركز التكلفه الافتراضي</label>
+        <ng-select [items]="costCentersList" bindLabel="nameAr" bindValue="id" placeholder="مركز التكلفه الافتراضي" formControlName="costCenterId"></ng-select>
+        <app-form-error [control]="settingsForm.controls['costCenterId']" [errorKey]="'required'" [message]="'مركز التكلفة الافتراضي مطلوب'"></app-form-error>
     </div>
       <div class="col-span-12 md:col-span-4">
-        <label for="inventoryDefault">مخزن المبيعات الإفتراضي</label>
-        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن المبيعات الإفتراضي'"></ng-select>
+        <label for="salesStoreFinance">مخزن المبيعات الإفتراضي</label>
+        <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن المبيعات الإفتراضي" formControlName="salesStoreId"></ng-select>
+        <app-form-error [control]="settingsForm.controls['salesStoreId']" [errorKey]="'required'" [message]="'مخزن المبيعات الإفتراضي مطلوب'"></app-form-error>
     </div>
       <div class="col-span-12 md:col-span-4">
-        <label for="inventoryDefault">مخزن الحجز الإفتراضي</label>
-        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'مخزن الحجز '"></ng-select>
+        <label for="reservationStoreFinance">مخزن الحجز الإفتراضي</label>
+        <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن الحجز " formControlName="reservationStoreId"></ng-select>
+        <app-form-error [control]="settingsForm.controls['reservationStoreId']" [errorKey]="'required'" [message]="'مخزن الحجز الإفتراضي مطلوب'"></app-form-error>
     </div>
    
     <div class="col-span-12 md:col-span-4">
-        <label for="buildingNumber">الحد الأدني للضريبة الإنتقائية </label>
-        <input type="text" placeholder="الحد الأدني للضريبة الإنتقائية " id="buildingNumber">
+        <label for="minimumSelectiveTax">الحد الأدني للضريبة الإنتقائية </label>
+        <input type="text" placeholder="الحد الأدني للضريبة الإنتقائية " id="minimumSelectiveTax" formControlName="minimumSelectiveTax" appOnlyNumber maxlength="15">
+        <app-form-error [control]="settingsForm.controls['minimumSelectiveTax']" [errorKey]="'required'" [message]="'الحد الأدني للضريبة الإنتقائية مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['minimumSelectiveTax']" [errorKey]="'min'" [message]="'الحد الأدني يجب ان يكون 0 أو أكثر'"></app-form-error>
     </div>
 
       <div class="col-span-12 md:col-span-4">
-        <label for="inventoryDefault">طريقة استخدام ضريبة القيمة المضافة</label>
-        <ng-select [items]="[
-        {
-        id:1,
-        name:'سعر شامل ضريبة القيمة المضافة'
-        },
-        {
-        id:2,
-        name:'سعر غير شامل ضريبة القيمة المضافة'
-        }
-        ]" [bindLabel]="''" [bindValue]="''" [placeholder]="'القيمة المضافة '"></ng-select>
+        <label for="discountMethod">طريقة استخدام ضريبة القيمة المضافة</label>
+        <ng-select [items]="discountMethodOptions" bindLabel="name" bindValue="id" placeholder="القيمة المضافة " formControlName="discountMethod"></ng-select>
+        <app-form-error [control]="settingsForm.controls['discountMethod']" [errorKey]="'required'" [message]="'طريقة ضريبة القيمة المضافة مطلوبة'"></app-form-error>
     </div>
 
     
       <div class="col-span-12 md:col-span-4">
         <label for="statics">الاحصائيات</label>
-        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'الاحصائيات '"></ng-select>
+        <ng-select [items]="statisticsOptions" bindLabel="name" bindValue="id" placeholder="الاحصائيات " formControlName="enableStatistics"></ng-select>
+        <app-form-error [control]="settingsForm.controls['enableStatistics']" [errorKey]="'required'" [message]="'الاحصائيات مطلوبة'"></app-form-error>
     </div>
       <div class="col-span-12 md:col-span-4">
         <label for="showCustomers">اظهار العملاء والموردين للفروع</label>
-        <ng-select [items]="showCustomersData" [bindLabel]="'name'" [bindValue]="'name'" [placeholder]="'أظهار العملاء والموردين  '"></ng-select>
+        <ng-select [items]="showCustomersData" bindLabel="name" bindValue="id" placeholder="أظهار العملاء والموردين  " formControlName="customerSupplierDisplayType"></ng-select>
+        <app-form-error [control]="settingsForm.controls['customerSupplierDisplayType']" [errorKey]="'required'" [message]="'إظهار العملاء والموردين مطلوب'"></app-form-error>
     </div>
       <div class="col-span-12 md:col-span-4">
         <label for="mezan">معدل الميزان</label>
-        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'أظهار العملاء والموردين  '"></ng-select>
+        <ng-select [items]="BalancerateList" bindLabel="name" bindValue="id" placeholder="معدل الميزان" formControlName="balanceRate"></ng-select>
+        <app-form-error [control]="settingsForm.controls['balanceRate']" [errorKey]="'required'" [message]="'معدل الميزان مطلوب'"></app-form-error>
     </div>
 
-   
-   
-    
       <div class="col-span-12 md:col-span-3 flex items-center gap-3">
-        <input type="checkbox" id="alerts" checked>
-        <label for="alerts" style="margin-bottom:0px;">تفعيل التنبيهات</label>
+        <input type="checkbox" id="itemsFinance" formControlName="enableWeightedBalanceColor">
+        <label for="itemsFinance" style="margin-bottom:0px;">تفعيل أصناف الميزانيه بالوزن</label>
     </div>
       <div class="col-span-12 md:col-span-3 flex items-center gap-3">
-        <input type="checkbox" id="items" checked>
-        <label for="items" style="margin-bottom:0px;">تفعيل أصناف الميزانيه بالوزن</label>
+        <input type="checkbox" id="activationFinance" formControlName="enableDiscounts">
+        <label for="activationFinance" style="margin-bottom:0px;">تفعيل الحد الائتماني وحد التنبيه للعميل</label>
     </div>
       <div class="col-span-12 md:col-span-3 flex items-center gap-3">
-        <input type="checkbox" id="activation" checked>
-        <label for="activation" style="margin-bottom:0px;">تفعيل الحد الائتماني وحد التنبيه للعميل</label>
+        <input type="checkbox" id="TecrarFinance" formControlName="repeatTaxNumber">
+        <label for="TecrarFinance" style="margin-bottom:0px;">تكرار الرقم الضريبي</label>
     </div>
-      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
-        <input type="checkbox" id="Tecrar" checked>
-        <label for="Tecrar" style="margin-bottom:0px;">تكرار الرقم الضريبي</label>
-    </div>
-
-      
-
-    <div class="btns col-span-12 flex items-center  justify-end gap-[12px]">
-        <button class="btn btn-primary">حفظ</button>
-
-    </div>
-  
 
   </div>
   </ng-template>
-  
 
-  <ng-container *ngTemplateOutlet="currentTemplate == 'main' ? mainData : FinanceSettings"></ng-container>
-  
+  <ng-template #companySettings>
 
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] mt-[10px] mb-[20px]">
+
+
+    <div class="col-span-12 md:col-span-4">
+        <label for="companyName">اسم الشركة</label>
+        <input type="text" placeholder="اسم الشركة" id="companyName" formControlName="companyNameAr" maxlength="200">
+        <app-form-error [control]="settingsForm.controls['companyNameAr']" [errorKey]="'required'" [message]="'اسم الشركة مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['companyNameAr']" [errorKey]="'minlength'" [message]="'اسم الشركة يجب ان يكون حرفين علي الأقل'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['companyNameAr']" [errorKey]="'invalidEntityName'" [message]="'اسم الشركة يجب ان يحتوي على حروف وارقام و _ فقط'"></app-form-error>
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="englishName">الأسم بالانجليزي</label>
+        <input type="text" placeholder="الأسم بالانجليزي" id="englishName" formControlName="companyNameEn" maxlength="200">
+        <app-form-error [control]="settingsForm.controls['companyNameEn']" [errorKey]="'required'" [message]="'الاسم بالانجليزي مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['companyNameEn']" [errorKey]="'minlength'" [message]="'الاسم يجب ان يكون حرفين علي الأقل'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['companyNameEn']" [errorKey]="'invalidEntityName'" [message]="'الاسم يجب ان يحتوي على حروف وارقام و _ فقط'"></app-form-error>
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="AccountBank">رقم الحساب البنكي</label>
+        <input type="text" placeholder="رقم الحساب البنكي" id="AccountBank" formControlName="bankAccountNumber" maxlength="34">
+        <app-form-error [control]="settingsForm.controls['bankAccountNumber']" [errorKey]="'required'" [message]="'رقم الحساب البنكي مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['bankAccountNumber']" [errorKey]="'minlength'" [message]="'رقم الحساب البنكي يجب ان يكون 10 أحرف علي الأقل'"></app-form-error>
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="nationalType">نوع الهوية</label>
+        <ng-select [items]="commercialRegister" bindLabel="name" bindValue="id" placeholder="نوع الهوية" formControlName="identityTypeId"></ng-select>
+        <!-- <input type="text" placeholder="نوع الهوية" id="nationalType" formControlName="identityTypeId" appOnlyNumber maxlength="2"> -->
+        <app-form-error [control]="settingsForm.controls['identityTypeId']" [errorKey]="'required'" [message]="'نوع الهوية مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['identityTypeId']" [errorKey]="'min'" [message]="'نوع الهوية غير صحيح'"></app-form-error>
+    </div>
+    <div class="col-span-12 md:col-span-4">
+        <label for="nationalId">رقم الهويه</label>
+        <input type="text" placeholder="رقم الهويه" id="nationalId" formControlName="identityNumber" appOnlyNumber maxlength="14">
+        <app-form-error [control]="settingsForm.controls['identityNumber']" [errorKey]="'required'" [message]="'رقم الهوية مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['identityNumber']" [errorKey]="'minlength'" [message]="'رقم الهوية يجب ان يكون 10 أرقام علي الأقل'"></app-form-error>
+    </div>
+    <div class="col-span-12 md:col-span-2">
+        <label for="taxNumber">الرقم الضريبي</label>
+        <input type="text" placeholder="الرقم الضريبي" id="taxNumber" formControlName="taxNumber" appOnlyNumber maxlength="15">
+        <app-form-error [control]="settingsForm.controls['taxNumber']" [errorKey]="'required'" [message]="'الرقم الضريبي مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['taxNumber']" [errorKey]="'minlength'" [message]="'الرقم الضريبي يجب ان يكون من 9 الي 15 رقم'"></app-form-error>
+    </div>
+    <div class="col-span-12 md:col-span-2">
+        <label for="addtionNumber">الرقم الاضافي</label>
+        <input type="text" placeholder="الرقم الاضافي" id="addtionNumber" formControlName="additionalNumber" appOnlyNumber maxlength="10">
+        <app-form-error [control]="settingsForm.controls['additionalNumber']" [errorKey]="'maxlength'" [message]="'الرقم الاضافي يجب ان يكون 10 أرقام كحد أقصى'"></app-form-error>
+    </div>
+    <div class="col-span-12 md:col-span-6">
+        <label for="emailCompany">الايميل</label>
+        <input type="text" placeholder="الايميل" id="emailCompany" formControlName="email" maxlength="100">
+        <app-form-error [control]="settingsForm.controls['email']" [errorKey]="'required'" [message]="'البريد الالكتروني مطلوب'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['email']" [errorKey]="'invalidEmail'" [message]="'البريد الالكتروني غير صحيح'"></app-form-error>
+    </div>
+    <div class="col-span-12 md:col-span-6">
+        <label for="map">الموقع الالكتروني</label>
+        <input type="text" placeholder="الموقع الاكتروني" id="map" formControlName="website" maxlength="200">
+        <app-form-error [control]="settingsForm.controls['website']" [errorKey]="'maxlength'" [message]="'الموقع الالكتروني يجب ان يكون 200 حرف كحد أقصى'"></app-form-error>
+    </div>
+
+  </div>
+
+  </ng-template>
+
+  <ng-container *ngTemplateOutlet="currentTemplate == 'main' ? mainData : currentTemplate == 'company' ? companySettings : FinanceSettings"></ng-container>
+  
+  
 </form>
 
+<div class="flex flex-wrap items-center justify-end gap-3 my-4">
+  <!-- <button type="button" class="btn" (click)="fillSampleData()">بيانات تجريبية</button>
+  <button type="button" class="btn" (click)="resetMovements()">إعادة تهيئة الحركات</button>
+  <button type="button" class="btn" (click)="resetMovementsAndProducts()">إعادة تهيئة الحركات والأصناف</button>
+  <button type="button" class="btn" (click)="openResetAllDialog()">إعادة تهيئة جميع البيانات</button> -->
+  <button type="button" class="btn btn-primary" (click)="save()">حفظ</button>
+</div>
 
+<app-shared-confirm-dialog
+  [show]="showResetAllDialog"
+  title="تأكيد إعادة التهيئة"
+  message="هل أنت متأكد من إعادة تهيئة جميع البيانات؟ لا يمكن التراجع عن هذا الإجراء."
+  (confirm)="confirmResetAllData()"
+  (cancel)="cancelResetAllDialog()"
+></app-shared-confirm-dialog>

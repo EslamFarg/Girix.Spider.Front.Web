@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ProofOfSalary } from './proof-of-salary';
 
 describe('ProofOfSalary', () => {

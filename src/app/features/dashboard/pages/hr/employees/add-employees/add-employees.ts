@@ -1,4 +1,4 @@
-import { Component, DestroyRef, forwardRef, inject } from '@angular/core';
+import { Component, DestroyRef, ElementRef, forwardRef, inject, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePicker } from 'primeng/datepicker';
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -44,6 +44,7 @@ import { environment } from '../../../../../../../environments/environment.devel
 export class AddEmployees extends FormComponentBase {
   // !!!!!!!!!!!!!!!!! Services
   _fb: FormBuilder = inject(FormBuilder);
+  @ViewChild('inputSearch') inputSearch!: ElementRef<HTMLInputElement>;
   formAttachment = this._fb.group({
     attachment: [''],
   });
@@ -245,24 +246,21 @@ attachmentsPreviews = {
         }
 
         this.loading = false;
-      console.log(this.sectionsData);
+     
     })
   }
 
   getAllAllowances(){
     return this._AllowancesServices.getAllSendInQuery(0,0).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
       this.AllowancesList=res.data.rows
-      console.log(res);
     })
   }
 
 loadEmployeeCommingFromExplorer() {
   const id = this._sharedStateService.selectedId$();
-  console.log(id);
-  // console.log(id);
+
   if(id){
     this._employeeService.getById(id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
-      console.log("RRRRR",res);
       this.fillForm(res.data);
     })
   }
@@ -270,72 +268,37 @@ loadEmployeeCommingFromExplorer() {
 }
 
  
-// fillForm(data: any) {
 
-//   this.employeeForm.patchValue({
-//     id: data.id,
-//     employeeNumber: data.employeeNumber,
-//     baseNember: data.baseNember,
-//     allowancesIds: data.allowancesIds ?? [],
-//     salary: data.salary,
-//     departmentId: data.departmentId,
 
-//     nameAr: data.nameAr,
-//     nameEn: data.nameEn,
-//     phoneNember: data.phoneNember,
 
-//     nationalIdOrIqamaNumber: data.nationalIdOrIqamaNumber,
+searchEmployee(val: any) {
 
-//     medicalInsuranceDate: data.medicalInsuranceDate
-//       ? new Date(data.medicalInsuranceDate)
-//       : null,
 
-//     iban: data.iban,
 
-//     passportNumber: data.passportNumber,
+  if(!val){
+    this._messageService.add({
+      severity: 'error',
+      summary: 'خطأ',
+      detail: 'يجب أن يكون هذا الحقل فارغ'
+    });
+     return;
+  } 
 
-//     borderNumber: data.borderNumber,
+  this._employeeService.getById(val).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+    next:(res:any)=>{
+      this.fillForm(res.data);
+    }
+  })
+}
 
-//     nationality: data.nationality,
-
-//     jobTitle: data.jobTitle,
-
-//     dateOfBirth: data.dateOfBirth
-//       ? new Date(data.dateOfBirth)
-//       : null,
-
-//     workStartDate: data.workStartDate
-//       ? new Date(data.workStartDate)
-//       : null,
-
-//     returnFromLeaveDate: data.returnFromLeaveDate
-//       ? new Date(data.returnFromLeaveDate)
-//       : null,
-
-//     contractEndDate: data.contractEndDate
-//       ? new Date(data.contractEndDate)
-//       : null,
-
-//     address: data.address
-//   });
-
-//   // صورة البروفايل
-//   if (data.imageUrl) {
-//     this.imagePreviewProfile =environment.baseUrl + data.imageUrl; // أو environment.urlStorage + data.image
-//   }
-
-//   // دخول وضع التعديل
-  
-
-//   this.changeButtonState(data.id, true);
-// }
 
 fillForm(data: any) {
+
   this.employeeForm.patchValue({
     id: data.id,
     employeeNumber: data.employeeNumber,
     baseNember: data.baseNember,
-    allowancesIds: data.allowancesIds ?? [],
+    allowancesIds:  data.allowances?.map((x: any) => x.id) ?? [],
     salary: data.salary,
     departmentId: data.departmentId,
     nameAr: data.nameAr,
@@ -354,25 +317,22 @@ fillForm(data: any) {
     workStartDate: data.workStartDate ? new Date(data.workStartDate) : null,
     returnFromLeaveDate: data.returnFromLeaveDate ? new Date(data.returnFromLeaveDate) : null,
     contractEndDate: data.contractEndDate ? new Date(data.contractEndDate) : null,
-    
-    // نترك حقول الملفات في الفورم null أو نمررها فقط إذا كان الكومبوننت يدعم روابط نصوص
-    // لتجنب خطأ createObjectURL نتركها فارغة هنا ونعتمد على المعاينة الخارجية
-    image: null,
-    nationalIdOrIqamaNumberFile: null,
-    medicalInsuranceFile: null,
-    bankAttachmentFile: null,
-    passportAttachment: null,
-    borderAttachment: null,
-    contractEndAttachmentFile: null
+
+    image:data.imageUrl ? data.imageUrl : null,
+    nationalIdOrIqamaNumberFile: data.nationalIdOrIqamaNumberUrl ?   data.nationalIdOrIqamaNumberUrl : null,
+    medicalInsuranceFile: data.medicalInsuranceFileUrl ? data.medicalInsuranceFileUrl : null,
+    bankAttachmentFile: data.bankAttachmentUrl ? data.bankAttachmentUrl : null,
+    passportAttachment: data.passportAttachmentUrl ? data.passportAttachmentUrl : null,
+    borderAttachment: data.borderAttachmentUrl ? data.borderAttachmentUrl : null,
+    contractEndAttachmentFile: data.contractEndAttachmentUrl ? data.contractEndAttachmentUrl : null
   });
 
-  // 1. صورة البروفايل
+
   if (data.imageUrl) {
-    this.imagePreviewProfile = environment.baseUrl + data.imageUrl;
-    // إذا كنت تحتاج لإلزامية الصورة حتى عند التعديل، يمكنك إزالة Validator الـ required برمجياً أو تركه إذا كنت ستتعامل معه
+    this.imagePreviewProfile = environment.baseUrl+'/' + data.imageUrl;
   }
 
-  // 2. تخزين روابط المرفقات القادمة من السيرفر للمعاينة
+
   const base = environment.baseUrl;
   this.attachmentsPreviews = {
     nationalIdOrIqamaNumberFile: data.nationalIdOrIqamaNumberFile ? base + data.nationalIdOrIqamaNumberFile : null,
@@ -406,6 +366,7 @@ formatDate(date: Date | string): string {
 }
 
   save() {
+
     if(this.employeeForm.invalid){
       this.employeeForm.markAllAsTouched();
       return;
@@ -420,6 +381,7 @@ formatDate(date: Date | string): string {
   formData.append('departmentId', String(formValue.departmentId ?? ''));
   formData.append('nameAr', formValue.nameAr ?? '');
   formData.append('nameEn', formValue.nameEn ?? '');
+ 
   formData.append('phoneNember', formValue.phoneNember ?? '');
   formData.append('nationalIdOrIqamaNumber', formValue.nationalIdOrIqamaNumber ?? '');
   formData.append('iban', formValue.iban ?? '');
@@ -550,25 +512,7 @@ formatDate(date: Date | string): string {
     }
   }
 
-  // reset() {
-  //   this.employeeForm.reset({
-  //   medicalInsuranceDate: new Date(),
-  //   dateOfBirth: new Date(),
-  //   workStartDate: new Date(),
-  //   returnFromLeaveDate: new Date(),
-  //   contractEndDate: new Date(
-  //     new Date().setFullYear(new Date().getFullYear() + 1)
-  //   ),
-  // });
-
-  // this.profileImageSelected = null;
-  // this.imagePreviewProfile = null;
-
-  //   this.isEditMode=false;
-  //   this.idUpdate=0;
-  //   this.refreshActions();
-  // }
-
+  resetFileName=false;
   reset() {
   this.employeeForm.reset({
     medicalInsuranceDate: new Date(),
@@ -593,13 +537,14 @@ formatDate(date: Date | string): string {
     contractEndAttachmentFile: null,
   };
 
+  
+
   this.isEditMode = false;
   this.idUpdate = 0;
   this.refreshActions();
 }
 
   delete() {
-    // console.log('Delete action triggered');
     this.showDeleteDialog=true;
   }
 
@@ -662,5 +607,7 @@ removeImage() {
   });
 }
 
-  
+  ngOnDestroy() {
+    this._sharedStateService.clearSelectedId();
+  }
 }

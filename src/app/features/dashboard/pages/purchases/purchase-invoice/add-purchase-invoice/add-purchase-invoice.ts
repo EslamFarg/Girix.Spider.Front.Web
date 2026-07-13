@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, ViewChild } from '@angular/core';
 import { PageHeader } from '../../../../../../shared/ui/page-header/page-header';
 import { DatePicker } from 'primeng/datepicker';
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -35,6 +35,18 @@ import { customerType } from '../../../../../../shared/Enums/customer-type.enum'
 import { CustSuppType } from '../../../../../../shared/Enums/custSupp-type.enum';
 import { SharedConfirmDialog } from '../../../../../../shared/ui/shared-confirm-dialog/shared-confirm-dialog';
 import { Purchase } from '../services/purchase';
+import {
+  AccountLookupItem,
+  ApiResponse,
+  PaginatedRows,
+  CreatePurchasePayload,
+  ProductSearchItem,
+  ProductUnitItem,
+  PurchaseDetailDto,
+  PurchaseDetailResponse,
+  PurchaseResponse,
+  UpdatePurchasePayload,
+} from '../models/purchase-invoice';
 
 @Component({
   selector: 'app-add-purchase-invoice',
@@ -58,7 +70,7 @@ import { Purchase } from '../services/purchase';
   templateUrl: './add-purchase-invoice.html',
   styleUrl: './add-purchase-invoice.scss',
 })
-export class AddPurchaseInvoice extends FormComponentBase {
+export class AddPurchaseInvoice extends FormComponentBase implements OnDestroy {
   // !!!!!!!!!!!!!!!!! Services
   _fb: FormBuilder = inject(FormBuilder);
   _lookup = inject(LookupFacade);
@@ -95,15 +107,17 @@ export class AddPurchaseInvoice extends FormComponentBase {
     taxNumber: [null, [Validators.required, Validators.minLength(9), Validators.maxLength(15)]],
     net: [0],
     expenses: ['', [Validators.required]],
-    branchId: [null, Validators.required],
+    branchId: [null],
     paidCash: [null, [Validators.required]],
     paidCashAccountId: [null, [Validators.required]],
     networkPaid: [null, [Validators.required]],
     networkPaidAccountId: [null],
-    purchaseDetails: this._fb.array([]) as any,
+    purchaseDetails: this._fb.array([]),
   });
 
   searchControl = new FormControl('', Validators.required);
+  supplierSearchControl = new FormControl('', Validators.required);
+  invoiceSearchControl = new FormControl('');
 
   date2: Date | undefined;
 
@@ -116,7 +130,7 @@ export class AddPurchaseInvoice extends FormComponentBase {
     link: '/purchase-invoice/explorer',
   };
 
-  items = [];
+  items: ProductSearchItem[] = [];
 
   invoiceType = [
     {
@@ -151,57 +165,77 @@ export class AddPurchaseInvoice extends FormComponentBase {
   showDialog() {
     this.visible = true;
   }
-getDataInventories:any[]=[]
-warehouseData: any[] = [
-  {name:"EEE",id:1},
-  {name:"EEE",id:2},
-];
+getDataInventories: { id: number; name: string }[] = [];
+  showDeleteDialog = false;
+  printCount = 0;
+  editCount = 0;
   // invoiceTypeEnum: invoiceType = invoiceType;
   // !!!!!!!!!!!!!!! Methods
   ngOnInit() {
     this._lookup.loadSuppliers();
-    // this._lookup.loadInventories();
     this.getAllInventories();
-    
     this.listenSupplierChange();
     this.loadNameEnInSupplier();
     this.loadPhoneNumber();
     this.listenPaymentChanges();
     this.getAllAccountsCash();
     this.getAllNetAccounts();
-  
+    this.listenAddingRowChanges();
+    this.loadPurchase();
     this.refreshActions();
+  }
+
+  loadPurchase(): void {
+    const id = this._sharedStateService.selectedId$();
+    if (!id) {
+      return;
+    }
+
+    this._purchaseServices
+      .getPurchaseById(id)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.fillForm(res.data);
+        },
+      });
   }
 
 
 
-  getAllInventories(){
-         this._inventoriesServices.getAllWithoutPagination().pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
-          this.getDataInventories=res.data.rows
-         
-        })
+  getAllInventories() {
+    this._inventoriesServices
+      .getAllWithoutPagination<ApiResponse<PaginatedRows<{ id: number; name: string }>>>()
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((res) => {
+        this.getDataInventories = res.data.rows;
+      });
+  }
+
+  private listenAddingRowChanges(): void {
+    this.itemAddingForm.valueChanges
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => this.calculateAddingRowTotals());
   }
 
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 PaymentMethod Invoice!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
   // ** properties
-  cashAccounts: any[] = [];
-  NetAccounts: any[] = [];
+  cashAccounts: AccountLookupItem[] = [];
+  NetAccounts: AccountLookupItem[] = [];
   getAllAccountsCash() {
     this._purchaseServices
       .getAllAccountsCash()
       .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((res: any) => {
+      .subscribe((res: ApiResponse<AccountLookupItem[]>) => {
         this.cashAccounts = res.data;
-        
       });
   }
   getAllNetAccounts() {
     this._purchaseServices
       .getAllNetAccounts()
       .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((res: any) => {
+      .subscribe((res: ApiResponse<AccountLookupItem[]>) => {
         this.NetAccounts = res.data;
-       
       });
   }
 
@@ -306,7 +340,7 @@ warehouseData: any[] = [
 
 
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!! Table Products !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  get purchaseDetails(): any {
+  get purchaseDetails(): FormArray {
     return this.purchaseForm.get('purchaseDetails') as FormArray;
   }
 
@@ -315,31 +349,38 @@ warehouseData: any[] = [
   }
 
   //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ProductInvoice
-  createPurchaseDetail(product?: any): FormGroup {
-    return this._fb.group({
-      productCartId: [product?.id || null, Validators.required],
-      productCode: [product?.code || ''],
-      productName: [product?.name || ''],
-      unitName: [product?.unitName || 'قطعة'], // القيمة الافتراضية للوحدة
-      warehouseId: [this.purchaseForm.get('branchId')?.value || null, Validators.required], // ربط تلقائي بمخزن الفرع إن وجد
+  createPurchaseDetail(product?: PurchaseDetailResponse): FormGroup {
+    const vatRate = product?.vat && product?.quantity && product?.purchasesPrice
+      ? (product.vat / (product.quantity * product.purchasesPrice - (product.discountAmount || 0))) * 100
+      : 15;
 
-      quantity: [1, [Validators.required, Validators.min(1)]],
-      purchasesPrice: [product?.price || 0, [Validators.required, Validators.min(0.01)]],
-      total: [0], // الكمية * السعر
-      vat: [0], // قيمة الضريبة للسطر
-      vatRate: [product?.vatRate || 15], // نسبة ضريبة الصنف مثلاً 15%
-
-      disCountPercentage: [0, [Validators.min(0), Validators.max(100)]],
-      discountAmount: [0, Validators.min(0)],
-      vatDiscount: [0],
-      totalDiscount: [0],
-      net: [0], // الصافي النهائي للسطر
+    const row = this._fb.group({
+      productCartId: [product?.productCartId ?? null, Validators.required],
+      productCode: [product?.productCode || ''],
+      productName: [product?.productName || ''],
+      unitName: [product?.unitName || ''],
+      warehouseId: [product?.warehouseId ?? this.purchaseForm.get('branchId')?.value ?? null, Validators.required],
+      warehouseName: [product?.warehouseName || ''],
+      unitId: [product?.unitId ?? null],
+      quantity: [product?.quantity ?? 1, [Validators.required, Validators.min(1)]],
+      purchasesPrice: [product?.purchasesPrice ?? 0, [Validators.required, Validators.min(0.01)]],
+      total: [product?.total ?? 0],
+      vat: [product?.vat ?? 0],
+      vatRate: [vatRate],
+      disCountPercentage: [product?.disCountPercentage ?? 0, [Validators.min(0), Validators.max(100)]],
+      discountAmount: [product?.discountAmount ?? 0, Validators.min(0)],
+      vatDiscount: [product?.vatDiscount ?? 0],
+      totalDiscount: [product?.totalDiscount ?? 0],
+      net: [product?.net ?? 0],
     });
+
+    this.attachRowCalculations(row, Number(row.get('vatRate')?.value) || 15);
+    return row;
   }
 
-  unitData: any[] = [];
+  unitData: ProductUnitItem[] = [];
   // مصفوفة لتخزين وحدات الصنف المختار حالياً في سطر الإضافة
-  currentProductUnits: any[] = [];
+  currentProductUnits: ProductUnitItem[] = [];
 
 
   itemAddingForm: FormGroup = this._fb.group({
@@ -372,8 +413,8 @@ warehouseData: any[] = [
     this._purchaseServices
       .searchByProductName(pageIndex, PageSize, query)
       .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((res: any) => {
-        this.items = res.data.rows.map((item: any) => ({
+      .subscribe((res: ApiResponse<PaginatedRows<{ id: number; name: string }>>) => {
+        this.items = res.data.rows.map((item) => ({
           label: item.name,
           value: item.id,
         }));
@@ -384,59 +425,64 @@ warehouseData: any[] = [
       });
   }
 
-  onSelectProduct(event: any) {
-  const productId = event.value?.value ? event.value.value : event.value;
-  
-  if (!productId) return;
+  onSelectProduct(event: { value: ProductSearchItem | number }) {
+    const productId = typeof event.value === 'object' ? event.value?.value : event.value;
 
-  // جلب بيانات وحدات الصنف وتحديث الفورم
-  this._purchaseServices.getProductCartByProductId(productId)
-    .pipe(takeUntilDestroyed(this._destroyRef))
-    .subscribe((res: any) => {
-      this.unitData = res.data; // مصفوفة الوحدات القادمة من السيرفر
+    if (!productId) {
+      return;
+    }
 
-      if (this.unitData && this.unitData.length > 0) {
-        const firstUnit = this.unitData[0];
-        
-        // تحديث حقول سطر الإضافة بالوحدة الأولى وسعرها تلقائياً
-        this.itemAddingForm.patchValue({
-          productCartId: productId,
-          productCode: firstUnit.productCode || '', // تأكد من مطابقة المسميات مع الـ API
-          productName: event.value?.label || firstUnit.productName,
-          unitId: firstUnit.id,
-          unitName: firstUnit.name,
-          price: firstUnit.price || 0, // السعر الافتراضي لهذه الوحدة
-          qty: 1,
-          discountRate: 0,
-          discountAmount: 0
-        }, { emitEvent: false });
+    this._purchaseServices
+      .getProductCartByProductId(productId)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((res: ApiResponse<ProductUnitItem[]>) => {
+        this.unitData = res.data;
 
-        // إعادة حساب الإجماليات للسطر
-        // this.calculateAddingRowTotals();
-      }
-    });
-}
+        if (this.unitData.length > 0) {
+          const firstUnit = this.unitData[0];
 
+          this.itemAddingForm.patchValue(
+            {
+              productCartId: firstUnit.id,
+              productCode: firstUnit.productCode || '',
+              productName: typeof event.value === 'object' ? event.value.label : firstUnit.productName || '',
+              unitId: firstUnit.id,
+              unitName: firstUnit.fromUnitName || firstUnit.name || '',
+              price: firstUnit.purchasePrice ?? firstUnit.price ?? 0,
+              qty: 1,
+              discountRate: 0,
+              discountAmount: 0,
+            },
+            { emitEvent: false },
+          );
 
-  
-
-  loadUnitData(productId: number) {
-      this._purchaseServices.getProductCartByProductId(productId).subscribe((res: any) => {
-      // const = res.data;
-      this.unitData = res.data;
-
+          this.calculateAddingRowTotals();
+        }
       });
-
   }
 
+  onUnitChange(selectedUnitId: number) {
+    const selectedUnit = this.unitData.find((unit) => unit.id === selectedUnitId);
+    if (!selectedUnit) {
+      return;
+    }
 
+    this.itemAddingForm.patchValue(
+      {
+        unitId: selectedUnit.id,
+        unitName: selectedUnit.fromUnitName || selectedUnit.name || '',
+        price: selectedUnit.purchasePrice ?? selectedUnit.price ?? 0,
+        productCartId: selectedUnit.id,
+      },
+      { emitEvent: false },
+    );
 
-   onUnitChange(selectedUnitId: any) {
-    
+    this.calculateAddingRowTotals();
   }
 
-  searchByProductCode(e: any) {
-    const code = e.target.value?.trim();
+  searchByProductCode(e: Event) {
+    const target = e.target as HTMLInputElement;
+    const code = target.value?.trim();
     if (!code){
       this._messageService.add({
         severity: 'warn',
@@ -452,7 +498,7 @@ warehouseData: any[] = [
       const product = res?.data?.rows?.length > 0 ? res.data.rows[0] : res?.data;
       if (product && product.id) {
         this.loadProductToAddingRow(product);
-        e.target.value = '';
+        target.value = '';
       }
       } else {
         this._messageService.add({ severity: 'warn', summary: 'تنبيه', detail: 'الكود غير موجود' });
@@ -461,62 +507,76 @@ warehouseData: any[] = [
 
   }
 
-  loadProductToAddingRow(res: any) {
-  const product = res?.data || res;
-  if (!product || !product.id) return;
+  loadProductToAddingRow(
+    product: ProductUnitItem & { productCart?: ProductUnitItem[]; productName?: string; code?: string; vat?: number },
+  ) {
+    if (!product?.id) {
+      return;
+    }
 
-  const units = product.productCart || [];
-  const defaultUnit = units.find((u: any) => u.selected === true) || units[0];
+    const units = product.productCart ?? [];
+    const defaultUnit = units.find((unit) => unit.selected === true) ?? units[0] ?? product;
+    const unitId = defaultUnit.id;
+    const unitName = defaultUnit.fromUnitName || defaultUnit.name || '';
+    const price = defaultUnit.purchasePrice ?? defaultUnit.price ?? 0;
+    const vatRate = product.vat ?? 15;
 
-  // إذا لم يكن للصنف أي وحدات، نضع قيم صفرية حماية للكود
-  const unitId = defaultUnit ? defaultUnit.id : null;
-  const unitName = defaultUnit ? defaultUnit.fromUnitName : '';
-  const price = defaultUnit ? (defaultUnit.purchasePrice || 0) : 0;
-  const vatRate = product.vat || 0; // نسبة الضريبة مثلاً 15
+    const newRowGroup = this.createPurchaseDetail({
+      productCartId: unitId,
+      productCode: product.code || defaultUnit.productCode || '',
+      productName: product.productName || '',
+      warehouseId: this.purchaseForm.get('branchId')?.value ?? this.itemAddingForm.get('warehouseId')?.value,
+      warehouseName: this.getWarehouseName(this.itemAddingForm.get('warehouseId')?.value),
+      unitId,
+      unitName,
+      quantity: 1,
+      purchasesPrice: price,
+      disCountPercentage: 0,
+      discountAmount: 0,
+      vat: 0,
+      net: 0,
+    });
 
-  const totalBeforeTax = +(1 * price).toFixed(2);
-
-const taxAmount = +(
-  totalBeforeTax * (vatRate / 100)
-).toFixed(2);
-
-const netTotal = +(
-  totalBeforeTax + taxAmount
-).toFixed(2);
-
-  // 4. بناء الـ FormGroup المطابق تماماً للـ FormArray بالأسفل
-  const newRowGroup = this._fb.group({
-    productCartId: [product.id, Validators.required],
-    productCode: [product.code || ''], // لو الباكيند بيرجع كود
-    productName: [product.productName || ''],
-    warehouseId: [this.purchaseForm.get('branchId')?.value || null, Validators.required], 
-    warehouseName: [''], // سيتم عرضه بناءً على اختيار المخزن لاحقاً
-    unitId: [unitId, Validators.required],
-    unitName: [unitName],
-    quantity: [1, [Validators.required, Validators.min(1)]],
-    purchasesPrice: [price, [Validators.required, Validators.min(0.01)]],
-    disCountPercentage: [0],
-    discountAmount: [0],
-    vat: [taxAmount], // قيمة الضريبة المحسوبة للسطر
-    net: [netTotal], // الصافي النهائي الكلي للسطر
-  });
-
-
-  newRowGroup.valueChanges.subscribe(() => {
+    newRowGroup.patchValue({ vatRate }, { emitEvent: false });
     this.calculateRowTotals(newRowGroup, vatRate);
-  });
+    this.purchaseDetails.push(newRowGroup);
+    this.searchControl.reset(null, { emitEvent: false });
+  }
 
+  private attachRowCalculations(row: FormGroup, vatRate: number): void {
+    row.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(() => {
+      this.calculateRowTotals(row, vatRate);
+    });
+  }
 
-  this.purchaseDetails.push(newRowGroup);
+  calculateAddingRowTotals(): void {
+    const qty = Number(this.itemAddingForm.get('qty')?.value) || 0;
+    const price = Number(this.itemAddingForm.get('price')?.value) || 0;
+    const discountRate = Number(this.itemAddingForm.get('discountRate')?.value) || 0;
+    const taxRate = Number(this.itemAddingForm.get('taxRate')?.value) || 15;
 
-  this.calculateRowTotals(newRowGroup, vatRate);
+    const totalBeforeDiscount = qty * price;
+    const discountAmount = totalBeforeDiscount * (discountRate / 100);
+    const subTotal = totalBeforeDiscount - discountAmount;
+    const taxAmount = subTotal * (taxRate / 100);
+    const total = subTotal + taxAmount;
 
-  // تصفير حقل البحث العلوي
-  this.searchControl.reset(null, { emitEvent: false });
+    this.itemAddingForm.patchValue(
+      {
+        discountAmount: +discountAmount.toFixed(2),
+        tax: +taxAmount.toFixed(2),
+        total: +total.toFixed(2),
+      },
+      { emitEvent: false },
+    );
+  }
 
-  // 8. تصفير حقول البحث للاستعداد للصنف القادم
-  this.searchControl.reset(null, { emitEvent: false });
-}
+  private getWarehouseName(warehouseId: number | null | undefined): string {
+    if (!warehouseId) {
+      return '';
+    }
+    return this.getDataInventories.find((inventory) => inventory.id === warehouseId)?.name ?? '';
+  }
 
  calculateRowTotals(row: FormGroup, vatRate: number) {
   const qty = Number(row.get('quantity')?.value) || 0;
@@ -559,7 +619,8 @@ calculateInvoiceTotals() {
   let totalVat = 0;
   let netInvoice = 0;
 
-  this.purchaseDetails.controls.forEach((control:any) => {
+  this.purchaseDetails.controls.forEach((control) => {
+    const row = control as FormGroup;
     totalQty += Number(control.get('quantity')?.value) || 0;
     totalDiscount += Number(control.get('discountAmount')?.value) || 0;
     totalVat += Number(control.get('vat')?.value) || 0;
@@ -571,6 +632,8 @@ calculateInvoiceTotals() {
   this.totalDiscounts = totalDiscount;
   this.totalVat = totalVat;
   this.invoiceNetTotal = netInvoice;
+
+  this.purchaseForm.patchValue({ net: netInvoice }, { emitEvent: false });
 }
 
   // ترحيل البيانات من السطر العلوي إلى جدول الـ FormArray بالأسفل
@@ -586,26 +649,26 @@ calculateInvoiceTotals() {
     }
 
     const rawData = this.itemAddingForm.getRawValue();
+    const vatRate = Number(rawData.taxRate) || 15;
 
-    // بناء FormGroup للسطر الجديد في الـ FormArray الرئيسي ليرسل للسيرفر
-    const itemGroup = this._fb.group({
-      productCartId: [rawData.productCartId, Validators.required],
-      productCode: [rawData.productCode],
-      productName: [rawData.productName],
-      warehouseId: [rawData.warehouseId, Validators.required],
-      // هنا نجلب اسم المخزن من الـ LookupFacade للعرض بالجدول بالأسفل
-      warehouseName: [
-        this._lookup.inventories().find((i) => i.id === rawData.warehouseId)?.name || '',
-      ],
-      unitId: [rawData.unitId, Validators.required],
-      unitName: [rawData.unitName],
-      quantity: [rawData.qty, [Validators.required, Validators.min(1)]],
-      purchasesPrice: [rawData.price, Validators.required],
-      disCountPercentage: [rawData.discountRate],
-      discountAmount: [rawData.discountAmount],
-      vat: [rawData.tax],
-      net: [rawData.total],
+    const itemGroup = this.createPurchaseDetail({
+      productCartId: rawData.productCartId,
+      productCode: rawData.productCode,
+      productName: rawData.productName,
+      warehouseId: rawData.warehouseId,
+      warehouseName: this.getWarehouseName(rawData.warehouseId),
+      unitId: rawData.unitId,
+      unitName: rawData.unitName,
+      quantity: rawData.qty,
+      purchasesPrice: rawData.price,
+      disCountPercentage: rawData.discountRate,
+      discountAmount: rawData.discountAmount,
+      vat: rawData.tax,
+      net: rawData.total,
     });
+
+    itemGroup.patchValue({ vatRate }, { emitEvent: false });
+    this.calculateRowTotals(itemGroup, vatRate);
 
     // إضافة للـ FormArray
     this.purchaseDetails.push(itemGroup);
@@ -696,23 +759,258 @@ calculateInvoiceTotals() {
   SearchValEnum = SearchableColumnEnum.Name;
 
   save() {
+    if (this.purchaseDetails.length === 0) {
+      this._messageService.add({
+        severity: 'error',
+        summary: 'خطأ',
+        detail: 'برجاء إضافة صنف واحد على الأقل',
+      });
+      return;
+    }
+
     if (this.purchaseForm.invalid) {
       this.purchaseForm.markAllAsTouched();
       return;
     }
-    console.log('Save action triggered');
+
+    const payload = this.buildPayload();
+
+    if (!this.isEditMode) {
+      this._purchaseServices
+        .createPurchase(payload)
+        .pipe(takeUntilDestroyed(this._destroyRef))
+        .subscribe({
+          next: (res) => {
+            this._messageService.add({
+              severity: 'success',
+              summary: 'تم',
+              detail: 'تم حفظ فاتورة الشراء بنجاح',
+            });
+            this.changeButtonState(res.data, true);
+            this.purchaseForm.get('invoiceNumber')?.setValue(res.data);
+            this.refreshActions();
+          },
+        });
+      return;
+    }
+
+    const updatePayload: UpdatePurchasePayload = {
+      ...payload,
+      id: this.idUpdate,
+      totalPrice: this.invoiceNetTotal,
+      disCountPercentage: 0,
+      discountAmount: this.totalDiscounts,
+      allDiscount: this.totalDiscounts,
+      vatDiscount: 0,
+      totalDiscount: this.totalDiscounts,
+    };
+
+    this._purchaseServices
+      .updatePurchase(updatePayload)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'تم',
+            detail: 'تم تعديل فاتورة الشراء بنجاح',
+          });
+        },
+      });
   }
 
   reset() {
-    console.log('Reset action triggered');
+    this.purchaseForm.reset({
+      invoiceNumber: 0,
+      supplierId: null,
+      purchasesDate: new Date(),
+      notes: '',
+      RefNum: '',
+      orderPymentType: null,
+      paymentMethod: null,
+      supplierPhone: '',
+      taxNumber: null,
+      net: 0,
+      expenses: '',
+      branchId: null,
+      paidCash: null,
+      paidCashAccountId: null,
+      networkPaid: null,
+      networkPaidAccountId: null,
+    });
+
+    this.purchaseDetails.clear();
+    this.itemAddingForm.reset({
+      qty: 1,
+      price: 0,
+      discountRate: 0,
+      discountAmount: 0,
+      taxRate: 15,
+      warehouseId: null,
+      unitId: null,
+    });
+
+    this.totalQuantities = 0;
+    this.totalDiscounts = 0;
+    this.totalVat = 0;
+    this.invoiceNetTotal = 0;
+    this.printCount = 0;
+    this.editCount = 0;
+    this.unitData = [];
+    this.searchControl.reset();
+    this.changeButtonState(0, false);
+    this.refreshActions();
   }
 
   delete() {
-    console.log('Delete action triggered');
+    this.showDeleteDialog = true;
+  }
+
+  deleteInvoice() {
+    this._purchaseServices
+      .deletePurchase(this.idUpdate)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'نجاح',
+            detail: 'تم الحذف بنجاح',
+          });
+          this.showDeleteDialog = false;
+          this.reset();
+        },
+      });
   }
 
   print() {
-    console.log('Print action triggered');
+    this._messageService.add({
+      severity: 'info',
+      summary: 'تنبيه',
+      detail: 'طباعة فاتورة الشراء غير متوفرة حالياً في واجهة البرمجة',
+    });
+  }
+
+  searchInvoiceById() {
+    const id = Number(this.invoiceSearchControl.value);
+    if (!id) {
+      return;
+    }
+
+    this.getPurchaseById(id);
+  }
+
+  prevInvoice() {
+    const currentId = Number(this.purchaseForm.get('invoiceNumber')?.value);
+    if (!currentId || currentId <= 1) {
+      return;
+    }
+    this.getPurchaseById(currentId - 1);
+  }
+
+  nextInvoice() {
+    const currentId = Number(this.purchaseForm.get('invoiceNumber')?.value);
+    if (!currentId) {
+      return;
+    }
+    this.getPurchaseById(currentId + 1);
+  }
+
+  private getPurchaseById(id: number) {
+    this._purchaseServices
+      .getPurchaseById(id)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.fillForm(res.data);
+        },
+        error: () => {
+          this._messageService.add({
+            severity: 'warn',
+            summary: '',
+            detail: 'الفاتورة غير موجودة',
+          });
+        },
+      });
+  }
+
+  private fillForm(data: PurchaseResponse): void {
+    this.purchaseForm.patchValue({
+      invoiceNumber: data.id,
+      supplierId: data.supplierId,
+      purchasesDate: new Date(data.purchasesDate),
+      notes: data.notes ?? '',
+      RefNum: data.refNum ?? '',
+      orderPymentType: data.orderPymentType,
+      paymentMethod: data.paymentMethod,
+      supplierPhone: data.supplierPhone ?? '',
+      taxNumber: data.taxNumber ?? null,
+      net: data.net,
+      expenses: data.expenses ?? '',
+      branchId: data.branchId ?? null,
+      paidCash: data.paidCash ?? null,
+      paidCashAccountId: data.paidCashAccountId ?? null,
+      networkPaid: data.networkPaid ?? null,
+      networkPaidAccountId: data.networkPaidAccountId ?? null,
+    });
+
+    this.purchaseDetails.clear();
+    (data.purchaseDetails ?? []).forEach((detail) => {
+      this.purchaseDetails.push(this.createPurchaseDetail(detail));
+    });
+
+    this.printCount = data.printCount ?? 0;
+    this.editCount = data.editCount ?? 0;
+    this.changeButtonState(data.id, true);
+    this.calculateInvoiceTotals();
+    this.purchaseForm.markAsPristine();
+    this.purchaseForm.markAsUntouched();
+    this.refreshActions();
+  }
+
+  private buildPayload(): CreatePurchasePayload {
+    const raw = this.purchaseForm.getRawValue();
+    const details = this.purchaseDetails.getRawValue() as Array<
+      PurchaseDetailDto & { vatRate?: number; productCode?: string; productName?: string; warehouseName?: string; unitName?: string; unitId?: number }
+    >;
+
+    const branchId = raw.branchId ?? details[0]?.warehouseId ?? null;
+
+    return {
+      refNum: raw.RefNum || null,
+      supplierPhone: raw.supplierPhone || null,
+      taxNumber: raw.taxNumber ? String(raw.taxNumber) : null,
+      supplierId: Number(raw.supplierId),
+      purchasesDate: new Date(raw.purchasesDate).toISOString(),
+      notes: raw.notes || null,
+      orderPymentType: raw.orderPymentType,
+      paymentMethod: raw.paymentMethod,
+      vat: this.totalVat,
+      expenses: raw.expenses !== '' && raw.expenses != null ? Number(raw.expenses) : null,
+      net: this.invoiceNetTotal,
+      branchId,
+      paidCash: raw.paidCash != null && raw.paidCash !== '' ? Number(raw.paidCash) : null,
+      paidCashAccountId: raw.paidCashAccountId ?? null,
+      networkPaid: raw.networkPaid != null && raw.networkPaid !== '' ? Number(raw.networkPaid) : null,
+      networkPaidAccountId: raw.networkPaidAccountId ?? null,
+      purchaseDetails: details.map((detail) => ({
+        productCartId: detail.productCartId,
+        warehouseId: Number(detail.warehouseId),
+        quantity: Number(detail.quantity),
+        purchasesPrice: Number(detail.purchasesPrice),
+        total: Number(detail.quantity) * Number(detail.purchasesPrice),
+        vat: Number(detail.vat),
+        disCountPercentage: Number(detail.disCountPercentage),
+        discountAmount: Number(detail.discountAmount),
+        vatDiscount: Number(detail.vatDiscount ?? 0),
+        totalDiscount: Number(detail.totalDiscount ?? detail.discountAmount ?? 0),
+        net: Number(detail.net),
+      })),
+    };
+  }
+
+  ngOnDestroy(): void {
+    this._sharedStateService.clearSelectedId();
   }
   // !!!!!!!!!! Supplier
   commercialRegister = [
@@ -972,8 +1270,8 @@ calculateInvoiceTotals() {
     this.showSearchBox = false;
   }
 
-  onEnterSupplier(event: any) {
-    if (this.searchControl.invalid) {
+  onEnterSupplier(event: Event) {
+    if (this.supplierSearchControl.invalid) {
       this._messageService.add({
         severity: 'error',
         summary: 'خطأ',
@@ -1052,7 +1350,7 @@ calculateInvoiceTotals() {
               break;
           }
         }
-        this.searchControl.reset();
+        this.supplierSearchControl.reset();
         this.items = [];
       });
   }

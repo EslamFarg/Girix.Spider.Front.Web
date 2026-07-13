@@ -1,7 +1,8 @@
 <label for="attch">{{label()}}</label>
 <div>
     <div class="relative">
-        <input type="text" [placeholder]="this.fileName ? this.fileName : 'اختر الملف'" readOnly>
+        <input type="text"   #fileInput
+ [placeholder]="this.fileName ? this.fileName : 'اختر الملف'" readOnly>
         <!-- <div > -->
             
             
@@ -31,6 +32,6 @@
             </button>
         <!-- </div> -->
     </div>
-    <input type="file" [id]="id" hidden (change)="onFileChange($event)">
+    <input type="file" [id]="id" hidden (change)="onFileChange($event)" accept="{{accept}}">
 
 </div>

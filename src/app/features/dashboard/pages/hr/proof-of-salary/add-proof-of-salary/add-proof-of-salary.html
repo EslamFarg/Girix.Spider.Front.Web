@@ -1,0 +1,288 @@
+<div class="flex justify-between items-center">
+  <app-page-header-search [titleHeading]="'إثبات رواتب '" [showIconSearch]="false"></app-page-header-search>
+  <button class="btn btn-primary px-2" type="button" (click)="explorerProofOfSalary()">مستكشف اثبات الرواتب</button>
+</div>
+<form [formGroup]="searchForm" (ngSubmit)="search()">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div>
+      <label>القسم</label>
+      <ng-select
+        [items]="departmentsList"
+        [bindLabel]="'name'"
+        [bindValue]="'id'"
+        [placeholder]="'القسم'"
+        formControlName="departmentId"
+      ></ng-select>
+      <app-form-error [control]="searchForm.controls['departmentId']" [errorKey]="'required'" [message]="'القسم  مطلوب'"></app-form-error>
+    </div>
+    <div>
+      <label>الشهر</label>
+      <ng-select
+        [items]="monthsList"
+        [bindLabel]="'name'"
+        [bindValue]="'id'"
+        [placeholder]="'الشهر'"
+        formControlName="month"
+      ></ng-select>
+      <app-form-error [control]="searchForm.controls['month']" [errorKey]="'required'" [message]="'الشهر  مطلوب'"></app-form-error>
+    </div>
+    <div>
+      <label>السنة</label>
+      <ng-select
+        [items]="yearsList"
+        [bindLabel]="'name'"
+        [bindValue]="'id'"
+        [placeholder]="'السنة'"
+        formControlName="year"
+      ></ng-select>
+      <app-form-error [control]="searchForm.controls['year']" [errorKey]="'required'" [message]="'السنة  مطلوب'"></app-form-error>
+    </div>
+  </div>
+  <div class="flex justify-end mt-4">
+    <button class="btn btn-primary" type="submit">بحث</button>
+  </div>
+</form>
+
+<form [formGroup]="payrollForm">
+  <div class="table-responsive table_explorer">
+    <table class="w-full">
+      <thead class="bg-gray-100">
+        <tr class="sticky top-0">
+          <th class="p-2 text-center">م</th>
+          <th class="p-2 text-center">الرقم الوظيفي</th>
+          <th class="p-2 text-center">اسم الموظف</th>
+          <th class="p-2 text-center">الراتب الاساسي</th>
+          <th class="p-2 text-center">البدلات</th>
+          <th class="p-2 text-center">راتب البدلات</th>
+          <th class="p-2 text-center">قيمة التاخيرات</th>
+          <th class="p-2 text-center">قيمة الغياب</th>
+          <th class="p-2 text-center">قيمة الوقت الاضافي</th>
+          <th class="p-2 text-center">قيمة الاجازات</th>
+          <th class="p-2 text-center">قيمة المكافاءات</th>
+          <th class="p-2 text-center">قيمة الجزاءات</th>
+          <th class="p-2 text-center">قيمة السلفيات</th>
+          <th class="p-2 text-center">الصافي الراتب</th>
+          <th class="p-2 text-center">الادوات</th>
+        </tr>
+      </thead>
+      <tbody formArrayName="items">
+        @for (group of pagedItems; track group.get('employeeId')?.value; let i = $index) {
+          <tr [formGroupName]="first + i">
+            <td class="p-2 text-center">{{ first + i + 1 }}</td>
+            <td class="p-2 text-center">{{ group.get('employeeNumber')?.value }}</td>
+            <td class="p-2 text-center">{{ group.get('employeeName')?.value }}</td>
+
+            <td class="p-2 text-center">
+              <input
+                type="number"
+                min="0"
+                [max]="maxMoneyValue"
+                class="w-full text-center"
+                formControlName="basicSalary"
+                [class.border-red-500]="isFieldInvalid(group, 'basicSalary')"
+                (input)="onMoneyFieldChange(group)"
+                (blur)="normalizeMoneyField(group, 'basicSalary')"
+              />
+              <app-form-error [control]="group.get('basicSalary')" [errorKey]="'required'" [message]="'مطلوب'"></app-form-error>
+              <app-form-error [control]="group.get('basicSalary')" [errorKey]="'min'" [message]="'لا يمكن أن يكون أقل من صفر'"></app-form-error>
+              <app-form-error [control]="group.get('basicSalary')" [errorKey]="'max'" [message]="'الحد الأقصى 1,000,000'"></app-form-error>
+            </td>
+
+            <td class="p-2 text-center">
+              <input
+                type="number"
+                min="0"
+                [max]="maxCountValue"
+                class="w-full text-center"
+                formControlName="allowancesCount"
+                [class.border-red-500]="isFieldInvalid(group, 'allowancesCount')"
+                (blur)="normalizeCountField(group, 'allowancesCount')"
+              />
+              <app-form-error [control]="group.get('allowancesCount')" [errorKey]="'required'" [message]="'مطلوب'"></app-form-error>
+              <app-form-error [control]="group.get('allowancesCount')" [errorKey]="'min'" [message]="'لا يمكن أن يكون أقل من صفر'"></app-form-error>
+              <app-form-error [control]="group.get('allowancesCount')" [errorKey]="'max'" [message]="'الحد الأقصى 999'"></app-form-error>
+            </td>
+
+            <td class="p-2 text-center">
+              <input
+                type="number"
+                min="0"
+                [max]="maxMoneyValue"
+                class="w-full text-center"
+                formControlName="allowancesAmount"
+                [class.border-red-500]="isFieldInvalid(group, 'allowancesAmount')"
+                (input)="onMoneyFieldChange(group)"
+                (blur)="normalizeMoneyField(group, 'allowancesAmount')"
+              />
+              <app-form-error [control]="group.get('allowancesAmount')" [errorKey]="'required'" [message]="'مطلوب'"></app-form-error>
+              <app-form-error [control]="group.get('allowancesAmount')" [errorKey]="'min'" [message]="'لا يمكن أن يكون أقل من صفر'"></app-form-error>
+              <app-form-error [control]="group.get('allowancesAmount')" [errorKey]="'max'" [message]="'الحد الأقصى 1,000,000'"></app-form-error>
+            </td>
+
+            <td class="p-2 text-center">
+              <input
+                type="number"
+                min="0"
+                [max]="maxMoneyValue"
+                class="w-full text-center"
+                formControlName="delayAmount"
+                [class.border-red-500]="isFieldInvalid(group, 'delayAmount')"
+                (input)="onMoneyFieldChange(group)"
+                (blur)="normalizeMoneyField(group, 'delayAmount')"
+              />
+              <app-form-error [control]="group.get('delayAmount')" [errorKey]="'required'" [message]="'مطلوب'"></app-form-error>
+              <app-form-error [control]="group.get('delayAmount')" [errorKey]="'min'" [message]="'لا يمكن أن يكون أقل من صفر'"></app-form-error>
+              <app-form-error [control]="group.get('delayAmount')" [errorKey]="'max'" [message]="'الحد الأقصى 1,000,000'"></app-form-error>
+            </td>
+
+            <td class="p-2 text-center">
+              <input
+                type="number"
+                min="0"
+                [max]="maxMoneyValue"
+                class="w-full text-center"
+                formControlName="absenceAmount"
+                [class.border-red-500]="isFieldInvalid(group, 'absenceAmount')"
+                (input)="onMoneyFieldChange(group)"
+                (blur)="normalizeMoneyField(group, 'absenceAmount')"
+              />
+              <app-form-error [control]="group.get('absenceAmount')" [errorKey]="'required'" [message]="'مطلوب'"></app-form-error>
+              <app-form-error [control]="group.get('absenceAmount')" [errorKey]="'min'" [message]="'لا يمكن أن يكون أقل من صفر'"></app-form-error>
+              <app-form-error [control]="group.get('absenceAmount')" [errorKey]="'max'" [message]="'الحد الأقصى 1,000,000'"></app-form-error>
+            </td>
+
+            <td class="p-2 text-center">
+              <input
+                type="number"
+                min="0"
+                [max]="maxMoneyValue"
+                class="w-full text-center"
+                formControlName="overtimeAmount"
+                [class.border-red-500]="isFieldInvalid(group, 'overtimeAmount')"
+                (input)="onMoneyFieldChange(group)"
+                (blur)="normalizeMoneyField(group, 'overtimeAmount')"
+              />
+              <app-form-error [control]="group.get('overtimeAmount')" [errorKey]="'required'" [message]="'مطلوب'"></app-form-error>
+              <app-form-error [control]="group.get('overtimeAmount')" [errorKey]="'min'" [message]="'لا يمكن أن يكون أقل من صفر'"></app-form-error>
+              <app-form-error [control]="group.get('overtimeAmount')" [errorKey]="'max'" [message]="'الحد الأقصى 1,000,000'"></app-form-error>
+            </td>
+
+            <td class="p-2 text-center">
+              <input
+                type="number"
+                min="0"
+                [max]="maxMoneyValue"
+                class="w-full text-center"
+                formControlName="vacationAmount"
+                [class.border-red-500]="isFieldInvalid(group, 'vacationAmount')"
+                (input)="onMoneyFieldChange(group)"
+                (blur)="normalizeMoneyField(group, 'vacationAmount')"
+              />
+              <app-form-error [control]="group.get('vacationAmount')" [errorKey]="'required'" [message]="'مطلوب'"></app-form-error>
+              <app-form-error [control]="group.get('vacationAmount')" [errorKey]="'min'" [message]="'لا يمكن أن يكون أقل من صفر'"></app-form-error>
+              <app-form-error [control]="group.get('vacationAmount')" [errorKey]="'max'" [message]="'الحد الأقصى 1,000,000'"></app-form-error>
+            </td>
+
+            <td class="p-2 text-center">
+              <input
+                type="number"
+                min="0"
+                [max]="maxMoneyValue"
+                class="w-full text-center"
+                formControlName="bonusAmount"
+                [class.border-red-500]="isFieldInvalid(group, 'bonusAmount')"
+                (input)="onMoneyFieldChange(group)"
+                (blur)="normalizeMoneyField(group, 'bonusAmount')"
+              />
+              <app-form-error [control]="group.get('bonusAmount')" [errorKey]="'required'" [message]="'مطلوب'"></app-form-error>
+              <app-form-error [control]="group.get('bonusAmount')" [errorKey]="'min'" [message]="'لا يمكن أن يكون أقل من صفر'"></app-form-error>
+              <app-form-error [control]="group.get('bonusAmount')" [errorKey]="'max'" [message]="'الحد الأقصى 1,000,000'"></app-form-error>
+            </td>
+
+            <td class="p-2 text-center">
+              <input
+                type="number"
+                min="0"
+                [max]="maxMoneyValue"
+                class="w-full text-center"
+                formControlName="penaltyAmount"
+                [class.border-red-500]="isFieldInvalid(group, 'penaltyAmount')"
+                (input)="onMoneyFieldChange(group)"
+                (blur)="normalizeMoneyField(group, 'penaltyAmount')"
+              />
+              <app-form-error [control]="group.get('penaltyAmount')" [errorKey]="'required'" [message]="'مطلوب'"></app-form-error>
+              <app-form-error [control]="group.get('penaltyAmount')" [errorKey]="'min'" [message]="'لا يمكن أن يكون أقل من صفر'"></app-form-error>
+              <app-form-error [control]="group.get('penaltyAmount')" [errorKey]="'max'" [message]="'الحد الأقصى 1,000,000'"></app-form-error>
+            </td>
+
+            <td class="p-2 text-center">
+              <input
+                type="number"
+                min="0"
+                [max]="maxMoneyValue"
+                class="w-full text-center"
+                formControlName="advanceAmount"
+                [class.border-red-500]="isFieldInvalid(group, 'advanceAmount')"
+                (input)="onMoneyFieldChange(group)"
+                (blur)="normalizeMoneyField(group, 'advanceAmount')"
+              />
+              <app-form-error [control]="group.get('advanceAmount')" [errorKey]="'required'" [message]="'مطلوب'"></app-form-error>
+              <app-form-error [control]="group.get('advanceAmount')" [errorKey]="'min'" [message]="'لا يمكن أن يكون أقل من صفر'"></app-form-error>
+              <app-form-error [control]="group.get('advanceAmount')" [errorKey]="'max'" [message]="'الحد الأقصى 1,000,000'"></app-form-error>
+            </td>
+
+            <td class="p-2 text-center">{{ group.get('netSalary')?.value }}</td>
+
+            <td class="p-2 w-full flex items-center justify-center gap-2">
+              <button type="button" class="delete" (click)="deleteEmployee(group.get('employeeId')?.value)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr class="h-[420px]">
+            <td colspan="15">
+              <div class="flex flex-col items-center justify-center py-12 text-center">
+                <div class="mb-4 opacity-70">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 7h18M5 7v13h14V7M9 3h6v4H9V3z" stroke="#9CA3AF" stroke-width="1.5"/>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-700 mb-2">لا توجد بيانات</h3>
+                <p class="text-sm text-gray-500 mb-4">
+                  لم يتم العثور على أي نتائج، يمكنك إضافة بيانات جديدة أو تعديل الفلاتر
+                </p>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</form>
+
+@if (hasSearchResults) {
+  <div class="flex justify-end mt-4">
+    <button
+      type="button"
+      class="btn"
+      [ngClass]="{ 'btn-warning': isEditMode, 'btn-primary': !isEditMode }"
+      (click)="saveProof()"
+    >
+      {{ saveButtonLabel }}
+    </button>
+  </div>
+}
+
+@if(totalRecords > 0) {
+  <div class="card flex justify-center mt-4">
+    <p-paginator
+      (onPageChange)="onPageChange($event)"
+      [showFirstLastIcon]="false"
+      [first]="first"
+      [rows]="rows"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 25, 50, 100, 250]"
+    />
+  </div>
+}

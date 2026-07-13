@@ -10,10 +10,10 @@ export const AdditionRoute:Routes=[
                 path:'add',
                 loadComponent:()=>import('./add-addition/add-addition').then(m=>m.AddAddition)
             },
-              {
-                path:'explorer',
-                loadComponent:()=>import('./explorer-addition/explorer-addition').then(m=>m.ExplorerAddition)
-            }
+            //   {
+            //     path:'explorer',
+            //     loadComponent:()=>import('./explorer-addition/explorer-addition').then(m=>m.ExplorerAddition)
+            // }
         ]
     }
 ]

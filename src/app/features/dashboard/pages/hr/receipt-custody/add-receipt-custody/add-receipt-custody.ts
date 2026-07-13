@@ -1,130 +1,363 @@
-import { Component } from '@angular/core';
-import { DatePicker } from "primeng/datepicker";
-import { NgSelectComponent } from "@ng-select/ng-select";
-import { PageHeader } from "../../../../../../shared/ui/page-header/page-header";
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgSelectComponent } from '@ng-select/ng-select';
+import { MessageService } from 'primeng/api';
+import { DatePicker } from 'primeng/datepicker';
+import { Observable } from 'rxjs';
+import { FormComponentBase } from '../../../../../../shared/base/form-component-base';
+import { onlyNumberDirective } from '../../../../../../shared/directives/only-number';
+import { EmployeeByIdResponse, EmployeeModel } from '../../employees/model/employee';
+import { EmployeeService } from '../../employees/services/employee-service';
+import { CustodyDropdownItem } from '../../custody/models/custody';
+import { CustodyService } from '../../custody/services/custody-service';
+import {
+  CustodyReceiptCreateModel,
+  CustodyReceiptDetailModel,
+  CustodyReceiptUpdateModel,
+} from '../models/custody-receipt';
+import { CustodyReceiptService } from '../services/custody-receipt-service';
+import { PageHeader } from '../../../../../../shared/ui/page-header/page-header';
+import { FormError } from '../../../../../../shared/ui/form-error/form-error';
+import { SharedConfirmDialog } from '../../../../../../shared/ui/shared-confirm-dialog/shared-confirm-dialog';
+import { PageHeaderSearch } from "../../../../../../shared/ui/page-header-search/page-header-search";
 
 @Component({
   selector: 'app-add-receipt-custody',
-  imports: [DatePicker, NgSelectComponent, PageHeader],
+  imports: [
+    DatePicker,
+    NgSelectComponent,
+    PageHeader,
+    ReactiveFormsModule,
+    FormError,
+    SharedConfirmDialog,
+    onlyNumberDirective,
+    PageHeaderSearch
+],
   templateUrl: './add-receipt-custody.html',
   styleUrl: './add-receipt-custody.scss',
 })
-export class AddReceiptCustody {
-     // !!!!!!!!!!!!!!!!! Services
+export class AddReceiptCustody extends FormComponentBase implements OnInit {
+  private readonly _fb = inject(FormBuilder);
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _custodyReceiptService = inject(CustodyReceiptService);
+  private readonly _custodyService = inject(CustodyService);
+  private readonly _employeeService = inject(EmployeeService);
+  private readonly _messageService = inject(MessageService);
 
-  // !!!!!!!!!!!!!!!!!!! Properties
-  date2: Date | undefined;
- actions = [
-  { label: 'حفظ', type: 'primary', action: 'save' },
-  { label: 'جديد', action: 'reset' },
-  { label: 'حذف', action: 'delete' },
-  { label: 'طباعه', action: 'print' }
-];
+  explorerBtn = {
+    label: 'مستكشف  استلام عهدة  ',
+    link: '/hr/receipt-custody/explorer',
+  };
 
-explorerBtn={
-  label:'مستكشف  استلام عهدة  ',
-  link:'/hr/receipt-custody/explorer'
-}
+  custodyItems: CustodyDropdownItem[] = [];
+  selectedEmployeeId: number | null = null;
+  showDeleteDialog = false;
+  visible = false;
 
+  employeeDisplay = {
+    employeeId: '',
+    employeeName: '',
+    departmentName: '',
+    phoneNumber: '',
+    nationalIdOrIqamaNumber: '',
+    gender: '',
+    nationality: '',
+    baseSalary: '',
+  };
 
-items=[
-  {name:'sherif yehia',id:1},
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-  {name:'sherif yehia',id:2
-  },
-]
+  receiptForm = this._fb.group({
+    employeeSearch: [''],
+    custodyId: [null as number | null, [Validators.required]],
+    amount: ['', [Validators.required]],
+    date: [new Date(), [Validators.required]],
+  });
 
+  ngOnInit(): void {
+    this.loadCustodyItems();
+    this.refreshActions();
 
-   visible: boolean = false;
+    const selectedId = this._sharedStateService.selectedId$();
+    if (selectedId) {
+      this.loadReceiptById(selectedId);
+    }
+  }
 
-    showDialog() {
-        this.visible = true;
+  ngOnDestroy(): void {
+    this._sharedStateService.clearSelectedId();
+  }
+
+  loadCustodyItems(): void {
+    this._custodyService
+      .getAllCustodyOptions()
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.custodyItems = (res.data?.rows ?? []).map((item) => ({
+            id: item.id,
+            name: item.name ?? item.custodyName ?? item.custodyTypeName ?? '',
+          }));
+        },
+      });
+  }
+
+  loadReceiptById(id: number): void {
+    this._custodyReceiptService
+      .getCustodyReceiptById(id)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res) => {
+          const data = res.data;
+          if (!data) {
+            return;
+          }
+
+          this.changeButtonState(data.id, true);
+          this.receiptForm.patchValue({
+            custodyId: data.custodyId ?? null,
+            amount: data.amount != null ? String(data.amount) : '',
+            date: data.receiptDate
+              ? new Date(data.receiptDate)
+              : data.date
+                ? new Date(data.date)
+                : new Date(),
+          });
+
+          if (data.employeeId) {
+            this.loadEmployeeById(data.employeeId);
+          }
+        },
+      });
+  }
+
+  searchEmployee(): void {
+    const query = this.receiptForm.get('employeeSearch')?.value?.trim();
+    if (!query) {
+      return;
     }
 
-// itemsTable:any=[
-  
-//   { id: 1, name: 'قلم', unit: 'قطعة', quantity: 50 },
-//   { id: 2, name: 'دفتر', unit: 'قطعة', quantity: 30 },
-//   { id: 3, name: 'مسطرة', unit: 'قطعة', quantity: 20 },
-//   { id: 4, name: 'ممحاة', unit: 'قطعة', quantity: 40 },
-//   { id: 5, name: 'كشكول', unit: 'قطعة', quantity: 25 },
-//   { id: 6, name: 'آلة حاسبة', unit: 'قطعة', quantity: 10 },
-//   { id: 7, name: 'ملف', unit: 'قطعة', quantity: 15 },
-//   { id: 8, name: 'دباسة', unit: 'قطعة', quantity: 8 },
-//   { id: 9, name: 'ورق A4', unit: 'علبة', quantity: 12 },
-//   { id: 10, name: 'قلم رصاص', unit: 'قطعة', quantity: 60 }
+    const employeeId = Number(query);
+    if (Number.isNaN(employeeId)) {
+      return;
+    }
 
-// ]
-
-tableData = [
-  {id:1, code:'ITM-001', name:'لاب توب Dell', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:5, price:15000, discountRate:5, discount:3750, tax:750, total:72000},
-  {id:2, code:'ITM-002', name:'ماوس Logitech', warehouse:'مخزن فرعي', unit:'قطعة', qty:20, price:200, discountRate:0, discount:0, tax:40, total:4040},
-  {id:3, code:'ITM-003', name:'كيبورد HP', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:15, price:300, discountRate:3, discount:135, tax:67.5, total:4432.5},
-  {id:4, code:'ITM-004', name:'شاشة Samsung', warehouse:'مخزن 1', unit:'قطعة', qty:10, price:2500, discountRate:2, discount:500, tax:125, total:24625},
-  {id:5, code:'ITM-005', name:'طابعة Canon', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:3, price:4000, discountRate:0, discount:0, tax:200, total:12200},
-
-  {id:6, code:'ITM-006', name:'هارد SSD', warehouse:'مخزن 2', unit:'قطعة', qty:12, price:1200, discountRate:4, discount:576, tax:72, total:14016},
-  {id:7, code:'ITM-007', name:'فلاش USB', warehouse:'مخزن فرعي', unit:'قطعة', qty:50, price:100, discountRate:5, discount:250, tax:25, total:4775},
-  {id:8, code:'ITM-008', name:'راوتر TP-Link', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:8, price:900, discountRate:0, discount:0, tax:45, total:7245},
-  {id:9, code:'ITM-009', name:'سماعات Sony', warehouse:'مخزن 1', unit:'قطعة', qty:6, price:700, discountRate:2, discount:84, tax:35, total:4131},
-  {id:10, code:'ITM-010', name:'كاميرا مراقبة', warehouse:'مخزن 2', unit:'قطعة', qty:4, price:1800, discountRate:3, discount:216, tax:90, total:6990},
-
-  {id:11, code:'ITM-011', name:'كرسي مكتب', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:10, price:1200, discountRate:5, discount:600, tax:60, total:11460},
-  {id:12, code:'ITM-012', name:'مكتب خشب', warehouse:'مخزن 1', unit:'قطعة', qty:2, price:5000, discountRate:0, discount:0, tax:250, total:10250},
-  {id:13, code:'ITM-013', name:'ورق A4', warehouse:'مخزن فرعي', unit:'كرتونة', qty:30, price:150, discountRate:2, discount:90, tax:7.5, total:4417.5},
-  {id:14, code:'ITM-014', name:'أقلام حبر', warehouse:'المخزن الرئيسي', unit:'علبة', qty:40, price:50, discountRate:0, discount:0, tax:2.5, total:2025},
-  {id:15, code:'ITM-015', name:'دفاتر', warehouse:'مخزن 2', unit:'قطعة', qty:60, price:20, discountRate:1, discount:12, tax:1, total:1189},
-
-  {id:16, code:'ITM-016', name:'مكيف هواء', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:2, price:8000, discountRate:5, discount:800, tax:400, total:15600},
-  {id:17, code:'ITM-017', name:'ثلاجة', warehouse:'مخزن 1', unit:'قطعة', qty:1, price:10000, discountRate:0, discount:0, tax:500, total:10500},
-  {id:18, code:'ITM-018', name:'غسالة', warehouse:'مخزن 2', unit:'قطعة', qty:1, price:7000, discountRate:3, discount:210, tax:350, total:7140},
-  {id:19, code:'ITM-019', name:'ميكروويف', warehouse:'مخزن فرعي', unit:'قطعة', qty:3, price:2500, discountRate:2, discount:150, tax:125, total:7475},
-  {id:20, code:'ITM-020', name:'مروحة', warehouse:'المخزن الرئيسي', unit:'قطعة', qty:10, price:300, discountRate:0, discount:0, tax:15, total:3015}
-];
-
-// !!!!!!!!!!!!!!! Methods
-handleAction(action: string) {
-  switch (action) {
-    case 'save':
-      this.save();
-      break;
-    case 'reset':
-      this.reset();
-      break;
-    case 'delete':
-      this.delete();
-      break;
-    case 'print':
-      this.print();
-      break;
+    this.loadEmployeeById(employeeId);
   }
-}
 
+  navigateEmployee(direction: 'prev' | 'next'): void {
+    const currentValue = this.receiptForm.get('employeeSearch')?.value?.trim();
+    const currentId = Number(currentValue);
 
+    if (!currentValue || Number.isNaN(currentId)) {
+      return;
+    }
 
-save(){
-  console.log('Save action triggered');
-}
+    const nextId =
+      direction === 'prev' ? Math.max(1, currentId - 1) : currentId + 1;
 
-reset(){
-  console.log('Reset action triggered');
-}
+    this.loadEmployeeById(nextId);
+  }
 
+  loadEmployeeById(id: number): void {
+    this.receiptForm.patchValue({ employeeSearch: String(id) });
 
-delete(){
-  console.log('Delete action triggered');
-}
+    (
+      this._employeeService.getById(id) as unknown as Observable<EmployeeByIdResponse>
+    )
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res) => {
+          if (!res.data) {
+            this._messageService.add({
+              severity: 'error',
+              summary: 'خطأ',
+              detail: 'لم يتم العثور على الموظف',
+            });
+            this.clearEmployeeDisplay();
+            return;
+          }
 
-print(){
-  console.log('Print action triggered');
-}
+          this.selectEmployee(res.data);
+        },
+      });
+  }
+
+  selectEmployee(employee: EmployeeModel): void {
+    this.selectedEmployeeId = employee.id;
+    this.fillEmployeeDisplay(employee);
+    this.receiptForm.patchValue({
+      employeeSearch: String(employee.id),
+    });
+  }
+
+  clearEmployeeDisplay(): void {
+    this.selectedEmployeeId = null;
+    this.employeeDisplay = {
+      employeeId: '',
+      employeeName: '',
+      departmentName: '',
+      phoneNumber: '',
+      nationalIdOrIqamaNumber: '',
+      gender: '',
+      nationality: '',
+      baseSalary: '',
+    };
+  }
+
+  fillEmployeeDisplay(data: EmployeeModel | CustodyReceiptDetailModel): void {
+    if (this.isEmployeeModel(data)) {
+      this.employeeDisplay = {
+        employeeId: String(data.id),
+        employeeName: data.name ?? '',
+        departmentName: data.departmentName ?? '',
+        phoneNumber: data.phoneNember ?? '',
+        nationalIdOrIqamaNumber: data.nationalIdOrIqamaNumber ?? '',
+        gender: '',
+        nationality: data.nationality ?? '',
+        baseSalary: String(data.salary ?? ''),
+      };
+      return;
+    }
+
+    this.employeeDisplay = {
+      employeeId: String(data.employeeId),
+      employeeName: data.employeeName ?? data.name ?? '',
+      departmentName: data.departmentName ?? '',
+      phoneNumber: data.phoneNumber ?? '',
+      nationalIdOrIqamaNumber: data.nationalIdOrIqamaNumber ?? '',
+      gender: data.gender ?? '',
+      nationality: data.nationality ?? '',
+      baseSalary: String(data.baseSalary ?? data.salary ?? ''),
+    };
+  }
+
+  private isEmployeeModel(
+    data: EmployeeModel | CustodyReceiptDetailModel
+  ): data is EmployeeModel {
+    return 'phoneNember' in data || 'nameAr' in data;
+  }
+
+  save(): void {
+    if (this.receiptForm.invalid || this.selectedEmployeeId == null) {
+      this.receiptForm.markAllAsTouched();
+      if (this.selectedEmployeeId == null) {
+        this._messageService.add({
+          severity: 'error',
+          summary: 'خطأ',
+          detail: 'الرجاء اختيار موظف',
+        });
+      }
+      return;
+    }
+
+    const formValue = this.receiptForm.getRawValue();
+    const payload: CustodyReceiptCreateModel = {
+      employeeId: this.selectedEmployeeId,
+      custodyId: formValue.custodyId as number,
+      amount: Number(formValue.amount),
+      receiptDate: (formValue.date as Date).toISOString(),
+    };
+
+    if (!this.isEditMode) {
+      this._custodyReceiptService
+        .createCustodyReceipt(payload)
+        .pipe(takeUntilDestroyed(this._destroyRef))
+        .subscribe({
+          next: (res) => {
+            this._messageService.add({
+              severity: 'success',
+              summary: 'نجاح',
+              detail: 'تم الاضافة بنجاح',
+            });
+            this.changeButtonState(res.data, true);
+          },
+        });
+      return;
+    }
+
+    const updatePayload: CustodyReceiptUpdateModel = {
+      id: this.idUpdate,
+      ...payload,
+    };
+
+    this._custodyReceiptService
+      .updateCustodyReceipt(updatePayload)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'نجاح',
+            detail: 'تم التعديل بنجاح',
+          });
+        },
+      });
+  }
+
+  reset(): void {
+    this.isEditMode = false;
+    this.idUpdate = 0;
+    this.selectedEmployeeId = null;
+    this.receiptForm.reset({
+      employeeSearch: '',
+      custodyId: null,
+      amount: '',
+      date: new Date(),
+    });
+    this.clearEmployeeDisplay();
+    this._sharedStateService.clearSelectedId();
+    this.refreshActions();
+  }
+
+  delete(): void {
+    if (!this.idUpdate) {
+      return;
+    }
+    this.showDeleteDialog = true;
+  }
+
+  confirmDelete(): void {
+    this._custodyReceiptService
+      .deleteCustodyReceipt(this.idUpdate)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'نجاح',
+            detail: 'تم الحذف بنجاح',
+          });
+          this.showDeleteDialog = false;
+          this.reset();
+        },
+      });
+  }
+
+  print(): void {
+    window.print();
+  }
+
+  showDialog(): void {
+    this.visible = true;
+  }
+
+  assignCustodyToEmployee(employeeId: number): void {
+    if (!this.idUpdate) {
+      return;
+    }
+
+    this._custodyService
+      .assignCustodyToEmployee({ id: this.idUpdate, employeeId })
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'نجاح',
+            detail: 'تم تسليم العهدة للموظف بنجاح',
+          });
+          this.visible = false;
+        },
+      });
+  }
 }
