@@ -297,7 +297,8 @@
             "name": "userId",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -594,6 +595,177 @@
             "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/BarcodeSearchRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Branch/Create": {
+      "post": {
+        "tags": [
+          "Branch"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBranchDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBranchDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBranchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Branch/Update": {
+      "put": {
+        "tags": [
+          "Branch"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBranchDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBranchDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBranchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Branch/Delete/{Id}": {
+      "delete": {
+        "tags": [
+          "Branch"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Branch/GetById/{Id}": {
+      "get": {
+        "tags": [
+          "Branch"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Branch/GetAll": {
+      "get": {
+        "tags": [
+          "Branch"
+        ],
+        "parameters": [
+          {
+            "name": "PageIndex",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Branch/Search": {
+      "post": {
+        "tags": [
+          "Branch"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PagedSearchRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PagedSearchRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PagedSearchRequest"
               }
             }
           }
@@ -1531,6 +1703,27 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ChartOfAccounts/account-Code": {
+      "get": {
+        "tags": [
+          "ChartOfAccounts"
+        ],
+        "parameters": [
+          {
+            "name": "Method",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SelectedAccountMethod"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -4181,6 +4374,245 @@
         }
       }
     },
+    "/api/FinancialYears/Create": {
+      "post": {
+        "tags": [
+          "FinancialYears"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFinancialYearDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFinancialYearDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFinancialYearDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FinancialYears/Update": {
+      "put": {
+        "tags": [
+          "FinancialYears"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFinancialYearDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFinancialYearDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFinancialYearDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FinancialYears/Delete/{Id}": {
+      "delete": {
+        "tags": [
+          "FinancialYears"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FinancialYears/GetById/{Id}": {
+      "get": {
+        "tags": [
+          "FinancialYears"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FinancialYears/GetAll": {
+      "get": {
+        "tags": [
+          "FinancialYears"
+        ],
+        "parameters": [
+          {
+            "name": "PageIndex",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FinancialYears/Search": {
+      "post": {
+        "tags": [
+          "FinancialYears"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PagedSearchRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PagedSearchRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PagedSearchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FixedAccount": {
+      "put": {
+        "tags": [
+          "FixedAccount"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UpdateFixedAccountItem"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UpdateFixedAccountItem"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UpdateFixedAccountItem"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "FixedAccount"
+        ],
+        "parameters": [
+          {
+            "name": "PageIndex",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/GroupPermission/GetGroupPermissionById": {
       "get": {
         "tags": [
@@ -4245,7 +4677,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           },
           {
@@ -7803,6 +8236,28 @@
         }
       }
     },
+    "/api/ProductGroup/GetByIdWithProductAndUnits": {
+      "get": {
+        "tags": [
+          "ProductGroup"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/ProductGroup/GetAll": {
       "get": {
         "tags": [
@@ -9793,6 +10248,177 @@
         }
       }
     },
+    "/api/SalaryPayments/GetSalaryPostingDetailEmployees": {
+      "get": {
+        "tags": [
+          "SalaryPayments"
+        ],
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "employeeIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/SalaryPayments/GetSalaryPostingsByPeriod": {
+      "get": {
+        "tags": [
+          "SalaryPayments"
+        ],
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/SalaryPayments/GetDepartmentSalaryPostingEmployees": {
+      "get": {
+        "tags": [
+          "SalaryPayments"
+        ],
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/SalaryPayments/GetEmployeeSalaryPostingRow": {
+      "get": {
+        "tags": [
+          "SalaryPayments"
+        ],
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "employeeId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/SalaryPayments/GetNextNo": {
       "get": {
         "tags": [
@@ -11750,6 +12376,25 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectTransferRequestCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectTransferRequestCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectTransferRequestCommand"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -11902,6 +12547,105 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TransferRequest/Filter": {
+      "post": {
+        "tags": [
+          "TransferRequest"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetTransferRequestsByViewQuery"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetTransferRequestsByViewQuery"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetTransferRequestsByViewQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TransferRequest/lookup-by-code/{code}": {
+      "get": {
+        "tags": [
+          "TransferRequest"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TransferRequest/search-by-name/{name}": {
+      "get": {
+        "tags": [
+          "TransferRequest"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TransferRequest/lookup-by-id/{productId}": {
+      "get": {
+        "tags": [
+          "TransferRequest"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -12136,19 +12880,137 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/CreateUserDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserDto"
+                "type": "object",
+                "properties": {
+                  "UserName": {
+                    "type": "string"
+                  },
+                  "Email": {
+                    "type": "string"
+                  },
+                  "PhoneNumber": {
+                    "type": "string"
+                  },
+                  "Password": {
+                    "type": "string"
+                  },
+                  "FullName": {
+                    "type": "string"
+                  },
+                  "Role": {
+                    "$ref": "#/components/schemas/EmployeeRole"
+                  },
+                  "Image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "GroupId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "BranchId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "DefaultCashBoxAccountId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "DefaultBankAccountId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "CustomerAccountId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "DefaultPurchaseCashBoxAccountId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "DefaultWarehouseId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "PurchaseWarehouseId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "ReservedWarehouseId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "IsActive": {
+                    "type": "boolean"
+                  },
+                  "SendElectronicInvoice": {
+                    "type": "boolean"
+                  },
+                  "Notes": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "UserName": {
+                  "style": "form"
+                },
+                "Email": {
+                  "style": "form"
+                },
+                "PhoneNumber": {
+                  "style": "form"
+                },
+                "Password": {
+                  "style": "form"
+                },
+                "FullName": {
+                  "style": "form"
+                },
+                "Role": {
+                  "style": "form"
+                },
+                "Image": {
+                  "style": "form"
+                },
+                "GroupId": {
+                  "style": "form"
+                },
+                "BranchId": {
+                  "style": "form"
+                },
+                "DefaultCashBoxAccountId": {
+                  "style": "form"
+                },
+                "DefaultBankAccountId": {
+                  "style": "form"
+                },
+                "CustomerAccountId": {
+                  "style": "form"
+                },
+                "DefaultPurchaseCashBoxAccountId": {
+                  "style": "form"
+                },
+                "DefaultWarehouseId": {
+                  "style": "form"
+                },
+                "PurchaseWarehouseId": {
+                  "style": "form"
+                },
+                "ReservedWarehouseId": {
+                  "style": "form"
+                },
+                "IsActive": {
+                  "style": "form"
+                },
+                "SendElectronicInvoice": {
+                  "style": "form"
+                },
+                "Notes": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -12167,19 +13029,125 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
+                "type": "object",
+                "properties": {
+                  "Id": {
+                    "type": "string"
+                  },
+                  "UserName": {
+                    "type": "string"
+                  },
+                  "Email": {
+                    "type": "string"
+                  },
+                  "PhoneNumber": {
+                    "type": "string"
+                  },
+                  "Image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "GroupId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "BranchId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "DefaultCashBoxAccountId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "DefaultBankAccountId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "CustomerAccountId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "DefaultPurchaseCashBoxAccountId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "DefaultWarehouseId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "PurchaseWarehouseId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "ReservedWarehouseId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "IsActive": {
+                    "type": "boolean"
+                  },
+                  "SendElectronicInvoice": {
+                    "type": "boolean"
+                  },
+                  "Notes": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "Id": {
+                  "style": "form"
+                },
+                "UserName": {
+                  "style": "form"
+                },
+                "Email": {
+                  "style": "form"
+                },
+                "PhoneNumber": {
+                  "style": "form"
+                },
+                "Image": {
+                  "style": "form"
+                },
+                "GroupId": {
+                  "style": "form"
+                },
+                "BranchId": {
+                  "style": "form"
+                },
+                "DefaultCashBoxAccountId": {
+                  "style": "form"
+                },
+                "DefaultBankAccountId": {
+                  "style": "form"
+                },
+                "CustomerAccountId": {
+                  "style": "form"
+                },
+                "DefaultPurchaseCashBoxAccountId": {
+                  "style": "form"
+                },
+                "DefaultWarehouseId": {
+                  "style": "form"
+                },
+                "PurchaseWarehouseId": {
+                  "style": "form"
+                },
+                "ReservedWarehouseId": {
+                  "style": "form"
+                },
+                "IsActive": {
+                  "style": "form"
+                },
+                "SendElectronicInvoice": {
+                  "style": "form"
+                },
+                "Notes": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -12202,7 +13170,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -12223,7 +13192,8 @@
             "name": "id",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -12562,7 +13532,11 @@
         "enum": [
           1,
           2,
-          3
+          3,
+          4,
+          5,
+          6,
+          7
         ],
         "type": "integer",
         "format": "int32"
@@ -12906,6 +13880,32 @@
           "toCashboxId": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateBranchDto": {
+        "type": "object",
+        "properties": {
+          "nameAr": {
+            "type": "string",
+            "nullable": true
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -13312,12 +14312,63 @@
         },
         "additionalProperties": false
       },
+      "CreateFinancialYearDto": {
+        "type": "object",
+        "properties": {
+          "nameAr": {
+            "type": "string",
+            "nullable": true
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FinancialYearStatus"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateGroupDto": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
             "nullable": true
+          },
+          "branchId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "salePriceType": {
+            "$ref": "#/components/schemas/SalePriceType"
+          },
+          "showWholesalePrice": {
+            "type": "boolean"
+          },
+          "showProfitPrice": {
+            "type": "boolean"
+          },
+          "showSuperWholesalePrice": {
+            "type": "boolean"
+          },
+          "showAverageCostPrice": {
+            "type": "boolean"
+          },
+          "showPurchasePrice": {
+            "type": "boolean"
+          },
+          "allowSellingBelowAvailable": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -13582,26 +14633,6 @@
             "type": "number",
             "format": "double"
           },
-          "price": {
-            "type": "number",
-            "format": "double"
-          },
-          "discountPercent": {
-            "type": "number",
-            "format": "double"
-          },
-          "discountAmount": {
-            "type": "number",
-            "format": "double"
-          },
-          "taxAmount": {
-            "type": "number",
-            "format": "double"
-          },
-          "lineTotal": {
-            "type": "number",
-            "format": "double"
-          },
           "notes": {
             "type": "string",
             "nullable": true
@@ -13624,14 +14655,10 @@
             "type": "integer",
             "format": "int32"
           },
-          "customerId": {
+          "accountId": {
             "type": "integer",
             "format": "int32",
             "nullable": true
-          },
-          "paymentMethodId": {
-            "type": "integer",
-            "format": "int32"
           },
           "notes": {
             "type": "string",
@@ -14558,24 +15585,12 @@
             "type": "integer",
             "format": "int32"
           },
-          "bankAccountId": {
-            "type": "integer",
-            "format": "int32"
-          },
           "notes": {
             "type": "string",
             "nullable": true
           },
           "payAllEmployees": {
             "type": "boolean"
-          },
-          "employeeIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "nullable": true
           },
           "details": {
             "type": "array",
@@ -14759,83 +15774,6 @@
           "requestedQuantity": {
             "type": "number",
             "format": "double"
-          }
-        },
-        "additionalProperties": false
-      },
-      "CreateUserDto": {
-        "type": "object",
-        "properties": {
-          "userName": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "phoneNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "password": {
-            "type": "string",
-            "nullable": true
-          },
-          "groupId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "branchId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "defaultCashBoxAccountId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "defaultBankAccountId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "customerAccountId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "defaultPurchaseCashBoxAccountId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "defaultWarehouseId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "purchaseWarehouseId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "reservedWarehouseId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "sendElectronicInvoice": {
-            "type": "boolean"
-          },
-          "notes": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -15061,6 +15999,22 @@
         "type": "integer",
         "format": "int32"
       },
+      "EmployeeRole": {
+        "enum": [
+          1,
+          2
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "FinancialYearStatus": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "GenerateBarcodeDto": {
         "type": "object",
         "properties": {
@@ -15174,6 +16128,22 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTransferRequestsByViewQuery": {
+        "type": "object",
+        "properties": {
+          "viewType": {
+            "$ref": "#/components/schemas/TransferRequestViewType"
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/RequestPaginationInfo"
           }
         },
         "additionalProperties": false
@@ -15514,7 +16484,7 @@
             "format": "int32",
             "nullable": true
           },
-          "customerId": {
+          "accountId": {
             "type": "integer",
             "format": "int32",
             "nullable": true
@@ -16324,6 +17294,20 @@
         },
         "additionalProperties": false
       },
+      "RejectTransferRequestCommand": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rejectionOtherReason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "RemovePeriodDataDto": {
         "type": "object",
         "properties": {
@@ -16740,7 +17724,18 @@
           15,
           16,
           17,
-          18
+          18,
+          19
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "SelectedAccountMethod": {
+        "enum": [
+          1,
+          2,
+          3,
+          4
         ],
         "type": "integer",
         "format": "int32"
@@ -16857,6 +17852,15 @@
         },
         "additionalProperties": false
       },
+      "TransferRequestViewType": {
+        "enum": [
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "UpdateAllowancesDto": {
         "type": "object",
         "properties": {
@@ -16915,6 +17919,36 @@
             "format": "int32"
           },
           "toCashboxId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateBranchDto": {
+        "type": "object",
+        "properties": {
+          "nameAr": {
+            "type": "string",
+            "nullable": true
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
             "type": "integer",
             "format": "int32"
           }
@@ -17285,6 +18319,49 @@
         },
         "additionalProperties": false
       },
+      "UpdateFinancialYearDto": {
+        "type": "object",
+        "properties": {
+          "nameAr": {
+            "type": "string",
+            "nullable": true
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FinancialYearStatus"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateFixedAccountItem": {
+        "type": "object",
+        "properties": {
+          "fixedAccountCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "financialAccountId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateGroupDto": {
         "type": "object",
         "properties": {
@@ -17295,6 +18372,32 @@
           "name": {
             "type": "string",
             "nullable": true
+          },
+          "branchId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "salePriceType": {
+            "$ref": "#/components/schemas/SalePriceType"
+          },
+          "showWholesalePrice": {
+            "type": "boolean"
+          },
+          "showProfitPrice": {
+            "type": "boolean"
+          },
+          "showSuperWholesalePrice": {
+            "type": "boolean"
+          },
+          "showAverageCostPrice": {
+            "type": "boolean"
+          },
+          "showPurchasePrice": {
+            "type": "boolean"
+          },
+          "allowSellingBelowAvailable": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -17590,26 +18693,6 @@
             "type": "number",
             "format": "double"
           },
-          "price": {
-            "type": "number",
-            "format": "double"
-          },
-          "discountPercent": {
-            "type": "number",
-            "format": "double"
-          },
-          "discountAmount": {
-            "type": "number",
-            "format": "double"
-          },
-          "taxAmount": {
-            "type": "number",
-            "format": "double"
-          },
-          "lineTotal": {
-            "type": "number",
-            "format": "double"
-          },
           "notes": {
             "type": "string",
             "nullable": true
@@ -17636,7 +18719,7 @@
             "type": "integer",
             "format": "int32"
           },
-          "customerId": {
+          "accountId": {
             "type": "integer",
             "format": "int32",
             "nullable": true
@@ -18634,24 +19717,12 @@
             "type": "integer",
             "format": "int32"
           },
-          "bankAccountId": {
-            "type": "integer",
-            "format": "int32"
-          },
           "notes": {
             "type": "string",
             "nullable": true
           },
           "payAllEmployees": {
             "type": "boolean"
-          },
-          "employeeIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "nullable": true
           },
           "details": {
             "type": "array",
@@ -18866,83 +19937,6 @@
           "requestedQuantity": {
             "type": "number",
             "format": "double"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UpdateUserDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "nullable": true
-          },
-          "userName": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "phoneNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "groupId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "branchId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "defaultCashBoxAccountId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "defaultBankAccountId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "customerAccountId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "defaultPurchaseCashBoxAccountId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "defaultWarehouseId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "purchaseWarehouseId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "reservedWarehouseId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "sendElectronicInvoice": {
-            "type": "boolean"
-          },
-          "notes": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false

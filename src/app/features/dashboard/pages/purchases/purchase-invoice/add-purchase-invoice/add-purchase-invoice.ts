@@ -47,6 +47,8 @@ import {
   PurchaseResponse,
   UpdatePurchasePayload,
 } from '../models/purchase-invoice';
+import { CalculationService, DiscountSource } from '../../../../../../shared/services/calculation-service';
+import { ApplicationSettingsService } from '../../../../../../shared/services/application-settings-service';
 
 @Component({
   selector: 'app-add-purchase-invoice',
@@ -80,7 +82,11 @@ export class AddPurchaseInvoice extends FormComponentBase implements OnDestroy {
   _productServices = inject(ProductCardService);
   _inventoriesServices = inject(InventoriesServices);
   _purchaseServices = inject(Purchase);
-  
+  _calculationService = inject(CalculationService);
+  _applicationSettingsService = inject(ApplicationSettingsService);
+
+  private currentProductTaxRates = { vatRate: 0, selectiveTaxRate: 0 };
+
   // _supplierServices=inject(Suppliers)
   // !!!!!!!!!!!!!!!!!!! Properties
   @ViewChild('autoComplete') autoComplete!: AutoComplete;
@@ -172,6 +178,7 @@ getDataInventories: { id: number; name: string }[] = [];
   // invoiceTypeEnum: invoiceType = invoiceType;
   // !!!!!!!!!!!!!!! Methods
   ngOnInit() {
+    this.ensureApplicationSettings();
     this._lookup.loadSuppliers();
     this.getAllInventories();
     this.listenSupplierChange();
@@ -182,6 +189,7 @@ getDataInventories: { id: number; name: string }[] = [];
     this.getAllNetAccounts();
     this.listenAddingRowChanges();
     this.loadPurchase();
+    this.getApplicationSettings();
     this.refreshActions();
   }
 
@@ -212,10 +220,26 @@ getDataInventories: { id: number; name: string }[] = [];
       });
   }
 
+  private ensureApplicationSettings(): void {
+    if (!this._applicationSettingsService.settingsSignal()) {
+      this._applicationSettingsService.setSettings();
+    }
+  }
+
   private listenAddingRowChanges(): void {
     this.itemAddingForm.valueChanges
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this.calculateAddingRowTotals());
+  }
+
+
+  // !!!!!!!  Settings
+  getApplicationSettings(): void {
+    // this._applicationSettingsService.getSettings().pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res: any) => {
+    //   this.applicationSettings = res.data;
+    // });
+    const settings = this._applicationSettingsService.settingsSignal() as any;
+    console.log(settings);
   }
 
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 PaymentMethod Invoice!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
@@ -350,16 +374,30 @@ getDataInventories: { id: number; name: string }[] = [];
 
   //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ProductInvoice
   createPurchaseDetail(product?: PurchaseDetailResponse): FormGroup {
-    const vatRate = product?.vat && product?.quantity && product?.purchasesPrice
-      ? (product.vat / (product.quantity * product.purchasesPrice - (product.discountAmount || 0))) * 100
-      : 15;
+    const vatRate = product
+      ? this._calculationService.inferVatRate(
+          product.vat ?? 0,
+          product.quantity ?? 0,
+          product.purchasesPrice ?? 0,
+          product.discountAmount ?? 0,
+        )
+      : 0;
+
+    const selectiveTaxRate = product
+      ? this._calculationService.inferSelectiveTaxRate(
+          product.vatDiscount ?? 0,
+          product.quantity ?? 0,
+          product.purchasesPrice ?? 0,
+          product.discountAmount ?? 0,
+        )
+      : 0;
 
     const row = this._fb.group({
       productCartId: [product?.productCartId ?? null, Validators.required],
       productCode: [product?.productCode || ''],
       productName: [product?.productName || ''],
       unitName: [product?.unitName || ''],
-      warehouseId: [product?.warehouseId ?? this.purchaseForm.get('branchId')?.value ?? null, Validators.required],
+      warehouseId: [product?.warehouseId ?? this.purchaseForm.get('branchId')?.value ?? null, [Validators.required]],
       warehouseName: [product?.warehouseName || ''],
       unitId: [product?.unitId ?? null],
       quantity: [product?.quantity ?? 1, [Validators.required, Validators.min(1)]],
@@ -367,6 +405,8 @@ getDataInventories: { id: number; name: string }[] = [];
       total: [product?.total ?? 0],
       vat: [product?.vat ?? 0],
       vatRate: [vatRate],
+      selectiveTaxRate: [selectiveTaxRate],
+      invoiceDiscountShare: [0],
       disCountPercentage: [product?.disCountPercentage ?? 0, [Validators.min(0), Validators.max(100)]],
       discountAmount: [product?.discountAmount ?? 0, Validators.min(0)],
       vatDiscount: [product?.vatDiscount ?? 0],
@@ -374,7 +414,7 @@ getDataInventories: { id: number; name: string }[] = [];
       net: [product?.net ?? 0],
     });
 
-    this.attachRowCalculations(row, Number(row.get('vatRate')?.value) || 15);
+    this.attachRowCalculations(row);
     return row;
   }
 
@@ -391,10 +431,11 @@ getDataInventories: { id: number; name: string }[] = [];
     unitId: [null, Validators.required], // معتمد على الصنف المختار
     unitName: [''],
     qty: [1, [Validators.required, Validators.min(1)]],
-    price: [0, [Validators.required, Validators.min(0.01)]],
+    price: [0, [Validators.required]],
     discountRate: [0],
     discountAmount: [0],
-    taxRate: [15], // نسبة الضريبة الافتراضية مثلاً 15%
+    taxRate: [0],
+    selectiveTaxRate: [0],
     tax: [0],
     total: [0],
   });
@@ -438,26 +479,41 @@ getDataInventories: { id: number; name: string }[] = [];
       .subscribe((res: ApiResponse<ProductUnitItem[]>) => {
         this.unitData = res.data;
 
-        if (this.unitData.length > 0) {
-          const firstUnit = this.unitData[0];
-
-          this.itemAddingForm.patchValue(
-            {
-              productCartId: firstUnit.id,
-              productCode: firstUnit.productCode || '',
-              productName: typeof event.value === 'object' ? event.value.label : firstUnit.productName || '',
-              unitId: firstUnit.id,
-              unitName: firstUnit.fromUnitName || firstUnit.name || '',
-              price: firstUnit.purchasePrice ?? firstUnit.price ?? 0,
-              qty: 1,
-              discountRate: 0,
-              discountAmount: 0,
-            },
-            { emitEvent: false },
-          );
-
-          this.calculateAddingRowTotals();
+        if (this.unitData.length === 0) {
+          return;
         }
+
+        this._productServices
+          .getById(productId)
+          .pipe(takeUntilDestroyed(this._destroyRef))
+          .subscribe((productRes: any) => {
+            const productTax = productRes?.data;
+            this.currentProductTaxRates = {
+              vatRate: Number(productTax?.vat) || 0,
+              selectiveTaxRate: Number(productTax?.selectiveVat ?? productTax?.selectiveTaxRate) || 0,
+            };
+
+            const firstUnit = this.unitData[0];
+
+            this.itemAddingForm.patchValue(
+              {
+                productCartId: firstUnit.id,
+                productCode: firstUnit.productCode || '',
+                productName: typeof event.value === 'object' ? event.value.label : firstUnit.productName || '',
+                unitId: firstUnit.id,
+                unitName: firstUnit.fromUnitName || firstUnit.name || '',
+                price: firstUnit.purchasePrice ?? firstUnit.price ?? 0,
+                qty: 1,
+                discountRate: 0,
+                discountAmount: 0,
+                taxRate: this.currentProductTaxRates.vatRate,
+                selectiveTaxRate: this.currentProductTaxRates.selectiveTaxRate,
+              },
+              { emitEvent: false },
+            );
+
+            this.calculateAddingRowTotals();
+          });
       });
   }
 
@@ -492,6 +548,11 @@ getDataInventories: { id: number; name: string }[] = [];
       return
     } ;
 
+    // if(this.itemAddingForm.invalid){
+    //   this.itemAddingForm.markAllAsTouched();
+    //   return;
+    // }
+
 
     this._purchaseServices.searchByCode(code).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res: any) => {
       if (res?.data) {
@@ -508,7 +569,7 @@ getDataInventories: { id: number; name: string }[] = [];
   }
 
   loadProductToAddingRow(
-    product: ProductUnitItem & { productCart?: ProductUnitItem[]; productName?: string; code?: string; vat?: number },
+    product: ProductUnitItem & { productCart?: ProductUnitItem[]; productName?: string; code?: string; vat?: number; selectiveVat?: number; selectiveTaxRate?: number },
   ) {
     if (!product?.id) {
       return;
@@ -519,7 +580,8 @@ getDataInventories: { id: number; name: string }[] = [];
     const unitId = defaultUnit.id;
     const unitName = defaultUnit.fromUnitName || defaultUnit.name || '';
     const price = defaultUnit.purchasePrice ?? defaultUnit.price ?? 0;
-    const vatRate = product.vat ?? 15;
+    const vatRate = Number(product.vat) || 0;
+    const selectiveTaxRate = Number(product.selectiveVat ?? product.selectiveTaxRate) || 0;
 
     const newRowGroup = this.createPurchaseDetail({
       productCartId: unitId,
@@ -537,35 +599,47 @@ getDataInventories: { id: number; name: string }[] = [];
       net: 0,
     });
 
-    newRowGroup.patchValue({ vatRate }, { emitEvent: false });
-    this.calculateRowTotals(newRowGroup, vatRate);
+    newRowGroup.patchValue({ vatRate, selectiveTaxRate }, { emitEvent: false });
+    this.syncRowTotals(newRowGroup);
     this.purchaseDetails.push(newRowGroup);
     this.searchControl.reset(null, { emitEvent: false });
   }
 
-  private attachRowCalculations(row: FormGroup, vatRate: number): void {
+  private attachRowCalculations(row: FormGroup): void {
     row.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(() => {
-      this.calculateRowTotals(row, vatRate);
+      this.syncRowTotals(row);
     });
   }
 
-  calculateAddingRowTotals(): void {
-    const qty = Number(this.itemAddingForm.get('qty')?.value) || 0;
-    const price = Number(this.itemAddingForm.get('price')?.value) || 0;
-    const discountRate = Number(this.itemAddingForm.get('discountRate')?.value) || 0;
-    const taxRate = Number(this.itemAddingForm.get('taxRate')?.value) || 15;
+  private resolveDiscountSource(form: FormGroup, percentKey: string, amountKey: string): DiscountSource {
+    if (form.get(percentKey)?.dirty) {
+      return 'percent';
+    }
+    if (form.get(amountKey)?.dirty) {
+      return 'amount';
+    }
+    return 'none';
+  }
 
-    const totalBeforeDiscount = qty * price;
-    const discountAmount = totalBeforeDiscount * (discountRate / 100);
-    const subTotal = totalBeforeDiscount - discountAmount;
-    const taxAmount = subTotal * (taxRate / 100);
-    const total = subTotal + taxAmount;
+  calculateAddingRowTotals(): void {
+    const result = this._calculationService.calculateLine({
+      quantity: Number(this.itemAddingForm.get('qty')?.value) || 0,
+      unitPrice: Number(this.itemAddingForm.get('price')?.value) || 0,
+      discountPercent: Number(this.itemAddingForm.get('discountRate')?.value) || 0,
+      discountAmount: Number(this.itemAddingForm.get('discountAmount')?.value) || 0,
+      discountSource: this.resolveDiscountSource(this.itemAddingForm, 'discountRate', 'discountAmount'),
+      vatRate: Number(this.itemAddingForm.get('taxRate')?.value) || 0,
+      selectiveTaxRate: Number(this.itemAddingForm.get('selectiveTaxRate')?.value) || 0,
+    });
 
     this.itemAddingForm.patchValue(
       {
-        discountAmount: +discountAmount.toFixed(2),
-        tax: +taxAmount.toFixed(2),
-        total: +total.toFixed(2),
+        qty: result.quantity,
+        price: result.unitPrice,
+        discountRate: result.discountPercent,
+        discountAmount: result.discountAmount,
+        tax: result.vatAmount,
+        total: result.netLineTotal,
       },
       { emitEvent: false },
     );
@@ -578,63 +652,47 @@ getDataInventories: { id: number; name: string }[] = [];
     return this.getDataInventories.find((inventory) => inventory.id === warehouseId)?.name ?? '';
   }
 
- calculateRowTotals(row: FormGroup, vatRate: number) {
-  const qty = Number(row.get('quantity')?.value) || 0;
-  const price = Number(row.get('purchasesPrice')?.value) || 0;
-  let discountPercent = Number(row.get('disCountPercentage')?.value) || 0;
-  let discountAmount = Number(row.get('discountAmount')?.value) || 0;
+  private syncRowTotals(row: FormGroup): void {
+    const result = this._calculationService.calculateLine({
+      quantity: Number(row.get('quantity')?.value) || 0,
+      unitPrice: Number(row.get('purchasesPrice')?.value) || 0,
+      discountPercent: Number(row.get('disCountPercentage')?.value) || 0,
+      discountAmount: Number(row.get('discountAmount')?.value) || 0,
+      discountSource: this.resolveDiscountSource(row, 'disCountPercentage', 'discountAmount'),
+      vatRate: Number(row.get('vatRate')?.value) || 0,
+      selectiveTaxRate: Number(row.get('selectiveTaxRate')?.value) || 0,
+      invoiceDiscountShare: Number(row.get('invoiceDiscountShare')?.value) || 0,
+    });
 
-  const totalBeforeDiscount = qty * price;
+    row.patchValue(
+      {
+        quantity: result.quantity,
+        purchasesPrice: result.unitPrice,
+        total: result.lineTotal,
+        disCountPercentage: result.discountPercent,
+        discountAmount: result.discountAmount,
+        vat: result.vatAmount,
+        vatDiscount: result.selectiveTaxAmount,
+        totalDiscount: result.totalDiscount,
+        net: result.netLineTotal,
+      },
+      { emitEvent: false },
+    );
 
-  if (row.get('disCountPercentage')?.dirty) {
-    discountAmount = totalBeforeDiscount * (discountPercent / 100);
-    row.get('discountAmount')?.setValue(discountAmount, { emitEvent: false });
-  } 
-  // إذا تم تغيير قيمة الخصم مباشرة، احسب النسبة المئوية لها
-  else if (row.get('discountAmount')?.dirty) {
-    discountPercent = totalBeforeDiscount > 0 ? (discountAmount / totalBeforeDiscount) * 100 : 0;
-    row.get('disCountPercentage')?.setValue(discountPercent, { emitEvent: false });
+    this.calculateInvoiceTotals();
   }
 
+  calculateInvoiceTotals() {
+    const totals = this._calculationService.calculateInvoiceTotals(this.purchaseDetails.getRawValue());
 
-  const subTotal = +(totalBeforeDiscount - discountAmount).toFixed(2);
+    this.totalQuantities = totals.totalQuantities;
+    this.totalDiscounts = totals.totalDiscounts;
+    this.totalVat = totals.totalVat;
+    this.totalSelectiveTax = totals.totalSelectiveTax;
+    this.invoiceNetTotal = totals.invoiceNetTotal;
 
-// حساب قيمة الضريبة
-const vatAmount = +(subTotal * (vatRate / 100)).toFixed(2);
-
-const netTotal = +(subTotal + vatAmount).toFixed(2);
-
-  row.patchValue({
-    vat: vatAmount,
-    net: netTotal
-  }, { emitEvent: false });
-
-  // تحديث الإجماليات الكلية للفاتورة بالأسفل
-  this.calculateInvoiceTotals();
-}
-
-calculateInvoiceTotals() {
-  let totalQty = 0;
-  let totalDiscount = 0;
-  let totalVat = 0;
-  let netInvoice = 0;
-
-  this.purchaseDetails.controls.forEach((control) => {
-    const row = control as FormGroup;
-    totalQty += Number(control.get('quantity')?.value) || 0;
-    totalDiscount += Number(control.get('discountAmount')?.value) || 0;
-    totalVat += Number(control.get('vat')?.value) || 0;
-    netInvoice += Number(control.get('net')?.value) || 0;
-  });
-
-  // إسناد القيم لمتغيرات الـ tfoot المعروضة لديك في الـ HTML
-  this.totalQuantities = totalQty;
-  this.totalDiscounts = totalDiscount;
-  this.totalVat = totalVat;
-  this.invoiceNetTotal = netInvoice;
-
-  this.purchaseForm.patchValue({ net: netInvoice }, { emitEvent: false });
-}
+    this.purchaseForm.patchValue({ net: this.invoiceNetTotal }, { emitEvent: false });
+  }
 
   // ترحيل البيانات من السطر العلوي إلى جدول الـ FormArray بالأسفل
   addToTable() {
@@ -649,7 +707,8 @@ calculateInvoiceTotals() {
     }
 
     const rawData = this.itemAddingForm.getRawValue();
-    const vatRate = Number(rawData.taxRate) || 15;
+    const vatRate = Number(rawData.taxRate) || 0;
+    const selectiveTaxRate = Number(rawData.selectiveTaxRate) || 0;
 
     const itemGroup = this.createPurchaseDetail({
       productCartId: rawData.productCartId,
@@ -667,8 +726,8 @@ calculateInvoiceTotals() {
       net: rawData.total,
     });
 
-    itemGroup.patchValue({ vatRate }, { emitEvent: false });
-    this.calculateRowTotals(itemGroup, vatRate);
+    itemGroup.patchValue({ vatRate, selectiveTaxRate }, { emitEvent: false });
+    this.syncRowTotals(itemGroup);
 
     // إضافة للـ FormArray
     this.purchaseDetails.push(itemGroup);
@@ -684,7 +743,8 @@ calculateInvoiceTotals() {
       discountRate: 0,
       discountAmount: 0,
       warehouseId: currentWarehouse,
-      taxRate: 15,
+      taxRate: this.currentProductTaxRates.vatRate,
+      selectiveTaxRate: this.currentProductTaxRates.selectiveTaxRate,
     });
     this.searchControl.reset();
     this.currentProductUnits = [];
@@ -694,6 +754,7 @@ calculateInvoiceTotals() {
   totalQuantities = 0;
   totalDiscounts = 0;
   totalVat = 0;
+  totalSelectiveTax = 0;
   invoiceNetTotal = 0;
 
 
@@ -986,19 +1047,28 @@ calculateInvoiceTotals() {
       orderPymentType: raw.orderPymentType,
       paymentMethod: raw.paymentMethod,
       vat: this.totalVat,
-      expenses: raw.expenses !== '' && raw.expenses != null ? Number(raw.expenses) : null,
+      expenses:
+        raw.expenses !== '' && raw.expenses != null
+          ? this._calculationService.roundPrice(Number(raw.expenses))
+          : null,
       net: this.invoiceNetTotal,
       branchId,
-      paidCash: raw.paidCash != null && raw.paidCash !== '' ? Number(raw.paidCash) : null,
+      paidCash:
+        raw.paidCash != null && raw.paidCash !== ''
+          ? this._calculationService.roundPrice(Number(raw.paidCash))
+          : null,
       paidCashAccountId: raw.paidCashAccountId ?? null,
-      networkPaid: raw.networkPaid != null && raw.networkPaid !== '' ? Number(raw.networkPaid) : null,
+      networkPaid:
+        raw.networkPaid != null && raw.networkPaid !== ''
+          ? this._calculationService.roundPrice(Number(raw.networkPaid))
+          : null,
       networkPaidAccountId: raw.networkPaidAccountId ?? null,
       purchaseDetails: details.map((detail) => ({
         productCartId: detail.productCartId,
         warehouseId: Number(detail.warehouseId),
         quantity: Number(detail.quantity),
         purchasesPrice: Number(detail.purchasesPrice),
-        total: Number(detail.quantity) * Number(detail.purchasesPrice),
+        total: this._calculationService.roundPrice(Number(detail.quantity) * Number(detail.purchasesPrice)),
         vat: Number(detail.vat),
         disCountPercentage: Number(detail.disCountPercentage),
         discountAmount: Number(detail.discountAmount),

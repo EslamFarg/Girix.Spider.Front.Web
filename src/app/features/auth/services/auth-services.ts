@@ -67,4 +67,12 @@ isTokenExpired(token: string): boolean {
     sessionStorage.removeItem('erp_auth');
     this.router.navigate(['/auth']);
   }
+
+
+  // getForUser(){
+  //   return this.http.get(`${this.baseUrl}/api/ApplicationSettings/GetForUser?userId=37896fe2-f308-4180-92e1-f6fea023c343`);
+  // }
+  getForUser(){
+    return this.http.get(`${this.baseUrl}/api/ApplicationSettings/GetForUser?userId=${this.getSession()?.userId}`);
+  }
 }

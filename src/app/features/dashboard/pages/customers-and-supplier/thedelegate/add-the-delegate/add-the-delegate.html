@@ -127,7 +127,7 @@ transition-all duration-200"
         <label for="phonenumber">رقم الجوال</label>
         <input type="text" placeholder="رقم الجوال" id="phonenumber">
     </div> -->
-       <div class="col-span-12 lg:col-span-3">
+       <div class="col-span-12 lg:col-span-4">
         <label for="phonenumber">رقم الجوال</label>
         <!-- <input type="text" placeholder="رقم الجوال" id="phonenumber" formControlName="phoneNumber"> -->
   <intl-tel-input
@@ -143,15 +143,15 @@ transition-all duration-200"
 <app-form-error [control]="delegateForm.controls['phone']" [errorKey]="'invalidSaudiPhone'" [message]="'رقم الجوال السعودي غير صحيح'"></app-form-error>
 <app-form-error [control]="delegateForm.controls['phone']" [errorKey]="'invalidEgyptPhone'" [message]="'رقم الجوال المصري غير صحيح'"></app-form-error>
     </div>
-    <div class="col-span-12 lg:col-span-3">
+    <!-- <div class="col-span-12 lg:col-span-3">
         <label for="area">المنطقة</label>
        <input type="text" name="area" id="area" placeholder="المنطقة" formControlName="area" maxlength="100">
        <app-form-error [control]="delegateForm.controls['area']" [errorKey]="'required'" [message]="'المنطقة مطلوبة'"></app-form-error>
        <app-form-error [control]="delegateForm.controls['area']" [errorKey]="'minlength'" [message]="'المنطقة يجب ان يتكون من حرفين علي الاقل'"></app-form-error>
        <app-form-error [control]="delegateForm.controls['area']" [errorKey]="'maxlength'" [message]="'المنطقة يجب ان يكون اقل من 100 حروف'"></app-form-error>
         <app-form-error [control]="delegateForm.controls['area']" [errorKey]="'invalidEntityName'" [message]="'اسم المنطقة يجب ان يحتوي علي احرف وارقام  وبعض الحروف الخاصه مثل _ , - ولايبدء برقم'"></app-form-error>
-    </div>
-    <div class="col-span-12 lg:col-span-3">
+    </div> -->
+    <div class="col-span-12 lg:col-span-4">
         <label for="warn">نسبه الارباح</label>
        <input type="text" name="warn" id="warn" placeholder="الرقم" formControlName="commissionPercent" maxlength="6" appMaxPercentage>
        <app-form-error [control]="delegateForm.controls['commissionPercent']" [errorKey]="'required'" [message]="'نسبه الارباح مطلوبة'"></app-form-error>

@@ -12,6 +12,10 @@ export const SettingsRoute:Routes=[
             {
                 path:'branch-settings',
                 loadComponent:()=>import('./branch-settings/branch-settings').then(m=>m.BranchSettings)
+            },
+            {
+                path:'virtual-accounts',
+                loadComponent:()=>import('./virtual-accounts/virtual-accounts').then(m=>m.VirtualAccounts)
             }
         ]
     }

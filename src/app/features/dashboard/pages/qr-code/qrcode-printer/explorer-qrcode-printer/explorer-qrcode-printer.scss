@@ -1,0 +1,39 @@
+.print-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+  padding: 16px;
+}
+
+.print-item-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  background: #fff;
+}
+
+.print-item-title {
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.barcode-number {
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #111;
+}
+
+.preview-card {
+  margin-top: 24px;
+}
+
+.delete {
+  color: #ff3d00;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}

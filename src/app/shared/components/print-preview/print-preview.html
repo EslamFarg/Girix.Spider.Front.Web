@@ -1,0 +1,126 @@
+    <!-- <div class="print-toolbar">
+        <button class="btn btn-primary" (click)="print()">
+        🖨️ طباعة
+        </button>
+    
+        <button class="btn btn-success" (click)="exportPdf()">
+        📄 PDF
+        </button>
+    </div>
+    
+    <div #printArea class="print-area">
+        <ng-content></ng-content>
+    </div> -->
+    <div class="print-preview">
+
+        <div class="toolbar">
+
+            <div class="toolbar-info">
+
+                <div class="icon">
+                    <i class="pi pi-print"></i>
+                </div>
+
+                <div>
+                    <h3>معاينة الطباعة</h3>
+                    <span>يمكنك الطباعة أو تصدير الملف</span>
+                </div>
+
+            </div>
+
+            <div class="toolbar-actions justify-end w-full" >
+                <button
+        class="btn btn-secondary"
+        (click)="exportImage()">
+
+        <i class="pi pi-image"></i>
+
+        PNG
+
+    </button>
+                <button
+                    class="btn btn-primary"
+                  (click)="visiblePrintDialog = true">
+
+                    <i class="pi pi-print"></i>
+
+                    <span>طباعة</span>
+
+                </button>
+
+                <button
+    class="btn btn-success flex items-center gap-2"
+    (click)="exportPdf()"
+    [disabled]="isExportingPdf">
+
+    <!-- <i
+        class="pi"
+        [class.pi-file-pdf]="!isExportingPdf"
+        [class.pi-spinner]="isExportingPdf"
+        [class.pi-spin]="isExportingPdf">
+    </i> -->
+
+    <span>
+        {{ isExportingPdf ? 'جارٍ إنشاء الملف...' : 'PDF' }}
+    </span>
+
+</button>
+
+            </div>
+
+        </div>
+        <div #printArea class="print-area">
+
+            <ng-content></ng-content>
+
+        </div>
+
+
+    </div>
+
+
+    <p-dialog
+    header="إعدادات الطباعة"
+    [(visible)]="visiblePrintDialog"
+    [modal]="true"
+    [style]="{width:'400px'}">
+
+    <div class="mb-3">
+        <label>عدد النسخ</label>
+
+        <input
+            pInputText
+            type="number"
+            min="1"
+            [(ngModel)]="printCopies">
+    </div>
+
+    <div class="flex justify-end gap-2">
+
+        <button
+            class="btn btn-secondary"
+            (click)="visiblePrintDialog=false">
+
+            إلغاء
+
+        </button>
+
+        <button
+            class="btn btn-primary px-4"
+            (click)="print(printCopies)"
+            [disabled]="isPrinting">
+
+           @if (!isPrinting) {
+            <span>طباعة</span>
+           } @else {
+               <span>جارٍ تجهيز الطباعة...</span>
+               <i class="fa-solid fa-spinner"></i>
+           }
+
+        </button>
+
+    </div>
+
+</p-dialog>
+
+<!--  -->

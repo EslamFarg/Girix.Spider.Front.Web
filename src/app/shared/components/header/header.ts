@@ -1,5 +1,6 @@
 import { NgClass, NgStyle } from '@angular/common';
-import { Component, EventEmitter, HostListener, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, inject, Output } from '@angular/core';
+import { AuthServices } from '../../../features/auth/services/auth-services';
 
 @Component({
   selector: 'app-header',
@@ -11,7 +12,7 @@ export class Header {
 
    // !!!!! Services 
  @Output() isShowSidebar = new EventEmitter(true);
-
+ _authServices: AuthServices = inject(AuthServices);
 // isShowSidebar = output<any>();
 
   // !!!!! Properties
@@ -107,6 +108,10 @@ get unreadCount() {
 
 markAsRead(notification: any) {
   notification.isRead = true;
+}
+
+logout(){
+  this._authServices.logout();
 }
 
 }

@@ -1,0 +1,42 @@
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  
+  .status-pending {
+    background: #fff7e6;
+    color: #d48806;
+  }
+  
+  .status-approved {
+    background: #f6ffed;
+    color: #389e0d;
+  }
+  
+  .status-partial {
+    background: #e6f7ff;
+    color: #096dd9;
+  }
+  
+  .status-rejected {
+    background: #fff1f0;
+    color: #cf1322;
+  }
+  
+  .status-received {
+    background: #f6ffed;
+    color: #237804;
+  }
+  
+  .status-partial-received {
+    background: #fffbe6;
+    color: #d48806;
+  }
+  
+  .status-rejected-receiver {
+    background: #fff1f0;
+    color: #a8071a;
+  }

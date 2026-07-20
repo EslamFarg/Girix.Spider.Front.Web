@@ -25,7 +25,7 @@
         />
       </svg>
     </div> -->
-    <button class="btn btn-primary">صرف</button>
+    <button class="btn"  [ngClass]="{'btn-primary': !this.isEditMode, 'btn-warning': this.isEditMode}" (click)="salaryPayment()">{{this.isEditMode ? 'تعديل' : 'صرف'}}</button>
   </div>
 </div>
 
@@ -63,7 +63,7 @@
     <div class="col-span-6">
         <label for="">اسم الموظف </label>
         <div class="flex items-center gap-5">
-            <ng-select class="flex-1" formControlName="employeeIds" [items]="employeesList" multiple [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'اسم الموظف'"></ng-select>
+            <ng-select class="flex-1" formControlName="employeeIds" [items]="employeesList" multiple [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'اسم الموظف'" [closeOnSelect]="false"></ng-select>
           </div>
           <app-form-error [control]="searchForm.controls['employeeIds']" [errorKey]="'required'" [message]="'اسم الموظف  مطلوب'"></app-form-error>
 
@@ -85,23 +85,23 @@
         <th class="p-2 text-center">الرقم الوظيفي</th>
         <th class="p-2 text-center">اسم الموظف</th>
         <th class="p-2 text-center">الراتب الاساسي </th>
-        <th class="p-2 text-center">البدلات</th>
-        <th class="p-2 text-center">راتب البدلات</th>
-        <th class="p-2 text-center">التاخيرات</th>
-        <th class="p-2 text-center">الغياب</th>
+        <th class="p-2 text-center">عدد البدلات </th>
+        <th class="p-2 text-center">قيمة البدلات</th>
+        <th class="p-2 text-center">قيمة التاخيرات </th>
+        <th class="p-2 text-center">قيمة الغياب </th>
         <th class="p-2 text-center">الوقت الاضافي</th>
-        <th class="p-2 text-center">الاجازات</th>
-        <th class="p-2 text-center">البونص</th>
-        <th class="p-2 text-center">مكافاءات</th>
-        <th class="p-2 text-center">صافي المكافاءات</th>
-        <th class="p-2 text-center">جزاءات</th>
-        <th class="p-2 text-center">صافي الجزاءات</th>
-        <th class="p-2 text-center">السلفيات</th>
+        <th class="p-2 text-center">قيمة الاجازات </th>
+        <!-- <th class="p-2 text-center">قيمة البونص </th>
+        <th class="p-2 text-center">قيمة مكافاءات </th> -->
+        <th class="p-2 text-center">قيمة المكافاءات</th>
+        <!-- <th class="p-2 text-center">جزاءات</th> -->
+        <th class="p-2 text-center">قيمة الجزاءات</th>
+        <th class="p-2 text-center">قيمة السلفيات</th>
         <th class="p-2 text-center">صافي الراتب</th>
         <th class=""> 
              
        
-            <p-toggleswitch [(ngModel)]="checked"  (change)="toggleAll($event)" style="--p-toggleswitch-checked-background:var(--color-btn);
+            <p-toggleswitch [(ngModel)]="checked"  (onChange)="toggleAll($event)" style="--p-toggleswitch-checked-background:var(--color-btn);
             --p-toggleswitch-hover-background:var(--color-btn);
           --p-toggleswitch-handle-color:red;
             " />
@@ -112,35 +112,36 @@
     <tbody>
   
 
-@for(item of itemsTable;track $index){
+@for(item of exchangeSalariesList;track $index){
 
     <tr >
 <td class="p-2 text-center">{{ $index + 1 }}</td>
-<td class="p-2 text-center">9876543</td>
-<td class="p-2 text-center">محمد</td>
-<td class="p-2 text-center">30000</td>
-<td class="p-2 text-center">3</td>
-<td class="p-2 text-center">800.0</td>
-<td class="p-2 text-center">4ساعات</td>
-<td class="p-2 text-center">1</td>
-<td class="p-2 text-center">5ساعات</td>
-<td class="p-2 text-center">1</td>
-<td class="p-2 text-center">5ساعات</td>
-<td class="p-2 text-center">2</td>
-<td class="p-2 text-center">500+</td>
-<td class="p-2 text-center">3</td>
-<td class="p-2 text-center">200.00</td>
-<td class="p-2 text-center">4</td>
-<td class="p-2 text-center">1000</td>
+<td class="p-2 text-center">{{item.employeeNumber}}</td>
+<td class="p-2 text-center">{{item.employeeName}}</td>
+<td class="p-2 text-center">{{item.basicSalary}}</td>
+<td class="p-2 text-center">{{item.allowancesCount}}</td>
+<td class="p-2 text-center">{{item.allowancesAmount}}</td>
+<td class="p-2 text-center">{{item.delayAmount}}</td>
+<td class="p-2 text-center">{{item.absenceAmount}}</td>
+<td class="p-2 text-center">{{item.overtimeAmount}}</td>
+<td class="p-2 text-center">{{item.vacationAmount}}</td>
+<td class="p-2 text-center">{{item.bonusAmount}}</td>
+<!-- <td class="p-2 text-center">2</td>
+<td class="p-2 text-center">500+</td> -->
+<!-- <td class="p-2 text-center">200.00</td> -->
+<td class="p-2 text-center">{{item.penaltyAmount}}</td>
+<td class="p-2 text-center">{{item.advanceAmount}}</td>
+<td class="p-2 text-center">{{item.netSalary}}</td>
 
        <td class="p-2 w-full flex items-center justify-center gap-2">
-       <input type="checkbox" checked disabled>
+       <input type="checkbox" [(ngModel)]="item.checked"
+  (change)="toggleEmployee(item)">
         </td>
 </tr>
 }@empty{
-    <tr class="h-[420px]">
-      <td colspan="7">
-        <div class="flex flex-col items-center justify-center py-12 text-center">
+    <tr class="h-[200px]">
+      <td colspan="20">
+        <div class="flex flex-col items-center justify-center py-5 text-center">
           
           <!-- SVG -->
           <div class="mb-4 opacity-70">

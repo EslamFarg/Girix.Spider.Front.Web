@@ -8,9 +8,12 @@ import { SectionsService } from '../sections/services/sections-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ExchangeOfSalariesService } from './services/exchange-of-salaries-service';
 import { FormError } from "../../../../../shared/ui/form-error/form-error";
+import { exchangeSalariesModel } from './models/exchange-salaries';
+import { MessageService } from 'primeng/api';
+import { NgClass } from '@angular/common';
 @Component({
   selector: 'app-exchange-of-salaries',
-  imports: [PageHeaderSearch, Paginator, ToggleSwitch, FormsModule, NgSelectComponent, ReactiveFormsModule, FormError],
+  imports: [PageHeaderSearch, Paginator, NgClass,ToggleSwitch, FormsModule, NgSelectComponent, ReactiveFormsModule, FormError],
   templateUrl: './exchange-of-salaries.html',
   styleUrl: './exchange-of-salaries.scss',
 })
@@ -20,7 +23,9 @@ _departmentsService = inject(SectionsService);
 _destroyRef = inject(DestroyRef);
 _fb:FormBuilder=inject(FormBuilder);
 _exchangeOfSalariesService = inject(ExchangeOfSalariesService);
+_messageService=inject(MessageService);
 employeesList:any=[];
+private lastEmployeesLoadKey = '';
   //!!!!!!!!!! Property 
   dataAddButton = {
     label: 'اضافه سند صرف جديد',
@@ -85,17 +90,18 @@ employeesList:any=[];
   first: number = 0;
   rows: number = 10;
 
-  itemsTable: any = Array.from({ length: 20 }, (_, i) => ({
-    id: i + 1,
-    invoiceNumber: `INV-${1000 + i}`,
-    date: new Date(2026, 2, i + 1).toISOString().split('T')[0],
-    warehouse: ['المخزن الرئيسي', 'مخزن 1', 'مخزن 2'][i % 3],
-    supplier: `مورد ${i + 1}`,
-    paymentMethod: ['كاش', 'تحويل بنكي', 'آجل'][i % 3],
-    qty: Math.floor(Math.random() * 100) + 1,
-    totalAmount: Math.floor(Math.random() * 50000) + 1000
-  }));
+  // itemsTable: any = Array.from({ length: 20 }, (_, i) => ({
+  //   id: i + 1,
+  //   invoiceNumber: `INV-${1000 + i}`,
+  //   date: new Date(2026, 2, i + 1).toISOString().split('T')[0],
+  //   warehouse: ['المخزن الرئيسي', 'مخزن 1', 'مخزن 2'][i % 3],
+  //   supplier: `مورد ${i + 1}`,
+  //   paymentMethod: ['كاش', 'تحويل بنكي', 'آجل'][i % 3],
+  //   qty: Math.floor(Math.random() * 100) + 1,
+  //   totalAmount: Math.floor(Math.random() * 50000) + 1000
+  // }));
 
+  exchangeSalariesList:exchangeSalariesModel[]=[];
 
   // !!!!!!!!!!! Method
 
@@ -109,44 +115,63 @@ employeesList:any=[];
   }
 
 
-  changeGetEmployees():void{
+  changeGetEmployees(): void {
     this.searchForm.valueChanges
-  .pipe(takeUntilDestroyed(this._destroyRef))
-  .subscribe((value:any) => {
-    if (value.departmentId && value.month && value.year) {
-      this.loadEmployeesItems();
-    }
-  });
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((value: any) => {
+        if (!this.canLoadEmployees(value)) {
+          return;
+        }
 
-    // this.loadEmployeesItems();
+        const loadKey = `${value.departmentId}-${value.month}-${value.year}`;
+        if (loadKey === this.lastEmployeesLoadKey) {
+          return;
+        }
+
+        this.lastEmployeesLoadKey = loadKey;
+        this.loadEmployeesItems();
+      });
   }
-  
 
+  private canLoadEmployees(value: {
+    departmentId?: number | null;
+    month?: number | null;
+    year?: number | null;
+  }): boolean {
+    return value.departmentId != null && value.month != null && value.year != null;
+  }
 
-
-  loadEmployeesItems():void{
-    const param=new URLSearchParams({
-      departmentId: this.searchForm.value.departmentId?.toString(),
-      month: this.searchForm.value.month?.toString(),
-      year: this.searchForm.value.year?.toString(),
+  private buildPeriodParams(): URLSearchParams {
+    const { departmentId, month, year } = this.searchForm.getRawValue();
+    const param = new URLSearchParams({
+      month: month?.toString() ?? '',
+      year: year?.toString() ?? '',
     });
 
-    
-
-    if(this.searchForm.value.departmentId && this.searchForm.value.month && this.searchForm.value.year){
-      this._exchangeOfSalariesService.getDepartmentSalaryPostingEmployees(param).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
-        next:(res:any)=>{
-          this.employeesList = [
-            { id: 0, name: 'الكل' },
-            ...(res.data ?? [])
-          ];
-          console.log(this.employeesList);  
-        }
-      });
+    if (departmentId != null) {
+      param.set('departmentId', departmentId.toString());
     }
- 
+
+    return param;
   }
 
+  loadEmployeesItems(): void {
+    const value = this.searchForm.getRawValue();
+
+    if (!this.canLoadEmployees(value)) {
+      return;
+    }
+
+    this._exchangeOfSalariesService
+      .getDepartmentSalaryPostingEmployees(this.buildPeriodParams())
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res: any) => {
+          this.employeesList = [{ id: 0, name: 'الكل' }, ...(res.data ?? [])];
+          this.searchForm.patchValue({ employeeIds: [] }, { emitEvent: false });
+        },
+      });
+  }
 
 
   loadDepartmentsItems(): void {
@@ -166,26 +191,46 @@ employeesList:any=[];
   }
 
 
-  onSubmit():void{
-    
-   if(this.searchForm.invalid){
-    this.searchForm.markAllAsTouched();
-    return;
-   }
-   const param=new URLSearchParams();
-   param.append('departmentId', this.searchForm.value.departmentId?.toString());
-  //  param.append('employeeId', this.searchForm.value.employeeId?.toString());
-   param.append('month', this.searchForm.value.month?.toString());
-   param.append('year', this.searchForm.value.year?.toString());
-  const value = this.searchForm.getRawValue();
-value.employeeIds.forEach((id: number) => {
-  param.append('employeeIds', id.toString());
-});
-   this._exchangeOfSalariesService.GetEmployeeSalaryPosting(param).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
-    next:(res:any)=>{
-      console.log(res);
+  onSubmit(): void {
+    if (this.searchForm.invalid) {
+      this.searchForm.markAllAsTouched();
+      return;
     }
-   });
+
+    const param = this.buildPeriodParams();
+    const employeeIds = this.resolveEmployeeIds(this.searchForm.getRawValue().employeeIds);
+
+    employeeIds.forEach((id: number) => {
+      param.append('employeeIds', id.toString());
+    });
+
+    this._exchangeOfSalariesService
+      .GetEmployeeSalaryPosting(param)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res: any) => {
+          this.exchangeSalariesList = res.data.map((item: any) => ({
+            ...item,
+            checked: true,
+          }));
+          this.checked = true;
+          this.selectedEmployees = [...this.exchangeSalariesList];
+        },
+      });
+  }
+
+  private resolveEmployeeIds(selectedIds: number[]): number[] {
+    if (!selectedIds?.length) {
+      return [];
+    }
+
+    if (selectedIds.includes(0)) {
+      return this.employeesList
+        .filter((item: { id: number }) => item.id !== 0)
+        .map((item: { id: number }) => item.id);
+    }
+
+    return selectedIds;
   }
   onPageChange(event: any) {
     this.first = event.first ?? 0;
@@ -208,16 +253,80 @@ value.employeeIds.forEach((id: number) => {
 
 
   loadCheckedEmployees():void{
-    if(this.checked){
-      this.selectedEmployees=[...this.itemsTable];
-     }else{
-      this.selectedEmployees=[];
-     }
+ 
 
-     console.log(this.selectedEmployees);
+      // this.exchangeSalariesList.forEach(item => {
+      //   item.checked = this.checked;
+      // });
+    
+      // this.selectedEmployees = this.checked
+      //   ? [...this.exchangeSalariesList]
+      //   : [];
+      
+      this.exchangeSalariesList.forEach(item => item.checked = this.checked);
   
+      this.selectedEmployees = this.checked
+        ? [...this.exchangeSalariesList]
+        : [];
+    
   }
   
+  toggleEmployee(item: any): void {
+    if (item.checked) {
+      if (!this.selectedEmployees.some(x => x.employeeId === item.employeeId)) {
+        this.selectedEmployees.push(item);
+      }
+    } else {
+      this.selectedEmployees = this.selectedEmployees.filter(
+        x => x.employeeId !== item.employeeId
+      );
+    }
+  
+    this.checked = this.exchangeSalariesList.every(x => x.checked);
+  }
 
+
+  isEditMode: boolean = false;
+  salaryPaymentId: number | null = null;
+  salaryPayment() {
+  
+    // if (this.selectedEmployees.length === 0) {
+    //   this._messageService.add({ severity: 'error', summary: 'خطأ', detail: 'يجب عليك اختيار موظف واحد على الاقل' });
+    //   return;
+    // }
+    const payload: any = {
+      paymentDate: new Date(),
+      salaryPostingId: 0,
+      notes: "string",
+      payAllEmployees: false,
+      details: this.selectedEmployees.map((item: any) => ({
+        salaryPostingDetailId: item.salaryPostingDetailId,
+        employeeId: item.employeeId,
+        amount: item.netSalary,
+      }))
+    };
+
+    if (this.isEditMode) {
+      payload.id = this.salaryPaymentId;
+      this._exchangeOfSalariesService.updateSalaryPayment(payload).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+        next: (res: any) => {
+          console.log(res);
+         
+          console.log(this.salaryPaymentId);
+          this._messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم تعديل صرف الرواتب بنجاح' });
+        }
+      });
+    } else {
+      this._exchangeOfSalariesService.createSalaryPayment(payload).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+        next: (res: any) => {
+          console.log(res);
+          this.salaryPaymentId = res.data;
+          this._messageService.add({ severity: 'success', summary: 'نجاح', detail: 'تم صرف الرواتب بنجاح' });
+          this.isEditMode = true;
+        }
+      });
+    }
+    console.log(this.selectedEmployees);
+  }
 
 }

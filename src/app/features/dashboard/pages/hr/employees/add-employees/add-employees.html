@@ -318,6 +318,7 @@
         <input type="text" id="address" placeholder="العنوان" formControlName="address">
         <app-form-error [control]="employeeForm.controls['address']" [errorKey]="'required'" [message]="'العنوان مطلوب'"></app-form-error>
         <app-form-error [control]="employeeForm.controls['address']" [errorKey]="'minlength'" [message]="'العنوان يجب ان يكون على الاقل 3 حروف'"></app-form-error>
+        <app-form-error [control]="employeeForm.controls['address']" [errorKey]="'invalidEntityName'" [message]="'العنوان يجب ان يحتوي على حروف وارقام و _ و - فقط'"></app-form-error>
     </div>
 
 

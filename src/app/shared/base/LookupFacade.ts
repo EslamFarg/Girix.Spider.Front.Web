@@ -6,6 +6,7 @@ import { ProductCardService } from "../../features/dashboard/pages/products/prod
 import { UnitOfMeasure } from "../../features/dashboard/pages/products/units-of-measurement/services/unit-of-measure";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { InventoriesServices } from "../../features/dashboard/pages/products/inventories/services/inventories-services";
+import { tap } from "rxjs";
 
 
 @Injectable({
@@ -25,7 +26,7 @@ export class LookupFacade {
     products = signal<any[]>([]);
     unitOfMeasures = signal<any[]>([]);
     inventories = signal<any[]>([]);
-
+    inventoriesWithPagination = signal<any[]>([]);
     // !!!! Methods
     loadSuppliers() : any {
         this.supplierService.getAllWithoutPagination().pipe(takeUntilDestroyed(this.destroyRef))
@@ -52,4 +53,26 @@ export class LookupFacade {
             this.inventories.set(res.data.rows);
         })
     }
+    // loadInventoriesWithPagination(page: number, pageSize: number){
+    //     this.inventoriesService.getAllSendInQuery(page, pageSize).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res:any)=>{
+    //         // this.inventories.set(res.data.rows);
+    //         this.inventoriesWithPagination.set([
+    //             ...this.inventories(),
+    //             ...res.data.rows
+    //           ]);
+    //     })
+    // }
+
+    loadInventoriesWithPagination(page: number, pageSize: number) {
+        return this.inventoriesService
+          .getAllSendInQuery(page, pageSize)
+          .pipe(
+            tap((res: any) => {
+              this.inventoriesWithPagination.set([
+                ...this.inventoriesWithPagination(),
+                ...res.data.rows
+              ]);
+            })
+          );
+      }
 }

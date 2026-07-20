@@ -1270,6 +1270,12 @@ sidebarSections:any = [
           link:'/the-delegate'
         
         },
+        {
+          label:"الفروع",
+          icon:'',
+          link:'/branches/explorer'
+        
+        },
      
      
      
@@ -1449,6 +1455,12 @@ sidebarSections:any = [
       ),
       content:[
      
+        {
+          label:"الحسابات الأفتراضية",
+          icon:'',
+          link:'/settings/virtual-accounts'
+        
+        },
         {
           label:"الاعدادات العامة",
           icon:'',

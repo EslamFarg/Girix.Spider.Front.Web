@@ -1,112 +1,154 @@
 <div class="flex justify-between flex-wrap mb-[25px] sticky top-[60px] pt-[10px] mt-[10px] bg-[var(--color-bg)] z-1">
-    <div>
-        
-        <h2 class="text-[var(--color-primary)] text-[20px] font-[700]">المستخدمين والصلاحيات</h2>
-      <div class="flex items-center flex-wrap gap-5 my-4
-      [&>*]:w-[104px]  [&>*]:h-[32px]  
-      ">
-          <button class="btn btn-primary">حفظ</button>
-          <button class="btn">جديد</button>
-          <button class="btn">حذف</button>
-          <button class="btn">طباعه</button>
-     
-        </div>
+  <div>
+    <h2 class="text-[var(--color-primary)] text-[20px] font-[700]">المستخدمين والصلاحيات</h2>
+    <div class="flex items-center flex-wrap gap-5 my-4 [&>*]:w-[104px] [&>*]:h-[32px]">
+      <button class="btn" [ngClass]="buttonClass" (click)="save()">{{ buttonLabel }}</button>
+      <button class="btn" (click)="reset()">جديد</button>
+      @if (idUpdate > 0) {
+        <button class="btn" (click)="delete()">حذف</button>
+        <button class="btn" (click)="print()">طباعه</button>
+      }
     </div>
-
-   <div class="explorer_button">
-    <button [routerLink]="'/users-and-permissions/users-and-permissions/explorer'"  class="btn btn-primary" style="width:245px !important;">  مستكشف الصلاحيات   </button>
-
-   </div>
-    
-</div>
-
-
-<form class="box_header mb-7">
-  <div class="title"> المستخدمين والصلاحيات </div>
-
-
-
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] mb-[20px] mt-[5px]">
-
-
-
-
-   
-         <div class="col-span-12 md:col-span-4">
-          <label for="branch" >الفرع
-          </label>
-         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'الفرع الرئيسي'"></ng-select>
-      </div>
-         <div class="col-span-12 md:col-span-4">
-          <label for="group" >المجموعه
-          </label>
-         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'المجموعه'"></ng-select>
-      </div>
-         <div class="col-span-12 md:col-span-4">
-          <label for="group" >تحديد سعر البيع
-          </label>
-         <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'تحديد سعر البيع'"></ng-select>
-      </div>
-         <div class="col-span-12 md:col-span-4">
-            <div class="flex items-center gap-[10px]">
-            <input type="checkbox" name="now" id="now" checked>
-            <label for="now" style="margin-bottom: 0px !important; ">إظهار سعر بيع جمله </label>
-
-
-        </div>
-            <div class="flex items-center gap-[10px] mt-5">
-            <input type="checkbox" name="now" id="now" checked>
-            <label for="now" style="margin-bottom: 0px !important; ">إظهار سعر الربح  </label>
-
-
-        </div>
-      </div>
-         <div class="col-span-12 md:col-span-4">
-            <div class="flex items-center gap-[10px]">
-            <input type="checkbox" name="now" id="now" checked>
-            <label for="now" style="margin-bottom: 0px !important; ">إظهار سعر بيع جمله الجمله </label>
-
-
-        </div>
-            <div class="flex items-center gap-[10px] mt-5">
-            <input type="checkbox" name="now" id="now" checked>
-            <label for="now" style="margin-bottom: 0px !important; ">إظهار سعر متوسط التكلفه  </label>
-
-
-        </div>
-      </div>
-         <div class="col-span-12 md:col-span-4">
-            <div class="flex items-center gap-[10px]">
-            <input type="checkbox" name="now" id="now" checked>
-            <label for="now" style="margin-bottom: 0px !important; ">إظهار سعر بيع شراء  </label>
-
-
-        </div>
-            <div class="flex items-center gap-[10px] mt-5">
-            <input type="checkbox" name="now" id="now" checked>
-            <label for="now" style="margin-bottom: 0px !important; ">البيع بكميه اقل من المتاح  </label>
-
-
-        </div>
-      </div>
-
-
-
-       
-    
-
-     
-
-  
-
   </div>
 
+  <div class="explorer_button">
+    <button [routerLink]="'/users-and-permissions/users-and-permissions/explorer'" class="btn btn-primary" style="width:245px !important;">
+      مستكشف الصلاحيات
+    </button>
+  </div>
+</div>
 
+<form class="box_header mb-7" [formGroup]="groupForm">
+  <div class="title">المستخدمين والصلاحيات</div>
+
+  <!-- <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] mb-[20px] mt-[5px]">
+    <div class="col-span-12 md:col-span-4">
+      <div class="input_group">
+        <label>بحث باسم المجموعة</label>
+        <div class="flex items-center gap-2 relative">
+          <div class="search_input relative w-full">
+            <input
+              type="text"
+              class="text-[14px] w-full"
+              [formControl]="groupSearchControl"
+              placeholder="اسم المجموعة"
+              (keydown.enter)="$event.preventDefault(); searchGroupByName()"
+              style="color:var(--color-black); font-weight:600;"
+            />
+            <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[7px]">
+              <button type="button" (click)="searchGroupByName()">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10.4193 17.5001C6.04702 17.5001 2.5026 13.9557 2.5026 9.58341C2.5026 5.21116 6.04702 1.66675 10.4193 1.66675C14.7915 1.66675 18.3359 5.21116 18.3359 9.58341C18.3359 13.9557 14.7915 17.5001 10.4193 17.5001Z" stroke="#7F7F7F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M1.66927 18.3334L3.33594 16.6667" stroke="#7F7F7F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] mb-[20px] mt-[5px]">
+    <div class="lg:col-span-12 col-span-12">
+      <label for="groupName">اسم المجموعة</label>
+      <input type="text" placeholder="اسم المجموعة" id="groupName" formControlName="name" maxlength="100" class="w-full" />
+      <app-form-error
+        [control]="groupForm.controls['name']"
+        [errorKey]="'required'"
+        [message]="'اسم المجموعة مطلوب'"
+      ></app-form-error>
+      <app-form-error
+        [control]="groupForm.controls['name']"
+        [errorKey]="'minlength'"
+        [message]="'اسم المجموعة يجب ان يتكون من 2 حرف او أكثر'"
+      ></app-form-error>
+      <app-form-error
+        [control]="groupForm.controls['name']"
+        [errorKey]="'maxlength'"
+        [message]="'اسم المجموعة يجب ان يكون اقل من 100 حرف'"
+      ></app-form-error>
+      <app-form-error
+        [control]="groupForm.controls['name']"
+        [errorKey]="'invalidUsername'"
+        [message]="'اسم المجموعة يجب ان يحتوي علي حروف وارقام و _ ويجب ان لا يبدأ برقم'"
+      ></app-form-error>
+    </div>
+
+    <div class="col-span-12 md:col-span-6">
+      <label for="branch">الفرع</label>
+      <ng-select
+        id="branch"
+        [items]="branchesList"
+        bindLabel="name"
+        bindValue="id"
+        [loading]="branchesLoading"
+        formControlName="branchId"
+        placeholder="الفرع الرئيسي">
+      </ng-select>
+      <app-form-error
+        [control]="groupForm.controls['branchId']"
+        [errorKey]="'required'"
+        [message]="'الفرع مطلوب'"
+      ></app-form-error>
+    </div>
+
+    <div class="col-span-12 md:col-span-6">
+      <label for="salePriceType">تحديد سعر البيع</label>
+      <ng-select
+        id="salePriceType"
+        [items]="salePriceTypes"
+        bindLabel="name"
+        bindValue="id"
+        formControlName="salePriceType"
+        placeholder="تحديد سعر البيع">
+      </ng-select>
+      <app-form-error
+        [control]="groupForm.controls['salePriceType']"
+        [errorKey]="'required'"
+        [message]="'تحديد سعر البيع مطلوب'"
+      ></app-form-error>
+    </div>
+
+    <div class="col-span-12 md:col-span-4">
+      <div class="flex items-center gap-[10px]">
+        <input type="checkbox" id="showWholesalePrice" formControlName="showWholesalePrice" />
+        <label for="showWholesalePrice" style="margin-bottom: 0px !important;">إظهار سعر بيع جمله</label>
+      </div>
+      <div class="flex items-center gap-[10px] mt-5">
+        <input type="checkbox" id="showProfitPrice" formControlName="showProfitPrice" />
+        <label for="showProfitPrice" style="margin-bottom: 0px !important;">إظهار سعر الربح</label>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-4">
+      <div class="flex items-center gap-[10px]">
+        <input type="checkbox" id="showSuperWholesalePrice" formControlName="showSuperWholesalePrice" />
+        <label for="showSuperWholesalePrice" style="margin-bottom: 0px !important;">إظهار سعر بيع جمله الجمله</label>
+      </div>
+      <div class="flex items-center gap-[10px] mt-5">
+        <input type="checkbox" id="showAverageCostPrice" formControlName="showAverageCostPrice" />
+        <label for="showAverageCostPrice" style="margin-bottom: 0px !important;">إظهار سعر متوسط التكلفه</label>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-4">
+      <div class="flex items-center gap-[10px]">
+        <input type="checkbox" id="showPurchasePrice" formControlName="showPurchasePrice" />
+        <label for="showPurchasePrice" style="margin-bottom: 0px !important;">إظهار سعر بيع شراء</label>
+      </div>
+      <div class="flex items-center gap-[10px] mt-5">
+        <input type="checkbox" id="allowSellingBelowAvailable" formControlName="allowSellingBelowAvailable" />
+        <label for="allowSellingBelowAvailable" style="margin-bottom: 0px !important;">البيع بكميه اقل من المتاح</label>
+      </div>
+    </div>
+  </div>
 </form>
 
-
-
-
-
-
-
+<app-shared-confirm-dialog
+  [show]="showDeleteDialog"
+  [title]="'حذف المجموعة'"
+  [message]="'هل أنت متأكد من حذف هذه المجموعة؟ لا يمكن التراجع عن هذا الإجراء.'"
+  (confirm)="deleteDialog()"
+  (cancel)="showDeleteDialog = false"
+></app-shared-confirm-dialog>

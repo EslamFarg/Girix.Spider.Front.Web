@@ -1,0 +1,42 @@
+.table-responsive {
+    max-height: 470px;
+    min-height: 523px;
+    overflow: auto;
+  }
+  
+  .table-responsive table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  
+  .table-responsive th,
+  .table-responsive td {
+    min-width: 65px;
+    padding: 5px;
+    vertical-align: middle;
+  }
+  
+  .table-responsive th {
+    font-weight: 600;
+    padding: 10px;
+  }
+  
+  ng-select {
+    width: 100%;
+  }
+  
+  .btn_add_reset {
+    display: flex;
+    justify-content: flex-end;
+    // margin-top: 20px;
+  }
+  
+  small {
+    color: rgb(238, 11, 11);
+    font-size: 9px;
+    font-weight: 700;
+    margin: 6px;
+    display: block;
+    text-align: right;
+  }

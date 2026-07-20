@@ -1,0 +1,8 @@
+input[type="password"]{
+    .ng-valid.ng-touched{
+        background-image: none;
+    }
+    .ng-invalid.ng-touched{
+        background-image: none;
+    }
+}

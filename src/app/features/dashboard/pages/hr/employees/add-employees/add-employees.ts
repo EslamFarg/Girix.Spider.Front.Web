@@ -199,7 +199,8 @@ export class AddEmployees extends FormComponentBase {
     [
       Validators.required,
       Validators.minLength(3),
-      Validators.maxLength(500)
+      Validators.maxLength(500),
+      entityNameValidator()
     ]
   ]
 });

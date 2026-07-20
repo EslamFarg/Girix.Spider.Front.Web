@@ -1,6 +1,6 @@
 <div class="flex items-center justify-between
  h-[60px] bg-[var(--color-bg)]   px-4
-
+bg-white
 " style="box-shadow: -5px 1px 5px rgba(9, 24, 56, 0.1)  !important;">
 
 <div class="right flex items-center gap-4">
@@ -152,7 +152,7 @@
             ">الملف الشخصي
                 <span><i class="fa-solid fa-user"></i></span>
             </p>
-            <p class="p-2 text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-bg)]
+            <p (click)="logout()" class="p-2 text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-bg)]
             flex items-center justify-between
        
             ">تسجيل الخروج

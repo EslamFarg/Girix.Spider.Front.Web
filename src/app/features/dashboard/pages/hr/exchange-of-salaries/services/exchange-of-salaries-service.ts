@@ -19,6 +19,15 @@ export class ExchangeOfSalariesService{
   }
 
   GetEmployeeSalaryPosting(param:any){
-    return this.http.get(`${environment.baseUrl}/api/SalaryPayments/GetEmployeeSalaryPostingRow?${param.toString()}`);
+    return this.http.get(`${environment.baseUrl}/api/SalaryPayments/GetSalaryPostingDetailEmployees?${param.toString()}`);
+  }
+
+
+  createSalaryPayment(data:any){
+    return this.http.post(`${environment.baseUrl}/api/SalaryPayments`,data);
+  }
+
+  updateSalaryPayment(data:any){
+    return this.http.put(`${environment.baseUrl}/api/SalaryPayments`,data);
   }
 }

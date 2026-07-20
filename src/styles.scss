@@ -397,6 +397,7 @@ p-datepicker{
     table{
         // border: 1px solid var(--color-border-input);
         tr{
+            z-index: 22;
             th,td{
                 font-size: 14px;
                 font-weight: 400;
@@ -1143,6 +1144,12 @@ p-autocomplete{
     .p-autocomplete-loader{
         left: 35px !important;
     }
+
+    &.search-product-autoComplete{
+        .p-autocomplete-loader{
+            left: 10px !important;
+        }
+    }
     .p-autocomplete-input{
             background-color: var(--color-white) !important;
             border: 1px solid var(--color-border-input) !important;
@@ -1249,7 +1256,11 @@ input:-webkit-autofill {
     input{
         height:32px !important;
     }
+
+    
 }
+
+
 
 .ng-select.ng-select-focused .ng-select-container,
 .ng-select.ng-select-opened .ng-select-container {

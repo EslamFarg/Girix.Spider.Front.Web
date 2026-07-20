@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AuthServices } from '../../../auth/services/auth-services';
 
 @Component({
   selector: 'app-home',
@@ -6,4 +7,6 @@ import { Component } from '@angular/core';
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home {}
+export class Home {
+ 
+}

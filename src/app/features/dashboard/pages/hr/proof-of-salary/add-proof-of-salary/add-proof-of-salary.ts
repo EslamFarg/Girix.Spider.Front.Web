@@ -57,7 +57,7 @@ export class AddProofOfSalary implements OnInit, OnDestroy {
   searchForm = this._fb.group({
     departmentId: [0, [Validators.required]],
     month: [1, [Validators.required]],
-    year: [1, [Validators.required]],
+    year: [2026, [Validators.required]],
   });
 
   payrollForm = this._fb.group({
@@ -186,16 +186,29 @@ export class AddProofOfSalary implements OnInit, OnDestroy {
     this._proofService
       .getPayrollEmployees({
         month: String(month!),
-        year: String(this.getActualYear(year!)),
+        year: year!.toString(),
         departmentId,
       })
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: (res) => {
-          const data = res.data;
-          const rows = Array.isArray(data) ? data : (data?.rows ?? []);
-          this.buildPayrollItems(rows);
-          this.hasSearchResults = rows.length > 0;
+          if (res.isSuccess) {
+            const data = res.data;
+            const rows = Array.isArray(data) ? data : (data?.rows ?? []);
+            this.buildPayrollItems(rows);
+            this.hasSearchResults = rows.length > 0;
+          } else {
+            // this._messageService.add({
+            //   severity: 'error',
+            //   summary: 'خطاء',
+            //   detail: res.message,
+            // });
+            this.hasSearchResults = false;
+          }
+          // const data = res.data;
+          // const rows = Array.isArray(data) ? data : (data?.rows ?? []);
+          // this.buildPayrollItems(rows);
+          // this.hasSearchResults = rows.length > 0;
         },
       });
   }
@@ -397,7 +410,7 @@ export class AddProofOfSalary implements OnInit, OnDestroy {
 
     return {
       month: month!,
-      year: this.getActualYear(year!),
+      year: year!,
       postingDate: this.postingDate ?? new Date().toISOString(),
       notes: this.notes,
       details: this.items.controls.map((control) => this.mapDetailFromGroup(control)),
@@ -464,9 +477,9 @@ export class AddProofOfSalary implements OnInit, OnDestroy {
     return value == null || Number.isNaN(Number(value)) ? 0 : Number(value);
   }
 
-  private getActualYear(yearId: number): number {
-    return 2025 + yearId;
-  }
+  // private getActualYear(yearId: number): number {
+  //   return 2025 + yearId;
+  // }
 
   private getYearIdFromActualYear(actualYear: number): number {
     const yearId = actualYear - 2025;

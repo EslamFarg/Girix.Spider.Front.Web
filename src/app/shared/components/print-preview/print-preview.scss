@@ -1,0 +1,201 @@
+html,
+body{
+
+margin:0;
+
+padding:0;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+}
+.print-preview{
+
+    background:#fff;
+
+    border:1px solid #E8E8E8;
+
+    border-radius:16px;
+
+    overflow:hidden;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+
+}
+
+.toolbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 24px;
+
+    border-bottom:1px solid #ECECEC;
+
+    background:#FAFAFA;
+
+    flex-wrap:wrap;
+
+    gap:16px;
+
+}
+
+.toolbar-info{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+}
+
+.toolbar-info .icon{
+
+    width:48px;
+
+    height:48px;
+
+    border-radius:12px;
+
+    background:#EEF4FF;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:22px;
+
+    color:#2563EB;
+
+}
+
+.toolbar-info h3{
+
+    margin:0;
+
+    font-size:18px;
+
+    font-weight:700;
+
+}
+
+.toolbar-info span{
+
+    color:#888;
+
+    font-size:13px;
+
+}
+
+.toolbar-actions{
+
+    display:flex;
+
+    gap:12px;
+
+}
+
+.toolbar-actions button{
+
+    // min-width:140px;
+
+    // height:44px;
+
+    min-width: 94px;
+    height: 32px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:8px;
+
+    border-radius:10px;
+
+    transition:.25s;
+
+}
+
+.toolbar-actions button:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.print-area{
+
+    padding:35px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#f3f3f3;
+    
+
+    min-height:350px;
+    transition: transform 0.3s ease;
+
+    &:has(.print-items-grid){
+        // padding: 16px;
+        display: block !important;
+    }
+
+    &:hover{
+        // transform: scale(1.05);
+    }
+
+}
+
+@media print {
+    .toolbar {
+      display: none !important;
+    }
+  
+    h3,
+    .toolbar-info span {
+      display: none !important;
+    }
+  }
+
+
+//   overlay
+
+.loading-print{
+    position:absolute;
+    inset:0;
+    background:rgba(255,255,255,.85);
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    z-index:1000;
+}
+
+.loading-print i{
+    font-size:42px;
+    color:#2563eb;
+    margin-bottom:12px;
+}
+
+:host ::ng-deep .p-dialog{
+    .p-dialog-title{
+        color: #000 !important;
+    }
+    background-color: #fff !important;
+}

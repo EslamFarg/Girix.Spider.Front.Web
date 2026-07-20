@@ -5,16 +5,23 @@
   (actionClicked)="handleAction($event)"
 ></app-page-header>
 
-<form class="box_header relative">
-        <div class="inventoryName text-[20px] font-[700] text-[--var(--color-black)] absolute left-[15px] top-[20px]">مخزن الرياض</div>
+<form class="box_header relative" [formGroup]="transferOrderForm" >
+        <div class="inventoryName text-[20px] font-[700] text-[--var(--color-black)] absolute left-[15px] top-[20px]">{{this.settingsUser?.defaultWarehouseName}}</div>
   <div class="title">بيانات طلب التحويل</div>
-  <div class="input_group">
+  <div class="input_group input_group_search">
     <label>بحث برقم الطلب</label>
-    <div class="flex items-center gap-2 relative">
+    <div class="flex items-center gap-2 relative ">
       <div class="search_input relative ">
-        <input type="text" class="text-[14px]"  style="color:var(--color-black); font-weight:600; width:700px;"/>
-        <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[10px]" >
-          <button>
+        <input
+          type="text"
+          class="text-[14px]"
+          style="color:var(--color-black); font-weight:600;"
+          placeholder="بحث برقم الطلب"
+          [formControl]="requestSearchControl"
+          (keyup.enter)="searchTransferRequest($event)"
+        />
+        <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[6px]" >
+          <!-- <button>
             <svg
               width="20"
               height="18"
@@ -38,9 +45,9 @@
           >
             <rect width="1" height="18" fill="#BFD3E0" />
           </svg>
-         </button>
+         </button> -->
 
-          <button>
+          <button type="button" (click)="searchTransferRequest()">
             <svg
               width="20"
               height="20"
@@ -72,22 +79,31 @@
 
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] my-[20px]">
-    <div class="col-span-4">
+    <div class="col-span-12 lg:col-span-4 ">
         <label for="employee" >موظف التحويل</label>
-        <input type="text" id="employee" placeholder="موظف التحويل">
+        <input type="text" id="employee" placeholder="موظف التحويل" formControlName="employeeName" 
+        style="pointer-events: none; "
+        readonly
+        >
     </div>
-       <div class="col-span-4">
+       <div class="col-span-12 lg:col-span-4 ">
         <label for="warehouseorder">طلب من مخزن</label>
-        <ng-select [items]="[]" [bindLabel]="''" [bindValue]="''" [placeholder]="'طلب من مخزن'"></ng-select>
+        <ng-select [items]="this._lookupFacade.inventoriesWithPagination()"
+        [virtualScroll]="true"
+        (scrollToEnd)="loadMoreInventories()"
+         [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'طلب من مخزن'" formControlName="fromWarehouseId"></ng-select>
+        <app-form-error [control]="transferOrderForm.controls['fromWarehouseId']" [errorKey]="'required'" [message]="'المخزن مطلوب'"></app-form-error>
     </div>
-    <div class="col-span-4">
+    <div class="col-span-12 lg:col-span-4 ">
           <label for="icondisplay" class="font-bold block mb-2"> التاريخ </label>
-          <p-datepicker  [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="icondisplay" />
+          <p-datepicker  [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="icondisplay" formControlName="date"/>
+          <app-form-error [control]="transferOrderForm.controls['date']" [errorKey]="'required'" [message]="'التاريخ مطلوب'"></app-form-error>
       </div>
 
          <div class="col-span-12">
         <label for="reference">ملاحظات</label>
-        <textarea type="text" placeholder="ملاحظات" id="reference"></textarea>
+        <textarea type="text" placeholder="ملاحظات" id="reference" formControlName="notes"></textarea>
+        <app-form-error [control]="transferOrderForm.controls['notes']" [errorKey]="'required'" [message]="'الملاحظات مطلوبة'"></app-form-error>
     </div>
    
  
@@ -103,7 +119,7 @@
 
 
 
-<div class="table-responsive">
+<!-- <div class="table-responsive">
   <table class="w-full ">
     <thead class="bg-gray-100 ">
       <tr class="sticky top-0">
@@ -115,7 +131,7 @@
         <th class="p-2 text-center">الادوات</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody  formArrayName="lines">
 
              <tr class="section_add sticky top-[37px] [&>*]:bg-[var(--color-white)] ">
         <td class="p-2 text-center text-[var(--color-gray)] text-[14px] font-[400]">م</td>
@@ -152,19 +168,12 @@
 
       <td class="p-2 w-full flex items-center justify-center gap-2">
             <button class="update">
-                <!-- <svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="33.0001" height="25.0001" rx="2" fill="#BEE0F0"/>
-<path d="M11 8H10C9.46957 8 8.96086 8.21071 8.58579 8.58579C8.21071 8.96086 8 9.46957 8 10V19C8 19.5304 8.21071 20.0391 8.58579 20.4142C8.96086 20.7893 9.46957 21 10 21H19C19.5304 21 20.0391 20.7893 20.4142 20.4142C20.7893 20.0391 21 19.5304 21 19V18" stroke="#083448" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M20 6.00011L23 9.00011M24.385 7.58511C24.7788 7.19126 25.0001 6.65709 25.0001 6.10011C25.0001 5.54312 24.7788 5.00895 24.385 4.61511C23.9912 4.22126 23.457 4 22.9 4C22.343 4 21.8088 4.22126 21.415 4.61511L13 13.0001V16.0001H16L24.385 7.58511Z" stroke="#083448" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg> -->
+              
 
 <i class="fa-solid fa-pen-to-square"></i>
             </button>
             <button class="delete">
-                <!-- <svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="33" height="25" rx="2" fill="#FFE5E5"/>
-<path d="M23.5 4.5H20L19 3.5H14L13 4.5H9.5V6.5H23.5M10.5 19.5C10.5 20.0304 10.7107 20.5391 11.0858 20.9142C11.4609 21.2893 11.9696 21.5 12.5 21.5H20.5C21.0304 21.5 21.5391 21.2893 21.9142 20.9142C22.2893 20.5391 22.5 20.0304 22.5 19.5V7.5H10.5V19.5Z" fill="#FF3D00"/>
-</svg> -->
+
   <i class="fa-solid fa-trash"></i>
 
             </button>
@@ -185,6 +194,156 @@
             <td ></td>
            
         </tr>
+    </tfoot>
+  </table>
+</div> -->
+
+
+<!-- تأكد من ربط الفورم الرئيسي هنا -->
+<div class="table-responsive" [formGroup]="transferOrderForm">
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr class="sticky top-0">
+        <th class="p-2 text-center">م</th>
+        <th class="p-2 text-center">كود الصنف</th>
+        <th class="p-2 text-center">اسم الصنف</th>
+        <th class="p-2 text-center">الوحده</th>
+        <th class="p-2 text-center">الكميه المطلوبة</th>
+        <th class="p-2 text-center">الادوات</th>
+      </tr>
+    </thead>
+    
+    <tbody formArrayName="lines">
+<!-- 
+      <tr class="section_add sticky top-[37px] [&>*]:bg-[var(--color-white)]">
+        <td class="p-2 text-center text-[var(--color-gray)] text-[14px] font-[400]">+</td>
+        <td class="p-2">
+        
+          <input type="text" class="form-control" #newCode placeholder="كود الصنف">
+          <app-form-error [control]="lines.controls['code']" [errorKey]="'required'" [message]="'الكود مطلوب'"></app-form-error>
+        </td>
+        <td class="p-2">
+          <input type="text" #newItemName placeholder="اسم الصنف" >
+        </td>
+        <td class="p-2">
+          <ng-select [items]="this._lookupFacade.unitOfMeasures()" [bindLabel]="'name'" [bindValue]="'id'" placeholder="الوحدة"></ng-select>
+        </td>
+        <td class="p-2">
+          <input type="number" #newQty placeholder="العدد" value="1">
+        </td>
+        <td class="block text-center w-[100%] p-[11px]">
+       
+          <button type="button" class="btn btn-primary" (click)="addNewLine(newCode.value, newItemName.value, newQty.value); newCode.value=''; newItemName.value=''; newQty.value='1'">اضافه</button>
+        </td>
+      </tr> -->
+
+      <tr class="section_add sticky top-[37px] [&>*]:bg-[var(--color-white)]" [formGroup]="addItemForm">
+        <td class="p-2 text-center text-[var(--color-gray)] text-[14px] font-[400]">+</td>
+        
+        <!-- الكود -->
+        <td class="p-2">
+          <input type="text" class="form-control" formControlName="code" placeholder="كود الصنف" (keydown.enter)="onSearchByCode($event)">
+          <app-form-error [control]="addItemForm.controls['code']" [errorKey]="'required'" [message]="'الكود مطلوب'"></app-form-error>
+        </td>
+        
+        <!-- الاسم -->
+        <td class="p-2">
+          <p-autocomplete
+          class="search-product-autoComplete w-full"
+          [suggestions]="items"
+          optionLabel="label"
+          (completeMethod)="search($event)"
+          [placeholder]="'ابحث عن صنف...'"
+          [formControl]="searchControl"
+          #autoComplete
+          (onSelect)="onSelectProduct($event)"
+          formControlName="itemName"
+        />
+          <!-- <input type="text" class="form-control" formControlName="itemName" placeholder="اسم الصنف"> -->
+          <app-form-error [control]="addItemForm.controls['itemName']" [errorKey]="'required'" [message]="'اسم الصنف مطلوب'"></app-form-error>
+        </td>
+        
+        <!-- الوحدة -->
+        <td class="p-2">
+          <ng-select 
+            [items]="dataUnits" 
+            [bindLabel]="'unitName'" 
+            [bindValue]="'unitId'" 
+            formControlName="unitId"
+            [appendTo]="'body'"
+            [dropdownPosition]="'bottom'"
+            (change)="onUnitChange($event)"
+            
+            placeholder="الوحدة">
+          </ng-select>
+          <app-form-error [control]="addItemForm.controls['unitId']" [errorKey]="'required'" [message]="'الوحدة مطلوبة'"></app-form-error>
+        </td>
+        
+        <!-- العدد -->
+        <td class="p-2">
+          <input type="number" class="form-control" formControlName="qty" placeholder="العدد">
+          <app-form-error [control]="addItemForm.controls['qty']" [errorKey]="'required'" [message]="'العدد مطلوب'"></app-form-error>
+        </td>
+        
+        <td class="block text-center w-[100%] p-[11px]">
+          <button type="button" class="btn" [ngClass]="{'btn-primary': editingIndex === null, 'btn-warning': editingIndex !== null}" (click)="addNewLine()" >{{ editingIndex === null ? 'اضافه' : 'تعديل' }}</button>
+        </td>
+      </tr>
+
+      <!-- عرض الأسطر المضافة داخل الـ FormArray -->
+      @for(line of lines.controls; track $index) {
+        <tr [formGroupName]="$index">
+          <td class="p-2 text-center">{{ $index + 1 }}</td>
+          
+          <td class="p-2">
+            <!-- <input type="text" formControlName="code" class="text-center w-full border-0 bg-transparent" readonly> -->
+            <span>{{ line.get('code')?.value }}</span>
+          </td>
+          
+          <!-- حقل اسم الصنف -->
+          <td class="p-2">
+            <!-- <input type="text" formControlName="itemName" class="text-center w-full border-0 bg-transparent" readonlyظ> -->
+            <span>{{ line.get('itemName')?.value }}</span>
+          </td>
+          
+          <!-- حقل الوحدة -->
+          <td class="p-2 text-center">
+             <!-- يمكنك عرض اسم الوحدة أو عمل select control -->
+             <!-- <input type="text" formControlName="unitId" class="text-center w-full border-0 bg-transparent" readonly> -->
+             <span>{{ line.get('unitName')?.value }}</span>
+          </td>
+          
+          <!-- حقل الكمية المطلوبة (قابل للتعديل مباشرة) -->
+          <td class="p-2">
+            <span>{{ line.get('requestedQuantity')?.value }}</span>
+            <!-- <input type="number" formControlName="requestedQuantity" class="text-center w-full border border-gray-300 rounded p-1"> -->
+          </td>
+
+          <!-- الأدوات (حذف) -->
+          <td class="p-2 w-full flex items-center justify-center gap-2">
+            <button type="button" class="update text-blue-600" (click)="editLine($index)"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button type="button" class="delete text-red-600" (click)="removeLine($index)">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="text-center p-4 text-gray-500">لا توجد أصناف مضافة بعد.</td>
+        </tr>
+      }
+    </tbody>
+
+    <tfoot>
+      <tr class="sticky bottom-0 [&>*]:text-center">
+        <td></td>
+        <td>الاجمالي</td>
+        <td></td>
+        <td></td>
+        <!-- حساب الإجمالي تلقائياً من الـ FormArray -->
+        <td>{{ getTotalQuantity() }}</td>
+        <td></td>
+      </tr>
     </tfoot>
   </table>
 </div>
@@ -211,3 +370,11 @@
 </footer>
 
 
+
+<app-shared-confirm-dialog
+  [show]="showDeleteDialogTransfer"
+  [title]="'حذف الطلب'"
+  [message]="'هل أنت متأكد من حذف هذا الطلب ؟ لا يمكن التراجع عن هذا الإجراء.'"
+  (confirm)="deleteDialogTransfer()"
+  (cancel)="showDeleteDialogTransfer = false"
+></app-shared-confirm-dialog>

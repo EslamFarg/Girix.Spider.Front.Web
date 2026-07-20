@@ -383,6 +383,7 @@
             placeholder="المخزن"
             formControlName="warehouseId"
           ></ng-select>
+          <app-form-error [control]="itemAddingForm.controls['warehouseId']" [errorKey]="'required'" [message]="'المخزن مطلوب'"></app-form-error>
         </td>
 
         <td class="p-2">
@@ -407,6 +408,7 @@
 
         <td class="p-2">
           <input type="number" class="form-control text-center" formControlName="price" />
+          <app-form-error [control]="itemAddingForm.controls['price']" [errorKey]="'required'" [message]="'سعر الشراء مطلوب'"></app-form-error>
         </td>
 
         <td class="p-2">

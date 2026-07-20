@@ -215,7 +215,14 @@ export class PageHeaderSearch {
     }
 
     const active = this.filteringData().find((x: any) => this.hasFilterValue(x.value));
-    if (!active) return;
+    // if (!active) return;
+
+    if(!active){
+      this.clickSearch.emit(null);
+      this.visible = false;
+      this.cdr.detectChanges();
+      return;
+    }
 
     this.visible = false;
 

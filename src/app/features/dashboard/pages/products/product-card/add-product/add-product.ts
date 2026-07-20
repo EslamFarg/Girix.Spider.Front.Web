@@ -104,9 +104,9 @@ export class AddProduct extends FormComponentBase{
     vat: [null, [Validators.required]],
     selectiveVat: [null, [Validators.required]],
     isScaleItem: [true],
-    vatCode: [null, [Validators.required]],
+    vatCode: [null],
     taxExemptionReasonCode: [''],
-    taxExemptionReason: [null, [Validators.required]] as any,
+    taxExemptionReason: [null] as any,
     productCards: this._fb.array([]) as any,
   });
 
@@ -133,6 +133,10 @@ export class AddProduct extends FormComponentBase{
   pageSize = 10;
   SearchValEnum: any = SearchableColumnEnum.Code;
   showDeleteDialog = false;
+  explorerBtn={
+    label:'مستكشف الأصناف ',
+    link:'/products/product-card/explorer'
+  }
   // !!!!!!!!!!! Methods
 
   ngOnInit() {
@@ -188,8 +192,100 @@ export class AddProduct extends FormComponentBase{
     this.initVatLogic();
     this.loadProductFromExplorer();
     this.refreshActions();
+    this.changeNameArValidation();
+    this.changeVatValue();
+    this.checkBarcodeValidation();
   }
 
+
+  checkBarcodeValidation(){
+    let barcode1:any= this.newProductCardForm.get('barcode1');
+    let barcode2:any= this.newProductCardForm.get('barcode2');
+    barcode1.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value: any) => {
+      console.log(value);
+    });
+    
+    barcode2.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value: any) => {
+      console.log(value);
+    });
+
+    
+  }
+
+  changeVatValue(){
+    this.productForm.get('vat')?.valueChanges
+    .pipe(takeUntilDestroyed(this._destroyRef))
+    .subscribe((value: any) => {
+      if(value === 0){
+        this.productForm.get('vatCode')?.clearValidators();
+        this.productForm.get('selectiveVat')?.clearValidators();
+        this.productForm.get('selectiveVat')?.setValue(0);
+        this.productForm.get('selectiveVat')?.disable();
+      }else{
+        this.productForm.get('vatCode')?.setValidators([Validators.required]);
+        this.productForm.get('selectiveVat')?.setValidators([Validators.required]);
+        
+        this.productForm.get('selectiveVat')?.setValue(null);
+        this.productForm.get('selectiveVat')?.enable();
+      }
+    });
+  }
+
+
+  changeNameArValidation() {
+    this.productForm.get('nameAr')?.valueChanges
+    .pipe(takeUntilDestroyed(this._destroyRef))
+    .subscribe((value: string) => {
+      const nameEn = this.productForm.get('nameEn');
+  
+      if (value?.trim()) {
+        // كتب العربي => الإنجليزي مش Required
+        nameEn?.clearValidators();
+        nameEn?.setValidators([
+          Validators.minLength(2),
+          Validators.maxLength(100),
+          entityNameValidator(),
+        ]);
+      } else {
+        // العربي فاضي => الإنجليزي Required
+        nameEn?.setValidators([
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(100),
+          entityNameValidator(),
+        ]);
+      }
+  
+      nameEn?.updateValueAndValidity({ emitEvent: false });
+    });
+  
+  this.productForm.get('nameEn')?.valueChanges
+    .pipe(takeUntilDestroyed(this._destroyRef))
+    .subscribe((value: string) => {
+      const nameAr = this.productForm.get('nameAr');
+  
+      if (value?.trim()) {
+        // كتب الإنجليزي => العربي مش Required
+        nameAr?.clearValidators();
+        nameAr?.setValidators([
+          Validators.minLength(2),
+          Validators.maxLength(100),
+          entityNameValidator(),
+        ]);
+      } else {
+        // الإنجليزي فاضي => العربي Required
+        nameAr?.setValidators([
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(100),
+          entityNameValidator(),
+        ]);
+      }
+  
+      nameAr?.updateValueAndValidity({ emitEvent: false });
+    });
+  
+  }
 
     loadProductFromExplorer() {
    const id:any=this._sharedStateServices.selectedId$();
@@ -289,6 +385,61 @@ export class AddProduct extends FormComponentBase{
 
       return;
     }
+
+
+    const barcode1 = this.newProductCardForm.get('barcode1')?.value?.trim();
+const barcode2 = this.newProductCardForm.get('barcode2')?.value?.trim();
+const productCode = this.productForm.get('code')?.value?.trim();
+
+
+if (barcode1 && barcode2 && barcode1 === barcode2) {
+  this._messageService.add({
+    severity: 'warn',
+    summary: 'تنبيه',
+    detail: 'لا يمكن أن يكون الباركود الأول والثاني متطابقين',
+  });
+  return;
+}
+
+if (
+  barcode1 === productCode ||
+  barcode2 === productCode
+) {
+  this._messageService.add({
+    severity: 'warn',
+    summary: 'تنبيه',
+    detail: 'لا يمكن أن يكون الباركود مساوياً لكود الصنف',
+  });
+  return;
+}
+
+
+const productCards = this.productCards.controls;
+
+const isBarcodeExists = productCards.some(card => {
+
+  const oldBarcode1 = card.get('barcode1')?.value;
+  const oldBarcode2 = card.get('barcode2')?.value;
+
+  return (
+      oldBarcode1 === barcode1 ||
+      oldBarcode2 === barcode1 ||
+      oldBarcode1 === barcode2 ||
+      oldBarcode2 === barcode2
+  );
+
+});
+
+if (isBarcodeExists) {
+    this._messageService.add({
+      severity: 'warn',
+      summary: 'تنبيه',
+      detail: 'هذا الباركود مستخدم بالفعل',
+    });
+    return;
+}
+
+
     const exists = this.isDuplicate(
       (control) =>
         control.get('unitOfMeasureId')?.value === value.unitOfMeasureId &&
@@ -461,10 +612,7 @@ export class AddProduct extends FormComponentBase{
     },
   ];
 
-  explorerBtn = {
-    // label:'مستكشف فاتورة مبيعات',
-    // link:'/display-sales-prices/explorer'
-  };
+
 
   items: any[] = [];
   value: any;

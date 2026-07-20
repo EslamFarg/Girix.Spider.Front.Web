@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { BasehttpService } from '../../../../../../shared/services/basehttp-service';
 
 @Injectable({
@@ -15,5 +16,10 @@ export class GroupsServices extends BasehttpService {
       'search':'api/ProductGroup/Search'
     });
   }
-  
+
+  getByIdWithProductAndUnits(id: number): Observable<unknown> {
+    return this.http.get(
+      `${this.baseUrl}/api/ProductGroup/GetByIdWithProductAndUnits?id=${id}`
+    );
+  }
 }

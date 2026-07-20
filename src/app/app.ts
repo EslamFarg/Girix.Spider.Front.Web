@@ -8,6 +8,7 @@ import { SHARED_IMPORTS } from './shared/shared-imports';
 import { LoadingService } from './shared/ui/loading/services/loading';
 import { Toastr } from "./shared/ui/toastr/toastr";
 import { ToastModule, Toast } from 'primeng/toast';
+import { ApplicationSettingsService } from './shared/services/application-settings-service';
 
 @Component({
   selector: 'app-root',
@@ -19,4 +20,15 @@ export class App {
   // !!!! Services
   _loading=inject(LoadingService);
   loading$ = this._loading.loading$;
+  _applicationSettingsService=inject(ApplicationSettingsService);
+
+  ngOnInit() {
+    const settings = this._applicationSettingsService.setSettings();
+    console.log('settings', settings);
+    // if (settings) {
+    //   this._applicationSettingsService.setSettings(settings);
+    // }
+  }
+
+  
 }

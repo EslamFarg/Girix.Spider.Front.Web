@@ -63,15 +63,15 @@ export class AddTheDelegate extends FormComponentBase{
       ],
     ],
     phone: ['', [Validators.required, egyptSaudiPhoneValidator]],
-    area: [
-      '',
-      [
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(100),
-        entityNameValidator(),
-      ],
-    ],
+    // area: [
+    //   '',
+    //   [
+    //     Validators.required,
+    //     Validators.minLength(2),
+    //     Validators.maxLength(100),
+    //     entityNameValidator(),
+    //   ],
+    // ],
     commissionPercent: ['', [Validators.required]],
     commissionType: [this.CommissionTypeSales, [Validators.required]],
   });
@@ -108,7 +108,7 @@ export class AddTheDelegate extends FormComponentBase{
       this.delegateForm.patchValue({
         name: res.data.name,
         phone: res.data.phone,
-        area: res.data.area,
+        // area: res.data.area,
         commissionPercent: res.data.commissionPercent,
         commissionType: res.data.commissionType,
       });
@@ -203,7 +203,7 @@ export class AddTheDelegate extends FormComponentBase{
       this.delegateForm.patchValue({
         name: res.data.name,
         phone: res.data.phone,
-        area: res.data.area,
+        // area: res.data.area,
         commissionPercent: res.data.commissionPercent,
         commissionType: res.data.commissionType,
       });

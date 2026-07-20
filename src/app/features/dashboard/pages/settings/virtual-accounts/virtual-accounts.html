@@ -1,0 +1,54 @@
+<h2 class="text-[20px] font-bold mt-4">الحسابات الأفتراضية</h2>
+
+<form (ngSubmit)="save()">
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr class="text-right sticky top-0 bg-white z-10 [&>*]:text-[20px]">
+          <th> <span class="text-right text-[16px] font-bold">م</span></th>
+          <th> <span class="text-right text-[16px] font-bold">الحساب الأساسي</span></th>
+          <th> <span class="text-right text-[16px] font-bold">الحساب المقابل</span></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @if (isLoading) {
+          <tr>
+            <td colspan="3" class="text-center py-5">جاري التحميل...</td>
+          </tr>
+        } @else {
+          @for (item of fixedAccounts; track item.fixedAccountCode; let i = $index) {
+            <tr>
+              <td>{{ i + 1 }}</td>
+              <td>{{ item?.nameAr }}</td>
+              <td>
+                <ng-select
+                  [items]="chartOfAccounts"
+                  bindLabel="name"
+                  bindValue="id"
+                  placeholder="اختر الحساب"
+                  [(ngModel)]="item.accountId"
+                  [ngModelOptions]="{ standalone: true }"
+                  [clearable]="true"
+                  [searchable]="true">
+                </ng-select>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="3" class="empty-cell text-center py-5">
+                لا توجد بيانات
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="btn_add_reset">
+    <button type="submit" class="btn btn-warning" [disabled]="isSaving || isLoading">
+      {{ isSaving ? 'جاري الحفظ...' : 'تعديل' }}
+    </button>
+  </div>
+</form>

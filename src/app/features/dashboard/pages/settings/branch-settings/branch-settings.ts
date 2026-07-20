@@ -145,7 +145,7 @@ export class BranchSettings implements OnInit {
   ];
 
   settingsForm = this._fb.group({
-    branchId: [0],
+    branchId: [1],
     priceType: [1],
     priceDisplayType: [0],
     companyNameAr: [
@@ -185,9 +185,9 @@ export class BranchSettings implements OnInit {
     currency: [1, [Validators.required]],
     decimalPrice: [0, [Validators.required, Validators.min(0), Validators.max(6)]],
     decimalQuantity: [0, [Validators.required, Validators.min(0), Validators.max(6)]],
-    purchaseStoreId: [null as number | null, [Validators.required]],
-    salesStoreId: [null as number | null, [Validators.required]],
-    reservationStoreId: [null as number | null, [Validators.required]],
+    // purchaseStoreId: [null as number | null, [Validators.required]],
+    // salesStoreId: [null as number | null, [Validators.required]],
+    // reservationStoreId: [null as number | null, [Validators.required]],
     costCenterId: [null as number | null, [Validators.required]],
     enableStatistics: [true, [Validators.required]],
     discountMethod: [1, [Validators.required]],
@@ -381,7 +381,7 @@ export class BranchSettings implements OnInit {
       });
 
     this._costCenterService
-      .getAllSendInQuery()
+      .getAllWithoutPagination()
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: (res: any) => {
@@ -410,9 +410,9 @@ export class BranchSettings implements OnInit {
       currency: data.currency ?? 1,
       decimalPrice: data.decimalPrice ?? 0,
       decimalQuantity: data.decimalQuantity ?? 0,
-      purchaseStoreId: data.purchaseStoreId || null,
-      salesStoreId: data.salesStoreId || null,
-      reservationStoreId: data.reservationStoreId || null,
+      // purchaseStoreId: data.purchaseStoreId || null,
+      // salesStoreId: data.salesStoreId || null,
+      // reservationStoreId: data.reservationStoreId || null,
       costCenterId: data.costCenterId || null,
       enableStatistics: data.enableStatistics ?? true,
       discountMethod: data.discountMethod ?? 1,
@@ -449,7 +449,7 @@ export class BranchSettings implements OnInit {
     });
   }
 
-  private buildUpsertPayload(): ApplicationSettingsModel {
+  private buildUpsertPayload(): any {
     const raw = this.settingsForm.getRawValue();
 
     return {
@@ -468,9 +468,9 @@ export class BranchSettings implements OnInit {
       currency: Number(raw.currency ?? 1),
       decimalPrice: Number(raw.decimalPrice ?? 0),
       decimalQuantity: Number(raw.decimalQuantity ?? 0),
-      purchaseStoreId: Number(raw.purchaseStoreId ?? 0),
-      salesStoreId: Number(raw.salesStoreId ?? 0),
-      reservationStoreId: Number(raw.reservationStoreId ?? 0),
+      // purchaseStoreId: Number(raw.purchaseStoreId ?? 0),
+      // salesStoreId: Number(raw.salesStoreId ?? 0),
+      // reservationStoreId: Number(raw.reservationStoreId ?? 0),
       costCenterId: Number(raw.costCenterId ?? 0),
       enableStatistics: !!raw.enableStatistics,
       discountMethod: Number(raw.discountMethod ?? 1),
@@ -572,7 +572,7 @@ export class BranchSettings implements OnInit {
     return result;
   }
 
-  private getSampleSettings(): ApplicationSettingsModel {
+  private getSampleSettings(): any {
     return {
       branchId: this.currentBranchId || 1,
       priceType: 1,
@@ -589,9 +589,9 @@ export class BranchSettings implements OnInit {
       currency: 1,
       decimalPrice: 2,
       decimalQuantity: 2,
-      purchaseStoreId: 0,
-      salesStoreId: 0,
-      reservationStoreId: 0,
+      // purchaseStoreId: 0,
+      // salesStoreId: 0,
+      // reservationStoreId: 0,
       costCenterId: 0,
       enableStatistics: true,
       discountMethod: 1,
@@ -640,9 +640,9 @@ export class BranchSettings implements OnInit {
 
     if (firstWarehouse) {
       this.settingsForm.patchValue({
-        purchaseStoreId: firstWarehouse,
-        salesStoreId: firstWarehouse,
-        reservationStoreId: firstWarehouse,
+        // purchaseStoreId: firstWarehouse,
+        // salesStoreId: firstWarehouse,
+        // reservationStoreId: firstWarehouse,
       });
     }
 

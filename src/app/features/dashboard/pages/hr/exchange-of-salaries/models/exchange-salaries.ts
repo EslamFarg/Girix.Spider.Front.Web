@@ -1,0 +1,31 @@
+export interface exchangeSalariesModel {
+  salaryPostingDetailId: number
+  salaryPostingId: number
+  postingNo: string
+  employeeId: number
+  employeeNumber: string
+  employeeName: string
+  departmentId: number
+  departmentName: string
+  basicSalary: number
+  allowancesAmount: number
+  allowancesCount: number
+  bonusAmount: number
+  bonusCount: number
+  penaltyAmount: number
+  penaltyCount: number
+  advanceAmount: number
+  advanceCount: number
+  deductionAmount: number
+  deductionCount: number
+  overtimeAmount: number
+  overtimeCount: number
+  delayAmount: number
+  delayCount: number
+  absenceAmount: number
+  absenceCount: number
+  vacationAmount: number
+  vacationCount: number
+  netSalary: number,
+  checked: boolean
+}

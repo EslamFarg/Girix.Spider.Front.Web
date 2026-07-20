@@ -1,0 +1,162 @@
+<div class="flex justify-between flex-wrap mb-[25px] sticky top-[60px] pt-[10px] mt-[10px] bg-[var(--color-bg)] z-1">
+  <div>
+    <h2 class="text-[var(--color-primary)] text-[20px] font-[700]">اضافة فرع</h2>
+    <div class="flex items-center flex-wrap gap-5 my-4 [&>*]:w-[104px] [&>*]:h-[32px]">
+      <button class="btn" [ngClass]="buttonClass" (click)="save()">{{ buttonLabel }}</button>
+      <button class="btn" (click)="reset()">جديد</button>
+      @if (idUpdate > 0) {
+        <button class="btn" (click)="delete()">حذف</button>
+        <button class="btn" (click)="print()">طباعه</button>
+      }
+    </div>
+  </div>
+
+  <div class="explorer_button">
+    <button [routerLink]="'/branches/explorer'" class="btn btn-primary" style="width:245px !important;">
+      مستكشف الفروع
+    </button>
+  </div>
+</div>
+
+<form class="box_header mb-7" [formGroup]="branchForm">
+  <div class="title">بيانات انشاء الفرع</div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] mb-[20px] mt-[5px]">
+    <div class="col-span-12 md:col-span-3">
+      <div class="input_group">
+        <label>بحث بكود الفرع</label>
+        <div class="flex items-center gap-2 relative">
+          <div class="search_input relative w-full">
+            <input
+              type="text"
+              class="text-[14px] w-full"
+              [formControl]="branchSearchControl"
+              placeholder="كود الفرع"
+              (keydown.enter)="$event.preventDefault(); searchBranchByCode()"
+              style="color:var(--color-black); font-weight:600;"
+            />
+            <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[7px]">
+              <button type="button" (click)="searchBranchByCode()">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.4193 17.5001C6.04702 17.5001 2.5026 13.9557 2.5026 9.58341C2.5026 5.21116 6.04702 1.66675 10.4193 1.66675C14.7915 1.66675 18.3359 5.21116 18.3359 9.58341C18.3359 13.9557 14.7915 17.5001 10.4193 17.5001Z"
+                    stroke="#7F7F7F"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M1.66927 18.3334L3.33594 16.6667"
+                    stroke="#7F7F7F"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px]">
+    <!-- <div class="col-span-12 md:col-span-3">
+      <label for="accountNumber">رقم الحساب</label>
+      <input
+        type="text"
+        id="accountNumber"
+        placeholder="رقم الحساب"
+        formControlName="accountNumber"
+        readonly
+        class="bg-gray-100 pointer-events-none"
+        style="background-color: #ebeced;"
+      />
+    </div> -->
+
+    <div class="col-span-12 md:col-span-4">
+      <label for="branchName">اسم الفرع</label>
+      <input type="text" placeholder="اسم الفرع" id="branchName" formControlName="nameAr" maxlength="100" />
+      <app-form-error
+        [control]="branchForm.controls['nameAr']"
+        [errorKey]="'required'"
+        [message]="'اسم الفرع مطلوب'"
+      ></app-form-error>
+      <app-form-error
+        [control]="branchForm.controls['nameAr']"
+        [errorKey]="'minlength'"
+        [message]="'اسم الفرع يجب ان يتكون من حرفين علي الاقل'"
+      ></app-form-error>
+      <app-form-error
+        [control]="branchForm.controls['nameAr']"
+        [errorKey]="'maxlength'"
+        [message]="'اسم الفرع يجب ان يكون اقل من 100 حروف'"
+      ></app-form-error>
+      <app-form-error
+        [control]="branchForm.controls['nameAr']"
+        [errorKey]="'invalidEntityName'"
+        [message]="'اسم الفرع يجب ان يحتوي علي احرف وارقام وبعض الحروف الخاصه مثل _ , - ولايبدء برقم'"
+      ></app-form-error>
+    </div>
+
+    <div class="col-span-12 md:col-span-4">
+      <label for="phoneNumber">رقم الجوال</label>
+      <intl-tel-input
+        [countryOrder]="['eg', 'sa']"
+        [onlyCountries]="['eg', 'sa']"
+        initialCountry="sa"
+        [loadUtils]="loadUtils"
+        formControlName="phoneNumber"
+      ></intl-tel-input>
+      <app-form-error
+        [control]="branchForm.controls['phoneNumber']"
+        [errorKey]="'required'"
+        [message]="'رقم الجوال مطلوب'"
+      ></app-form-error>
+      <app-form-error
+        [control]="branchForm.controls['phoneNumber']"
+        [errorKey]="'invalidSaudiPhone'"
+        [message]="'رقم الجوال السعودي غير صحيح'"
+      ></app-form-error>
+      <app-form-error
+        [control]="branchForm.controls['phoneNumber']"
+        [errorKey]="'invalidEgyptPhone'"
+        [message]="'رقم الجوال المصري غير صحيح'"
+      ></app-form-error>
+      <app-form-error
+        [control]="branchForm.controls['phoneNumber']"
+        [errorKey]="'invalidPhone'"
+        [message]="'رقم الجوال غير صحيح'"
+      ></app-form-error>
+    </div>
+
+    <div class="col-span-12 md:col-span-4">
+      <label for="address">العنوان</label>
+      <input type="text" placeholder="العنوان" id="address" formControlName="address" maxlength="250" />
+      <app-form-error
+        [control]="branchForm.controls['address']"
+        [errorKey]="'maxlength'"
+        [message]="'العنوان يجب ان يكون اقل من 250 حرف'"
+      ></app-form-error>
+    </div>
+
+    <div class="col-span-12">
+      <label for="reference">ملاحظات</label>
+      <textarea placeholder="ملاحظات" id="reference" formControlName="notes" maxlength="500"></textarea>
+      <app-form-error
+        [control]="branchForm.controls['notes']"
+        [errorKey]="'maxlength'"
+        [message]="'الملاحظات يجب ان تكون اقل من 500 حرف'"
+      ></app-form-error>
+    </div>
+  </div>
+</form>
+
+<app-shared-confirm-dialog
+  [show]="showDeleteDialog"
+  [title]="'حذف الفرع'"
+  [message]="'هل أنت متأكد من حذف هذا الفرع؟ لا يمكن التراجع عن هذا الإجراء.'"
+  (confirm)="deleteDialog()"
+  (cancel)="showDeleteDialog = false"
+></app-shared-confirm-dialog>

@@ -52,9 +52,11 @@ form{
         font-size: 16px;
         &.ng-invalid.ng-touched{
             border-color: var(--color-danger) !important;
+            background-image: none !important;
         }
         &.ng-valid.ng-touched{
             border-color: var(--color-success) !important;
+            background-image: none !important;
         }
     }
 }

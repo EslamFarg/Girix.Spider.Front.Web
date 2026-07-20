@@ -230,7 +230,99 @@ export class AddCustomers extends FormComponentBase{
       });
     this.refreshActions();
     this.loadCustomer();
+    this.customerForm.get('customerType')?.valueChanges
+    .pipe(takeUntilDestroyed(this._destroyRef))
+    .subscribe((type: any) => {
+      this.updateSimpleAddressValidation(type);
+      this.updateValidation(type === this.Individual);
+    });
   }
+
+  updateValidation(isIndividual: boolean) {
+    const controls = [
+      'phoneNumber',
+      'email',
+      'creditWarningLimit',
+      'creditLimit',
+      'idTypeId',
+      'idNumber',
+      'taxNumber'
+    ];
+  
+    if (isIndividual) {
+      // فرد => شيل الـ Required من كل الحقول
+      controls.forEach(controlName => {
+        const control = this.customerForm.get(controlName);
+  
+        control?.clearValidators();
+        control?.updateValueAndValidity({ emitEvent: false });
+      });
+  
+      // اسم العميل يفضل Required
+      this.customerForm.get('nameAr')?.setValidators([
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(100),
+        userNameValidation()
+      ]);
+  
+      this.customerForm.get('nameEn')?.setValidators([
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(100),
+        userNameValidation()
+      ]);
+      this.customerForm.get('phoneNumber')?.setValidators([
+        Validators.required,
+        egyptSaudiPhoneValidator
+      ]);
+    } else {
+      // شركة => رجع الـ Required
+      this.customerForm.get('phoneNumber')?.setValidators([
+        Validators.required,
+        egyptSaudiPhoneValidator
+      ]);
+  
+      this.customerForm.get('email')?.setValidators([
+        // Validators.required,
+        EmailValidation
+      ]);
+  
+      this.customerForm.get('creditWarningLimit')?.setValidators([
+        Validators.required,
+        Validators.maxLength(12)
+      ]);
+  
+      this.customerForm.get('creditLimit')?.setValidators([
+        Validators.required,
+        Validators.maxLength(12)
+      ]);
+  
+      this.customerForm.get('idTypeId')?.setValidators([
+        Validators.required
+      ]);
+  
+      this.customerForm.get('idNumber')?.setValidators([
+        Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(14)
+      ]);
+  
+      this.customerForm.get('taxNumber')?.setValidators([
+        Validators.required,
+        Validators.minLength(9),
+        Validators.maxLength(15)
+      ]);
+  
+      controls.forEach(controlName => {
+        this.customerForm.get(controlName)?.updateValueAndValidity({
+          emitEvent: false,
+        });
+      });
+    }
+  }
+
+
 
   @HostListener('document:click', ['$event'])
   onClick(event: any) {
@@ -581,6 +673,16 @@ getCombinedData() {
 
     
   };
+}
+
+ngOnDestroy(): void {
+  this.customerForm.reset();
+  this.searchControl.reset();
+  this.items = [];
+  this.autoComplete.hide();
+  this._sharedStateServices.clearSelectedId();
+  this.changeButtonState(0, false);
+  this.refreshActions();
 }
   
 }

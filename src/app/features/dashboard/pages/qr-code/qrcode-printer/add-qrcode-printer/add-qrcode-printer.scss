@@ -1,0 +1,118 @@
+.preview-card{
+
+    background:#fff;
+
+    border-radius:16px;
+
+    padding:24px;
+    padding-top:10px !important;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+
+    margin-top:30px;
+
+}
+
+.preview-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    border-bottom:1px solid #eee;
+
+    padding-bottom:15px;
+
+    margin-bottom:25px;
+
+}
+
+.preview-header h2{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    margin:0;
+
+}
+
+.preview-header span{
+
+    color:#888;
+
+    font-size:14px;
+
+}
+
+.preview-body{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+
+    gap:25px;
+
+}
+
+.preview-item{
+
+    background:#fafafa;
+
+    border:1px solid #ececec;
+
+    border-radius:12px;
+
+    min-height:270px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    transition:.3s;
+
+}
+
+.preview-item:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 10px 20px rgba(0,0,0,.08);
+
+}
+
+.preview-item h4{
+
+    margin-bottom:15px;
+
+    color:#666;
+
+    font-weight:600;
+
+}
+
+.preview-footer{
+
+    // margin-top:30px;
+    margin-top:10px !important;
+
+    // border-top:1px solid #eee;
+
+    // padding-top:20px;
+
+}
+
+.barcode-number {
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #111;
+  text-align: center;
+}

@@ -20,7 +20,21 @@ SupplayerNameEn = 10,
 SupplayerNameAr= 11,
 PuchareNum=12,
 EmployeeNumber=13,
+
+  // CustodyReceipt
+  CustodyName = 14,
+  CustodyReceiptAmount = 15,
+  ReceiptDate = 16,
+
+  // User
+  UserName = 17,
+  Email = 18,
+  //Group
+  BranchName=19,
   }
+
+
+
 
 
  

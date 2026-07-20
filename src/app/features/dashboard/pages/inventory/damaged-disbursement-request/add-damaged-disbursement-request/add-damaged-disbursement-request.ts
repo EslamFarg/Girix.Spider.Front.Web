@@ -60,6 +60,95 @@ itemsTable: any = Array.from({ length: 20 }, (_, i) => ({
   tools: ['تعديل', 'حذف'], // الأدوات
 }));
 
+
+
+damageReasons = [
+  { id: 1, name: 'انتهاء صلاحية' },
+  { id: 2, name: 'كسر' },
+  { id: 3, name: 'عيب تصنيع' },
+  { id: 4, name: 'سوء تخزين' },
+  { id: 5, name: 'تالف أثناء النقل' },
+  { id: 6, name: 'أخرى' }
+];
+
+constructor() {
+  // بيانات تجريبية
+  this.itemsTable = [
+    {
+      id: 1,
+      code: 'PRD-001',
+      itemName: 'شاشة Dell',
+      unit: 'قطعة',
+      balance: 20,
+      damagedQty: 2,
+      cost: 2500,
+      total: 5000,
+      damageReasonId: 2,
+      notes: ''
+    },
+    {
+      id: 2,
+      code: 'PRD-005',
+      itemName: 'كيبورد',
+      unit: 'قطعة',
+      balance: 100,
+      damagedQty: 5,
+      cost: 150,
+      total: 750,
+      damageReasonId: 3,
+      notes: ''
+    }
+  ];
+}
+
+get totalQty(): number {
+  return this.itemsTable.reduce(
+    (sum: number, item: any) => sum + Number(item.damagedQty || 0),
+    0
+  );
+}
+
+get totalAmount(): number {
+  return this.itemsTable.reduce(
+    (sum: number, item: any) => sum + Number(item.total || 0),
+    0
+  );
+}
+
+onQtyChange(item: any): void {
+
+  if (item.damagedQty > item.balance) {
+    item.damagedQty = item.balance;
+  }
+
+  if (item.damagedQty < 0) {
+    item.damagedQty = 0;
+  }
+
+  item.total = item.damagedQty * item.cost;
+}
+
+addRow(): void {
+
+  this.itemsTable.push({
+    id: Date.now(),
+    code: '',
+    itemName: '',
+    unit: '',
+    balance: 0,
+    damagedQty: 0,
+    cost: 0,
+    total: 0,
+    damageReasonId: null,
+    notes: ''
+  });
+
+}
+
+removeRow(index: number): void {
+  this.itemsTable.splice(index, 1);
+}
+
 // !!!!!!!!!!!!!!! Methods
 handleAction(action: string) {
   switch (action) {

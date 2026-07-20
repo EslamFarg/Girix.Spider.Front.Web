@@ -28,13 +28,13 @@
         <app-form-error [control]="settingsForm.controls['district']" [errorKey]="'required'" [message]="'الحي مطلوب'"></app-form-error>
         <app-form-error [control]="settingsForm.controls['district']" [errorKey]="'minlength'" [message]="'الحي يجب ان يكون حرفين علي الأقل'"></app-form-error>
     </div>
-    <div class="col-span-12 md:col-span-2">
+    <div class="col-span-12 md:col-span-4">
         <label for="country">البلد</label>
         <input type="text" placeholder="البلد" id="country" formControlName="country" maxlength="50">
         <app-form-error [control]="settingsForm.controls['country']" [errorKey]="'required'" [message]="'البلد مطلوب'"></app-form-error>
         <app-form-error [control]="settingsForm.controls['country']" [errorKey]="'minlength'" [message]="'البلد يجب ان يكون حرفين علي الأقل'"></app-form-error>
     </div>
-    <div class="col-span-12 md:col-span-2">
+    <div class="col-span-12 md:col-span-4">
         <label for="street">الشارع</label>
         <input type="text" placeholder="الشارع" id="street" formControlName="street" maxlength="100">
         <app-form-error [control]="settingsForm.controls['street']" [errorKey]="'required'" [message]="'الشارع مطلوب'"></app-form-error>
@@ -48,18 +48,18 @@
         <app-form-error [control]="settingsForm.controls['addressDetails']" [errorKey]="'minlength'" [message]="'العنوان يجب ان يكون 3 أحرف علي الأقل'"></app-form-error>
     </div>
    
-    <div class="col-span-12 md:col-span-4">
+    <!-- <div class="col-span-12 md:col-span-4">
         <label for="inventory">مخزن المشتريات</label>
         <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن المشتريات" formControlName="purchaseStoreId"></ng-select>
         <app-form-error [control]="settingsForm.controls['purchaseStoreId']" [errorKey]="'required'" [message]="'مخزن المشتريات مطلوب'"></app-form-error>
-    </div>
+    </div> -->
    
-    <div class="col-span-12 md:col-span-2">
+    <div class="col-span-12 md:col-span-4">
         <label for="buildingNumber">رقم المبني</label>
         <input type="text" placeholder="رقم المبني" id="buildingNumber" formControlName="buildingNumber" maxlength="10">
         <app-form-error [control]="settingsForm.controls['buildingNumber']" [errorKey]="'required'" [message]="'رقم المبني مطلوب'"></app-form-error>
     </div>
-    <div class="col-span-12 md:col-span-2">
+    <div class="col-span-12 md:col-span-4">
         <label for="phoneNumber">رقم الجوال</label>
         <input type="text" placeholder="رقم الجوال" id="phoneNumber" formControlName="mobile" maxlength="15">
         <app-form-error [control]="settingsForm.controls['mobile']" [errorKey]="'required'" [message]="'رقم الجوال مطلوب'"></app-form-error>
@@ -96,28 +96,28 @@
         <label for="zipCodeMain">الرمز البريدي</label>
         <input type="text" placeholder="الرمز البريدي" id="zipCodeMain" formControlName="postalCode" appOnlyNumber maxlength="10">
     </div>
-    <div class="col-span-12 md:col-span-4">
+    <div class="col-span-12 md:col-span-6">
         <label for="email">الأيميل</label>
         <input type="text" placeholder="الأيميل" id="email" formControlName="email" maxlength="100">
         <app-form-error [control]="settingsForm.controls['email']" [errorKey]="'required'" [message]="'البريد الالكتروني مطلوب'"></app-form-error>
         <app-form-error [control]="settingsForm.controls['email']" [errorKey]="'invalidEmail'" [message]="'البريد الالكتروني غير صحيح'"></app-form-error>
     </div>
    
-      <div class="col-span-12 md:col-span-4">
+      <!-- <div class="col-span-12 md:col-span-4">
         <label for="inventoryDefault">مخزن المشتريات الإفتراضي</label>
         <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن المشتريات الإفتراضي" formControlName="purchaseStoreId"></ng-select>
         <app-form-error [control]="settingsForm.controls['purchaseStoreId']" [errorKey]="'required'" [message]="'مخزن المشتريات الإفتراضي مطلوب'"></app-form-error>
-    </div>
-      <div class="col-span-12 md:col-span-4">
+    </div> -->
+      <div class="col-span-12 md:col-span-6">
         <label for="costCenterDefault">مركز التكلفه الافتراضي</label>
         <ng-select [items]="costCentersList" bindLabel="nameAr" bindValue="id" placeholder="مركز التكلفه الافتراضي" formControlName="costCenterId"></ng-select>
         <app-form-error [control]="settingsForm.controls['costCenterId']" [errorKey]="'required'" [message]="'مركز التكلفة الافتراضي مطلوب'"></app-form-error>
     </div>
-      <div class="col-span-12 md:col-span-4">
+      <!-- <div class="col-span-12 md:col-span-4">
         <label for="salesStoreDefault">مخزن المبيعات الإفتراضي</label>
         <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن المبيعات الإفتراضي" formControlName="salesStoreId"></ng-select>
         <app-form-error [control]="settingsForm.controls['salesStoreId']" [errorKey]="'required'" [message]="'مخزن المبيعات الإفتراضي مطلوب'"></app-form-error>
-    </div>
+    </div> -->
       <div class="col-span-12 md:col-span-3 flex items-center gap-3">
         <input type="checkbox" id="alertsMain" formControlName="enableStatistics">
         <label for="alertsMain" style="margin-bottom:0px;">تفعيل التنبيهات</label>
@@ -177,7 +177,7 @@
         <p-datePicker [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="balanceDate" />
     </div> -->
    
-   <div class="col-span-12 md:col-span-4">
+   <!-- <div class="col-span-12 md:col-span-4">
         <label for="inventoryDefaultFinance">مخزن المشتريات الإفتراضي</label>
         <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن المشتريات الإفتراضي" formControlName="purchaseStoreId"></ng-select>
         <app-form-error [control]="settingsForm.controls['purchaseStoreId']" [errorKey]="'required'" [message]="'مخزن المشتريات الإفتراضي مطلوب'"></app-form-error>
@@ -191,12 +191,12 @@
         <label for="salesStoreFinance">مخزن المبيعات الإفتراضي</label>
         <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن المبيعات الإفتراضي" formControlName="salesStoreId"></ng-select>
         <app-form-error [control]="settingsForm.controls['salesStoreId']" [errorKey]="'required'" [message]="'مخزن المبيعات الإفتراضي مطلوب'"></app-form-error>
-    </div>
-      <div class="col-span-12 md:col-span-4">
+    </div> -->
+      <!-- <div class="col-span-12 md:col-span-4">
         <label for="reservationStoreFinance">مخزن الحجز الإفتراضي</label>
         <ng-select [items]="warehousesList" bindLabel="name" bindValue="id" placeholder="مخزن الحجز " formControlName="reservationStoreId"></ng-select>
         <app-form-error [control]="settingsForm.controls['reservationStoreId']" [errorKey]="'required'" [message]="'مخزن الحجز الإفتراضي مطلوب'"></app-form-error>
-    </div>
+    </div> -->
    
     <div class="col-span-12 md:col-span-4">
         <label for="minimumSelectiveTax">الحد الأدني للضريبة الإنتقائية </label>
@@ -217,26 +217,26 @@
         <ng-select [items]="statisticsOptions" bindLabel="name" bindValue="id" placeholder="الاحصائيات " formControlName="enableStatistics"></ng-select>
         <app-form-error [control]="settingsForm.controls['enableStatistics']" [errorKey]="'required'" [message]="'الاحصائيات مطلوبة'"></app-form-error>
     </div>
-      <div class="col-span-12 md:col-span-4">
+      <div class="col-span-12 md:col-span-6">
         <label for="showCustomers">اظهار العملاء والموردين للفروع</label>
         <ng-select [items]="showCustomersData" bindLabel="name" bindValue="id" placeholder="أظهار العملاء والموردين  " formControlName="customerSupplierDisplayType"></ng-select>
         <app-form-error [control]="settingsForm.controls['customerSupplierDisplayType']" [errorKey]="'required'" [message]="'إظهار العملاء والموردين مطلوب'"></app-form-error>
     </div>
-      <div class="col-span-12 md:col-span-4">
+      <div class="col-span-12 md:col-span-6">
         <label for="mezan">معدل الميزان</label>
         <ng-select [items]="BalancerateList" bindLabel="name" bindValue="id" placeholder="معدل الميزان" formControlName="balanceRate"></ng-select>
         <app-form-error [control]="settingsForm.controls['balanceRate']" [errorKey]="'required'" [message]="'معدل الميزان مطلوب'"></app-form-error>
     </div>
 
-      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+      <div class="col-span-12 md:col-span-4 flex items-center gap-3">
         <input type="checkbox" id="itemsFinance" formControlName="enableWeightedBalanceColor">
         <label for="itemsFinance" style="margin-bottom:0px;">تفعيل أصناف الميزانيه بالوزن</label>
     </div>
-      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+      <div class="col-span-12 md:col-span-4 flex items-center gap-3">
         <input type="checkbox" id="activationFinance" formControlName="enableDiscounts">
         <label for="activationFinance" style="margin-bottom:0px;">تفعيل الحد الائتماني وحد التنبيه للعميل</label>
     </div>
-      <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+      <div class="col-span-12 md:col-span-4 flex items-center gap-3">
         <input type="checkbox" id="TecrarFinance" formControlName="repeatTaxNumber">
         <label for="TecrarFinance" style="margin-bottom:0px;">تكرار الرقم الضريبي</label>
     </div>
@@ -319,7 +319,7 @@
   <button type="button" class="btn" (click)="resetMovements()">إعادة تهيئة الحركات</button>
   <button type="button" class="btn" (click)="resetMovementsAndProducts()">إعادة تهيئة الحركات والأصناف</button>
   <button type="button" class="btn" (click)="openResetAllDialog()">إعادة تهيئة جميع البيانات</button> -->
-  <button type="button" class="btn btn-primary" (click)="save()">حفظ</button>
+  <button type="button" class="btn btn-warning" (click)="save()">تعديل</button>
 </div>
 
 <app-shared-confirm-dialog

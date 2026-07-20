@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AutoComplete, AutoCompleteCompleteEvent } from "primeng/autocomplete";
 import { Paginator } from "primeng/paginator";
@@ -30,6 +30,7 @@ export class Categories {
   // !!!!!!!!! Property
 
 
+  @ViewChild('ac') autoComplete!: AutoComplete;
   categoryForm = this._fb.group({
     nameAr: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100),entityNameValidator()]],
     nameEn: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100),entityNameValidator()]],
@@ -49,6 +50,8 @@ export class Categories {
   totalRecords = 0
   groupDataList: any | null = null;
   showDeleteDialog = false
+  ignoreNextFocus = false;
+
   // !!!!!!!!!!! Method
 
   ngOnInit(): void {
@@ -63,13 +66,18 @@ export class Categories {
     this.getAllData();
   }
 
+
   search(event: AutoCompleteCompleteEvent) {
-     if (!event.query) {
+
+    const query = event.query?.trim();
+     if (!query) {
     this.items = [];
     return;
   }
 
-      const payload = buildSearchPayload(event.query,this.pageSize);
+  
+
+      const payload = buildSearchPayload(query,this.pageSize);
     
       this._categoryService.search(payload)
         .pipe(takeUntilDestroyed(this._destroyRef))
@@ -79,7 +87,9 @@ export class Categories {
               label: item.name,
               value: item.id
             }));
-    
+            setTimeout(() => {
+              this.autoComplete.show();
+            });
           }
         });
   }
@@ -90,6 +100,10 @@ if (!event || !event.value) {
   this.getAllData();
   return;
 }
+this.ignoreNextFocus = true;
+setTimeout(() => {
+  this.autoComplete.hide();
+}, 0);
 
   this.idResultSearch = event.value.value;
 
@@ -129,6 +143,36 @@ if (!event || !event.value) {
   this.idResultSearch = 0;
   this.items = [];
   this.getAllData();
+}
+
+onFocusSearch(event: any) {
+
+  if (this.ignoreNextFocus) {
+    this.ignoreNextFocus = false;
+    return;
+  }
+  const value = event.target?.value?.trim();
+  console.log(value);
+
+  const query={
+    query: value
+  }
+
+  
+  
+  if (!value) {
+    return;
+    
+  }
+  
+  // لو الاقتراحات موجودة بالفعل، متبحثش تاني
+  setTimeout(() => {
+  this.autoComplete.show();
+  }, 100);
+  if (this.items.length > 0) return;
+  this.search(query as AutoCompleteCompleteEvent);
+  
+
 }
 
   onSubmit() {

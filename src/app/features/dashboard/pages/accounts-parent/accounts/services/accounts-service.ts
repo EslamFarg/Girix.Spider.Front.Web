@@ -27,4 +27,16 @@ export class AccountsService extends BasehttpService{
   generateCode(code:string | null | undefined){
     return this.http.get(`${this.baseUrl}/api/ChartOfAccounts/generate-code?code=${code}`);
   }
+
+  getAccountsByMethod(method: number, pageIndex?: number, pageSize?: number) {
+    let url = `${this.baseUrl}/api/ChartOfAccounts/account-Code?Method=${method}`;
+
+    if (pageIndex != null && pageSize != null) {
+      url += `&Pagination.PageIndex=${pageIndex}&Pagination.PageSize=${pageSize}`;
+    }
+
+    return this.http.get(url, {
+      headers: { 'skip-loading': 'true' },
+    });
+  }
 }

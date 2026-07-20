@@ -59,6 +59,7 @@ import { UsersAndPermissionsRoute } from "./pages/users-and-permissions/users-an
 import { HrRoute } from "./pages/hr/hr.routes";
 import { SettingsRoute } from "./pages/settings/settings.routes";
 import { ElectronicInvoiceRoute } from "./pages/electronic-invoice/electronic-invoice.routes";
+import { BranchesRoutes } from "./pages/customers-and-supplier/branches/branches.routes";
 
 
 
@@ -122,7 +123,8 @@ export const dashboardRoute:Routes = [
            ...UsersAndPermissionsRoute,
            ...HrRoute,
            ...SettingsRoute,
-           ...ElectronicInvoiceRoute
+           ...ElectronicInvoiceRoute,
+           ...BranchesRoutes
         ]
     }
 ]

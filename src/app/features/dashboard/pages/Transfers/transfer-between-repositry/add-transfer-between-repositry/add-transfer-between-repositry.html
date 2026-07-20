@@ -12,7 +12,7 @@
     <label>بحث برقم الطلب </label>
     <div class="flex items-center gap-2 relative">
       <div class="search_input relative ">
-        <input type="text" class="text-[14px]"  style="color:var(--color-black); font-weight:600; width:700px;"/>
+        <input type="text" class="text-[14px]"  style="color:var(--color-black); font-weight:600; "/>
         <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[10px]" >
           <button>
             <svg
@@ -72,21 +72,21 @@
 
 
   <div class="grid grid-cols-1 lg:grid-cols-12   gap-[24px] my-[20px]">
-    <div class="col-span-3">
-        <label for="employee" >موظف التحويل :  </label>
+    <div class="col-span-12 lg:col-span-3">
+        <label for="employee" >موظف التحويل   </label>
         <input type="text" id="employee" placeholder="موظف التحويل" >
     </div>
-    <div class="col-span-3">
-        <label for="employee" >تحويل من : </label>
+    <div class="col-span-12 lg:col-span-3">
+        <label for="employee" >تحويل من  </label>
+        <!-- <input type="text" id="employee" placeholder="وارد من مخزن" style="padding-right 100px;"> -->
+         <ng-select [items]="[]" [bindLabel]="''" [placeholder]="'اسم المخزن' "></ng-select>
+    </div>
+    <div class="col-span-12 lg:col-span-3">
+        <label for="employee" >تحويل الي  </label>
         <!-- <input type="text" id="employee" placeholder="وارد من مخزن" style="padding-right: 100px;"> -->
          <ng-select [items]="[]" [bindLabel]="''" [placeholder]="'اسم المخزن' "></ng-select>
     </div>
-    <div class="col-span-3">
-        <label for="employee" >تحويل الي : </label>
-        <!-- <input type="text" id="employee" placeholder="وارد من مخزن" style="padding-right: 100px;"> -->
-         <ng-select [items]="[]" [bindLabel]="''" [placeholder]="'اسم المخزن' "></ng-select>
-    </div>
-    <div class="col-span-3">
+    <div class="col-span-12 lg:col-span-3">
         <label for="employee" >التاريخ  : </label>
         <!-- <input type="text" id="employee" placeholder=" الطلب" style="padding-right: 100px;"> -->
          <p-datePicker  [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="icondisplay" />

@@ -160,6 +160,140 @@
   </table>
 </div>
 
+<!-- <div class="table-responsive mt-5">
+  <div class="flex items-center justify-between mb-3">
+    <h3 class="text-[15px] font-bold text-[#106388]">
+      أصناف طلب صرف التالف
+    </h3>
+
+    <button class="primary-btn">
+      + إضافة صنف
+    </button>
+  </div>
+
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="text-center">م</th>
+        <th class="text-center">كود الصنف</th>
+        <th class="text-center">اسم الصنف</th>
+        <th class="text-center">الوحدة</th>
+        <th class="text-center">الرصيد الحالي</th>
+        <th class="text-center">الكمية التالفة</th>
+        <th class="text-center">تكلفة الوحدة</th>
+        <th class="text-center">قيمة التالف</th>
+        <th class="text-center">سبب التالف</th>
+        <th class="text-center">ملاحظات</th>
+        <th class="text-center">حذف</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      @for(item of itemsTable; track $index){
+
+      <tr>
+
+        <td class="text-center">
+          {{ $index + 1 }}
+        </td>
+
+        <td>
+          {{item.code}}
+        </td>
+
+        <td>
+          {{item.itemName}}
+        </td>
+
+        <td>
+          {{item.unit}}
+        </td>
+
+        <td class="text-center">
+          {{item.balance}}
+        </td>
+
+        <td>
+
+          <input
+            type="number"
+            placeholder="الكمية"
+          >
+
+        </td>
+
+        <td class="text-center">
+          {{item.cost}}
+        </td>
+
+        <td class="text-center">
+          {{item.total}}
+        </td>
+
+        <td>
+
+          <ng-select
+            [items]="damageReasons"
+            bindLabel="name"
+            bindValue="id"
+            placeholder="سبب التالف">
+          </ng-select>
+
+        </td>
+
+        <td>
+
+          <input
+            type="text"
+            placeholder="ملاحظات">
+
+        </td>
+
+        <td class="text-center">
+
+          <button class="delete-btn">
+
+            <i class="pi pi-trash"></i>
+
+          </button>
+
+        </td>
+
+      </tr>
+
+      }
+
+    </tbody>
+
+    <tfoot>
+
+      <tr>
+
+        <td colspan="5" class="text-end font-bold">
+          الإجمالي
+        </td>
+
+        <td class="text-center font-bold">
+          {{totalQty}}
+        </td>
+
+        <td></td>
+
+        <td class="text-center font-bold">
+          {{totalAmount}}
+        </td>
+
+        <td colspan="3"></td>
+
+      </tr>
+
+    </tfoot>
+
+  </table>
+
+</div> -->
+
 
 <footer class="flex items-center justify-end gap-3 p-2  rounded-lg">
 

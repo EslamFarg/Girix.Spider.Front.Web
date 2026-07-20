@@ -5,228 +5,212 @@
   (actionClicked)="handleAction($event)"
 ></app-page-header>
 
-<form class="box_header relative">
-    <div class="inventoryName text-[20px] font-[700] text-[--var(--color-black)] absolute left-[15px] top-[20px]">مخزن الرياض</div>    
-  <div class="title">بيانات الطلب</div>
-  <div class="input_group">
-    <label>بحث برقم الطلب </label>
+<form class="box_header relative" [formGroup]="issueOrderForm">
+  <div class="inventoryName text-[20px] font-[700] text-[--var(--color-black)] absolute left-[15px] top-[20px]">
+    {{ settingsUser?.defaultWarehouseName }}
+  </div>
+  <div class="title">بيانات اذن الصرف</div>
+  <div class="input_group_header">
+    <label>بحث برقم الأذن</label>
     <div class="flex items-center gap-2 relative">
-      <div class="search_input relative ">
-        <input type="text" class="text-[14px]"  style="color:var(--color-black); font-weight:600; width:700px;"/>
-        <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[10px]" >
-          <button>
-            <svg
-              width="20"
-              height="18"
-              viewBox="0 0 20 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M3.17752 0H11.8225C12.405 0 12.8875 -1.58054e-07 13.2613 0.0359987C13.6325 0.0719976 14.025 0.15171 14.3338 0.413987C14.7563 0.770119 14.9963 1.30496 15 1.86551C15.0025 2.27179 14.825 2.63692 14.6238 2.96862C14.42 3.3029 14.1238 3.70531 13.7613 4.19515L10.5238 8.58444C10.2163 9.001 10.115 9.14243 10.045 9.29285C9.97626 9.43957 9.92586 9.59466 9.89501 9.75441C9.86251 9.92155 9.86001 10.1015 9.86001 10.6312V16.0774C9.86001 16.3538 9.86001 16.6019 9.84376 16.8012C9.82626 16.9979 9.78626 17.2627 9.62251 17.4916C9.51902 17.6382 9.38541 17.7596 9.23116 17.8472C9.07691 17.9347 8.90581 17.9863 8.73001 17.9981C8.44627 18.0161 8.20627 17.8992 8.04002 17.8027C7.87377 17.7063 7.67752 17.5674 7.46377 17.4157L6.23377 16.5415L6.18127 16.5042C5.93127 16.3281 5.70627 16.1699 5.53877 15.9514C5.39192 15.7601 5.28164 15.542 5.21377 15.3085C5.13877 15.0411 5.13877 14.7595 5.13877 14.4394V10.6325C5.13877 10.1028 5.13752 9.92155 5.10502 9.75569C5.07417 9.59594 5.02377 9.44086 4.95502 9.29414C4.88502 9.14371 4.78377 9.00229 4.47627 8.58573L1.27877 4.25301L1.27127 4.24015L1.23752 4.19644C0.933854 3.80019 0.646518 3.39099 0.376276 2.96991C0.175026 2.63949 -0.0024739 2.27307 2.60942e-05 1.8668C0.00252609 1.30624 0.243776 0.771404 0.666275 0.413987C0.975025 0.152995 1.36627 0.0732832 1.73877 0.0372843C2.11252 -2.49054e-07 2.59502 0 3.17752 0ZM3.03127 4.49986L5.47127 7.80661L5.50627 7.85418C5.76627 8.20646 5.94877 8.45202 6.08002 8.73101C6.19668 8.97786 6.28085 9.23671 6.33252 9.50756C6.39002 9.81098 6.39002 10.1234 6.39002 10.5721V14.3726C6.39002 14.7968 6.39502 14.8804 6.41502 14.946C6.43668 15.0231 6.47085 15.0917 6.51752 15.1517C6.55502 15.2005 6.61127 15.2481 6.94377 15.4847L8.15127 16.3409C8.36001 16.4888 8.49751 16.5852 8.60126 16.6508C8.61001 16.5183 8.61001 16.3345 8.61001 16.0504V10.5721C8.61001 10.1221 8.61001 9.81098 8.66751 9.50756C8.72001 9.23671 8.80418 8.97786 8.92001 8.73101C9.05126 8.45202 9.23376 8.20646 9.49501 7.8529L9.52876 7.80661L11.9688 4.49986H3.03127ZM12.9163 3.21418C13.2113 2.81434 13.42 2.52249 13.5638 2.28721C13.7388 1.99922 13.7513 1.89508 13.75 1.87194C13.7503 1.78327 13.7317 1.6956 13.6954 1.61517C13.6591 1.53474 13.6061 1.4635 13.54 1.40653C13.5338 1.40138 13.4625 1.34739 13.145 1.31653C12.8363 1.28567 12.4125 1.28567 11.79 1.28567H3.21002C2.58627 1.28567 2.16377 1.28567 1.85502 1.31653C1.53752 1.34739 1.46627 1.40138 1.46002 1.40653C1.39396 1.4635 1.3409 1.53474 1.30461 1.61517C1.26832 1.6956 1.24968 1.78327 1.25002 1.87194C1.25002 1.89508 1.26127 2.00051 1.43627 2.28721C1.58002 2.52249 1.78877 2.81434 2.08377 3.21418H12.9163ZM15 7.07121C15 6.90072 15.0659 6.73721 15.1831 6.61665C15.3003 6.4961 15.4592 6.42837 15.625 6.42837H19.375C19.5408 6.42837 19.6997 6.4961 19.8169 6.61665C19.9342 6.73721 20 6.90072 20 7.07121C20 7.2417 19.9342 7.40521 19.8169 7.52576C19.6997 7.64632 19.5408 7.71404 19.375 7.71404H15.625C15.4592 7.71404 15.3003 7.64632 15.1831 7.52576C15.0659 7.40521 15 7.2417 15 7.07121ZM13.125 10.2854C13.125 10.1149 13.1909 9.95139 13.3081 9.83084C13.4253 9.71028 13.5842 9.64256 13.75 9.64256H19.375C19.5408 9.64256 19.6997 9.71028 19.8169 9.83084C19.9342 9.95139 20 10.1149 20 10.2854C20 10.4559 19.9342 10.6194 19.8169 10.7399C19.6997 10.8605 19.5408 10.9282 19.375 10.9282H13.75C13.5842 10.9282 13.4253 10.8605 13.3081 10.7399C13.1909 10.6194 13.125 10.4559 13.125 10.2854ZM12.5 13.4996C12.5 13.3291 12.5659 13.1656 12.6831 13.045C12.8003 12.9245 12.9592 12.8567 13.125 12.8567H19.375C19.5408 12.8567 19.6997 12.9245 19.8169 13.045C19.9342 13.1656 20 13.3291 20 13.4996C20 13.6701 19.9342 13.8336 19.8169 13.9541C19.6997 14.0747 19.5408 14.1424 19.375 14.1424H13.125C12.9592 14.1424 12.8003 14.0747 12.6831 13.9541C12.5659 13.8336 12.5 13.6701 12.5 13.4996ZM12.5 16.7138C12.5 16.5433 12.5659 16.3798 12.6831 16.2592C12.8003 16.1387 12.9592 16.0709 13.125 16.0709H16.25C16.4158 16.0709 16.5747 16.1387 16.6919 16.2592C16.8092 16.3798 16.875 16.5433 16.875 16.7138C16.875 16.8843 16.8092 17.0478 16.6919 17.1683C16.5747 17.2889 16.4158 17.3566 16.25 17.3566H13.125C12.9592 17.3566 12.8003 17.2889 12.6831 17.1683C12.5659 17.0478 12.5 16.8843 12.5 16.7138Z"
-                
-              />
-            </svg>
-          </button>
-         <button>
-             <svg
-            width="1"
-            height="18"
-            viewBox="0 0 1 18"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect width="1" height="18" fill="#BFD3E0" />
-          </svg>
-         </button>
-
-          <button>
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10.4193 17.5001C6.04702 17.5001 2.5026 13.9557 2.5026 9.58341C2.5026 5.21116 6.04702 1.66675 10.4193 1.66675C14.7915 1.66675 18.3359 5.21116 18.3359 9.58341C18.3359 13.9557 14.7915 17.5001 10.4193 17.5001Z"
-                stroke="#7F7F7F"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M1.66927 18.3334L3.33594 16.6667"
-                stroke="#7F7F7F"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+      <div class="search_input relative">
+        <input
+          type="text"
+          class="text-[14px]"
+          style="color:var(--color-black); font-weight:600;"
+          placeholder="بحث برقم الأذن"
+          [formControl]="permitSearchControl"
+          (keyup.enter)="searchIssueOrder($event)"
+        />
+        <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[10px]">
+          <button type="button" (click)="searchIssueOrder()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.4193 17.5001C6.04702 17.5001 2.5026 13.9557 2.5026 9.58341C2.5026 5.21116 6.04702 1.66675 10.4193 1.66675C14.7915 1.66675 18.3359 5.21116 18.3359 9.58341C18.3359 13.9557 14.7915 17.5001 10.4193 17.5001Z" stroke="#7F7F7F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M1.66927 18.3334L3.33594 16.6667" stroke="#7F7F7F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
         </div>
       </div>
-  
     </div>
   </div>
 
-
-  <div class="grid grid-cols-1 lg:grid-cols-12  readonly_data gap-[24px] my-[20px]">
-    <div class="col-span-4">
-        <label for="employee" >الكميه المتاحه: </label>
-        <input type="text" id="employee" placeholder="موظف التحويل" style="padding-right: 110px;">
+  <div class="grid grid-cols-1 lg:grid-cols-15 gap-[24px] my-[20px]">
+    <div class="col-span-15 lg:col-span-3">
+      <label for="invoiceNo">رقم الأذن</label>
+      <input type="text" id="invoiceNo" placeholder="رقم الأذن" formControlName="invoiceNo" readonly style="background-color: var(--color-readonly);">
     </div>
-    <div class="col-span-4">
-        <label for="employee" >وارد من مخزن : </label>
-        <input type="text" id="employee" placeholder="وارد من مخزن" style="padding-right: 100px;">
+    <div class="col-span-15 lg:col-span-3">
+      <label for="referenceNo">المرجع</label>
+      <input type="text" id="referenceNo" placeholder="المرجع" formControlName="referenceNo">
     </div>
-    <div class="col-span-4">
-        <label for="employee" >التاريخ الطلب : </label>
-        <input type="text" id="employee" placeholder="التاريخ الطلب" style="padding-right: 100px;">
+    <div class="col-span-15 lg:col-span-3">
+      <label for="invoiceDate">التاريخ</label>
+      <p-datepicker [iconDisplay]="'input'" [placeholder]="'التاريخ'" [showIcon]="true" inputId="invoiceDate" formControlName="invoiceDate" />
+      <app-form-error [control]="issueOrderForm.controls['invoiceDate']" [errorKey]="'required'" [message]="'التاريخ مطلوب'"></app-form-error>
+    </div>
+    <div class="col-span-15 lg:col-span-3">
+      <label for="warehouseId">المخزن</label>
+      <ng-select
+        [items]="_lookupFacade.inventoriesWithPagination()"
+        [virtualScroll]="true"
+        (scrollToEnd)="loadMoreInventories()"
+        bindLabel="name"
+        bindValue="id"
+        placeholder="اختر المخزن"
+        formControlName="warehouseId"
+      ></ng-select>
+      <app-form-error [control]="issueOrderForm.controls['warehouseId']" [errorKey]="'required'" [message]="'المخزن مطلوب'"></app-form-error>
+    </div>
+    <div class="col-span-15 lg:col-span-3">
+      <label for="customerId">الحساب</label>
+      <ng-select
+        [items]="accountsList"
+        bindLabel="name"
+        bindValue="id"
+        placeholder="اختر الحساب"
+        formControlName="customerId"
+      ></ng-select>
     </div>
 
-         <div class="col-span-12 "  >
-        <label for="reference" class="exipition_label">ملاحظات</label>
-        <textarea type="text" placeholder="ملاحظات" id="reference" class="exipition_input"></textarea>
+    <div class="col-span-15">
+      <label for="notes" class="exipition_label">ملاحظات</label>
+      <textarea placeholder="ملاحظات" id="notes" class="exipition_input" formControlName="notes"></textarea>
     </div>
-   
- 
-   
-
-
-   
-
   </div>
-
-
 </form>
 
-
-
-<div class="table-responsive">
-  <table class="w-full ">
-    <thead class="bg-gray-100 ">
-      <tr class="sticky top-0 z-[5]" >
+<div class="table-responsive" [formGroup]="issueOrderForm">
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr class="sticky top-0">
         <th class="p-2 text-center">م</th>
-        <th class="p-2 text-center">   كود الصنف   </th>
+        <th class="p-2 text-center">كود الصنف</th>
         <th class="p-2 text-center">اسم الصنف</th>
         <th class="p-2 text-center">الوحده</th>
         <th class="p-2 text-center">الكميه المطلوبة</th>
-        <th class="p-2 text-center">الكميه المصروفه</th>
-        <th class="p-2 text-center">الوحده</th>
         <th class="p-2 text-center">الادوات</th>
       </tr>
     </thead>
+
     <tbody>
-
-    
-
-@for(item of itemsTable;track $index){
-
-    <tr >
-<td class="p-2 text-center">{{ $index + 1 }}</td>
-<td class="p-2 text-center">{{ item.store }}</td>
-<td class="p-2 text-center">{{ item?.itemName }}</td>
-<td class="p-2 text-center">{{ item.unit }}</td>
-<td class="p-2 text-center">{{ item.qty }}</td>
-<td class="p-2 text-center"><input type="text" placeholder="الكمية"/></td>
-<td class="p-2 text-center"><ng-select [items]="[]" [bindLabel]="''" [placeholder]="'الوحدة' "></ng-select></td>
-
-      <td class="p-2 h-[56px] w-full flex items-center justify-center gap-2">
-              <div class="printer" (click)="showDialog()">
-                <svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="33" height="25" rx="2" style="fill:#DADEE1; stroke:none;" fill="#DADEE1"/>
-<path style="fill:white; stroke:none;" d="M22.9634 6.04566C22.9634 6.04566 22.9705 6.43312 22.9705 7.06495C22.9967 10.0612 22.8884 18.6143 20.9249 18.6143C18.547 18.6143 20.5849 15.8972 18.887 15.8972H13.8047C14.5591 12.126 14.484 6.04566 14.484 6.04566C14.484 6.04566 14.5045 5.02637 15.1838 5.02637H23.6555C22.9769 5.02637 22.9634 6.04566 22.9634 6.04566Z" fill="white"/>
-<path style="fill:#E3E3E3; stroke:none;" d="M23.6599 5.02637H22.3268C22.2857 9.12266 19.7874 14.6165 15.9922 15.8972H18.89C20.5886 15.8972 18.55 18.615 20.9286 18.615C22.8921 18.615 23.0004 10.0612 22.9735 7.06495C22.9735 6.43312 22.9664 6.04495 22.9664 6.04495C22.9664 6.04495 22.9806 5.02637 23.6599 5.02637Z" fill="#E3E3E3"/>
-<path style="fill:none; stroke:#083448;" d="M16.5233 7.74424H17.8819M16.694 11.82H20.6004M16.694 9.78212H20.6004M16.184 13.8586H20.2604M22.9634 6.04566C22.9634 6.04566 22.9705 6.43312 22.9705 7.06495C22.9967 10.0612 22.8884 18.6143 20.9249 18.6143C18.547 18.6143 20.5849 15.8972 18.887 15.8972H13.8047C14.5591 12.126 14.484 6.04566 14.484 6.04566C14.484 6.04566 14.5045 5.02637 15.1838 5.02637H23.6555C22.9769 5.02637 22.9634 6.04566 22.9634 6.04566Z" stroke="#083448" stroke-linecap="round" stroke-linejoin="round"/>
-<path style="fill:#B2B2B2; stroke:#083448;" d="M24.2933 6.30349C24.304 6.3988 24.2943 6.49528 24.265 6.58659C24.2357 6.67791 24.1874 6.76199 24.1233 6.83333C24.061 6.90575 23.9839 6.96393 23.8971 7.00389C23.8103 7.04386 23.716 7.06468 23.6204 7.06495H22.9758C22.9758 6.43312 22.9688 6.04495 22.9688 6.04495C22.9688 6.04495 22.9822 5.02637 23.6615 5.02637C24.0624 5.02637 24.2253 5.7262 24.2933 6.30349Z" fill="#B2B2B2" stroke="#083448" stroke-linecap="round" stroke-linejoin="round"/>
-<path style="fill:white; stroke:#083448;" d="M18.8883 15.897C17.8491 15.897 18.209 17.4326 18.0935 18.6148C18.0255 19.3621 17.7677 19.9734 16.8504 19.9734H8.71094C11.0888 19.9734 9.05094 15.897 10.7495 15.897H18.8883Z" fill="white" stroke="#083448" stroke-linecap="round" stroke-linejoin="round"/>
-<path style="fill:#B2B2B2; stroke:#083448;" d="M20.9271 18.6148H18.0938C18.2092 17.4319 17.8494 15.897 18.8885 15.897C20.5871 15.897 18.5485 18.6148 20.9271 18.6148Z" fill="#B2B2B2" stroke="#083448" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-
-            </div>
+      <tr class="section_add sticky top-[37px] [&>*]:bg-[var(--color-white)]" [formGroup]="addItemForm">
+        <td class="p-2 text-center text-[var(--color-gray)] text-[14px] font-[400]">+</td>
+        <td class="p-2">
+          <input type="text" class="form-control" formControlName="code" placeholder="كود الصنف" (keydown.enter)="onSearchByCode($event)">
+          <app-form-error [control]="addItemForm.controls['code']" [errorKey]="'required'" [message]="'الكود مطلوب'"></app-form-error>
         </td>
-</tr>
-}
+        <td class="p-2">
+          <p-autocomplete
+            class="search-product-autoComplete w-full"
+            [suggestions]="items"
+            optionLabel="label"
+            (completeMethod)="search($event)"
+            placeholder="ابحث عن صنف..."
+            #autoComplete
+            (onSelect)="onSelectProduct($event)"
+            formControlName="itemName"
+          />
+        </td>
+        <td class="p-2">
+          <ng-select
+            [items]="dataUnits"
+            bindLabel="unitName"
+            bindValue="unitId"
+            formControlName="unitId"
+            [appendTo]="'body'"
+            [dropdownPosition]="'bottom'"
+            (change)="onUnitChange($event)"
+            placeholder="الوحدة"
+          ></ng-select>
+          <app-form-error [control]="addItemForm.controls['unitId']" [errorKey]="'required'" [message]="'الوحدة مطلوبة'"></app-form-error>
+        </td>
+        <td class="p-2">
+          <input type="number" class="form-control" formControlName="qty" placeholder="العدد">
+          <app-form-error [control]="addItemForm.controls['qty']" [errorKey]="'required'" [message]="'العدد مطلوب'"></app-form-error>
+        </td>
+        <td class="block text-center w-[100%] p-[11px]">
+          <button type="button" class="btn" [ngClass]="{'btn-primary': editingIndex === null, 'btn-warning': editingIndex !== null}" (click)="addNewLine()">
+            {{ editingIndex === null ? 'اضافه' : 'تعديل' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+
+    <tbody formArrayName="details">
+      @for (line of lines.controls; track $index) {
+        <tr [formGroupName]="$index">
+          <td class="p-2 text-center">{{ $index + 1 }}</td>
+          <td class="p-2 text-center"><span>{{ line.get('code')?.value }}</span></td>
+          <td class="p-2 text-center"><span>{{ line.get('itemName')?.value }}</span></td>
+          <td class="p-2 text-center"><span>{{ line.get('unitName')?.value }}</span></td>
+          <td class="p-2 text-center"><span>{{ line.get('quantity')?.value }}</span></td>
+          <td class="p-2 w-full flex items-center justify-center gap-2">
+            <button type="button" class="update" (click)="editLine($index)">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button type="button" class="delete" (click)="removeLine($index)">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      }
     </tbody>
 
     <tfoot>
-        <tr class="sticky bottom-0
-        [&>*]:text-center
-        ">
-            <td></td>
-            <td >الاجمالي</td>
-            <td></td>
-            <td></td>
-            <td>28</td>
-            <td ></td>
-            <td ></td>
-            <td ></td>
-           
-        </tr>
+      <tr class="sticky bottom-0 [&>*]:text-center">
+        <td></td>
+        <td>الاجمالي</td>
+        <td></td>
+        <td></td>
+        <td>{{ getTotalQuantity() }}</td>
+        <td></td>
+      </tr>
     </tfoot>
   </table>
 </div>
 
-
-
-
-
-
-
-
-<footer class="flex items-center justify-end gap-3 p-2  rounded-lg">
-
+<footer class="flex items-center justify-end gap-3 p-2 rounded-lg">
   <div class="flex items-center justify-center w-[214px] h-[38px] bg-[var(--color-border-input)] rounded-md text-sm font-medium">
-   <h5 class="text-[#106388] text-[14px] font-[700]">  مرات الطباعة : </h5>
-   <span> 2 </span>
+    <h5 class="text-[#106388] text-[14px] font-[700]">مرات الطباعة :</h5>
+    <span>{{ printCount }}</span>
   </div>
-
   <div class="flex items-center justify-center w-[214px] h-[38px] bg-[var(--color-border-input)] rounded-md text-sm font-medium">
-    <h5 class="text-[#106388] text-[14px] font-[700]">  مرات التعديل : </h5>
-   <span> 1 </span>
+    <h5 class="text-[#106388] text-[14px] font-[700]">مرات التعديل :</h5>
+    <span>{{ editCount }}</span>
   </div>
-
 </footer>
 
+<app-shared-confirm-dialog
+  [show]="showDeleteDialog"
+  [title]="'حذف أذن صرف داخلي'"
+  [message]="'هل أنت متأكد من حذف هذا الأذن؟ لا يمكن التراجع عن هذا الإجراء.'"
+  (confirm)="deleteDialog()"
+  (cancel)="showDeleteDialog = false"
+></app-shared-confirm-dialog>
 
- <div class="card flex justify-center popup_dialog_cashier">
-           
-            <p-dialog header="" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
-                  <div class="grid grid-cols-1 lg:grid-cols-12  readonly_data gap-[24px] my-[20px]
-                  
-                  ">
-    <div class="col-span-6">
-        <label for="employee" >الكميه المتاحه : </label>
-        <input type="text" id="employee" placeholder="الكميه المتاحه" style="padding-right: 105px; background:var(--color-bg);">
+<div class="card flex justify-center popup_dialog_cashier">
+  <p-dialog header="" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+    <div class="grid grid-cols-1 lg:grid-cols-12 readonly_data gap-[24px] my-[20px]">
+      <div class="col-span-6">
+        <label>الكميه المتاحه :</label>
+        <input type="text" placeholder="الكميه المتاحه" style="padding-right: 105px; background:var(--color-bg);">
+      </div>
+      <div class="col-span-6">
+        <label>الحد الاقبصي للسحب :</label>
+        <input type="text" placeholder="الحد الاقبصي للسحب" style="padding-right: 140px; background:var(--color-bg);">
+      </div>
+      <div class="col-span-6">
+        <label>الكميه المحتجزه للمبيعات :</label>
+        <input type="text" placeholder="الكميه" style="padding-right: 165px; background:var(--color-bg);">
+      </div>
+      <div class="col-span-6">
+        <label>الكميه المحتجزه للتحويلات :</label>
+        <input type="text" placeholder="الكميه" style="padding-right: 165px; background:var(--color-bg);">
+      </div>
+      <div class="col-span-12">
+        <label>الكميه المحتجزه سابقا للمخزن :</label>
+        <input type="text" placeholder="الكميه" style="padding-right: 190px; background:var(--color-bg);">
+      </div>
     </div>
-    <div class="col-span-6">
-        <label for="employee" >الحد الاقبصي للسحب : </label>
-        <input type="text" id="employee" placeholder="الحد الاقبصي للسحب" style="padding-right: 140px; background:var(--color-bg);">
-    </div>
-    <div class="col-span-6">
-        <label for="employee" >الكميه المحتجزه للمبيعات  : </label>
-        <input type="text" id="employee" placeholder="الكميه  " style="padding-right: 165px; background:var(--color-bg);">
-    </div>
-    <div class="col-span-6">
-        <label for="employee" >الكميه المحتجزه للتحويلات   : </label>
-        <input type="text" id="employee" placeholder="الكميه  " style="padding-right: 165px; background:var(--color-bg);">
-    </div>
-    <div class="col-span-12">
-        <label for="employee" >الكميه المحتجزه سابقا للمخزن    : </label>
-        <input type="text" id="employee" placeholder="الكميه  " style="padding-right: 190px; background:var(--color-bg);">
-    </div>
-
- 
-   
-
-
-   
-
-  </div>
-            </p-dialog>
-        </div>
-
-
-
-
+  </p-dialog>
+</div>

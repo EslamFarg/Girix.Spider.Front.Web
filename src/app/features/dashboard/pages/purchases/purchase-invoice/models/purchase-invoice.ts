@@ -124,4 +124,8 @@ export interface ProductUnitItem {
   price?: number;
   purchasePrice?: number;
   selected?: boolean;
+  vat?: number;
+  selectiveVat?: number;
+  selectiveTaxRate?: number;
+  productCart?: ProductUnitItem[];
 }
