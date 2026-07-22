@@ -17,6 +17,7 @@ import { CostCenterService } from '../../costcenter-and-projects/cost-center/ser
 import { ApplicationSettingsModel } from '../models/application-settings';
 import { ApplicationSettingsService } from '../services/application-settings-service';
 import { BalanceRate } from '../../../../../shared/Enums/BalanceRate';
+import { OnlyStringDirective } from "../../../../../shared/directives/only-string";
 
 @Component({
   selector: 'app-branch-settings',
@@ -29,7 +30,8 @@ import { BalanceRate } from '../../../../../shared/Enums/BalanceRate';
     SharedConfirmDialog,
     onlyNumberDirective,
     FormError,
-  ],
+    OnlyStringDirective
+],
   templateUrl: './branch-settings.html',
   styleUrl: './branch-settings.scss',
 })
@@ -180,7 +182,7 @@ export class BranchSettings implements OnInit {
     website: ['', [Validators.maxLength(200)]],
     bankAccountNumber: [
       '',
-      [Validators.required, Validators.minLength(10), Validators.maxLength(34)],
+      [Validators.required, Validators.minLength(10), Validators.maxLength(34),Validators.pattern(/^[0-9a-zA-Z]+$/)],
     ],
     currency: [1, [Validators.required]],
     decimalPrice: [0, [Validators.required, Validators.min(0), Validators.max(6)]],
@@ -196,7 +198,7 @@ export class BranchSettings implements OnInit {
     balanceRate: [1, [Validators.required]],
     printName: [
       '',
-      [Validators.required, Validators.minLength(2), Validators.maxLength(200)],
+      [Validators.required, Validators.minLength(2), Validators.maxLength(200),entityNameValidator()],
     ],
     postalCode: [
       '',
@@ -233,11 +235,12 @@ export class BranchSettings implements OnInit {
   ngOnInit(): void {
     this.loadDropdowns();
     this.loadSettings();
+    console.log('init')
   }
 
   fillSampleData(): void {
     this.useSampleDropdownDefaults = true;
-    this.patchSettingsForm(this.getSampleSettings());
+    // this.patchSettingsForm(this.getSampleSettings());
     this.applyDropdownDefaults();
 
     // this._messageService.add({
@@ -339,11 +342,16 @@ export class BranchSettings implements OnInit {
       )
       .subscribe({
         next: (res:any) => {
-          if (res?.data && this.hasSettingsData(res.data)) {
+          // if (res?.data && this.hasSettingsData(res.data)) {
+          //   this.patchSettingsForm(res.data);
+          // } else {
+          //   this.useSampleDropdownDefaults = true;
+          //   this.fillSampleData();
+          // }
+          console.log(res);
+
+          if (res?.data) {
             this.patchSettingsForm(res.data);
-          } else {
-            this.useSampleDropdownDefaults = true;
-            this.fillSampleData();
           }
         },
         error: () => {
@@ -391,7 +399,9 @@ export class BranchSettings implements OnInit {
       });
   }
 
-  private patchSettingsForm(data: ApplicationSettingsModel): void {
+  private patchSettingsForm(res: any): void {
+    // console.log(data);
+    const data = res[0];
     this.currentBranchId = data.branchId ?? this.currentBranchId;
 
     this.settingsForm.patchValue({
@@ -572,59 +582,59 @@ export class BranchSettings implements OnInit {
     return result;
   }
 
-  private getSampleSettings(): any {
-    return {
-      branchId: this.currentBranchId || 1,
-      priceType: 1,
-      priceDisplayType: 0,
-      companyNameAr: 'شركة العنكبوت للتجارة',
-      companyNameEn: 'Spider Trading Company',
-      identityTypeId: 1,
-      identityNumber: '1010123456',
-      taxNumber: '300012345678903',
-      additionalNumber: '1234',
-      email: 'info@spider-erp.com',
-      website: 'https://www.spider-erp.com',
-      bankAccountNumber: 'SA0380000000608010167519',
-      currency: 1,
-      decimalPrice: 2,
-      decimalQuantity: 2,
-      // purchaseStoreId: 0,
-      // salesStoreId: 0,
-      // reservationStoreId: 0,
-      costCenterId: 0,
-      enableStatistics: true,
-      discountMethod: 1,
-      minimumSelectiveTax: 1000,
-      customerSupplierDisplayType: 3,
-      balanceRate: 1,
-      printName: 'شركة العنكبوت للتجارة',
-      postalCode: '12345',
-      city: 'الرياض',
-      district: 'العليا',
-      country: 'المملكة العربية السعودية',
-      street: 'طريق الملك فهد',
-      addressDetails: 'مبنى رقم 10، الدور الثاني',
-      buildingNumber: '7890',
-      mobile: '0501234567',
-      fax: '0112345678',
-      phone: '0118765432',
-      enableDiscounts: true,
-      enableWeightedBalanceColor: true,
-      enableExpiryAndBatch: true,
-      repeatTaxNumber: false,
-      enableArabicName: true,
-      enableEnglishName: true,
-      enablePrice: true,
-      enableImage: true,
-      printInCashier: true,
-      printInvoice: true,
-      printSalesReturns: true,
-      printCollectionReceipt: true,
-      saveInvoiceType: 1,
-      printType: 1,
-    };
-  }
+  // private getSampleSettings(): any {
+  //   return {
+  //     branchId: this.currentBranchId || 1,
+  //     priceType: 1,
+  //     priceDisplayType: 0,
+  //     companyNameAr: 'شركة العنكبوت للتجارة',
+  //     companyNameEn: 'Spider Trading Company',
+  //     identityTypeId: 1,
+  //     identityNumber: '1010123456',
+  //     taxNumber: '300012345678903',
+  //     additionalNumber: '1234',
+  //     email: 'info@spider-erp.com',
+  //     website: 'https://www.spider-erp.com',
+  //     bankAccountNumber: 'SA0380000000608010167519',
+  //     currency: 1,
+  //     decimalPrice: 2,
+  //     decimalQuantity: 2,
+  //     // purchaseStoreId: 0,
+  //     // salesStoreId: 0,
+  //     // reservationStoreId: 0,
+  //     costCenterId: 0,
+  //     enableStatistics: true,
+  //     discountMethod: 1,
+  //     minimumSelectiveTax: 1000,
+  //     customerSupplierDisplayType: 3,
+  //     balanceRate: 1,
+  //     printName: 'شركة العنكبوت للتجارة',
+  //     postalCode: '12345',
+  //     city: 'الرياض',
+  //     district: 'العليا',
+  //     country: 'المملكة العربية السعودية',
+  //     street: 'طريق الملك فهد',
+  //     addressDetails: 'مبنى رقم 10، الدور الثاني',
+  //     buildingNumber: '7890',
+  //     mobile: '0501234567',
+  //     fax: '0112345678',
+  //     phone: '0118765432',
+  //     enableDiscounts: true,
+  //     enableWeightedBalanceColor: true,
+  //     enableExpiryAndBatch: true,
+  //     repeatTaxNumber: false,
+  //     enableArabicName: true,
+  //     enableEnglishName: true,
+  //     enablePrice: true,
+  //     enableImage: true,
+  //     printInCashier: true,
+  //     printInvoice: true,
+  //     printSalesReturns: true,
+  //     printCollectionReceipt: true,
+  //     saveInvoiceType: 1,
+  //     printType: 1,
+  //   };
+  // }
 
   private applyDropdownDefaults(): void {
     if (!this.useSampleDropdownDefaults) {
@@ -656,40 +666,57 @@ export class BranchSettings implements OnInit {
   }
 
   private switchToInvalidTab(): void {
-    const companyFields = [
-      'companyNameAr',
-      'companyNameEn',
-      'identityTypeId',
-      'identityNumber',
-      'taxNumber',
-      'email',
-      'bankAccountNumber',
+    const tabFieldOrder: { tab: 'company' | 'main' | 'finance'; fields: string[] }[] = [
+      {
+        tab: 'company',
+        fields: [
+          'companyNameAr',
+          'companyNameEn',
+          'bankAccountNumber',
+          'identityTypeId',
+          'identityNumber',
+          'taxNumber',
+          'email',
+        ],
+      },
+      {
+        tab: 'main',
+        fields: [
+          'city',
+          'district',
+          'country',
+          'street',
+          'addressDetails',
+          'buildingNumber',
+          'mobile',
+          'postalCode',
+          'printName',
+          'costCenterId',
+        ],
+      },
+      {
+        tab: 'finance',
+        fields: [
+          'currency',
+          'decimalQuantity',
+          'decimalPrice',
+          'minimumSelectiveTax',
+          'discountMethod',
+          'enableStatistics',
+          'customerSupplierDisplayType',
+          'balanceRate',
+        ],
+      },
     ];
-    const financeFields = [
-      'currency',
-      'decimalPrice',
-      'decimalQuantity',
-      'purchaseStoreId',
-      'salesStoreId',
-      'reservationStoreId',
-      'costCenterId',
-      'minimumSelectiveTax',
-      'discountMethod',
-      'customerSupplierDisplayType',
-      'balanceRate',
-    ];
 
-    if (companyFields.some((field) => this.settingsForm.get(field)?.invalid)) {
-      this.currentTemplate = 'company';
-      return;
+    for (const { tab, fields } of tabFieldOrder) {
+      const invalidField = fields.find((field) => this.settingsForm.get(field)?.invalid);
+      if (invalidField) {
+        this.currentTemplate = tab;
+        this.settingsForm.get(invalidField)?.markAsTouched();
+        return;
+      }
     }
-
-    if (financeFields.some((field) => this.settingsForm.get(field)?.invalid)) {
-      this.currentTemplate = 'finance';
-      return;
-    }
-
-    this.currentTemplate = 'main';
   }
 
   private hasSettingsData(data: ApplicationSettingsModel): boolean {
@@ -700,4 +727,6 @@ export class BranchSettings implements OnInit {
       data.email?.trim()
     );
   }
+
+  
 }

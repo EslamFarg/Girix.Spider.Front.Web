@@ -57,6 +57,7 @@ export class AddIncommingTransfer implements OnInit {
   };
 
   itemsTable: IncomingTransferLineItem[] = [];
+  selectedPopupLine: IncomingTransferLineItem | null = null;
 
   explorerBtn = {
     label: 'مستكشف تحويل وارد ',
@@ -196,9 +197,15 @@ export class AddIncommingTransfer implements OnInit {
           0,
         transferredUnitName:
           line.transferredUnitName ??
+          line.transferUnitName ??
           line.approvedUnitName ??
           line.unitName ??
           '-',
+        availableQuantity: line.availableQuantity ?? 0,
+        suggestedTransferQuantity: line.suggestedTransferQuantity ?? 0,
+        reservedForSalesQuantity: line.reservedForSalesQuantity ?? 0,
+        reservedForTransfersQuantity: line.reservedForTransfersQuantity ?? 0,
+        stockStatus: line.stockStatus ?? '',
         availableUnits,
       };
     });
@@ -258,7 +265,8 @@ export class AddIncommingTransfer implements OnInit {
     }
   }
 
-  showDialog(): void {
+  showDialog(index: number): void {
+    this.selectedPopupLine = this.itemsTable[index] ?? null;
     this.visible = true;
   }
 

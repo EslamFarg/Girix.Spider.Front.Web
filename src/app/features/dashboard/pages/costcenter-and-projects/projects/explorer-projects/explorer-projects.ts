@@ -38,7 +38,7 @@ export class ExplorerProjects {
 
    
 filteringData=[
-      {label:'رقم المشروع',key:'id',type:'text',value:'',class:'col-span-12 md:col-span-6',placeholder:'رقم المشروع'},
+      {label:'رقم المشروع',key:'id',type:'text',error:'',value:'',class:'col-span-12 md:col-span-6',placeholder:'رقم المشروع'},
       {label:'اسم المشروع',key:'returnsNumber',type:'text',value:'',class:'col-span-12 md:col-span-6',placeholder:'اسم المشروع'},
     
    ]
@@ -72,7 +72,10 @@ onSearch(value: any) {
       this.first = 0;
    const dataActive=value;
    console.log(dataActive);
-   if (!dataActive.key || !dataActive.value) return; 
+   if (!dataActive?.key || !dataActive?.value) {
+    this.getAllData()
+    return;
+   }; 
    let enumKey: SearchableColumnEnum;
 
 

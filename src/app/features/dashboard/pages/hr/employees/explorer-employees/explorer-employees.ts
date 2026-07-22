@@ -30,7 +30,8 @@ export class ExplorerEmployees {
 
    
 filteringData=[
-      {label:'رقم الموظف',key:'employeeNumber',type:'text',value:'',class:'col-span-12',placeholder:'رقم الموظف'},
+      {label:'رقم الموظف',key:'employeeNumber',error:'',type:'text',value:'',class:'col-span-12',placeholder:'رقم الموظف'},
+      // {label:'اسم الموظف',key:'employeeName',error:'',type:'text',value:'',class:'col-span-12',placeholder:'اسم الموظف'},
       
    ]
      first: number = 0;
@@ -64,10 +65,28 @@ onPageChange(event:any){
 
 
 search(e:any){
+
+  // console.log(e);
+  if(!e?.value?.trim()){
+    this.first=0;
+    this.getAllData();
+    return;
+  }
+  console.log(e);
+
   
   this._employeeService.getById(e.value).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
+
+
+    
+    if(!res?.data){
+      this.getAllData();
+      return;
+    }
     this.employeeData=[res.data];
     this.totalRecords=res.data.paginationInfo.totalRowsCount;
+  },(err:any)=>{
+    this.getAllData();
   })
 }
 

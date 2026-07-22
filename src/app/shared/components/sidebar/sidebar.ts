@@ -2,21 +2,18 @@ import { CommonModule, NgClass, NgFor, NgStyle } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { Loading } from "../../ui/loading/loading";
+import { environment } from '../../../../environments/environment.development';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, NgClass, RouterLinkActive, CommonModule, Loading],
+  imports: [RouterLink, NgClass, RouterLinkActive, CommonModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
 })
 export class Sidebar {
-
-
-  // !!!!!!!! Services
-    accordionModule: any;
-    _sanitizer:DomSanitizer=inject(DomSanitizer);
-    _router:Router=inject(Router)
+  _sanitizer: DomSanitizer = inject(DomSanitizer);
+  _router: Router = inject(Router);
+  readonly appVersion = environment.version;
 
 
 // !!!!!!! Property

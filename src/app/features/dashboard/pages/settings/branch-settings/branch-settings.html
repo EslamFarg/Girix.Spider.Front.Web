@@ -80,22 +80,23 @@
         <app-form-error [control]="settingsForm.controls['fax']" [errorKey]="'maxlength'" [message]="'رقم الفاكس يجب ان يكون 15 رقم كحد أقصى'"></app-form-error>
     </div>
    
-    <div class="col-span-12 md:col-span-4">
+    <div class="col-span-12 md:col-span-6">
         <label for="telephoneNumber">رقم الهاتف</label>
         <input type="text" placeholder="رقم الهاتف" id="telephoneNumber" formControlName="phone" maxlength="15">
         <app-form-error [control]="settingsForm.controls['phone']" [errorKey]="'maxlength'" [message]="'رقم الهاتف يجب ان يكون 15 رقم كحد أقصى'"></app-form-error>
     </div>
    
-    <div class="col-span-12 md:col-span-4">
+    <div class="col-span-12 md:col-span-6">
         <label for="namePrinted">الاسم علي الطابعه</label>
         <input type="text" placeholder="الاسم علي الطابعه" id="namePrinted" formControlName="printName" maxlength="200">
         <app-form-error [control]="settingsForm.controls['printName']" [errorKey]="'required'" [message]="'الاسم علي الطابعة مطلوب'"></app-form-error>
         <app-form-error [control]="settingsForm.controls['printName']" [errorKey]="'minlength'" [message]="'الاسم يجب ان يكون حرفين علي الأقل'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['printName']" [errorKey]="'invalidEntityName'" [message]="'اسم الموظف يجب ان يحتوي على حروف وارقام و _ و - فقط'"></app-form-error>
+
+        <!-- <app-form-error [control]="settingsForm.controls['printName']" [errorKey]=""></app-form-error> -->
+          
     </div>
-    <div class="col-span-12 md:col-span-4">
-        <label for="zipCodeMain">الرمز البريدي</label>
-        <input type="text" placeholder="الرمز البريدي" id="zipCodeMain" formControlName="postalCode" appOnlyNumber maxlength="10">
-    </div>
+  
     <div class="col-span-12 md:col-span-6">
         <label for="email">الأيميل</label>
         <input type="text" placeholder="الأيميل" id="email" formControlName="email" maxlength="100">
@@ -254,20 +255,21 @@
         <input type="text" placeholder="اسم الشركة" id="companyName" formControlName="companyNameAr" maxlength="200">
         <app-form-error [control]="settingsForm.controls['companyNameAr']" [errorKey]="'required'" [message]="'اسم الشركة مطلوب'"></app-form-error>
         <app-form-error [control]="settingsForm.controls['companyNameAr']" [errorKey]="'minlength'" [message]="'اسم الشركة يجب ان يكون حرفين علي الأقل'"></app-form-error>
-        <app-form-error [control]="settingsForm.controls['companyNameAr']" [errorKey]="'invalidEntityName'" [message]="'اسم الشركة يجب ان يحتوي على حروف وارقام و _ فقط'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['companyNameAr']" [errorKey]="'invalidEntityName'" [message]="'اسم الشركة يجب ان يحتوي على حروف وارقام و _ و - فقط ويجب ان لايبدء برقم' "></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-4">
         <label for="englishName">الأسم بالانجليزي</label>
         <input type="text" placeholder="الأسم بالانجليزي" id="englishName" formControlName="companyNameEn" maxlength="200">
         <app-form-error [control]="settingsForm.controls['companyNameEn']" [errorKey]="'required'" [message]="'الاسم بالانجليزي مطلوب'"></app-form-error>
         <app-form-error [control]="settingsForm.controls['companyNameEn']" [errorKey]="'minlength'" [message]="'الاسم يجب ان يكون حرفين علي الأقل'"></app-form-error>
-        <app-form-error [control]="settingsForm.controls['companyNameEn']" [errorKey]="'invalidEntityName'" [message]="'الاسم يجب ان يحتوي على حروف وارقام و _ فقط'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['companyNameEn']" [errorKey]="'invalidEntityName'" [message]="'الاسم يجب ان يحتوي على حروف وارقام و يجب ان لايبدء برقم'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-4">
         <label for="AccountBank">رقم الحساب البنكي</label>
-        <input type="text" placeholder="رقم الحساب البنكي" id="AccountBank" formControlName="bankAccountNumber" maxlength="34">
+        <input type="text" placeholder="رقم الحساب البنكي" id="AccountBank"   formControlName="bankAccountNumber" maxlength="34">
         <app-form-error [control]="settingsForm.controls['bankAccountNumber']" [errorKey]="'required'" [message]="'رقم الحساب البنكي مطلوب'"></app-form-error>
         <app-form-error [control]="settingsForm.controls['bankAccountNumber']" [errorKey]="'minlength'" [message]="'رقم الحساب البنكي يجب ان يكون 10 أحرف علي الأقل'"></app-form-error>
+        <app-form-error [control]="settingsForm.controls['bankAccountNumber']" [errorKey]="'pattern'" [message]="'رقم الحساب البنكي يجب ان يحتوي على حروف وارقام فقط'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-4">
         <label for="nationalType">نوع الهوية</label>

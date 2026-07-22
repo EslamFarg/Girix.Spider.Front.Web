@@ -5,3 +5,39 @@
         width: 0px;
     }
 }
+
+:host ::ng-deep .search_input .p-autocomplete {
+  width: 100%;
+}
+
+:host ::ng-deep .search_input .p-inputtext {
+  width: 100%;
+}
+
+
+
+
+.search_box p.bg-btn {
+  background-color: var(--color-btn);
+  color: #fff;
+}
+
+
+.search_input{
+    width: 100% !important; 
+}
+    
+.container_tree{
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      width: 0px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #0C4B68;
+      border-radius: 10px;
+    }
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+  }

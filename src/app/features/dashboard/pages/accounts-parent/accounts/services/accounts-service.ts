@@ -20,8 +20,11 @@ export class AccountsService extends BasehttpService{
   }
 
 
-  getAllParents(pageIndex:string,pageSize:string){
-    return this.http.get(`${this.baseUrl}/api/ChartOfAccounts/parents?Pagination.PageIndex=${pageIndex}&Pagination.PageSize=${pageSize}`);
+  getAllParents(pageIndex: number, pageSize: number) {
+    return this.http.get(
+      `${this.baseUrl}/api/ChartOfAccounts/GetAllWithoutTree?PageIndex=${pageIndex}&PageSize=${pageSize}`,
+      { headers: { 'skip-loading': 'true' } },
+    );
   }
 
   generateCode(code:string | null | undefined){

@@ -161,10 +161,20 @@ deleteDialog(){
 // }
 
 onSearch(value: any) {
+
+  this.first = 0;
  
   const dataActive=value;
   console.log(dataActive);
-  if (!dataActive.key || !dataActive.value) return;
+  // if (!dataActive.key || !dataActive.value) {
+  //   this.getAllData();
+  //   return;
+  // };
+
+  if (!dataActive?.key || !dataActive?.value?.trim()) {
+    this.getAllData();
+    return;
+  }
 
 
 

@@ -191,15 +191,21 @@ transition-all duration-200"
         <label for="warn">الحد التنبيهي</label>
        <input type="text" name="warn" id="warn" placeholder="عدد" formControlName="creditWarningLimit"
        maxlength="12"
-       appOnlyNumber
+       appDecimalNumber
        >
        <app-form-error [control]="customerForm.controls['creditWarningLimit']" [errorKey]="'required'" [message]="'الحد التنبيهي مطلوب'"></app-form-error>
                 <app-form-error  [control]="customerForm.controls['creditWarningLimit']" [errorKey]="'minlength'" [message]="' الحد التنبيهي يجب ان يكون اقل من 12 رقم'"></app-form-error>
+                <app-form-error
+                [control]="customerForm.controls['creditWarningLimit']"
+                errorKey="creditLimitExceeded"
+                message="الحد التنبيهي يجب أن يكون أقل من أو يساوي حد الائتمان">
+              </app-form-error>
+                <!-- <app-form-error [control]="customerForm.controls['creditWarningLimit']" [errorKey]="'creditLimitExceeded'" [message]="'الحد التنبيهي يجب ان يكون اقل من او يساوي حد الائتمان'"></app-form-error> -->
     </div>
     <div class="col-span-12 lg:col-span-3">
         <label for="pay">حد الائتمان</label>
        <input type="text" name="pay" id="pay" placeholder="الرقم" formControlName="creditLimit"
-       appOnlyNumber
+       appDecimalNumber
        maxlength="12"
        >
          <app-form-error [control]="customerForm.controls['creditLimit']" [errorKey]="'required'" [message]="'حد الائتمان'"></app-form-error>
@@ -266,7 +272,7 @@ transition-all duration-200"
 
       <div class="sm:col-span-12 md:col-span-4">
         <label>الدولة</label>
-        <input type="text" placeholder="الدولة" formControlName="country" maxlength="50">
+        <input type="text" placeholder="الدولة" formControlName="country" maxlength="50" appOnlyString>
         <app-form-error [control]="customerForm.controls['address'].controls['country']" [errorKey]="'required'" [message]="'الدولة مطلوبة'"></app-form-error>
         <app-form-error [control]="customerForm.controls['address'].controls['country']" [errorKey]="'minlength'" [message]="'الدولة يجب ان يكون  2 حرف علي الأقل'"></app-form-error>
         <app-form-error [control]="customerForm.controls['address'].controls['country']" [errorKey]="'maxlength'" [message]="'الدولة يجب ان يكون أقل من 50 حرف'"></app-form-error>

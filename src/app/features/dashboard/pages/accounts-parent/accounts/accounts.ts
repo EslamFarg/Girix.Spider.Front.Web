@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, HostListener, inject, signal, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, HostListener, inject, signal, ViewChild } from '@angular/core';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { TreeModule } from 'primeng/tree';
 
@@ -39,13 +39,16 @@ _destroyRef=inject(DestroyRef);
 _fb:FormBuilder=inject(FormBuilder);
 _messageServices=inject(MessageService)
 _loadingService=inject(LoadingService);
+_cdr=inject(ChangeDetectorRef);
 
-_accountsServices=inject(AccountsService);
 showPdfGenerate=false;
 // !!!!!!!!!!!!! Properties
 printPageAccounts=PrintPageAccounts
-pageIndex=0;
-pageSize=10;
+parentsPage=1;
+parentsPageSize=10;
+parentsLoading=false;
+parentsHasMore=true;
+searchPageSize=10;
 parentsList:parentsData[]=[];
 accountsList:any[]=[];
 selectedAccountParent=null;
@@ -116,10 +119,10 @@ accountStatus:any[]=[
 
 
 closedType:any[]=[
-  {
-    id:0,
-    name:"None"
-  },
+  // {
+  //   id:0,
+  //   name:"None"
+  // },
   {
     id:1,
     name:'BalanceSheet'
@@ -216,8 +219,10 @@ accountsForm=this._fb.group({
   items: any[] = [];
       value: any;
 showSearchBox: boolean = false;
-selectedSearch='رقم الحساب'
-idResultSearch:number=0
+selectedSearch = 'رقم الحساب';
+selectedSearchType: 'number' | 'name' = 'number';
+SearchValEnum = SearchableColumnEnum.Code;
+  @ViewChild('autoComplete') autoComplete!: AutoComplete;
   // !!!!!!!!!!!!!!!!!!!!!! Methods
   
   
@@ -231,46 +236,137 @@ onClick(event: any) {
 
 }
 
-    search(event: AutoCompleteCompleteEvent) {
-          const query = (event.query ?? '').trim();
-        
-          if (!query) {
-            this.items = [];
-            this.idResultSearch = 0;
-            this.getAll();
-            return;
-          }
-        
-        
-          console.log("id Result Search",this.idResultSearch);
-        
-          const EnumSearch = SearchableColumnEnum.NameEn;
-          const payload = buildSearchPayload(query, this.pageSize, EnumSearch);
-        
-          this._accountsServices.search(payload)
-            .pipe(takeUntilDestroyed(this._destroyRef))
-            .subscribe({
-              next: (res: any) => {
-                this.items = res.data.rows.map((item: any) => ({
-                  label: item.name,
-                  value: item.id
-                }));
-              }
-            });
+    search(event: AutoCompleteCompleteEvent): void {
+      if (this.selectedSearchType === 'number') {
+        this.items = [];
+        return;
+      }
+
+      const query = (event.query ?? '').trim();
+
+      if (!query) {
+        this.items = [];
+        return;
+      }
+
+      const payload = buildSearchPayload(query, this.searchPageSize, this.SearchValEnum);
+
+      this._accountsService
+        .search(payload)
+        .pipe(takeUntilDestroyed(this._destroyRef))
+        .subscribe({
+          next: (res: any) => {
+            const rows = this.extractSearchRows(res);
+            this.items = rows.map((item: any) => ({
+              label: item.name ?? item.nameAr ?? item.nameEn ?? '',
+              value: item.id,
+            }));
+          },
+        });
     }
 
-    selectFilterSearch(type:'number' | 'name'){
-  if(type == 'number'){
-    this.selectedSearch='رقم الحساب'
-    this.showSearchBox = false
+    onSearchEnter(event: Event): void {
+      if (this.selectedSearchType !== 'number') {
+        return;
+      }
+      const value = (event.target as HTMLInputElement)?.value ?? '';
+      this.searchByAccountNumber(value);
+    }
 
-  }else{
-    this.selectedSearch='اسم الحساب'
-    this.showSearchBox = false
+    onSearchButtonClick(): void {
+      if (this.selectedSearchType !== 'number') {
+        return;
+      }
+      const value = this.autoComplete?.inputEL?.nativeElement?.value ?? '';
+      this.searchByAccountNumber(value);
+    }
 
-  }
+    searchByAccountNumber(value: string): void {
+      const query = (value ?? '').trim();
+      if (!query) {
+        return;
+      }
 
-}
+      const payload = buildSearchPayload(query, this.searchPageSize, SearchableColumnEnum.Code);
+
+      this._accountsService
+        .search(payload)
+        .pipe(takeUntilDestroyed(this._destroyRef))
+        .subscribe({
+          next: (res: any) => {
+            const rows = this.extractSearchRows(res);
+            if (!rows.length) {
+              this._messageServices.add({
+                severity: 'warn',
+                summary: 'تنبيه',
+                detail: 'لم يتم العثور على حساب بهذا الرقم',
+              });
+              return;
+            }
+
+            const match =
+              rows.find(
+                (item) => (item.accountCode ?? item.code ?? '') === query,
+              ) ?? rows[0];
+
+            this.getDataFromTreeById(match.id);
+            this.clearSearchInput();
+          },
+        });
+    }
+
+    private clearSearchInput(): void {
+      if (this.autoComplete?.inputEL?.nativeElement) {
+        this.autoComplete.inputEL.nativeElement.value = '';
+      }
+      this.items = [];
+    }
+
+    onSelectAccount(event: { value: { label: string; value: number } }): void {
+      const id = event.value?.value;
+      if (!id) {
+        return;
+      }
+      this.getDataFromTreeById(id);
+      this.items = [];
+    }
+
+    private extractSearchRows(res: any): any[] {
+      if (Array.isArray(res?.data?.rows)) {
+        return res.data.rows;
+      }
+
+      const result: any[] = [];
+      const flatten = (items: any[]) => {
+        items.forEach((item) => {
+          result.push(item);
+          if (item.children?.length) {
+            flatten(item.children);
+          }
+        });
+      };
+
+      if (Array.isArray(res?.data)) {
+        flatten(res.data);
+      } else if (Array.isArray(res?.data?.data)) {
+        flatten(res.data.data);
+      }
+
+      return result;
+    }
+
+    selectFilterSearch(type: 'number' | 'name'): void {
+      this.selectedSearchType = type;
+      this.items = [];
+      if (type === 'number') {
+        this.selectedSearch = 'رقم الحساب';
+        this.SearchValEnum = SearchableColumnEnum.Code;
+      } else {
+        this.selectedSearch = 'اسم الحساب';
+        this.SearchValEnum = SearchableColumnEnum.NameAr;
+      }
+      this.showSearchBox = false;
+    }
     
 
   //  visible: boolean = false;
@@ -280,7 +376,7 @@ onClick(event: any) {
   //   }
 
   ngOnInit(): void {
-    this.getAllParents();
+    this.loadParents(true);
     this.accountsForm.get('nameAr')?.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
       this.accountsForm.patchValue({
         nameEn: value
@@ -289,10 +385,102 @@ onClick(event: any) {
     })
     this.getAll();
   }
-  getAllParents(){
-    this._accountsService.getAllParents(this.pageIndex.toString(),this.pageSize.toString()).pipe(takeUntilDestroyed(this._destroyRef)).subscribe((res:any)=>{
-      this.parentsList=res?.data?.rows;
-    })
+
+  loadMoreParents(): void {
+    this.loadParents(false);
+  }
+
+  private loadParents(reset = false): void {
+    if (this.parentsLoading) {
+      return;
+    }
+
+    if (!reset && !this.parentsHasMore) {
+      return;
+    }
+
+    if (reset) {
+      this.parentsPage = 1;
+      this.parentsHasMore = true;
+      this.parentsList = [];
+    }
+
+    this.parentsLoading = true;
+
+    this._accountsService
+      .getAllParents(this.parentsPage, this.parentsPageSize)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res: any) => {
+          const rows = this.mapParentRows(res);
+
+          if (!rows.length) {
+            this.parentsHasMore = false;
+            this.parentsLoading = false;
+            this._cdr.detectChanges();
+            return;
+          }
+
+          this.parentsList = reset
+            ? rows
+            : this.mergeParents(this.parentsList, rows);
+
+          this.parentsPage += 1;
+          this.parentsHasMore = rows.length >= this.parentsPageSize;
+          this.parentsLoading = false;
+          this._cdr.detectChanges();
+        },
+        error: () => {
+          this.parentsLoading = false;
+          this._cdr.detectChanges();
+        },
+      });
+  }
+
+  private mapParentRows(res: any): parentsData[] {
+    const rawRows = res?.data?.rows ?? res?.data ?? [];
+    if (!Array.isArray(rawRows)) {
+      return [];
+    }
+
+    return rawRows.map((item: any) => ({
+      id: item.id,
+      code: item.code ?? item.accountCode ?? '',
+      name: item.name ?? item.nameAr ?? item.nameEn ?? '',
+      group: item.group ?? item.accountGroup ?? 0,
+    }));
+  }
+
+  private mergeParents(
+    current: parentsData[],
+    incoming: parentsData[],
+  ): parentsData[] {
+    const merged = new Map<number, parentsData>();
+    [...current, ...incoming].forEach((item) => merged.set(item.id, item));
+    return Array.from(merged.values());
+  }
+
+  private ensureParentOption(
+    id?: number | null,
+    name?: string | null,
+    code?: string | null,
+    group?: number | null,
+  ): void {
+    if (id == null) {
+      return;
+    }
+
+    if (!this.parentsList.some((item) => item.id === id)) {
+      this.parentsList = [
+        ...this.parentsList,
+        {
+          id,
+          name: name?.trim() || code || String(id),
+          code: code ?? '',
+          group: group ?? 0,
+        },
+      ];
+    }
   }
   onSelectParent(e:any){
 
@@ -492,10 +680,14 @@ onClick(event: any) {
   fax: res.data.contactInfo?.fax,
   description: res.data.contactInfo?.description,
 });
+      this.ensureParentOption(
+        res.data.parentId,
+        res.data.parentName ?? res.data.parentNameAr,
+        res.data.parentCode,
+        res.data.group,
+      );
       this.isEditMode=true
     this.selectedAccountParent = res.data.parentCode;
-// أو
-this.selectedAccountParent = res.data.parentId;
     })
     
 

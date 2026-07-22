@@ -192,13 +192,18 @@ transition-all duration-200"
     <div class="col-span-12 lg:col-span-3">
         <label for="warn">الحد التنبيهي</label>
        <input type="text" name="warn" id="warn" placeholder="عدد" formControlName="creditWarningLimit"    maxlength="12"
-       appOnlyNumber>
+       appDecimalNumber>
       <app-form-error [control]="supplierForm.controls['creditWarningLimit']" [errorKey]="'required'" [message]="'الحد التنبيهي مطلوب'"></app-form-error>
       <app-form-error [control]="supplierForm.controls['creditWarningLimit']" [errorKey]="'maxlength'" [message]="' الحد التنبيهي يجب ان يكون 12 رقم علي الاقل'"></app-form-error>
+      <app-form-error
+  [control]="supplierForm.controls['creditWarningLimit']"
+  errorKey="creditLimitExceeded"
+  message="الحد التنبيهي يجب أن يكون أقل من أو يساوي حد الائتمان">
+</app-form-error>
     </div>
     <div class="col-span-12 lg:col-span-3">
         <label for="pay">حد الائتمان</label>
-       <input type="text" name="pay" id="pay" placeholder="الرقم" formControlName="creditLimit" maxlength="12" appOnlyNumber>
+       <input type="text" name="pay" id="pay" placeholder="الرقم" appDecimalNumber formControlName="creditLimit" maxlength="12" appOnlyNumber>
        <app-form-error [control]="supplierForm.controls['creditLimit']" [errorKey]="'required'" [message]="'حد الائتمان مطلوب'"></app-form-error>
        <app-form-error [control]="supplierForm.controls['creditLimit']" [errorKey]="'maxlength'" [message]="'حد الائتمان يجب ان يكون 12 رقم علي الاقل'"></app-form-error>
     </div>
@@ -227,7 +232,7 @@ transition-all duration-200"
                 <app-form-error [control]="supplierForm.controls['simpleAddress']" [errorKey]="'required'" [message]="'العنوان مطلوب'"></app-form-error>
                 <app-form-error [control]="supplierForm.controls['simpleAddress']" [errorKey]="'minlength'" [message]="'العنوان يجب ان يكون 3 حروف علي الاقل'"></app-form-error>
                 <app-form-error [control]="supplierForm.controls['simpleAddress']" [errorKey]="'maxlength'" [message]="'العنوان يجب ان يكون اقل من 200 حرف'"></app-form-error>
-                <app-form-error [control]="supplierForm.controls['simpleAddress']" [errorKey]="'invalidUsername'" [message]="'العنوان غير صحيح'"></app-form-error>
+                <app-form-error [control]="supplierForm.controls['simpleAddress']" [errorKey]="'invalidUsername'" [message]="'العنوان يجب ان يحتوي على حروف وارقام و _ و - فقط ويجب ان لايبدء برقم'"></app-form-error>
     </div>
 
    }
@@ -266,6 +271,8 @@ transition-all duration-200"
         <app-form-error [control]="addressForm.controls['city']" [errorKey]="'required'" [message]="'المدينة مطلوبة'"></app-form-error>
         <app-form-error [control]="addressForm.controls['city']" [errorKey]="'minlength'" [message]="'المدينة يجب ان يكون  2 حرف علي الأقل'"></app-form-error>
         <app-form-error [control]="addressForm.controls['city']" [errorKey]="'maxlength'" [message]="'المدينة يجب ان يكون أقل من 50 حرف'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['city']" [errorKey]="'invalidEntityName'" [message]="' اسم المدينة غير صحيح  يجب ان يحتوي على حروف وارقام و _ و - فقط ويجب ان لايبدء برقم'"></app-form-error>
+
       </div>
 
       <div class="sm:col-span-12 md:col-span-4">
@@ -274,6 +281,8 @@ transition-all duration-200"
         <app-form-error [control]="addressForm.controls['district']" [errorKey]="'required'" [message]="'الحي مطلوب'"></app-form-error>
         <app-form-error [control]="addressForm.controls['district']" [errorKey]="'minlength'" [message]="'الحي يجب أن يكون   2 حرف علي الأقل'"></app-form-error>
         <app-form-error [control]="addressForm.controls['district']" [errorKey]="'maxlength'" [message]="'الحي يجب أن يكون أقل من 50 حرف'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['district']" [errorKey]="'invalidEntityName'" [message]="' الحي غير صحيح  يجب ان يحتوي على حروف وارقام و _ و - فقط ويجب ان لايبدء برقم'"></app-form-error>
+
       </div>
 
       <div class="sm:col-span-12 md:col-span-4">
@@ -282,6 +291,7 @@ transition-all duration-200"
         <app-form-error [control]="addressForm.controls['street']" [errorKey]="'required'" [message]="'الشارع مطلوب'"></app-form-error>
         <app-form-error [control]="addressForm.controls['street']" [errorKey]="'minlength'" [message]="'علي الأقل الشارع يجب ان يكون  3 حروف'"></app-form-error>
         <app-form-error [control]="addressForm.controls['street']" [errorKey]="'maxlength'" [message]="'الشارع يجب ان يكون اقل من 100 حروف'"></app-form-error>
+        <app-form-error [control]="addressForm.controls['street']" [errorKey]="'invalidEntityName'" [message]="' الشارع غير صحيح  يجب ان يحتوي على حروف وارقام و _ و - فقط ويجب ان لايبدء برقم'"></app-form-error>
       </div>
 
       <div class="sm:col-span-12 md:col-span-4">

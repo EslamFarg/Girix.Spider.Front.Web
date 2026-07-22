@@ -22,11 +22,15 @@ import { NgClass } from '@angular/common';
 import { SearchableColumnEnum } from '../../../../../../shared/Enums/enumSearch';
 import { buildSearchPayload } from '../../../../../../shared/config/search-config';
 import { SharedStateServices } from '../../../../../../shared/services/shared-state-services';
+import { creditWarningLimitValidator } from '../../../../../../shared/validations/credit-limit.validator';
+import { entityNameValidator } from '../../../../../../shared/validations/entity-name-validator';
+import { DecimalNumberDirective } from '../../../../../../shared/directives/only-number-decimal';
 
 @Component({
   selector: 'app-add-suppliers',
   imports: [PageHeader, NgSelectComponent, ReactiveFormsModule, FormError, IntlTelInput, onlyNumberDirective, SharedConfirmDialog, PdfPrinterComponent
-    ,AutoCompleteModule,NgClass
+    ,AutoCompleteModule,NgClass,
+    DecimalNumberDirective
   ],
   templateUrl: './add-suppliers.html',
   styleUrl: './add-suppliers.scss',
@@ -58,11 +62,12 @@ export class AddSuppliers extends FormComponentBase {
     nameEn: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100),userNameValidation()]],
     phoneNumber: ['', [Validators.required, egyptSaudiPhoneValidator]],
     phoneCountryCode: ['+20', Validators.required],
-     email: ['', [Validators.required, EmailValidation]],
+     email: ['', [EmailValidation]],
     creditLimit: [null,[   Validators.required,
         Validators.maxLength(12),]],
     creditWarningLimit: [null,[Validators.required ,
-        Validators.maxLength(12)]],
+        Validators.maxLength(12),    creditWarningLimitValidator()
+      ]],
     idTypeId: [null, [
          Validators.required,
     ]],
@@ -75,9 +80,9 @@ export class AddSuppliers extends FormComponentBase {
 
     address: this._fb.group({
           country: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
-      city: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
-      district: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
-      street: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+      city: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50),entityNameValidator()]],
+      district: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50),entityNameValidator()]],
+      street: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100),entityNameValidator()]],
       buildingNumber: ['', [Validators.required, Validators.maxLength(10)]],
       postalCode: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(10)]],
     })
@@ -141,45 +146,80 @@ pageSize = 10;
     this.showSearchBox = false;
   }
   }
-    updateSimpleAddressValidation(type: number | any) {
+    // updateSimpleAddressValidation(type: number | any) {
+    //   const simple = this.supplierForm.get('simpleAddress');
+    //   const address = this.supplierForm.get('address');
+  
+    //   if (type === 1) {
+    //     // 👤 فرد
+    //     address?.reset({ emitEvent: false });
+    //     address?.disable({ emitEvent: false });
+  
+    //     simple?.enable({ emitEvent: false });
+    //     simple?.setValidators([
+    //       Validators.required,
+    //       Validators.minLength(3),
+    //       Validators.maxLength(200),
+    //       addressValidations(),
+  
+    //     ]);
+    //     simple?.updateValueAndValidity({ emitEvent: false });
+    //   } else {
+    //     const addressGroup = this.supplierForm.get('address') as any;
+  
+    //     simple?.reset();
+    //     simple?.clearValidators();
+    //     simple?.disable({ emitEvent: false });
+    //     simple?.updateValueAndValidity({ emitEvent: false });
+  
+    //     addressGroup.enable({ emitEvent: false });
+  
+    //     // شيل أي validators قديمة الأول
+    //     addressGroup.setValidators(null);
+    //     addressGroup.updateValueAndValidity({ emitEvent: false });
+  
+    //     // رجّع required لكل الحقول
+    //     Object.keys(addressGroup.controls).forEach((key) => {
+    //       const control = addressGroup.get(key);
+    //       control?.setValidators([Validators.required]);
+    //       control?.updateValueAndValidity({ emitEvent: false });
+    //     });
+  
+    //     addressGroup.updateValueAndValidity({ emitEvent: false });
+    //   }
+    // }
+
+    updateSimpleAddressValidation(type: number) {
       const simple = this.supplierForm.get('simpleAddress');
-      const address = this.supplierForm.get('address');
-  
-      if (type === 1) {
-        // 👤 فرد
-        address?.reset({ emitEvent: false });
-        address?.disable({ emitEvent: false });
-  
+      const addressGroup = this.supplierForm.get('address') as FormGroup;
+    
+      if (type === this.Individual) {
+        // ====== فرد ======
+        addressGroup.reset({}, { emitEvent: false });
+        addressGroup.disable({ emitEvent: false });
+    
         simple?.enable({ emitEvent: false });
         simple?.setValidators([
           Validators.required,
           Validators.minLength(3),
           Validators.maxLength(200),
           addressValidations(),
-  
         ]);
+    
         simple?.updateValueAndValidity({ emitEvent: false });
       } else {
-        const addressGroup = this.supplierForm.get('address') as any;
-  
-        simple?.reset();
+        // ====== شركة ======
+        simple?.reset('', { emitEvent: false });
         simple?.clearValidators();
         simple?.disable({ emitEvent: false });
         simple?.updateValueAndValidity({ emitEvent: false });
-  
+    
         addressGroup.enable({ emitEvent: false });
-  
-        // شيل أي validators قديمة الأول
-        addressGroup.setValidators(null);
-        addressGroup.updateValueAndValidity({ emitEvent: false });
-  
-        // رجّع required لكل الحقول
-        Object.keys(addressGroup.controls).forEach((key) => {
-          const control = addressGroup.get(key);
-          control?.setValidators([Validators.required]);
-          control?.updateValueAndValidity({ emitEvent: false });
+    
+        Object.keys(addressGroup.controls).forEach(key => {
+          addressGroup.get(key)?.updateValueAndValidity({ emitEvent: false });
         });
-  
+    
         addressGroup.updateValueAndValidity({ emitEvent: false });
       }
     }
@@ -203,7 +243,113 @@ pageSize = 10;
         this.updateSimpleAddressValidation(type);
       });
       this.loadSupplier();
+      this.supplierForm
+  .get('creditLimit')
+  ?.valueChanges
+  .pipe(takeUntilDestroyed(this._destroyRef))
+  .subscribe(() => {
+    this.supplierForm
+      .get('creditWarningLimit')
+      ?.updateValueAndValidity();
+  });
+
+  this.supplierForm.get('customerType')
+  ?.valueChanges
+  .pipe(takeUntilDestroyed(this._destroyRef))
+  .subscribe((type: number) => {
+
+    this.updateSimpleAddressValidation(type);
+
+    this.updateValidation(type === this.Individual);
+
+  });
   }
+
+
+  updateValidation(isIndividual: boolean) {
+    const controls = [
+      'phoneNumber',
+      'email',
+      'creditWarningLimit',
+      'creditLimit',
+      'idTypeId',
+      'idNumber',
+      'taxNumber'
+    ];
+  
+    if (isIndividual) {
+      // فرد => شيل الـ Required من كل الحقول
+      controls.forEach(controlName => {
+        const control = this.supplierForm.get(controlName);
+  
+        control?.clearValidators();
+        control?.updateValueAndValidity({ emitEvent: false });
+      });
+  
+      // اسم العميل يفضل Required
+      this.supplierForm.get('nameAr')?.setValidators([
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(100),
+        userNameValidation()
+      ]);
+  
+      this.supplierForm.get('nameEn')?.setValidators([
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(100),
+        userNameValidation()
+      ]);
+      this.supplierForm.get('phoneNumber')?.setValidators([
+        Validators.required,
+        egyptSaudiPhoneValidator
+      ]);
+    } else {
+      // شركة => رجع الـ Required
+      this.supplierForm.get('phoneNumber')?.setValidators([
+        Validators.required,
+        egyptSaudiPhoneValidator
+      ]);
+  
+      this.supplierForm.get('email')?.setValidators([
+        // Validators.required,
+        EmailValidation
+      ]);
+  
+      this.supplierForm.get('creditWarningLimit')?.setValidators([
+        Validators.required,
+        Validators.maxLength(12)
+      ]);
+  
+      this.supplierForm.get('creditLimit')?.setValidators([
+        Validators.required,
+        Validators.maxLength(12)
+      ]);
+  
+      this.supplierForm.get('idTypeId')?.setValidators([
+        Validators.required
+      ]);
+  
+      this.supplierForm.get('idNumber')?.setValidators([
+        Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(14)
+      ]);
+  
+      this.supplierForm.get('taxNumber')?.setValidators([
+        Validators.required,
+        Validators.minLength(9),
+        Validators.maxLength(15)
+      ]);
+  
+      controls.forEach(controlName => {
+        this.supplierForm.get(controlName)?.updateValueAndValidity({
+          emitEvent: false,
+        });
+      });
+    }
+  }
+
 
 
    loadSupplier() {
@@ -519,6 +665,20 @@ if (iti) {
       idTypeName: this.commercialRegister.find(x => x.id === value.idTypeId)?.name ?? ''
     }
   
+}
+
+ngOnDestroy(): void {
+  this._sharedStateServices.clearSelectedId();
+  this.supplierForm.reset();
+  this.supplierForm.clearValidators();
+  this.supplierForm.updateValueAndValidity();
+  this.supplierForm.disable();
+  this.supplierForm.enable();
+  this.supplierForm.patchValue({
+    customerCode: '',
+    customerType: this.Company,
+    phoneCountryCode: '+966',
+  });
 }
   
 }

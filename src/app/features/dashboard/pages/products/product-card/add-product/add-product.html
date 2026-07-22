@@ -128,7 +128,19 @@
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-[24px] my-[20px]">
     <div class="col-span-4">
       <label for="code">كود الصنف </label>
-      <input type="text" id="code" placeholder="كود الصنف "  formControlName="code" maxlength="100"/>
+      @if(this.isEditMode){
+        <input type="text" id="code" placeholder="كود الصنف "  formControlName="code" maxlength="100" readonly style="pointer-events: none;" />
+      }@else{
+        <div class="relative ">
+          <input type="text" id="code" placeholder="كود الصنف "  formControlName="code" maxlength="100"/>
+          <div (click)="generateRandomCode(6)" class="absolute rounded-[5px_0px_0px_5px] cursor-pointer top-0 left-0 w-[40px] h-[100%] text-white  bg-[#1791C8] flex items-center justify-center">
+            <i class="fa-solid fa-arrow-rotate-right"></i>
+          </div>
+        </div>
+        <!-- <input type="text" id="code" placeholder="كود الصنف "  formControlName="code" maxlength="100"/> -->
+
+      }
+      
      <app-form-error [control]="productForm.controls['code']" [errorKey]="'required'" [message]="'كود الصنف مطلوب'"></app-form-error> 
     <app-form-error [control]="productForm.controls['code']" [errorKey]="'maxlength'" [message]="'كود الصنف يجب ان اقل من 100 حرف'"></app-form-error>
     </div>
@@ -257,10 +269,11 @@
             <app-form-error [control]="newProductCardForm.controls['unitOfMeasureId']" [errorKey]="'required'" [message]="'الوحدة مطلوبة'"></app-form-error>
           </td>
           <td class="p-2">
-            <input type="text" placeholder="عدد" formControlName="conversionFactor" maxlength="6" appOnlyNumber
+            <input type="text" placeholder="عدد" formControlName="conversionFactor" maxlength="7" appOnlyNumber
             [readonly]="newProductCardForm.get('isBaseUnit')?.value"
             />
             <app-form-error [control]="newProductCardForm.controls['conversionFactor']" [errorKey]="'required'" [message]="'عدد مطلوب'"></app-form-error>
+            <app-form-error [control]="newProductCardForm.controls['conversionFactor']" [errorKey]="'min'" [message]="'عدد يجب ان يكون اكبر من 0'"></app-form-error>
           </td>
           <td class="p-2">
             <ng-select
@@ -276,16 +289,16 @@
             <app-form-error [control]="newProductCardForm.controls['smallerUnitId']" [errorKey]="'required'" [message]="'الوحدة المصغرة مطلوبة'"></app-form-error>
           </td>
           <td class="p-2">
-            <input type="text" placeholder="السعر" maxlength="8"  formControlName="purchasePrice" appOnlyNumber/>
+            <input type="text" placeholder="السعر" maxlength="8"  formControlName="purchasePrice" appDecimalNumber/>
             <app-form-error [control]="newProductCardForm.controls['purchasePrice']" [errorKey]="'required'" [message]="'سعر الشراء مطلوب'"></app-form-error>
           </td>
           <td class="p-2">
-            <input type="text" placeholder="السعر" maxlength="8" formControlName="retailPrice" appOnlyNumber/>
+            <input type="text" placeholder="السعر" maxlength="8" formControlName="retailPrice" appDecimalNumber/>
             <app-form-error [control]="newProductCardForm.controls['retailPrice']" [errorKey]="'required'" [message]="'سعر البيع قطاعي للوحدة مطلوب'"></app-form-error>
 
           </td>
           <td class="p-2">
-            <input type="text" placeholder="السعر" maxlength="8" formControlName="wholesalePrice"  appOnlyNumber/>
+            <input type="text" placeholder="السعر" maxlength="8" formControlName="wholesalePrice"  appDecimalNumber/>
             <app-form-error [control]="newProductCardForm.controls['wholesalePrice']" [errorKey]="'required'" [message]="'سعر البيع جمله للوحدة مطلوب'"></app-form-error>
           </td>
           <td class="p-2">
@@ -303,7 +316,7 @@
             />
           </td>
 
-          <td class="block text-center w-[100%] p-[11px]">
+          <td class=" text-center w-[100%] p-[11px]">
             <button class="btn " [ngClass]="{'btn-primary': !isEditProductCard, 'btn-warning': isEditProductCard}" (click)="addProductCard()">
                {{ isEditProductCard ? 'تعديل' : 'إضافة' }}
             </button>

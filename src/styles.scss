@@ -59,6 +59,24 @@
     --color-danger:rgba(223, 22, 22, 0.796);
     --color-success:#22c55e;
    
+    // 
+
+
+    // --p-datepicker-background: #ffffff !important;
+    // --p-datepicker-border-color: #d1d5db;
+    // --p-datepicker-color: #1f2937;
+  
+    // --p-datepicker-header-background: #ffffff;
+    // --p-datepicker-header-color: #111827;
+  
+    // --p-datepicker-hover-background: #f3f4f6;
+    // --p-datepicker-hover-color: #111827;
+  
+    // --p-datepicker-selected-background: #2563eb;
+    // --p-datepicker-selected-color: #ffffff;
+  
+    // --p-datepicker-today-background: #e0f2fe;
+    // --p-datepicker-today-color: #0369a1;
    
 
 }
@@ -1281,3 +1299,7 @@ input:-webkit-autofill {
 //     // background-color: #000 !important;
 //     // color: #fff !important;
 // }
+
+.p-component.p-datepicker-panel{
+    background: #fff !important;
+}

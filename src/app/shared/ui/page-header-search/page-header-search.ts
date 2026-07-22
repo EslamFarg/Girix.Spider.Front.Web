@@ -119,6 +119,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePicker } from "primeng/datepicker";
 import { ActiveFilterKey } from '../../services/active-filter-key';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-page-header-search',
@@ -134,7 +135,7 @@ import { ActiveFilterKey } from '../../services/active-filter-key';
   ],
   templateUrl: './page-header-search.html',
   styleUrl: './page-header-search.scss',
-})
+})  
 export class PageHeaderSearch {
 
   titleHeading = input<string>('');
@@ -144,6 +145,7 @@ export class PageHeaderSearch {
   showIconSearch = input<boolean>(true);
   multiFilter = input<boolean>(false);
   filterDialogWidth = input<string>('25rem');
+  _messageService=inject(MessageService);
  
 
   private _activeFilterKey = inject(ActiveFilterKey);
@@ -160,6 +162,11 @@ export class PageHeaderSearch {
 
 
   onFieldInput(currentItem: any) {
+    currentItem.error = '';
+
+      // اعمل Validation أثناء الكتابة
+  this.validateField(currentItem);
+
     if (this.multiFilter()) {
       return;
     }
@@ -197,6 +204,19 @@ export class PageHeaderSearch {
   }
 
   search() {
+
+    let isValid = true;
+
+  this.filteringData().forEach(item => {
+    if (!this.validateField(item)) {
+      isValid = false;
+    }
+  });
+
+  if (!isValid) {
+    return;
+  }
+  
     if (this.multiFilter()) {
       const filters = this.filteringData().reduce(
         (acc: Record<string, string>, item: any) => {
@@ -237,6 +257,105 @@ export class PageHeaderSearch {
     });
   }
 
+
+  // !! Validation
+  // private validateField(item: any): string | null {
+
+  //   const value = item.value?.toString().trim() ?? '';
+  
+  //   // لو الحقل فاضي متعملش Validation
+  //   if (!value) {
+  //     return null;
+  //   }
+  
+  //   switch (item.key) {
+  
+  //     case 'phone':
+  //       if (!/^01[0125]\d{8}$/.test(value)) {
+  //         return 'رقم الجوال غير صحيح';
+  //       }
+  //       break;
+  
+  //     case 'email':
+  //       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+  //         return 'البريد الإلكتروني غير صحيح';
+  //       }
+  //       break;
+  
+  //     case 'code':
+  //       if (!/^[0-9]+$/.test(value)) {
+  //         return 'الكود يجب أن يكون أرقام فقط';
+  //       }
+  //       break;
+  
+  //     case 'nationalId':
+  //       if (!/^\d{14}$/.test(value)) {
+  //         return 'الرقم القومي يجب أن يكون 14 رقم';
+  //       }
+  //       break;
+  
+  //     case 'taxNumber':
+  //       if (!/^\d{9,15}$/.test(value)) {
+  //         return 'الرقم الضريبي غير صحيح';
+  //       }
+  //       break;
+  
+  //     default:
+  //       return null;
+  //   }
+  
+  //   return null;
+  // }
+
+
+  private validateField(item: any): boolean {
+
+    item.error = '';
+  
+    const value = item.value?.toString().trim() ?? '';
+  
+    if (!value) {
+      return true;
+    }
+  
+    switch (item.key) {
+  
+      case 'phone':
+        if (!/^01[0125]\d{8}$/.test(value)) {
+          item.error = 'رقم الجوال غير صحيح';
+          return false;
+        }
+        break;
+  
+      case 'email':
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          item.error = 'البريد الإلكتروني غير صحيح';
+          return false;
+        }
+        break;
+  
+      case 'code':
+        if (!/^[0-9]+$/.test(value)) {
+          item.error = 'الكود يجب أن يكون أرقام فقط';
+          return false;
+        }
+        break;
+        case 'employeeNumber':
+          if (!/^\d+$/.test(value)) {
+            item.error = 'رقم الموظف يجب أن يكون أرقام فقط';
+            return false;
+          }
+          break;   
+        case 'id':
+          if (!/^\d+$/.test(value)) {
+            item.error = 'رقم المشروع يجب أن يكون أرقام فقط';
+            return false;
+          }
+          break;
+    }
+  
+    return true;
+  }
 
 
 }

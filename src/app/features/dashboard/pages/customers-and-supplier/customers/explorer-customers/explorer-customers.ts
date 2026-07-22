@@ -74,7 +74,11 @@ export class ExplorerCustomers {
    
     const dataActive=value;
     console.log(dataActive);
-    if (!dataActive.key || !dataActive.value) return;
+    if (!dataActive?.key || !dataActive?.value?.trim()){
+      this.first=0;
+      this.gellAllCustomers();
+      return;
+    } 
   
   
   
@@ -103,6 +107,9 @@ export class ExplorerCustomers {
           this.cdr.detectChanges();
     });
   }
+
+
+  
   
   
   viewDeletePopup(id:number){

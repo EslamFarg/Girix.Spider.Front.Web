@@ -1,0 +1,33 @@
+:host ::ng-deep .ng-select.ng-select-multiple .ng-select-container {
+    min-height: 42px;
+    max-height: 90px;
+    overflow-y: auto;
+    align-items: flex-start;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  
+  :host ::ng-deep .ng-select.ng-select-multiple .ng-value-container {
+    max-height: 80px;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+
+  :host ::ng-deep .ng-select .ng-arrow-wrapper {
+    padding-left: 9px;
+    padding-right: 0;
+    height: 100%;
+    padding-top: 7px;
+}
+
+:host ::ng-deep .ng-select .ng-clear-wrapper {
+   
+    padding-top: 6px;
+}
+
+
+  

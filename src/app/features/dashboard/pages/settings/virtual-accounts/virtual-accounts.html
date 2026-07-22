@@ -1,13 +1,13 @@
 <h2 class="text-[20px] font-bold mt-4">الحسابات الأفتراضية</h2>
 
 <form (ngSubmit)="save()">
-  <div class="table-responsive">
+  <div class="table-responsive" (scroll)="onTableScroll()">
     <table>
       <thead>
         <tr class="text-right sticky top-0 bg-white z-10 [&>*]:text-[20px]">
           <th> <span class="text-right text-[16px] font-bold">م</span></th>
           <th> <span class="text-right text-[16px] font-bold">الحساب الأساسي</span></th>
-          <th> <span class="text-right text-[16px] font-bold">الحساب المقابل</span></th>
+          <th> <span class="text-right text-[16px] font-bold">الحساب المقابل *</span></th>
         </tr>
       </thead>
 
@@ -23,15 +23,22 @@
               <td>{{ item?.nameAr }}</td>
               <td>
                 <ng-select
+                #accountSelect
                   [items]="chartOfAccounts"
                   bindLabel="name"
                   bindValue="id"
                   placeholder="اختر الحساب"
                   [(ngModel)]="item.accountId"
                   [ngModelOptions]="{ standalone: true }"
-                  [clearable]="true"
-                  [searchable]="true">
+                  [clearable]="false"
+                  [searchable]="true"
+                  required
+                  appendTo="body"
+                  >
                 </ng-select>
+                @if (submitted && !item.accountId) {
+                  <small>الحساب المقابل مطلوب</small>
+                }
               </td>
             </tr>
           } @empty {

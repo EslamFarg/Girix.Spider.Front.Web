@@ -624,4 +624,9 @@ showPopupPreview() {
 showPopupPreview2() {
   this.previewDialog2 = true;
 }
+
+
+ngOnDestroy(): void {
+  this._sharedStateServices.clearSelectedId();
+}
 }

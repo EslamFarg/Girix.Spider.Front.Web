@@ -286,4 +286,16 @@ export class AddTheDelegate extends FormComponentBase{
   print() {
 this.printer.print();
   }
+
+  ngOnDestroy(): void {
+    this._sharedStateServices.clearSelectedId();
+    this.delegateForm.clearValidators();
+    this.delegateForm.updateValueAndValidity();
+    this.delegateForm.disable();
+    this.delegateForm.enable();
+    this.delegateForm.patchValue({
+      name: '',
+      phone: '',
+    });
+  }
 }

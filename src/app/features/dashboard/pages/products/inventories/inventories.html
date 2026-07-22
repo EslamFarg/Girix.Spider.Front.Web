@@ -36,6 +36,8 @@
       <td colspan="3" class="text-right">   <div class="search_input relative md:w-[30%]">
         <!-- <input type="text" class="text-[14px] w-[100%]"  placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/> -->
         <p-autocomplete
+        #autoComplete
+         (onFocus)="onFocusSearch($event)"
         (onClear)="clearSearch()"
         (onSelect)="onSelect($event)"
         class='autocomplete_full_width' [inputId]="'searchByCodeProduct'"  [suggestions]="items" (completeMethod)="search($event)" [placeholder]="selectedSearch"/>

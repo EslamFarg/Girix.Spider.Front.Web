@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -29,27 +29,32 @@ export class VirtualAccounts implements OnInit {
   chartOfAccounts: LookupItem[] = [];
   isSaving = false;
   isLoading = false;
+  submitted = false;
 
   ngOnInit(): void {
     this.loadPageData();
   }
 
   save(): void {
-    const payload = this.fixedAccounts
-      .filter((item) => item.accountId != null)
-      .map((item) => ({
-        fixedAccountCode: item.fixedAccountCode,
-        financialAccountId: item.accountId as number,
-      }));
+    this.submitted = true;
 
-    if (!payload.length) {
+    const hasMissingCounterpart = this.fixedAccounts.some(
+      (item) => item.accountId == null,
+    );
+
+    if (hasMissingCounterpart) {
       this._messageService.add({
         severity: 'warn',
         summary: 'تنبيه',
-        detail: 'يرجى اختيار حساب مقابل واحد على الأقل',
+        detail: 'يرجى اختيار الحساب المقابل لجميع الحسابات',
       });
       return;
     }
+
+    const payload = this.fixedAccounts.map((item) => ({
+      fixedAccountCode: item.fixedAccountCode,
+      financialAccountId: item.accountId as number,
+    }));
 
     this.isSaving = true;
     this._fixedAccountService
@@ -161,4 +166,16 @@ export class VirtualAccounts implements OnInit {
       ];
     }
   }
+
+
+  @ViewChildren('accountSelect')
+accountSelects!: QueryList<NgSelectComponent>;
+
+onTableScroll() {
+  this.accountSelects.forEach((select:any) => {
+    if (select.isOpen) {
+      select.close();
+    }
+  });
+}
 }

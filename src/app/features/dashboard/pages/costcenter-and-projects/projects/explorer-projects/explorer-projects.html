@@ -35,8 +35,8 @@
 <td class="p-2 text-center">{{item?.projectTax}}</td>
 <td class="p-2 text-center">{{item?.insuranceValue}}</td>
 
-       <td class="p-2 w-full flex items-center justify-center gap-2" (click)="onEditProject(item.id)">
-            <button class="update">
+       <td class="p-2 w-full flex items-center justify-center gap-2" >
+            <button class="update" (click)="onEditProject(item.id)">
 <i class="fa-solid fa-pen-to-square"></i>
             </button>
             <button class="delete" (click)="showPopupDelete(item.id)">

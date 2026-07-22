@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, ViewChild } from '@angular/core';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { TreeProject } from '../../../../../shared/ui/tree-project/tree-project';
 import { CostCenterService } from './services/cost-center';
@@ -32,6 +32,7 @@ export class CostCenter extends FormComponentBase {
   // !!!!!!!!!!! properties
   @ViewChild('autoComplete') autoComplete!: AutoComplete;
   costCenterForm: FormGroup = this._fb.group({
+    code: [''],
     nameAr: [
       '',
       [
@@ -56,84 +57,7 @@ export class CostCenter extends FormComponentBase {
 
   isChangeStateParentId = true;
 
-  treeCost: any = [
-    {
-      label: 'مشروع الطاقه الشمسيه',
-      expanded: false,
-      children: [
-        {
-          label: 'اداره المشتريات',
-          expanded: false,
-          children: [],
-        },
-        {
-          label: 'اداره الماليه',
-          expanded: false,
-          children: [],
-        },
-        {
-          label: 'الاستثمارات',
-          expanded: false,
-          children: [],
-        },
-        {
-          label: 'راس المال',
-          expanded: false,
-          children: [
-            {
-              label: 'نقديه',
-              expanded: false,
-              isLeaf: true,
-            },
-            {
-              label: 'ائتمان',
-              expanded: false,
-              isLeaf: true,
-            },
-            {
-              label: 'نقديه',
-              expanded: false,
-              isLeaf: true,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      label: ' 2 مشروع الطاقه الشمسيه',
-      children: [
-        {
-          label: 'اداره المشتريات',
-          children: [],
-        },
-        {
-          label: 'اداره الماليه',
-          children: [],
-        },
-        {
-          label: 'الاستثمارات',
-          children: [],
-        },
-        {
-          label: 'راس المال',
-          children: [
-            {
-              label: 'نقديه',
-              isLeaf: true,
-            },
-            {
-              label: 'ائتمان',
-              isLeaf: true,
-            },
-            {
-              label: 'نقديه',
-              isLeaf: true,
-            },
-          ],
-        },
-      ],
-    },
-  ];
+  treeCost: any[] = [];
 
   getDatabySelect:CostCenterModel[]=[]
   showDeleteDialog=false;
@@ -226,10 +150,9 @@ mapToTree(data: any[]): any[] {
   getAllData() {
     this._costCenterService.getAllSendInQuery().pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next:(res:any)=>{
-        const flat=this.flattenCostCenters(res.data)
-        console.log(flat);
-         this.treeCost = this.mapToTree(res.data);
-        this.getDatabySelect=flat
+        const data = Array.isArray(res?.data) ? res.data : [];
+        this.treeCost = this.mapToTree(data);
+        this.getDatabySelect = this.flattenCostCenters(data);
       }
     })
   }
@@ -350,106 +273,129 @@ mapToTree(data: any[]): any[] {
 
 
   // !!! Search
-  searchControl = new FormControl('',Validators.required);
+  searchControl = new FormControl('');
+  items: { label: string; value: number }[] = [];
+  pageSize = 10;
   showSearchBox = false;
-  selectedSearch = 'الكود';
-  SearchValEnum:any=SearchableColumnEnum.Code;
-  selectedSearchType: 'code' | 'name' | 'mobile' = 'code';
-  items:any=[];
-  pageSize=10
-        selectFilterSearch(type:  'name' | 'code' ) {
-        this.selectedSearchType = type;
-    if (type == 'name') {
-      this.selectedSearch = 'الأسم';
-      this.SearchValEnum=SearchableColumnEnum.Name
-  
-    } else if (type == 'code') {
-      this.selectedSearch = 'الكود';
-      this.SearchValEnum=SearchableColumnEnum.Code
-    } 
+  showTreeSearchBox = false;
+  selectedSearchType: 'code' | 'name' = 'code';
+  selectedSearch = 'كود مركز التكلفة';
+  SearchValEnum = SearchableColumnEnum.Code;
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = (event.target as HTMLElement).closest('.search_input');
+    if (!target) {
+      this.showSearchBox = false;
+      this.showTreeSearchBox = false;
+    }
+  }
+
+  selectFilterSearch(type: 'code' | 'name'): void {
+    this.selectedSearchType = type;
+    if (type === 'code') {
+      this.selectedSearch = 'كود مركز التكلفة';
+      this.SearchValEnum = SearchableColumnEnum.Code;
+    } else {
+      this.selectedSearch = 'اسم مركز التكلفة';
+      this.SearchValEnum = SearchableColumnEnum.NameAr;
+    }
     this.showSearchBox = false;
+    this.showTreeSearchBox = false;
+  }
+
+  private extractSearchTreeData(res: any): any[] {
+    if (Array.isArray(res?.data)) {
+      return res.data;
+    }
+    if (Array.isArray(res?.data?.rows)) {
+      return res.data.rows;
+    }
+    return [];
+  }
+
+  search(event: AutoCompleteCompleteEvent): void {
+    const query = (event.query ?? '').trim();
+    if (!query) {
+      this.items = [];
+      return;
+    }
+
+    const payload = buildSearchPayload(query, this.pageSize, this.SearchValEnum);
+
+    this._costCenterService
+      .search(payload)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res: any) => {
+          const data = this.extractSearchTreeData(res);
+          this.items = this.flattenCostCenters(data).map((item: any) => ({
+            label:
+              this.selectedSearchType === 'code'
+                ? String(item.id)
+                : (item.nameAr ?? item.nameEn ?? ''),
+                
+            value: item.id,
+          }));
+         
+
+
+          setTimeout(() => {
+            this.autoComplete?.show();
+          });
+        },
+      });
+  }
+
+  onSelectDelegate(event: { value: { label: string; value: number } }): void {
+    const id = event.value?.value;
+    if (!id) {
+      return;
+    }
+
+    this.loadCostCenterById(id);
+  }
+
+  private loadCostCenterById(id: number): void {
+    this._costCenterService
+      .getByIdInQuery(id)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((res: any) => {
+        if (res.data.parentId == null) {
+          this.costCenterForm.get('isCheckAccount')?.patchValue(false);
+        } else {
+          this.costCenterForm.get('isCheckAccount')?.patchValue(true);
+        }
+
+        this.costCenterForm.patchValue({
+          ...res.data,
+        });
+
+        this.changeButtonState(res.data.id, true);
+        this.searchControl.reset();
+        this.items = [];
+      });
   }
 
 
-  onEnter(event: any) {
-  if (this.searchControl.invalid) {
-    this._messageService.add({
-      severity: 'error',
-      summary: 'خطأ',
-      detail: `يجب ادخال قيمه بحث ${this.selectedSearch}`,
-    })
+searchInTree(value: any): void {
+  const query = (value ?? '').trim();
+  if (!query) {
+    this.getAllData();
     return;
   }
-  // نفذ البحث هنا
-}
 
-
-    search(event: AutoCompleteCompleteEvent) {
-      console.log('event', this.searchControl.value);
-      const query = (event.query ?? '').trim();
-      if(!query){
-        this.items = [];
-        return;
-      }
-
-        const payload = buildSearchPayload(query, this.pageSize, this.SearchValEnum);
-
-        this._costCenterService
-          .search(payload)
-          .pipe(takeUntilDestroyed(this._destroyRef))
-          .subscribe({
-          
-            next: (res: any) => {
-              console.log(res);
-              this.items = res.data.rows.map((item: any) => ({
-                label: item.nameAr,
-                value: item.id,
-              }));
-               setTimeout(() => {
-    this.autoComplete.show();
-  });
-            },
-          });
-    }
-
-     onSelectDelegate(event: any) {
-  const delegateId = event.value.value;
-
-
+  const payload = buildSearchPayload(query, this.pageSize, this.SearchValEnum);
   this._costCenterService
-    .getByIdInQuery(delegateId)
+    .search(payload)
     .pipe(takeUntilDestroyed(this._destroyRef))
-    .subscribe(res => {
-      // console.log(res);
-      // this.idUpdate = res.data.id;
-      console.log(res.data);
-// asdasdasd
-      
-      if(res.data.parentId == null){
-        this.costCenterForm.get('isCheckAccount')?.patchValue(false);
-      }else{
-        this.costCenterForm.get('isCheckAccount')?.patchValue(true);
-      }
-      this.costCenterForm.patchValue({
-        ...res.data,
-      });
-    
-      this.changeButtonState(res.data.id,true);
-      this.searchControl.reset();
-      this.items = [];
+    .subscribe({
+      next: (res: any) => {
+        const data = this.extractSearchTreeData(res);
+        this.treeCost = this.mapToTree(data);
+        this.getDatabySelect = this.flattenCostCenters(data);
+      },
     });
-}
-
-
-searchInTree(value:any){
-  const query = (value ?? '').trim();
-  const searchByName=SearchableColumnEnum.Name
-     const payload = buildSearchPayload(query, this.pageSize, searchByName);
-  this._costCenterService.search(payload).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
-    next:(res:any)=>{
-      console.log(res);
-    }
-  })  
 }
 
 }

@@ -70,7 +70,16 @@ onSearch(value: any) {
  
   const dataActive=value;
   console.log(dataActive);
-  if (!dataActive.key || !dataActive.value) return;
+  // if (!dataActive.key || !dataActive.value.trim()) {
+  //   this.getAllData();
+  //   return;
+  // };
+
+  if (!dataActive?.key || !dataActive?.value?.trim()) {
+    this.first = 0;
+    this.getAllData();
+    return;
+  }
 
 
 

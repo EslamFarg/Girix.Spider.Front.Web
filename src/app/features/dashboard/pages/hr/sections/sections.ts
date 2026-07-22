@@ -1,5 +1,5 @@
-import { Component, DestroyRef, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SectionsService } from './services/sections-service';
 import { MessageService } from 'primeng/api';
 import { entityNameValidator } from '../../../../../shared/validations/entity-name-validator';
@@ -16,7 +16,7 @@ import { SearchableColumnEnum } from '../../../../../shared/Enums/enumSearch';
 
 @Component({
   selector: 'app-sections',
-  imports: [ReactiveFormsModule, FormError, Paginator, SharedConfirmDialog, NgClass, AutoComplete],
+  imports: [ReactiveFormsModule, FormError, Paginator, SharedConfirmDialog, NgClass, AutoComplete,FormsModule],
   templateUrl: './sections.html',
   styleUrl: './sections.scss',
 })
@@ -33,7 +33,7 @@ private _destroyRef = inject(DestroyRef);
 
 
 // !!!!!!!!!!!!!!!!!! Properties
-
+@ViewChild('autoComplete') autoComplete!: AutoComplete;
 sectionForm=this._fb.group({
   nameAr: ['',[Validators.required,Validators.minLength(2),Validators.maxLength(100),entityNameValidator()]],
   nameEn: ['',[Validators.required,Validators.minLength(2),Validators.maxLength(100),entityNameValidator()]],
@@ -61,6 +61,8 @@ totalPages = 0;
 searchPage = 1;
 searchPageSize = 10;
 idResultSearch: number =0;
+ignoreNextFocus=false;
+searchValue:string='';
 
 // !!!!!!!!!!!!!!! Methods
 
@@ -87,6 +89,10 @@ search(event: AutoCompleteCompleteEvent) {
           value: item.id
         }));
 
+        setTimeout(() => {
+          this.autoComplete.show();
+        });
+
       }
     });
 }
@@ -100,9 +106,14 @@ onSelect(event: any) {
     this.getAll();
     return;
   }
+  
+    this.ignoreNextFocus = true;
+  setTimeout(() => {
+    this.autoComplete.hide();
+  }, 0);
+
     this.idResultSearch = event.value?.value ?? 0;
 
-  
   if(this.idResultSearch==0){
 
     this._messageServices.add({
@@ -121,11 +132,48 @@ onSelect(event: any) {
      rows: [res.data],
     paginationInfo: res.data.paginationInfo
   }
+
+  
+
 };
 
+     this.searchValue = '';
+     this.items = [];
       this.totalRecords = 1 ;
     }
   })
+}
+
+
+  
+onFocusSearch(event: any) {
+
+  if (this.ignoreNextFocus) {
+    this.ignoreNextFocus = false;
+    return;
+  }
+  const value = event.target?.value?.trim();
+  console.log(value);
+
+  const query={
+    query: value
+  }
+
+  
+  
+  if (!value) {
+    return;
+    
+  }
+  
+  // لو الاقتراحات موجودة بالفعل، متبحثش تاني
+  setTimeout(() => {
+  this.autoComplete.show();
+  }, 100);
+  if (this.items.length > 0) return;
+  this.search(query as AutoCompleteCompleteEvent);
+  
+
 }
 
   clearSearch() {

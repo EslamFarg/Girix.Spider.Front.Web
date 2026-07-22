@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
 import { InventoriesServices } from './services/inventories-services';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AutoComplete, AutoCompleteCompleteEvent } from "primeng/autocomplete";
@@ -27,6 +27,7 @@ _fb:FormBuilder=inject(FormBuilder);
 _destroyRef:DestroyRef=inject(DestroyRef);
 _messageServices:MessageService=inject(MessageService)
 // !!!!!!!!!!!! properites
+@ViewChild('autoComplete') autoComplete!: AutoComplete;
 inventoriesForm=this._fb.group({
   nameAr: ['',[Validators.required,Validators.minLength(2),Validators.maxLength(100),userNameValidation()]],
   nameEn: ['',[Validators.required,Validators.minLength(2),Validators.maxLength(100),userNameValidation()]],
@@ -42,6 +43,7 @@ pageIndex=1;
 pageSize=10
 showDeleteDialog=false
 buttonConfig=BUTTON_CONFIG;
+ignoreNextFocus = false;
 
 // !!!!!!!!!! Methods
 
@@ -83,6 +85,10 @@ search(event: AutoCompleteCompleteEvent) {
           label: item.name,
           value: item.id
         }));
+        setTimeout(() => {
+          this.autoComplete.hide();
+        }, 0);
+        
       }
     });
 }
@@ -93,6 +99,12 @@ if (!event || !event.value) {
   this.getAllData();
   return;
 }
+
+this.ignoreNextFocus = true;
+setTimeout(() => {
+  this.autoComplete.hide();
+}, 0);
+
 
   this.idResultSearch = event.value.value;
 
@@ -128,6 +140,36 @@ if (!event || !event.value) {
     });
   }
 
+  
+onFocusSearch(event: any) {
+
+  if (this.ignoreNextFocus) {
+    this.ignoreNextFocus = false;
+    return;
+  }
+  const value = event.target?.value?.trim();
+  console.log(value);
+
+  const query={
+    query: value
+  }
+
+  
+  
+  if (!value) {
+    return;
+    
+  }
+  
+  // لو الاقتراحات موجودة بالفعل، متبحثش تاني
+  setTimeout(() => {
+  this.autoComplete.show();
+  }, 100);
+  if (this.items.length > 0) return;
+  this.search(query as AutoCompleteCompleteEvent);
+  
+
+}
   clearSearch() {
   this.idResultSearch = 0;
   this.items = [];

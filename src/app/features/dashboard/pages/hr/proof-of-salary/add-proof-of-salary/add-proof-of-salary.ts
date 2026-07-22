@@ -191,26 +191,61 @@ export class AddProofOfSalary implements OnInit, OnDestroy {
       })
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
+        // next: (res) => {
+        //   if (res.isSuccess) {
+        //     const data = res.data;
+        //     const rows = Array.isArray(data) ? data : (data?.rows ?? []);
+        //     this.buildPayrollItems(rows);
+        //     this.hasSearchResults = rows.length > 0;
+        //   } else {
+        //     // this._messageService.add({
+        //     //   severity: 'error',
+        //     //   summary: 'خطاء',
+        //     //   detail: res.message,
+        //     // });
+        //     // console.log('res', res);
+        //     // this.items.clear();د
+           
+        //     this.hasSearchResults = false;
+        //   }
+        //   // const data = res.data;
+        //   // const rows = Array.isArray(data) ? data : (data?.rows ?? []);
+        //   // this.buildPayrollItems(rows);
+        //   // this.hasSearchResults = rows.length > 0;
+        // },
+
         next: (res) => {
           if (res.isSuccess) {
             const data = res.data;
             const rows = Array.isArray(data) ? data : (data?.rows ?? []);
+        
             this.buildPayrollItems(rows);
             this.hasSearchResults = rows.length > 0;
           } else {
-            // this._messageService.add({
-            //   severity: 'error',
-            //   summary: 'خطاء',
-            //   detail: res.message,
-            // });
-            this.hasSearchResults = false;
+            this.resetPayrollTable();
+        
+            this._messageService.add({
+              severity: 'error',
+              summary: 'خطأ',
+              detail: 'لا توجد بيانات للحفظ، قم بالبحث أولاً',
+            });
           }
-          // const data = res.data;
-          // const rows = Array.isArray(data) ? data : (data?.rows ?? []);
-          // this.buildPayrollItems(rows);
-          // this.hasSearchResults = rows.length > 0;
         },
+        error: (err) => {
+          this.resetPayrollTable();
+        
+         
+        }
       });
+  }
+
+  private resetPayrollTable(): void {
+    this.items.clear();          // يمسح كل صفوف الجدول
+    this.first = 0;              // يرجع لأول صفحة
+    this.hasSearchResults = false;
+  
+    this.payrollForm.markAsPristine();
+    this.payrollForm.markAsUntouched();
   }
 
   saveProof(): void {

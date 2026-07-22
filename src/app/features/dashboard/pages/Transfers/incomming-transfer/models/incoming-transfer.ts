@@ -8,6 +8,11 @@ export interface IncomingTransferLineItem {
   transferredQuantity?: number;
   transferredUnitName?: string;
   availableUnits?: IncomingTransferUnitOption[];
+  availableQuantity?: number;
+  suggestedTransferQuantity?: number;
+  reservedForSalesQuantity?: number;
+  reservedForTransfersQuantity?: number;
+  stockStatus?: string;
 }
 
 export interface IncomingTransferUnitOption {
@@ -73,6 +78,11 @@ export interface IncomingTransferLineDetail {
   dispensedQuantity?: number;
   transferredUnitName?: string;
   approvedUnitName?: string;
+  availableQuantity?: number;
+  suggestedTransferQuantity?: number;
+  reservedForSalesQuantity?: number;
+  reservedForTransfersQuantity?: number;
+  stockStatus?: string;
   availableUnits?: IncomingTransferUnitOption[];
   units?: IncomingTransferUnitOption[];
 }

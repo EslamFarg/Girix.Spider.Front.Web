@@ -1,10 +1,10 @@
-import { Component, DestroyRef, ElementRef, forwardRef, inject, ViewChild } from '@angular/core';
+import { Component, ChangeDetectorRef, DestroyRef, ElementRef, forwardRef, inject, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePicker } from 'primeng/datepicker';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { Dialog } from 'primeng/dialog';
 import { InputAttachment } from '../../../../../../shared/ui/input-attachment/input-attachment';
-import { FormBuilder, NG_VALUE_ACCESSOR, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, NG_VALUE_ACCESSOR, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { FormComponentBase } from '../../../../../../shared/base/form-component-base';
 import { entityNameValidator } from '../../../../../../shared/validations/entity-name-validator';
 import { SectionsService } from '../../sections/services/sections-service';
@@ -22,6 +22,7 @@ import { SharedConfirmDialog } from "../../../../../../shared/ui/shared-confirm-
 import { SharedStateServices } from '../../../../../../shared/services/shared-state-services';
 import { env } from 'node:process';
 import { environment } from '../../../../../../../environments/environment.development';
+import { LanguageNameValidator } from '../../../../../../shared/validations/language-name-validators';
 
 @Component({
   selector: 'app-add-employees',
@@ -53,6 +54,7 @@ export class AddEmployees extends FormComponentBase {
   _AllowancesServices = inject(AllowancesService);
   _employeeService = inject(EmployeeService);
   _messageService:MessageService = inject(MessageService);
+  private readonly _cdr = inject(ChangeDetectorRef);
   
   // !!!!!!!!!!!!!!!!!!! Properties
   date2: Date | undefined;
@@ -61,6 +63,7 @@ export class AddEmployees extends FormComponentBase {
   items = [];
   showDeleteDialog=false;
    loadUtils = () => import('intl-tel-input/utils');
+
   AllowancesList = [];
   employeeForm = this._fb.group({
   id:[null],
@@ -92,7 +95,8 @@ export class AddEmployees extends FormComponentBase {
       Validators.required,
       Validators.minLength(2),
       Validators.maxLength(200),
-      entityNameValidator()
+      entityNameValidator(),
+      LanguageNameValidator.arabicOnly()
     ]
   ],
 
@@ -102,7 +106,8 @@ export class AddEmployees extends FormComponentBase {
       Validators.required,
       Validators.minLength(2),
       Validators.maxLength(200),
-      entityNameValidator()
+      entityNameValidator(),
+      LanguageNameValidator.englishOnly()
     ]
   ],
 
@@ -164,12 +169,12 @@ export class AddEmployees extends FormComponentBase {
 
   nationality: [
     '',
-    [Validators.required]
+    [Validators.required,Validators.minLength(3),Validators.maxLength(50),entityNameValidator()]
   ],
 
   jobTitle: [
     '',
-    [Validators.required]
+    [Validators.required,Validators.minLength(3),Validators.maxLength(50),entityNameValidator()]
   ],
 
   dateOfBirth: [
@@ -187,7 +192,8 @@ export class AddEmployees extends FormComponentBase {
   ],
 
   contractEndDate: [
-    new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+    new Date()
+    // new Date(new Date().getDate() + 1,new Date().setFullYear(new Date().getFullYear() + 1)),
   ],
 
   contractEndAttachmentFile: [
@@ -213,6 +219,8 @@ offset = 0;
 loading = false;
 hasMore = true;
 
+contractEndPickerKey = 0;
+
 // !!!!!!!!!!!!!!! Server Attachments Previews
 attachmentsPreviews = {
   nationalIdOrIqamaNumberFile: null as string | null,
@@ -222,12 +230,150 @@ attachmentsPreviews = {
   borderAttachment: null as string | null,
   contractEndAttachmentFile: null as string | null,
 };
+
   // !!!!!!!!!!!!!!! Methods
+
+
+
+//  constructor() {
+
+// }
   ngOnInit() {
     this.getAllDataSections();
     this.getAllAllowances();
     this.loadEmployeeCommingFromExplorer();
     this.refreshActions();
+    this.setupContractEndDateValidation();
+  }
+
+  private setupContractEndDateValidation(): void {
+    this.syncContractEndDateMin(this.employeeForm.get('workStartDate')?.value);
+
+    this.employeeForm
+      .get('contractEndDate')
+      ?.addValidators((control) => this.validateContractEndDate(control));
+
+    this.employeeForm
+      .get('workStartDate')
+      ?.valueChanges.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => {
+        this.onWorkStartDateChange();
+      });
+  }
+
+  get contractEndMinDate(): Date {
+    return this.buildMinContractEndDate(
+      this.employeeForm.get('workStartDate')?.value,
+    );
+  }
+
+  onWorkStartDateChange(): void {
+    setTimeout(() => {
+      this.syncContractEndDateMin(this.employeeForm.get('workStartDate')?.value);
+      this.contractEndPickerKey++;
+      this.employeeForm.get('contractEndDate')?.updateValueAndValidity();
+      this._cdr.detectChanges();
+    });
+  }
+
+  onContractEndDateChange(): void {
+    setTimeout(() => {
+      this.enforceContractEndDate(true);
+    });
+  }
+
+  private enforceContractEndDate(showMessage: boolean): void {
+    const endControl = this.employeeForm.get('contractEndDate');
+    const startDate = this.employeeForm.get('workStartDate')?.value;
+    const endDate = endControl?.value;
+    const minEndDate = this.buildMinContractEndDate(startDate);
+
+    if (!this.isDateBefore(endDate, minEndDate)) {
+      endControl?.updateValueAndValidity({ emitEvent: false });
+      return;
+    }
+
+    endControl?.setValue(new Date(minEndDate), { emitEvent: false });
+    endControl?.updateValueAndValidity({ emitEvent: false });
+    endControl?.markAsTouched();
+    endControl?.markAsDirty();
+
+    if (showMessage) {
+      this._messageService.add({
+        severity: 'warn',
+        summary: 'تنبيه',
+        detail: 'تاريخ إنهاء العقد يجب أن يكون بعد تاريخ مباشرة العمل',
+      });
+    }
+
+    this._cdr.detectChanges();
+  }
+
+  private buildMinContractEndDate(
+    startDate: Date | string | null | undefined,
+  ): Date {
+    const base = this.normalizeDate(startDate) ?? this.normalizeDate(new Date())!;
+    return new Date(base.getFullYear(), base.getMonth(), base.getDate() + 1);
+  }
+
+  private normalizeDate(
+    value: Date | string | null | undefined,
+  ): Date | null {
+    if (!value) {
+      return null;
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  private toDateKey(value: Date | string | null | undefined): string | null {
+    const date = this.normalizeDate(value);
+    if (!date) {
+      return null;
+    }
+
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${date.getFullYear()}-${month}-${day}`;
+  }
+
+  private isDateBefore(
+    value: Date | string | null | undefined,
+    minValue: Date | string | null | undefined,
+  ): boolean {
+    const valueKey = this.toDateKey(value);
+    const minKey = this.toDateKey(minValue);
+    return !!valueKey && !!minKey && valueKey < minKey;
+  }
+
+  private syncContractEndDateMin(
+    startDate: Date | string | null | undefined,
+  ): void {
+    const endControl = this.employeeForm.get('contractEndDate');
+    const minEndDate = this.buildMinContractEndDate(startDate);
+
+    if (this.isDateBefore(endControl?.value, minEndDate)) {
+      endControl?.setValue(new Date(minEndDate), { emitEvent: false });
+      endControl?.setErrors({ minContractEndDate: true });
+      endControl?.markAsTouched();
+    }
+  }
+
+  private validateContractEndDate(
+    control: AbstractControl,
+  ): ValidationErrors | null {
+    const minEndDate = this.buildMinContractEndDate(
+      this.employeeForm.get('workStartDate')?.value,
+    );
+
+    return this.isDateBefore(control.value, minEndDate)
+      ? { minContractEndDate: true }
+      : null;
   }
 
 
@@ -277,11 +423,11 @@ searchEmployee(val: any) {
 
 
   if(!val){
-    this._messageService.add({
-      severity: 'error',
-      summary: 'خطأ',
-      detail: 'يجب أن يكون هذا الحقل فارغ'
-    });
+    // this._messageService.add({
+    //   severity: 'error',
+    //   summary: 'خطأ',
+    //   detail: 'يجب أن يكون هذا الحقل فارغ'
+    // });
      return;
   } 
 
@@ -328,6 +474,10 @@ fillForm(data: any) {
     contractEndAttachmentFile: data.contractEndAttachmentUrl ? data.contractEndAttachmentUrl : null
   });
 
+  this.syncContractEndDateMin(this.employeeForm.get('workStartDate')?.value);
+  this.contractEndPickerKey++;
+  this.employeeForm.get('contractEndDate')?.updateValueAndValidity();
+
 
   if (data.imageUrl) {
     this.imagePreviewProfile = environment.baseUrl+'/' + data.imageUrl;
@@ -367,9 +517,20 @@ formatDate(date: Date | string): string {
 }
 
   save() {
+    this.enforceContractEndDate(false);
+    this.employeeForm.get('contractEndDate')?.updateValueAndValidity();
 
     if(this.employeeForm.invalid){
       this.employeeForm.markAllAsTouched();
+
+      if (this.employeeForm.get('contractEndDate')?.hasError('minContractEndDate')) {
+        this._messageService.add({
+          severity: 'warn',
+          summary: 'تنبيه',
+          detail: 'تاريخ إنهاء العقد يجب أن يكون بعد تاريخ مباشرة العمل',
+        });
+      }
+
       return;
     }
       const formData = new FormData();
@@ -524,6 +685,8 @@ formatDate(date: Date | string): string {
       new Date().setFullYear(new Date().getFullYear() + 1)
     ),
   });
+
+  this.syncContractEndDateMin(this.employeeForm.get('workStartDate')?.value);
 
   this.profileImageSelected = null;
   this.imagePreviewProfile = null;

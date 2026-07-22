@@ -123,7 +123,7 @@
 </td>
 
       <td class="p-2 h-[56px] w-full flex items-center justify-center gap-2">
-              <div class="printer" (click)="showDialog()">
+              <div class="printer" (click)="showDialog($index)">
                 <svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="33" height="25" rx="2" style="fill:#DADEE1; stroke:none;" fill="#DADEE1"/>
 <path style="fill:white; stroke:none;" d="M22.9634 6.04566C22.9634 6.04566 22.9705 6.43312 22.9705 7.06495C22.9967 10.0612 22.8884 18.6143 20.9249 18.6143C18.547 18.6143 20.5849 15.8972 18.887 15.8972H13.8047C14.5591 12.126 14.484 6.04566 14.484 6.04566C14.484 6.04566 14.5045 5.02637 15.1838 5.02637H23.6555C22.9769 5.02637 22.9634 6.04566 22.9634 6.04566Z" fill="white"/>
@@ -198,25 +198,25 @@
                   
                   ">
     <div class="col-span-6">
-        <label for="employee" >الكميه المتاحه : </label>
-        <input type="text" id="employee" placeholder="الكميه المتاحه" style="padding-right: 105px; background:var(--color-bg);">
+        <label for="availableQuantity">الكميه المتاحه : </label>
+        <input type="text" id="availableQuantity" readonly [value]="selectedPopupLine?.availableQuantity ?? ''" placeholder="الكميه المتاحه" style="padding-right: 105px; background:var(--color-bg);">
     </div>
     <div class="col-span-6">
-        <label for="employee" >الحد الاقبصي للسحب : </label>
-        <input type="text" id="employee" placeholder="الحد الاقبصي للسحب" style="padding-right: 140px; background:var(--color-bg);">
+        <label for="suggestedTransferQuantity">الحد الاقصي للسحب : </label>
+        <input type="text" id="suggestedTransferQuantity" readonly [value]="selectedPopupLine?.suggestedTransferQuantity ?? ''" placeholder="الحد الاقبصي للسحب" style="padding-right: 140px; background:var(--color-bg);">
     </div>
     <div class="col-span-6">
-        <label for="employee" >الكميه المحتجزه للمبيعات  : </label>
-        <input type="text" id="employee" placeholder="الكميه  " style="padding-right: 165px; background:var(--color-bg);">
+        <label for="reservedForSalesQuantity">الكميه المحتجزه للمبيعات  : </label>
+        <input type="text" id="reservedForSalesQuantity" readonly [value]="selectedPopupLine?.reservedForSalesQuantity ?? ''" placeholder="الكميه  " style="padding-right: 165px; background:var(--color-bg);">
     </div>
     <div class="col-span-6">
-        <label for="employee" >الكميه المحتجزه للتحويلات   : </label>
-        <input type="text" id="employee" placeholder="الكميه  " style="padding-right: 165px; background:var(--color-bg);">
+        <label for="reservedForTransfersQuantity">الكميه المحتجزه للتحويلات   : </label>
+        <input type="text" id="reservedForTransfersQuantity" readonly [value]="selectedPopupLine?.reservedForTransfersQuantity ?? ''" placeholder="الكميه  " style="padding-right: 165px; background:var(--color-bg);">
     </div>
-    <div class="col-span-12">
-        <label for="employee" >الكميه المحتجزه سابقا للمخزن    : </label>
-        <input type="text" id="employee" placeholder="الكميه  " style="padding-right: 190px; background:var(--color-bg);">
-    </div>
+    <!-- <div class="col-span-12">
+        <label for="previousReservedQuantity">الكميه المحتجزه سابقا للمخزن    : </label>
+        <input type="text" id="previousReservedQuantity" placeholder="الكميه  " style="padding-right: 190px; background:var(--color-bg);">
+    </div> -->
 
  
    

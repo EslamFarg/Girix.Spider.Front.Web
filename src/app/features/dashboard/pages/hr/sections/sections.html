@@ -9,7 +9,7 @@
         <app-form-error [control]="sectionForm.controls['nameAr']" [errorKey]="'required'" [message]="'اسم القسم مطلوب'"></app-form-error>
         <app-form-error [control]="sectionForm.controls['nameAr']" [errorKey]="'minlength'" [message]="'اسم القسم يجب ان يتكون من حرفين او اكثر'"></app-form-error>
         <app-form-error [control]="sectionForm.controls['nameAr']" [errorKey]="'maxlength'" [message]="'اسم القسم يجب ان يكون اقل من 100 حرف'"></app-form-error>
-        <app-form-error [control]="sectionForm.controls['nameAr']" [errorKey]="'invalidEntityName'" [message]="'اسم القسم يجب ان يحتوي على حروف وارقام و _ و - فقط'"></app-form-error>
+        <app-form-error [control]="sectionForm.controls['nameAr']" [errorKey]="'invalidEntityName'" [message]="'اسم القسم يجب ان يحتوي على حروف وارقام و _ و - فقط وأن لايبدء برقم'"></app-form-error>
     </div>
 
     <div class="col-span-12 flex justify-end gap-5 mt-[15px]">
@@ -28,6 +28,9 @@
       <td class="text-right" colspan="3">   <div class="search_input relative md:w-[30%]">
         <!-- <input type="text" class="text-[14px] w-[100%]"  placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/> -->
         <p-autocomplete
+        [(ngModel)]="searchValue"
+        #autoComplete
+          (onFocus)="onFocusSearch($event)"
         (onClear)="clearSearch()"
         (onSelect)="onSelect($event)"
         class='autocomplete_full_width' [inputId]="'searchByCodeProduct'"  [suggestions]="items" (completeMethod)="search($event)" [placeholder]="selectedSearch"/>

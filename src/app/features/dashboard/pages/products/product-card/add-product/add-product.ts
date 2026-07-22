@@ -23,10 +23,11 @@ import { OnlyStringDirective } from '../../../../../../shared/directives/only-st
 import { onlyNumberDirective } from '../../../../../../shared/directives/only-number';
 import { SharedStateServices } from '../../../../../../shared/services/shared-state-services';
 import { SharedConfirmDialog } from "../../../../../../shared/ui/shared-confirm-dialog/shared-confirm-dialog";
+import { DecimalNumberDirective } from "../../../../../../shared/directives/only-number-decimal";
 
 @Component({
   selector: 'app-add-product',
-  imports: [PageHeader, ReactiveFormsModule, AutoCompleteModule, NgClass, FormError, NgSelectComponent, Dialog, OnlyStringDirective, onlyNumberDirective, SharedConfirmDialog],
+  imports: [PageHeader, ReactiveFormsModule, AutoCompleteModule, NgClass, FormError, NgSelectComponent, Dialog, OnlyStringDirective, onlyNumberDirective, SharedConfirmDialog, DecimalNumberDirective],
   templateUrl: './add-product.html',
   styleUrl: './add-product.scss',
 })
@@ -116,7 +117,7 @@ export class AddProduct extends FormComponentBase{
       unitOfMeasureId: [null, [Validators.required]],
       isBaseUnit: [true, [Validators.required]],
       smallerUnitId: [null] as any,
-      conversionFactor: [null, [Validators.required]] as any,
+      conversionFactor: [null, [Validators.required,Validators.min(1)]] as any,
       purchasePrice: [null, [Validators.required]],
       retailPrice: [null, [Validators.required]],
       wholesalePrice: [null],
@@ -195,6 +196,20 @@ export class AddProduct extends FormComponentBase{
     this.changeNameArValidation();
     this.changeVatValue();
     this.checkBarcodeValidation();
+
+    this.productForm.get('selectiveVat')?.valueChanges
+  .pipe(takeUntilDestroyed(this._destroyRef))
+  .subscribe((value: any) => {
+
+    if (value === 0) {
+      this.productForm.get('vat')?.setValue(0, { emitEvent: false });
+      this.productForm.get('vat')?.disable({ emitEvent: false });
+    }else{
+      this.productForm.get('vat')?.setValue(null, { emitEvent: false });
+      this.productForm.get('vat')?.enable({ emitEvent: false });
+    }
+
+  });
   }
 
 
@@ -229,6 +244,8 @@ export class AddProduct extends FormComponentBase{
         this.productForm.get('selectiveVat')?.enable();
       }
     });
+
+  //   
   }
 
 
@@ -625,6 +642,19 @@ if (isBarcodeExists) {
 
   showSearchBox: boolean = false;
   selectedSearch = 'كود الصنف';
+
+
+  generateRandomCode(length: number): void {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let code = '';
+  
+    for (let i = 0; i < length; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+  
+   this.productForm.get('code')?.setValue(code);
+ 
+  }
 
   @HostListener('document:click', ['$event'])
   onClick(event: any) {

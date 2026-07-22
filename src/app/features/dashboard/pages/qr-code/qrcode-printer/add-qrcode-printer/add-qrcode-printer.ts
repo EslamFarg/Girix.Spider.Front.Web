@@ -203,6 +203,7 @@ onSelectProductByName(event: { value: { label: string; value: number } | number 
   const productId = typeof event.value === 'object' ? event.value?.value : event.value;
   const productName = typeof event.value === 'object' ? event.value?.label : '';
 
+  console.log(event);
   if (!productId) {
     return;
   }
@@ -212,6 +213,8 @@ onSelectProductByName(event: { value: { label: string; value: number } | number 
     .pipe(takeUntilDestroyed(this.destroyRef))
     .subscribe((res: any) => {
       const productCart = res?.data ?? [];
+
+      console.log(productCart);
 
       if (productCart.length === 0) {
         this._messageService.add({
@@ -262,16 +265,26 @@ searchByCodeOrBarcode(value: string): void {
     });
 }
 
-loadProductData(productName: string, productCart: any[]): void {
+loadProductData(productName: string, productCart: any): void {
   this.formQrCode.patchValue({ productName });
   this.isCreatingQrCode = false;
 
-  this.units = productCart.map((item: any) => ({
-    name: item.fromUnitName || item.name || '',
-    id: item.id,
-    bareCode1: item.bareCode1 ?? '',
-    bareCode2: item.bareCode2 ?? '',
-  }));
+  // this.units = productCart.map((item: any) => ({
+  //   name: item.fromUnitName || item.name || '',
+  //   id: item.id,
+  //   bareCode1: item.bareCode1 ?? '',
+  //   bareCode2: item.bareCode2 ?? '',
+  // }));
+  const units = Array.isArray(productCart)
+  ? productCart
+  : productCart?.productCart ?? [];
+
+this.units = units.map((item: any) => ({
+  name: item.fromUnitName || item.name || '',
+  id: item.id,
+  bareCode1: item.bareCode1 ?? '',
+  bareCode2: item.bareCode2 ?? '',
+}));
 }
 
 

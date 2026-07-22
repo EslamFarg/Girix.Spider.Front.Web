@@ -7,14 +7,14 @@
 
 
         <div class="search_input relative w-[100%] ">
-           <p-autocomplete styleClass="w-full"  [inputId]="'searchByCodeProduct'" [suggestions]="items" (completeMethod)="search($event)" [placeholder]="selectedSearch"/>
+           <p-autocomplete #autoComplete styleClass="w-full" [inputId]="'searchByCodeProduct'" [suggestions]="items" optionLabel="label" [minLength]="selectedSearchType === 'number' ? 999 : 1" (completeMethod)="search($event)" (onSelect)="onSelectAccount($event)" (keydown.enter)="onSearchEnter($event)" [placeholder]="selectedSearch"/>
         
                     <div class="search_box absolute top-[40px] left-0 z-[20]
                     shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]
                     bg-[var(--color-white)] w-[200px]  min-h-[32px] rounded-[4px]
                     p-2
                     [&>*]:p-2
-                    [&>*]:hover:bg-[var(--color-primary)]
+                    [&>*]:hover:bg-[#137AA8]
                     [&>*]:hover:text-[var(--color-white)]
                     [&>*]:not-last:mb-3
                     [&>*]:text-[14px]
@@ -27,8 +27,8 @@
                     [ngClass]="{'translate-y-[-20px] opacity-0 invisible':!this.showSearchBox,'opacity-100 visible':this.showSearchBox}"
                     
                     >
-                      <p (click)="selectFilterSearch('number')">رقم الحساب</p>
-                      <p (click)="selectFilterSearch('name')">اسم الحساب</p>
+                      <p (click)="selectFilterSearch('number')" [ngClass]="{ 'bg-btn text-white': selectedSearchType === 'number' }">رقم الحساب</p>
+                      <p (click)="selectFilterSearch('name')" [ngClass]="{ 'bg-btn text-white': selectedSearchType === 'name' }">اسم الحساب</p>
                     </div>
         <!-- <input type="text" class="text-[14px] w-[100%]"  placeholder="بحث" style="color:var(--color-black); font-weight:600; width:100%"/> -->
         <div class="search_btns flex items-center gap-[10px] absolute left-[10px] top-[7px]" >
@@ -59,7 +59,7 @@
           </svg>
          </button>
 
-          <button>
+          <button (click)="onSearchButtonClick()">
             <svg
               width="20"
               height="20"
@@ -111,8 +111,20 @@
     </div>
                  <div class="col-span-12 md:col-span-6 ">
         <label for="document" (click)="nameAccountParent.focus()">اسم حساب الأب</label>
-        <ng-select [items]="parentsList" #nameAccountParent [bindLabel]="'name'"  (clear)="onClearParent()"
-  [clearable]="true" (change)="onSelectParent($event)" [bindValue]="'id'" formControlName="parentId" [placeholder]="'اسم حساب الأب'"></ng-select>
+        <ng-select
+          [items]="parentsList"
+          #nameAccountParent
+          [bindLabel]="'name'"
+          [bindValue]="'id'"
+          formControlName="parentId"
+          [placeholder]="'اسم حساب الأب'"
+          [clearable]="true"
+          [loading]="parentsLoading"
+          [appendTo]="'body'"
+          (clear)="onClearParent()"
+          (change)="onSelectParent($event)"
+          (scrollToEnd)="loadMoreParents()"
+        ></ng-select>
     <app-form-error [control]="accountsForm.controls['parentId']" [errorKey]="'required'" [message]="'اسم حساب الأب مطلوب'"></app-form-error>
     </div>
              </div>

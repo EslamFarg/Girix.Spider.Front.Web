@@ -39,18 +39,6 @@
         }
       }
     },
-    "/api/Actions/SyncActions": {
-      "post": {
-        "tags": [
-          "Actions"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Allowance/Create": {
       "post": {
         "tags": [
@@ -3844,6 +3832,184 @@
         }
       }
     },
+    "/api/DirectTransfers": {
+      "post": {
+        "tags": [
+          "DirectTransfers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDirectTransferDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDirectTransferDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDirectTransferDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DirectTransfers/{id}": {
+      "get": {
+        "tags": [
+          "DirectTransfers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "DirectTransfers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDirectTransferDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDirectTransferDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDirectTransferDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "DirectTransfers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DirectTransfers/list": {
+      "post": {
+        "tags": [
+          "DirectTransfers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPaginationInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPaginationInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPaginationInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DirectTransfers/search": {
+      "post": {
+        "tags": [
+          "DirectTransfers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchDirectTransfersQuery"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchDirectTransfersQuery"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchDirectTransfersQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Employee": {
       "post": {
         "tags": [
@@ -3861,11 +4027,10 @@
                   "BaseNember": {
                     "type": "string"
                   },
-                  "AllowancesIds": {
+                  "Allowances": {
                     "type": "array",
                     "items": {
-                      "type": "integer",
-                      "format": "int32"
+                      "$ref": "#/components/schemas/EmployeeAllowanceItemDto"
                     }
                   },
                   "Salary": {
@@ -3963,7 +4128,7 @@
                 "BaseNember": {
                   "style": "form"
                 },
-                "AllowancesIds": {
+                "Allowances": {
                   "style": "form"
                 },
                 "Salary": {
@@ -4068,11 +4233,10 @@
                   "BaseNember": {
                     "type": "string"
                   },
-                  "AllowancesIds": {
+                  "Allowances": {
                     "type": "array",
                     "items": {
-                      "type": "integer",
-                      "format": "int32"
+                      "$ref": "#/components/schemas/EmployeeAllowanceItemDto"
                     }
                   },
                   "Salary": {
@@ -4173,7 +4337,7 @@
                 "BaseNember": {
                   "style": "form"
                 },
-                "AllowancesIds": {
+                "Allowances": {
                   "style": "form"
                 },
                 "Salary": {
@@ -7601,37 +7765,6 @@
         }
       }
     },
-    "/api/PageAction/Manage": {
-      "post": {
-        "tags": [
-          "PageAction"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PageActionWriteDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PageActionWriteDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/PageActionWriteDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/PayrollAdjustment/Create": {
       "post": {
         "tags": [
@@ -7962,6 +8095,30 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Permissions/pages/{pageId}/actions": {
+      "get": {
+        "tags": [
+          "Permissions"
+        ],
+        "parameters": [
+          {
+            "name": "pageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -12054,116 +12211,11 @@
         }
       }
     },
-    "/api/SystemPage/Create": {
-      "post": {
+    "/api/SystemPage/GetAllWithActions": {
+      "get": {
         "tags": [
           "SystemPage"
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PageDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PageDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/PageDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/SystemPage/Update": {
-      "put": {
-        "tags": [
-          "SystemPage"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PageDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PageDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/PageDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/SystemPage/Delete/{id}": {
-      "delete": {
-        "tags": [
-          "SystemPage"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "minimum": 1,
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/SystemPage/Manage": {
-      "post": {
-        "tags": [
-          "SystemPage"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SystemPageManageDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SystemPageManageDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SystemPageManageDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK"
@@ -12813,59 +12865,6 @@
             }
           }
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/UserGroup/GetByGroupId": {
-      "get": {
-        "tags": [
-          "UserGroup"
-        ],
-        "parameters": [
-          {
-            "name": "groupId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/UserGroup/Manage": {
-      "post": {
-        "tags": [
-          "UserGroup"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserGroupWriteDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserGroupWriteDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserGroupWriteDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK"
@@ -13838,10 +13837,6 @@
           "nameEn": {
             "type": "string",
             "nullable": true
-          },
-          "amount": {
-            "type": "number",
-            "format": "double"
           }
         },
         "additionalProperties": false
@@ -14308,6 +14303,57 @@
           "nameEn": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateDirectTransferDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "reference": {
+            "type": "string",
+            "nullable": true
+          },
+          "fromWarehouseId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "toWarehouseId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateDirectTransferLineDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateDirectTransferLineDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "productCardId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantity": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
@@ -15999,6 +16045,20 @@
         "type": "integer",
         "format": "int32"
       },
+      "EmployeeAllowanceItemDto": {
+        "type": "object",
+        "properties": {
+          "allowanceId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "value": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
       "EmployeeRole": {
         "enum": [
           1,
@@ -16618,46 +16678,6 @@
         ],
         "type": "integer",
         "format": "int32"
-      },
-      "PageActionWriteDto": {
-        "type": "object",
-        "properties": {
-          "pageId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "actionIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "PageDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "code": {
-            "type": "string",
-            "nullable": true
-          },
-          "controller": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
       },
       "PagePermissionDto": {
         "type": "object",
@@ -17649,6 +17669,19 @@
         },
         "additionalProperties": false
       },
+      "SearchDirectTransfersQuery": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/RequestPaginationInfo"
+          }
+        },
+        "additionalProperties": false
+      },
       "SearchFilterHelper": {
         "type": "object",
         "properties": {
@@ -17839,19 +17872,6 @@
         },
         "additionalProperties": false
       },
-      "SystemPageManageDto": {
-        "type": "object",
-        "properties": {
-          "pages": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PageDto"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "TransferRequestViewType": {
         "enum": [
           1,
@@ -17871,10 +17891,6 @@
           "nameEn": {
             "type": "string",
             "nullable": true
-          },
-          "amount": {
-            "type": "number",
-            "format": "double"
           },
           "id": {
             "type": "integer",
@@ -18314,6 +18330,39 @@
           },
           "nameEn": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateDirectTransferDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reference": {
+            "type": "string",
+            "nullable": true
+          },
+          "fromWarehouseId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "toWarehouseId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateDirectTransferLineDto"
+            },
             "nullable": true
           }
         },
@@ -20124,23 +20173,6 @@
           },
           "printType": {
             "$ref": "#/components/schemas/PrintType"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserGroupWriteDto": {
-        "type": "object",
-        "properties": {
-          "groupId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "userIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false

@@ -1,10 +1,10 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AutoCompleteCompleteEvent, AutoComplete } from 'primeng/autocomplete';
 import { SearchableColumnEnum } from '../../../../../shared/Enums/enumSearch';
 import { buildSearchPayload } from '../../../../../shared/config/search-config';
 import { BUTTON_CONFIG } from '../../../../../shared/config/button-cofig';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { entityNameValidator } from '../../../../../shared/validations/entity-name-validator';
 import { CustodyService } from './services/custody-service';
 import { MessageService } from 'primeng/api';
@@ -15,7 +15,7 @@ import { SharedConfirmDialog } from "../../../../../shared/ui/shared-confirm-dia
 
 @Component({
   selector: 'app-custody',
-  imports: [AutoComplete, NgClass, FormError, ReactiveFormsModule, Paginator, SharedConfirmDialog],
+  imports: [AutoComplete, NgClass, FormError, ReactiveFormsModule, Paginator, SharedConfirmDialog,FormsModule],
   templateUrl: './custody.html',
   styleUrl: './custody.scss',
 })
@@ -31,6 +31,7 @@ private _destroyRef = inject(DestroyRef);
 
 
 // !!!!!!!!!!!!!!!!!! Properties
+@ViewChild('autoComplete') autoComplete!: AutoComplete;
 
 custodyForm=this._fb.group({
   nameAr: ['',[Validators.required,Validators.minLength(2),Validators.maxLength(100),entityNameValidator()]],
@@ -47,7 +48,7 @@ sectionsList:any | null=null;
 isEditMode:boolean=false
 buttonConfig=BUTTON_CONFIG;
 unitId:number=0
-
+searchValue:string='';
 pageIndex=0;
 pageSize=10
 totalRecords = 0;
@@ -121,6 +122,7 @@ onSelect(event: any) {
   }
 };
 
+this.searchValue = '';
       this.totalRecords = 1 ;
     }
   })

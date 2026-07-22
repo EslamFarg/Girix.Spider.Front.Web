@@ -32,6 +32,7 @@ private lastEmployeesLoadKey = '';
     action: '/expenses/simple-payment-voucher/add'
   }
 
+  totalRecords: number = 0;
 
   searchForm:any=this._fb.group({
     departmentId: [null,[Validators.required]],
@@ -214,6 +215,7 @@ private lastEmployeesLoadKey = '';
             checked: true,
           }));
           this.checked = true;
+          console.log(res);
           this.selectedEmployees = [...this.exchangeSalariesList];
         },
       });

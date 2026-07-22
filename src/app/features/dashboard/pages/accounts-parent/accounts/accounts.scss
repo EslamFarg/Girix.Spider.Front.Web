@@ -5,3 +5,38 @@
 :host ::ng-deep .p-inputtext {
   width: 100%;
 }
+
+.search_box p.bg-btn {
+  background-color: var(--color-btn);
+  color: #fff;
+}
+.search_input{
+  width: 100% !important;
+}
+
+:host ::ng-deep .p-autocomplete {
+  position: relative;
+}
+
+:host ::ng-deep .p-autocomplete .p-autocomplete-loader {
+  position: absolute;
+  left:80px !important;   /* أو right حسب المكان اللي عايزه */
+  right: auto !important;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: none;
+  box-shadow: none;
+  // padding: 5px;
+  // border-radius: 5px;
+  // box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+
+.container_tree{
+  overflow-x:auto ;
+  &::-webkit-scrollbar{
+    display: none;
+  }
+
+}

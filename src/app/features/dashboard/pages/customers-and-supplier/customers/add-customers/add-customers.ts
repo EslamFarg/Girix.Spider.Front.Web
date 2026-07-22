@@ -26,6 +26,9 @@ import { FormComponentBase } from '../../../../../../shared/base/form-component-
 import { SharedConfirmDialog } from "../../../../../../shared/ui/shared-confirm-dialog/shared-confirm-dialog";
 import { PdfPrinterComponent } from "../../../../../../shared/components/pdf-printer/pdf-printer";
 import { SharedStateServices } from '../../../../../../shared/services/shared-state-services';
+import { creditWarningLimitValidator } from '../../../../../../shared/validations/credit-limit.validator';
+import { DecimalNumberDirective } from '../../../../../../shared/directives/only-number-decimal';
+
 @Component({
   selector: 'app-add-customers',
   imports: [
@@ -42,7 +45,8 @@ import { SharedStateServices } from '../../../../../../shared/services/shared-st
     OnlyStringDirective,
     onlyNumberDirective,
     SharedConfirmDialog,
-    PdfPrinterComponent
+    PdfPrinterComponent,
+    DecimalNumberDirective
 ],
   templateUrl: './add-customers.html',
   styleUrl: './add-customers.scss',
@@ -97,7 +101,7 @@ export class AddCustomers extends FormComponentBase{
 
     phoneCountryCode: ['+966', [Validators.required]],
 
-    email: ['', [Validators.required, EmailValidation]],
+    email: ['', [EmailValidation]],
 
     creditWarningLimit: [
       null,
@@ -105,6 +109,9 @@ export class AddCustomers extends FormComponentBase{
         // Validators.min(0),
         Validators.required,
         Validators.maxLength(12),
+        creditWarningLimitValidator()
+
+        // creditLimitValidator()
       ],
     ],
 
@@ -114,6 +121,7 @@ export class AddCustomers extends FormComponentBase{
         // Validators.min(0),
         Validators.required,
         Validators.maxLength(12),
+        //  creditLimitValidator(),
       ],
     ],
 
@@ -236,6 +244,16 @@ export class AddCustomers extends FormComponentBase{
       this.updateSimpleAddressValidation(type);
       this.updateValidation(type === this.Individual);
     });
+
+    this.customerForm
+  .get('creditLimit')
+  ?.valueChanges
+  .pipe(takeUntilDestroyed(this._destroyRef))
+  .subscribe(() => {
+    this.customerForm
+      .get('creditWarningLimit')
+      ?.updateValueAndValidity();
+  });
   }
 
   updateValidation(isIndividual: boolean) {

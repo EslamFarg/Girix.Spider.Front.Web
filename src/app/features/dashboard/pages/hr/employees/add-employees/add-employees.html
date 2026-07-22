@@ -1,4 +1,4 @@
-<div class="flex justify-between flex-wrap mb-[25px] sticky top-[60px] pt-[10px] mt-[10px] bg-[var(--color-bg)] z-1">
+<div class="flex justify-between z-[20] flex-wrap mb-[25px] sticky top-[60px] pt-[10px] mt-[10px] bg-[var(--color-bg)] z-1">
     <div>
         
         <h2 class="text-[var(--color-primary)] text-[20px] font-[700]">الموظفين</h2>
@@ -53,7 +53,7 @@
      
  
 
-          <button>
+          <button (click)="searchEmployee(inputSearch.value)">
             <svg
               width="20"
               height="20"
@@ -133,7 +133,19 @@
         <div class="col-span-4">
             <label for="badal" >البدلات</label>
             <!-- <input type="text" id="badal" placeholder="البدلات"> -->
-             <ng-select [items]="AllowancesList" [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'أختر'" multiple formControlName="allowancesIds"></ng-select>
+             <ng-select [items]="AllowancesList" [bindLabel]="'name'" [bindValue]="'id'" [placeholder]="'أختر'" multiple formControlName="allowancesIds">
+
+              <!-- <ng-template ng-multi-label-tmp let-items="items">
+                <span>
+                    {{ items[0]?.name }}
+                    @if(items.length > 1){
+                        +{{ items.length - 1 }}
+                    }
+                </span>
+            </ng-template> -->
+             </ng-select>
+
+             
              <app-form-error [control]="employeeForm.controls['allowancesIds']" [errorKey]="'required'" [message]="'البدلات مطلوبة'"></app-form-error>
         </div>
         <div class="col-span-4">
@@ -156,9 +168,10 @@
             <input type="text" name="arabicName" id="arabicName" placeholder="الأسم" formControlName="nameAr" maxlength="200">
             <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'required'" [message]="'الأسم  مطلوب'"></app-form-error>
             <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'minlength'" [message]="'الأسم  يجب ان يكون  2 حرف علي الأقل'"></app-form-error>
-            <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'maxlength'" [message]="'اسم المشروع يجب ان يكون اقل من 200 حرف'"></app-form-error>
-            <!-- <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'pattern'" [message]="'اسم المشروع يجب ان يكون حروف فقط'"></app-form-error> -->
-              <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'invalidEntityName'" [message]="'اسم المشروع يجب ان يحتوي على حروف وارقام و _ و - فقط'"></app-form-error>
+            <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'maxlength'" [message]="'اسم الموظف يجب ان يكون اقل من 200 حرف'"></app-form-error>
+            <!-- <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'pattern'" [message]="'اسم الموظف يجب ان يكون حروف فقط'"></app-form-error> -->
+              <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'invalidEntityName'" [message]="'اسم الموظف يجب ان يحتوي على حروف وارقام و _ و - فقط'"></app-form-error>
+              <app-form-error [control]="employeeForm.controls['nameAr']" [errorKey]="'arabicOnly'" [message]="'اسم الموظف يجب ان يكون حروف عربية فقط'"></app-form-error>
         </div>
         <div class="col-span-4">
              <label for="englishName" >english name</label>
@@ -169,6 +182,7 @@
             <app-form-error [control]="employeeForm.controls['nameEn']" [errorKey]="'maxlength'" [message]="'اسم المشروع يجب ان يكون اقل من 200 حرف'"></app-form-error>
             <!-- <app-form-error [control]="employeeForm.controls['nameEn']" [errorKey]="'pattern'" [message]="'اسم المشروع يجب ان يكون حروف فقط'"></app-form-error> -->
               <app-form-error [control]="employeeForm.controls['nameEn']" [errorKey]="'invalidEntityName'" [message]="'اسم المشروع يجب ان يحتوي على حروف وارقام و _ و - فقط'"></app-form-error>
+              <app-form-error [control]="employeeForm.controls['nameEn']" [errorKey]="'englishOnly'" [message]="'اسم الموظف يجب ان يكون حروف انجليزية فقط'"></app-form-error>
         </div>
             <div class="col-span-4">
              <label for="phoneNumber" >رقم الجوال</label>
@@ -270,11 +284,17 @@
         formControlName="nationality"         
         >
         <app-form-error [control]="employeeForm.controls['nationality']" [errorKey]="'required'" [message]="'الجنسية مطلوب'"></app-form-error>
+        <app-form-error [control]="employeeForm.controls['nationality']" [errorKey]="'minlength'" [message]="'الجنسية يجب ان يكون على الاقل 3 حروف'"></app-form-error>
+        <app-form-error [control]="employeeForm.controls['nationality']" [errorKey]="'maxlength'" [message]="'الجنسية يجب ان يكون على الاقل 50 حرف'"></app-form-error>
+        <app-form-error [control]="employeeForm.controls['nationality']" [errorKey]="'invalidEntityName'" [message]="'الجنسية يجب ان يحتوي على حروف وارقام و _ و - فقط وأن لايبدء برقم'"></app-form-error>
     </div>
     <div class="col-span-12 md:col-span-4">
         <label for="work" >المهنه</label>
         <input type="text" id="work" placeholder="المهنه" formControlName="jobTitle">
         <app-form-error [control]="employeeForm.controls['jobTitle']" [errorKey]="'required'" [message]="'المهنه مطلوب'"></app-form-error>
+        <app-form-error [control]="employeeForm.controls['jobTitle']" [errorKey]="'minlength'" [message]="'المهنه يجب ان يكون على الاقل 3 حروف'"></app-form-error>
+        <app-form-error [control]="employeeForm.controls['jobTitle']" [errorKey]="'maxlength'" [message]="'المهنه يجب ان يكون على الاقل 50 حرف'"></app-form-error>
+        <app-form-error [control]="employeeForm.controls['jobTitle']" [errorKey]="'invalidEntityName'" [message]="'المهنه يجب ان يحتوي على حروف وارقام و _ و - فقط وأن لايبدء برقم'"></app-form-error>
     </div>
 
       <div class="col-span-12 md:col-span-4">
@@ -287,10 +307,32 @@
 
       <div class="col-span-12 md:col-span-4">
             <label for="live" >تاريخ مباشره العمل</label>
-            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ مباشره العمل'" [showIcon]="true" inputId="live" formControlName="workStartDate" />
+            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ مباشره العمل'" [showIcon]="true" inputId="live" formControlName="workStartDate" (onSelect)="onWorkStartDateChange()" />
             <app-form-error [control]="employeeForm.controls['workStartDate']" [errorKey]="'required'" [message]="'تاريخ مباشره العمل مطلوب'"></app-form-error>
             <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
         </div>
+
+        <div class="col-span-12 md:col-span-4">
+          <label for="endContract" >تاريخ إنهاء العقد</label>
+          @for (pickerKey of [contractEndPickerKey]; track pickerKey) {
+            <p-datepicker
+              [iconDisplay]="'input'"
+              [minDate]="contractEndMinDate"
+              [defaultDate]="contractEndMinDate"
+              [readonlyInput]="true"
+              appendTo="body"
+              [placeholder]="'تاريخ إنهاء العقد'"
+              [showIcon]="true"
+              inputId="endContract"
+              formControlName="contractEndDate"
+              (onSelect)="onContractEndDateChange()"
+            />
+          }
+          <app-form-error [control]="employeeForm.controls['contractEndDate']" [errorKey]="'required'" [message]="'تاريخ إنهاء العقد مطلوب'"></app-form-error>
+          <app-form-error [control]="employeeForm.controls['contractEndDate']" [errorKey]="'minContractEndDate'" [message]="'تاريخ إنهاء العقد يجب أن يكون بعد تاريخ مباشرة العمل'"></app-form-error>
+          <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
+      </div>
+
 
       <div class="col-span-12 md:col-span-4">
             <label for="Replay" >تاريخ العوده من الاجازه</label>
@@ -299,12 +341,7 @@
             <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
         </div>
 
-      <div class="col-span-12 md:col-span-4">
-            <label for="endContract" >تاريخ إنهاء العقد</label>
-            <p-datepicker  [iconDisplay]="'input'" [placeholder]="'تاريخ إنهاء العقد'" [showIcon]="true" inputId="endContract" formControlName="contractEndDate"/>
-            <app-form-error [control]="employeeForm.controls['contractEndDate']" [errorKey]="'required'" [message]="'تاريخ إنهاء العقد مطلوب'"></app-form-error>
-            <!-- <input type="text" id="document" placeholder="التاريخ" placeholder="0.00"> -->
-        </div>
+
 
         
             <div class="col-span-12 md:col-span-4">

@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AutoComplete, AutoCompleteCompleteEvent } from "primeng/autocomplete";
 import { onlyNumberDirective } from '../../../../../shared/directives/only-number';
@@ -30,8 +30,9 @@ _unitOfMeasure=inject(UnitOfMeasure);
 _messageServices:MessageService=inject(MessageService)
 private _destroyRef = inject(DestroyRef);
 
-
 // !!!!!!!!!!!!!!!!!! Properties
+@ViewChild('autoComplete') autoComplete!: AutoComplete;
+
 
 unitForm=this._fb.group({
   nameAr: ['',[Validators.required,Validators.minLength(2),Validators.maxLength(100)]],
@@ -60,7 +61,7 @@ totalPages = 0;
 searchPage = 1;
 searchPageSize = 10;
 idResultSearch: number =0;
-
+ignoreNextFocus = false;
 // !!!!!!!!!!!!!!! Methods
 
 ngOnInit(): void {
@@ -75,7 +76,14 @@ ngOnInit(): void {
 
 search(event: AutoCompleteCompleteEvent) {
 
-  const payload = buildSearchPayload(event.query,this.pageSize);
+
+  
+  const query = event.query?.trim();
+  if (!query) {
+ this.items = [];
+ return;
+}
+  const payload = buildSearchPayload(query,this.pageSize);
 
   this._unitOfMeasure.search(payload)
     .pipe(takeUntilDestroyed(this._destroyRef))
@@ -85,6 +93,10 @@ search(event: AutoCompleteCompleteEvent) {
           label: item.name,
           value: item.id
         }));
+
+        setTimeout(() => {
+          this.autoComplete.show();
+        });
 
       }
     });
@@ -99,6 +111,11 @@ onSelect(event: any) {
     this.getAll();
     return;
   }
+
+  this.ignoreNextFocus = true;
+setTimeout(() => {
+  this.autoComplete.hide();
+}, 0);
     this.idResultSearch = event.value?.value ?? 0;
 
   
@@ -127,6 +144,37 @@ onSelect(event: any) {
   })
 }
 
+
+
+onFocusSearch(event: any) {
+
+  if (this.ignoreNextFocus) {
+    this.ignoreNextFocus = false;
+    return;
+  }
+  const value = event.target?.value?.trim();
+  console.log(value);
+
+  const query={
+    query: value
+  }
+
+  
+  
+  if (!value) {
+    return;
+    
+  }
+  
+  // لو الاقتراحات موجودة بالفعل، متبحثش تاني
+  setTimeout(() => {
+  this.autoComplete.show();
+  }, 100);
+  if (this.items.length > 0) return;
+  this.search(query as AutoCompleteCompleteEvent);
+  
+
+}
 
 
 
